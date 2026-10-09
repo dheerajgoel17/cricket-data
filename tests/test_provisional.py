@@ -68,8 +68,8 @@ def test_update_end_to_end_with_inbox(tmp_path, make_zip, monkeypatch):
 
 def test_update_with_scraper_enabled(tmp_path, make_zip, monkeypatch):
     """Test that --enable-scraper flag works in the update command."""
+
     from cricket_data.scrapers import ScraperSource
-    from unittest.mock import Mock
     
     # Mock the ScraperSource to return a test match
     mock_match = MatchRecord(
@@ -94,7 +94,7 @@ def test_update_with_scraper_enabled(tmp_path, make_zip, monkeypatch):
     monkeypatch.setattr(ScraperSource, "fetch", mock_fetch)
     
     # Run update with scraper enabled
-    assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z), "--enable-scraper"]) == 0
+    assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z), "--enable-scraper", "--backfill-batch-size", "0"]) == 0
     
     # Check that the scraped match was added
     store = Store(tmp_path)

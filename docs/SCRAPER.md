@@ -13,7 +13,7 @@ The scraper uses a **pluggable architecture** via `ScraperRegistry`:
 
 **Built-in sources:**
 - **ESPNcricinfo**: Public JSON API (fully implemented)
-- **CREX (crex.live)**: Live scores API (best-effort, graceful failure)
+- **CREX (crex.com)**: rendered pages + public sitemaps (see BACKFILL.md)
 - **Cricbuzz**: Placeholder (awaiting API documentation)
 
 **Add your own:** Any cricket score website can be added by implementing the `CricketScraper` protocol and registering with `ScraperRegistry`. See [Data Sources](#data-sources) section below.
@@ -81,13 +81,13 @@ The scraper uses a **pluggable architecture** via `ScraperRegistry`. Any cricket
 - **Rate Limiting**: 5-second delay between requests
 - **robots.txt Compliance**: Yes (checked before every request)
 
-#### CREX (crex.live)
-- **Status**: ✅ Implemented (best-effort)
-- **Base URL**: https://crex.live
-- **Endpoints**: Auto-discovered (tries multiple patterns)
-- **Note**: Gracefully fails if site is unreachable or blocks scraping
-- **Rate Limiting**: 5-second delay between requests
-- **robots.txt Compliance**: Yes
+#### CREX (crex.com)
+- **Status**: ✅ Working (headless Chromium via Playwright; pages render with JavaScript)
+- **Base URL**: https://crex.com
+- **Recent matches**: home page links; facts come from each match page's `SportsEvent` JSON-LD
+- **Historical matches**: sitemap index + strict confirmation, see [BACKFILL.md](BACKFILL.md)
+- **Rate Limiting**: 5-second delay between requests, back-off on 429/5xx
+- **robots.txt Compliance**: Yes (`/api/*` is never touched)
 
 #### Cricbuzz
 - **Status**: ⚠️ Placeholder

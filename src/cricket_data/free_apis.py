@@ -6,11 +6,9 @@ No credit card required, just sign up for a free account.
 from __future__ import annotations
 
 import json
-import os
 from datetime import date, timedelta
-from urllib.parse import urljoin
 
-from .models import MatchRecord, PlayerPerf
+from .models import MatchRecord
 from .polite import PoliteFetcher
 from .scrapers import ScraperError
 
@@ -65,7 +63,7 @@ class CricketDataOrgScraper:
             return [mid for mid in match_ids if mid]
         
         except Exception as exc:
-            raise ScraperError(f"CricketData.org API failed: {exc}")
+            raise ScraperError(f"CricketData.org API failed: {exc}") from exc
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch match details."""
@@ -161,7 +159,7 @@ class RapidAPICricketScraper:
             return [mid for mid in match_ids if mid]
         
         except Exception as exc:
-            raise ScraperError(f"RapidAPI Cricket failed: {exc}")
+            raise ScraperError(f"RapidAPI Cricket failed: {exc}") from exc
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch match details."""

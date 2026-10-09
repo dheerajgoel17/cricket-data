@@ -44,7 +44,44 @@ def _ingest_zip(store: Store, zip_path: Path) -> dict[str, int]:
     return store.upsert(iter_zip(zip_path))
 
 
+def _run_backfill(a: argparse.Namespace, store: Store, browser) -> None:
+    """One backfill batch: top up the queue, look matches up on CREX, save what is confirmed."""
+    import json as json_mod
+
+    from .backfill import enumerate_afghanistan_matches, initialize_backfill_queue, process_backfill_batch
+    from .crex_sitemap import CREXSitemapIndex
+
+    queue_path = store.root / "state" / "backfill_queue.json"
+    queue = initialize_backfill_queue(queue_path)
+    index = CREXSitemapIndex(cache_path=Path(".cache") / "crex_index.json")
+    index.load()
+    afg = enumerate_afghanistan_matches(queue, index)
+    print(f"afghanistan: {afg['seen']} men's matches in CREX sitemap, {afg['queued']} newly queued")
+    queue.batch_size = a.backfill_batch_size
+    if a.backfill_priority:
+        n = queue.prioritize(a.backfill_priority.split(","))
+        print(f"backfill: {n} task(s) moved to the front of the queue")
+    stats = process_backfill_batch(queue, index, browser, store, verbose=True, save=lambda: queue.save(queue_path))
+    queue.save(queue_path)
+    qs = queue.stats()
+    print(f"backfill: {stats['succeeded']} saved, {stats['not_found']} not found, {stats['failed']} failed, "
+          f"{stats['already_in_cricsheet']} already in Cricsheet; queue {qs}")
+    out = store.root / "state" / "last_backfill.json"
+    out.write_text(json_mod.dumps({
+        "ran_at": datetime.now().isoformat(timespec="seconds"), "batch": {k: v for k, v in stats.items()},
+        "afghanistan_enumeration": afg, "queue": qs}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def cmd_update(a: argparse.Namespace) -> int:
+    from .crex_browser import CREXBrowser
+    browser = CREXBrowser()  # starts Chromium lazily; closed once, here
+    try:
+        return _cmd_update(a, browser)
+    finally:
+        browser.close()
+
+
+def _cmd_update(a: argparse.Namespace, browser) -> int:
     store = Store(a.data_dir)
     
     # Initialize scraper run report
@@ -65,7 +102,7 @@ def cmd_update(a: argparse.Namespace) -> int:
     
     # Add web scraper if enabled
     if a.enable_scraper:
-        scraper_source = ScraperSource()
+        scraper_source = ScraperSource(browser=browser)
         sources.append(scraper_source)
         
         # Track which scrapers were attempted
@@ -131,76 +168,16 @@ def cmd_update(a: argparse.Namespace) -> int:
     if rstats["mismatched"]:
         print("warning: provisional data disagreed with Cricsheet; see reconcile_log.csv", file=sys.stderr)
     
-    # Process backfill batch (after recent matches, low priority)
-    if a.enable_scraper and hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
-        from .backfill import BackfillQueue, process_backfill_batch, enumerate_afghanistan_matches_from_sitemap
-        from .scrapers import CREXScraper
-        from .crex_sitemap import CREXSitemapIndex
-        
-        queue_path = store.root / "state" / "backfill_queue.json"
-        
-        # Load or initialize queue
-        if not queue_path.exists():
-            from .backfill import initialize_backfill_queue
-            queue = initialize_backfill_queue(queue_path, verbose=True)
-            
-            # Enumerate Afghanistan matches on first run using sitemap
-            afg_scraper = CREXScraper()
-            sitemap_index = CREXSitemapIndex()
-            try:
-                enumerate_afghanistan_matches_from_sitemap(afg_scraper, queue, sitemap_index, verbose=True)
-                queue.save(queue_path)
-            except Exception as exc:
-                print(f"Warning: Failed to enumerate Afghanistan matches: {exc}")
-            finally:
-                # Clean up
-                try:
-                    if afg_scraper._context:
-                        afg_scraper._context.close()
-                    if afg_scraper._browser:
-                        afg_scraper._browser.close()
-                    if afg_scraper._playwright:
-                        afg_scraper._playwright.stop()
-                except:
-                    pass
-        else:
-            queue = BackfillQueue.load(queue_path)
-        
-        # Override batch size if specified
-        if hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
-            queue.batch_size = a.backfill_batch_size
-        
-        # Process one batch if there are pending tasks
-        if queue.pending or queue.in_progress:
-            # Initialize FRESH CREX scraper for backfill (avoid event loop conflicts)
-            crex_scraper = CREXScraper()
-            
-            try:
-                # Actually process the batch
-                backfill_stats = process_backfill_batch(queue, crex_scraper, store, verbose=True)
-                
-                # Show results
-                if backfill_stats["succeeded"] > 0 or backfill_stats["not_found"] > 0:
-                    print(f"  Backfill: {backfill_stats['succeeded']} scraped, {backfill_stats['not_found']} not found, {backfill_stats['failed']} failed")
-            finally:
-                # Clean up browser properly
-                try:
-                    if crex_scraper._context:
-                        crex_scraper._context.close()
-                    if crex_scraper._browser:
-                        crex_scraper._browser.close()
-                    if crex_scraper._playwright:
-                        crex_scraper._playwright.stop()
-                except:
-                    pass
-        
-        # Show queue stats
-        stats = queue.stats()
-        if stats['pending'] + stats['in_progress'] > 0:
-            print(f"backfill: {stats['pending'] + stats['in_progress']} remaining, {stats['done']} done, {stats['not_found']} not found")
-        
-        queue.save(queue_path)
-    
+    # Process a backfill batch (after recent matches, low priority); shares the one browser session
+    if a.enable_scraper and a.backfill_batch_size > 0:
+        try:
+            _run_backfill(a, store, browser)
+        except Exception as exc:  # a broken backfill must not hide the recent-match results
+            print(f"warning: backfill failed: {exc}", file=sys.stderr)
+            report.add_failure(ScraperFailure(
+                source="crex-backfill", error_type=type(exc).__name__, error_message=str(exc),
+                timestamp=datetime.now().isoformat()))
+
     # Complete and save report
     report.completed_at = datetime.now().isoformat()
     save_report(report, store.root / "scraper_run_report.json")
@@ -288,6 +265,8 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
     u.add_argument("--backfill-batch-size", type=int, default=5,
                    help="number of historical missing matches to backfill per run (default: 5, 0 to disable)")
+    u.add_argument("--backfill-priority", default="",
+                   help="comma-separated task-key prefixes (e.g. 2025-12-18-Jharkhand) to backfill first this run")
     u.set_defaults(fn=cmd_update)
 
     b = sub.add_parser("backfill", help="load full history (all_json.zip)")

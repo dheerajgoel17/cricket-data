@@ -22,7 +22,7 @@ import re
 from datetime import date, timedelta
 from pathlib import Path
 
-from .models import MatchRecord, PlayerPerf, MatchStatus
+from .models import MatchRecord, MatchStatus, PlayerPerf
 from .store import Store
 
 LOG_FIELDS = ["checked_on", "provisional_id", "canonical_id", "date", "status", "winner_ok", "players_compared", "player_mismatches", "action"]
@@ -43,7 +43,8 @@ def _dir(store: Store) -> Path:
 
 
 def write_provisional(store: Store, rec: MatchRecord) -> Path:
-    rec.status = "provisional"
+    if rec.status not in (MatchStatus.CRICSHEET_MISSING.value, MatchStatus.CRICSHEET_WITHHELD.value):
+        rec.status = MatchStatus.PROVISIONAL.value  # permanent classes keep the status they were given
     rec.match_id = rec.match_id or slug(rec)
     for pl in rec.players:
         pl.match_id, pl.date = rec.match_id, rec.date

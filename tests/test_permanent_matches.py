@@ -1,13 +1,11 @@
 """Tests for permanent match detection and classification."""
-import pytest
-from datetime import date
 
 from cricket_data.models import MatchRecord, MatchStatus
 from cricket_data.permanent_matches import (
     MissingMatch,
     MissingMatchesParser,
-    is_afghanistan_match,
     classify_match_status,
+    is_afghanistan_match,
 )
 
 

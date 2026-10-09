@@ -23,11 +23,14 @@ import re
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from typing import Any, Protocol
-from urllib.parse import urljoin, urlencode, urlparse
+from urllib.parse import urljoin
 
-from .models import MatchRecord, PlayerPerf, MatchStatus
-from .polite import PoliteFetcher, RobotsDisallowed
+from .crex_browser import BrowserError, CREXBrowser
+from .crex_lookup import parse_match_page, record_from_facts
+from .crex_sitemap import MatchEntry
+from .models import MatchRecord, PlayerPerf
 from .permanent_matches import classify_match_status, fetch_cricsheet_missing_matches
+from .polite import PoliteFetcher, RobotsDisallowed
 
 
 class ScraperError(Exception):
@@ -192,7 +195,7 @@ class ESPNcricinfoScraper:
             
             return match_ids
         except (RobotsDisallowed, Exception) as exc:
-            raise ScraperError(f"Failed to fetch recent match list: {exc}")
+            raise ScraperError(f"Failed to fetch recent match list: {exc}") from exc
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch a single match by ID."""
@@ -204,7 +207,7 @@ class ESPNcricinfoScraper:
         except RobotsDisallowed:
             raise
         except Exception as exc:
-            raise ScraperError(f"Failed to fetch match {match_id}: {exc}")
+            raise ScraperError(f"Failed to fetch match {match_id}: {exc}") from exc
     
     def _parse_match(self, match_id: str, doc: dict[str, Any]) -> MatchRecord:
         """Parse ESPNcricinfo JSON into MatchRecord."""
@@ -385,213 +388,68 @@ class CricbuzzScraper:
 
 
 class CREXScraper:
-    """Scrape CREX live cricket scores using headless browser.
-    
-    CREX (crex.live) has no robots.txt restriction and lists all cricket matches.
-    Uses Playwright to render Angular-based pages and extract match data.
+    """Scrape CREX (crex.com) with the shared headless-Chromium session.
+
+    CREX pages render with JavaScript, so ``CREXBrowser`` (Playwright, sync API) loads them. The
+    browser is shared with the backfill (``use_browser``) so Playwright is started once per
+    process. Match facts come from the page's own schema.org ``SportsEvent`` block (start date,
+    both team names, venue) and its headline (result), never from guessing at CSS classes.
     """
-    
+
     name = "crex"
-    base_url = "https://crex.live"
-    
-    def __init__(self, fetcher: PoliteFetcher | None = None):
+    base_url = "https://crex.com"
+
+    def __init__(self, fetcher: PoliteFetcher | None = None, browser: CREXBrowser | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
-        self._browser = None
-        self._context = None
-        self._playwright = None
-    
-    def _get_browser(self):
-        """Lazy browser initialization."""
-        if self._browser is None:
-            try:
-                from playwright.sync_api import sync_playwright
-                self._playwright = sync_playwright().start()
-                self._browser = self._playwright.chromium.launch(headless=True)
-                self._context = self._browser.new_context(
-                    user_agent="cricket-data/0.1 (open-source dataset updater)"
-                )
-            except ImportError:
-                raise ScraperError("Playwright not installed. Run: pip install playwright && playwright install chromium")
-            except Exception as exc:
-                raise ScraperError(f"Failed to initialize browser: {exc}")
-        return self._context
-    
-    def __del__(self):
-        """Cleanup browser on deletion."""
-        try:
-            if self._context:
-                self._context.close()
-            if self._browser:
-                self._browser.close()
-            if self._playwright:
-                self._playwright.stop()
-        except:
-            pass  # Cleanup is best-effort
-    
+        self.browser = browser
+        self._owns_browser = False
+
+    def use_browser(self, browser: CREXBrowser) -> None:
+        self.close()
+        self.browser, self._owns_browser = browser, False
+
+    def _get_browser(self) -> CREXBrowser:
+        if self.browser is None:
+            self.browser, self._owns_browser = CREXBrowser(fetcher=self.fetcher), True
+        return self.browser
+
+    def close(self) -> None:
+        """Stop the browser if this scraper started it (a shared one is closed by its owner)."""
+        if self.browser is not None and self._owns_browser:
+            self.browser.close()
+        if self._owns_browser:
+            self.browser = None
+
     def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
-        """Get match IDs by rendering CREX homepage and extracting completed matches."""
+        """Completed matches listed on the CREX home page (slugs under /cricket-live-score/)."""
         try:
-            # Check robots.txt first
-            if not self.fetcher.allowed(self.base_url):
-                return []
-            
-            context = self._get_browser()
-            page = context.new_page()
-            
-            # Navigate and wait for content
-            page.goto(self.base_url, wait_until="networkidle", timeout=30000)
-            
-            # Find all match links
-            match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
-            
-            matches_found = []
-            for link in match_links[:30]:  # Check first 30
-                href = link.get_attribute('href') or ''
-                if not href or not href.startswith('/cricket-live-score/'):
-                    continue
-                
-                # Get link text to check if completed
-                text = link.inner_text().strip()
-                
-                # Look for completed matches (has "won" in text)
-                if 'won' in text.lower():
-                    # Extract ID from URL
-                    # Format: /cricket-live-score/match-name-XXXXX
-                    match_id = href.split('/')[-1]
-                    matches_found.append(match_id)
-            
-            page.close()
-            
-            # Rate limit
-            import time
-            time.sleep(5)
-            
-            return matches_found
-            
-        except Exception as exc:
-            # Graceful failure
-            print(f"CREX fetch_recent_match_ids failed: {exc}")
-            return []
-    
+            _, links = self._get_browser().links(self.base_url, "/cricket-live-score/")
+        except (BrowserError, RobotsDisallowed) as exc:
+            raise ScraperError(f"CREX home page unavailable: {exc}") from exc
+        ids: list[str] = []
+        for link in links:
+            href = link["href"]
+            if not href.startswith("/cricket-live-score/"):
+                continue
+            if re.search(r"\b(won|tied|no result|abandoned|drawn)\b", link["text"], re.I):
+                slug = href.rstrip("/").split("/")[-1]
+                if slug not in ids:
+                    ids.append(slug)
+        return ids
+
     def fetch_match(self, match_id: str) -> MatchRecord | None:
-        """Fetch complete match data by rendering its page."""
+        """Render one match page and build its record; None if the page is not a finished match."""
+        url = f"{self.base_url}/cricket-live-score/{match_id}"
         try:
-            context = self._get_browser()
-            page = context.new_page()
-            
-            # Build URL
-            url = f"{self.base_url}/cricket-live-score/{match_id}"
-            page.goto(url, wait_until="networkidle", timeout=30000)
-            
-            # Extra time for Angular to render
-            import time
-            time.sleep(2)
-            
-            # Extract data from page
-            page_title = page.title()
-            full_text = page.inner_text('body')
-            
-            # Extract teams from page title and content
-            # Title format: "India won by 8 wickets 🏆, IND vs WI Highlights..."
-            teams = []
-            
-            # Look for "X vs Y" pattern
-            import re
-            vs_pattern = re.search(r'([A-Z]{2,})\s+vs\s+([A-Z]{2,})', page_title, re.IGNORECASE)
-            if vs_pattern:
-                teams = [vs_pattern.group(1), vs_pattern.group(2)]
-            else:
-                # Fallback: look in text for team codes
-                team_elements = page.query_selector_all('h2, h3, [class*="team"]')
-                for elem in team_elements[:5]:
-                    text = elem.inner_text().strip()
-                    if text and len(text) <= 3 and text.isupper():
-                        teams.append(text)
-            
-            if len(teams) < 2:
-                page.close()
-                return None
-            
-            # Extract result from title
-            # Format: "India won by 8 wickets 🏆"
-            winner = ""
-            result_margin = ""
-            won_pattern = re.search(r'(.+?)\s+won\s+by\s+(.+?)(?:\s*🏆|,|$)', page_title, re.IGNORECASE)
-            if won_pattern:
-                winner = won_pattern.group(1).strip()
-                result_margin = f"{winner} won by {won_pattern.group(2).strip()}"
-            
-            # Extract date - look for date pattern
-            match_date = date.today().isoformat()
-            date_pattern = re.search(r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4})', full_text)
-            if date_pattern:
-                try:
-                    from datetime import datetime
-                    parsed = datetime.strptime(date_pattern.group(1), "%d %b %Y")
-                    match_date = parsed.date().isoformat()
-                except:
-                    pass
-            
-            # Extract venue from text
-            venue = ""
-            venue_pattern = re.search(r'(?:Stadium|Ground|Arena|Park)[^,\n]{0,50}', full_text)
-            if venue_pattern:
-                venue = venue_pattern.group(0).strip()
-            
-            # Extract match type from URL or text
-            match_type = "T20"  # Default
-            if "t20" in match_id.lower() or "t20" in page_title.lower():
-                match_type = "T20"
-            elif "odi" in match_id.lower() or "odi" in page_title.lower():
-                match_type = "ODI"
-            elif "test" in match_id.lower() or "test" in page_title.lower():
-                match_type = "Test"
-            
-            # Extract player stats (simplified - would need more detailed scraping)
-            players = []
-            # Look for scorecard section
-            scorecard_elements = page.query_selector_all('[class*="scorecard"], [class*="batting"], [class*="bowling"]')
-            for elem in scorecard_elements[:20]:
-                text = elem.inner_text().strip()
-                # Look for patterns like "Player Name 45(32)"
-                player_pattern = re.findall(r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(\d+)\((\d+)\)', text)
-                for match in player_pattern[:5]:  # Limit to avoid duplicates
-                    player_name, runs, balls = match
-                    players.append(PlayerPerf(
-                        match_id=f"crex-{match_id}",
-                        date=match_date,
-                        player=player_name,
-                        team="",  # Would need to determine
-                        opponent="",
-                        runs=int(runs),
-                        balls=int(balls),
-                    ))
-            
-            page.close()
-            
-            # Rate limit
-            time.sleep(5)
-            
-            return MatchRecord(
-                match_id=f"crex-{match_id}",
-                date=match_date,
-                match_type=match_type,
-                team_type="international",
-                gender="male",  # Would need to determine
-                event="",  # Could extract from page
-                venue=venue,
-                team_a=teams[0],
-                team_b=teams[1] if len(teams) > 1 else "",
-                winner=winner,
-                result="win" if winner else "",
-                result_margin=result_margin,
-                source=self.name,
-                players=players,
-            )
-            
-        except Exception as exc:
+            page = self._get_browser().render(url, wait_selector="script#sports-event-schema")
+        except (BrowserError, RobotsDisallowed) as exc:
             print(f"CREX fetch_match failed for {match_id}: {exc}")
             return None
+        facts = parse_match_page(page.html, page.text, page.title, url) if page.status < 400 else None
+        if facts is None or facts.start_date is None or not facts.finished:
+            return None
+        entry = MatchEntry(url=url, match_id=match_id, lastmod=facts.start.isoformat())
+        return record_from_facts(entry, facts, facts.start_date.isoformat(), status="provisional")
 
 
 class MultiSourceScraper:
@@ -686,7 +544,7 @@ class MultiSourceScraper:
         
         # Resolve conflicts and return deduplicated matches
         resolved = []
-        for key, matches in all_matches.items():
+        for _key, matches in all_matches.items():
             if len(matches) == 1:
                 resolved.append(matches[0])
             else:
@@ -737,7 +595,7 @@ class MultiSourceScraper:
                 player_map[_norm(player.player)].append(player)
         
         resolved_players = []
-        for player_key, player_versions in player_map.items():
+        for _player_key, player_versions in player_map.items():
             # Take most common name form
             names = [p.player for p in player_versions]
             resolved_name = Counter(names).most_common(1)[0][0]
@@ -814,9 +672,18 @@ class ScraperSource:
     
     name = "scraper"
     
-    def __init__(self):
+    def __init__(self, browser: CREXBrowser | None = None):
         self.scraper = MultiSourceScraper()
         self._missing_matches_cache = None
+        if browser is not None:  # share one Playwright session with the backfill
+            for sc in self.scraper.scrapers:
+                if hasattr(sc, "use_browser"):
+                    sc.use_browser(browser)
+
+    def close(self) -> None:
+        for sc in self.scraper.scrapers:
+            if hasattr(sc, "close"):
+                sc.close()
     
     def fetch(self, since: date) -> list[MatchRecord]:
         """Fetch matches from all configured scrapers and classify them."""

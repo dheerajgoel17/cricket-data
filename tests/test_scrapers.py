@@ -1,7 +1,7 @@
 """Tests for web scrapers and conflict resolution."""
 import json
-from datetime import date, timedelta
-from unittest.mock import Mock, patch
+from datetime import date
+from unittest.mock import patch
 
 import pytest
 
@@ -517,30 +517,61 @@ def test_multi_source_uses_registry():
 
 
 def test_crex_scraper_graceful_failure():
-    """Test that CREX scraper fails gracefully when site is unreachable."""
-    scraper = CREXScraper()
-    
-    # CREX now uses Playwright, so mock browser calls would be complex
-    # Instead, test that it handles missing browser gracefully
-    # Without Playwright initialized, should return empty
-    match_ids = scraper.fetch_recent_match_ids(days=7)
-    assert isinstance(match_ids, list)  # Should return list (may be empty)
-    
-    # fetch_match should return None gracefully on error
-    match = scraper.fetch_match("123")
-    assert match is None or isinstance(match, MatchRecord)
+    """Browser trouble: a broken home page is a reported failure, a broken match page is skipped."""
+    from cricket_data.crex_browser import BrowserError
+
+    class Broken:
+        def links(self, *a, **k):
+            raise BrowserError("timeout")
+
+        def render(self, *a, **k):
+            raise BrowserError("timeout")
+
+    scraper = CREXScraper(browser=Broken())
+    with pytest.raises(ScraperError):
+        scraper.fetch_recent_match_ids(days=7)
+    assert scraper.fetch_match("123") is None
 
 
-def test_crex_scraper_browser_based():
-    """Test CREX scraper structure (browser-based, can't easily mock)."""
+def test_crex_scraper_builds_record_from_rendered_page():
+    from pathlib import Path
+
+    from cricket_data.crex_browser import RenderedPage
+
+    fix = Path(__file__).parent / "fixtures" / "crex"
+    html = (fix / "afg_ind_1st_t20i_2024.html").read_text()
+
+    class Fixture:
+        def render(self, url, wait_selector=None, timeout_ms=0):
+            return RenderedPage(url, 200, html, (fix / "afg_ind_1st_t20i_2024.txt").read_text(), "t")
+
+    slug = "afg-vs-ind-1st-t20-afghanistan-tour-of-india-2024-match-updates-LR3"
+    rec = CREXScraper(browser=Fixture()).fetch_match(slug)
+    assert rec.date == "2024-01-11"  # the match's own date, not today's
+    assert (rec.team_a, rec.team_b, rec.winner) == ("India", "Afghanistan", "India")
+    assert rec.venue.startswith("Punjab Cricket Association")
+    assert rec.match_id == "crex-" + slug and rec.source == "crex"
+
+
+def test_crex_scraper_skips_live_matches():
+    from pathlib import Path
+
+    from cricket_data.crex_browser import RenderedPage
+
+    fix = Path(__file__).parent / "fixtures" / "crex"
+
+    class Live:
+        def render(self, url, wait_selector=None, timeout_ms=0):
+            return RenderedPage(url, 200, (fix / "afg_ban_only_test_2026.html").read_text(), "", "t")
+
+    assert CREXScraper(browser=Live()).fetch_match("afg-vs-ban-only-test-x-match-updates-13TH") is None
+
+
+def test_crex_scraper_interface():
     scraper = CREXScraper()
-    
-    # Verify it has the right interface
-    assert hasattr(scraper, 'fetch_recent_match_ids')
-    assert hasattr(scraper, 'fetch_match')
+    assert hasattr(scraper, "fetch_recent_match_ids") and hasattr(scraper, "fetch_match")
     assert scraper.name == "crex"
-    
-    # Browser-based scraping tested in integration, not unit tests
+    scraper.close()  # never started a browser: must be a no-op
 
 
 def test_scraper_source_integration():

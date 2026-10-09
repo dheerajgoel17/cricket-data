@@ -11,7 +11,6 @@ and prefer Cricsheet.
 from __future__ import annotations
 
 import re
-from datetime import date
 from html.parser import HTMLParser
 from typing import NamedTuple
 
@@ -203,7 +202,7 @@ def is_afghanistan_match(match: MatchRecord) -> bool:
             return True
     
     # Check for Afghanistan Premier League
-    if "afghanistan premier league" in event or "apl" in event:
+    if re.search(r"\bafghanistan premier league\b|\bapl\b", event):
         return True
     
     return False
