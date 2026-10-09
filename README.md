@@ -1,33 +1,48 @@
 # Cricket Data
 
-A free, self-updating, open cricket dataset. Every day it ingests [Cricsheet](https://cricsheet.org)
-ball-by-ball data into compact CSVs of **matches** and **per-player performance** (runs, wickets, catches,
-stumpings, "player performance" points), covering **23,000+ matches** from 2001 to today (men's and women's,
-internationals and leagues).
+A free, open cricket dataset that updates itself. Matches and per-player performance (runs, wickets,
+catches, stumpings and points) for **23,000+ matches since 2001**: men's and women's, internationals and leagues.
 
-- **Always fresh**: daily run re-reads the last 30 days; a weekly run re-reads everything to heal gaps.
-- **Provisional data for the latest games**: optionally supply matches Cricsheet hasn't published yet, or enable
-  the built-in **web scraper** to automatically fetch recent matches from public cricket sites. They are
-  verified against Cricsheet when it lands, then **deleted automatically** (see [docs/PROVISIONAL.md](docs/PROVISIONAL.md)
-  and [docs/SCRAPER.md](docs/SCRAPER.md)).
-- **Zero cost, zero secrets**: GitHub Actions + plain files. See [docs/ZERO_COST.md](docs/ZERO_COST.md).
-- **No dependencies**: pure Python standard library.
+Built on [Cricsheet](https://cricsheet.org) ball-by-ball data, stored as plain CSV files in this repo.
+
+## What you get
+
+- **Matches and players** in `data/matches/` and `data/players/`, one file per month.
+- **Updated daily** from Cricsheet.
+- **Latest games before Cricsheet has them**: recent matches are fetched from [CREX](https://crex.com) into
+  `data/provisional/` and replaced automatically once Cricsheet publishes.
+- **Matches Cricsheet doesn't have**: games on Cricsheet's [missing list](https://cricsheet.org/missing/) and
+  Afghanistan men's matches (withheld by Cricsheet) are filled in from CREX and kept.
+- **No cost, no keys, no dependencies**: GitHub Actions and plain Python.
 
 ## Quick start
+
 ```bash
-pip install -e ".[dev]"
+pip install -e .
 cricket-data stats
-cricket-data query "Renshaw" --since 2026-09-01
-
-# Enable web scraper for recent matches
-cricket-data update --enable-scraper
-
+cricket-data query "Kohli" --since 2026-01-01
 cricket-data export-sqlite --out cricket.db
 ```
-More: [Getting started (any IDE)](docs/GETTING_STARTED.md) | [Data dictionary](docs/DATA_DICTIONARY.md) |
-[Architecture](docs/ARCHITECTURE.md) | [Web Scraper](docs/SCRAPER.md) | [Contributing](CONTRIBUTING.md)
+
+To run the CREX scraper yourself: `pip install playwright && python -m playwright install chromium`, then
+`cricket-data update --enable-scraper`.
+
+More: [Data dictionary](docs/DATA_DICTIONARY.md) · [Getting started](docs/GETTING_STARTED.md) ·
+[Backfill](docs/BACKFILL.md) · [Contributing](CONTRIBUTING.md)
+
+## Support
+
+This project is free and ad-free. If it's useful to you, you can support it:
+
+<p align="center">
+  <a href="https://buymeacoffee.com/meghnaad">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy me a coffee" width="217" />
+  </a>
+</p>
 
 ## Licence
+
 Code: MIT ([LICENSE](LICENSE)). Data: CC BY-SA 4.0, derived from Cricsheet ([DATA_LICENSE.md](DATA_LICENSE.md)).
-Please credit **Cricsheet** (<https://cricsheet.org>) when you use the data.
-Maintainer contact: dheerajgoeldsuperdude@gmail.com.
+Please credit **[Cricsheet](https://cricsheet.org)** when you use the data.
+
+Questions: dheerajgoeldsuperdude@gmail.com
