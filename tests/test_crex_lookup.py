@@ -386,3 +386,34 @@ def test_health_checks_flag_a_changed_match_page(tmp_path):
     assert not any(r.ok for r in results.values())
     assert (tmp_path / "match_page.html").read_text() == "<html>redesigned</html>"  # raw page saved
     assert "parse_match_page" in results["match_page"].hint
+
+
+def test_parse_match_page_reads_toss_and_overs_from_embedded_data():
+    p = _page("ind_wi_1st_t20_2026")
+    f = parse_match_page(p.html, p.text, p.title)
+    assert (f.toss_winner, f.toss_decision) == ("India", "field")  # same as the Cricsheet record
+    assert f.max_overs == 19.1  # 171/10 in 19.1: a T20, and the all-out innings is not mistaken for 50-over
+    assert f.winner == "India" and f.venue.endswith("Lucknow")
+
+
+def test_record_carries_the_toss():
+    from cricket_data.crex_sitemap import MatchEntry
+    p = _page("ind_wi_1st_t20_2026")
+    f = parse_match_page(p.html, p.text, p.title)
+    slug = "ind-vs-wi-1st-t20-west-indies-tour-of-india-2026-match-updates-11AL"
+    rec = record_from_facts(MatchEntry(url="u", match_id=slug, lastmod="2026-10-06T19:00:00+05:30"), f, "2026-10-06")
+    assert (rec.toss_winner, rec.toss_decision, rec.venue.endswith("Lucknow")) == ("India", "field", True)
+
+
+def test_render_uses_plain_http_and_falls_back_to_the_browser(monkeypatch):
+    from cricket_data import crex_browser as cb
+
+    b = cb.CREXBrowser(fetcher=type("F", (), {"allowed": lambda self, u: True})(), min_interval=0)
+    page = cb.RenderedPage("u", 200, '<script id="sports-event-schema">x</script>', "x", "t")
+    monkeypatch.setattr(b, "_http", lambda url, marker: page)
+    monkeypatch.setattr(b, "start", lambda: (_ for _ in ()).throw(AssertionError("browser must not start")))
+    assert b.render("u", wait_selector="script#sports-event-schema") is page  # served over HTTP
+
+    monkeypatch.setattr(b, "_http", lambda url, marker: None)  # content missing from the plain response
+    with pytest.raises(AssertionError):
+        b.render("u", wait_selector="script#sports-event-schema")  # tried to start Chromium

@@ -80,7 +80,7 @@ class BackfillQueue:
     afghanistan_enumerated_at: str | None = None
     max_retries: int = 3
     batch_size: int = 5
-    delay_between_requests: float = 10.0
+    delay_between_requests: float = 5.0
 
     # ---- persistence ----------------------------------------------------------------------------
     @classmethod
@@ -101,7 +101,7 @@ class BackfillQueue:
             afghanistan_enumerated_at=data.get("afghanistan_enumerated_at"),
             max_retries=data.get("max_retries", 3),
             batch_size=data.get("batch_size", 5),
-            delay_between_requests=data.get("delay_between_requests", 10.0),
+            delay_between_requests=data.get("delay_between_requests", 5.0),
         )
         q._drop_unsourced_withheld()
         q._dedupe()

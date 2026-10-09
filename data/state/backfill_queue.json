@@ -2,7 +2,7 @@
  "afghanistan_enumerated_at": "2026-10-09T06:18:23",
  "already_in_cricsheet": [],
  "batch_size": 5,
- "delay_between_requests": 8.0,
+ "delay_between_requests": 5.0,
  "done": [
   {
    "crex_url": "https://crex.com/cricket-live-score/har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF",

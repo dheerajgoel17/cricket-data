@@ -154,6 +154,8 @@ def family_from_overs(max_overs: float | None) -> str | None:
 _LD_EVENT = re.compile(r'<script[^>]*id="sports-event-schema"[^>]*>(.*?)</script>', re.S)
 _TITLE = re.compile(r"<title[^>]*>(.*?)</title>", re.S)
 _OVERS = re.compile(r"\((\d{1,3}(?:\.\d)?)\)")
+_TOSS = re.compile(r"&q;toss_team&q;:&q;([A-Za-z0-9]+)&q;,&q;chose_to&q;:(\d)")
+_STATE_TS = re.compile(r"&q;ts&q;:&q;[0-9/]+\((\d{1,3}(?:\.\d)?)\)&q;")
 _WON = re.compile(r"^(?P<w>.+?)\s+won\s+(?P<m>(?:by|in)\s+.+?)\s*(?:🏆.*)?$", re.I)
 
 
@@ -171,6 +173,8 @@ class PageFacts:
     result: str = ""  # win | tie | draw | no result | ""
     max_overs: float | None = None
     scores: str = ""
+    toss_winner: str = ""
+    toss_decision: str = ""  # bat | field
 
     @property
     def start_date(self) -> date | None:
@@ -220,7 +224,17 @@ def parse_match_page(html: str, text: str = "", title: str = "", url: str = "") 
     headline = (ld.get("name") or title).split(", ")[0]
     winner, margin, result = parse_result(headline)
     max_overs = None
-    if text:
+    toss_winner = toss_decision = ""
+    tm = _TOSS.search(html)  # the page's embedded match data: toss team id and 0=bat / 1=field
+    if tm:
+        toss_decision = "bat" if tm.group(2) == "0" else "field"
+        for c in ld.get("competitor", []):
+            if isinstance(c, dict) and str(c.get("url", "")).rsplit("-", 1)[-1] == tm.group(1):
+                toss_winner = c.get("name", "")
+        window = _STATE_TS.findall(html[max(0, tm.start() - 2500):tm.start()])
+        if window:
+            max_overs = max(float(v) for v in window)
+    if text and max_overs is None:
         a = text.find("Match Details")
         b = text.find("Match info", a if a >= 0 else 0)
         seg = text[(a if a >= 0 else 0):(b if b > 0 else 600)][:700]
@@ -232,7 +246,8 @@ def parse_match_page(html: str, text: str = "", title: str = "", url: str = "") 
     return PageFacts(
         url=ld.get("url") or url, start=start, team_a=comps[0], team_b=comps[1],
         venue=(ld.get("location") or {}).get("name", ""), status=str(ld.get("eventStatus", "")),
-        title=title, winner=winner, margin=margin, result=result, max_overs=max_overs, scores=scores)
+        title=title, winner=winner, margin=margin, result=result, max_overs=max_overs, scores=scores,
+        toss_winner=toss_winner, toss_decision=toss_decision)
 
 
 # ---- strict confirmation -------------------------------------------------------------------------
@@ -373,5 +388,6 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
         gender="female" if entry.is_women else "male",
         event=humanize(entry.series_name) if entry.series_name else "",
         venue=facts.venue, team_a=facts.team_a, team_b=facts.team_b,
+        toss_winner=facts.toss_winner, toss_decision=facts.toss_decision,
         winner=facts.winner, result=facts.result, result_margin=facts.margin,
         status=status, source="crex")
