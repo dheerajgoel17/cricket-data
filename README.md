@@ -7,7 +7,7 @@ men's and women's, internationals and leagues. Updated daily, including the late
 
 - **Matches**: date, teams, venue, toss, winner, result and margin, player of the match.
 - **Players**: runs, balls, fours, sixes, wickets, catches, stumpings, run-outs and performance points for every player in every match.
-- Plain CSV files in `data/`, one per month. See the [data dictionary](docs/DATA_DICTIONARY.md).
+- CSV files (gzip) in `data/`, one per month. See the [data dictionary](docs/DATA_DICTIONARY.md).
 
 ## Quick start
 
