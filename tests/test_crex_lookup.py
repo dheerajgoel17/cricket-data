@@ -344,3 +344,45 @@ def test_queue_never_requeues_resolved_tasks(tmp_path):
 def test_extract_links():
     html = '<a href="/cricket-live-score/x-1"><span>IND</span> Won</a><a href="/other">no</a>'
     assert extract_links(html, "/cricket-live-score/") == [{"href": "/cricket-live-score/x-1", "text": "IND\nWon"}]
+
+
+def test_index_falls_back_to_stale_cache_when_sitemaps_fail(index, tmp_path):
+    import os
+    import time
+
+    cache = tmp_path / "idx.json"
+    seed = CREXSitemapIndex(cache_path=cache)
+    seed.matches, seed.series = index.matches, index.series
+    seed._save_cache()
+    old = time.time() - 10 * 86400
+    os.utime(cache, (old, old))  # older than the daily refresh window
+
+    class Down:
+        def get(self, url):
+            raise OSError("blocked")
+
+    idx = CREXSitemapIndex(fetcher=Down(), cache_path=cache)
+    idx.load()
+    assert len(idx.matches) == len(index.matches)
+    with pytest.raises(OSError):
+        CREXSitemapIndex(fetcher=Down(), cache_path=tmp_path / "none.json").load()
+
+
+def test_health_checks_flag_a_changed_match_page(tmp_path):
+    from cricket_data.health import run_checks
+
+    class Browser:
+        def render(self, url, wait_selector=None, timeout_ms=0):
+            return RenderedPage(url, 200, "<html>redesigned</html>", "", "t")
+
+        def links(self, url, contains):
+            return RenderedPage(url, 200, "<html></html>", "", "t"), []
+
+    class Fetcher:
+        def get(self, url):
+            return "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'></urlset>"
+
+    results = {r.name: r for r in run_checks(Browser(), Fetcher(), tmp_path)}
+    assert not any(r.ok for r in results.values())
+    assert (tmp_path / "match_page.html").read_text() == "<html>redesigned</html>"  # raw page saved
+    assert "parse_match_page" in results["match_page"].hint

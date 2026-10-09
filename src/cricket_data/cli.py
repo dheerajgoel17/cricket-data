@@ -194,6 +194,20 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     return 0
 
 
+def cmd_health(a: argparse.Namespace) -> int:
+    from .crex_browser import CREXBrowser
+    from .health import run_checks, write_report
+    from .polite import PoliteFetcher
+
+    out = Path(a.out)
+    with CREXBrowser() as browser:
+        results = run_checks(browser, PoliteFetcher(min_interval=2.0, timeout=120.0), out)
+    write_report(results, out)
+    for r in results:
+        print(f"{'ok  ' if r.ok else 'FAIL'} {r.name}: {r.detail}" + (f"  -> {r.hint}" if r.hint else ""))
+    return 0 if all(r.ok for r in results) else 1
+
+
 def cmd_backfill(a: argparse.Namespace) -> int:
     a.dataset = a.dataset or "all_json.zip"
     a.provisional_days = 30
@@ -268,6 +282,10 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--backfill-priority", default="",
                    help="comma-separated task-key prefixes (e.g. 2025-12-18-Jharkhand) to backfill first this run")
     u.set_defaults(fn=cmd_update)
+
+    h = sub.add_parser("health", help="check the CREX scraper's assumptions; save raw pages on failure")
+    h.add_argument("--out", default="diagnostics")
+    h.set_defaults(fn=cmd_health)
 
     b = sub.add_parser("backfill", help="load full history (all_json.zip)")
     b.add_argument("--dataset")

@@ -211,10 +211,18 @@ class CREXSitemapIndex:
         if not force_refresh and self._load_cache():
             self._finish()
             return
-        self.series = parse_series_sitemap(self.fetcher.get(SERIES_SITEMAP))
-        self.matches = parse_match_sitemap(self.fetcher.get(MATCH_SITEMAP))
-        if not self.matches or not self.series:
-            raise RuntimeError("CREX sitemaps parsed to zero entries; refusing to continue")
+        try:
+            self.series = parse_series_sitemap(self.fetcher.get(SERIES_SITEMAP))
+            self.matches = parse_match_sitemap(self.fetcher.get(MATCH_SITEMAP))
+            if not self.matches or not self.series:
+                raise RuntimeError("CREX sitemaps parsed to zero entries")
+        except Exception as exc:
+            # approach switch: a day-old (or older) index is still far better than no backfill
+            if self._load_cache(max_age=None):
+                print(f"warning: CREX sitemaps unavailable ({exc}); using the cached index")
+                self._finish()
+                return
+            raise
         self._save_cache()
         self._finish()
 
@@ -238,9 +246,9 @@ class CREXSitemapIndex:
         self._by_slug = {m.match_id: m for m in self.matches}
         self._loaded = True
 
-    def _load_cache(self) -> bool:
+    def _load_cache(self, max_age: float | None = CACHE_MAX_AGE) -> bool:
         p = self.cache_path
-        if not p or not p.exists() or time.time() - p.stat().st_mtime > CACHE_MAX_AGE:
+        if not p or not p.exists() or (max_age is not None and time.time() - p.stat().st_mtime > max_age):
             return False
         try:
             doc = json.loads(p.read_text(encoding="utf-8"))

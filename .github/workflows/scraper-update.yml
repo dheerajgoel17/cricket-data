@@ -35,6 +35,16 @@ jobs:
           pip install -e .
           pip install playwright
           python -m playwright install --with-deps chromium
+      - name: Restore CREX index cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: crex-index-${{ github.run_id }}
+          restore-keys: crex-index-
+      - name: Health check (which layer would break?)
+        id: health
+        run: cricket-data health --out diagnostics
+        continue-on-error: true
       - name: Scrape recent matches
         id: scrape
         env:
@@ -64,6 +74,11 @@ jobs:
       - name: Check for failures
         id: check_failures
         run: |
+          if [ "${{ steps.health.outcome }}" = "failure" ]; then
+            echo "health_failed=true" >> $GITHUB_OUTPUT
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           if [ -f data/scraper_run_report.json ]; then
             # Extract failure information
             FAILED_SOURCES=$(python3 -c "
@@ -102,6 +117,7 @@ jobs:
         with:
           name: scraper-report-${{ github.run_id }}
           path: |
+            diagnostics/
             data/scraper_report.csv
             data/scraper_run_report.json
             scraper_output.log
@@ -111,6 +127,7 @@ jobs:
         if: steps.check_failures.outputs.has_failures == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           # Generate issue body from report
           python3 << 'EOF'
@@ -168,6 +185,17 @@ jobs:
           Close this issue once scrapers are fixed and verified working.
           """
           
+          if os.path.exists('diagnostics/health.json'):
+              with open('diagnostics/health.json') as f:
+                  health = json.load(f)
+              body += "\n### Health check (which layer broke)\n\n"
+              for c in health['checks']:
+                  body += f"- {'ok' if c['ok'] else '**FAIL**'} `{c['name']}`: {c['detail']}\n"
+                  if c.get('hint'):
+                      body += f"  - fix: {c['hint']}\n"
+              body += (f"\nRaw pages the site returned are in the `scraper-report-{os.environ['RUN_ID']}` "
+                       "artifact under `diagnostics/`. Repair playbook: docs/SELF_HEALING.md\n")
+
           # Save to file
           with open('issue_body.md', 'w') as f:
               f.write(body)
