@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 */6 * * *"  # Every 6 hours
   workflow_dispatch:  # Allow manual triggers
+  push:
+    branches:
+      - cursor/scraper-workflow-0411  # TEMP: for final testing
 
 permissions:
   contents: write
