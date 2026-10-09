@@ -4,7 +4,7 @@
   "done": [],
   "failed": [],
   "in_progress": [],
-  "last_updated": "2026-10-09T05:28:05.136236",
+  "last_updated": "2026-10-09T05:46:03.063020",
   "max_retries": 3,
   "not_found": [
     "2026-09-25-Warriors-North West",
@@ -18,64 +18,14 @@
     "2025-12-16-Haryana-Hyderabad (India)",
     "2025-12-14-Haryana-Mumbai",
     "2025-12-14-Punjab-Andhra",
-    "2025-12-14-Rajasthan-Hyderabad (India)"
+    "2025-12-14-Rajasthan-Hyderabad (India)",
+    "2025-12-14-Jharkhand-Madhya Pradesh",
+    "2025-12-12-Andhra-Madhya Pradesh",
+    "2025-12-12-Rajasthan-Haryana",
+    "2025-12-12-Punjab-Jharkhand",
+    "2025-12-12-Mumbai-Hyderabad (India)"
   ],
   "pending": [
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-14",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Jharkhand",
-      "team_b": "Madhya Pradesh"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-12",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Andhra",
-      "team_b": "Madhya Pradesh"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-12",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Rajasthan",
-      "team_b": "Haryana"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-12",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Punjab",
-      "team_b": "Jharkhand"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-12",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Mumbai",
-      "team_b": "Hyderabad (India)"
-    },
     {
       "attempts": 0,
       "category": "cricsheet_missing",
