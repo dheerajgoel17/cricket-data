@@ -229,43 +229,72 @@ def search_crex_for_match(
 ) -> str | None:
     """Search CREX for a match by date and teams.
     
+    Strategy:
+    1. Check series listing for relevant series (by year/teams)
+    2. Look through series matches for date/team match
+    3. Return match_id if found
+    
     Returns match_id if found, None if not found.
     """
     try:
         from playwright.sync_api import TimeoutError as PlaywrightTimeout
+        import re
         
         # Get browser
         context = scraper._get_browser()
         page = context.new_page()
         
-        # Strategy: Load CREX homepage and look for matches with these teams
-        # CREX lists recent and ongoing matches prominently
-        page.goto("https://crex.live", wait_until="networkidle", timeout=30000)
+        # Extract year from task date
+        year = task.date[:4]
         
-        # Look for match links with both teams
-        team_a_norm = task.team_a.lower().replace(" ", "-")
-        team_b_norm = task.team_b.lower().replace(" ", "-")
+        # Normalize team names for matching
+        team_a_norm = task.team_a.lower()
+        team_b_norm = task.team_b.lower()
         
-        # Get all match links
-        match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+        # Strategy 1: Load series page and look for series with these teams/year
+        page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
         
-        for link in match_links:
+        # Find relevant series (contains year or team names)
+        series_links = page.query_selector_all('a[href*="/series/"]')
+        relevant_series = []
+        
+        for link in series_links[:100]:
             href = link.get_attribute('href') or ''
-            href_lower = href.lower()
+            text = link.inner_text().strip().lower()
             
-            # Check if both teams appear in URL (either order)
-            if ((team_a_norm in href_lower or task.team_a.lower() in href_lower) and
-                (team_b_norm in href_lower or task.team_b.lower() in href_lower)):
-                # Extract match_id from URL
-                match_id = href.split('/')[-1]
-                page.close()
-                return match_id
+            # Check if series mentions the year or teams
+            if year in text or team_a_norm in text or team_b_norm in text:
+                relevant_series.append(href)
+        
+        # Search through relevant series
+        for series_url in relevant_series[:10]:  # Limit to first 10 relevant series
+            try:
+                page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
+                
+                # Look for match links with both teams
+                match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+                
+                for link in match_links:
+                    href = link.get_attribute('href') or ''
+                    text = link.inner_text().strip().lower()
+                    href_lower = href.lower()
+                    
+                    # Check if both teams appear (either order)
+                    if ((team_a_norm in href_lower or team_a_norm in text) and
+                        (team_b_norm in href_lower or team_b_norm in text)):
+                        # Found a match! Extract match_id
+                        match_id = href.split('/')[-1]
+                        page.close()
+                        return match_id
+                
+            except Exception:
+                continue  # Try next series
         
         page.close()
         return None
         
     except Exception as exc:
-        print(f"Search failed: {exc}")
+        print(f"Search error: {exc}")
         return None
 
 
