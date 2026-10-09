@@ -24,24 +24,33 @@ class MissingMatch(NamedTuple):
     date: str  # ISO format YYYY-MM-DD
     team_a: str
     team_b: str
-    match_type: str  # Test, ODI, T20I
+    match_type: str  # Test, ODI, T20I (int'l) or T20, List A, FC (domestic)
     gender: str  # male, female
 
 
 class MissingMatchesParser(HTMLParser):
-    """Parse Cricsheet's missing-matches HTML page into structured data."""
+    """Parse Cricsheet's missing-matches HTML page into structured data.
+    
+    Handles two main sections:
+    1. "By match type" - Internationals (Test, ODI, T20I)  
+    2. "By competition" - Domestic leagues (BBL, Syed Mushtaq Ali, etc.)
+    """
     
     def __init__(self):
         super().__init__()
         self.matches: list[MissingMatch] = []
         self._current_match_type = ""
+        self._current_competition = ""
         self._current_gender = ""
         self._current_date = ""
         self._in_dt = False
         self._in_dd = False
+        self._in_h4 = False
         self._in_h5 = False
         self._in_h6 = False
         self._data = ""
+        self._in_by_match_type_section = False
+        self._in_by_competition_section = False
     
     def handle_starttag(self, tag: str, attrs):
         if tag == "dt":
@@ -49,6 +58,9 @@ class MissingMatchesParser(HTMLParser):
             self._data = ""
         elif tag == "dd":
             self._in_dd = True
+            self._data = ""
+        elif tag == "h4":
+            self._in_h4 = True
             self._data = ""
         elif tag == "h5":
             self._in_h5 = True
@@ -60,35 +72,76 @@ class MissingMatchesParser(HTMLParser):
     def handle_endtag(self, tag: str):
         if tag == "dt":
             self._in_dt = False
-            # Parse date
             self._current_date = self._data.strip()
         elif tag == "dd":
             self._in_dd = False
-            # Parse teams: "England vs India"
             text = self._data.strip()
             if " vs " in text:
                 teams = text.split(" vs ")
-                if len(teams) == 2 and self._current_date and self._current_match_type and self._current_gender:
-                    self.matches.append(MissingMatch(
-                        date=self._current_date,
-                        team_a=teams[0].strip(),
-                        team_b=teams[1].strip(),
-                        match_type=self._current_match_type,
-                        gender=self._current_gender
-                    ))
+                if len(teams) == 2 and self._current_date and self._current_gender:
+                    # Determine match type based on section
+                    if self._in_by_match_type_section and self._current_match_type:
+                        # International match
+                        match_type = self._current_match_type
+                    elif self._in_by_competition_section and self._current_competition:
+                        # Domestic league - infer type from competition name
+                        comp_lower = self._current_competition.lower()
+                        # Known T20 competitions
+                        if any(t20_comp in comp_lower for t20_comp in [
+                            "t20", "twenty", "big bash", "bbl", "blast", "cpl", 
+                            "super smash", "psl", "ipl", "mushtaq ali", "sma"
+                        ]):
+                            match_type = "T20"
+                        # Known first-class competitions
+                        elif any(fc_comp in comp_lower for fc_comp in [
+                            "championship", "shield", "plunket", "ranji", "duleep"
+                        ]):
+                            match_type = "FC"
+                        else:
+                            # Default to List A for other domestic competitions
+                            match_type = "List A"
+                    else:
+                        match_type = ""
+                    
+                    if match_type:
+                        self.matches.append(MissingMatch(
+                            date=self._current_date,
+                            team_a=teams[0].strip(),
+                            team_b=teams[1].strip(),
+                            match_type=match_type,
+                            gender=self._current_gender
+                        ))
+        elif tag == "h4":
+            self._in_h4 = False
+            text = self._data.strip().lower()
+            # Track which main section we're in
+            if "by match type" in text:
+                self._in_by_match_type_section = True
+                self._in_by_competition_section = False
+                self._current_competition = ""
+            elif "by competition" in text:
+                self._in_by_match_type_section = False
+                self._in_by_competition_section = True
+                self._current_match_type = ""
         elif tag == "h5":
             self._in_h5 = False
-            # Parse match type from h5
             text = self._data.strip().lower()
-            if "test" in text:
-                self._current_match_type = "Test"
-            elif "one-day" in text or "one day" in text or "odi" in text:
-                self._current_match_type = "ODI"
-            elif "t20" in text or "twenty" in text:
-                self._current_match_type = "T20I"
+            
+            if self._in_by_match_type_section:
+                # International match types only
+                if "test" in text and "match" in text:
+                    self._current_match_type = "Test"
+                elif "odi" in text or ("one" in text and "day" in text):
+                    self._current_match_type = "ODI"
+                elif "t20i" in text or ("t20" in text and "international" in text):
+                    self._current_match_type = "T20I"
+                else:
+                    self._current_match_type = ""
+            elif self._in_by_competition_section:
+                # Domestic competition name
+                self._current_competition = self._data.strip()
         elif tag == "h6":
             self._in_h6 = False
-            # Parse gender from h6
             text = self._data.strip().lower()
             if "female" in text or "women" in text:
                 self._current_gender = "female"
@@ -96,7 +149,7 @@ class MissingMatchesParser(HTMLParser):
                 self._current_gender = "male"
     
     def handle_data(self, data: str):
-        if self._in_dt or self._in_dd or self._in_h5 or self._in_h6:
+        if self._in_dt or self._in_dd or self._in_h4 or self._in_h5 or self._in_h6:
             self._data += data
 
 
