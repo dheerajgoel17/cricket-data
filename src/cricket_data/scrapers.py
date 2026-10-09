@@ -639,9 +639,12 @@ class MultiSourceScraper:
         
         Sources fail independently - if one source breaks, others continue.
         Failures are tracked in self.failures for reporting.
+        
+        Empty results (no matches found) are tracked separately from failures.
         """
         all_matches: dict[tuple, list[MatchRecord]] = defaultdict(list)
         self.failures: list[tuple[str, str, str]] = []  # (source, error_type, message)
+        self.sources_checked: dict[str, int] = {}  # source -> match count
         
         # Collect matches from all sources
         for scraper in self.scrapers:
@@ -650,13 +653,21 @@ class MultiSourceScraper:
             try:
                 # Get recent match IDs
                 match_ids = scraper.fetch_recent_match_ids(days=(date.today() - since).days)
+                self.sources_checked[source_name] = len(match_ids)
                 
+                if len(match_ids) == 0:
+                    # No matches found - track but don't fail
+                    # This is normal if there are no recent matches
+                    continue
+                
+                matches_fetched = 0
                 for match_id in match_ids:
                     try:
                         match = scraper.fetch_match(match_id)
                         if match:
                             key = _match_key(match)
                             all_matches[key].append(match)
+                            matches_fetched += 1
                     except (ScraperError, RobotsDisallowed) as exc:
                         # Individual match failures shouldn't stop the source
                         self.failures.append((source_name, type(exc).__name__, str(exc)))
@@ -665,14 +676,24 @@ class MultiSourceScraper:
                         # Unexpected errors - log but continue
                         self.failures.append((source_name, "UnexpectedError", str(exc)))
                         continue
+                
+                # If source claimed matches but fetched none, that's suspicious
+                if len(match_ids) > 0 and matches_fetched == 0:
+                    self.failures.append((
+                        source_name,
+                        "NoMatchesFetched",
+                        f"Found {len(match_ids)} match IDs but couldn't fetch any matches"
+                    ))
             
             except (ScraperError, RobotsDisallowed) as exc:
                 # If a source is completely unavailable, log and continue with others
                 self.failures.append((source_name, type(exc).__name__, str(exc)))
+                self.sources_checked[source_name] = 0
                 continue
             except Exception as exc:
                 # Unexpected errors at source level
                 self.failures.append((source_name, "UnexpectedError", str(exc)))
+                self.sources_checked[source_name] = 0
                 continue
         
         # Resolve conflicts and return deduplicated matches
