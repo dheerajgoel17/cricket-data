@@ -116,6 +116,25 @@ def cmd_update(a: argparse.Namespace) -> int:
     report.matches_scraped = added
     print(f"provisional: {added} written")
     
+    # Report permanent match statistics
+    if provisional_matches:
+        status_counts = {
+            "provisional": 0,
+            "cricsheet_missing": 0,
+            "cricsheet_withheld": 0
+        }
+        for match in provisional_matches:
+            status = match.status or "provisional"
+            if status in status_counts:
+                status_counts[status] += 1
+        
+        if status_counts["cricsheet_missing"] > 0 or status_counts["cricsheet_withheld"] > 0:
+            print(f"  - {status_counts['provisional']} provisional (normal lag)")
+            if status_counts["cricsheet_missing"] > 0:
+                print(f"  - {status_counts['cricsheet_missing']} cricsheet_missing (permanent)")
+            if status_counts["cricsheet_withheld"] > 0:
+                print(f"  - {status_counts['cricsheet_withheld']} cricsheet_withheld (Afghanistan)")
+    
     # Report scraper conflicts
     if scraper_conflicts:
         report.conflicts_resolved = len(scraper_conflicts)

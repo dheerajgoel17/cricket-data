@@ -25,8 +25,9 @@ from datetime import date, datetime, timedelta
 from typing import Any, Protocol
 from urllib.parse import urljoin, urlencode, urlparse
 
-from .models import MatchRecord, PlayerPerf
+from .models import MatchRecord, PlayerPerf, MatchStatus
 from .polite import PoliteFetcher, RobotsDisallowed
+from .permanent_matches import classify_match_status, fetch_cricsheet_missing_matches
 
 
 class ScraperError(Exception):
@@ -803,20 +804,35 @@ class MultiSourceScraper:
 
 
 class ScraperSource:
-    """Source implementation that uses MultiSourceScraper for the pluggable system."""
+    """Source implementation that uses MultiSourceScraper for the pluggable system.
+    
+    Classifies matches based on their permanence:
+    - provisional: Normal lag (delete after Cricsheet arrives)
+    - cricsheet_missing: On Cricsheet's missing list (keep permanently)
+    - cricsheet_withheld: Afghanistan men's team or APL (keep permanently)
+    """
     
     name = "scraper"
     
     def __init__(self):
         self.scraper = MultiSourceScraper()
+        self._missing_matches_cache = None
     
     def fetch(self, since: date) -> list[MatchRecord]:
-        """Fetch matches from all configured scrapers."""
+        """Fetch matches from all configured scrapers and classify them."""
         matches = self.scraper.fetch(since)
         
-        # Mark all as provisional with scraped timestamp
+        # Fetch missing matches list once for all matches
+        if self._missing_matches_cache is None:
+            self._missing_matches_cache = fetch_cricsheet_missing_matches()
+        
+        # Classify and mark each match
         for match in matches:
-            match.status = "provisional"
+            # Classify based on Cricsheet missing list or Afghanistan status
+            status = classify_match_status(match, self._missing_matches_cache)
+            match.status = status.value
+            
+            # Ensure match ID format
             if not match.match_id.startswith(("espn-", "cb-", "crex-", "prov-")):
                 match.match_id = f"scraped-{match.date}-{_norm(match.team_a)}-{_norm(match.team_b)}"
         

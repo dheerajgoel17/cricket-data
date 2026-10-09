@@ -2,6 +2,25 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from enum import Enum
+
+
+class MatchStatus(str, Enum):
+    """Classification for how to handle scraped match data.
+    
+    - provisional: Normal lag between live match and Cricsheet release.
+                   Delete after Cricsheet data arrives and is reconciled.
+    - cricsheet_missing: Match is on Cricsheet's missing-matches list.
+                         Keep permanently as source of truth unless Cricsheet
+                         later provides it.
+    - cricsheet_withheld: Match involves Afghanistan men's team or APL.
+                          Cricsheet has withheld these matches since Nov 2024.
+                          Keep permanently unless Cricsheet restores them.
+    """
+    PROVISIONAL = "provisional"
+    CRICSHEET_MISSING = "cricsheet_missing"
+    CRICSHEET_WITHHELD = "cricsheet_withheld"
+
 
 # Player-performance points (fantasy-style scoring): 1/run, 20/wicket, 10/catch, 25/stumping.
 PTS_RUN, PTS_WICKET, PTS_CATCH, PTS_STUMPING = 1, 20, 10, 25

@@ -1,9 +1,18 @@
 """Provisional (not yet in Cricsheet) matches, and reconciliation when they land.
 
-A provisional match is one JSON file under <data>/provisional/. When Cricsheet
-publishes the same match, `reconcile` compares the two, logs the verdict to
-reconcile_log.csv, and DELETES the provisional file, so provisional data never
-accumulates and never outlives its canonical replacement.
+A provisional match is one JSON file under <data>/provisional/. There are three statuses:
+
+1. **provisional**: Normal lag between live match and Cricsheet release.
+   When Cricsheet publishes the match, reconcile compares, logs, and DELETES the file.
+
+2. **cricsheet_missing**: Match is on Cricsheet's missing-matches list.
+   Keep permanently as source of truth. If Cricsheet later provides it, reconcile
+   and prefer Cricsheet (then delete the scraped version).
+
+3. **cricsheet_withheld**: Afghanistan men's team or APL matches withheld by Cricsheet.
+   Keep permanently. If Cricsheet ever restores them, reconcile and prefer Cricsheet.
+
+Permanent matches (statuses 2 and 3) are never deleted unless Cricsheet provides them.
 """
 from __future__ import annotations
 
@@ -13,10 +22,10 @@ import re
 from datetime import date, timedelta
 from pathlib import Path
 
-from .models import MatchRecord, PlayerPerf
+from .models import MatchRecord, PlayerPerf, MatchStatus
 from .store import Store
 
-LOG_FIELDS = ["checked_on", "provisional_id", "canonical_id", "date", "winner_ok", "players_compared", "player_mismatches"]
+LOG_FIELDS = ["checked_on", "provisional_id", "canonical_id", "date", "status", "winner_ok", "players_compared", "player_mismatches", "action"]
 STALE_DAYS = 45
 
 
@@ -80,20 +89,37 @@ def find_canonical(store: Store, prov: MatchRecord) -> dict[str, str] | None:
 
 
 def reconcile(store: Store, today: date | None = None) -> dict[str, int]:
-    """Verify provisional matches against canonical ones and delete those that landed."""
+    """Verify provisional matches against canonical ones and delete those that landed.
+    
+    Respects match status:
+    - provisional: Delete after Cricsheet arrival
+    - cricsheet_missing: Keep permanently unless Cricsheet provides it
+    - cricsheet_withheld: Keep permanently unless Cricsheet restores it
+    
+    Returns stats dict with counts by action taken.
+    """
     today = today or date.today()
-    stats = {"landed": 0, "mismatched": 0, "pending": 0, "stale": 0}
+    stats = {"landed": 0, "mismatched": 0, "pending": 0, "stale": 0, "permanent_kept": 0}
     log_path = store.root / "reconcile_log.csv"
+    
     for path, prov in load_provisional(store):
+        # Determine match status
+        status = prov.status or "provisional"
+        is_permanent = status in (MatchStatus.CRICSHEET_MISSING.value, MatchStatus.CRICSHEET_WITHHELD.value)
+        
         canon = find_canonical(store, prov)
         if canon is None:
             stats["pending"] += 1
+            if is_permanent:
+                stats["permanent_kept"] += 1
             try:
                 if (today - date.fromisoformat(prov.date)).days > STALE_DAYS:
                     stats["stale"] += 1
             except ValueError:
                 pass
             continue
+        
+        # Found canonical version - compare and decide
         month = canon["date"][:7]
         cplayers = {r["player"]: r for r in store.read("players", month) if r["match_id"] == canon["match_id"]}
         compared = mism = 0
@@ -105,17 +131,42 @@ def reconcile(store: Store, today: date | None = None) -> dict[str, int]:
             if (int(c["runs"]), int(c["wickets"])) != (p.runs, p.wickets):
                 mism += 1
         winner_ok = not prov.winner or _norm(prov.winner) == _norm(canon["winner"])
+        
+        # Log the reconciliation
         new = not log_path.exists()
         log_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Determine action based on status
+        if is_permanent:
+            # Permanent match: Cricsheet has now provided it
+            # Prefer Cricsheet and delete scraped version
+            action = "replaced_by_cricsheet"
+            should_delete = True
+        else:
+            # Provisional match: normal case, delete after landing
+            action = "landed_deleted"
+            should_delete = True
+        
         with log_path.open("a", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=LOG_FIELDS, lineterminator="\n")
             if new:
                 w.writeheader()
-            w.writerow({"checked_on": today.isoformat(), "provisional_id": prov.match_id,
-                        "canonical_id": canon["match_id"], "date": canon["date"],
-                        "winner_ok": str(winner_ok).lower(), "players_compared": compared,
-                        "player_mismatches": mism})
+            w.writerow({
+                "checked_on": today.isoformat(),
+                "provisional_id": prov.match_id,
+                "canonical_id": canon["match_id"],
+                "date": canon["date"],
+                "status": status,
+                "winner_ok": str(winner_ok).lower(),
+                "players_compared": compared,
+                "player_mismatches": mism,
+                "action": action
+            })
+        
         stats["landed"] += 1
         stats["mismatched"] += int(not winner_ok or mism > 0)
-        path.unlink()  # canonical copy exists: free the space
+        
+        if should_delete:
+            path.unlink()  # canonical copy exists: free the space
+    
     return stats
