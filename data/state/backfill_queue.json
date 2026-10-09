@@ -1,71 +1,21 @@
 {
-  "batch_size": 2,
+  "batch_size": 5,
   "delay_between_requests": 8.0,
   "done": [],
   "failed": [],
   "in_progress": [],
-  "last_updated": "2026-10-09T05:10:54.072556",
+  "last_updated": "2026-10-09T05:16:08.967380",
   "max_retries": 3,
   "not_found": [
     "2026-09-25-Warriors-North West",
-    "2026-03-28-Police Sports Club-Ace Capital Cricket Club"
+    "2026-03-28-Police Sports Club-Ace Capital Cricket Club",
+    "2026-09-25-Warriors-North West",
+    "2026-03-28-Police Sports Club-Ace Capital Cricket Club",
+    "2025-12-18-Jharkhand-Haryana",
+    "2025-12-16-Madhya Pradesh-Punjab",
+    "2025-12-16-Rajasthan-Mumbai"
   ],
   "pending": [
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2026-09-25",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "List A",
-      "team_a": "Warriors",
-      "team_b": "North West"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2026-03-28",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "List A",
-      "team_a": "Police Sports Club",
-      "team_b": "Ace Capital Cricket Club"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-18",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Jharkhand",
-      "team_b": "Haryana"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-16",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Madhya Pradesh",
-      "team_b": "Punjab"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-16",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Rajasthan",
-      "team_b": "Mumbai"
-    },
     {
       "attempts": 0,
       "category": "cricsheet_missing",
