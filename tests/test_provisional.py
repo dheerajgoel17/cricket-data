@@ -20,7 +20,7 @@ def prov(winner="Australia", runs=30):
 def test_pending_provisional_kept(tmp_path):
     s = Store(tmp_path)
     write_provisional(s, prov())
-    assert reconcile(s, today=date(2026, 10, 1)) == {"landed": 0, "mismatched": 0, "pending": 1, "stale": 0}
+    assert reconcile(s, today=date(2026, 10, 1)) == {"landed": 0, "mismatched": 0, "pending": 1, "stale": 0, "permanent_kept": 0}
     assert len(load_provisional(s)) == 1
 
 
