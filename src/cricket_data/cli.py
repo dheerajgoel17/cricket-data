@@ -133,21 +133,40 @@ def cmd_update(a: argparse.Namespace) -> int:
     
     # Process backfill batch (after recent matches, low priority)
     if a.enable_scraper and hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
-        from .backfill import BackfillQueue
+        from .backfill import BackfillQueue, process_backfill_batch
+        from .scrapers import CREXScraper
         
         queue_path = store.root / "state" / "backfill_queue.json"
         
         # Load or initialize queue
         if not queue_path.exists():
             from .backfill import initialize_backfill_queue
-            queue = initialize_backfill_queue(queue_path, verbose=False)
+            queue = initialize_backfill_queue(queue_path, verbose=True)
         else:
             queue = BackfillQueue.load(queue_path)
         
-        # Show stats
+        # Override batch size if specified
+        if hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
+            queue.batch_size = a.backfill_batch_size
+        
+        # Process one batch if there are pending tasks
+        if queue.pending or queue.in_progress:
+            # Initialize CREX scraper for backfill
+            crex_scraper = CREXScraper()
+            
+            # Actually process the batch
+            backfill_stats = process_backfill_batch(queue, crex_scraper, store, verbose=True)
+            
+            # Show results
+            if backfill_stats["succeeded"] > 0 or backfill_stats["not_found"] > 0:
+                print(f"  Backfill: {backfill_stats['succeeded']} scraped, {backfill_stats['not_found']} not found, {backfill_stats['failed']} failed")
+        
+        # Show queue stats
         stats = queue.stats()
         if stats['pending'] + stats['in_progress'] > 0:
-            print(f"backfill: {stats['pending'] + stats['in_progress']} remaining, {stats['done']} done")
+            print(f"backfill: {stats['pending'] + stats['in_progress']} remaining, {stats['done']} done, {stats['not_found']} not found")
+        
+        queue.save(queue_path)
     
     # Complete and save report
     report.completed_at = datetime.now().isoformat()

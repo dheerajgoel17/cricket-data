@@ -58,6 +58,7 @@ class BackfillQueue:
     in_progress: list[BackfillTask] = field(default_factory=list)
     done: list[str] = field(default_factory=list)  # Task keys
     failed: list[BackfillTask] = field(default_factory=list)
+    not_found: list[str] = field(default_factory=list)  # Matches CREX doesn't have
     
     # Configuration
     max_retries: int = 3
@@ -77,6 +78,7 @@ class BackfillQueue:
                 in_progress=[BackfillTask(**t) for t in data.get("in_progress", [])],
                 done=data.get("done", []),
                 failed=[BackfillTask(**t) for t in data.get("failed", [])],
+                not_found=data.get("not_found", []),
                 max_retries=data.get("max_retries", 3),
                 batch_size=data.get("batch_size", 5),
                 delay_between_requests=data.get("delay_between_requests", 10.0),
@@ -93,6 +95,7 @@ class BackfillQueue:
             "in_progress": [asdict(t) for t in self.in_progress],
             "done": self.done,
             "failed": [asdict(t) for t in self.failed],
+            "not_found": self.not_found,
             "max_retries": self.max_retries,
             "batch_size": self.batch_size,
             "delay_between_requests": self.delay_between_requests,
@@ -160,6 +163,12 @@ class BackfillQueue:
         
         return batch
     
+    def mark_not_found(self, task: BackfillTask) -> None:
+        """Mark task as not found in CREX (won't retry)."""
+        if task in self.in_progress:
+            self.in_progress.remove(task)
+        self.not_found.append(task.key())
+    
     def mark_done(self, task: BackfillTask) -> None:
         """Mark task as successfully completed."""
         if task in self.in_progress:
@@ -189,7 +198,8 @@ class BackfillQueue:
             "in_progress": len(self.in_progress),
             "done": len(self.done),
             "failed": len(self.failed),
-            "total": len(self.pending) + len(self.in_progress) + len(self.done) + len(self.failed),
+            "not_found": len(self.not_found),
+            "total": len(self.pending) + len(self.in_progress) + len(self.done) + len(self.failed) + len(self.not_found),
         }
 
 
@@ -213,24 +223,75 @@ def should_backoff(status_code: int | None, error_msg: str) -> tuple[bool, float
     return False, 0.0
 
 
+def search_crex_for_match(
+    task: BackfillTask,
+    scraper
+) -> str | None:
+    """Search CREX for a match by date and teams.
+    
+    Returns match_id if found, None if not found.
+    """
+    try:
+        from playwright.sync_api import TimeoutError as PlaywrightTimeout
+        
+        # Get browser
+        context = scraper._get_browser()
+        page = context.new_page()
+        
+        # Strategy: Load CREX homepage and look for matches with these teams
+        # CREX lists recent and ongoing matches prominently
+        page.goto("https://crex.live", wait_until="networkidle", timeout=30000)
+        
+        # Look for match links with both teams
+        team_a_norm = task.team_a.lower().replace(" ", "-")
+        team_b_norm = task.team_b.lower().replace(" ", "-")
+        
+        # Get all match links
+        match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+        
+        for link in match_links:
+            href = link.get_attribute('href') or ''
+            href_lower = href.lower()
+            
+            # Check if both teams appear in URL (either order)
+            if ((team_a_norm in href_lower or task.team_a.lower() in href_lower) and
+                (team_b_norm in href_lower or task.team_b.lower() in href_lower)):
+                # Extract match_id from URL
+                match_id = href.split('/')[-1]
+                page.close()
+                return match_id
+        
+        page.close()
+        return None
+        
+    except Exception as exc:
+        print(f"Search failed: {exc}")
+        return None
+
+
 def process_backfill_batch(
     queue: BackfillQueue,
     scraper,
+    store,
     verbose: bool = True
 ) -> dict[str, int]:
     """Process one batch from the backfill queue.
     
+    Actually scrapes matches from CREX and saves them.
+    
     Args:
         queue: BackfillQueue with tasks to process
         scraper: CricketScraper instance (typically CREXScraper)
+        store: Store instance for saving matches
         verbose: Print progress messages
     
     Returns:
-        Stats dict with succeeded, failed, skipped counts
+        Stats dict with succeeded, failed, not_found counts
     """
     from .scrapers import ScraperError
+    from .provisional import write_provisional
     
-    stats = {"succeeded": 0, "failed": 0, "skipped": 0}
+    stats = {"succeeded": 0, "failed": 0, "not_found": 0}
     
     batch = queue.get_next_batch()
     
@@ -245,14 +306,38 @@ def process_backfill_batch(
             print(f"  [{i}/{len(batch)}] {task.date} {task.team_a} vs {task.team_b}...", end=" ", flush=True)
         
         try:
-            # Try to fetch match from scraper
-            # We don't have a match_id, so we'd need to search CREX by date/teams
-            # For now, mark as skipped (would need CREX search capability)
-            if verbose:
-                print("skipped (search not implemented)")
-            stats["skipped"] += 1
-            queue.mark_done(task)  # Don't retry search failures indefinitely
+            # Try to find match on CREX
+            match_id = search_crex_for_match(task, scraper)
             
+            if match_id is None:
+                # Not found on CREX
+                queue.mark_not_found(task)
+                stats["not_found"] += 1
+                if verbose:
+                    print("not found")
+                continue
+            
+            # Found - now scrape it
+            match = scraper.fetch_match(match_id)
+            
+            if match is None:
+                # Failed to scrape (error or parsing issue)
+                queue.mark_failed(task, "Failed to parse match data")
+                stats["failed"] += 1
+                if verbose:
+                    print("parse failed")
+            else:
+                # Successfully scraped - save it
+                # Set status based on task category
+                match.status = task.category
+                write_provisional(store, match)
+                queue.mark_done(task)
+                stats["succeeded"] += 1
+                
+                if verbose:
+                    result = f"{match.winner} won" if match.winner else "result unknown"
+                    print(f"✓ {result}")
+        
         except ScraperError as exc:
             error_msg = str(exc)
             
@@ -268,14 +353,14 @@ def process_backfill_batch(
             stats["failed"] += 1
             
             if verbose:
-                print(f"failed: {error_msg}")
+                print(f"failed: {error_msg[:50]}")
         
         except Exception as exc:
             queue.mark_failed(task, str(exc))
             stats["failed"] += 1
             
             if verbose:
-                print(f"error: {exc}")
+                print(f"error: {str(exc)[:50]}")
         
         # Generous delay between historical requests
         if i < len(batch):
