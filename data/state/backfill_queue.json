@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-09T06:09:26",
+ "afghanistan_enumerated_at": "2026-10-09T06:18:23",
  "already_in_cricsheet": [],
  "batch_size": 5,
  "delay_between_requests": 8.0,
@@ -33,91 +33,50 @@
    "key": "2026-09-28-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO",
    "saved_at": "2026-10-09T06:10:15"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
+   "key": "2026-09-25-Afghanistan-Nepal",
+   "match_id": "crex-afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
+   "saved_at": "2026-10-09T06:18:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
+   "key": "2026-09-24-Afghanistan-Japan",
+   "match_id": "crex-afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
+   "saved_at": "2026-10-09T06:18:38"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
+   "key": "2026-09-17-Afghanistan-India",
+   "match_id": "crex-afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
+   "saved_at": "2026-10-09T06:18:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
+   "key": "2026-09-15-Afghanistan-India",
+   "match_id": "crex-afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
+   "saved_at": "2026-10-09T06:19:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
+   "key": "2026-09-13-Afghanistan-India",
+   "match_id": "crex-afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
+   "saved_at": "2026-10-09T06:19:12"
   }
  ],
  "failed": [],
  "in_progress": [],
  "max_retries": 3,
- "not_found": [],
+ "not_found": [
+  {
+   "checked": [],
+   "checked_at": "2026-10-09T06:18:23",
+   "key": "2026-09-25-Warriors-North West",
+   "reason": "no CREX match within a day of 2026-09-25 with plausible teams (sitemap covers 1993-01-02..2026-10-09)"
+  }
+ ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2026-09-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
-   "date": "2026-09-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Nepal"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
-   "date": "2026-09-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Japan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
-   "date": "2026-09-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
-   "date": "2026-09-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
-   "date": "2026-09-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "India"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
