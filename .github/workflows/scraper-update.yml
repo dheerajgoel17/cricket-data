@@ -4,7 +4,10 @@ name: Scraper update
 on:
   schedule:
     - cron: "0 */6 * * *"  # Every 6 hours
-  workflow_dispatch:
+  workflow_dispatch:  # Allow manual triggers
+  push:  # TEMPORARY: Test on this branch, remove before merge
+    branches:
+      - cursor/scraper-workflow-0411
 
 permissions:
   contents: write
@@ -26,7 +29,33 @@ jobs:
       - name: Install
         run: pip install -e .
       - name: Scrape recent matches
-        run: cricket-data update --enable-scraper --provisional-days 7
+        id: scrape
+        run: |
+          cricket-data update --enable-scraper --provisional-days 7 2>&1 | tee scraper_output.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Check for failures
+        id: check_failures
+        run: |
+          if [ -f data/scraper_run_report.json ]; then
+            # Extract failure information
+            FAILED_SOURCES=$(python3 -c "
+            import json
+            with open('data/scraper_run_report.json') as f:
+                report = json.load(f)
+                print(','.join(report.get('sources_failed', [])))
+            ")
+            echo "failed_sources=$FAILED_SOURCES" >> $GITHUB_OUTPUT
+            
+            if [ -n "$FAILED_SOURCES" ]; then
+              echo "has_failures=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_failures=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
       - name: Size guard
         run: |
           du -sh .git data
@@ -46,8 +75,91 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: scraper-report-${{ github.run_id }}
-          path: data/scraper_report.csv
+          path: |
+            data/scraper_report.csv
+            data/scraper_run_report.json
+            scraper_output.log
           if-no-files-found: ignore
+      
+      - name: Create or update scraper-broken issue
+        if: steps.check_failures.outputs.has_failures == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Generate issue body from report
+          python3 << 'EOF'
+          import json
+          import os
+          
+          with open('data/scraper_run_report.json') as f:
+              report = json.load(f)
+          
+          run_url = f"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          body = f"""## Scraper Failure Report
+
+          **Run started:** {report['started_at']}
+          **GitHub Actions run:** {run_url}
+          
+          **Sources attempted:** {len(report['sources_attempted'])}
+          **Sources succeeded:** {len(report['sources_succeeded'])}
+          **Sources failed:** {len(report['sources_failed'])}
+          
+          """
+          
+          if report['sources_failed']:
+              body += "### Failed Sources\n\n"
+              for source in report['sources_failed']:
+                  source_failures = [f for f in report['failures'] if f['source'] == source]
+                  body += f"#### {source}\n\n"
+                  for failure in source_failures:
+                      body += f"- **Error:** `{failure['error_type']}`\n"
+                      body += f"- **Message:** {failure['error_message']}\n"
+                      body += f"- **Time:** {failure['timestamp']}\n\n"
+          
+          body += f"""
+          ### Run Summary
+          
+          ```
+          Sources attempted: {', '.join(report['sources_attempted'])}
+          Sources succeeded: {', '.join(report['sources_succeeded']) if report['sources_succeeded'] else 'None'}
+          Sources failed: {', '.join(report['sources_failed'])}
+          Matches scraped: {report['matches_scraped']}
+          Conflicts resolved: {report['conflicts_resolved']}
+          ```
+          
+          ---
+          
+          **Action needed:** Investigate and fix the failing scraper(s).
+          
+          Common causes:
+          - Site changed API structure
+          - robots.txt blocks our user agent
+          - Network issues or site down
+          - Rate limiting
+          
+          This issue will be automatically updated on subsequent failures.
+          Close this issue once scrapers are fixed and verified working.
+          """
+          
+          # Save to file
+          with open('issue_body.md', 'w') as f:
+              f.write(body)
+          EOF
+          
+          # Check if issue exists
+          ISSUE_NUMBER=$(gh issue list --label scraper-broken --state open --json number --jq '.[0].number')
+          
+          if [ -z "$ISSUE_NUMBER" ]; then
+            # Create new issue
+            gh label create scraper-broken --color FFA500 --description "Scraper failure" 2>/dev/null || true
+            gh issue create --label scraper-broken --title "Scraper failures detected" --body-file issue_body.md
+            echo "Created new scraper-broken issue"
+          else
+            # Update existing issue
+            gh issue comment $ISSUE_NUMBER --body-file issue_body.md
+            echo "Updated existing issue #$ISSUE_NUMBER"
+          fi
       - name: Open an issue if scraping failed
         if: failure()
         env:

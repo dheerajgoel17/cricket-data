@@ -5,13 +5,14 @@ import argparse
 import csv
 import sqlite3
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from . import __version__
 from .cricsheet import download, iter_zip
 from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
+from .scraper_monitor import ScraperFailure, ScraperRunReport, save_report
 from .scrapers import ScraperSource
 from .sources import InboxSource, load_extra_sources
 from .store import Store
@@ -45,6 +46,10 @@ def _ingest_zip(store: Store, zip_path: Path) -> dict[str, int]:
 
 def cmd_update(a: argparse.Namespace) -> int:
     store = Store(a.data_dir)
+    
+    # Initialize scraper run report
+    report = ScraperRunReport(started_at=datetime.now().isoformat())
+    
     if a.zip:
         stats = _ingest_zip(store, Path(a.zip))
     else:
@@ -60,26 +65,60 @@ def cmd_update(a: argparse.Namespace) -> int:
     
     # Add web scraper if enabled
     if a.enable_scraper:
-        sources.append(ScraperSource())
+        scraper_source = ScraperSource()
+        sources.append(scraper_source)
+        
+        # Track which scrapers were attempted
+        report.sources_attempted = [s.name for s in scraper_source.scraper.scrapers]
     
     added = 0
     scraper_conflicts = []
     for src in sources:
+        source_name = getattr(src, 'name', src.__class__.__name__)
+        
         try:
             for rec in src.fetch(since):
                 if find_canonical(store, rec) is None:  # skip anything Cricsheet already has
                     write_provisional(store, rec)
                     added += 1
             
-            # Capture conflict log from scraper
-            if isinstance(src, ScraperSource) and src.scraper.conflict_log:
-                scraper_conflicts.extend(src.scraper.get_conflict_log())
+            # Track successful scraper
+            if isinstance(src, ScraperSource):
+                # Mark sources that successfully returned data
+                if added > 0:
+                    for scraper in src.scraper.scrapers:
+                        scraper_name = getattr(scraper, 'name', scraper.__class__.__name__)
+                        report.mark_success(scraper_name, 0)  # Will be updated with actual count
+                
+                # Capture failures
+                for source, error_type, error_msg in src.scraper.failures:
+                    report.add_failure(ScraperFailure(
+                        source=source,
+                        error_type=error_type,
+                        error_message=error_msg,
+                        timestamp=datetime.now().isoformat(),
+                    ))
+                
+                # Capture conflict log from scraper
+                if src.scraper.conflict_log:
+                    scraper_conflicts.extend(src.scraper.get_conflict_log())
+        
         except Exception as exc:  # one broken source must not stop the daily run
-            print(f"warning: source {src.name} failed: {exc}", file=sys.stderr)
+            print(f"warning: source {source_name} failed: {exc}", file=sys.stderr)
+            if a.enable_scraper and isinstance(src, ScraperSource):
+                report.add_failure(ScraperFailure(
+                    source=source_name,
+                    error_type=type(exc).__name__,
+                    error_message=str(exc),
+                    timestamp=datetime.now().isoformat(),
+                ))
+    
+    report.matches_scraped = added
     print(f"provisional: {added} written")
     
     # Report scraper conflicts
     if scraper_conflicts:
+        report.conflicts_resolved = len(scraper_conflicts)
         print(f"scraper conflicts: {len(scraper_conflicts)} resolved", file=sys.stderr)
         _write_scraper_report(store, scraper_conflicts)
 
@@ -91,6 +130,20 @@ def cmd_update(a: argparse.Namespace) -> int:
     print(f"reconcile: {rstats}")
     if rstats["mismatched"]:
         print("warning: provisional data disagreed with Cricsheet; see reconcile_log.csv", file=sys.stderr)
+    
+    # Complete and save report
+    report.completed_at = datetime.now().isoformat()
+    save_report(report, store.root / "scraper_run_report.json")
+    
+    # Print summary
+    if a.enable_scraper:
+        print("\n" + report.summary())
+        
+        # Return error code if scrapers failed
+        if report.sources_failed:
+            print(f"\nWarning: {len(report.sources_failed)} source(s) failed", file=sys.stderr)
+            return 1
+    
     return 0
 
 

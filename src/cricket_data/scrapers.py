@@ -632,13 +632,21 @@ class MultiSourceScraper:
             self.scrapers = ScraperRegistry.get_all(fetcher=fetcher)
         
         self.conflict_log: list[dict[str, Any]] = []
+        self.failures: list[tuple[str, str, str]] = []  # Track failures per source
     
     def fetch(self, since: date) -> list[MatchRecord]:
-        """Fetch matches from all sources and resolve conflicts."""
+        """Fetch matches from all sources and resolve conflicts.
+        
+        Sources fail independently - if one source breaks, others continue.
+        Failures are tracked in self.failures for reporting.
+        """
         all_matches: dict[tuple, list[MatchRecord]] = defaultdict(list)
+        self.failures: list[tuple[str, str, str]] = []  # (source, error_type, message)
         
         # Collect matches from all sources
         for scraper in self.scrapers:
+            source_name = getattr(scraper, 'name', scraper.__class__.__name__)
+            
             try:
                 # Get recent match IDs
                 match_ids = scraper.fetch_recent_match_ids(days=(date.today() - since).days)
@@ -649,12 +657,22 @@ class MultiSourceScraper:
                         if match:
                             key = _match_key(match)
                             all_matches[key].append(match)
-                    except (ScraperError, RobotsDisallowed):
+                    except (ScraperError, RobotsDisallowed) as exc:
                         # Individual match failures shouldn't stop the source
+                        self.failures.append((source_name, type(exc).__name__, str(exc)))
+                        continue
+                    except Exception as exc:
+                        # Unexpected errors - log but continue
+                        self.failures.append((source_name, "UnexpectedError", str(exc)))
                         continue
             
-            except (ScraperError, RobotsDisallowed):
-                # If a source is completely unavailable, continue with others
+            except (ScraperError, RobotsDisallowed) as exc:
+                # If a source is completely unavailable, log and continue with others
+                self.failures.append((source_name, type(exc).__name__, str(exc)))
+                continue
+            except Exception as exc:
+                # Unexpected errors at source level
+                self.failures.append((source_name, "UnexpectedError", str(exc)))
                 continue
         
         # Resolve conflicts and return deduplicated matches
