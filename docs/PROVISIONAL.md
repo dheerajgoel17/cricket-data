@@ -34,7 +34,7 @@ CRICKET_DATA_SOURCES="my_pkg.module:MySource" cricket-data update
 `MySource` needs a `name` and `fetch(since: date) -> Iterable[MatchRecord]`; see `examples/example_source.py`.
 A failing source never stops the daily run.
 
-## Please only use sources you have the right to use
+## Please only use sources you have the right to use (see [PRIVATE_SOURCES.md](PRIVATE_SOURCES.md))
 No scraper ships with this project. Many sites forbid scraping in their terms.
 
 ## What reconciliation checks
