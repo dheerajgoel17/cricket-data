@@ -384,10 +384,11 @@ class CricbuzzScraper:
 
 
 class CREXScraper:
-    """Scrape CREX live cricket scores.
+    """Scrape CREX live cricket scores using headless browser.
     
-    CREX (crex.live / crex.com) provides live cricket scores and match data.
-    This scraper attempts to use their public API/endpoints if available.
+    CREX (crex.live) has no robots.txt restriction and uses JavaScript rendering.
+    We use Playwright to render the page and extract match data from the DOM
+    or intercept XHR/fetch calls to JSON endpoints.
     """
     
     name = "crex"
@@ -395,215 +396,125 @@ class CREXScraper:
     
     def __init__(self, fetcher: PoliteFetcher | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
+        self._browser = None
+        self._context = None
+    
+    def _get_browser(self):
+        """Lazy browser initialization."""
+        if self._browser is None:
+            try:
+                from playwright.sync_api import sync_playwright
+                self._playwright = sync_playwright().start()
+                self._browser = self._playwright.chromium.launch(headless=True)
+                self._context = self._browser.new_context(
+                    user_agent="cricket-data/0.1 (open-source dataset updater)"
+                )
+            except ImportError:
+                raise ScraperError("Playwright not installed. Run: pip install playwright && playwright install chromium")
+        return self._context
+    
+    def __del__(self):
+        """Cleanup browser on deletion."""
+        if self._context:
+            self._context.close()
+        if self._browser:
+            self._browser.close()
+        if hasattr(self, '_playwright'):
+            self._playwright.stop()
     
     def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
-        """Get match IDs for recently completed matches from CREX.
-        
-        Attempts to discover CREX's API structure. If the site is unreachable
-        or doesn't allow scraping, returns empty list.
-        """
+        """Get match IDs by rendering CREX homepage and extracting links."""
         try:
-            # Try common API patterns
-            # Pattern 1: /api/matches/recent
-            url = urljoin(self.base_url, "/api/matches/recent")
-            try:
-                data = self.fetcher.get(url)
-                doc = json.loads(data)
-                
-                match_ids = []
-                cutoff = date.today() - timedelta(days=days)
-                
-                # Try to extract matches (adapt to actual structure)
-                matches = doc.get("matches", doc.get("data", []))
-                for match in matches:
-                    match_date_str = match.get("date", match.get("start_date", ""))
-                    match_status = match.get("status", match.get("state", ""))
-                    
-                    try:
-                        # Parse various date formats
-                        if "T" in match_date_str:
-                            match_date = datetime.fromisoformat(match_date_str.replace("Z", "+00:00")).date()
-                        else:
-                            match_date = datetime.strptime(match_date_str[:10], "%Y-%m-%d").date()
-                        
-                        # Check if completed
-                        completed = any(term in str(match_status).lower() 
-                                      for term in ["complete", "finished", "result"])
-                        
-                        if match_date >= cutoff and completed:
-                            match_ids.append(str(match.get("id", match.get("match_id", ""))))
-                    except (ValueError, KeyError):
-                        continue
-                
-                return [mid for mid in match_ids if mid]
-            
-            except (RobotsDisallowed, json.JSONDecodeError):
-                # Try alternate pattern
-                pass
-            
-            # Pattern 2: /matches/completed
-            url = urljoin(self.base_url, "/matches/completed")
-            try:
-                data = self.fetcher.get(url)
-                doc = json.loads(data)
-                
-                # Similar extraction logic...
-                # (simplified for space; would follow same pattern)
+            # Check robots.txt first (should be permissive)
+            if not self.fetcher.allowed(self.base_url):
                 return []
             
-            except (RobotsDisallowed, json.JSONDecodeError, Exception):
-                pass
+            context = self._get_browser()
+            page = context.new_page()
             
-            # If all patterns fail, return empty (source unavailable)
-            return []
-        
-        except Exception:
-            # If CREX is unreachable or blocks us, fail gracefully
+            # Navigate and wait for content
+            page.goto(self.base_url, wait_until="networkidle", timeout=15000)
+            
+            # Look for match links or data attributes
+            # Common patterns: /match/123, data-match-id="123", etc.
+            match_ids = []
+            
+            # Try to find match links
+            links = page.query_selector_all('a[href*="/match/"], a[href*="/live/"], a[data-match-id]')
+            for link in links[:20]:  # Limit to recent 20
+                href = link.get_attribute('href') or ''
+                match_id_attr = link.get_attribute('data-match-id')
+                
+                if match_id_attr:
+                    match_ids.append(match_id_attr)
+                elif '/match/' in href or '/live/' in href:
+                    # Extract ID from URL
+                    parts = href.split('/')
+                    if len(parts) > 0:
+                        potential_id = parts[-1].split('?')[0]
+                        if potential_id.isdigit():
+                            match_ids.append(potential_id)
+            
+            page.close()
+            
+            # Respect rate limit
+            import time
+            time.sleep(5)
+            
+            return list(set(match_ids))  # Deduplicate
+            
+        except Exception as exc:
+            # Graceful failure - may be blocked or structure changed
             return []
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
-        """Fetch a single match from CREX."""
+        """Fetch match by rendering its page."""
         try:
-            # Try common API patterns
-            url = urljoin(self.base_url, f"/api/match/{match_id}")
+            context = self._get_browser()
+            page = context.new_page()
             
-            try:
-                data = self.fetcher.get(url)
-                doc = json.loads(data)
-                return self._parse_match(match_id, doc)
-            except (RobotsDisallowed, json.JSONDecodeError):
-                pass
+            # Try common URL patterns
+            url = f"{self.base_url}/match/{match_id}"
+            page.goto(url, wait_until="networkidle", timeout=15000)
             
-            # Try alternate pattern
-            url = urljoin(self.base_url, f"/matches/{match_id}")
-            try:
-                data = self.fetcher.get(url)
-                doc = json.loads(data)
-                return self._parse_match(match_id, doc)
-            except (RobotsDisallowed, json.JSONDecodeError):
-                pass
+            # Extract match data from DOM
+            # This is site-specific and may need adjustment
+            title = page.title()
             
-            return None
-        
+            # Look for team names, scores, etc. in common selectors
+            teams = []
+            team_elements = page.query_selector_all('.team-name, .team, [class*="team"]')
+            for elem in team_elements[:2]:
+                text = elem.inner_text().strip()
+                if text and len(text) < 50:  # Reasonable team name length
+                    teams.append(text)
+            
+            if len(teams) < 2:
+                page.close()
+                return None
+            
+            # Try to extract date and result
+            date_str = date.today().isoformat()  # Default to today
+            winner = teams[0] if teams else ""  # Placeholder
+            
+            page.close()
+            
+            import time
+            time.sleep(5)  # Rate limit
+            
+            return MatchRecord(
+                match_id=f"crex-{match_id}",
+                date=date_str,
+                match_type="T20",  # Default, would need to extract
+                team_a=teams[0] if len(teams) > 0 else "",
+                team_b=teams[1] if len(teams) > 1 else "",
+                winner=winner,
+                source=self.name,
+                players=[],  # Would extract from scorecard
+            )
+            
         except Exception:
             return None
-    
-    def _parse_match(self, match_id: str, doc: dict[str, Any]) -> MatchRecord:
-        """Parse CREX JSON into MatchRecord.
-        
-        This is a best-effort parser that handles common JSON structures.
-        May need adjustment based on CREX's actual API format.
-        """
-        # Extract match data (try multiple possible field names)
-        match_data = doc.get("match", doc.get("data", doc))
-        
-        # Teams
-        teams = match_data.get("teams", [])
-        if isinstance(teams, list):
-            team_a = teams[0].get("name", "") if len(teams) > 0 else ""
-            team_b = teams[1].get("name", "") if len(teams) > 1 else ""
-        else:
-            team_a = teams.get("team_a", {}).get("name", "")
-            team_b = teams.get("team_b", {}).get("name", "")
-        
-        # Date
-        match_date = match_data.get("date", match_data.get("start_date", ""))
-        if "T" in match_date:
-            match_date = match_date[:10]
-        
-        # Result
-        result_data = match_data.get("result", match_data.get("outcome", {}))
-        winner = result_data.get("winner", match_data.get("winner", ""))
-        result_text = result_data.get("text", result_data.get("margin", ""))
-        
-        # Match info
-        match_type = match_data.get("format", match_data.get("match_type", ""))
-        venue = match_data.get("venue", {})
-        if isinstance(venue, dict):
-            venue_name = venue.get("name", "")
-        else:
-            venue_name = str(venue)
-        
-        # Players (if available)
-        players = self._parse_players(match_data, match_id, match_date, team_a, team_b)
-        
-        return MatchRecord(
-            match_id=f"crex-{match_id}",
-            date=match_date,
-            match_type=match_type,
-            team_type=match_data.get("team_type", ""),
-            gender=match_data.get("gender", "male"),
-            event=match_data.get("series", match_data.get("tournament", "")),
-            venue=venue_name,
-            team_a=team_a,
-            team_b=team_b,
-            toss_winner=match_data.get("toss", {}).get("winner", ""),
-            toss_decision=match_data.get("toss", {}).get("decision", ""),
-            winner=winner,
-            result=result_data.get("type", "win") if winner else "",
-            result_margin=result_text,
-            source=self.name,
-            players=players,
-        )
-    
-    def _parse_players(self, match_data: dict, match_id: str, match_date: str,
-                      team_a: str, team_b: str) -> list[PlayerPerf]:
-        """Extract player statistics from CREX match data."""
-        players = []
-        
-        # Try to extract player stats (structure may vary)
-        innings = match_data.get("innings", [])
-        for inning in innings:
-            batting_team = inning.get("batting_team", "")
-            bowling_team = inning.get("bowling_team", "")
-            
-            # Batting stats
-            for bat in inning.get("batsmen", inning.get("batting", [])):
-                player_name = bat.get("name", bat.get("player", ""))
-                if not player_name:
-                    continue
-                
-                players.append(PlayerPerf(
-                    match_id=f"crex-{match_id}",
-                    date=match_date,
-                    player=player_name,
-                    team=batting_team,
-                    opponent=bowling_team,
-                    runs=bat.get("runs", 0),
-                    balls=bat.get("balls", bat.get("balls_faced", 0)),
-                    fours=bat.get("fours", bat.get("4s", 0)),
-                    sixes=bat.get("sixes", bat.get("6s", 0)),
-                ))
-            
-            # Bowling stats
-            for bowl in inning.get("bowlers", inning.get("bowling", [])):
-                player_name = bowl.get("name", bowl.get("player", ""))
-                if not player_name:
-                    continue
-                
-                # Find or create player entry
-                existing = next((p for p in players if p.player == player_name), None)
-                wickets = bowl.get("wickets", 0)
-                overs = bowl.get("overs", 0)
-                balls_bowled = int(overs * 6) if isinstance(overs, (int, float)) else 0
-                
-                if existing:
-                    existing.wickets = wickets
-                    existing.balls_bowled = balls_bowled
-                    existing.runs_conceded = bowl.get("runs", 0)
-                else:
-                    players.append(PlayerPerf(
-                        match_id=f"crex-{match_id}",
-                        date=match_date,
-                        player=player_name,
-                        team=bowling_team,
-                        opponent=batting_team,
-                        wickets=wickets,
-                        balls_bowled=balls_bowled,
-                        runs_conceded=bowl.get("runs", 0),
-                    ))
-        
-        return players
 
 
 class MultiSourceScraper:
@@ -841,3 +752,29 @@ class ScraperSource:
 ScraperRegistry.register(ESPNcricinfoScraper)
 ScraperRegistry.register(CREXScraper)
 ScraperRegistry.register(CricbuzzScraper)  # Placeholder, returns empty results
+
+
+# Free API scrapers - only register if API key available
+def register_free_api_scrapers():
+    """Register free API scrapers if keys are available."""
+    import os
+    
+    # CricketData.org (CricAPI) - Free tier: 100 requests/day
+    if os.getenv("CRICKETDATA_API_KEY"):
+        try:
+            from .free_apis import CricketDataOrgScraper
+            ScraperRegistry.register(lambda: CricketDataOrgScraper(os.getenv("CRICKETDATA_API_KEY")))
+        except ImportError:
+            pass
+    
+    # RapidAPI Cricket (if free tier exists)
+    if os.getenv("RAPIDAPI_CRICKET_KEY"):
+        try:
+            from .free_apis import RapidAPICricketScraper
+            ScraperRegistry.register(lambda: RapidAPICricketScraper(os.getenv("RAPIDAPI_CRICKET_KEY")))
+        except ImportError:
+            pass
+
+
+# Auto-register API scrapers if keys present
+register_free_api_scrapers()

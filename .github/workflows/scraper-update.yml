@@ -24,9 +24,15 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install -e .
+        run: |
+          pip install -e .
+          pip install playwright
+          playwright install chromium
       - name: Scrape recent matches
         id: scrape
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+          RAPIDAPI_CRICKET_KEY: ${{ secrets.RAPIDAPI_CRICKET_KEY }}
         run: |
           cricket-data update --enable-scraper --provisional-days 7 2>&1 | tee scraper_output.log
           echo "exit_code=$?" >> $GITHUB_OUTPUT
