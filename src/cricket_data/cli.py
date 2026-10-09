@@ -131,6 +131,24 @@ def cmd_update(a: argparse.Namespace) -> int:
     if rstats["mismatched"]:
         print("warning: provisional data disagreed with Cricsheet; see reconcile_log.csv", file=sys.stderr)
     
+    # Process backfill batch (after recent matches, low priority)
+    if a.enable_scraper and hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
+        from .backfill import BackfillQueue
+        
+        queue_path = store.root / "state" / "backfill_queue.json"
+        
+        # Load or initialize queue
+        if not queue_path.exists():
+            from .backfill import initialize_backfill_queue
+            queue = initialize_backfill_queue(queue_path, verbose=False)
+        else:
+            queue = BackfillQueue.load(queue_path)
+        
+        # Show stats
+        stats = queue.stats()
+        if stats['pending'] + stats['in_progress'] > 0:
+            print(f"backfill: {stats['pending'] + stats['in_progress']} remaining, {stats['done']} done")
+    
     # Complete and save report
     report.completed_at = datetime.now().isoformat()
     save_report(report, store.root / "scraper_run_report.json")
@@ -216,6 +234,8 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--zip", help="use a local zip instead of downloading")
     u.add_argument("--provisional-days", type=int, default=14)
     u.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
+    u.add_argument("--backfill-batch-size", type=int, default=5,
+                   help="number of historical missing matches to backfill per run (default: 5, 0 to disable)")
     u.set_defaults(fn=cmd_update)
 
     b = sub.add_parser("backfill", help="load full history (all_json.zip)")
