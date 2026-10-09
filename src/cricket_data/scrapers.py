@@ -712,9 +712,9 @@ class ScraperSource:
 
 # Register all built-in scrapers
 # These are automatically available to MultiSourceScraper
-ScraperRegistry.register(ESPNcricinfoScraper)
+# ESPNcricinfo and Cricbuzz disallow bots in robots.txt, so their adapters are not registered:
+# registering them would only produce a failure on every run.
 ScraperRegistry.register(CREXScraper)
-ScraperRegistry.register(CricbuzzScraper)  # Placeholder, returns empty results
 
 
 # Free API scrapers - only register if API key available
