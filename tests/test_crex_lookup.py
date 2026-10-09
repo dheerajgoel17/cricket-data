@@ -114,7 +114,7 @@ def test_parse_match_page_reads_schema_facts():
     assert f.start_date == date(2024, 1, 11)
     assert f.venue.startswith("Punjab Cricket Association")
     assert f.finished
-    assert (f.winner, f.result, f.margin) == ("India", "win", "India won by 6 wickets")
+    assert (f.winner, f.result, f.margin) == ("India", "win", "6 wickets")  # Cricsheet wording
     assert f.max_overs == 20.0
 
 
@@ -126,8 +126,11 @@ def test_parse_result_variants():
     assert parse_result("Match tied")[2] == "tie"
     assert parse_result("Match drawn")[2] == "draw"
     assert parse_result("No result")[2] == "no result"
-    assert parse_result("Australia won by an innings and 9 runs 🏆")[:2] == (
-        "Australia", "Australia won by an innings and 9 runs")
+    assert parse_result("Australia won by an innings and 9 runs 🏆") == ("Australia", "innings 9 runs", "win")
+    assert parse_result("India won by 5 wickets (DLS method)") == ("India", "5 wickets", "win")
+    assert parse_result("India won by 69 runs") == ("India", "69 runs", "win")
+    # a super-over finish is a tie with no winner or margin, as in Cricsheet
+    assert parse_result("India won in Super Over 🏆") == ("", "", "tie")
 
 
 # ---- names / codes --------------------------------------------------------------------------------
@@ -386,3 +389,111 @@ def test_health_checks_flag_a_changed_match_page(tmp_path):
     assert not any(r.ok for r in results.values())
     assert (tmp_path / "match_page.html").read_text() == "<html>redesigned</html>"  # raw page saved
     assert "parse_match_page" in results["match_page"].hint
+
+
+def test_parse_match_page_reads_toss_and_overs_from_embedded_data():
+    p = _page("ind_wi_1st_t20_2026")
+    f = parse_match_page(p.html, p.text, p.title)
+    assert (f.toss_winner, f.toss_decision) == ("India", "field")  # same as the Cricsheet record
+    assert f.max_overs == 19.1  # 171/10 in 19.1: a T20, and the all-out innings is not mistaken for 50-over
+    assert f.winner == "India" and f.venue.endswith("Lucknow")
+
+
+def test_record_carries_the_toss():
+    from cricket_data.crex_sitemap import MatchEntry
+    p = _page("ind_wi_1st_t20_2026")
+    f = parse_match_page(p.html, p.text, p.title)
+    slug = "ind-vs-wi-1st-t20-west-indies-tour-of-india-2026-match-updates-11AL"
+    rec = record_from_facts(MatchEntry(url="u", match_id=slug, lastmod="2026-10-06T19:00:00+05:30"), f, "2026-10-06")
+    assert (rec.toss_winner, rec.toss_decision, rec.venue.endswith("Lucknow")) == ("India", "field", True)
+
+
+def test_render_uses_plain_http_and_falls_back_to_the_browser(monkeypatch):
+    from cricket_data import crex_browser as cb
+
+    b = cb.CREXBrowser(fetcher=type("F", (), {"allowed": lambda self, u: True})(), min_interval=0)
+    page = cb.RenderedPage("u", 200, '<script id="sports-event-schema">x</script>', "x", "t")
+    monkeypatch.setattr(b, "_http", lambda url, marker: page)
+    monkeypatch.setattr(b, "start", lambda: (_ for _ in ()).throw(AssertionError("browser must not start")))
+    assert b.render("u", wait_selector="script#sports-event-schema") is page  # served over HTTP
+
+    monkeypatch.setattr(b, "_http", lambda url, marker: None)  # content missing from the plain response
+    with pytest.raises(AssertionError):
+        b.render("u", wait_selector="script#sports-event-schema")  # tried to start Chromium
+
+
+# ---- Cricsheet-shaped records: match fields + every player -----------------------------------------
+def _scorecard():
+    from cricket_data.crex_scorecard import parse_scorecard
+    return parse_scorecard((FIX / "ind_wi_1st_t20_2026_scorecard.html").read_text())
+
+
+def test_scorecard_gives_a_row_for_every_player_with_cricsheet_columns():
+    from cricket_data.crex_scorecard import player_rows
+
+    rows = {r.player: r for r in player_rows(_scorecard(), "m", "2026-10-06")}
+    assert len(rows) == 22  # both XIs, including those who did not bat or bowl
+    iyer = rows["Shreyas Iyer"]
+    assert (iyer.team, iyer.opponent, iyer.runs, iyer.balls, iyer.fours, iyer.sixes) == ("India", "West Indies", 102, 43, 10, 6)
+    hosein = rows["Akeal Hosein"]
+    assert (hosein.team, hosein.wickets, hosein.balls_bowled, hosein.runs_conceded) == ("West Indies", 1, 24, 37)
+    assert rows["Tilak Varma"].runs == 0 and rows["Tilak Varma"].team == "India"  # did not bat
+
+
+def test_scorecard_fielding_credits_match_the_dismissals():
+    from cricket_data.crex_scorecard import player_rows
+
+    rows = {r.player: r for r in player_rows(_scorecard(), "m", "2026-10-06")}
+    assert rows["Akeal Hosein"].catches == 1  # caught and bowled Samson
+    assert rows["Shimron Hetmyer"].run_outs == 0
+    assert rows["Shreyas Iyer"].run_outs == 1 and rows["Sanju Samson"].run_outs == 1  # Hetmyer run out
+    assert rows["Axar Patel"].catches == 2 and rows["Ishan Kishan"].catches == 2 and rows["Naman Dhir"].catches == 1
+    assert sum(r.wickets for r in rows.values() if r.team == "India") == 9  # West Indies lost 10: nine to bowlers, one run out (no bowler credit)
+
+
+def test_full_record_has_toss_potm_event_and_players(index):
+    from cricket_data.crex_lookup import fetch_record
+    from cricket_data.crex_sitemap import MatchEntry
+
+    slug = "ind-vs-wi-1st-t20-west-indies-tour-of-india-2026-match-updates-11AL"
+    summary = _page("ind_wi_1st_t20_2026")
+    facts = parse_match_page(summary.html, summary.text, summary.title)
+
+    class B:
+        def render(self, url, wait_selector=None, timeout_ms=0, force_browser=False, marker=None):
+            assert url.endswith("/match-scorecard")
+            return RenderedPage(url, 200, (FIX / "ind_wi_1st_t20_2026_scorecard.html").read_text(), "", "")
+
+    rec = fetch_record(B(), MatchEntry(url="https://crex.com/cricket-live-score/" + slug, match_id=slug,
+                                       lastmod="2026-10-06T19:00:00+05:30"), facts, "2026-10-06")
+    assert (rec.match_type, rec.team_type, rec.gender) == ("T20", "international", "male")  # Cricsheet vocabulary
+    assert rec.event == "West Indies tour of India"  # no year, as Cricsheet writes it
+    assert (rec.toss_winner, rec.toss_decision) == ("India", "field")
+    assert (rec.winner, rec.result, rec.result_margin) == ("India", "win", "8 wickets")
+    assert rec.player_of_match == "Shreyas Iyer"
+    assert rec.venue.endswith("Lucknow") and len(rec.players) == 22
+
+
+def test_fetch_record_survives_an_unreadable_scorecard():
+    from cricket_data.crex_lookup import fetch_record
+    from cricket_data.crex_sitemap import MatchEntry
+
+    slug = "ind-vs-wi-1st-t20-west-indies-tour-of-india-2026-match-updates-11AL"
+    summary = _page("ind_wi_1st_t20_2026")
+    facts = parse_match_page(summary.html, summary.text, summary.title)
+
+    class Down:
+        def render(self, *a, **k):
+            raise RuntimeError("timeout")
+
+    rec = fetch_record(Down(), MatchEntry(url="u", match_id=slug, lastmod=None), facts, "2026-10-06")
+    assert rec.players == [] and rec.toss_winner == "India"
+
+
+def test_cricsheet_match_type_vocabulary():
+    from cricket_data.crex_lookup import cricsheet_match_type as t
+
+    assert t("T20I", "t20", True) == "T20" and t("T20", "t20", False) == "T20"
+    assert t("ODI", "50", True) == "ODI" and t("List A", "50", False) == "ODM"
+    assert t("Test", "multi", True) == "Test" and t("FC", "multi", False) == "MDM"
+    assert t("", "multi", False) == "MDM"

@@ -647,3 +647,13 @@ def test_crex_recent_ids_skip_matches_already_saved():
     scraper = CREXScraper(browser=Home())
     scraper.skip_ids = {"a-vs-b-1st-t20-x-2026-match-updates-AAA"}
     assert scraper.fetch_recent_match_ids() == ["c-vs-d-1st-t20-x-2026-match-updates-BBB"]
+
+
+def test_sources_that_disallow_bots_are_not_registered():
+    import importlib
+
+    import cricket_data.scrapers as sc
+
+    importlib.reload(sc)  # fresh default registry (other tests clear it)
+    names = [getattr(c, "name", "") for c in sc.ScraperRegistry._scrapers if isinstance(c, type)]
+    assert "crex" in names and "espncricinfo" not in names and "cricbuzz" not in names

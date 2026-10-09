@@ -84,6 +84,17 @@ def run_checks(browser, fetcher, out_dir: Path) -> list[CheckResult]:
         res.append(CheckResult("match_page", False, f"{type(exc).__name__}: {exc}",
                                hint="browser could not render CREX (Chromium install, block, or outage)"))
 
+    try:  # the Chromium fallback must keep working even though plain HTTP is tried first
+        page = browser.render(url, wait_selector="script#sports-event-schema", force_browser=True)
+        ok = parse_match_page(page.html, page.text, page.title, url) is not None
+        res.append(CheckResult("browser_fallback", ok, "Chromium renders the canary page" if ok else
+                               f"Chromium got no match data (HTTP {page.status})",
+                               "" if ok else _save(out_dir, "browser_fallback.html", page.html),
+                               "" if ok else "Chromium fallback broken: check the Playwright install step"))
+    except Exception as exc:
+        res.append(CheckResult("browser_fallback", False, f"{type(exc).__name__}: {exc}",
+                               hint="Chromium could not start: check the Playwright install step"))
+
     try:
         page, links = browser.links(BASE, "/cricket-live-score/")
         ok = len(links) > 0

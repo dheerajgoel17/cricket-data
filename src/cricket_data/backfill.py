@@ -31,9 +31,9 @@ from .crex_lookup import (
     LookupResult,
     code_is,
     confirm,
+    fetch_record,
     find_match,
     parse_match_page,
-    record_from_facts,
 )
 from .crex_sitemap import CREXSitemapIndex, MatchEntry
 from .permanent_matches import MissingMatch, fetch_cricsheet_missing_matches
@@ -80,7 +80,7 @@ class BackfillQueue:
     afghanistan_enumerated_at: str | None = None
     max_retries: int = 3
     batch_size: int = 5
-    delay_between_requests: float = 10.0
+    delay_between_requests: float = 5.0
 
     # ---- persistence ----------------------------------------------------------------------------
     @classmethod
@@ -101,7 +101,7 @@ class BackfillQueue:
             afghanistan_enumerated_at=data.get("afghanistan_enumerated_at"),
             max_retries=data.get("max_retries", 3),
             batch_size=data.get("batch_size", 5),
-            delay_between_requests=data.get("delay_between_requests", 10.0),
+            delay_between_requests=data.get("delay_between_requests", 5.0),
         )
         q._drop_unsourced_withheld()
         q._dedupe()
@@ -374,7 +374,7 @@ def process_backfill_batch(
             cheap += 1
 
         if result.status == "found":
-            rec = record_from_facts(result.entry, result.facts, task.date, task.match_type, task.category)
+            rec = fetch_record(browser, result.entry, result.facts, task.date, task.match_type, task.category)
             write_provisional(store, rec)
             queue.mark_done(task, rec.match_id, result.entry.url)
             stats["succeeded"] += 1

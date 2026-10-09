@@ -26,7 +26,7 @@ from typing import Any, Protocol
 from urllib.parse import urljoin
 
 from .crex_browser import BrowserError, CREXBrowser
-from .crex_lookup import parse_match_page, record_from_facts
+from .crex_lookup import fetch_record, parse_match_page
 from .crex_sitemap import MatchEntry
 from .models import MatchRecord, PlayerPerf
 from .permanent_matches import classify_match_status, fetch_cricsheet_missing_matches
@@ -450,7 +450,7 @@ class CREXScraper:
         if facts is None or facts.start_date is None or not facts.finished:
             return None
         entry = MatchEntry(url=url, match_id=match_id, lastmod=facts.start.isoformat())
-        return record_from_facts(entry, facts, facts.start_date.isoformat(), status="provisional")
+        return fetch_record(self._get_browser(), entry, facts, facts.start_date.isoformat(), status="provisional")
 
 
 class MultiSourceScraper:
@@ -712,9 +712,9 @@ class ScraperSource:
 
 # Register all built-in scrapers
 # These are automatically available to MultiSourceScraper
-ScraperRegistry.register(ESPNcricinfoScraper)
+# ESPNcricinfo and Cricbuzz disallow bots in robots.txt, so their adapters are not registered:
+# registering them would only produce a failure on every run.
 ScraperRegistry.register(CREXScraper)
-ScraperRegistry.register(CricbuzzScraper)  # Placeholder, returns empty results
 
 
 # Free API scrapers - only register if API key available
