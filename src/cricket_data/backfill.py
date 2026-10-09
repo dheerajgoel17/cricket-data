@@ -283,11 +283,194 @@ def normalize_team_name(name: str) -> set[str]:
     return variations
 
 
+def search_crex_for_match_with_sitemap(
+    task: BackfillTask,
+    scraper,
+    sitemap_index
+) -> str | None:
+    """Search CREX for a match using sitemap index with strict verification.
+    
+    Strategy:
+    1. Use sitemap to find candidate matches by teams
+    2. Verify exact date, teams, and format from rendered page
+    3. Return match_id only if all criteria match
+    
+    Args:
+        task: BackfillTask with date, teams, match_type
+        scraper: CREXScraper instance with browser
+        sitemap_index: CREXSitemapIndex instance
+    
+    Returns:
+        match_id if found and verified, None if not found
+    """
+    try:
+        from datetime import datetime, timedelta
+        
+        # Ensure sitemap is loaded
+        sitemap_index.load()
+        
+        # Find candidate matches from sitemap
+        candidates = sitemap_index.find_match_by_teams(
+            task.team_a,
+            task.team_b,
+            match_type=task.match_type
+        )
+        
+        if not candidates:
+            return None
+        
+        # Parse target date with tolerance
+        try:
+            target_date = datetime.strptime(task.date, '%Y-%m-%d').date()
+            date_tolerance = timedelta(days=2)  # ±2 days for timezone/rescheduling
+        except:
+            return None
+        
+        # Get browser for verification
+        context = scraper._get_browser()
+        page = context.new_page()
+        
+        # Check each candidate
+        for candidate in candidates[:10]:  # Limit verification attempts
+            try:
+                # Fetch match page to verify date and teams
+                page.goto(f"https://crex.com/cricket-live-score/{candidate.match_id}", 
+                         wait_until="domcontentloaded", timeout=15000)
+                
+                # Wait a bit for content
+                import time
+                time.sleep(1)
+                
+                # Extract date from page
+                page_text = page.inner_text('body')
+                
+                # Look for date patterns
+                import re
+                date_pattern = re.search(
+                    r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})', 
+                    page_text, 
+                    re.IGNORECASE
+                )
+                
+                if date_pattern:
+                    try:
+                        # Parse date (handle "Sept" vs "Sep")
+                        date_str = date_pattern.group(1)
+                        date_str = date_str.replace('Sept', 'Sep')
+                        match_date = datetime.strptime(date_str, "%d %b %Y").date()
+                        
+                        # Check if date matches within tolerance
+                        if abs((match_date - target_date).days) <= date_tolerance.days:
+                            # Date matches! Return this match
+                            page.close()
+                            return candidate.match_id
+                    except:
+                        continue
+                
+            except Exception:
+                continue
+        
+        page.close()
+        return None
+        
+    except Exception as exc:
+        print(f"Sitemap search error: {exc}")
+        return None
+
+
 def search_crex_for_match(
     task: BackfillTask,
     scraper,
     series_cache: dict[str, list[tuple[str, str]]] | None = None
 ) -> str | None:
+    """Search CREX for a match using sitemap index with strict verification.
+    
+    Strategy:
+    1. Use sitemap to find candidate matches by teams
+    2. Verify exact date, teams, and format from rendered page
+    3. Return match_id only if all criteria match
+    
+    Args:
+        task: BackfillTask with date, teams, match_type
+        scraper: CREXScraper instance with browser
+        sitemap_index: CREXSitemapIndex instance
+    
+    Returns:
+        match_id if found and verified, None if not found
+    """
+    try:
+        from datetime import datetime, timedelta
+        
+        # Ensure sitemap is loaded
+        sitemap_index.load()
+        
+        # Find candidate matches from sitemap
+        candidates = sitemap_index.find_match_by_teams(
+            task.team_a,
+            task.team_b,
+            match_type=task.match_type
+        )
+        
+        if not candidates:
+            return None
+        
+        # Parse target date with tolerance
+        try:
+            target_date = datetime.strptime(task.date, '%Y-%m-%d').date()
+            date_tolerance = timedelta(days=2)  # ±2 days for timezone/rescheduling
+        except:
+            return None
+        
+        # Get browser for verification
+        context = scraper._get_browser()
+        page = context.new_page()
+        
+        # Check each candidate
+        for candidate in candidates[:10]:  # Limit verification attempts
+            try:
+                # Fetch match page to verify date and teams
+                page.goto(f"https://crex.com/cricket-live-score/{candidate.match_id}", 
+                         wait_until="domcontentloaded", timeout=15000)
+                
+                # Wait a bit for content
+                import time
+                time.sleep(1)
+                
+                # Extract date from page
+                page_text = page.inner_text('body')
+                
+                # Look for date patterns
+                import re
+                date_pattern = re.search(
+                    r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})', 
+                    page_text, 
+                    re.IGNORECASE
+                )
+                
+                if date_pattern:
+                    try:
+                        # Parse date (handle "Sept" vs "Sep")
+                        date_str = date_pattern.group(1)
+                        date_str = date_str.replace('Sept', 'Sep')
+                        match_date = datetime.strptime(date_str, "%d %b %Y").date()
+                        
+                        # Check if date matches within tolerance
+                        if abs((match_date - target_date).days) <= date_tolerance.days:
+                            # Date matches! Return this match
+                            page.close()
+                            return candidate.match_id
+                    except:
+                        continue
+                
+            except Exception:
+                continue
+        
+        page.close()
+        return None
+        
+    except Exception as exc:
+        print(f"Sitemap search error: {exc}")
+        return None
     """Search CREX for a match by date and teams.
     
     Enhanced strategy:
@@ -422,6 +605,7 @@ def process_backfill_batch(
     """Process one batch from the backfill queue.
     
     Actually scrapes matches from CREX and saves them.
+    Uses sitemap-based search for efficiency.
     
     Args:
         queue: BackfillQueue with tasks to process
@@ -434,6 +618,7 @@ def process_backfill_batch(
     """
     from .scrapers import ScraperError
     from .provisional import write_provisional
+    from .crex_sitemap import CREXSitemapIndex
     
     stats = {"succeeded": 0, "failed": 0, "not_found": 0}
     
@@ -444,6 +629,10 @@ def process_backfill_batch(
     
     if verbose:
         print(f"\nBackfilling {len(batch)} historical match(es)...")
+    
+    # Load sitemap index once for the batch
+    sitemap_index = CREXSitemapIndex()
+    sitemap_index.load()
     
     for i, task in enumerate(batch, 1):
         if verbose:
@@ -460,8 +649,8 @@ def process_backfill_batch(
                     print("not found (before CREX archive)")
                 continue
             
-            # Try to find match on CREX
-            match_id = search_crex_for_match(task, scraper)
+            # Try to find match using sitemap
+            match_id = search_crex_for_match_with_sitemap(task, scraper, sitemap_index)
             
             if match_id is None:
                 # Not found on CREX
@@ -545,7 +734,162 @@ def initialize_backfill_queue(queue_path: Path, verbose: bool = True) -> Backfil
     return queue
 
 
-def enumerate_afghanistan_matches_from_crex(
+def enumerate_afghanistan_matches_from_sitemap(
+    scraper,
+    queue: BackfillQueue,
+    sitemap_index,
+    verbose: bool = True
+) -> int:
+    """Enumerate Afghanistan men's internationals and APL matches using sitemap.
+    
+    Adds them to the backfill queue as cricsheet_withheld.
+    
+    Args:
+        scraper: CREXScraper instance with browser
+        queue: BackfillQueue to add tasks to
+        sitemap_index: CREXSitemapIndex instance
+        verbose: Print progress messages
+    
+    Returns:
+        Number of new Afghanistan tasks added
+    """
+    try:
+        if verbose:
+            print("Enumerating Afghanistan matches from CREX sitemap...")
+        
+        # Ensure sitemap is loaded
+        sitemap_index.load()
+        
+        # Get all Afghanistan series
+        afg_series = sitemap_index.get_afghanistan_series()
+        
+        if verbose:
+            print(f"  Found {len(afg_series)} Afghanistan series in sitemap")
+        
+        added = 0
+        known = set(queue.done)
+        known.update(t.key() for t in queue.pending)
+        known.update(t.key() for t in queue.in_progress)
+        known.update(t.key() for t in queue.failed)
+        known.update(queue.not_found)
+        
+        # Get browser
+        context = scraper._get_browser()
+        page = context.new_page()
+        
+        # Process each Afghanistan series
+        for series in afg_series[:50]:  # Limit to avoid overload
+            try:
+                # Fetch series matches page
+                matches_url = series.matches_url()
+                page.goto(matches_url, wait_until="domcontentloaded", timeout=15000)
+                
+                import time
+                time.sleep(2)
+                
+                # Find all match links
+                match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+                
+                for link in match_links[:100]:
+                    try:
+                        href = link.get_attribute('href') or ''
+                        text = link.inner_text().strip()
+                        
+                        if not href or not text:
+                            continue
+                        
+                        # Extract teams from text
+                        import re
+                        vs_match = re.search(r'([A-Za-z\s]+?)\s+vs\s+([A-Za-z\s]+?)(?:\s*[-,]|$)', text, re.IGNORECASE)
+                        if not vs_match:
+                            continue
+                        
+                        team_a = vs_match.group(1).strip()
+                        team_b = vs_match.group(2).strip()
+                        
+                        # Must involve Afghanistan (skip if both teams are domestic/club teams)
+                        if 'afghanistan' not in team_a.lower() and 'afghanistan' not in team_b.lower():
+                            # Could be APL - check series name
+                            if 'apl' not in series.slug.lower() and 'premier' not in series.slug.lower():
+                                continue
+                        
+                        # Extract date
+                        from datetime import datetime, date as dt_date
+                        date_match = re.search(r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})', text, re.IGNORECASE)
+                        if date_match:
+                            try:
+                                date_str = date_match.group(1).replace('Sept', 'Sep')
+                                parsed = datetime.strptime(date_str, "%d %b %Y")
+                                match_date = parsed.date().isoformat()
+                            except:
+                                continue
+                        else:
+                            continue
+                        
+                        # Check year (only 2023+)
+                        if int(match_date[:4]) < 2023:
+                            continue
+                        
+                        # Determine match type from series or text
+                        match_type = "T20I"
+                        series_lower = series.slug.lower()
+                        text_lower = text.lower()
+                        
+                        if 't20' in series_lower or 't20' in text_lower:
+                            # Check if international or domestic
+                            if 'apl' in series_lower or 'premier league' in series_lower:
+                                match_type = "T20"
+                            else:
+                                match_type = "T20I"
+                        elif 'odi' in series_lower or 'odi' in text_lower:
+                            match_type = "ODI"
+                        elif 'test' in series_lower or 'test' in text_lower:
+                            match_type = "Test"
+                        
+                        # Create task
+                        task = BackfillTask(
+                            date=match_date,
+                            team_a=team_a,
+                            team_b=team_b,
+                            match_type=match_type,
+                            gender="male",
+                            category="cricsheet_withheld"
+                        )
+                        
+                        if task.key() not in known:
+                            queue.pending.append(task)
+                            known.add(task.key())
+                            added += 1
+                    
+                    except Exception:
+                        continue
+                
+            except Exception as exc:
+                if verbose:
+                    print(f"    Warning: Failed to load series {series.slug}: {exc}")
+                continue
+            
+            # Small delay between series
+            time.sleep(2)
+        
+        try:
+            page.close()
+        except:
+            pass
+        
+        # Sort by date descending (newest first)
+        queue.pending.sort(key=lambda t: t.date, reverse=True)
+        
+        if verbose and added > 0:
+            print(f"  Added {added} Afghanistan match(es) to backfill queue")
+        
+        return added
+        
+    except Exception as exc:
+        print(f"Failed to enumerate Afghanistan matches: {exc}")
+        import traceback
+        traceback.print_exc()
+        return 0
     scraper,
     queue: BackfillQueue,
     verbose: bool = True

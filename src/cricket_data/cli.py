@@ -133,8 +133,9 @@ def cmd_update(a: argparse.Namespace) -> int:
     
     # Process backfill batch (after recent matches, low priority)
     if a.enable_scraper and hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
-        from .backfill import BackfillQueue, process_backfill_batch, enumerate_afghanistan_matches_from_crex
+        from .backfill import BackfillQueue, process_backfill_batch, enumerate_afghanistan_matches_from_sitemap
         from .scrapers import CREXScraper
+        from .crex_sitemap import CREXSitemapIndex
         
         queue_path = store.root / "state" / "backfill_queue.json"
         
@@ -143,13 +144,25 @@ def cmd_update(a: argparse.Namespace) -> int:
             from .backfill import initialize_backfill_queue
             queue = initialize_backfill_queue(queue_path, verbose=True)
             
-            # Enumerate Afghanistan matches on first run
-            crex_scraper = CREXScraper()
+            # Enumerate Afghanistan matches on first run using sitemap
+            afg_scraper = CREXScraper()
+            sitemap_index = CREXSitemapIndex()
             try:
-                enumerate_afghanistan_matches_from_crex(crex_scraper, queue, verbose=True)
+                enumerate_afghanistan_matches_from_sitemap(afg_scraper, queue, sitemap_index, verbose=True)
                 queue.save(queue_path)
             except Exception as exc:
                 print(f"Warning: Failed to enumerate Afghanistan matches: {exc}")
+            finally:
+                # Clean up
+                try:
+                    if afg_scraper._context:
+                        afg_scraper._context.close()
+                    if afg_scraper._browser:
+                        afg_scraper._browser.close()
+                    if afg_scraper._playwright:
+                        afg_scraper._playwright.stop()
+                except:
+                    pass
         else:
             queue = BackfillQueue.load(queue_path)
         
@@ -159,15 +172,27 @@ def cmd_update(a: argparse.Namespace) -> int:
         
         # Process one batch if there are pending tasks
         if queue.pending or queue.in_progress:
-            # Initialize CREX scraper for backfill
+            # Initialize FRESH CREX scraper for backfill (avoid event loop conflicts)
             crex_scraper = CREXScraper()
             
-            # Actually process the batch
-            backfill_stats = process_backfill_batch(queue, crex_scraper, store, verbose=True)
-            
-            # Show results
-            if backfill_stats["succeeded"] > 0 or backfill_stats["not_found"] > 0:
-                print(f"  Backfill: {backfill_stats['succeeded']} scraped, {backfill_stats['not_found']} not found, {backfill_stats['failed']} failed")
+            try:
+                # Actually process the batch
+                backfill_stats = process_backfill_batch(queue, crex_scraper, store, verbose=True)
+                
+                # Show results
+                if backfill_stats["succeeded"] > 0 or backfill_stats["not_found"] > 0:
+                    print(f"  Backfill: {backfill_stats['succeeded']} scraped, {backfill_stats['not_found']} not found, {backfill_stats['failed']} failed")
+            finally:
+                # Clean up browser properly
+                try:
+                    if crex_scraper._context:
+                        crex_scraper._context.close()
+                    if crex_scraper._browser:
+                        crex_scraper._browser.close()
+                    if crex_scraper._playwright:
+                        crex_scraper._playwright.stop()
+                except:
+                    pass
         
         # Show queue stats
         stats = queue.stats()
