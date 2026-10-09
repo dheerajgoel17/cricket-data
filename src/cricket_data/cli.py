@@ -12,10 +12,31 @@ from . import __version__
 from .cricsheet import download, iter_zip
 from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
+from .scrapers import ScraperSource
 from .sources import InboxSource, load_extra_sources
 from .store import Store
 
 DEFAULT_DATA = "data"
+
+
+def _write_scraper_report(store: Store, conflicts: list) -> None:
+    """Write scraper conflict report to a CSV file."""
+    import json as json_mod
+    report_path = store.root / "scraper_report.csv"
+    new = not report_path.exists()
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    with report_path.open("a", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=["timestamp", "date", "teams", "sources", "disagreements"], lineterminator="\n")
+        if new:
+            w.writeheader()
+        for conflict in conflicts:
+            w.writerow({
+                "timestamp": date.today().isoformat(),
+                "date": conflict["date"],
+                "teams": conflict["teams"],
+                "sources": ",".join(conflict["sources"]),
+                "disagreements": json_mod.dumps(conflict["disagreements"]),
+            })
 
 
 def _ingest_zip(store: Store, zip_path: Path) -> dict[str, int]:
@@ -36,16 +57,31 @@ def cmd_update(a: argparse.Namespace) -> int:
 
     since = date.today() - timedelta(days=a.provisional_days)
     sources = [InboxSource(store.root / "provisional" / "inbox"), *load_extra_sources()]
+    
+    # Add web scraper if enabled
+    if a.enable_scraper:
+        sources.append(ScraperSource())
+    
     added = 0
+    scraper_conflicts = []
     for src in sources:
         try:
             for rec in src.fetch(since):
                 if find_canonical(store, rec) is None:  # skip anything Cricsheet already has
                     write_provisional(store, rec)
                     added += 1
+            
+            # Capture conflict log from scraper
+            if isinstance(src, ScraperSource) and src.scraper.conflict_log:
+                scraper_conflicts.extend(src.scraper.get_conflict_log())
         except Exception as exc:  # one broken source must not stop the daily run
             print(f"warning: source {src.name} failed: {exc}", file=sys.stderr)
     print(f"provisional: {added} written")
+    
+    # Report scraper conflicts
+    if scraper_conflicts:
+        print(f"scraper conflicts: {len(scraper_conflicts)} resolved", file=sys.stderr)
+        _write_scraper_report(store, scraper_conflicts)
 
     inbox = InboxSource(store.root / "provisional" / "inbox")
     removed = inbox.cleanup(lambda rec: find_canonical(store, rec) is not None)
@@ -126,6 +162,7 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--dataset", default="recently_added_30_json.zip")
     u.add_argument("--zip", help="use a local zip instead of downloading")
     u.add_argument("--provisional-days", type=int, default=14)
+    u.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
     u.set_defaults(fn=cmd_update)
 
     b = sub.add_parser("backfill", help="load full history (all_json.zip)")

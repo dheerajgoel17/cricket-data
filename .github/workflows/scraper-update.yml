@@ -1,0 +1,60 @@
+name: Scraper update
+
+# Run every 6 hours to catch recently completed matches
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: scraper-update
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e .
+      - name: Scrape recent matches
+        run: cricket-data update --enable-scraper --provisional-days 7
+      - name: Size guard
+        run: |
+          du -sh .git data
+          KB=$(du -sk .git | cut -f1)
+          if [ "$KB" -gt 800000 ]; then echo "::warning::.git is over 800 MB"; fi
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "No new scraped data."; else
+            git commit -m "data: scraper update $(date -u +%F\ %H:%M)"
+            git pull --rebase -q && git push
+          fi
+      - name: Upload scraper report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-report-${{ github.run_id }}
+          path: data/scraper_report.csv
+          if-no-files-found: ignore
+      - name: Open an issue if scraping failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(gh issue list --label scraper-failed --state open --json number -q '.[0].number')" ]; then
+            gh label create scraper-failed --color FFA500 2>/dev/null || true
+            gh issue create --label scraper-failed --title "Scraper update failed" \
+              --body "The scraper update failed. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi

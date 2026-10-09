@@ -25,8 +25,8 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: pip install -e .
-      - name: Update (Cricsheet delta + inbox/extra sources + reconcile)
-        run: cricket-data update
+      - name: Update (Cricsheet delta + inbox/extra sources + scraper + reconcile)
+        run: cricket-data update --enable-scraper
       - name: Size guard (stay inside GitHub's free limits)
         run: |
           du -sh .git data

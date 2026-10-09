@@ -64,3 +64,43 @@ def test_update_end_to_end_with_inbox(tmp_path, make_zip, monkeypatch):
     assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z2)]) == 0
     assert load_provisional(Store(tmp_path)) == []
     assert not list(inbox.glob("*.json"))  # inbox file deleted once landed
+
+
+def test_update_with_scraper_enabled(tmp_path, make_zip, monkeypatch):
+    """Test that --enable-scraper flag works in the update command."""
+    from cricket_data.scrapers import ScraperSource
+    from unittest.mock import Mock
+    
+    # Mock the ScraperSource to return a test match
+    mock_match = MatchRecord(
+        match_id="test-scraper",
+        date=date.today().isoformat(),
+        team_a="Test Team A",
+        team_b="Test Team B",
+        winner="Test Team A",
+        source="test",
+        status="provisional",
+    )
+    
+    # Create a minimal Cricsheet zip
+    z = make_zip(make_match(date="2020-01-01"))
+    
+    # Mock ScraperSource.fetch to return our test match
+    original_fetch = ScraperSource.fetch
+    
+    def mock_fetch(self, since):
+        return [mock_match]
+    
+    monkeypatch.setattr(ScraperSource, "fetch", mock_fetch)
+    
+    # Run update with scraper enabled
+    assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z), "--enable-scraper"]) == 0
+    
+    # Check that the scraped match was added
+    store = Store(tmp_path)
+    provisionals = load_provisional(store)
+    assert len(provisionals) == 1
+    assert provisionals[0][1].team_a == "Test Team A"
+    
+    # Restore original method
+    monkeypatch.setattr(ScraperSource, "fetch", original_fetch)
