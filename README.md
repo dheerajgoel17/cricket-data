@@ -30,9 +30,4 @@ This project is free and ad-free. If it's useful to you, you can support it:
   </a>
 </p>
 
-## Licence
-
-Code: MIT ([LICENSE](LICENSE)). Data: CC BY-SA 4.0, derived from Cricsheet ([DATA_LICENSE.md](DATA_LICENSE.md)).
-Credit: [Cricsheet](https://cricsheet.org) (required by the data licence).
-
 Questions: dheerajgoeldsuperdude@gmail.com
