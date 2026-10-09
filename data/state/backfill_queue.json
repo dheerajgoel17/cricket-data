@@ -4,7 +4,7 @@
   "done": [],
   "failed": [],
   "in_progress": [],
-  "last_updated": "2026-10-09T04:58:02.039054",
+  "last_updated": "2026-10-09T05:10:54.072556",
   "max_retries": 3,
   "not_found": [
     "2026-09-25-Warriors-North West",
@@ -14,57 +14,24 @@
     {
       "attempts": 0,
       "category": "cricsheet_missing",
-      "date": "2024-03-24",
-      "gender": "female",
+      "date": "2026-09-25",
+      "gender": "male",
       "last_attempt": null,
       "last_error": null,
-      "match_type": "ODI",
-      "team_a": "Papua New Guinea",
-      "team_b": "Zimbabwe"
+      "match_type": "List A",
+      "team_a": "Warriors",
+      "team_b": "North West"
     },
     {
       "attempts": 0,
       "category": "cricsheet_missing",
-      "date": "2023-03-29",
+      "date": "2026-03-28",
       "gender": "male",
       "last_attempt": null,
       "last_error": null,
-      "match_type": "ODI",
-      "team_a": "Namibia",
-      "team_b": "Papua New Guinea"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2023-03-27",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "ODI",
-      "team_a": "Canada",
-      "team_b": "Jersey"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2023-02-27",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "ODI",
-      "team_a": "Papua New Guinea",
-      "team_b": "Nepal"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2022-07-10",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "ODI",
-      "team_a": "Scotland",
-      "team_b": "Namibia"
+      "match_type": "List A",
+      "team_a": "Police Sports Club",
+      "team_b": "Ace Capital Cricket Club"
     },
     {
       "attempts": 0,
@@ -3799,6 +3766,17 @@
       "attempts": 0,
       "category": "cricsheet_missing",
       "date": "2024-03-24",
+      "gender": "female",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Papua New Guinea",
+      "team_b": "Zimbabwe"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_missing",
+      "date": "2024-03-24",
       "gender": "male",
       "last_attempt": null,
       "last_error": null,
@@ -5052,6 +5030,39 @@
     {
       "attempts": 0,
       "category": "cricsheet_missing",
+      "date": "2023-03-29",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Namibia",
+      "team_b": "Papua New Guinea"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_missing",
+      "date": "2023-03-27",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Canada",
+      "team_b": "Jersey"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_missing",
+      "date": "2023-02-27",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Papua New Guinea",
+      "team_b": "Nepal"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_missing",
       "date": "2023-02-26",
       "gender": "male",
       "last_attempt": null,
@@ -6082,6 +6093,17 @@
       "match_type": "List A",
       "team_a": "Sunrisers",
       "team_b": "Thunder"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_missing",
+      "date": "2022-07-10",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Scotland",
+      "team_b": "Namibia"
     },
     {
       "attempts": 0,
