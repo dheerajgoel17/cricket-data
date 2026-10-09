@@ -1,14 +1,16 @@
 name: Scraper update
 
-# Run every 6 hours to catch recently completed matches
+# Every 30 minutes: pick up newly finished matches (commits only when something new was found).
+# Once a day: also backfill a batch of older matches.
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Every 6 hours
+    - cron: "7,37 * * * *"  # every 30 minutes
+    - cron: "17 3 * * *"  # daily backfill
   workflow_dispatch:  # Allow manual triggers
     inputs:
       backfill_batch_size:
-        description: "Historical matches to backfill this run (render-limited)"
-        default: "5"
+        description: "Older matches to backfill this run (0 = none)"
+        default: "0"
       backfill_priority:
         description: "Comma-separated task-key prefixes to backfill first, e.g. 2025-12-18-Jharkhand"
         default: ""
@@ -24,7 +26,7 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,6 +45,7 @@ jobs:
           restore-keys: crex-index-
       - name: Health check (which layer would break?)
         id: health
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '17 3 * * *'  # daily; it downloads the sitemaps
         run: cricket-data health --out diagnostics
         continue-on-error: true
       - name: Scrape recent matches
@@ -50,7 +53,7 @@ jobs:
         env:
           CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
           RAPIDAPI_CRICKET_KEY: ${{ secrets.RAPIDAPI_CRICKET_KEY }}
-          BACKFILL_BATCH_SIZE: ${{ inputs.backfill_batch_size || '5' }}
+          BACKFILL_BATCH_SIZE: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill_batch_size || (github.event.schedule == '17 3 * * *' && '30' || '0') }}
           BACKFILL_PRIORITY: ${{ inputs.backfill_priority }}
         run: |
           cricket-data update --enable-scraper --provisional-days 7 \
@@ -107,8 +110,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
-          if git diff --cached --quiet; then echo "No new scraped data."; else
-            git commit -m "data: scraper update $(date -u +%F\ %H:%M)"
+          if git diff --cached --quiet; then echo "Nothing new."; else
+            N=$(git diff --cached --name-only | wc -l)
+            git commit -m "data: update match data ($N files, $(date -u +%F))"
             git pull --rebase -q && git push
           fi
       - name: Upload scraper report

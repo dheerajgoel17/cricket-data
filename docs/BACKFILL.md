@@ -54,6 +54,13 @@ recent-match scraper and the backfill, and closed once in a `finally`. Never sta
 Locally, if Playwright's own Chromium is not installed, point `CRICKET_CHROMIUM_PATH` at any
 Chromium binary.
 
+## Schedule
+
+`scraper-update.yml` runs every 30 minutes for newly finished matches (matches already saved are
+skipped, and it only commits when something new was found) and once a day at 03:17 UTC with a
+backfill batch of 30 plus the health check. The run report and `last_backfill.json` are
+git-ignored so they never create commits; they appear in the job summary instead.
+
 ## Known limits
 
 * CREX stamps start times in IST; a venue-local date can differ by a day, so `date` is the CREX

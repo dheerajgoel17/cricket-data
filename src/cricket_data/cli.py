@@ -102,7 +102,9 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     
     # Add web scraper if enabled
     if a.enable_scraper:
-        scraper_source = ScraperSource(browser=browser)
+        # matches already saved are not fetched again: a finished result never changes
+        known = {p.stem.removeprefix("crex-") for p in (store.root / "provisional").glob("crex-*.json")}
+        scraper_source = ScraperSource(browser=browser, known_ids=known)
         sources.append(scraper_source)
         
         # Track which scrapers were attempted
