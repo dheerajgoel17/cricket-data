@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # Allow manual triggers
   push:
     branches:
-      - cursor/scraper-workflow-0411  # TEMP: for final testing
+      - cursor/scraper-workflow-0411  # TEMP: testing backfill fixes
 
 permissions:
   contents: write
