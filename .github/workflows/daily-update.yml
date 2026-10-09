@@ -1,0 +1,53 @@
+name: Daily update
+
+# Zero cost: public-repo Actions minutes are free, no secrets, no external services.
+on:
+  schedule:
+    - cron: "30 5 * * *" # Cricsheet publishes overnight UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e .
+      - name: Update (Cricsheet delta + inbox/extra sources + reconcile)
+        run: cricket-data update
+      - name: Size guard (stay inside GitHub's free limits)
+        run: |
+          du -sh .git data
+          KB=$(du -sk .git | cut -f1)
+          if [ "$KB" -gt 800000 ]; then echo "::warning::.git is over 800 MB; see docs/ZERO_COST.md"; fi
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "No new data."; else
+            git commit -m "data: daily update $(date -u +%F)"
+            git pull --rebase -q && git push
+          fi
+      - name: Open an issue if the update failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(gh issue list --label update-failed --state open --json number -q '.[0].number')" ]; then
+            gh label create update-failed --color B60205 2>/dev/null || true
+            gh issue create --label update-failed --title "Daily update failed" \
+              --body "The daily update failed. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi

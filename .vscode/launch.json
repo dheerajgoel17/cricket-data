@@ -1,0 +1,8 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    { "name": "cricket-data: stats", "type": "debugpy", "request": "launch", "module": "cricket_data.cli", "args": ["stats"], "justMyCode": true },
+    { "name": "cricket-data: update (offline zip)", "type": "debugpy", "request": "launch", "module": "cricket_data.cli", "args": ["update", "--zip", "${input:zip}"] }
+  ],
+  "inputs": [{ "id": "zip", "type": "promptString", "description": "Path to a Cricsheet zip" }]
+}
