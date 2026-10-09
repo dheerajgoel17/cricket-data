@@ -7,9 +7,11 @@ import pytest
 
 from cricket_data.models import MatchRecord, PlayerPerf
 from cricket_data.scrapers import (
+    CREXScraper,
     ESPNcricinfoScraper,
     MultiSourceScraper,
     ScraperError,
+    ScraperRegistry,
     ScraperSource,
     _match_key,
     _norm,
@@ -188,7 +190,7 @@ def test_espn_scraper_recent_match_ids(espn_match_list_json):
     with patch.object(scraper.fetcher, "get") as mock_get:
         mock_get.return_value = json.dumps(espn_match_list_json)
         
-        match_ids = scraper._recent_match_ids(days=7)
+        match_ids = scraper.fetch_recent_match_ids(days=7)
         
         # Should only include completed matches
         assert "12345" in match_ids
@@ -410,32 +412,227 @@ def test_scraper_source_marks_provisional():
         assert matches[0].status == "provisional"
 
 
+def test_scraper_registry_registration():
+    """Test ScraperRegistry registration and retrieval."""
+    # Clear registry for clean test
+    ScraperRegistry.clear()
+    
+    # Create a mock scraper class
+    class MockScraper:
+        name = "mock"
+        def __init__(self, fetcher=None):
+            pass
+        def fetch_recent_match_ids(self, days=7):
+            return []
+        def fetch_match(self, match_id):
+            return None
+    
+    # Register it
+    ScraperRegistry.register(MockScraper)
+    
+    # Should be retrievable
+    scrapers = ScraperRegistry.get_all()
+    assert len(scrapers) == 1
+    assert scrapers[0].name == "mock"
+    
+    # Get by name
+    scraper = ScraperRegistry.get_by_name("mock")
+    assert scraper is not None
+    assert scraper.name == "mock"
+    
+    # Clean up
+    ScraperRegistry.clear()
+
+
+def test_scraper_registry_duplicate_registration():
+    """Test that duplicate registrations are ignored."""
+    ScraperRegistry.clear()
+    
+    class MockScraper:
+        name = "mock"
+        def __init__(self, fetcher=None):
+            pass
+    
+    ScraperRegistry.register(MockScraper)
+    ScraperRegistry.register(MockScraper)  # Duplicate
+    
+    scrapers = ScraperRegistry.get_all()
+    assert len(scrapers) == 1
+    
+    ScraperRegistry.clear()
+
+
+def test_multi_source_uses_registry():
+    """Test that MultiSourceScraper uses registered scrapers when none provided."""
+    ScraperRegistry.clear()
+    
+    # Register mock scrapers
+    class MockScraper1:
+        name = "mock1"
+        def __init__(self, fetcher=None):
+            pass
+        def fetch_recent_match_ids(self, days=7):
+            return ["1"]
+        def fetch_match(self, match_id):
+            return MatchRecord(
+                match_id="mock1-1",
+                date="2026-10-08",
+                team_a="India",
+                team_b="Australia",
+                winner="India",
+                source="mock1",
+            )
+    
+    class MockScraper2:
+        name = "mock2"
+        def __init__(self, fetcher=None):
+            pass
+        def fetch_recent_match_ids(self, days=7):
+            return ["1"]
+        def fetch_match(self, match_id):
+            return MatchRecord(
+                match_id="mock2-1",
+                date="2026-10-08",
+                team_a="India",
+                team_b="Australia",
+                winner="India",
+                source="mock2",
+            )
+    
+    ScraperRegistry.register(MockScraper1)
+    ScraperRegistry.register(MockScraper2)
+    
+    # Create MultiSourceScraper without explicit scrapers
+    multi = MultiSourceScraper()
+    
+    # Should use registered scrapers
+    matches = multi.fetch(date(2026, 10, 1))
+    
+    # Should get one match (deduplicated)
+    assert len(matches) == 1
+    # Source should indicate multi-source
+    assert "multi" in matches[0].source
+    
+    ScraperRegistry.clear()
+
+
+def test_crex_scraper_graceful_failure():
+    """Test that CREX scraper fails gracefully when site is unreachable."""
+    scraper = CREXScraper()
+    
+    with patch.object(scraper.fetcher, "get") as mock_get:
+        mock_get.side_effect = Exception("Network error")
+        
+        # Should return empty list, not crash
+        match_ids = scraper.fetch_recent_match_ids(days=7)
+        assert match_ids == []
+        
+        # Should return None for individual match
+        match = scraper.fetch_match("123")
+        assert match is None
+
+
+def test_crex_scraper_parse_match():
+    """Test CREX match parsing with sample data."""
+    scraper = CREXScraper()
+    
+    # Sample CREX-style JSON (hypothetical structure)
+    crex_json = {
+        "match": {
+            "teams": [
+                {"name": "India"},
+                {"name": "Australia"},
+            ],
+            "date": "2026-10-08",
+            "result": {
+                "winner": "India",
+                "text": "India won by 7 wickets",
+            },
+            "format": "T20",
+            "venue": {"name": "Wankhede Stadium"},
+            "innings": [
+                {
+                    "batting_team": "Australia",
+                    "bowling_team": "India",
+                    "batting": [
+                        {
+                            "name": "D Warner",
+                            "runs": 45,
+                            "balls": 32,
+                            "fours": 6,
+                            "sixes": 1,
+                        }
+                    ],
+                    "bowling": [
+                        {
+                            "name": "J Bumrah",
+                            "wickets": 2,
+                            "overs": 4,
+                            "runs": 25,
+                        }
+                    ],
+                }
+            ],
+        }
+    }
+    
+    with patch.object(scraper.fetcher, "get") as mock_get:
+        mock_get.return_value = json.dumps(crex_json)
+        
+        match = scraper.fetch_match("12345")
+        
+        assert match is not None
+        assert match.match_id == "crex-12345"
+        assert match.team_a == "India"
+        assert match.team_b == "Australia"
+        assert match.winner == "India"
+        assert match.source == "crex"
+        
+        # Check player parsed
+        assert len(match.players) > 0
+        warner = next((p for p in match.players if "Warner" in p.player), None)
+        assert warner is not None
+        assert warner.runs == 45
+
+
 def test_scraper_source_integration():
     """Test ScraperSource with MultiSourceScraper integration."""
+    # Save original registry state
+    original_scrapers = ScraperRegistry._scrapers.copy()
+    original_instances = ScraperRegistry._instances.copy()
+    
+    # Clear and set up test scrapers
+    ScraperRegistry.clear()
+    
     # Create a mock scraper that returns matches
-    mock_scraper = Mock()
-    mock_scraper.name = "mock_scraper"
-    mock_scraper._recent_match_ids = Mock(return_value=["123"])
-    mock_scraper.fetch_match = Mock(
-        return_value=MatchRecord(
-            match_id="mock-123",
-            date="2026-10-08",
-            team_a="India",
-            team_b="Australia",
-            winner="India",
-            source="mock_scraper",
-        )
-    )
+    class TestScraper:
+        name = "test_scraper"
+        def __init__(self, fetcher=None):
+            pass
+        def fetch_recent_match_ids(self, days=7):
+            return ["123"]
+        def fetch_match(self, match_id):
+            return MatchRecord(
+                match_id="test-123",
+                date="2026-10-08",
+                team_a="India",
+                team_b="Australia",
+                winner="India",
+                source="test_scraper",
+            )
+    
+    ScraperRegistry.register(TestScraper)
     
     scraper_source = ScraperSource()
-    scraper_source.scraper.scrapers = [mock_scraper]
-    
     matches = scraper_source.fetch(date(2026, 10, 1))
     
-    assert len(matches) >= 0  # May be empty if mock doesn't match criteria
     # All returned matches should be provisional
     for match in matches:
         assert match.status == "provisional"
+    
+    # Restore original registry state
+    ScraperRegistry._scrapers = original_scrapers
+    ScraperRegistry._instances = original_instances
 
 
 def test_match_key_normalization():

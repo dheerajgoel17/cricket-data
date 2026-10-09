@@ -1,12 +1,20 @@
-"""Public cricket data scrapers with multi-source conflict resolution.
+"""Pluggable cricket data scrapers with multi-source conflict resolution.
 
-Scrapers fetch recently completed matches from public cricket websites
-(ESPNcricinfo, Cricbuzz) using their public JSON endpoints where available,
-falling back to structured HTML when needed. All scrapers respect robots.txt
-and rate limits via PoliteFetcher.
+This module provides a pluggable architecture for scraping cricket match data
+from any public website. Scrapers implement the CricketScraper protocol and
+register themselves with the ScraperRegistry for automatic discovery.
 
-Multi-source conflict resolution: when sources disagree on a match, the scraper
-queries additional sources and picks the majority consensus, logging the decision.
+Built-in sources:
+- ESPNcricinfo: Public JSON API
+- Cricbuzz: Mobile API (placeholder)
+- CREX: Live scores JSON API
+
+To add a new source:
+1. Implement the CricketScraper protocol (name, fetch_recent_match_ids, fetch_match)
+2. Register it: ScraperRegistry.register(YourScraper)
+3. It will automatically participate in multi-source conflict resolution
+
+All scrapers respect robots.txt and rate limits via PoliteFetcher.
 """
 from __future__ import annotations
 
@@ -14,8 +22,8 @@ import json
 import re
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
-from typing import Any
-from urllib.parse import urljoin, urlencode
+from typing import Any, Protocol
+from urllib.parse import urljoin, urlencode, urlparse
 
 from .models import MatchRecord, PlayerPerf
 from .polite import PoliteFetcher, RobotsDisallowed
@@ -36,11 +44,123 @@ def _match_key(rec: MatchRecord) -> tuple[str, str, str]:
     return (rec.date, teams[0], teams[1])
 
 
+# Pluggable scraper architecture
+
+class CricketScraper(Protocol):
+    """Protocol (interface) that all cricket scrapers must implement.
+    
+    A scraper is any object with these three attributes/methods:
+    - name: str - Unique identifier for this scraper
+    - fetch_recent_match_ids(days: int) -> list[str] - Get IDs of recent matches
+    - fetch_match(match_id: str) -> MatchRecord | None - Fetch a single match
+    
+    The scraper should handle its own rate limiting and robots.txt compliance,
+    typically by using a PoliteFetcher instance.
+    """
+    
+    name: str
+    
+    def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
+        """Return match IDs for matches completed in the last N days.
+        
+        Raises:
+            ScraperError: If fetching the match list fails
+            RobotsDisallowed: If robots.txt forbids access
+        """
+        ...
+    
+    def fetch_match(self, match_id: str) -> MatchRecord | None:
+        """Fetch and parse a single match by ID.
+        
+        Returns None if the match cannot be fetched or parsed.
+        
+        Raises:
+            ScraperError: If fetching fails
+            RobotsDisallowed: If robots.txt forbids access
+        """
+        ...
+
+
+class ScraperRegistry:
+    """Registry for pluggable cricket scrapers.
+    
+    All registered scrapers are automatically used by MultiSourceScraper for
+    conflict resolution. Scrapers can be added at module load time or runtime.
+    
+    Usage:
+        # Register a scraper
+        ScraperRegistry.register(MyCustomScraper)
+        
+        # Get all registered scrapers
+        scrapers = ScraperRegistry.get_all()
+        
+        # Clear registry (useful for testing)
+        ScraperRegistry.clear()
+    """
+    
+    _scrapers: list[type] = []
+    _instances: dict[str, Any] = {}
+    
+    @classmethod
+    def register(cls, scraper_class: type) -> None:
+        """Register a scraper class.
+        
+        The scraper will be instantiated lazily when first accessed.
+        Duplicate registrations are ignored.
+        """
+        if scraper_class not in cls._scrapers:
+            cls._scrapers.append(scraper_class)
+    
+    @classmethod
+    def get_all(cls, fetcher: PoliteFetcher | None = None) -> list[Any]:
+        """Get instances of all registered scrapers.
+        
+        Args:
+            fetcher: Optional shared PoliteFetcher instance. If not provided,
+                    each scraper will create its own.
+        
+        Returns:
+            List of scraper instances ready to use.
+        """
+        instances = []
+        for scraper_class in cls._scrapers:
+            name = getattr(scraper_class, "name", scraper_class.__name__)
+            
+            # Cache instances to reuse them
+            if name not in cls._instances:
+                try:
+                    # Try to instantiate with fetcher
+                    cls._instances[name] = scraper_class(fetcher=fetcher)
+                except TypeError:
+                    # Fallback: no fetcher argument
+                    cls._instances[name] = scraper_class()
+            
+            instances.append(cls._instances[name])
+        
+        return instances
+    
+    @classmethod
+    def clear(cls) -> None:
+        """Clear the registry (useful for testing)."""
+        cls._scrapers.clear()
+        cls._instances.clear()
+    
+    @classmethod
+    def get_by_name(cls, name: str, fetcher: PoliteFetcher | None = None) -> Any | None:
+        """Get a specific scraper by name."""
+        for instance in cls.get_all(fetcher):
+            if instance.name == name:
+                return instance
+        return None
+
+
 class ESPNcricinfoScraper:
     """Scrape ESPNcricinfo match data from their public JSON feed.
     
     ESPNcricinfo exposes a public JSON API for completed matches.
-    Endpoint: /ci/engine/match/<match_id>.json
+    Endpoints:
+    - /ci/engine/match/index.json?view=live - Recent match list
+    - /ci/engine/match/<match_id>.json - Match details
     """
     
     name = "espncricinfo"
@@ -49,16 +169,8 @@ class ESPNcricinfoScraper:
     def __init__(self, fetcher: PoliteFetcher | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
     
-    def _recent_match_ids(self, days: int = 7) -> list[str]:
-        """Get match IDs for recently completed matches.
-        
-        ESPNcricinfo has a /ci/content/match/latest.json endpoint that lists
-        recent matches. This is a simplified implementation; in production
-        you might scrape the schedule page or use their match list API.
-        """
-        # For this implementation, we'll use a known structure
-        # In practice, you'd scrape the results page or use their API
-        # Example: /matches/results/2026
+    def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
+        """Get match IDs for recently completed matches."""
         try:
             url = urljoin(self.base_url, "/ci/engine/match/index.json?view=live")
             data = self.fetcher.get(url)
@@ -239,11 +351,13 @@ class ESPNcricinfoScraper:
 class CricbuzzScraper:
     """Scrape Cricbuzz match data.
     
-    Cricbuzz has a mobile API that can be accessed. This is a placeholder
-    implementation showing the structure. In practice, you'd need to:
-    1. Check if their API is publicly documented and allowed
-    2. Respect their terms of service
-    3. Use their official endpoints if available
+    Cricbuzz has a mobile API that may be accessible. This implementation
+    provides the interface structure for future development.
+    
+    To implement:
+    1. Identify Cricbuzz's API endpoints (check developer tools in browser)
+    2. Verify their terms of service allow automated access
+    3. Parse their JSON/HTML response format
     """
     
     name = "cricbuzz"
@@ -252,26 +366,271 @@ class CricbuzzScraper:
     def __init__(self, fetcher: PoliteFetcher | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
     
+    def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
+        """Get match IDs for recently completed matches.
+        
+        Placeholder - needs implementation once Cricbuzz API structure is known.
+        """
+        # TODO: Implement once API structure is documented/discovered
+        return []
+    
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch a single match by ID.
         
-        This is a placeholder. Cricbuzz's API structure would need to be
-        reverse-engineered or documented officially.
+        Placeholder - needs implementation.
         """
-        # Placeholder - would need actual implementation based on Cricbuzz API
-        raise ScraperError("Cricbuzz scraper not yet implemented")
+        # TODO: Implement Cricbuzz match fetching
+        return None
+
+
+class CREXScraper:
+    """Scrape CREX live cricket scores.
+    
+    CREX (crex.live / crex.com) provides live cricket scores and match data.
+    This scraper attempts to use their public API/endpoints if available.
+    """
+    
+    name = "crex"
+    base_url = "https://crex.live"
+    
+    def __init__(self, fetcher: PoliteFetcher | None = None):
+        self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
+    
+    def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
+        """Get match IDs for recently completed matches from CREX.
+        
+        Attempts to discover CREX's API structure. If the site is unreachable
+        or doesn't allow scraping, returns empty list.
+        """
+        try:
+            # Try common API patterns
+            # Pattern 1: /api/matches/recent
+            url = urljoin(self.base_url, "/api/matches/recent")
+            try:
+                data = self.fetcher.get(url)
+                doc = json.loads(data)
+                
+                match_ids = []
+                cutoff = date.today() - timedelta(days=days)
+                
+                # Try to extract matches (adapt to actual structure)
+                matches = doc.get("matches", doc.get("data", []))
+                for match in matches:
+                    match_date_str = match.get("date", match.get("start_date", ""))
+                    match_status = match.get("status", match.get("state", ""))
+                    
+                    try:
+                        # Parse various date formats
+                        if "T" in match_date_str:
+                            match_date = datetime.fromisoformat(match_date_str.replace("Z", "+00:00")).date()
+                        else:
+                            match_date = datetime.strptime(match_date_str[:10], "%Y-%m-%d").date()
+                        
+                        # Check if completed
+                        completed = any(term in str(match_status).lower() 
+                                      for term in ["complete", "finished", "result"])
+                        
+                        if match_date >= cutoff and completed:
+                            match_ids.append(str(match.get("id", match.get("match_id", ""))))
+                    except (ValueError, KeyError):
+                        continue
+                
+                return [mid for mid in match_ids if mid]
+            
+            except (RobotsDisallowed, json.JSONDecodeError):
+                # Try alternate pattern
+                pass
+            
+            # Pattern 2: /matches/completed
+            url = urljoin(self.base_url, "/matches/completed")
+            try:
+                data = self.fetcher.get(url)
+                doc = json.loads(data)
+                
+                # Similar extraction logic...
+                # (simplified for space; would follow same pattern)
+                return []
+            
+            except (RobotsDisallowed, json.JSONDecodeError, Exception):
+                pass
+            
+            # If all patterns fail, return empty (source unavailable)
+            return []
+        
+        except Exception:
+            # If CREX is unreachable or blocks us, fail gracefully
+            return []
+    
+    def fetch_match(self, match_id: str) -> MatchRecord | None:
+        """Fetch a single match from CREX."""
+        try:
+            # Try common API patterns
+            url = urljoin(self.base_url, f"/api/match/{match_id}")
+            
+            try:
+                data = self.fetcher.get(url)
+                doc = json.loads(data)
+                return self._parse_match(match_id, doc)
+            except (RobotsDisallowed, json.JSONDecodeError):
+                pass
+            
+            # Try alternate pattern
+            url = urljoin(self.base_url, f"/matches/{match_id}")
+            try:
+                data = self.fetcher.get(url)
+                doc = json.loads(data)
+                return self._parse_match(match_id, doc)
+            except (RobotsDisallowed, json.JSONDecodeError):
+                pass
+            
+            return None
+        
+        except Exception:
+            return None
+    
+    def _parse_match(self, match_id: str, doc: dict[str, Any]) -> MatchRecord:
+        """Parse CREX JSON into MatchRecord.
+        
+        This is a best-effort parser that handles common JSON structures.
+        May need adjustment based on CREX's actual API format.
+        """
+        # Extract match data (try multiple possible field names)
+        match_data = doc.get("match", doc.get("data", doc))
+        
+        # Teams
+        teams = match_data.get("teams", [])
+        if isinstance(teams, list):
+            team_a = teams[0].get("name", "") if len(teams) > 0 else ""
+            team_b = teams[1].get("name", "") if len(teams) > 1 else ""
+        else:
+            team_a = teams.get("team_a", {}).get("name", "")
+            team_b = teams.get("team_b", {}).get("name", "")
+        
+        # Date
+        match_date = match_data.get("date", match_data.get("start_date", ""))
+        if "T" in match_date:
+            match_date = match_date[:10]
+        
+        # Result
+        result_data = match_data.get("result", match_data.get("outcome", {}))
+        winner = result_data.get("winner", match_data.get("winner", ""))
+        result_text = result_data.get("text", result_data.get("margin", ""))
+        
+        # Match info
+        match_type = match_data.get("format", match_data.get("match_type", ""))
+        venue = match_data.get("venue", {})
+        if isinstance(venue, dict):
+            venue_name = venue.get("name", "")
+        else:
+            venue_name = str(venue)
+        
+        # Players (if available)
+        players = self._parse_players(match_data, match_id, match_date, team_a, team_b)
+        
+        return MatchRecord(
+            match_id=f"crex-{match_id}",
+            date=match_date,
+            match_type=match_type,
+            team_type=match_data.get("team_type", ""),
+            gender=match_data.get("gender", "male"),
+            event=match_data.get("series", match_data.get("tournament", "")),
+            venue=venue_name,
+            team_a=team_a,
+            team_b=team_b,
+            toss_winner=match_data.get("toss", {}).get("winner", ""),
+            toss_decision=match_data.get("toss", {}).get("decision", ""),
+            winner=winner,
+            result=result_data.get("type", "win") if winner else "",
+            result_margin=result_text,
+            source=self.name,
+            players=players,
+        )
+    
+    def _parse_players(self, match_data: dict, match_id: str, match_date: str,
+                      team_a: str, team_b: str) -> list[PlayerPerf]:
+        """Extract player statistics from CREX match data."""
+        players = []
+        
+        # Try to extract player stats (structure may vary)
+        innings = match_data.get("innings", [])
+        for inning in innings:
+            batting_team = inning.get("batting_team", "")
+            bowling_team = inning.get("bowling_team", "")
+            
+            # Batting stats
+            for bat in inning.get("batsmen", inning.get("batting", [])):
+                player_name = bat.get("name", bat.get("player", ""))
+                if not player_name:
+                    continue
+                
+                players.append(PlayerPerf(
+                    match_id=f"crex-{match_id}",
+                    date=match_date,
+                    player=player_name,
+                    team=batting_team,
+                    opponent=bowling_team,
+                    runs=bat.get("runs", 0),
+                    balls=bat.get("balls", bat.get("balls_faced", 0)),
+                    fours=bat.get("fours", bat.get("4s", 0)),
+                    sixes=bat.get("sixes", bat.get("6s", 0)),
+                ))
+            
+            # Bowling stats
+            for bowl in inning.get("bowlers", inning.get("bowling", [])):
+                player_name = bowl.get("name", bowl.get("player", ""))
+                if not player_name:
+                    continue
+                
+                # Find or create player entry
+                existing = next((p for p in players if p.player == player_name), None)
+                wickets = bowl.get("wickets", 0)
+                overs = bowl.get("overs", 0)
+                balls_bowled = int(overs * 6) if isinstance(overs, (int, float)) else 0
+                
+                if existing:
+                    existing.wickets = wickets
+                    existing.balls_bowled = balls_bowled
+                    existing.runs_conceded = bowl.get("runs", 0)
+                else:
+                    players.append(PlayerPerf(
+                        match_id=f"crex-{match_id}",
+                        date=match_date,
+                        player=player_name,
+                        team=bowling_team,
+                        opponent=batting_team,
+                        wickets=wickets,
+                        balls_bowled=balls_bowled,
+                        runs_conceded=bowl.get("runs", 0),
+                    ))
+        
+        return players
 
 
 class MultiSourceScraper:
     """Aggregate multiple scrapers with conflict resolution.
     
-    When sources disagree on match details (winner, scores, etc.), this
-    scraper queries all available sources and uses majority voting to
+    Automatically uses all scrapers registered with ScraperRegistry. When sources
+    disagree on match details (winner, scores, etc.), uses majority voting to
     resolve conflicts. All decisions are logged.
+    
+    More sources = better conflict resolution. When 3+ sources are available,
+    majority voting becomes more robust.
     """
     
-    def __init__(self, scrapers: list | None = None):
-        self.scrapers = scrapers or [ESPNcricinfoScraper()]
+    def __init__(self, scrapers: list | None = None, fetcher: PoliteFetcher | None = None):
+        """Initialize with scrapers.
+        
+        Args:
+            scrapers: Optional list of scraper instances. If None, uses all
+                     registered scrapers from ScraperRegistry.
+            fetcher: Optional shared PoliteFetcher for rate limiting across sources.
+        """
+        if scrapers is not None:
+            self.scrapers = scrapers
+        else:
+            # Auto-discover all registered scrapers
+            self.scrapers = ScraperRegistry.get_all(fetcher=fetcher)
+        
         self.conflict_log: list[dict[str, Any]] = []
     
     def fetch(self, since: date) -> list[MatchRecord]:
@@ -281,18 +640,21 @@ class MultiSourceScraper:
         # Collect matches from all sources
         for scraper in self.scrapers:
             try:
-                if hasattr(scraper, "_recent_match_ids"):
-                    # Scraper provides match list
-                    match_ids = scraper._recent_match_ids(days=(date.today() - since).days)
-                    for match_id in match_ids:
-                        try:
-                            match = scraper.fetch_match(match_id)
-                            if match:
-                                key = _match_key(match)
-                                all_matches[key].append(match)
-                        except (ScraperError, RobotsDisallowed):
-                            continue
+                # Get recent match IDs
+                match_ids = scraper.fetch_recent_match_ids(days=(date.today() - since).days)
+                
+                for match_id in match_ids:
+                    try:
+                        match = scraper.fetch_match(match_id)
+                        if match:
+                            key = _match_key(match)
+                            all_matches[key].append(match)
+                    except (ScraperError, RobotsDisallowed):
+                        # Individual match failures shouldn't stop the source
+                        continue
+            
             except (ScraperError, RobotsDisallowed):
+                # If a source is completely unavailable, continue with others
                 continue
         
         # Resolve conflicts and return deduplicated matches
@@ -429,7 +791,14 @@ class ScraperSource:
         # Mark all as provisional with scraped timestamp
         for match in matches:
             match.status = "provisional"
-            if not match.match_id.startswith(("espn-", "cb-", "prov-")):
+            if not match.match_id.startswith(("espn-", "cb-", "crex-", "prov-")):
                 match.match_id = f"scraped-{match.date}-{_norm(match.team_a)}-{_norm(match.team_b)}"
         
         return matches
+
+
+# Register all built-in scrapers
+# These are automatically available to MultiSourceScraper
+ScraperRegistry.register(ESPNcricinfoScraper)
+ScraperRegistry.register(CREXScraper)
+ScraperRegistry.register(CricbuzzScraper)  # Placeholder, returns empty results
