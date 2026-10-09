@@ -3,14 +3,12 @@ from __future__ import annotations
 
 import argparse
 import csv
-import sqlite3
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from . import __version__
 from .cricsheet import download, iter_zip
-from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
 from .scraper_monitor import ScraperFailure, ScraperRunReport, save_report
 from .scrapers import ScraperSource
@@ -210,6 +208,44 @@ def cmd_health(a: argparse.Namespace) -> int:
     return 0 if all(r.ok for r in results) else 1
 
 
+def _bot(a: argparse.Namespace):
+    from .ask.bot import CricketBot
+    return CricketBot(a.data_dir, model=getattr(a, "model", None))
+
+
+def cmd_ask(a: argparse.Namespace) -> int:
+    r = _bot(a).ask(" ".join(a.question))
+    if a.show_queries:
+        for q in r.queries:
+            print(f"[{q['tool']}] {q['input']}", file=sys.stderr)
+    print(r.answer)
+    print(f"({r.seconds}s)", file=sys.stderr)
+    return 0
+
+
+def cmd_chat(a: argparse.Namespace) -> int:
+    bot = _bot(a)
+    print(f"Ask about cricket (data through {bot.data_through}). Empty line to quit.")
+    history: list[dict] = []
+    while True:
+        try:
+            q = input("> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            break
+        if not q:
+            break
+        r = bot.ask(q, history)
+        print(r.answer, f"\n({r.seconds}s)\n")
+        history += [{"role": "user", "content": q}, {"role": "assistant", "content": r.answer}]
+    return 0
+
+
+def cmd_serve(a: argparse.Namespace) -> int:
+    from .ask.server import serve
+    serve(_bot(a), a.host, a.port, a.allow_origin)
+    return 0
+
+
 def cmd_backfill(a: argparse.Namespace) -> int:
     a.dataset = a.dataset or "all_json.zip"
     a.provisional_days = 30
@@ -246,25 +282,9 @@ def cmd_query(a: argparse.Namespace) -> int:
 
 
 def cmd_export_sqlite(a: argparse.Namespace) -> int:
-    store = Store(a.data_dir)
-    out = Path(a.out)
-    out.unlink(missing_ok=True)
-    db = sqlite3.connect(out)
-    for table, fields in (("matches", MATCH_FIELDS), ("players", PLAYER_FIELDS)):
-        db.execute(f"CREATE TABLE {table} ({', '.join(fields)})")
-        ph = ",".join("?" * len(fields))
-        db.executemany(f"INSERT INTO {table} VALUES ({ph})",
-                       ([r[f] for f in fields] for r in store.iter_all(table)))
-    for _, rec in load_provisional(store):
-        db.execute(f"INSERT INTO matches VALUES ({','.join('?' * len(MATCH_FIELDS))})",
-                   [rec.row()[f] for f in MATCH_FIELDS])
-        db.executemany(f"INSERT INTO players VALUES ({','.join('?' * len(PLAYER_FIELDS))})",
-                       ([p.row()[f] for f in PLAYER_FIELDS] for p in rec.players))
-    db.execute("CREATE INDEX idx_players_name ON players(player)")
-    db.execute("CREATE INDEX idx_matches_date ON matches(date)")
-    db.commit()
-    db.close()
-    print(f"wrote {out}")
+    from .ask.db import export_sqlite
+    export_sqlite(Store(a.data_dir), Path(a.out))
+    print(f"wrote {a.out}")
     return 0
 
 
@@ -284,6 +304,23 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--backfill-priority", default="",
                    help="comma-separated task-key prefixes (e.g. 2025-12-18-Jharkhand) to backfill first this run")
     u.set_defaults(fn=cmd_update)
+
+    q = sub.add_parser("ask", help="answer a cricket question from the data (needs the Claude API)")
+    q.add_argument("question", nargs="+")
+    q.add_argument("--model", help="Claude model (default: claude-opus-5-5, or $CRICKET_BOT_MODEL)")
+    q.add_argument("--show-queries", action="store_true", help="print the lookups and SQL used")
+    q.set_defaults(fn=cmd_ask)
+
+    c = sub.add_parser("chat", help="interactive cricket Q&A")
+    c.add_argument("--model")
+    c.set_defaults(fn=cmd_chat)
+
+    sv = sub.add_parser("serve", help="HTTP endpoint (POST /ask) so a chat UI can plug in")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.add_argument("--model")
+    sv.add_argument("--allow-origin", help="CORS origin for browser UIs, e.g. https://chat.example.com")
+    sv.set_defaults(fn=cmd_serve)
 
     h = sub.add_parser("health", help="check the CREX scraper's assumptions; save raw pages on failure")
     h.add_argument("--out", default="diagnostics")

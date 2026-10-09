@@ -18,6 +18,8 @@ cricket-data query "Kohli" --since 2026-01-01
 cricket-data export-sqlite --out cricket.db
 ```
 
+**Ask in plain English** (needs a Claude API key): `cricket-data ask "who won the toss in the last 5 India v West Indies T20Is?"`. See [Ask](docs/ASK.md).
+
 More: [Getting started](docs/GETTING_STARTED.md) · [Contributing](CONTRIBUTING.md)
 
 ## Support
