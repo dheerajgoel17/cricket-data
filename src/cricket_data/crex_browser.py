@@ -109,15 +109,16 @@ class CREXBrowser:
                             title=re.sub(r"\s+", " ", title.group(1)).strip() if title else "")
 
     def render(self, url: str, wait_selector: str | None = None, timeout_ms: int = 45000,
-               force_browser: bool = False) -> RenderedPage:
+               force_browser: bool = False, marker: str | None = None) -> RenderedPage:
         """Return the page's HTML/text: plain HTTP first, Chromium if the content is not in it.
 
         Raises RobotsDisallowed / BrowserError.
         """
         if not self.fetcher.allowed(url):
             raise RobotsDisallowed(f"robots.txt disallows {url}")
-        marker = None
-        if wait_selector == "script#sports-event-schema":
+        if marker is not None:
+            pass  # caller names the text that proves the page has its data
+        elif wait_selector == "script#sports-event-schema":
             marker = 'id="sports-event-schema"'
         elif wait_selector and wait_selector.startswith('a[href*="'):
             marker = f'href="{wait_selector[9:-2]}'

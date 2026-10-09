@@ -156,6 +156,7 @@ _TITLE = re.compile(r"<title[^>]*>(.*?)</title>", re.S)
 _OVERS = re.compile(r"\((\d{1,3}(?:\.\d)?)\)")
 _TOSS = re.compile(r"&q;toss_team&q;:&q;([A-Za-z0-9]+)&q;,&q;chose_to&q;:(\d)")
 _STATE_TS = re.compile(r"&q;ts&q;:&q;[0-9/]+\((\d{1,3}(?:\.\d)?)\)&q;")
+_MM = re.compile(r"&q;mm&q;:&q;([A-Za-z0-9]+)\^")
 _WON = re.compile(r"^(?P<w>.+?)\s+won\s+(?P<m>(?:by|in)\s+.+?)\s*(?:🏆.*)?$", re.I)
 
 
@@ -175,6 +176,7 @@ class PageFacts:
     scores: str = ""
     toss_winner: str = ""
     toss_decision: str = ""  # bat | field
+    potm_id: str = ""  # CREX player id of the player of the match
 
     @property
     def start_date(self) -> date | None:
@@ -185,20 +187,36 @@ class PageFacts:
         return self.status.lower() in ("finished", "eventcompleted", "completed", "result")
 
 
+def _cricsheet_margin(text: str) -> str:
+    """'by an innings and 9 runs' -> 'innings 9 runs'; 'by 8 wickets (DLS method)' -> '8 wickets'."""
+    t = re.sub(r"\(.*?\)", "", text).strip()
+    t = re.sub(r"^(?:by|in)\s+", "", t, flags=re.I)
+    t = re.sub(r"^an\s+innings\s+and\s+", "innings ", t, flags=re.I)
+    return re.sub(r"\s+", " ", t).strip()
+
+
 def parse_result(headline: str) -> tuple[str, str, str]:
-    """('India', 'India won by 6 wickets', 'win') from 'India won by 6 wickets 🏆'."""
+    """(winner, margin, result) as Cricsheet records them: ('India', '6 wickets', 'win').
+
+    Ties (including ones settled by a super over), draws and no-results have no winner or margin.
+    """
     h = (headline or "").strip()
+    low = h.lower()
+    if "super over" in low or "superover" in low or "tied" in low or low.startswith("tie"):
+        return "", "", "tie"
     m = _WON.match(h)
     if m:
-        return m.group("w").strip(), f"{m.group('w').strip()} won {m.group('m').strip()}", "win"
-    low = h.lower()
-    if "tied" in low or low.startswith("tie") or "super over" in low and "won" not in low:
-        return "", h, "tie"
+        return m.group("w").strip(), _cricsheet_margin(m.group("m")), "win"
     if "drawn" in low or low.startswith("draw"):
-        return "", h, "draw"
+        return "", "", "draw"
     if "no result" in low or "abandon" in low or "washed" in low:
-        return "", h, "no result"
+        return "", "", "no result"
     return "", "", ""
+
+
+def _potm_id(html: str) -> str:
+    m = _MM.search(html or "")
+    return m.group(1) if m else ""
 
 
 def parse_match_page(html: str, text: str = "", title: str = "", url: str = "") -> PageFacts | None:
@@ -247,7 +265,7 @@ def parse_match_page(html: str, text: str = "", title: str = "", url: str = "") 
         url=ld.get("url") or url, start=start, team_a=comps[0], team_b=comps[1],
         venue=(ld.get("location") or {}).get("name", ""), status=str(ld.get("eventStatus", "")),
         title=title, winner=winner, margin=margin, result=result, max_overs=max_overs, scores=scores,
-        toss_winner=toss_winner, toss_decision=toss_decision)
+        toss_winner=toss_winner, toss_decision=toss_decision, potm_id=_potm_id(html))
 
 
 # ---- strict confirmation -------------------------------------------------------------------------
@@ -368,26 +386,61 @@ def humanize(slug_name: str) -> str:
                     for w in slug_name.split("-"))
 
 
+_CRICSHEET_TYPE = {"t20": "T20", "t20i": "T20", "it20": "T20", "odi": "ODI", "odm": "ODM", "lista": "ODM",
+                   "test": "Test", "mdm": "MDM", "fc": "MDM", "firstclass": "MDM"}
+
+
+def cricsheet_match_type(match_type: str, fam: str, international: bool) -> str:
+    """Use Cricsheet's own match_type vocabulary: T20, ODI, ODM (domestic one-day), Test, MDM (domestic multi-day)."""
+    key = (match_type or "").lower().replace(" ", "").replace("-", "")
+    mt = _CRICSHEET_TYPE.get(key) or {"t20": "T20", "50": "ODI", "multi": "Test"}[fam]
+    if mt == "ODI" and not international:
+        mt = "ODM"
+    if mt == "Test" and not international:
+        mt = "MDM"
+    return mt
+
+
 def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, match_type: str = "",
-                      status: str = "provisional") -> MatchRecord:
+                      status: str = "provisional", scorecard=None) -> MatchRecord:
+    from .crex_scorecard import event_name, player_rows
+
     a, b = entry.codes
     intl = _strip_qualifiers(a) in NATIONS and _strip_qualifiers(b) in NATIONS
     fam = entry_family(entry) or family_from_overs(facts.max_overs) or "t20"
-    if not match_type:
-        base = {"t20": "T20", "50": "ODI", "multi": "Test"}[fam]
-        if intl:
-            base = "T20I" if fam == "t20" else base
-        elif fam == "50":
-            base = "List A"
-        elif fam == "multi":
-            base = "FC"
-        match_type = base
+    event = humanize(entry.series_name) if entry.series_name else ""
+    potm, players = "", []
+    match_id = f"crex-{entry.match_id}"
+    if scorecard is not None:
+        event = event_name(scorecard.series_name) or event
+        potm = scorecard.names.get(facts.potm_id, "")
+        players = player_rows(scorecard, match_id, match_date)
+        canon = {n: next((t for t in (facts.team_a, facts.team_b) if names_match(n, t)), n) for n in scorecard.teams.values()}
+        for pl in players:  # use the match page's team names everywhere ('United States' vs 'United States of America')
+            pl.team, pl.opponent = canon.get(pl.team, pl.team), canon.get(pl.opponent, pl.opponent)
     return MatchRecord(
-        match_id=f"crex-{entry.match_id}", date=match_date, match_type=match_type,
+        match_id=match_id, date=match_date, match_type=cricsheet_match_type(match_type, fam, intl),
         team_type="international" if intl else "club",
         gender="female" if entry.is_women else "male",
-        event=humanize(entry.series_name) if entry.series_name else "",
-        venue=facts.venue, team_a=facts.team_a, team_b=facts.team_b,
+        event=event, venue=facts.venue, team_a=facts.team_a, team_b=facts.team_b,
         toss_winner=facts.toss_winner, toss_decision=facts.toss_decision,
         winner=facts.winner, result=facts.result, result_margin=facts.margin,
-        status=status, source="crex")
+        player_of_match=potm, status=status, source="crex", players=players)
+
+
+def fetch_record(browser, entry: MatchEntry, facts: PageFacts, match_date: str, match_type: str = "",
+                 status: str = "provisional") -> MatchRecord:
+    """The full Cricsheet-shaped record: match fields plus every player's row from the scorecard page.
+
+    If the scorecard page cannot be read the match is still returned (without players), and the
+    next run of Cricsheet's own data replaces it anyway.
+    """
+    from .crex_scorecard import parse_scorecard
+
+    sc = None
+    try:
+        page = browser.render(entry.url + "/match-scorecard", marker="getSC4")
+        sc = parse_scorecard(page.html) if page.status < 400 else None
+    except Exception:
+        sc = None
+    return record_from_facts(entry, facts, match_date, match_type, status, scorecard=sc)

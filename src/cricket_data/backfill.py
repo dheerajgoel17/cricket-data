@@ -31,9 +31,9 @@ from .crex_lookup import (
     LookupResult,
     code_is,
     confirm,
+    fetch_record,
     find_match,
     parse_match_page,
-    record_from_facts,
 )
 from .crex_sitemap import CREXSitemapIndex, MatchEntry
 from .permanent_matches import MissingMatch, fetch_cricsheet_missing_matches
@@ -374,7 +374,7 @@ def process_backfill_batch(
             cheap += 1
 
         if result.status == "found":
-            rec = record_from_facts(result.entry, result.facts, task.date, task.match_type, task.category)
+            rec = fetch_record(browser, result.entry, result.facts, task.date, task.match_type, task.category)
             write_provisional(store, rec)
             queue.mark_done(task, rec.match_id, result.entry.url)
             stats["succeeded"] += 1
