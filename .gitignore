@@ -8,3 +8,5 @@ __pycache__/
 .env
 .cache/
 diagnostics/
+data/scraper_run_report.json
+data/state/last_backfill.json

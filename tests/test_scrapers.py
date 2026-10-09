@@ -633,3 +633,17 @@ def test_scraper_error_propagation():
         
         with pytest.raises(ScraperError, match="Network error"):
             scraper.fetch_match("12345")
+
+
+def test_crex_recent_ids_skip_matches_already_saved():
+    class Home:
+        def links(self, url, contains):
+            from cricket_data.crex_browser import RenderedPage
+            return RenderedPage(url, 200, "", "", ""), [
+                {"href": "/cricket-live-score/a-vs-b-1st-t20-x-2026-match-updates-AAA", "text": "A Won"},
+                {"href": "/cricket-live-score/c-vs-d-1st-t20-x-2026-match-updates-BBB", "text": "D Won"},
+            ]
+
+    scraper = CREXScraper(browser=Home())
+    scraper.skip_ids = {"a-vs-b-1st-t20-x-2026-match-updates-AAA"}
+    assert scraper.fetch_recent_match_ids() == ["c-vs-d-1st-t20-x-2026-match-updates-BBB"]

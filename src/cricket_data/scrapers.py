@@ -403,6 +403,7 @@ class CREXScraper:
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
         self.browser = browser
         self._owns_browser = False
+        self.skip_ids: set[str] = set()  # slugs already saved: finished results never change
 
     def use_browser(self, browser: CREXBrowser) -> None:
         self.close()
@@ -433,7 +434,7 @@ class CREXScraper:
                 continue
             if re.search(r"\b(won|tied|no result|abandoned|drawn)\b", link["text"], re.I):
                 slug = href.rstrip("/").split("/")[-1]
-                if slug not in ids:
+                if slug not in ids and slug not in self.skip_ids:
                     ids.append(slug)
         return ids
 
@@ -672,13 +673,16 @@ class ScraperSource:
     
     name = "scraper"
     
-    def __init__(self, browser: CREXBrowser | None = None):
+    def __init__(self, browser: CREXBrowser | None = None, known_ids: set[str] | None = None):
         self.scraper = MultiSourceScraper()
         self._missing_matches_cache = None
         if browser is not None:  # share one Playwright session with the backfill
             for sc in self.scraper.scrapers:
                 if hasattr(sc, "use_browser"):
                     sc.use_browser(browser)
+        for sc in self.scraper.scrapers:
+            if known_ids and hasattr(sc, "skip_ids"):
+                sc.skip_ids = set(known_ids)
 
     def close(self) -> None:
         for sc in self.scraper.scrapers:
