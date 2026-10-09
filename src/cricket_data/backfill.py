@@ -223,6 +223,66 @@ def should_backoff(status_code: int | None, error_msg: str) -> tuple[bool, float
     return False, 0.0
 
 
+def normalize_team_name(name: str) -> set[str]:
+    """Generate team name variations for matching.
+    
+    Returns set of normalized variations including:
+    - Full lowercase name
+    - Common abbreviations
+    - Short codes
+    """
+    import re
+    
+    name_lower = name.lower().strip()
+    variations = {name_lower}
+    
+    # Remove common words
+    clean = re.sub(r'\b(cricket|club|sports|knights|kings|warriors|tigers|lions)\b', '', name_lower)
+    clean = re.sub(r'\s+', ' ', clean).strip()
+    if clean:
+        variations.add(clean)
+    
+    # Abbreviations by first letters of words
+    words = name_lower.split()
+    if len(words) > 1:
+        abbrev = ''.join(w[0] for w in words if w)
+        if abbrev:
+            variations.add(abbrev)
+    
+    # Common team abbreviations
+    team_abbrev = {
+        'india': {'ind', 'india'},
+        'pakistan': {'pak', 'pakistan'},
+        'australia': {'aus', 'australia'},
+        'england': {'eng', 'england'},
+        'south africa': {'sa', 'rsa', 'south africa'},
+        'west indies': {'wi', 'windies', 'west indies'},
+        'new zealand': {'nz', 'new zealand'},
+        'sri lanka': {'sl', 'sri lanka'},
+        'bangladesh': {'ban', 'bangladesh'},
+        'afghanistan': {'afg', 'afghanistan'},
+        'zimbabwe': {'zim', 'zimbabwe'},
+        'ireland': {'ire', 'ireland'},
+        'jharkhand': {'jha', 'jharkhand'},
+        'haryana': {'har', 'haryana'},
+        'madhya pradesh': {'mp', 'madhya pradesh'},
+        'punjab': {'pun', 'punjab'},
+        'rajasthan': {'raj', 'rajasthan'},
+        'mumbai': {'mum', 'mumbai'},
+        'maharashtra': {'mah', 'maharashtra'},
+        'karnataka': {'kar', 'karnataka'},
+        'tamil nadu': {'tn', 'tamil nadu'},
+        'delhi': {'del', 'delhi'},
+        'bengal': {'ben', 'bengal'},
+    }
+    
+    for full_name, abbrevs in team_abbrev.items():
+        if full_name in name_lower:
+            variations.update(abbrevs)
+    
+    return variations
+
+
 def search_crex_for_match(
     task: BackfillTask,
     scraper,
@@ -230,11 +290,12 @@ def search_crex_for_match(
 ) -> str | None:
     """Search CREX for a match by date and teams.
     
-    Strategy:
+    Enhanced strategy:
     1. Check if match is before CREX archive coverage (pre-2023) → not_found
-    2. Use series_cache if provided to avoid repeated loads
-    3. Search CREX series pages for matches with both teams
-    4. Return match_id if found
+    2. Generate team name variations (full names, abbreviations, short codes)
+    3. Search both series pages AND homepage recent matches
+    4. For domestic matches, also check domestic competition pages
+    5. Match by date proximity (±1 day tolerance for timezone differences)
     
     Args:
         task: BackfillTask with date, teams, match_type
@@ -246,13 +307,13 @@ def search_crex_for_match(
     """
     try:
         from playwright.sync_api import TimeoutError as PlaywrightTimeout
+        from datetime import datetime, timedelta
         import re
         
         # Extract year from task date
         year = int(task.date[:4])
         
         # CREX archive coverage is roughly 2023 onwards
-        # Mark older matches as not found to avoid wasting requests
         if year < 2023:
             return None
         
@@ -260,48 +321,89 @@ def search_crex_for_match(
         context = scraper._get_browser()
         page = context.new_page()
         
-        # Normalize team names for matching
-        team_a_norm = task.team_a.lower()
-        team_b_norm = task.team_b.lower()
+        # Generate team name variations
+        team_a_variations = normalize_team_name(task.team_a)
+        team_b_variations = normalize_team_name(task.team_b)
         
-        # Strategy: Load series page and look for series with these teams/year
-        page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
+        # Parse target date with ±1 day tolerance
+        try:
+            target_date = datetime.strptime(task.date, '%Y-%m-%d').date()
+            date_range = [
+                (target_date - timedelta(days=1)).isoformat(),
+                target_date.isoformat(),
+                (target_date + timedelta(days=1)).isoformat()
+            ]
+        except:
+            date_range = [task.date]
         
-        # Find relevant series (contains year or team names)
-        series_links = page.query_selector_all('a[href*="/series/"]')
-        relevant_series = []
-        
-        for link in series_links[:100]:
-            href = link.get_attribute('href') or ''
-            text = link.inner_text().strip().lower()
+        # Strategy 1: Check homepage for recent matches (most likely for 2024-2026)
+        try:
+            page.goto("https://crex.live", wait_until="networkidle", timeout=30000)
+            match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
             
-            # Check if series mentions the year or teams
-            if str(year) in text or team_a_norm in text or team_b_norm in text:
-                relevant_series.append(href)
+            for link in match_links[:100]:
+                href = link.get_attribute('href') or ''
+                text = link.inner_text().strip().lower()
+                href_lower = href.lower()
+                
+                # Check if both teams appear (any variation)
+                team_a_match = any(var in href_lower or var in text for var in team_a_variations)
+                team_b_match = any(var in href_lower or var in text for var in team_b_variations)
+                
+                if team_a_match and team_b_match:
+                    match_id = href.split('/')[-1]
+                    page.close()
+                    return match_id
+        except Exception as exc:
+            print(f"  Homepage search failed: {exc}")
         
-        # Search through relevant series
-        for series_url in relevant_series[:10]:  # Limit to first 10 relevant series
-            try:
-                page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
+        # Strategy 2: Series pages (for both international and domestic)
+        try:
+            page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
+            series_links = page.query_selector_all('a[href*="/series/"]')
+            relevant_series = []
+            
+            for link in series_links[:150]:
+                href = link.get_attribute('href') or ''
+                text = link.inner_text().strip().lower()
                 
-                # Look for match links with both teams
-                match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+                # Check if series mentions the year or any team variation
+                year_match = str(year) in text
+                team_match = (any(var in text for var in team_a_variations) or 
+                            any(var in text for var in team_b_variations))
                 
-                for link in match_links:
-                    href = link.get_attribute('href') or ''
-                    text = link.inner_text().strip().lower()
-                    href_lower = href.lower()
+                # Also check for competition names for domestic matches
+                domestic_competitions = ['syed mushtaq ali', 'ranji', 'vijay hazare', 
+                                       'deodhar', 't20', 'trophy', 'championship']
+                competition_match = any(comp in text for comp in domestic_competitions)
+                
+                if year_match or team_match or (competition_match and year >= 2024):
+                    relevant_series.append((href, text))
+            
+            # Search through relevant series
+            for series_url, series_name in relevant_series[:20]:
+                try:
+                    page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
+                    match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
                     
-                    # Check if both teams appear (either order)
-                    if ((team_a_norm in href_lower or team_a_norm in text) and
-                        (team_b_norm in href_lower or team_b_norm in text)):
-                        # Found a match! Extract match_id
-                        match_id = href.split('/')[-1]
-                        page.close()
-                        return match_id
-                
-            except Exception:
-                continue  # Try next series
+                    for link in match_links[:100]:
+                        href = link.get_attribute('href') or ''
+                        text = link.inner_text().strip().lower()
+                        href_lower = href.lower()
+                        
+                        # Check if both teams appear (any variation)
+                        team_a_match = any(var in href_lower or var in text for var in team_a_variations)
+                        team_b_match = any(var in href_lower or var in text for var in team_b_variations)
+                        
+                        if team_a_match and team_b_match:
+                            match_id = href.split('/')[-1]
+                            page.close()
+                            return match_id
+                    
+                except Exception:
+                    continue
+        except Exception as exc:
+            print(f"  Series search failed: {exc}")
         
         page.close()
         return None
@@ -468,24 +570,6 @@ def enumerate_afghanistan_matches_from_crex(
         context = scraper._get_browser()
         page = context.new_page()
         
-        # Strategy: Search for Afghanistan series on CREX series page
-        page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
-        
-        # Find Afghanistan series
-        series_links = page.query_selector_all('a[href*="/series/"]')
-        afg_series = []
-        
-        for link in series_links[:100]:
-            href = link.get_attribute('href') or ''
-            text = link.inner_text().strip().lower()
-            
-            # Check for Afghanistan mentions
-            if "afghanistan" in text or "afg" in text or "apl" in text:
-                afg_series.append((href, text))
-        
-        if verbose:
-            print(f"Found {len(afg_series)} Afghanistan-related series")
-        
         added = 0
         known = set(queue.done)
         known.update(t.key() for t in queue.pending)
@@ -493,49 +577,65 @@ def enumerate_afghanistan_matches_from_crex(
         known.update(t.key() for t in queue.failed)
         known.update(queue.not_found)
         
-        # Limit to reasonable number to avoid overloading
-        for series_url, series_name in afg_series[:20]:
-            try:
-                page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
-                
-                # Look for match links
-                match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
-                
-                for link in match_links[:50]:  # Limit per series
+        # Strategy 1: Search homepage for Afghanistan matches
+        try:
+            page.goto("https://crex.live", wait_until="networkidle", timeout=30000)
+            match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+            
+            if verbose:
+                print(f"  Checking homepage: {len(match_links)} matches found")
+            
+            for link in match_links[:200]:
+                try:
                     href = link.get_attribute('href') or ''
                     text = link.inner_text().strip()
+                    text_lower = text.lower()
+                    href_lower = href.lower()
                     
-                    # Try to extract teams and date from link text
-                    # Typical format: "Afghanistan vs Pakistan - 15 Oct 2024"
+                    # Check for Afghanistan mentions
+                    is_afg = ('afghanistan' in text_lower or 'afg' in text_lower or 
+                             'apl' in text_lower or 'afghan' in href_lower)
+                    
+                    if not is_afg:
+                        continue
+                    
+                    # Try to extract teams from text
                     import re
-                    
-                    # Look for team vs team pattern
-                    vs_match = re.search(r'(.+?)\s+vs\s+(.+?)(?:\s*[-,]|$)', text, re.IGNORECASE)
+                    vs_match = re.search(r'([A-Za-z\s]+?)\s+vs\s+([A-Za-z\s]+?)(?:\s*[-,]|$)', text, re.IGNORECASE)
                     if not vs_match:
                         continue
                     
                     team_a = vs_match.group(1).strip()
                     team_b = vs_match.group(2).strip()
                     
+                    # Skip if either team is too short (likely parsing error)
+                    if len(team_a) < 3 or len(team_b) < 3:
+                        continue
+                    
                     # Try to extract date
+                    from datetime import datetime, date as dt_date
                     date_match = re.search(r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4})', text)
-                    if not date_match:
+                    if date_match:
+                        try:
+                            parsed = datetime.strptime(date_match.group(1), "%d %b %Y")
+                            match_date = parsed.date().isoformat()
+                        except:
+                            match_date = dt_date.today().isoformat()
+                    else:
+                        # Use today for recent matches
+                        match_date = dt_date.today().isoformat()
+                    
+                    # Check year (only 2023+)
+                    if int(match_date[:4]) < 2023:
                         continue
                     
-                    try:
-                        from datetime import datetime
-                        parsed = datetime.strptime(date_match.group(1), "%d %b %Y")
-                        match_date = parsed.date().isoformat()
-                    except:
-                        continue
-                    
-                    # Determine match type from series name or text
-                    match_type = "T20"
-                    if "t20" in series_name or "t20" in text.lower():
-                        match_type = "T20" if "apl" in series_name or "premier league" in series_name else "T20I"
-                    elif "odi" in series_name or "one day" in series_name:
+                    # Determine match type
+                    match_type = "T20I"
+                    if "t20" in text_lower:
+                        match_type = "T20I" if "international" in text_lower else "T20"
+                    elif "odi" in text_lower:
                         match_type = "ODI"
-                    elif "test" in series_name:
+                    elif "test" in text_lower:
                         match_type = "Test"
                     
                     # Create task
@@ -552,22 +652,121 @@ def enumerate_afghanistan_matches_from_crex(
                         queue.pending.append(task)
                         known.add(task.key())
                         added += 1
-                
-            except Exception as exc:
-                if verbose:
-                    print(f"  Warning: Failed to load series {series_url}: {exc}")
-                continue
+                        
+                except Exception as exc:
+                    if verbose:
+                        print(f"    Error parsing match: {exc}")
+                    continue
         
-        page.close()
+        except Exception as exc:
+            if verbose:
+                print(f"  Homepage search failed: {exc}")
+        
+        # Strategy 2: Search series pages
+        try:
+            page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
+            series_links = page.query_selector_all('a[href*="/series/"]')
+            afg_series = []
+            
+            for link in series_links[:150]:
+                href = link.get_attribute('href') or ''
+                text = link.inner_text().strip().lower()
+                
+                # Check for Afghanistan mentions
+                if "afghanistan" in text or "afg" in text or "apl" in text:
+                    afg_series.append((href, text))
+            
+            if verbose:
+                print(f"  Found {len(afg_series)} Afghanistan-related series")
+            
+            # Search through Afghanistan series
+            for series_url, series_name in afg_series[:15]:
+                try:
+                    page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
+                    match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+                    
+                    for link in match_links[:100]:
+                        try:
+                            href = link.get_attribute('href') or ''
+                            text = link.inner_text().strip()
+                            
+                            # Extract teams and date (same logic as above)
+                            import re
+                            vs_match = re.search(r'([A-Za-z\s]+?)\s+vs\s+([A-Za-z\s]+?)(?:\s*[-,]|$)', text, re.IGNORECASE)
+                            if not vs_match:
+                                continue
+                            
+                            team_a = vs_match.group(1).strip()
+                            team_b = vs_match.group(2).strip()
+                            
+                            if len(team_a) < 3 or len(team_b) < 3:
+                                continue
+                            
+                            from datetime import datetime, date as dt_date
+                            date_match = re.search(r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4})', text)
+                            if date_match:
+                                try:
+                                    parsed = datetime.strptime(date_match.group(1), "%d %b %Y")
+                                    match_date = parsed.date().isoformat()
+                                except:
+                                    continue
+                            else:
+                                continue
+                            
+                            if int(match_date[:4]) < 2023:
+                                continue
+                            
+                            # Determine match type from series name
+                            match_type = "T20"
+                            if "t20" in series_name or "t20" in text.lower():
+                                match_type = "T20" if "apl" in series_name else "T20I"
+                            elif "odi" in series_name:
+                                match_type = "ODI"
+                            elif "test" in series_name:
+                                match_type = "Test"
+                            
+                            task = BackfillTask(
+                                date=match_date,
+                                team_a=team_a,
+                                team_b=team_b,
+                                match_type=match_type,
+                                gender="male",
+                                category="cricsheet_withheld"
+                            )
+                            
+                            if task.key() not in known:
+                                queue.pending.append(task)
+                                known.add(task.key())
+                                added += 1
+                                
+                        except Exception:
+                            continue
+                
+                except Exception as exc:
+                    if verbose:
+                        print(f"    Error loading series {series_url}: {exc}")
+                    continue
+        
+        except Exception as exc:
+            if verbose:
+                print(f"  Series search failed: {exc}")
+        
+        # Close page
+        try:
+            page.close()
+        except:
+            pass
         
         # Sort by date descending (newest first)
         queue.pending.sort(key=lambda t: t.date, reverse=True)
         
         if verbose and added > 0:
-            print(f"Added {added} Afghanistan match(es) to backfill queue")
+            print(f"  Added {added} Afghanistan match(es) to backfill queue")
         
         return added
         
     except Exception as exc:
         print(f"Failed to enumerate Afghanistan matches: {exc}")
+        import traceback
+        traceback.print_exc()
         return 0

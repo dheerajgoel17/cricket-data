@@ -4,7 +4,7 @@
   "done": [],
   "failed": [],
   "in_progress": [],
-  "last_updated": "2026-10-09T05:16:08.967380",
+  "last_updated": "2026-10-09T05:23:06.594625",
   "max_retries": 3,
   "not_found": [
     "2026-09-25-Warriors-North West",
@@ -3307,6 +3307,39 @@
     },
     {
       "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-11-14",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Afghanistan",
+      "team_b": "Bangladesh"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-11-11",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Afghanistan",
+      "team_b": "Bangladesh"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-11-08",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "ODI",
+      "team_a": "Afghanistan",
+      "team_b": "Bangladesh"
+    },
+    {
+      "attempts": 0,
       "category": "cricsheet_missing",
       "date": "2024-10-06",
       "gender": "male",
@@ -3945,6 +3978,39 @@
     },
     {
       "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-02-24",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "T20I",
+      "team_a": "Afghanistan",
+      "team_b": "Ireland"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-02-23",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "T20I",
+      "team_a": "Afghanistan",
+      "team_b": "Ireland"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2024-02-20",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "T20I",
+      "team_a": "Afghanistan",
+      "team_b": "Ireland"
+    },
+    {
+      "attempts": 0,
       "category": "cricsheet_missing",
       "date": "2024-01-23",
       "gender": "male",
@@ -3953,6 +4019,28 @@
       "match_type": "List A",
       "team_a": "Sylhet Strikers",
       "team_b": "Rangpur Riders"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2023-12-26",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "T20I",
+      "team_a": "Afghanistan",
+      "team_b": "Sri Lanka"
+    },
+    {
+      "attempts": 0,
+      "category": "cricsheet_withheld",
+      "date": "2023-12-23",
+      "gender": "male",
+      "last_attempt": null,
+      "last_error": null,
+      "match_type": "T20I",
+      "team_a": "Afghanistan",
+      "team_b": "Sri Lanka"
     },
     {
       "attempts": 0,

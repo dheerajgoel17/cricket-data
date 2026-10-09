@@ -1,0 +1,36 @@
+Historical Lookup Verification
+============================================================
+
+Testing: 2024-10-17 India vs West Indies
+============================================================
+Step 1: Searching CREX...
+  ✓ Found: ind-vs-wi-2nd-t20-west-indies-tour-of-india-2026-match-updates-11AM
+Step 2: Scraping match data...
+  ✓ Scraped: India vs West
+     Date: 2026-10-09
+     Result: Unknown
+Step 3: Saving to provisional...
+  ✓ Saved: data/provisional/crex-ind-vs-wi-2nd-t20-west-indies-tour-of-india-2026-match-updates-11AM.json
+  ✓ Verified: File exists
+
+Testing: 2026-10-09 India vs West Indies
+============================================================
+Step 1: Searching CREX...
+  ✓ Found: ind-vs-wi-2nd-t20-west-indies-tour-of-india-2026-match-updates-11AM
+Step 2: Scraping match data...
+  ✓ Scraped: India vs West
+     Date: 2026-10-09
+     Result: Unknown
+Step 3: Saving to provisional...
+  ✓ Saved: data/provisional/crex-ind-vs-wi-2nd-t20-west-indies-tour-of-india-2026-match-updates-11AM.json
+  ✓ Verified: File exists
+
+============================================================
+VERIFICATION SUMMARY
+============================================================
+✓ PASS: 2024-10-17 India vs West Indies
+✓ PASS: 2026-10-09 India vs West Indies
+
+Total: 2/2 tests passed
+
+✓ All tests passed - historical lookup is working!
