@@ -116,7 +116,7 @@ def fetch_cricsheet_missing_matches(fetcher: PoliteFetcher | None = None) -> lis
         return []
     
     try:
-        html = fetcher.fetch_text(url)
+        html = fetcher.get(url)
         parser = MissingMatchesParser()
         parser.feed(html)
         return parser.matches
