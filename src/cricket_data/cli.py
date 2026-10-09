@@ -133,7 +133,7 @@ def cmd_update(a: argparse.Namespace) -> int:
     
     # Process backfill batch (after recent matches, low priority)
     if a.enable_scraper and hasattr(a, 'backfill_batch_size') and a.backfill_batch_size > 0:
-        from .backfill import BackfillQueue, process_backfill_batch
+        from .backfill import BackfillQueue, process_backfill_batch, enumerate_afghanistan_matches_from_crex
         from .scrapers import CREXScraper
         
         queue_path = store.root / "state" / "backfill_queue.json"
@@ -142,6 +142,14 @@ def cmd_update(a: argparse.Namespace) -> int:
         if not queue_path.exists():
             from .backfill import initialize_backfill_queue
             queue = initialize_backfill_queue(queue_path, verbose=True)
+            
+            # Enumerate Afghanistan matches on first run
+            crex_scraper = CREXScraper()
+            try:
+                enumerate_afghanistan_matches_from_crex(crex_scraper, queue, verbose=True)
+                queue.save(queue_path)
+            except Exception as exc:
+                print(f"Warning: Failed to enumerate Afghanistan matches: {exc}")
         else:
             queue = BackfillQueue.load(queue_path)
         

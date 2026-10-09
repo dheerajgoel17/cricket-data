@@ -225,33 +225,46 @@ def should_backoff(status_code: int | None, error_msg: str) -> tuple[bool, float
 
 def search_crex_for_match(
     task: BackfillTask,
-    scraper
+    scraper,
+    series_cache: dict[str, list[tuple[str, str]]] | None = None
 ) -> str | None:
     """Search CREX for a match by date and teams.
     
     Strategy:
-    1. Check series listing for relevant series (by year/teams)
-    2. Look through series matches for date/team match
-    3. Return match_id if found
+    1. Check if match is before CREX archive coverage (pre-2023) → not_found
+    2. Use series_cache if provided to avoid repeated loads
+    3. Search CREX series pages for matches with both teams
+    4. Return match_id if found
     
-    Returns match_id if found, None if not found.
+    Args:
+        task: BackfillTask with date, teams, match_type
+        scraper: CREXScraper instance with browser
+        series_cache: Optional dict mapping year -> [(series_url, series_name)]
+    
+    Returns:
+        match_id if found, None if not found
     """
     try:
         from playwright.sync_api import TimeoutError as PlaywrightTimeout
         import re
         
+        # Extract year from task date
+        year = int(task.date[:4])
+        
+        # CREX archive coverage is roughly 2023 onwards
+        # Mark older matches as not found to avoid wasting requests
+        if year < 2023:
+            return None
+        
         # Get browser
         context = scraper._get_browser()
         page = context.new_page()
-        
-        # Extract year from task date
-        year = task.date[:4]
         
         # Normalize team names for matching
         team_a_norm = task.team_a.lower()
         team_b_norm = task.team_b.lower()
         
-        # Strategy 1: Load series page and look for series with these teams/year
+        # Strategy: Load series page and look for series with these teams/year
         page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
         
         # Find relevant series (contains year or team names)
@@ -263,7 +276,7 @@ def search_crex_for_match(
             text = link.inner_text().strip().lower()
             
             # Check if series mentions the year or teams
-            if year in text or team_a_norm in text or team_b_norm in text:
+            if str(year) in text or team_a_norm in text or team_b_norm in text:
                 relevant_series.append(href)
         
         # Search through relevant series
@@ -335,6 +348,16 @@ def process_backfill_batch(
             print(f"  [{i}/{len(batch)}] {task.date} {task.team_a} vs {task.team_b}...", end=" ", flush=True)
         
         try:
+            # Check if match is before CREX archive coverage (pre-2023)
+            year = int(task.date[:4])
+            if year < 2023:
+                # Mark as not found with reason
+                queue.mark_not_found(task)
+                stats["not_found"] += 1
+                if verbose:
+                    print("not found (before CREX archive)")
+                continue
+            
             # Try to find match on CREX
             match_id = search_crex_for_match(task, scraper)
             
@@ -418,3 +441,133 @@ def initialize_backfill_queue(queue_path: Path, verbose: bool = True) -> Backfil
     queue.save(queue_path)
     
     return queue
+
+
+def enumerate_afghanistan_matches_from_crex(
+    scraper,
+    queue: BackfillQueue,
+    verbose: bool = True
+) -> int:
+    """Enumerate Afghanistan men's internationals and APL matches from CREX.
+    
+    Adds them to the backfill queue as cricsheet_withheld.
+    
+    Args:
+        scraper: CREXScraper instance with browser
+        queue: BackfillQueue to add tasks to
+        verbose: Print progress messages
+    
+    Returns:
+        Number of new Afghanistan tasks added
+    """
+    try:
+        if verbose:
+            print("Enumerating Afghanistan matches from CREX...")
+        
+        # Get browser
+        context = scraper._get_browser()
+        page = context.new_page()
+        
+        # Strategy: Search for Afghanistan series on CREX series page
+        page.goto("https://crex.live/series", wait_until="networkidle", timeout=30000)
+        
+        # Find Afghanistan series
+        series_links = page.query_selector_all('a[href*="/series/"]')
+        afg_series = []
+        
+        for link in series_links[:100]:
+            href = link.get_attribute('href') or ''
+            text = link.inner_text().strip().lower()
+            
+            # Check for Afghanistan mentions
+            if "afghanistan" in text or "afg" in text or "apl" in text:
+                afg_series.append((href, text))
+        
+        if verbose:
+            print(f"Found {len(afg_series)} Afghanistan-related series")
+        
+        added = 0
+        known = set(queue.done)
+        known.update(t.key() for t in queue.pending)
+        known.update(t.key() for t in queue.in_progress)
+        known.update(t.key() for t in queue.failed)
+        known.update(queue.not_found)
+        
+        # Limit to reasonable number to avoid overloading
+        for series_url, series_name in afg_series[:20]:
+            try:
+                page.goto(f"https://crex.live{series_url}", wait_until="networkidle", timeout=15000)
+                
+                # Look for match links
+                match_links = page.query_selector_all('a[href*="cricket-live-score/"]')
+                
+                for link in match_links[:50]:  # Limit per series
+                    href = link.get_attribute('href') or ''
+                    text = link.inner_text().strip()
+                    
+                    # Try to extract teams and date from link text
+                    # Typical format: "Afghanistan vs Pakistan - 15 Oct 2024"
+                    import re
+                    
+                    # Look for team vs team pattern
+                    vs_match = re.search(r'(.+?)\s+vs\s+(.+?)(?:\s*[-,]|$)', text, re.IGNORECASE)
+                    if not vs_match:
+                        continue
+                    
+                    team_a = vs_match.group(1).strip()
+                    team_b = vs_match.group(2).strip()
+                    
+                    # Try to extract date
+                    date_match = re.search(r'(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4})', text)
+                    if not date_match:
+                        continue
+                    
+                    try:
+                        from datetime import datetime
+                        parsed = datetime.strptime(date_match.group(1), "%d %b %Y")
+                        match_date = parsed.date().isoformat()
+                    except:
+                        continue
+                    
+                    # Determine match type from series name or text
+                    match_type = "T20"
+                    if "t20" in series_name or "t20" in text.lower():
+                        match_type = "T20" if "apl" in series_name or "premier league" in series_name else "T20I"
+                    elif "odi" in series_name or "one day" in series_name:
+                        match_type = "ODI"
+                    elif "test" in series_name:
+                        match_type = "Test"
+                    
+                    # Create task
+                    task = BackfillTask(
+                        date=match_date,
+                        team_a=team_a,
+                        team_b=team_b,
+                        match_type=match_type,
+                        gender="male",
+                        category="cricsheet_withheld"
+                    )
+                    
+                    if task.key() not in known:
+                        queue.pending.append(task)
+                        known.add(task.key())
+                        added += 1
+                
+            except Exception as exc:
+                if verbose:
+                    print(f"  Warning: Failed to load series {series_url}: {exc}")
+                continue
+        
+        page.close()
+        
+        # Sort by date descending (newest first)
+        queue.pending.sort(key=lambda t: t.date, reverse=True)
+        
+        if verbose and added > 0:
+            print(f"Added {added} Afghanistan match(es) to backfill queue")
+        
+        return added
+        
+    except Exception as exc:
+        print(f"Failed to enumerate Afghanistan matches: {exc}")
+        return 0

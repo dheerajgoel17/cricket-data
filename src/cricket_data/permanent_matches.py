@@ -79,9 +79,9 @@ class MissingMatchesParser(HTMLParser):
             if " vs " in text:
                 teams = text.split(" vs ")
                 if len(teams) == 2 and self._current_date and self._current_gender:
-                    # Determine match type based on section
-                    if self._in_by_match_type_section and self._current_match_type:
-                        # International match
+                    # Determine match type based on section or current match type
+                    if self._current_match_type:
+                        # We have a match type from h5 tag
                         match_type = self._current_match_type
                     elif self._in_by_competition_section and self._current_competition:
                         # Domestic league - infer type from competition name
@@ -127,19 +127,20 @@ class MissingMatchesParser(HTMLParser):
             self._in_h5 = False
             text = self._data.strip().lower()
             
-            if self._in_by_match_type_section:
-                # International match types only
-                if "test" in text and "match" in text:
-                    self._current_match_type = "Test"
-                elif "odi" in text or ("one" in text and "day" in text):
-                    self._current_match_type = "ODI"
-                elif "t20i" in text or ("t20" in text and "international" in text):
-                    self._current_match_type = "T20I"
+            # Try to extract match type from h5, regardless of section
+            if "test" in text and "match" in text:
+                self._current_match_type = "Test"
+            elif "odi" in text or ("one" in text and "day" in text):
+                self._current_match_type = "ODI"
+            elif "t20i" in text or ("t20" in text and "international" in text):
+                self._current_match_type = "T20I"
+            else:
+                # If not a match type, might be a competition name
+                if self._in_by_competition_section:
+                    self._current_competition = self._data.strip()
+                    self._current_match_type = ""
                 else:
                     self._current_match_type = ""
-            elif self._in_by_competition_section:
-                # Domestic competition name
-                self._current_competition = self._data.strip()
         elif tag == "h6":
             self._in_h6 = False
             text = self._data.strip().lower()
