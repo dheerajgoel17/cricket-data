@@ -1,0 +1,66 @@
+{
+ "afghanistan_enumeration": {
+  "queued": 0,
+  "seen": 186,
+  "skipped_unknown_opponent": 0,
+  "skipped_unplayed": 13
+ },
+ "batch": {
+  "already_in_cricsheet": 0,
+  "failed": 0,
+  "not_found": 1,
+  "saved": [
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-25",
+    "match_id": "crex-afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
+    "result": "Nepal won by 5 wickets",
+    "teams": "Afghanistan v Nepal",
+    "url": "https://crex.com/cricket-live-score/afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-24",
+    "match_id": "crex-afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
+    "result": "Afghanistan won by 48 runs",
+    "teams": "Japan v Afghanistan",
+    "url": "https://crex.com/cricket-live-score/afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-17",
+    "match_id": "crex-afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
+    "result": "India won by 127 runs",
+    "teams": "Afghanistan v India",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-15",
+    "match_id": "crex-afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
+    "result": "India won by 7 wickets",
+    "teams": "Afghanistan v India",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-13",
+    "match_id": "crex-afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
+    "result": "India won by 7 wickets",
+    "teams": "Afghanistan v India",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX"
+   }
+  ],
+  "succeeded": 5
+ },
+ "queue": {
+  "already_in_cricsheet": 0,
+  "done": 10,
+  "failed": 0,
+  "in_progress": 0,
+  "not_found": 1,
+  "pending": 3089,
+  "total": 3100
+ },
+ "ran_at": "2026-10-09T06:19:12"
+}

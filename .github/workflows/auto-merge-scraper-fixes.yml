@@ -1,0 +1,36 @@
+name: Auto-merge scraper fixes
+
+# A repair PR labelled `scraper-fix` is merged once CI is green, but only if it touches nothing
+# outside the scraper code, its tests/fixtures and docs. Then the scraper is re-run on main.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  merge:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge labelled, in-scope, green PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          PR=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.state=="open")][0].number')
+          [ -z "$PR" ] && { echo "no open PR for $SHA"; exit 0; }
+          gh pr view "$PR" --repo "$REPO" --json labels --jq '.labels[].name' | grep -qx scraper-fix \
+            || { echo "PR #$PR is not labelled scraper-fix"; exit 0; }
+          [ "$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)" = "$SHA" ] \
+            || { echo "head moved since CI ran"; exit 0; }
+          OUT=$(gh pr diff "$PR" --repo "$REPO" --name-only \
+            | grep -v -E '^(src/cricket_data/(crex_[a-z_]+|scrapers|health|backfill)\.py|tests/|docs/)' || true)
+          [ -n "$OUT" ] && { echo "PR #$PR touches files outside the allowed scope:"; echo "$OUT"; exit 0; }
+          gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
+          gh workflow run scraper-update.yml --repo "$REPO" --ref "$(gh repo view "$REPO" --json defaultBranchRef --jq .defaultBranchRef.name)"

@@ -1,0 +1,226 @@
+name: Scraper update
+
+# Run every 6 hours to catch recently completed matches
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Every 6 hours
+  workflow_dispatch:  # Allow manual triggers
+    inputs:
+      backfill_batch_size:
+        description: "Historical matches to backfill this run (render-limited)"
+        default: "5"
+      backfill_priority:
+        description: "Comma-separated task-key prefixes to backfill first, e.g. 2025-12-18-Jharkhand"
+        default: ""
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: scraper-update
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          pip install -e .
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Restore CREX index cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: crex-index-${{ github.run_id }}
+          restore-keys: crex-index-
+      - name: Health check (which layer would break?)
+        id: health
+        run: cricket-data health --out diagnostics
+        continue-on-error: true
+      - name: Scrape recent matches
+        id: scrape
+        env:
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+          RAPIDAPI_CRICKET_KEY: ${{ secrets.RAPIDAPI_CRICKET_KEY }}
+          BACKFILL_BATCH_SIZE: ${{ inputs.backfill_batch_size || '5' }}
+          BACKFILL_PRIORITY: ${{ inputs.backfill_priority }}
+        run: |
+          cricket-data update --enable-scraper --provisional-days 7 \
+            --backfill-batch-size "$BACKFILL_BATCH_SIZE" \
+            --backfill-priority "$BACKFILL_PRIORITY" 2>&1 | tee scraper_output.log
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+        continue-on-error: true
+      
+      - name: Backfill summary
+        if: always()
+        run: |
+          if [ -f data/state/last_backfill.json ]; then
+            {
+              echo "### Backfill batch"
+              echo '```json'
+              cat data/state/last_backfill.json
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Check for failures
+        id: check_failures
+        run: |
+          if [ "${{ steps.health.outcome }}" = "failure" ]; then
+            echo "health_failed=true" >> $GITHUB_OUTPUT
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if [ -f data/scraper_run_report.json ]; then
+            # Extract failure information
+            FAILED_SOURCES=$(python3 -c "
+          import json
+          with open('data/scraper_run_report.json') as f:
+              report = json.load(f)
+              print(','.join(report.get('sources_failed', [])))
+          ")
+            echo "failed_sources=$FAILED_SOURCES" >> $GITHUB_OUTPUT
+            
+            if [ -n "$FAILED_SOURCES" ]; then
+              echo "has_failures=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_failures=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "has_failures=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Size guard
+        run: |
+          du -sh .git data
+          KB=$(du -sk .git | cut -f1)
+          if [ "$KB" -gt 800000 ]; then echo "::warning::.git is over 800 MB"; fi
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "No new scraped data."; else
+            git commit -m "data: scraper update $(date -u +%F\ %H:%M)"
+            git pull --rebase -q && git push
+          fi
+      - name: Upload scraper report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraper-report-${{ github.run_id }}
+          path: |
+            diagnostics/
+            data/scraper_report.csv
+            data/scraper_run_report.json
+            scraper_output.log
+          if-no-files-found: ignore
+      
+      - name: Create or update scraper-broken issue
+        if: steps.check_failures.outputs.has_failures == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          # Generate issue body from report
+          python3 << 'EOF'
+          import json
+          import os
+          
+          with open('data/scraper_run_report.json') as f:
+              report = json.load(f)
+          
+          run_url = f"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          body = f"""## Scraper Failure Report
+
+          **Run started:** {report['started_at']}
+          **GitHub Actions run:** {run_url}
+          
+          **Sources attempted:** {len(report['sources_attempted'])}
+          **Sources succeeded:** {len(report['sources_succeeded'])}
+          **Sources failed:** {len(report['sources_failed'])}
+          
+          """
+          
+          if report['sources_failed']:
+              body += "### Failed Sources\n\n"
+              for source in report['sources_failed']:
+                  source_failures = [f for f in report['failures'] if f['source'] == source]
+                  body += f"#### {source}\n\n"
+                  for failure in source_failures:
+                      body += f"- **Error:** `{failure['error_type']}`\n"
+                      body += f"- **Message:** {failure['error_message']}\n"
+                      body += f"- **Time:** {failure['timestamp']}\n\n"
+          
+          body += f"""
+          ### Run Summary
+          
+          ```
+          Sources attempted: {', '.join(report['sources_attempted'])}
+          Sources succeeded: {', '.join(report['sources_succeeded']) if report['sources_succeeded'] else 'None'}
+          Sources failed: {', '.join(report['sources_failed'])}
+          Matches scraped: {report['matches_scraped']}
+          Conflicts resolved: {report['conflicts_resolved']}
+          ```
+          
+          ---
+          
+          **Action needed:** Investigate and fix the failing scraper(s).
+          
+          Common causes:
+          - Site changed API structure
+          - robots.txt blocks our user agent
+          - Network issues or site down
+          - Rate limiting
+          
+          This issue will be automatically updated on subsequent failures.
+          Close this issue once scrapers are fixed and verified working.
+          """
+          
+          if os.path.exists('diagnostics/health.json'):
+              with open('diagnostics/health.json') as f:
+                  health = json.load(f)
+              body += "\n### Health check (which layer broke)\n\n"
+              for c in health['checks']:
+                  body += f"- {'ok' if c['ok'] else '**FAIL**'} `{c['name']}`: {c['detail']}\n"
+                  if c.get('hint'):
+                      body += f"  - fix: {c['hint']}\n"
+              body += (f"\nRaw pages the site returned are in the `scraper-report-{os.environ['RUN_ID']}` "
+                       "artifact under `diagnostics/`. Repair playbook: docs/SELF_HEALING.md\n")
+
+          # Save to file
+          with open('issue_body.md', 'w') as f:
+              f.write(body)
+          EOF
+          
+          # Check if issue exists
+          ISSUE_NUMBER=$(gh issue list --label scraper-broken --state open --json number --jq '.[0].number')
+          
+          if [ -z "$ISSUE_NUMBER" ]; then
+            # Create new issue
+            gh label create scraper-broken --color FFA500 --description "Scraper failure" 2>/dev/null || true
+            gh issue create --label scraper-broken --title "Scraper failures detected" --body-file issue_body.md
+            echo "Created new scraper-broken issue"
+          else
+            # Update existing issue
+            gh issue comment $ISSUE_NUMBER --body-file issue_body.md
+            echo "Updated existing issue #$ISSUE_NUMBER"
+          fi
+      - name: Open an issue if scraping failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(gh issue list --label scraper-failed --state open --json number -q '.[0].number')" ]; then
+            gh label create scraper-failed --color FFA500 2>/dev/null || true
+            gh issue create --label scraper-failed --title "Scraper update failed" \
+              --body "The scraper update failed. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi
