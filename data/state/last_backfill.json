@@ -1,0 +1,66 @@
+{
+ "afghanistan_enumeration": {
+  "queued": 0,
+  "seen": 186,
+  "skipped_unknown_opponent": 0,
+  "skipped_unplayed": 13
+ },
+ "batch": {
+  "already_in_cricsheet": 0,
+  "failed": 0,
+  "not_found": 0,
+  "saved": [
+   {
+    "category": "cricsheet_missing",
+    "date": "2025-12-18",
+    "match_id": "crex-har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF",
+    "result": "Jharkhand won by 69 runs",
+    "teams": "Haryana v Jharkhand",
+    "url": "https://crex.com/cricket-live-score/har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2024-12-26",
+    "match_id": "crex-afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
+    "result": "Match Drawn",
+    "teams": "Zimbabwe v Afghanistan",
+    "url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2024-11-09",
+    "match_id": "crex-afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
+    "result": "Bangladesh won by 68 runs",
+    "teams": "Afghanistan v Bangladesh",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2024-01-14",
+    "match_id": "crex-afg-vs-ind-2nd-t20-afghanistan-tour-of-india-2024-match-updates-LR4",
+    "result": "India won by 6 wickets",
+    "teams": "India v Afghanistan",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-tour-of-india-2024-match-updates-LR4"
+   },
+   {
+    "category": "cricsheet_withheld",
+    "date": "2026-09-28",
+    "match_id": "crex-afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO",
+    "result": "Match Abandoned/due to rain",
+    "teams": "India v Afghanistan",
+    "url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO"
+   }
+  ],
+  "succeeded": 5
+ },
+ "queue": {
+  "already_in_cricsheet": 0,
+  "done": 5,
+  "failed": 0,
+  "in_progress": 0,
+  "not_found": 0,
+  "pending": 3095,
+  "total": 3100
+ },
+ "ran_at": "2026-10-09T06:10:15"
+}

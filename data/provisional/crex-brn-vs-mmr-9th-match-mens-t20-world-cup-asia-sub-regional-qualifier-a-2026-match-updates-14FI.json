@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-08",
   "event": "",
   "gender": "male",
   "match_id": "crex-brn-vs-mmr-9th-match-mens-t20-world-cup-asia-sub-regional-qualifier-a-2026-match-updates-14FI",
@@ -10,11 +10,11 @@
   "result_margin": "Bahrain won by 8 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "BRN",
-  "team_b": "MMR",
-  "team_type": "international",
+  "team_a": "Bahrain",
+  "team_b": "Myanmar",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "Selangor Turf Club, Kuala Lumpur",
   "winner": "Bahrain"
 }

@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-08",
   "event": "",
   "gender": "male",
   "match_id": "crex-dub-vs-emb-37th-match-emirates-d10-league-2026-match-updates-14N3",
@@ -10,11 +10,11 @@
   "result_margin": "Emirates Blues won by 6 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "EMB",
-  "team_b": "DUB",
-  "team_type": "international",
+  "team_a": "Emirates Blues",
+  "team_b": "Dubai",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "Seven Districts Ground, Ajman",
   "winner": "Emirates Blues"
 }

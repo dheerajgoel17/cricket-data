@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-08",
   "event": "",
   "gender": "male",
   "match_id": "crex-dub-vs-fuj-39th-match-emirates-d10-league-2026-match-updates-14N5",
@@ -10,11 +10,11 @@
   "result_margin": "Fujairah won by 5 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "FUJ",
-  "team_b": "DUB",
-  "team_type": "international",
+  "team_a": "Dubai",
+  "team_b": "Fujairah",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "Seven Districts Ground, Ajman",
   "winner": "Fujairah"
 }

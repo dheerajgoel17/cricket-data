@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-08",
   "event": "",
   "gender": "male",
   "match_id": "crex-nch-vs-war-26th-match-csa-pro-t20-cup-2026-match-updates-14IY",
@@ -10,11 +10,11 @@
   "result_margin": "Warriors won by 7 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "WAR",
-  "team_b": "NCH",
-  "team_type": "international",
+  "team_a": "Warriors",
+  "team_b": "Northern Cape Heat",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "St George''s Park, Gqeberha",
   "winner": "Warriors"
 }

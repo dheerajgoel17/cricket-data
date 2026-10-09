@@ -10,11 +10,11 @@
   "result_margin": "Bahrain won by 6 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "BRN",
-  "team_b": "KUW",
-  "team_type": "international",
+  "team_a": "Bahrain",
+  "team_b": "Kuwait",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "YSD-UKM Cricket Oval, Bangi",
   "winner": "Bahrain"
 }

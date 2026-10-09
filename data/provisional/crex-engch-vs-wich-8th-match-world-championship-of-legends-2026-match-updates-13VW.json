@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-07",
   "event": "",
   "gender": "male",
   "match_id": "crex-engch-vs-wich-8th-match-world-championship-of-legends-2026-match-updates-13VW",
@@ -10,11 +10,11 @@
   "result_margin": "West Indies Champions won by 7 wickets",
   "source": "crex",
   "status": "provisional",
-  "team_a": "WICH",
-  "team_b": "ENGCH",
-  "team_type": "international",
+  "team_a": "England Champions",
+  "team_b": "West Indies Champions",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "Sharjah Cricket Stadium, Sharjah",
   "winner": "West Indies Champions"
 }

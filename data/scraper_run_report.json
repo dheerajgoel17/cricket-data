@@ -1,6 +1,6 @@
 {
-  "started_at": "2026-10-09T05:43:30.338514",
-  "completed_at": "2026-10-09T05:46:03.078514",
+  "started_at": "2026-10-09T06:06:51.364703",
+  "completed_at": "2026-10-09T06:10:15.557634",
   "sources_attempted": [
     "espncricinfo",
     "crex",
@@ -15,14 +15,14 @@
     "espncricinfo"
   ],
   "matches_found": 0,
-  "matches_scraped": 12,
+  "matches_scraped": 15,
   "conflicts_resolved": 0,
   "failures": [
     {
       "source": "espncricinfo",
       "error_type": "ScraperError",
       "error_message": "Failed to fetch recent match list: robots.txt disallows https://www.espncricinfo.com/ci/engine/match/index.json?view=live for cricket-data/0.1 (open-source dataset updater)",
-      "timestamp": "2026-10-09T05:46:03.042026",
+      "timestamp": "2026-10-09T06:09:15.595737",
       "match_id": null,
       "traceback": null
     }

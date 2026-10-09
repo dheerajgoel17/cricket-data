@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-08",
   "event": "",
   "gender": "male",
   "match_id": "crex-ajt-vs-emr-38th-match-emirates-d10-league-2026-match-updates-14N4",
@@ -10,11 +10,11 @@
   "result_margin": "Emirates Red won by 51 runs",
   "source": "crex",
   "status": "provisional",
-  "team_a": "AJT",
-  "team_b": "EMR",
-  "team_type": "international",
+  "team_a": "Ajman",
+  "team_b": "Emirates Red",
+  "team_type": "club",
   "toss_decision": "",
   "toss_winner": "",
-  "venue": "",
+  "venue": "Seven Districts Ground, Ajman",
   "winner": "Emirates Red"
 }
