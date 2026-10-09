@@ -4,7 +4,7 @@
   "done": [],
   "failed": [],
   "in_progress": [],
-  "last_updated": "2026-10-09T05:23:06.594625",
+  "last_updated": "2026-10-09T05:28:05.136236",
   "max_retries": 3,
   "not_found": [
     "2026-09-25-Warriors-North West",
@@ -13,64 +13,14 @@
     "2026-03-28-Police Sports Club-Ace Capital Cricket Club",
     "2025-12-18-Jharkhand-Haryana",
     "2025-12-16-Madhya Pradesh-Punjab",
-    "2025-12-16-Rajasthan-Mumbai"
+    "2025-12-16-Rajasthan-Mumbai",
+    "2025-12-16-Andhra-Jharkhand",
+    "2025-12-16-Haryana-Hyderabad (India)",
+    "2025-12-14-Haryana-Mumbai",
+    "2025-12-14-Punjab-Andhra",
+    "2025-12-14-Rajasthan-Hyderabad (India)"
   ],
   "pending": [
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-16",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Andhra",
-      "team_b": "Jharkhand"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-16",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Haryana",
-      "team_b": "Hyderabad (India)"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-14",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Haryana",
-      "team_b": "Mumbai"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-14",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Punjab",
-      "team_b": "Andhra"
-    },
-    {
-      "attempts": 0,
-      "category": "cricsheet_missing",
-      "date": "2025-12-14",
-      "gender": "male",
-      "last_attempt": null,
-      "last_error": null,
-      "match_type": "T20",
-      "team_a": "Rajasthan",
-      "team_b": "Hyderabad (India)"
-    },
     {
       "attempts": 0,
       "category": "cricsheet_missing",
