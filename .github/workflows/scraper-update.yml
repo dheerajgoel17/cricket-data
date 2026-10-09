@@ -5,9 +5,6 @@ on:
   schedule:
     - cron: "0 */6 * * *"  # Every 6 hours
   workflow_dispatch:  # Allow manual triggers
-  push:  # TEMPORARY: Test on this branch, remove before merge
-    branches:
-      - cursor/scraper-workflow-0411
 
 permissions:
   contents: write
@@ -41,11 +38,11 @@ jobs:
           if [ -f data/scraper_run_report.json ]; then
             # Extract failure information
             FAILED_SOURCES=$(python3 -c "
-            import json
-            with open('data/scraper_run_report.json') as f:
-                report = json.load(f)
-                print(','.join(report.get('sources_failed', [])))
-            ")
+          import json
+          with open('data/scraper_run_report.json') as f:
+              report = json.load(f)
+              print(','.join(report.get('sources_failed', [])))
+          ")
             echo "failed_sources=$FAILED_SOURCES" >> $GITHUB_OUTPUT
             
             if [ -n "$FAILED_SOURCES" ]; then
