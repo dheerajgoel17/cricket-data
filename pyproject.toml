@@ -14,6 +14,7 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5"]
+bot = ["anthropic>=1.0"]
 
 [project.scripts]
 cricket-data = "cricket_data.cli:main"
