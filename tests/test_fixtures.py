@@ -48,3 +48,13 @@ def test_fixture_from_html_reads_start_venue_and_status(tmp_path):
     write_fixtures(out, [fx])
     lines = out.read_text(encoding="utf-8").splitlines()
     assert lines[0] == ",".join(FIELDS) and len(lines) == 2
+
+
+def test_row_cleans_venue_apostrophes_and_labels_one_off_tests():
+    html = (FIX / "aus_w_ban_w_3rd_odi_2026_upcoming.html").read_text(encoding="utf-8").replace(
+        "Allan Border Field", "Lord''s")
+    slug = "aus-w-vs-eng-w-only-womens-ashes-2027-match-updates-13HO"
+    entry = parse_match_sitemap(_xml((slug, "2026-10-11T20:56:15+05:30")))[0]
+    row = fixture_from_html(entry, html, NOW, 30).row()
+    assert row["venue"] == "Lord's, Brisbane"
+    assert row["format"] == "Test"

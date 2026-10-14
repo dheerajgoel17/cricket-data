@@ -51,6 +51,11 @@ def select_candidates(entries: list[MatchEntry], today: date, teams: list[str] |
     return out
 
 
+def _format(entry: MatchEntry) -> str:
+    """Slug-derived format; a lone ``only`` match with no format in its name is a Test."""
+    return entry.format_hint or ("Test" if "-only-" in entry.match_id else "")
+
+
 @dataclass
 class Fixture:
     start: datetime
@@ -61,10 +66,10 @@ class Fixture:
         e = self.entry
         return {
             "start_utc": self.start.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
-            "match_id": e.match_id, "series": e.series_name, "format": e.format_hint or "",
+            "match_id": e.match_id, "series": e.series_name, "format": _format(e),
             "gender": "female" if e.is_women else "male",
             "team_a": self.facts.team_a, "team_b": self.facts.team_b,
-            "venue": self.facts.venue, "status": self.facts.status, "url": e.url,
+            "venue": self.facts.venue.replace("''", "'"), "status": self.facts.status, "url": e.url,
         }
 
 
