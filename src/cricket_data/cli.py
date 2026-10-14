@@ -1,4 +1,4 @@
-"""Command line: `cricket-data update | backfill | query | stats | export-sqlite`."""
+"""Command line: `cricket-data update | backfill | fixtures | query | stats | export-sqlite`."""
 from __future__ import annotations
 
 import argparse
@@ -11,6 +11,7 @@ from pathlib import Path
 from . import __version__
 from .cricsheet import download, iter_zip
 from .models import MATCH_FIELDS, PLAYER_FIELDS
+from .polite import PoliteFetcher
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
 from .scraper_monitor import ScraperFailure, ScraperRunReport, save_report
 from .scrapers import ScraperSource
@@ -216,6 +217,24 @@ def cmd_backfill(a: argparse.Namespace) -> int:
     return cmd_update(a)
 
 
+def cmd_fixtures(a: argparse.Namespace) -> int:
+    from .crex_sitemap import CREXSitemapIndex
+    from .fixtures import collect, write_fixtures
+
+    index = CREXSitemapIndex(cache_path=Path(".cache") / "crex_index.json")
+    index.load()
+    teams = [t.strip().lower() for t in a.team.split(",") if t.strip()]
+    found = collect(index.matches, PoliteFetcher(min_interval=3.0), teams=teams, days=a.days,
+                    max_pages=a.max_pages)
+    out = Path(a.data_dir) / "fixtures" / "upcoming.csv"
+    write_fixtures(out, found)
+    print(f"{len(found)} upcoming fixtures -> {out}")
+    for f in found[:20]:
+        r = f.row()
+        print(f"  {r['start_utc']}  {r['team_a']} v {r['team_b']}  ({r['format']}, {r['venue']})")
+    return 0
+
+
 def cmd_stats(a: argparse.Namespace) -> int:
     store = Store(a.data_dir)
     months = store.months("matches")
@@ -293,6 +312,12 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--dataset")
     b.add_argument("--zip")
     b.set_defaults(fn=cmd_backfill)
+
+    f = sub.add_parser("fixtures", help="refresh upcoming fixtures / schedule (data/fixtures/upcoming.csv)")
+    f.add_argument("--team", default="", help="comma-separated CREX team codes, e.g. aus-w,ban-w (default: all)")
+    f.add_argument("--days", type=int, default=30, help="only fixtures starting within this many days")
+    f.add_argument("--max-pages", type=int, default=40, help="cap on match pages fetched per run")
+    f.set_defaults(fn=cmd_fixtures)
 
     s = sub.add_parser("stats", help="dataset summary")
     s.set_defaults(fn=cmd_stats)
