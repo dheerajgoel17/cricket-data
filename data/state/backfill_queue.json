@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-14T08:50:15",
+ "afghanistan_enumerated_at": "2026-10-15T08:25:26",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -825,6 +825,150 @@
    "key": "2025-11-28-Haryana-Punjab",
    "match_id": "crex-har-vs-pun-19th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJC",
    "saved_at": "2026-10-14T08:56:23"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
+   "key": "2025-11-28-Gujarat-Bengal",
+   "match_id": "crex-ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
+   "saved_at": "2026-10-15T08:26:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/hp-vs-ser-27th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJK",
+   "key": "2025-11-28-Himachal Pradesh-Services",
+   "match_id": "crex-hp-vs-ser-27th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJK",
+   "saved_at": "2026-10-15T08:26:30"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
+   "key": "2025-11-28-Puducherry-Baroda",
+   "match_id": "crex-brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
+   "saved_at": "2026-10-15T08:26:41"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
+   "key": "2025-11-28-Tripura-Rajasthan",
+   "match_id": "crex-raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
+   "saved_at": "2026-10-15T08:26:54"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
+   "key": "2025-11-28-Tamil Nadu-Delhi",
+   "match_id": "crex-del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
+   "saved_at": "2026-10-15T08:27:07"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/saur-vs-utk-26th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJI",
+   "key": "2025-11-28-Saurashtra-Uttarakhand",
+   "match_id": "crex-saur-vs-utk-26th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJI",
+   "saved_at": "2026-10-15T08:27:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
+   "key": "2025-11-28-Karnataka-Jharkhand",
+   "match_id": "crex-jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
+   "saved_at": "2026-10-15T08:27:31"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-mnp-4th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIX",
+   "key": "2025-11-28-Manipur-Meghalaya",
+   "match_id": "crex-mgly-vs-mnp-4th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIX",
+   "saved_at": "2026-10-15T08:27:43"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
+   "key": "2025-11-28-Mizoram-Sikkim",
+   "match_id": "crex-miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
+   "saved_at": "2026-10-15T08:27:55"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
+   "key": "2025-11-28-Nagaland-Arunachal Pradesh",
+   "match_id": "crex-ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
+   "saved_at": "2026-10-15T08:28:07"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-eliminator-1-csa-t20-challenge-2025-match-updates-XDT",
+   "key": "2025-11-26-Dolphins-Western Province",
+   "match_id": "crex-dol-vs-wp-eliminator-1-csa-t20-challenge-2025-match-updates-XDT",
+   "saved_at": "2026-10-15T08:28:20"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/mum-vs-rlys-5th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDR",
+   "key": "2025-11-26-Railways-Mumbai",
+   "match_id": "crex-mum-vs-rlys-5th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDR",
+   "saved_at": "2026-10-15T08:28:33"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
+   "key": "2025-11-26-Odisha-Kerala",
+   "match_id": "crex-ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
+   "saved_at": "2026-10-15T08:28:45"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
+   "key": "2025-11-26-Andhra-Assam",
+   "match_id": "crex-andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
+   "saved_at": "2026-10-15T08:28:58"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
+   "key": "2025-11-26-Chhattisgarh-Vidarbha",
+   "match_id": "crex-chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
+   "saved_at": "2026-10-15T08:29:10"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
+   "key": "2025-11-26-Madhya Pradesh-Hyderabad (India)",
+   "match_id": "crex-hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
+   "saved_at": "2026-10-15T08:29:23"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-cg-15th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE4",
+   "key": "2025-11-26-Bihar-Chandigarh",
+   "match_id": "crex-bihr-vs-cg-15th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE4",
+   "saved_at": "2026-10-15T08:29:36"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
+   "key": "2025-11-26-Maharashtra-Jammu  Kashmir",
+   "match_id": "crex-jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
+   "saved_at": "2026-10-15T08:29:48"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/goa-vs-up-1st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDW",
+   "key": "2025-11-26-Goa-Uttar Pradesh",
+   "match_id": "crex-goa-vs-up-1st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDW",
+   "saved_at": "2026-10-15T08:30:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
+   "key": "2025-11-26-Himachal Pradesh-Punjab",
+   "match_id": "crex-hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
+   "saved_at": "2026-10-15T08:30:13"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
+   "key": "2025-11-26-Services-Gujarat",
+   "match_id": "crex-guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
+   "saved_at": "2026-10-15T08:30:25"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ben-vs-brd-14th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE2",
+   "key": "2025-11-26-Baroda-Bengal",
+   "match_id": "crex-ben-vs-brd-14th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE2",
+   "saved_at": "2026-10-15T08:30:38"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
+   "key": "2025-11-26-Puducherry-Haryana",
+   "match_id": "crex-har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
+   "saved_at": "2026-10-15T08:30:51"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
+   "key": "2025-11-26-Tripura-Saurashtra",
+   "match_id": "crex-saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
+   "saved_at": "2026-10-15T08:31:04"
   }
  ],
  "failed": [],
@@ -953,321 +1097,57 @@
    "checked_at": "2026-10-14T08:50:17",
    "key": "2026-10-12-Afghanistan-Bangladesh",
    "reason": "date 2026-10-09 != 2026-10-12; sitemap date 2026-10-12 != page date 2026-10-09"
+  },
+  {
+   "checked": [
+    "13TJ"
+   ],
+   "checked_at": "2026-10-15T08:25:28",
+   "key": "2026-10-14-Afghanistan-Zimbabwe",
+   "reason": "date 2026-10-19 != 2026-10-14; sitemap date 2026-10-14 != page date 2026-10-19; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "13TK"
+   ],
+   "checked_at": "2026-10-15T08:25:35",
+   "key": "2026-10-14-Afghanistan-Bangladesh",
+   "reason": "date 2026-10-21 != 2026-10-14; sitemap date 2026-10-14 != page date 2026-10-21; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "UDK"
+   ],
+   "checked_at": "2026-10-15T08:25:42",
+   "key": "2026-10-14-Afghanistan-Sri Lanka",
+   "reason": "date 2014-10-03 != 2026-10-14; sitemap date 2026-10-14 != page date 2014-10-03; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14P4"
+   ],
+   "checked_at": "2026-10-15T08:25:49",
+   "key": "2026-10-14-Afghanistan-Pakistan",
+   "reason": "date 2027-10-08 != 2026-10-14; sitemap date 2026-10-14 != page date 2027-10-08; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PF"
+   ],
+   "checked_at": "2026-10-15T08:25:57",
+   "key": "2026-10-14-Afghanistan-India",
+   "reason": "date 2027-10-14 != 2026-10-14; sitemap date 2026-10-14 != page date 2027-10-14; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PM"
+   ],
+   "checked_at": "2026-10-15T08:26:05",
+   "key": "2026-10-14-Afghanistan-Australia",
+   "reason": "date 2027-10-18 != 2026-10-14; sitemap date 2026-10-14 != page date 2027-10-18; match status is 'Upcoming', not finished"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Gujarat",
-   "team_b": "Bengal"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Himachal Pradesh",
-   "team_b": "Services"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Baroda"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tripura",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tamil Nadu",
-   "team_b": "Delhi"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Saurashtra",
-   "team_b": "Uttarakhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Karnataka",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Manipur",
-   "team_b": "Meghalaya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mizoram",
-   "team_b": "Sikkim"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Nagaland",
-   "team_b": "Arunachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Railways",
-   "team_b": "Mumbai"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Odisha",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Andhra",
-   "team_b": "Assam"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chhattisgarh",
-   "team_b": "Vidarbha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Madhya Pradesh",
-   "team_b": "Hyderabad (India)"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bihar",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Goa",
-   "team_b": "Uttar Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Himachal Pradesh",
-   "team_b": "Punjab"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Gujarat"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Baroda",
-   "team_b": "Bengal"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Haryana"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tripura",
-   "team_b": "Saurashtra"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
