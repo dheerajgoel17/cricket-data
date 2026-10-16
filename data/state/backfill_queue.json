@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-15T08:25:26",
+ "afghanistan_enumerated_at": "2026-10-16T08:17:28",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -969,6 +969,126 @@
    "key": "2025-11-26-Tripura-Saurashtra",
    "match_id": "crex-saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
    "saved_at": "2026-10-15T08:31:04"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
+   "key": "2025-11-26-Tamil Nadu-Rajasthan",
+   "match_id": "crex-raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
+   "saved_at": "2026-10-16T08:17:35"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
+   "key": "2025-11-26-Delhi-Jharkhand",
+   "match_id": "crex-del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
+   "saved_at": "2026-10-16T08:17:47"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
+   "key": "2025-11-26-Uttarakhand-Karnataka",
+   "match_id": "crex-kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
+   "saved_at": "2026-10-16T08:17:59"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
+   "key": "2025-11-26-Manipur-Arunachal Pradesh",
+   "match_id": "crex-ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
+   "saved_at": "2026-10-16T08:18:11"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIV",
+   "key": "2025-11-26-Meghalaya-Sikkim",
+   "match_id": "crex-mgly-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIV",
+   "saved_at": "2026-10-16T08:18:23"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/miz-vs-nagl-1st-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIU",
+   "key": "2025-11-26-Mizoram-Nagaland",
+   "match_id": "crex-miz-vs-nagl-1st-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIU",
+   "saved_at": "2026-10-16T08:18:35"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
+   "key": "2025-11-23-Lions-Dolphins",
+   "match_id": "crex-dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
+   "saved_at": "2026-10-16T08:18:54"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-25th-match-csa-t20-challenge-2025-match-updates-XDO",
+   "key": "2025-11-21-Lions-Western Province",
+   "match_id": "crex-lio-vs-wp-25th-match-csa-t20-challenge-2025-match-updates-XDO",
+   "saved_at": "2026-10-16T08:19:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
+   "key": "2025-11-21-Titans-Dolphins",
+   "match_id": "crex-dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
+   "saved_at": "2026-10-16T08:19:31"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-23rd-match-csa-t20-challenge-2025-match-updates-XDM",
+   "key": "2025-11-19-North West-Lions",
+   "match_id": "crex-lio-vs-nwd-23rd-match-csa-t20-challenge-2025-match-updates-XDM",
+   "saved_at": "2026-10-16T08:19:48"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
+   "key": "2025-11-16-Dolphins-Western Province",
+   "match_id": "crex-dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
+   "saved_at": "2026-10-16T08:20:13"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
+   "key": "2025-11-14-Titans-North West",
+   "match_id": "crex-nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
+   "saved_at": "2026-10-16T08:20:44"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
+   "key": "2025-11-11-Lions-Warriors",
+   "match_id": "crex-lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
+   "saved_at": "2026-10-16T08:21:09"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
+   "key": "2025-11-11-Afghanistan-Qatar",
+   "match_id": "crex-afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
+   "saved_at": "2026-10-16T08:21:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
+   "key": "2025-11-09-Western Province-Titans",
+   "match_id": "crex-tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
+   "saved_at": "2026-10-16T08:21:39"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
+   "key": "2025-11-09-Warriors-Dolphins",
+   "match_id": "crex-dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
+   "saved_at": "2026-10-16T08:21:51"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
+   "key": "2025-11-07-Western Province-Warriors",
+   "match_id": "crex-war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
+   "saved_at": "2026-10-16T08:22:11"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
+   "key": "2025-11-07-Dolphins-North West",
+   "match_id": "crex-dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
+   "saved_at": "2026-10-16T08:22:23"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
+   "key": "2025-11-02-North West-Western Province",
+   "match_id": "crex-nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
+   "saved_at": "2026-10-16T08:23:02"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
+   "key": "2025-11-02-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
+   "saved_at": "2026-10-16T08:23:21"
   }
  ],
  "failed": [],
@@ -1145,412 +1265,101 @@
    "checked_at": "2026-10-15T08:26:05",
    "key": "2026-10-14-Afghanistan-Australia",
    "reason": "date 2027-10-18 != 2026-10-14; sitemap date 2026-10-14 != page date 2027-10-18; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "XDS"
+   ],
+   "checked_at": "2026-10-16T08:18:42",
+   "key": "2025-11-25-Boland-Warriors",
+   "reason": "rendered 1 candidate page(s) for 2025-11-25; none confirmed"
+  },
+  {
+   "checked": [
+    "XNK",
+    "XNM"
+   ],
+   "checked_at": "2026-10-16T08:19:06",
+   "key": "2025-11-22-Boland-KwaZulu-Natal Inland",
+   "reason": "rendered 2 candidate page(s) for 2025-11-22; none confirmed"
+  },
+  {
+   "checked": [
+    "XNJ",
+    "XDN"
+   ],
+   "checked_at": "2026-10-16T08:20:01",
+   "key": "2025-11-19-Warriors-Boland",
+   "reason": "rendered 2 candidate page(s) for 2025-11-19; none confirmed"
+  },
+  {
+   "checked": [
+    "XDJ"
+   ],
+   "checked_at": "2026-10-16T08:20:20",
+   "key": "2025-11-15-Warriors-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2025-11-15; none confirmed"
+  },
+  {
+   "checked": [
+    "XDH",
+    "XNA"
+   ],
+   "checked_at": "2026-10-16T08:20:32",
+   "key": "2025-11-14-Boland-Dolphins",
+   "reason": "rendered 2 candidate page(s) for 2025-11-14; none confirmed"
+  },
+  {
+   "checked": [
+    "VBB",
+    "XDG"
+   ],
+   "checked_at": "2026-10-16T08:20:57",
+   "key": "2025-11-13-KwaZulu-Natal Inland-Western Province",
+   "reason": "rendered 2 candidate page(s) for 2025-11-13; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-16T08:21:14",
+   "key": "2025-11-11-North West-KwaZulu-Natal Inland",
+   "reason": "no CREX match within a day of 2025-11-11 with plausible teams (sitemap covers 1949-12-24..2026-10-14)"
+  },
+  {
+   "checked": [
+    "XDB"
+   ],
+   "checked_at": "2026-10-16T08:21:59",
+   "key": "2025-11-08-KwaZulu-Natal Inland-Lions",
+   "reason": "rendered 1 candidate page(s) for 2025-11-08; none confirmed"
+  },
+  {
+   "checked": [
+    "XD8",
+    "XIC"
+   ],
+   "checked_at": "2026-10-16T08:22:36",
+   "key": "2025-11-06-Titans-Boland",
+   "reason": "rendered 2 candidate page(s) for 2025-11-06; none confirmed"
+  },
+  {
+   "checked": [
+    "XD7",
+    "VB7"
+   ],
+   "checked_at": "2026-10-16T08:22:49",
+   "key": "2025-11-04-Boland-Western Province",
+   "reason": "rendered 2 candidate page(s) for 2025-11-04; none confirmed"
+  },
+  {
+   "checked": [
+    "XD6"
+   ],
+   "checked_at": "2026-10-16T08:23:09",
+   "key": "2025-11-02-Boland-Lions",
+   "reason": "rendered 1 candidate page(s) for 2025-11-02; none confirmed"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tamil Nadu",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Delhi",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Uttarakhand",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Manipur",
-   "team_b": "Arunachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Meghalaya",
-   "team_b": "Sikkim"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mizoram",
-   "team_b": "Nagaland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
-   "date": "2025-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Qatar"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
-   "date": "2025-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
