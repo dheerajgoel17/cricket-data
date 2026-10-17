@@ -7,7 +7,7 @@ finds are information it lacks, such as XIs, batting order, pitch or injuries.
 ## What runs where
 | | |
 |---|---|
-| workflow | `.github/workflows/value-bets.yml`, hourly `30 3-17 * * *` UTC = 09:00–23:00 IST, plus `workflow_dispatch` |
+| workflow | `.github/workflows/value-bets.yml`, hourly `30 3-17 * * *` UTC = 09:00–23:00 IST, plus `workflow_dispatch`, plus a no-commit dry run on PRs that touch the pipeline |
 | weekly refit | Sundays 07:00 UTC (or dispatch with `refit=true`): `python -m value_bets.backtest` re-runs the backtest and refits `value_bets/state/prop_model.json` |
 | local run | `pip install -e ".[value-bets]" && python -m value_bets.pipeline` (from the repo root) |
 | tests | `pytest -q tests/value_bets` (skipped automatically if the `value-bets` extra isn't installed) |

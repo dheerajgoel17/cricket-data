@@ -8,6 +8,8 @@ on:
   schedule:
     - cron: "30 3-17 * * *"
     - cron: "0 7 * * 0"
+  pull_request:  # dry run on PRs that touch the pipeline (proves the sources work from GitHub's runners; never commits)
+    paths: ["src/value_bets/**", "value_bets/**", ".github/workflows/value-bets.yml"]
   workflow_dispatch:
     inputs:
       refit:
@@ -58,7 +60,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           test ! -f value_bets/out/last_error.txt || { echo "::warning::pipeline error, see value_bets_run.log"; }
       - name: Commit outputs
-        if: github.event_name == 'schedule' || inputs.commit
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
