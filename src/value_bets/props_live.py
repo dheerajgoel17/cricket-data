@@ -10,7 +10,7 @@ from . import propmodel as pm
 
 D0 = pd.Timestamp("2000-01-01")
 CACHE_VERSION = 2
-LABEL = {"ven": "at this venue", "opp": "vs this opposition", "env": "venue environment",
+LABEL = {"wx": "weather", "ven": "at this venue", "opp": "vs this opposition", "env": "venue environment",
          "oppstr": "opposition strength", "h2h": "team H2H context", "intl": "international match",
          "p_bat": "batting frequency (role)", "p_bowl": "bowling frequency (role)"}
 
@@ -105,7 +105,7 @@ class PropEngine:
         col = col or ("wickets" if kind == "bowl" else "runs")
         return [int(x) for x in d[col].values[-n:][::-1]]
 
-    def why(self, stat, fmt, g, f, pid, opp, venue_raw, venue_key, line, side, p_model, p_market, milestone=False):
+    def why(self, stat, fmt, g, f, pid, opp, venue_raw, venue_key, line, side, p_model, p_market, milestone=False, wx=None):
         s = pm.STATS[stat]
         m = self.model(stat, fmt)
         raw = f["raw_form"]
@@ -143,7 +143,20 @@ class PropEngine:
                 continue
             e = math.exp(c * f[name]) - 1
             if abs(e) >= 0.01:
-                eff.append(f"{LABEL.get(name.split('_')[0], name)} {100 * e:+.0f}%")
+                lab = f"weather ({name[3:]})" if name.startswith("wx_") else LABEL.get(name.split('_')[0], name)
+                eff.append(f"{lab} {100 * e:+.0f}%")
         if eff:
             parts.append("context adj: " + ", ".join(eff))
+        if wx:  # weather when it matters: a model weather term moved the expectation, or rain/humidity/cloud stand out
+            w = wx.get("window") or {}
+            bits = []
+            if (w.get("rain_prob_max") or 0) >= 40:
+                bits.append(f"rain chance up to {w['rain_prob_max']}%")
+            if (w.get("humidity_mean") or 0) >= 75:
+                bits.append(f"high humidity {w['humidity_mean']}%")
+            if (w.get("cloud_mean") or 0) >= 70:
+                bits.append(f"cloud cover {w['cloud_mean']}%")
+            wx_eff = [x for x in eff if x.startswith("weather")]
+            if bits or wx_eff:
+                parts.append("weather: " + ", ".join(bits or ["conditions typical"]))
         return "; ".join(parts)

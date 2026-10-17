@@ -25,6 +25,8 @@ scraper files, so it never merges value-bet changes.
 | `value_bets/out/backtest_props.json` / `.md` | prop-model backtest (baseline vs new) |
 | `value_bets/state/alerted.json` | dedupe state (re-alert only if edge grows ≥ 3 pp; pruned when the match starts) |
 | `value_bets/state/prop_model.json` | fitted model coefficients |
+| `value_bets/mappings/venue_geo.csv` | venue → lat/lon from the Open-Meteo geocoder (blank = not located or rejected) |
+| `value_bets/mappings/venue_weather_daily.csv.gz` | Open-Meteo ERA5 daily weather per located venue × match day (2021+ T20/ODI), used by the backtest |
 
 Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json`
 
@@ -51,5 +53,22 @@ artifact `odds-snapshots-<run_id>` and kept 30 days, which keeps `main` small. C
 * **No ball-level data is stored.** Only per-player match totals are kept, so there is no batting position and no batter-vs-bowler matchup.
 * Fair p = 0.45·model + 0.55·market (0.35/0.65 for top markets). A bet needs edge ≥ 5 % and model/market within 0.15 (0.9 logit).
   Stake = quarter Kelly, capped at 2 %.
+
+## Weather (Open-Meteo, free, no key)
+* **Live:** for each event with a known venue, `weather.py` pulls the Open-Meteo forecast for the match window (4 h T20, 8 h ODI).
+  Every value bet carries `weather` (max hourly rain probability %, forecast mm, humidity %, cloud %) and `rain_risk`
+  (`true` if rain probability ≥ `RAIN_PROB_WARN` = 50 % or ≥ `RAIN_MM_WARN` = 2 mm; `false` otherwise; `null` if the venue is
+  unknown). A rain-risk bet also gets a `RAIN RISK` note (shortened match → lower counting stats; check void rules), and the
+  `why` line mentions rain chance ≥ 40 %, humidity ≥ 75 % or cloud ≥ 70 %.
+* **Backtest:** match-day ERA5 daily weather (rain mm, humidity, dew point, max temperature, max wind, cloud cover) was tested as extra
+  NB-GLM terms on top of each selected model, on the same splits (train 2021–22, select on 2023–24, test 2025+). A term is adopted
+  only if it gains ≥ 0.0003 validation log-loss **and** does not worsen the held-out test. Result: **no weather term was adopted**
+  (best: `wx_rain` for T20 fours passed validation, then got worse on test, 0.4819 → 0.4820). Weather is therefore informational
+  (why line + rain-risk flag) and is not in the probability. Cricsheet has no start times, so day/night and dew-at-night could not be
+  tested. The weekly refit re-runs this study and tops up the cache (`CV_WEATHER_FETCH=1`); a term that starts to help will be adopted
+  automatically.
+* Geocoding uses the venue's city with country hints from the match history (host country of tours/leagues); hits outside those
+  countries, country-level centroids and a few checked mis-hits are left blank rather than guessed. 92 % of 2021+ T20/ODI matches (10,473 of 11,418; 402 of 487 venue spellings located)
+  have weather; set `CV_WEATHER=0` to turn the live forecast off.
 
 See `value_bets/out/backtest_props.md` for the current numbers.

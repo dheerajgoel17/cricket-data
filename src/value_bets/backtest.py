@@ -202,12 +202,112 @@ def run():
             print(f"{stat}/{fmt}: n={len(test)} sel={sel} base={res['models']['baseline_v1_empirical']['logloss']:.4f} "
                   f"form={res['models']['glm_form_only']['logloss']:.4f} sel={res['models']['glm_selected']['logloss']:.4f} "
                   f"[{time.time()-t0:.0f}s]", flush=True)
+    try:
+        report["weather"] = weather_study(H, DFB, DFW, report, live)
+    except Exception as e:  # weather is optional; never lose the main refit
+        report["weather"] = {"error": f"{type(e).__name__}: {e}"}
+        print("weather study failed:", e)
     pm.save(live, {"trained_through": str(H.last_date.date()), "generated_at_ist": report["generated_at_ist"]})
     out = config.OUT / "backtest_props.json"
     out.write_text(json.dumps(report, indent=1))
     write_md(report)
     print("wrote", out)
     return report
+
+
+def attach_weather(H, DF, fetch=False):
+    """Add wx_* columns (0 = typical / unknown) and wx_ok from the Open-Meteo daily cache."""
+    from . import weather
+    m = H.matches[["match_id", "venue", "date"]].copy()
+    m["match_id"] = m["match_id"].astype(str)
+    m["vk"] = m["venue"].map(weather.wx_key)
+    m["d"] = m["date"].dt.strftime("%Y-%m-%d")
+    geo = weather.load_geo()
+    if fetch:
+        ids = set(DF["match_id"].astype(str))
+        mm = m[m.match_id.isin(ids)]
+        mh = H.matches[H.matches.match_id.astype(str).isin(ids)]
+        geo = weather.ensure_geo(sorted(set(mm.venue.dropna())), hints=weather.venue_country_hints(mh))
+        weather.ensure_daily(zip(mm.vk, mm.d, strict=True), geo)
+    daily = weather.load_daily()
+    feats = {}
+    for mid, vk, d in zip(m.match_id, m.vk, m.d, strict=True):
+        ll = geo.get(vk)
+        if ll:
+            k = (f"{ll[0]:.2f}", f"{ll[1]:.2f}", d)
+            f = weather.features(daily.get(k))
+            if f:
+                feats[mid] = f
+    W = pd.DataFrame.from_dict(feats, orient="index")
+    out = DF.merge(W, left_on="match_id", right_index=True, how="left")
+    out["wx_ok"] = out[weather.WX_FEATURES[0]].notna()
+    for c in weather.WX_FEATURES:
+        out[c] = out[c].fillna(0.0)
+    return out
+
+
+def weather_study(H, DFB, DFW, report, live):
+    """Baseline (selected non-weather model) vs + weather on rows that have match-day weather.
+    Train 2021-22 / validate 2023-24 (selection) / test 2025+ (held out). Weather terms are kept per stat x format
+    only if they improve validation log-loss by >= SELECT_GAIN; the live model is then refit with them."""
+    from . import weather
+    fetch = bool(int(__import__("os").environ.get("CV_WEATHER_FETCH", "0")))
+    B, W = attach_weather(H, DFB, fetch), attach_weather(H, DFW, fetch)
+    d0, d_val, d_test = DAY("2021-01-01"), DAY("2023-01-01"), DAY("2025-01-01")
+    out = {"source": "Open-Meteo ERA5 archive (daily, match date at venue)", "split": "train 2021-22 / validate 2023-24 / test 2025+",
+           "results": {}}
+    for stat, spec in pm.STATS.items():
+        DF = B if spec["kind"] == "bat" else W
+        nkey = "w_bat_fmt" if spec["kind"] == "bat" else "w_bowl_fmt"
+        for fmt in FMTS:
+            key = f"{stat}/{fmt}"
+            if key not in report["results"]:
+                continue
+            base = report["results"][key]["selected"]
+            R = DF[(DF.fmt == fmt) & DF.wx_ok & (DF.day >= d0)]
+            tr_a = R[R.day < d_val]
+            val = R[(R.day >= d_val) & (R.day < d_test) & (R[nkey] >= MIN_NEFF_EVAL)]
+            tr_b = R[R.day < d_test]
+            test = R[(R.day >= d_test) & (R[nkey] >= MIN_NEFF_EVAL)]
+            if len(test) < 300 or len(val) < 300:
+                continue
+
+            def score(feats, tr, ev):
+                m = pm.fit(tr, stat, feats)
+                y = ev[spec["y"]].to_numpy(float)
+                mu = pm.predict_mu(m, ev, stat)
+                P = np.array([pm.p_over(mu, m["alpha"], L) for L in pm.LINES[stat]]).T
+                Y = np.array([(y > L) for L in pm.LINES[stat]]).T.astype(float)
+                return metrics(P, Y), P, Y
+
+            sel, cur = [], score(base, tr_a, val)[0]["logloss"]
+            cand = list(weather.WX_FEATURES)
+            trace = []
+            while cand:
+                sc = {f: score(base + sel + [f], tr_a, val)[0]["logloss"] for f in cand}
+                f, v = min(sc.items(), key=lambda kv: kv[1])
+                trace.append({"feature": f, "val_gain": round(cur - v, 5)})
+                if cur - v < SELECT_GAIN:
+                    break
+                sel.append(f); cand.remove(f); cur = v
+            mb, _, _ = score(base, tr_b, test)
+            mw, Pw, Yw = score(base + sel, tr_b, test) if sel else (mb, None, None)
+            ma, _, _ = score(base + list(weather.WX_FEATURES), tr_b, test)
+            out["results"][key] = {"n_test": int(len(test)), "baseline_logloss": round(mb["logloss"], 5),
+                                   "baseline_brier": round(mb["brier"], 5),
+                                   "weather_selected": sel, "with_weather_logloss": round(mw["logloss"], 5),
+                                   "with_weather_brier": round(mw["brier"], 5),
+                                   "all_weather_logloss": round(ma["logloss"], 5), "selection_trace": trace}
+            # adopt only if it also does not hurt the held-out test (guards against a validation-only fluke)
+            adopted = bool(sel) and mw["logloss"] <= mb["logloss"]
+            out["results"][key]["adopted"] = adopted
+            if adopted:
+                m = pm.fit(R, stat, base + sel)
+                m["test_logloss"] = {"no_weather": mb["logloss"], "with_weather": mw["logloss"]}
+                m["weather_coef"] = dict(zip(sel, [round(c, 4) for c in m["coef"][5 + len(base):]], strict=False))
+                live[key] = m
+            print(f"weather {key}: n={len(test)} base={mb['logloss']:.4f} +wx={mw['logloss']:.4f} sel={sel}", flush=True)
+    return out
 
 
 def write_md(rep):
@@ -222,6 +322,20 @@ def write_md(rep):
         L.append(f"| {k} | {r['n_test_rows']} | {M['baseline_v1_empirical']['logloss']:.4f} | {M['glm_form_only']['logloss']:.4f} | "
                  f"{M['glm_all_context']['logloss']:.4f} | {M['glm_selected']['logloss']:.4f} | "
                  f"{M['baseline_v1_empirical']['brier']:.4f} | {M['glm_selected']['brier']:.4f} | {', '.join(r['selected']) or '-'} |")
+    wx = rep.get("weather") or {}
+    if wx.get("results"):
+        L += ["", "## Weather (Open-Meteo) — rows with match-day weather, " + wx["split"], "",
+              "| stat/format | n test | no weather LL | + selected weather LL | all weather LL | no-wx Brier | +wx Brier | selected on validation | adopted |",
+              "|---|---|---|---|---|---|---|---|---|"]
+        for k, r in wx["results"].items():
+            L.append(f"| {k} | {r['n_test']} | {r['baseline_logloss']:.4f} | {r['with_weather_logloss']:.4f} | "
+                     f"{r['all_weather_logloss']:.4f} | {r['baseline_brier']:.4f} | {r['with_weather_brier']:.4f} | "
+                     f"{', '.join(r['weather_selected']) or '-'} | {'yes' if r.get('adopted') else 'no'} |")
+        L += ["", "A weather term is adopted only if it improves validation log-loss by >= SELECT_GAIN and does not "
+              "worsen the held-out test; otherwise the live model has no weather terms (weather is still shown in "
+              "the 'why' line and drives the rain-risk flag)."]
+    elif wx.get("error"):
+        L += ["", f"Weather study failed: {wx['error']}"]
     (config.OUT / "backtest_props.md").write_text("\n".join(L) + "\n")
 
 

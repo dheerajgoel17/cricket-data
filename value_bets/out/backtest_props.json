@@ -1,5 +1,5 @@
 {
- "generated_at_ist": "2026-10-17 09:45 IST",
+ "generated_at_ist": "2026-10-17 13:34 IST",
  "data_last_date": "2026-10-14",
  "ball_level_data": false,
  "split": {
@@ -3089,6 +3089,146 @@
     "oppstr_wkts": 0.00075,
     "ven_wkts": 0.00088,
     "env_wkts": 0.0004
+   }
+  }
+ },
+ "weather": {
+  "source": "Open-Meteo ERA5 archive (daily, match date at venue)",
+  "split": "train 2021-22 / validate 2023-24 / test 2025+",
+  "results": {
+   "runs/T20": {
+    "n_test": 43113,
+    "baseline_logloss": 0.38748,
+    "baseline_brier": 0.12817,
+    "weather_selected": [],
+    "with_weather_logloss": 0.38748,
+    "with_weather_brier": 0.12817,
+    "all_weather_logloss": 0.38741,
+    "selection_trace": [
+     {
+      "feature": "wx_rain",
+      "val_gain": 0.00024
+     }
+    ],
+    "adopted": false
+   },
+   "runs/ODI": {
+    "n_test": 11007,
+    "baseline_logloss": 0.47794,
+    "baseline_brier": 0.16099,
+    "weather_selected": [],
+    "with_weather_logloss": 0.47794,
+    "with_weather_brier": 0.16099,
+    "all_weather_logloss": 0.47765,
+    "selection_trace": [
+     {
+      "feature": "wx_humid",
+      "val_gain": 0.00011
+     }
+    ],
+    "adopted": false
+   },
+   "sixes/T20": {
+    "n_test": 43113,
+    "baseline_logloss": 0.37281,
+    "baseline_brier": 0.11911,
+    "weather_selected": [],
+    "with_weather_logloss": 0.37281,
+    "with_weather_brier": 0.11911,
+    "all_weather_logloss": 0.37266,
+    "selection_trace": [
+     {
+      "feature": "wx_wind",
+      "val_gain": 5e-05
+     }
+    ],
+    "adopted": false
+   },
+   "sixes/ODI": {
+    "n_test": 11007,
+    "baseline_logloss": 0.31923,
+    "baseline_brier": 0.09764,
+    "weather_selected": [],
+    "with_weather_logloss": 0.31923,
+    "with_weather_brier": 0.09764,
+    "all_weather_logloss": 0.31933,
+    "selection_trace": [
+     {
+      "feature": "wx_dew",
+      "val_gain": 0.00015
+     }
+    ],
+    "adopted": false
+   },
+   "fours/T20": {
+    "n_test": 43113,
+    "baseline_logloss": 0.48187,
+    "baseline_brier": 0.15949,
+    "weather_selected": [
+     "wx_rain"
+    ],
+    "with_weather_logloss": 0.48205,
+    "with_weather_brier": 0.15954,
+    "all_weather_logloss": 0.48175,
+    "selection_trace": [
+     {
+      "feature": "wx_rain",
+      "val_gain": 0.00038
+     },
+     {
+      "feature": "wx_wind",
+      "val_gain": 6e-05
+     }
+    ],
+    "adopted": false
+   },
+   "fours/ODI": {
+    "n_test": 11007,
+    "baseline_logloss": 0.58296,
+    "baseline_brier": 0.20147,
+    "weather_selected": [],
+    "with_weather_logloss": 0.58296,
+    "with_weather_brier": 0.20147,
+    "all_weather_logloss": 0.58276,
+    "selection_trace": [
+     {
+      "feature": "wx_dew",
+      "val_gain": 0.00019
+     }
+    ],
+    "adopted": false
+   },
+   "wkts/T20": {
+    "n_test": 32455,
+    "baseline_logloss": 0.51282,
+    "baseline_brier": 0.1702,
+    "weather_selected": [],
+    "with_weather_logloss": 0.51282,
+    "with_weather_brier": 0.1702,
+    "all_weather_logloss": 0.51276,
+    "selection_trace": [
+     {
+      "feature": "wx_temp",
+      "val_gain": 4e-05
+     }
+    ],
+    "adopted": false
+   },
+   "wkts/ODI": {
+    "n_test": 7323,
+    "baseline_logloss": 0.54828,
+    "baseline_brier": 0.1844,
+    "weather_selected": [],
+    "with_weather_logloss": 0.54828,
+    "with_weather_brier": 0.1844,
+    "all_weather_logloss": 0.54867,
+    "selection_trace": [
+     {
+      "feature": "wx_rain",
+      "val_gain": 0.00016
+     }
+    ],
+    "adopted": false
    }
   }
  }

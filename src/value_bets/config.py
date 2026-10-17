@@ -53,6 +53,9 @@ DEFAULTS = {
     "SOURCES": "smarkets,moviodds_bet365",
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
+    "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off
+    "RAIN_PROB_WARN": 50,          # rain-risk flag if max hourly precipitation probability in the match window >= this
+    "RAIN_MM_WARN": 2.0,           # ... or forecast rain in the window >= this many mm
     "MAX_ODDS_MILESTONE": 10.0,
 }
 
