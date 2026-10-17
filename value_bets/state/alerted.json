@@ -128,5 +128,10 @@
   "edge": 0.0571,
   "start_utc": "2026-10-18T08:15:00Z",
   "alerted_at": "2026-10-17T09:03:09.537988+00:00"
+ },
+ "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||S Ayub under 0.5|0.5|under": {
+  "edge": 0.0566,
+  "start_utc": "2026-10-18T08:00:00Z",
+  "alerted_at": "2026-10-17T10:52:56.309473+00:00"
  }
 }

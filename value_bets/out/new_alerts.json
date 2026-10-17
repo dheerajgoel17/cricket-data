@@ -1,4 +1,55 @@
 {
- "generated_at_ist": "2026-10-17 15:22 IST",
- "alerts": []
+ "generated_at_ist": "2026-10-17 16:22 IST",
+ "alerts": [
+  {
+   "event_key": "male|Pakistan|Sri Lanka|2026-10-18",
+   "match": "Pakistan vs Sri Lanka",
+   "start_utc": "2026-10-18T08:00:00Z",
+   "start_ist": "2026-10-18 13:30 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_sixes",
+   "market": "Batsman Total Match Sixes",
+   "team_scope": "",
+   "selection": "S Ayub under 0.5",
+   "player_matched_as": "Saim Ayub",
+   "line": 0.5,
+   "side": "under",
+   "best_odds": 2.1,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 2.1,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 1.988,
+   "fair_prob": 0.5031,
+   "model_prob": 0.5773,
+   "market_prob": 0.4425,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0566,
+   "edge_pct": 5.66,
+   "kelly_quarter_stake_pct": 1.29,
+   "confidence": "low",
+   "why": "Model 58% vs market 44% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted ODI (n_eff 26.3; last 5: 1, 0, 1, 1, 1), bats in 94% of games played; venue unknown/unmatched (venue terms neutral); vs Sri Lanka: 2 inns avg 0.5",
+   "notes": "1 market source(s) for fair price; model 0.577 vs market 0.442; name matched loosely: 'S Ayub' -> 'Saim Ayub' (score 80) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 26.3,
+    "expected": 1.04,
+    "nb_alpha": 2.105,
+    "p_bats_or_bowls": 0.935,
+    "venue_matched": null,
+    "context_terms": [
+     "env_sixes",
+     "p_bat",
+     "intl"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "e490283dc2bbbda1",
+   "alert_key": "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||S Ayub under 0.5|0.5|under",
+   "alerted_at_ist": "2026-10-17 16:22 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
