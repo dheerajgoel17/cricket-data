@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-17T15:47:15Z",
- "generated_at_ist": "2026-10-17 21:17 IST",
- "runtime_secs": 33.3,
+ "generated_at_utc": "2026-10-17T15:54:58Z",
+ "generated_at_ist": "2026-10-17 21:24 IST",
+ "runtime_secs": 30.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "b95499f91b"
+  "commit": "0bb323b4f6"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1296,
-   "secs": 0.3
+   "rows": 1298,
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
    "rows": 513,
-   "secs": 2.7
+   "secs": 2.9
   }
  },
- "snapshot": "odds_20261017T154715Z.jsonl.gz",
+ "snapshot": "odds_20261017T155458Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,7 +66,7 @@
  },
  "stats": {
   "events_in_window": 23,
-  "rows_in_window": 1573,
+  "rows_in_window": 1575,
   "selections_with_model": 1014,
   "selections_with_market_fair": 1013,
   "markets_in_window": 185,
@@ -349,6 +349,7 @@
     "Sydney Sixers"
    ],
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -1181,14 +1182,14 @@
   }
  },
  "log": [
-  "[21:17 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[21:17 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[21:17 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1296, 'secs': 0.3}",
-  "[21:17 IST] source smarkets: {'status': 'ok', 'rows': 513, 'secs': 2.7}",
-  "[21:17 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[21:17 IST] 43 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[21:17 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[21:17 IST] weather: forecasts for 1 events, 0 failed",
-  "[21:17 IST] prop model: 714 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[21:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[21:25 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[21:25 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1298, 'secs': 0.6}",
+  "[21:25 IST] source smarkets: {'status': 'ok', 'rows': 513, 'secs': 2.9}",
+  "[21:25 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[21:25 IST] 43 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[21:25 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[21:25 IST] weather: forecasts for 1 events, 0 failed",
+  "[21:25 IST] prop model: 714 prop selections modelled, 331 milestone ladder prices anchored to O/U"
  ]
 }
