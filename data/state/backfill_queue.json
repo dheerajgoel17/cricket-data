@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-16T08:17:28",
+ "afghanistan_enumerated_at": "2026-10-17T07:54:04",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -1089,6 +1089,156 @@
    "key": "2025-11-02-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
    "saved_at": "2026-10-16T08:23:21"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
+   "key": "2025-11-01-Warriors-Titans",
+   "match_id": "crex-tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
+   "saved_at": "2026-10-17T07:54:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
+   "key": "2025-10-31-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
+   "saved_at": "2026-10-17T07:54:38"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
+   "key": "2025-10-29-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
+   "saved_at": "2026-10-17T07:54:58"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
+   "key": "2025-10-20-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
+   "saved_at": "2026-10-17T07:55:10"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
+   "key": "2025-10-14-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
+   "saved_at": "2026-10-17T07:55:22"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
+   "key": "2025-10-11-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
+   "saved_at": "2026-10-17T07:55:34"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
+   "key": "2025-10-08-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
+   "saved_at": "2026-10-17T07:55:46"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
+   "key": "2025-10-05-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
+   "saved_at": "2026-10-17T07:56:00"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
+   "key": "2025-10-03-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
+   "saved_at": "2026-10-17T07:56:12"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
+   "key": "2025-10-02-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
+   "saved_at": "2026-10-17T07:56:24"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
+   "key": "2025-09-18-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
+   "saved_at": "2026-10-17T07:56:36"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
+   "key": "2025-09-16-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
+   "saved_at": "2026-10-17T07:56:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
+   "key": "2025-09-09-Afghanistan-Hong Kong",
+   "match_id": "crex-afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
+   "saved_at": "2026-10-17T07:57:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
+   "key": "2025-09-07-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
+   "saved_at": "2026-10-17T07:57:14"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
+   "key": "2025-09-05-Afghanistan-United Arab Emirates",
+   "match_id": "crex-afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
+   "saved_at": "2026-10-17T07:57:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
+   "key": "2025-09-02-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
+   "saved_at": "2026-10-17T07:57:39"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
+   "key": "2025-09-01-Afghanistan-United Arab Emirates",
+   "match_id": "crex-afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
+   "saved_at": "2026-10-17T07:57:52"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
+   "key": "2025-08-29-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
+   "saved_at": "2026-10-17T07:58:04"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
+   "key": "2025-02-28-Afghanistan-Australia",
+   "match_id": "crex-afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
+   "saved_at": "2026-10-17T07:58:22"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
+   "key": "2025-02-26-Afghanistan-England",
+   "match_id": "crex-afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
+   "saved_at": "2026-10-17T07:58:35"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
+   "key": "2025-02-21-Afghanistan-South Africa",
+   "match_id": "crex-afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
+   "saved_at": "2026-10-17T07:58:55"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
+   "key": "2025-01-02-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
+   "saved_at": "2026-10-17T07:59:25"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
+   "key": "2024-12-26-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
+   "saved_at": "2026-10-17T07:59:37"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
+   "key": "2024-12-21-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
+   "saved_at": "2026-10-17T07:59:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
+   "key": "2024-12-19-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
+   "saved_at": "2026-10-17T08:00:02"
   }
  ],
  "failed": [],
@@ -1357,438 +1507,67 @@
    "checked_at": "2026-10-16T08:23:09",
    "key": "2025-11-02-Boland-Lions",
    "reason": "rendered 1 candidate page(s) for 2025-11-02; none confirmed"
+  },
+  {
+   "checked": [
+    "XD3"
+   ],
+   "checked_at": "2026-10-17T07:54:06",
+   "key": "2025-11-01-Dolphins-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2025-11-01; none confirmed"
+  },
+  {
+   "checked": [
+    "WZ2"
+   ],
+   "checked_at": "2026-10-17T07:54:26",
+   "key": "2025-10-31-Boland-North West",
+   "reason": "rendered 1 candidate page(s) for 2025-10-31; none confirmed"
+  },
+  {
+   "checked": [
+    "XD0"
+   ],
+   "checked_at": "2026-10-17T07:54:46",
+   "key": "2025-10-29-Titans-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2025-10-29; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-17T07:58:09",
+   "key": "2025-07-05-Nugegoda SWC-Bloomfield",
+   "reason": "no CREX match within a day of 2025-07-05 with plausible teams (sitemap covers 1949-12-24..2026-10-14)"
+  },
+  {
+   "checked": [
+    "SH0"
+   ],
+   "checked_at": "2026-10-17T07:58:42",
+   "key": "2025-02-21-Nondescripts Cricket Club-Kurunegala",
+   "reason": "rendered 1 candidate page(s) for 2025-02-21; none confirmed"
+  },
+  {
+   "checked": [
+    "RCS"
+   ],
+   "checked_at": "2026-10-17T07:59:02",
+   "key": "2025-02-07-Colts Cricket Club-Police Sports Club",
+   "reason": "rendered 1 candidate page(s) for 2025-02-07; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-17T07:59:07",
+   "key": "2025-01-31-Moors Sports Club-Sinhalese Sports Club",
+   "reason": "no CREX match within a day of 2025-01-31 with plausible teams (sitemap covers 1949-12-24..2026-10-14)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-17T07:59:12",
+   "key": "2025-01-17-Sinhalese Sports Club-Colombo Cricket Club",
+   "reason": "no CREX match within a day of 2025-01-17 with plausible teams (sitemap covers 1949-12-24..2026-10-14)"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-10-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
-   "date": "2025-10-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-10-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
-   "date": "2025-10-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
-   "date": "2025-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
-   "date": "2025-10-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
-   "date": "2025-10-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
-   "date": "2025-10-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
-   "date": "2025-10-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
-   "date": "2025-10-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
-   "date": "2025-10-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
-   "date": "2025-09-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
-   "date": "2025-09-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
-   "date": "2025-09-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Hong Kong"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
-   "date": "2025-09-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
-   "date": "2025-09-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
-   "date": "2025-09-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
-   "date": "2025-09-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
-   "date": "2025-08-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-07-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Nugegoda SWC",
-   "team_b": "Bloomfield"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
-   "date": "2025-02-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
-   "date": "2025-02-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-02-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Nondescripts Cricket Club",
-   "team_b": "Kurunegala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
-   "date": "2025-02-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-02-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Colts Cricket Club",
-   "team_b": "Police Sports Club"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-01-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Moors Sports Club",
-   "team_b": "Sinhalese Sports Club"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2025-01-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Sinhalese Sports Club",
-   "team_b": "Colombo Cricket Club"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
-   "date": "2025-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
-   "date": "2024-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
-   "date": "2024-12-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
-   "date": "2024-12-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
