@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-17 14:32 IST
+# Cricket value bets - 2026-10-17 15:22 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1788 prices
-- **smarkets**: ok, 529 prices
+- **moviodds_bet365**: ok, 1853 prices
+- **smarkets**: ok, 525 prices
 
-Matches starting in next 24h: **13**, markets priced: **198**, value bets: **14** (new alerts: 5). Min edge 5%.
+Matches starting in next 24h: **13**, markets priced: **198**, value bets: **14** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -43,4 +43,4 @@ Matches starting in next 24h: **13**, markets priced: **198**, value bets: **14*
 
 Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), Challengers (W) (female), Conquerors (W) (female), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
 
-Runtime 35.4s. Snapshot: `odds_20261017T090234Z.jsonl.gz`
+Runtime 37.2s. Snapshot: `odds_20261017T095244Z.jsonl.gz`

@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-17T09:02:34Z",
- "generated_at_ist": "2026-10-17 14:32 IST",
- "runtime_secs": 35.4,
+ "generated_at_utc": "2026-10-17T09:52:44Z",
+ "generated_at_ist": "2026-10-17 15:22 IST",
+ "runtime_secs": 37.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "c8bdc6b585"
+  "commit": "052790c8bc"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1788,
-   "secs": 0.8
+   "rows": 1853,
+   "secs": 1.4
   },
   "smarkets": {
    "status": "ok",
-   "rows": 529,
-   "secs": 2.9
+   "rows": 525,
+   "secs": 2.1
   }
  },
- "snapshot": "odds_20261017T090234Z.jsonl.gz",
+ "snapshot": "odds_20261017T095244Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,9 +66,9 @@
  },
  "stats": {
   "events_in_window": 13,
-  "rows_in_window": 1585,
-  "selections_with_model": 1232,
-  "selections_with_market_fair": 1127,
+  "rows_in_window": 1601,
+  "selections_with_model": 1241,
+  "selections_with_market_fair": 1136,
   "markets_in_window": 198,
   "value_bets": 14,
   "dropped_by_filter": {
@@ -84,16 +84,16 @@
     "n_prices": 229,
     "mean_model_p": 0.045,
     "mean_market_p": 0.064,
-    "mean_logit_diff_model_minus_market": 0.091,
-    "mean_abs_logit_diff": 0.722,
-    "corr": 0.853
+    "mean_logit_diff_model_minus_market": 0.095,
+    "mean_abs_logit_diff": 0.721,
+    "corr": 0.855
    },
    "top_bowler_team": {
     "n_prices": 83,
-    "mean_model_p": 0.099,
+    "mean_model_p": 0.098,
     "mean_market_p": 0.096,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.339,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.341,
     "corr": 0.806
    },
    "batter_runs": {
@@ -129,12 +129,12 @@
     "corr": 0.762
    },
    "batter_milestone": {
-    "n_prices": 275,
-    "mean_model_p": 0.387,
-    "mean_market_p": 0.439,
-    "mean_logit_diff_model_minus_market": -0.307,
-    "mean_abs_logit_diff": 0.475,
-    "corr": 0.974
+    "n_prices": 291,
+    "mean_model_p": 0.393,
+    "mean_market_p": 0.443,
+    "mean_logit_diff_model_minus_market": -0.29,
+    "mean_abs_logit_diff": 0.467,
+    "corr": 0.975
    },
    "bowler_milestone": {
     "n_prices": 188,
@@ -156,9 +156,9 @@
     "n_prices": 64,
     "mean_model_p": 0.045,
     "mean_market_p": 0.047,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.6,
-    "corr": 0.614
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.609,
+    "corr": 0.611
    }
   }
  },
@@ -1190,14 +1190,14 @@
   }
  },
  "log": [
-  "[14:32 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[14:32 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[14:32 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1788, 'secs': 0.8}",
-  "[14:32 IST] source smarkets: {'status': 'ok', 'rows': 529, 'secs': 2.9}",
-  "[14:33 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[14:33 IST] 39 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[14:33 IST] 34 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[14:33 IST] weather: forecasts for 2 events, 0 failed",
-  "[14:33 IST] prop model: 1086 prop selections modelled, 479 milestone ladder prices anchored to O/U"
+  "[15:22 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[15:22 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[15:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1853, 'secs': 1.4}",
+  "[15:23 IST] source smarkets: {'status': 'ok', 'rows': 525, 'secs': 2.1}",
+  "[15:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[15:23 IST] 41 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[15:23 IST] 34 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[15:23 IST] weather: forecasts for 2 events, 0 failed",
+  "[15:23 IST] prop model: 1095 prop selections modelled, 479 milestone ladder prices anchored to O/U"
  ]
 }
