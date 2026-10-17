@@ -34,3 +34,26 @@ def test_iter_zip_skips_bad_json(make_zip, tmp_path):
     with zipfile.ZipFile(p, "a") as z:
         z.writestr("broken.json", "{not json")
     assert len(list(iter_zip(p))) == 1
+
+
+def test_download_reports_what_came_back_instead_of_a_zip(monkeypatch):
+    import io
+
+    import pytest
+
+    from cricket_data import cricsheet
+
+    class Resp(io.BytesIO):
+        headers = {"Content-Type": "text/html; charset=utf-8"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    monkeypatch.setattr(cricsheet.urllib.request, "urlopen", lambda *a, **k: Resp(b"<html>rate limited</html>"))
+    with pytest.raises(RuntimeError) as e:
+        cricsheet.download("all_json.zip", retries=1)
+    msg = str(e.value)
+    assert "text/html" in msg and "rate limited" in msg

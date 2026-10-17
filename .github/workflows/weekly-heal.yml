@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: data-update
@@ -33,4 +34,14 @@ jobs:
           if git diff --cached --quiet; then echo "Already complete."; else
             git commit -m "data: weekly full re-sync $(date -u +%F)"
             git pull --rebase -q && git push
+          fi
+      - name: Open an issue if the re-sync failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(gh issue list --label heal-failed --state open --json number -q '.[0].number')" ]; then
+            gh label create heal-failed --color B60205 2>/dev/null || true
+            gh issue create --label heal-failed --title "Weekly full re-sync failed" \
+              --body "The weekly Cricsheet re-sync failed. See ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
