@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-17 17:29 IST
+# Cricket value bets - 2026-10-17 18:27 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1571 prices
-- **smarkets**: ok, 529 prices
+- **moviodds_bet365**: ok, 1603 prices
+- **smarkets**: ok, 526 prices
 
-Matches starting in next 24h: **17**, markets priced: **162**, value bets: **12** (new alerts: 0). Min edge 5%.
+Matches starting in next 24h: **21**, markets priced: **163**, value bets: **12** (new alerts: 1). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -19,8 +19,8 @@ Matches starting in next 24h: **17**, markets priced: **162**, value bets: **12*
 | 10-18 13:30 IST | Pakistan vs Sri Lanka | Batsman Total Match Sixes | S Ayub under 0.5 | 2.10 @ moviodds_bet365 | 1.99 | 0.5773 | 5.7% | 1.29% | low |
 | 10-18 13:30 IST | South Africa vs Australia | Bowler Total Match Wickets | SR Harmer under 3.5 | 2.00 @ moviodds_bet365 | 1.90 | 0.6037 | 5.3% | 1.33% | low |
 | 10-18 13:30 IST | Pakistan vs Sri Lanka | Batsman Total Match Sixes | H Nawaz under 0.5 | 2.20 @ moviodds_bet365 | 2.09 | 0.5455 | 5.2% | 1.09% | low |
+| 10-18 13:45 IST | Australia (W) vs New Zealand (W) | Batsman Total Match Sixes | I Sharp over 0.5 | 6.00 @ moviodds_bet365 | 4.87 | 0.2634 | 23.2% | 1.16% | low |
 | 10-18 13:45 IST | Australia (W) vs New Zealand (W) | Batsman Total Match Sixes | AC Kerr over 0.5 | 5.50 @ moviodds_bet365 | 4.92 | 0.2414 | 11.8% | 0.66% | low |
-| 10-18 13:45 IST | Australia (W) vs New Zealand (W) | Batter Total Match Fours | I Sharp under 1.5 | 2.20 @ moviodds_bet365 | 2.07 | 0.5567 | 6.3% | 1.32% | low |
 | 10-18 13:45 IST | Australia (W) vs New Zealand (W) | Batsman Total Match Sixes | GE Plimmer over 0.5 | 5.50 @ moviodds_bet365 | 5.20 | 0.2168 | 5.7% | 0.32% | low |
 
 ### Why / notes per bet
@@ -33,10 +33,10 @@ Matches starting in next 24h: **17**, markets priced: **162**, value bets: **12*
 - **Pakistan vs Sri Lanka / Batsman Total Match Sixes / S Ayub under 0.5** - why: Model 58% vs market 44% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted ODI (n_eff 26.3; last 5: 1, 0, 1, 1, 1), bats in 94% of games played; venue unknown/unmatched (venue terms neutral); vs Sri Lanka: 2 inns avg 0.5. Notes: 1 market source(s) for fair price; model 0.577 vs market 0.442; name matched loosely: 'S Ayub' -> 'Saim Ayub' (score 80) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **South Africa vs Australia / Bowler Total Match Wickets / SR Harmer under 3.5** - why: Model 60% vs market 46% for under 3.5 wkts; form 3.0 wkts/spell recency-weighted MULTI (n_eff 44.9; last 5: 2, 1, 4, 3, 2), bowls in 95% of games, 28.9 overs/spell; venue unknown/unmatched (venue terms neutral); vs Australia: 2 spells avg 1.0; context adj: opposition strength +6%. Notes: 1 market source(s) for fair price; model 0.604 vs market 0.463; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Pakistan vs Sri Lanka / Batsman Total Match Sixes / H Nawaz under 0.5** - why: Model 55% vs market 42% for under 0.5 sixes; form 1.5 sixes/inn recency-weighted ODI (n_eff 14.6; last 4: 0, 0, 3, 3), bats in 91% of games played; venue unknown/unmatched (venue terms neutral). Notes: 1 market source(s) for fair price; model 0.546 vs market 0.423; name matched loosely: 'H Nawaz' -> 'Hassan Nawaz' (score 80) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
+- **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / I Sharp over 0.5** - why: Model 26% vs market 16% for over 0.5 sixes; form 0.3 sixes/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 1, 0, 0, 0), bats in 85% of games played; context adj: venue environment +67%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.263 vs market 0.158; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / AC Kerr over 0.5** - why: Model 24% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 79.1; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.241 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
-- **Australia (W) vs New Zealand (W) / Batter Total Match Fours / I Sharp under 1.5** - why: Model 56% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 8, 4, 0, 0), bats in 85% of games played; context adj: venue environment +14%, team H2H context -12%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.557 vs market 0.423; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / GE Plimmer over 0.5** - why: Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.217 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Slc Emerging (male), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Colombo Aces (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Slc Emerging (male), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
 
-Runtime 25.0s. Snapshot: `odds_20261017T115923Z.jsonl.gz`
+Runtime 34.3s. Snapshot: `odds_20261017T125724Z.jsonl.gz`

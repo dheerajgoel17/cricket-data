@@ -118,5 +118,10 @@
   "edge": 0.0566,
   "start_utc": "2026-10-18T08:00:00Z",
   "alerted_at": "2026-10-17T10:52:56.309473+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-18|batter_sixes||I Sharp over 0.5|0.5|over": {
+  "edge": 0.2323,
+  "start_utc": "2026-10-18T08:15:00Z",
+  "alerted_at": "2026-10-17T12:57:58.477132+00:00"
  }
 }

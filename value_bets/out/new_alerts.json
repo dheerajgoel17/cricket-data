@@ -1,4 +1,60 @@
 {
- "generated_at_ist": "2026-10-17 17:29 IST",
- "alerts": []
+ "generated_at_ist": "2026-10-17 18:27 IST",
+ "alerts": [
+  {
+   "event_key": "female|Australia|New Zealand|2026-10-18",
+   "match": "Australia (W) vs New Zealand (W)",
+   "start_utc": "2026-10-18T08:15:00Z",
+   "start_ist": "2026-10-18 13:45 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_sixes",
+   "market": "Batsman Total Match Sixes",
+   "team_scope": "",
+   "selection": "I Sharp over 0.5",
+   "player_matched_as": "IG Sharp",
+   "line": 0.5,
+   "side": "over",
+   "best_odds": 6.0,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 6.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 4.869,
+   "fair_prob": 0.2054,
+   "model_prob": 0.2634,
+   "market_prob": 0.1579,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.2323,
+   "edge_pct": 23.23,
+   "kelly_quarter_stake_pct": 1.16,
+   "confidence": "low",
+   "why": "Model 26% vs market 16% for over 0.5 sixes; form 0.3 sixes/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 1, 0, 0, 0), bats in 85% of games played; context adj: venue environment +67%; weather: high humidity 76%",
+   "notes": "1 market source(s) for fair price; model 0.263 vs market 0.158; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 26.1,
+    "expected": 0.39,
+    "nb_alpha": 1.536,
+    "p_bats_or_bowls": 0.847,
+    "venue_matched": "north sydney oval",
+    "context_terms": [
+     "env_sixes",
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 10,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 76,
+    "cloud_pct": 23,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "941b1f2bbb6a9256",
+   "alert_key": "female|Australia|New Zealand|2026-10-18|batter_sixes||I Sharp over 0.5|0.5|over",
+   "alerted_at_ist": "2026-10-17 18:27 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
