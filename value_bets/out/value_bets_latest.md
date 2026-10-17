@@ -1,16 +1,15 @@
-# Cricket value bets - 2026-10-17 16:22 IST
+# Cricket value bets - 2026-10-17 17:11 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1874 prices
-- **smarkets**: ok, 525 prices
+- **moviodds_bet365**: ok, 1569 prices
+- **smarkets**: ok, 521 prices
 
-Matches starting in next 24h: **12**, markets priced: **198**, value bets: **13** (new alerts: 1). Min edge 5%.
+Matches starting in next 24h: **15**, markets priced: **162**, value bets: **12** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 10-17 17:00 IST | Bangladesh vs Zimbabwe | Batsman Total Match Sixes | BL Bennett over 0.5 | 3.75 @ moviodds_bet365 | 3.42 | 0.3452 | 9.8% | 0.89% | low |
 | 10-17 19:00 IST | India vs West Indies | Bowler Total Match Wickets | SK Springer over 1.5 | 5.50 @ moviodds_bet365 | 4.52 | 0.2815 | 21.7% | 1.21% | low |
 | 10-17 19:00 IST | India vs West Indies | Bowler Total Match Wickets | G Motie over 1.5 | 4.50 @ moviodds_bet365 | 3.98 | 0.3046 | 13.2% | 0.94% | low |
 | 10-17 19:00 IST | India vs West Indies | Bowler Total Match Wickets | S Joseph over 1.5 | 4.00 @ moviodds_bet365 | 3.56 | 0.3388 | 12.5% | 1.04% | low |
@@ -25,7 +24,6 @@ Matches starting in next 24h: **12**, markets priced: **198**, value bets: **13*
 | 10-18 13:45 IST | Australia (W) vs New Zealand (W) | Batsman Total Match Sixes | GE Plimmer over 0.5 | 5.50 @ moviodds_bet365 | 5.20 | 0.2168 | 5.7% | 0.32% | low |
 
 ### Why / notes per bet
-- **Bangladesh vs Zimbabwe / Batsman Total Match Sixes / BL Bennett over 0.5** - why: Model 35% vs market 25% for over 0.5 sixes; form 0.7 sixes/inn recency-weighted ODI (n_eff 19.6; last 5: 1, 0, 1, 0, 0), bats in 97% of games played; venue unknown/unmatched (venue terms neutral); vs Bangladesh: 3 inns avg 0.0. Notes: 1 market source(s) for fair price; model 0.345 vs market 0.250; name matched loosely: 'BL Bennett' -> 'BJ Bennett' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **India vs West Indies / Bowler Total Match Wickets / SK Springer over 1.5** - why: Model 28% vs market 17% for over 1.5 wkts; form 1.2 wkts/spell recency-weighted T20 (n_eff 21.6; last 5: 2, 2, 0, 1, 1), bowls in 84% of games, 2.9 overs/spell; vs India: 3 spells avg 1.3; context adj: opposition strength -2%. Notes: 1 market source(s) for fair price; model 0.281 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **India vs West Indies / Bowler Total Match Wickets / G Motie over 1.5** - why: Model 30% vs market 21% for over 1.5 wkts; form 1.2 wkts/spell recency-weighted T20 (n_eff 56.1; last 5: 1, 0, 0, 0, 2), bowls in 95% of games, 4.0 overs/spell; vs India: 3 spells avg 0.3; context adj: opposition strength -2%. Notes: 1 market source(s) for fair price; model 0.305 vs market 0.208; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **India vs West Indies / Bowler Total Match Wickets / S Joseph over 1.5** - why: Model 34% vs market 23% for over 1.5 wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 37.0; last 5: 2, 0, 0, 0, 0), bowls in 97% of games, 4.7 overs/spell; vs India: 4 spells avg 1.0; context adj: opposition strength -2%. Notes: 1 market source(s) for fair price; model 0.339 vs market 0.234; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
@@ -39,6 +37,6 @@ Matches starting in next 24h: **12**, markets priced: **198**, value bets: **13*
 - **Australia (W) vs New Zealand (W) / Batter Total Match Fours / I Sharp under 1.5** - why: Model 56% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 8, 4, 0, 0), bats in 85% of games played; context adj: venue environment +14%, team H2H context -12%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.557 vs market 0.423; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / GE Plimmer over 0.5** - why: Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.217 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), Challengers (W) (female), Conquerors (W) (female), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Hayleys Group A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
 
-Runtime 31.2s. Snapshot: `odds_20261017T105225Z.jsonl.gz`
+Runtime 23.1s. Snapshot: `odds_20261017T114147Z.jsonl.gz`
