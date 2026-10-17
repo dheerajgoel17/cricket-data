@@ -1,34 +1,4 @@
 {
- "male|India|West Indies|2026-10-17|bowler_wickets||SK Springer over 1.5|1.5|over": {
-  "edge": 0.2171,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
- "male|India|West Indies|2026-10-17|bowler_wickets||G Motie over 1.5|1.5|over": {
-  "edge": 0.1317,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
- "male|India|West Indies|2026-10-17|bowler_wickets||S Joseph over 1.5|1.5|over": {
-  "edge": 0.1247,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
- "male|India|West Indies|2026-10-17|bowler_milestone||S Joseph 2+ yes|1.5|over": {
-  "edge": 0.0958,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
- "male|India|West Indies|2026-10-17|bowler_milestone||G Motie 2+ yes|1.5|over": {
-  "edge": 0.0791,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
- "male|India|West Indies|2026-10-17|bowler_wickets||R Shepherd over 1.5|1.5|over": {
-  "edge": 0.0707,
-  "start_utc": "2026-10-17T13:30:00Z",
-  "alerted_at": "2026-10-17T06:34:16.721217+00:00"
- },
  "male|Australia|South Africa|2026-10-18|batter_milestone||T Bavuma 100+ yes|99.5|over": {
   "edge": 0.8784,
   "start_utc": "2026-10-18T08:00:00Z",
@@ -123,5 +93,20 @@
   "edge": 0.2323,
   "start_utc": "2026-10-18T08:15:00Z",
   "alerted_at": "2026-10-17T12:57:58.477132+00:00"
+ },
+ "female|India|Zimbabwe|2026-10-18|bowler_milestone||T Makusha 2+ yes|1.5|over": {
+  "edge": 0.1772,
+  "start_utc": "2026-10-18T13:30:00Z",
+  "alerted_at": "2026-10-17T13:55:50.991243+00:00"
+ },
+ "female|India|Zimbabwe|2026-10-18|bowler_milestone||M Mavunga 2+ yes|1.5|over": {
+  "edge": 0.0836,
+  "start_utc": "2026-10-18T13:30:00Z",
+  "alerted_at": "2026-10-17T13:55:50.991243+00:00"
+ },
+ "female|India|Zimbabwe|2026-10-18|bowler_milestone||F Chipare 2+ yes|1.5|over": {
+  "edge": 0.0764,
+  "start_utc": "2026-10-18T13:30:00Z",
+  "alerted_at": "2026-10-17T13:55:50.991243+00:00"
  }
 }

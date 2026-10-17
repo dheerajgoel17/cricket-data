@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-17T12:57:24Z",
- "generated_at_ist": "2026-10-17 18:27 IST",
- "runtime_secs": 34.3,
+ "generated_at_utc": "2026-10-17T13:55:13Z",
+ "generated_at_ist": "2026-10-17 19:25 IST",
+ "runtime_secs": 37.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "cd799561b7"
+  "commit": "61936f9d87"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1603,
-   "secs": 1.7
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 526,
-   "secs": 2.7
+   "rows": 535,
+   "secs": 6.3
   }
  },
- "snapshot": "odds_20261017T125724Z.jsonl.gz",
+ "snapshot": "odds_20261017T135513Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,138 +65,104 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 21,
-  "rows_in_window": 1399,
-  "selections_with_model": 980,
-  "selections_with_market_fair": 907,
-  "markets_in_window": 163,
-  "value_bets": 12,
+  "events_in_window": 19,
+  "rows_in_window": 1334,
+  "selections_with_model": 926,
+  "selections_with_market_fair": 859,
+  "markets_in_window": 157,
+  "value_bets": 9,
   "dropped_by_filter": {
-   "odds_range": 16,
-   "model_market_gap": 232,
-   "model_only_no_market": 106,
-   "liquidity": 1
+   "model_market_gap": 283,
+   "odds_range": 17,
+   "liquidity": 1,
+   "model_only_no_market": 100
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 36,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 169,
+    "n_prices": 161,
     "mean_model_p": 0.048,
-    "mean_market_p": 0.063,
-    "mean_logit_diff_model_minus_market": 0.147,
-    "mean_abs_logit_diff": 0.69,
-    "corr": 0.873
+    "mean_market_p": 0.064,
+    "mean_logit_diff_model_minus_market": 0.16,
+    "mean_abs_logit_diff": 0.793,
+    "corr": 0.843
    },
    "top_bowler_team": {
-    "n_prices": 62,
-    "mean_model_p": 0.1,
-    "mean_market_p": 0.097,
+    "n_prices": 61,
+    "mean_model_p": 0.102,
+    "mean_market_p": 0.098,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.353,
-    "corr": 0.792
+    "mean_abs_logit_diff": 0.338,
+    "corr": 0.793
    },
    "batter_runs": {
-    "n_prices": 60,
-    "mean_model_p": 0.5,
-    "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.478,
-    "corr": null
-   },
-   "batter_sixes": {
-    "n_prices": 60,
-    "mean_model_p": 0.5,
-    "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.247,
-    "corr": 0.899
-   },
-   "batter_fours": {
-    "n_prices": 60,
+    "n_prices": 56,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.53,
-    "corr": 0.168
+    "mean_abs_logit_diff": 0.512,
+    "corr": null
+   },
+   "batter_sixes": {
+    "n_prices": 56,
+    "mean_model_p": 0.5,
+    "mean_market_p": 0.5,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.346,
+    "corr": 0.891
+   },
+   "batter_fours": {
+    "n_prices": 56,
+    "mean_model_p": 0.5,
+    "mean_market_p": 0.5,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.577,
+    "corr": 0.311
    },
    "bowler_wickets": {
     "n_prices": 60,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.475,
-    "corr": 0.75
+    "mean_abs_logit_diff": 0.548,
+    "corr": 0.737
    },
    "batter_milestone": {
-    "n_prices": 224,
-    "mean_model_p": 0.395,
-    "mean_market_p": 0.455,
-    "mean_logit_diff_model_minus_market": -0.344,
-    "mean_abs_logit_diff": 0.527,
-    "corr": 0.971
+    "n_prices": 194,
+    "mean_model_p": 0.375,
+    "mean_market_p": 0.438,
+    "mean_logit_diff_model_minus_market": -0.392,
+    "mean_abs_logit_diff": 0.582,
+    "corr": 0.957
    },
    "bowler_milestone": {
-    "n_prices": 148,
-    "mean_model_p": 0.312,
-    "mean_market_p": 0.367,
-    "mean_logit_diff_model_minus_market": -0.315,
-    "mean_abs_logit_diff": 0.502,
-    "corr": 0.967
+    "n_prices": 146,
+    "mean_model_p": 0.311,
+    "mean_market_p": 0.378,
+    "mean_logit_diff_model_minus_market": -0.399,
+    "mean_abs_logit_diff": 0.584,
+    "corr": 0.965
    },
    "top_batter_match": {
-    "n_prices": 99,
-    "mean_model_p": 0.013,
-    "mean_market_p": 0.03,
+    "n_prices": 97,
+    "mean_model_p": 0.011,
+    "mean_market_p": 0.031,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 1.06,
-    "corr": 0.756
+    "mean_abs_logit_diff": 1.195,
+    "corr": 0.826
    },
    "top_bowler_match": {
-    "n_prices": 43,
-    "mean_model_p": 0.044,
-    "mean_market_p": 0.047,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.746,
-    "corr": 0.55
+    "n_prices": 42,
+    "mean_model_p": 0.04,
+    "mean_market_p": 0.048,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.681,
+    "corr": 0.75
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|India|West Indies|2026-10-17",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "India",
-    "West Indies"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Hobart Hurricanes|seattle thunders|2026-10-17",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|east bay blazers|prime raider gladiators|2026-10-17",
-   "start_ist": "2026-10-17 19:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Boland|Mpumalanga|2026-10-17",
    "start_ist": "2026-10-17 21:30 IST",
@@ -406,315 +372,23 @@
    "sources": [
     "smarkets"
    ]
+  },
+  {
+   "event": "female|India|Zimbabwe|2026-10-18",
+   "start_ist": "2026-10-18 19:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "India",
+    "Zimbabwe"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_wickets",
-   "market": "Bowler Total Match Wickets",
-   "team_scope": "",
-   "selection": "SK Springer over 1.5",
-   "player_matched_as": "SK Springer",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 5.5,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 5.5,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 4.519,
-   "fair_prob": 0.2213,
-   "model_prob": 0.2815,
-   "market_prob": 0.172,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.2171,
-   "edge_pct": 21.71,
-   "kelly_quarter_stake_pct": 1.21,
-   "confidence": "low",
-   "why": "Model 28% vs market 17% for over 1.5 wkts; form 1.2 wkts/spell recency-weighted T20 (n_eff 21.6; last 5: 2, 2, 0, 1, 1), bowls in 84% of games, 2.9 overs/spell; vs India: 3 spells avg 1.3; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.281 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 21.6,
-    "expected": 1.05,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.844,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_wickets",
-   "market": "Bowler Total Match Wickets",
-   "team_scope": "",
-   "selection": "G Motie over 1.5",
-   "player_matched_as": "G Motie",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 4.5,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 4.5,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 3.976,
-   "fair_prob": 0.2515,
-   "model_prob": 0.3046,
-   "market_prob": 0.208,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1317,
-   "edge_pct": 13.17,
-   "kelly_quarter_stake_pct": 0.94,
-   "confidence": "low",
-   "why": "Model 30% vs market 21% for over 1.5 wkts; form 1.2 wkts/spell recency-weighted T20 (n_eff 56.1; last 5: 1, 0, 0, 0, 2), bowls in 95% of games, 4.0 overs/spell; vs India: 3 spells avg 0.3; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.305 vs market 0.208; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 56.1,
-    "expected": 1.12,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.954,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_wickets",
-   "market": "Bowler Total Match Wickets",
-   "team_scope": "",
-   "selection": "S Joseph over 1.5",
-   "player_matched_as": "S Joseph",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 4.0,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 4.0,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 3.557,
-   "fair_prob": 0.2812,
-   "model_prob": 0.3388,
-   "market_prob": 0.234,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1247,
-   "edge_pct": 12.47,
-   "kelly_quarter_stake_pct": 1.04,
-   "confidence": "low",
-   "why": "Model 34% vs market 23% for over 1.5 wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 37.0; last 5: 2, 0, 0, 0, 0), bowls in 97% of games, 4.7 overs/spell; vs India: 4 spells avg 1.0; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.339 vs market 0.234; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 37.0,
-    "expected": 1.22,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.974,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_milestone",
-   "market": "Bowler Milestones",
-   "team_scope": "",
-   "selection": "S Joseph 2+ yes",
-   "player_matched_as": "S Joseph",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 4.0,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 4.0,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 3.65,
-   "fair_prob": 0.274,
-   "model_prob": 0.3301,
-   "market_prob": 0.228,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0958,
-   "edge_pct": 9.58,
-   "kelly_quarter_stake_pct": 0.8,
-   "confidence": "low",
-   "why": "Model 33% vs market 23% for 2+ wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 37.0; last 5: 2, 0, 0, 0, 0), bowls in 97% of games, 4.7 overs/spell; vs India: 4 spells avg 1.0; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.330 vs market 0.228; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.234); price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 37.0,
-    "expected": 1.22,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.974,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_milestone",
-   "market": "Bowler Milestones",
-   "team_scope": "",
-   "selection": "G Motie 2+ yes",
-   "player_matched_as": "G Motie",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 4.5,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 4.5,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 4.17,
-   "fair_prob": 0.2398,
-   "model_prob": 0.2905,
-   "market_prob": 0.1983,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0791,
-   "edge_pct": 7.91,
-   "kelly_quarter_stake_pct": 0.56,
-   "confidence": "low",
-   "why": "Model 29% vs market 20% for 2+ wkts; form 1.2 wkts/spell recency-weighted T20 (n_eff 56.1; last 5: 1, 0, 0, 0, 2), bowls in 95% of games, 4.0 overs/spell; vs India: 3 spells avg 0.3; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.290 vs market 0.198; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.208); price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 56.1,
-    "expected": 1.12,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.954,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "male|India|West Indies|2026-10-17",
-   "match": "India vs West Indies",
-   "start_utc": "2026-10-17T13:30:00Z",
-   "start_ist": "2026-10-17 19:00 IST",
-   "format": "T20",
-   "gender": "male",
-   "market_type": "bowler_wickets",
-   "market": "Bowler Total Match Wickets",
-   "team_scope": "",
-   "selection": "R Shepherd over 1.5",
-   "player_matched_as": "R Shepherd",
-   "line": 1.5,
-   "side": "over",
-   "best_odds": 5.0,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 5.0,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 4.67,
-   "fair_prob": 0.2141,
-   "model_prob": 0.2446,
-   "market_prob": 0.1892,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0707,
-   "edge_pct": 7.07,
-   "kelly_quarter_stake_pct": 0.44,
-   "confidence": "low",
-   "why": "Model 24% vs market 19% for over 1.5 wkts; form 0.8 wkts/spell recency-weighted T20 (n_eff 99.8; last 5: 0, 0, 1, 0, 1), bowls in 88% of games, 2.8 overs/spell; at M.Chinnaswamy Stadium, Bangalore: 6 spells avg 0.5; vs India: 11 spells avg 1.0; context adj: opposition strength -2%",
-   "notes": "1 market source(s) for fair price; model 0.245 vs market 0.189; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 99.8,
-    "expected": 0.94,
-    "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.882,
-    "venue_matched": "m chinnaswamy stadium",
-    "context_terms": [
-     "oppstr_wkts",
-     "p_bowl",
-     "intl"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 61,
-    "cloud_pct": 1,
-    "source": "Open-Meteo forecast"
-   }
-  },
   {
    "event_key": "male|Pakistan|Sri Lanka|2026-10-18",
    "match": "Pakistan vs Sri Lanka",
@@ -1000,6 +674,141 @@
     "cloud_pct": 23,
     "source": "Open-Meteo forecast"
    }
+  },
+  {
+   "event_key": "female|India|Zimbabwe|2026-10-18",
+   "match": "India (W) vs Zimbabwe (W)",
+   "start_utc": "2026-10-18T13:30:00Z",
+   "start_ist": "2026-10-18 19:00 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "bowler_milestone",
+   "market": "Bowler Milestones",
+   "team_scope": "",
+   "selection": "T Makusha 2+ yes",
+   "player_matched_as": "T Makusha",
+   "line": 1.5,
+   "side": "over",
+   "best_odds": 10.0,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 10.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 8.495,
+   "fair_prob": 0.1177,
+   "model_prob": 0.1559,
+   "market_prob": 0.0865,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1772,
+   "edge_pct": 17.72,
+   "kelly_quarter_stake_pct": 0.49,
+   "confidence": "low",
+   "why": "Model 16% vs market 9% for 2+ wkts; form 0.5 wkts/spell recency-weighted T20 (n_eff 9.7; last 5: 0, 1, 1, 0, 0), bowls in 90% of games, 3.4 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%",
+   "notes": "1 market source(s) for fair price; model 0.156 vs market 0.086; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.096); price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 9.7,
+    "expected": 0.74,
+    "nb_alpha": 0.106,
+    "p_bats_or_bowls": 0.9,
+    "venue_matched": null,
+    "context_terms": [
+     "oppstr_wkts",
+     "p_bowl",
+     "intl"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null
+  },
+  {
+   "event_key": "female|India|Zimbabwe|2026-10-18",
+   "match": "India (W) vs Zimbabwe (W)",
+   "start_utc": "2026-10-18T13:30:00Z",
+   "start_ist": "2026-10-18 19:00 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "bowler_milestone",
+   "market": "Bowler Milestones",
+   "team_scope": "",
+   "selection": "M Mavunga 2+ yes",
+   "player_matched_as": "M Mavunga",
+   "line": 1.5,
+   "side": "over",
+   "best_odds": 7.0,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 7.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 6.46,
+   "fair_prob": 0.1548,
+   "model_prob": 0.1928,
+   "market_prob": 0.1237,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0836,
+   "edge_pct": 8.36,
+   "kelly_quarter_stake_pct": 0.35,
+   "confidence": "low",
+   "why": "Model 19% vs market 12% for 2+ wkts; form 0.7 wkts/spell recency-weighted T20 (n_eff 12.1; last 5: 0, 0, 3, 0, 0), bowls in 91% of games, 3.0 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%",
+   "notes": "1 market source(s) for fair price; model 0.193 vs market 0.124; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.136); price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 12.1,
+    "expected": 0.85,
+    "nb_alpha": 0.106,
+    "p_bats_or_bowls": 0.911,
+    "venue_matched": null,
+    "context_terms": [
+     "oppstr_wkts",
+     "p_bowl",
+     "intl"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null
+  },
+  {
+   "event_key": "female|India|Zimbabwe|2026-10-18",
+   "match": "India (W) vs Zimbabwe (W)",
+   "start_utc": "2026-10-18T13:30:00Z",
+   "start_ist": "2026-10-18 19:00 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "bowler_milestone",
+   "market": "Bowler Milestones",
+   "team_scope": "",
+   "selection": "F Chipare 2+ yes",
+   "player_matched_as": "F Chipare",
+   "line": 1.5,
+   "side": "over",
+   "best_odds": 8.0,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 8.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 7.432,
+   "fair_prob": 0.1346,
+   "model_prob": 0.1674,
+   "market_prob": 0.1077,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0764,
+   "edge_pct": 7.64,
+   "kelly_quarter_stake_pct": 0.27,
+   "confidence": "low",
+   "why": "Model 17% vs market 11% for 2+ wkts; form 0.6 wkts/spell recency-weighted T20 (n_eff 13.6; last 5: 0, 0, 1, 2, 0), bowls in 90% of games, 3.5 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%",
+   "notes": "1 market source(s) for fair price; model 0.167 vs market 0.108; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.119); price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 13.6,
+    "expected": 0.78,
+    "nb_alpha": 0.106,
+    "p_bats_or_bowls": 0.903,
+    "venue_matched": null,
+    "context_terms": [
+     "oppstr_wkts",
+     "p_bowl",
+     "intl"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null
   }
  ],
  "suspect_not_alerted": [],
@@ -1042,6 +851,7 @@
   "Bjorn Fortuin",
   "Blake Simpson",
   "Charl Prinsloo",
+  "Chipo Mugeri",
   "Codi Ethan Yusuf",
   "Connor Esterhuizen",
   "Dasun Shanaka",
@@ -1052,6 +862,7 @@
   "Ethan John Cunningham",
   "GJ Maree",
   "Gysbert Wege",
+  "J Kalita",
   "JJ Basson",
   "Jacques Snyman",
   "Jason Muirhead",
@@ -1059,11 +870,14 @@
   "Jaydon Brooker",
   "Jethli Van Briesies",
   "Jevano Baron",
+  "Jintimoni Kalita",
   "Johan van Dyk",
   "Junaid Dawood",
+  "K Gaud",
   "Kamindu Mendis",
   "Kamo Phiri",
   "Khaya Fakude",
+  "Kranti Munna Gaud",
   "Kurtlyn Mannikam",
   "Kusal Mendis",
   "Kyle Jacobs",
@@ -1078,18 +892,19 @@
   "Mitchell van Buuren",
   "Mohamed Yassar Cook",
   "Musawenkosi Twala",
+  "NS Prasad",
   "Nathan Jacobs",
   "Neil Brand",
   "Neil Timmers",
   "Neill Jordaan",
   "Nico van Zyl",
+  "Nikki Siribhagwan Prasad",
   "Nonelela Yikha",
   "Nqabayomzi Peter",
   "Ntando Soni",
   "Odirile Modimokoane",
   "Ombesa Matsha",
   "Orapeleng Motlhoaring",
-  "P Yadav",
   "Rassie Van der Dussen",
   "Reeza Hendricks",
   "Richard Seletswane",
@@ -1248,14 +1063,14 @@
   }
  },
  "log": [
-  "[18:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[18:27 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[18:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1603, 'secs': 1.7}",
-  "[18:27 IST] source smarkets: {'status': 'ok', 'rows': 526, 'secs': 2.7}",
-  "[18:27 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[18:27 IST] 45 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[18:27 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[18:27 IST] weather: forecasts for 2 events, 0 failed",
-  "[18:27 IST] prop model: 908 prop selections modelled, 404 milestone ladder prices anchored to O/U"
+  "[19:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[19:25 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[19:25 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1603, 'secs': 0.2}",
+  "[19:25 IST] source smarkets: {'status': 'ok', 'rows': 535, 'secs': 6.3}",
+  "[19:25 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[19:25 IST] 45 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[19:25 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[19:25 IST] weather: forecasts for 2 events, 0 failed",
+  "[19:25 IST] prop model: 908 prop selections modelled, 404 milestone ladder prices anchored to O/U"
  ]
 }
