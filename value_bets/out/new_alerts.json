@@ -1,4 +1,55 @@
 {
- "generated_at_ist": "2026-10-17 20:26 IST",
- "alerts": []
+ "generated_at_ist": "2026-10-17 21:17 IST",
+ "alerts": [
+  {
+   "event_key": "male|England|West Indies|2026-10-18",
+   "match": "England Champions vs West Indies Champions",
+   "start_utc": "2026-10-18T15:30:00Z",
+   "start_ist": "2026-10-18 21:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "bowler_milestone",
+   "market": "Bowler Milestones",
+   "team_scope": "",
+   "selection": "TS Mills 3+ yes",
+   "player_matched_as": "TS Mills",
+   "line": 2.5,
+   "side": "over",
+   "best_odds": 9.0,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 9.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 7.831,
+   "fair_prob": 0.1277,
+   "model_prob": 0.1435,
+   "market_prob": 0.1148,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1493,
+   "edge_pct": 14.93,
+   "kelly_quarter_stake_pct": 0.47,
+   "confidence": "low",
+   "why": "Model 14% vs market 11% for 3+ wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 55.6; last 5: 2, 3, 2, 0, 1), bowls in 98% of games, 3.5 overs/spell; venue unknown/unmatched (venue terms neutral); vs West Indies: 8 spells avg 0.6; context adj: opposition strength +3%",
+   "notes": "1 market source(s) for fair price; model 0.143 vs market 0.115; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.312); price via unofficial bet365 mirror - confirm on bet365 before betting",
+   "model_detail": {
+    "n_eff": 55.6,
+    "expected": 1.27,
+    "nb_alpha": 0.106,
+    "p_bats_or_bowls": 0.978,
+    "venue_matched": null,
+    "context_terms": [
+     "oppstr_wkts",
+     "p_bowl",
+     "intl"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "059260b22c7999d3",
+   "alert_key": "male|England|West Indies|2026-10-18|bowler_milestone||TS Mills 3+ yes|2.5|over",
+   "alerted_at_ist": "2026-10-17 21:17 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
