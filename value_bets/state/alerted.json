@@ -103,5 +103,30 @@
   "edge": 0.0521,
   "start_utc": "2026-10-18T08:00:00Z",
   "alerted_at": "2026-10-17T08:13:45.907329+00:00"
+ },
+ "male|Bangladesh|Zimbabwe|2026-10-17|batter_sixes||BL Bennett over 0.5|0.5|over": {
+  "edge": 0.0982,
+  "start_utc": "2026-10-17T11:30:00Z",
+  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
+ },
+ "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||H Nawaz under 0.5|0.5|under": {
+  "edge": 0.0524,
+  "start_utc": "2026-10-18T08:00:00Z",
+  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-18|batter_sixes||AC Kerr over 0.5|0.5|over": {
+  "edge": 0.118,
+  "start_utc": "2026-10-18T08:15:00Z",
+  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-18|batter_fours||I Sharp under 1.5|1.5|under": {
+  "edge": 0.0634,
+  "start_utc": "2026-10-18T08:15:00Z",
+  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-18|batter_sixes||GE Plimmer over 0.5|0.5|over": {
+  "edge": 0.0571,
+  "start_utc": "2026-10-18T08:15:00Z",
+  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
  }
 }
