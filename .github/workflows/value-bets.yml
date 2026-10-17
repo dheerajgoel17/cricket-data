@@ -33,7 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      CV_SNAPSHOTS: ${{ runner.temp }}/snapshots
       CV_SOURCES: ${{ vars.CV_SOURCES || 'smarkets,moviodds_bet365' }}
       ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
       BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
@@ -53,6 +52,7 @@ jobs:
       - name: Find value bets
         if: github.event.schedule != '0 7 * * 0'
         run: |
+          export CV_SNAPSHOTS="$RUNNER_TEMP/snapshots"
           timeout 600 python -m value_bets.pipeline | tee value_bets_run.log
           {
             echo '### Value bets'
