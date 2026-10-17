@@ -53,6 +53,17 @@ artifact `odds-snapshots-<run_id>` and kept 30 days, which keeps `main` small. C
 * **No ball-level data is stored.** Only per-player match totals are kept, so there is no batting position and no batter-vs-bowler matchup.
 * Fair p = 0.45·model + 0.55·market (0.35/0.65 for top markets). A bet needs edge ≥ 5 % and model/market within 0.15 (0.9 logit).
   Stake = quarter Kelly, capped at 2 %.
+* **Sanity guards** (after all other filters): a bet is never alerted if the model on its own says it is not value
+  (model p below 1 / odds after commission), so an edge can't come purely from the market-blend input. Edges above
+  `MAX_EDGE` (30 %) are not alerted either; they are listed under `suspect_not_alerted` in `value_bets_latest.json` and under
+  "Suspect edges" in the markdown, because on these markets an edge that size is almost always a pricing or mapping error.
+* **Multi-day milestones:** "to score a Fifty/Hundred in the match" (Yes/No) is settled on a single innings, while the
+  "Batter Milestones" ladder and "Batsman Match Runs" O/U use the player's match aggregate (both innings). The history stores one
+  row per player per match, so in Tests the single-innings markets are re-typed `batter_innings_milestone`, kept apart from the
+  ladder and not modelled or alerted. In T20/ODI (one innings) they are the same market and are combined.
+* **Team top batter/bowler:** a bookmaker's team market is kept whole even when some names don't match the history (the team is
+  taken from the rest of the market), and a bookmaker market whose implied probabilities sum to under 100 % (runners missing) is not
+  de-vigged, since that would inflate every price.
 
 ## Weather (Open-Meteo, free, no key)
 * **Live:** for each event with a known venue, `weather.py` pulls the Open-Meteo forecast for the match window (4 h T20, 8 h ODI).
