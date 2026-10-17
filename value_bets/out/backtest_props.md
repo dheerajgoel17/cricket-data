@@ -1,4 +1,4 @@
-# Prop model backtest (2026-10-17 09:45 IST)
+# Prop model backtest (2026-10-17 13:34 IST)
 
 Data through 2026-10-14. Test = 2025-01-01..2026-10-14 (held out). Feature selection on validation 2023-01-01..2024-12-31. Eval rows: player n_eff in format >= 3.0.
 
@@ -18,3 +18,18 @@ Mean over fixed lines (runs 9.5/19.5/29.5/49.5/99.5, sixes 0.5/1.5/2.5, fours 1.
 | wkts/T20 | 34844 | 0.5237 | 0.5154 | 0.5136 | 0.5137 | 0.1738 | 0.1705 | oppstr_wkts, p_bowl, intl |
 | wkts/ODI | 7907 | 0.5567 | 0.5524 | 0.5478 | 0.5491 | 0.1873 | 0.1847 | p_bowl |
 | wkts/MULTI | 5270 | 0.5641 | 0.5508 | 0.5410 | 0.5409 | 0.1913 | 0.1816 | p_bowl, oppstr_wkts, ven_wkts, env_wkts |
+
+## Weather (Open-Meteo) — rows with match-day weather, train 2021-22 / validate 2023-24 / test 2025+
+
+| stat/format | n test | no weather LL | + selected weather LL | all weather LL | no-wx Brier | +wx Brier | selected on validation | adopted |
+|---|---|---|---|---|---|---|---|---|
+| runs/T20 | 43113 | 0.3875 | 0.3875 | 0.3874 | 0.1282 | 0.1282 | - | no |
+| runs/ODI | 11007 | 0.4779 | 0.4779 | 0.4777 | 0.1610 | 0.1610 | - | no |
+| sixes/T20 | 43113 | 0.3728 | 0.3728 | 0.3727 | 0.1191 | 0.1191 | - | no |
+| sixes/ODI | 11007 | 0.3192 | 0.3192 | 0.3193 | 0.0976 | 0.0976 | - | no |
+| fours/T20 | 43113 | 0.4819 | 0.4820 | 0.4818 | 0.1595 | 0.1595 | wx_rain | no |
+| fours/ODI | 11007 | 0.5830 | 0.5830 | 0.5828 | 0.2015 | 0.2015 | - | no |
+| wkts/T20 | 32455 | 0.5128 | 0.5128 | 0.5128 | 0.1702 | 0.1702 | - | no |
+| wkts/ODI | 7323 | 0.5483 | 0.5483 | 0.5487 | 0.1844 | 0.1844 | - | no |
+
+A weather term is adopted only if it improves validation log-loss by >= SELECT_GAIN and does not worsen the held-out test; otherwise the live model has no weather terms (weather is still shown in the 'why' line and drives the rain-risk flag).

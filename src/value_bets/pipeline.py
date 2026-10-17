@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import config, history, store
+from . import config, history, store, weather
 from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
@@ -364,6 +364,34 @@ def run():
                                  "group_logit_offset_removed": round(off, 3)}
     # O/U and milestones: context NB-GLM (value_bets.propmodel), conditional on batting/bowling for O/U
     feat_cache = {}
+    wx_geo = weather.load_geo()
+    n_wx = [0, 0]
+
+    def event_weather(c):
+        """Open-Meteo forecast for the event venue at its start (cached per event); None if venue unknown."""
+        if "wx" in c:
+            return c["wx"]
+        c["wx"] = None
+        if not c.get("venue") or not c.get("start") or not config.get("WEATHER"):
+            return None
+        try:
+            vk = weather.wx_key(c["venue"])
+            ll = wx_geo.get(vk)
+            if not ll:
+                hints = set().union(*[weather.TEAM_CC.get(str(t).lower().replace(" women", ""), set())
+                                      for t in (c.get("canon_teams") or [])])
+                _, ll, _ = weather.geocode(c["venue"], hints or None)
+                wx_geo[vk] = ll
+            if ll:
+                hours = {"T20": 4, "ODI": 8}.get(c["fmt"], 8)
+                daily, window = weather.forecast(ll, c["start"], hours=hours)
+                c["wx"] = {"features": weather.features(daily) or {}, "daily": daily, "window": window,
+                           "latlon": [round(ll[0], 3), round(ll[1], 3)]}
+                n_wx[0] += 1
+        except Exception as e:
+            n_wx[1] += 1
+            log(f"weather failed for {c['key']}: {e}")
+        return c["wx"]
 
     def player_ctx(r):
         c = clusters[r["event_key"]]
@@ -377,6 +405,9 @@ def run():
         if ck not in feat_cache:
             f = PE.features(stat, r["player_id"], team, opp, vk, c["fmt"], c["gender"])
             f["gender"] = c["gender"]
+            wx = event_weather(c)
+            for k_ in weather.WX_FEATURES:
+                f[k_] = (wx or {}).get("features", {}).get(k_, 0.0)
             feat_cache[ck] = f
         return {"stat": stat, "f": feat_cache[ck], "team": team, "opp": opp, "vk": vk, "c": c}
 
@@ -427,6 +458,7 @@ def run():
         r["p_src"] = float(play * pm_p_over(PE, stat, r["fmt"], mu_m, r["line"]))
         r["p_src_from"] = f"anchored on {r['source']} O/U {L0} (de-vigged {p0:.3f})"
         n_anch += 1
+    log(f"weather: forecasts for {n_wx[0]} events, {n_wx[1]} failed")
     log(f"prop model: {len(why_ctx)} prop selections modelled, {n_anch} milestone ladder prices anchored to O/U")
 
     # ---- value search
@@ -528,12 +560,25 @@ def run():
             conf = "low"
             if pm is not None and pc is not None and n_src >= 2:
                 conf = "medium"
+            wx_ = c.get("wx") if "wx" in c else event_weather(c)
+            wx_out, rain_risk = None, None
+            if wx_:
+                w_ = wx_["window"]
+                wx_out = {"rain_prob_max_pct": w_.get("rain_prob_max"), "rain_mm_in_window": w_.get("rain_mm"),
+                          "humidity_pct": w_.get("humidity_mean"), "cloud_pct": w_.get("cloud_mean"),
+                          "source": "Open-Meteo forecast"}
+                rain_risk = bool((w_.get("rain_prob_max") or 0) >= config.get("RAIN_PROB_WARN") or
+                                 (w_.get("rain_mm") or 0) >= config.get("RAIN_MM_WARN"))
+                if rain_risk:
+                    notes.append(f"RAIN RISK: up to {w_.get('rain_prob_max')}% rain chance, {w_.get('rain_mm')} mm forecast "
+                                 "during the match - shortened match or void props possible")
             why = ""
             if k in why_ctx and pm is not None:
                 w_ = why_ctx[k]
                 try:
-                    why = PE.why(w_["stat"], c["fmt"], c["gender"], w_["f"], r0["player_id"], w_["opp"], c["venue"],
-                                 w_["vk"], x["line"], x["side"], pm, pc, milestone=mt in MS_MKTS)
+                    wctx = why_ctx[k]
+                    why = PE.why(wctx["stat"], c["fmt"], c["gender"], wctx["f"], r0["player_id"], wctx["opp"], c["venue"],
+                                 wctx["vk"], x["line"], x["side"], pm, pc, milestone=mt in MS_MKTS, wx=wx_)
                 except Exception as e_:
                     why = f"(why unavailable: {e_})"
             elif mt in TOP_MKTS and pm is not None:
@@ -555,6 +600,7 @@ def run():
                 "edge": round(e, 4), "edge_pct": round(100 * e, 2),
                 "kelly_quarter_stake_pct": round(kelly_pct(pf, o, x["source"]), 2),
                 "confidence": conf, "why": why, "notes": "; ".join(notes), "model_detail": mi,
+                "rain_risk": rain_risk, "weather": wx_out,
             })
     # keep best price per selection
     best = {}
