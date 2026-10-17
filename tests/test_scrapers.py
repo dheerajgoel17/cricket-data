@@ -145,6 +145,11 @@ def espn_match_list_json():
                 "start_date_raw": "2026-10-09T14:00:00.000Z",
                 "match_status": "Live",  # Should be excluded
             },
+            {
+                "object_id": 12340,
+                "start_date_raw": "2026-09-20T10:00:00.000Z",
+                "match_status": "Complete",  # Older than the 7-day window: excluded
+            },
         ]
     }
 
@@ -184,10 +189,19 @@ def test_espn_scraper_parse_match(espn_match_json):
     assert bumrah.runs_conceded == 25
 
 
+class _FrozenDate(date):
+    """`date` with a fixed today(), so the fixture's dates stay inside the scraper's window."""
+
+    @classmethod
+    def today(cls):
+        return cls(2026, 10, 10)
+
+
 def test_espn_scraper_recent_match_ids(espn_match_list_json):
     scraper = ESPNcricinfoScraper()
-    
-    with patch.object(scraper.fetcher, "get") as mock_get:
+
+    with patch.object(scraper.fetcher, "get") as mock_get, \
+            patch("cricket_data.scrapers.date", _FrozenDate):
         mock_get.return_value = json.dumps(espn_match_list_json)
         
         match_ids = scraper.fetch_recent_match_ids(days=7)
@@ -196,6 +210,7 @@ def test_espn_scraper_recent_match_ids(espn_match_list_json):
         assert "12345" in match_ids
         assert "12346" in match_ids
         assert "12347" not in match_ids  # Live match excluded
+        assert "12340" not in match_ids  # outside the window
 
 
 def test_espn_scraper_fetch_match(espn_match_json):
