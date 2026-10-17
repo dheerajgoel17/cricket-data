@@ -28,11 +28,18 @@ def download(dataset: str, retries: int = 3, backoff: float = 30.0) -> Path:
         try:
             req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as out:
+                ctype = r.headers.get("Content-Type", "?")
                 while chunk := r.read(1 << 20):
                     out.write(chunk)
-            with zipfile.ZipFile(tmp) as z:
-                if z.testzip() is not None:
-                    raise zipfile.BadZipFile("corrupt member")
+            try:
+                with zipfile.ZipFile(tmp) as z:
+                    if z.testzip() is not None:
+                        raise zipfile.BadZipFile("corrupt member")
+            except zipfile.BadZipFile as exc:  # say what came back instead, so the failure is diagnosable
+                head = Path(tmp).read_bytes()[:120]
+                raise zipfile.BadZipFile(
+                    f"{exc} (got {Path(tmp).stat().st_size} bytes, Content-Type {ctype}, starts {head!r})"
+                ) from exc
             return Path(tmp)
         except Exception as exc:  # network, HTTP, bad zip: retry
             last = exc

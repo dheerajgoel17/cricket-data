@@ -82,6 +82,12 @@ jobs:
             echo "has_failures=true" >> $GITHUB_OUTPUT
             exit 0
           fi
+          # `cricket-data update` itself crashed (its exit code is hidden by `| tee` + continue-on-error)
+          if [ "${{ steps.scrape.outputs.exit_code }}" != "0" ]; then
+            echo "crashed=true" >> $GITHUB_OUTPUT
+            echo "has_failures=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           if [ -f data/scraper_run_report.json ]; then
             # Extract failure information
             FAILED_SOURCES=$(python3 -c "
@@ -138,8 +144,13 @@ jobs:
           import json
           import os
           
-          with open('data/scraper_run_report.json') as f:
-              report = json.load(f)
+          try:
+              with open('data/scraper_run_report.json') as f:
+                  report = json.load(f)
+          except FileNotFoundError:  # the update crashed before writing its report
+              report = {'started_at': 'unknown', 'sources_attempted': [], 'sources_succeeded': [],
+                        'sources_failed': ['cricket-data update (crashed)'], 'failures': [],
+                        'matches_scraped': 0, 'conflicts_resolved': 0}
           
           run_url = f"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           

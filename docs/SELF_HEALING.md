@@ -39,3 +39,13 @@ evasion, no skipping or deleting tests to get green.
 Free options: run this playbook from an agent on a schedule (the paused
 "cricket-data scraper auto-repair" routine) pointed at open `scraper-broken` issues. The
 repository itself needs no API key or paid service for any of the steps above.
+
+## What is and isn't automatic (audit 2026-10-17)
+
+* Detection is automatic. If the health check fails, a source fails, or `cricket-data update` crashes, a `scraper-broken`
+  issue is opened. Crash detection is new: the update's exit code used to be hidden by `| tee` with `continue-on-error`.
+  A failed weekly re-sync now opens a `heal-failed` issue; before this it failed silently.
+* Repair is **not** automatic unless something writes the fix. Steps 1-5 need a person or an agent to open a
+  `scraper-fix` PR. As of this audit no `scraper-fix` PR has ever been opened, because the auto-repair routine is paused.
+* Auto-merge only happens when CI is green. A red `main` (for example a date-dependent test) blocks every repair PR, so
+  keep tests deterministic (freeze `date.today()` rather than hard-coding a date that "is recent").
