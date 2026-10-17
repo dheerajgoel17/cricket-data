@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-17 17:11 IST
+# Cricket value bets - 2026-10-17 17:29 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1569 prices
-- **smarkets**: ok, 521 prices
+- **moviodds_bet365**: ok, 1571 prices
+- **smarkets**: ok, 529 prices
 
-Matches starting in next 24h: **15**, markets priced: **162**, value bets: **12** (new alerts: 0). Min edge 5%.
+Matches starting in next 24h: **17**, markets priced: **162**, value bets: **12** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -37,6 +37,6 @@ Matches starting in next 24h: **15**, markets priced: **162**, value bets: **12*
 - **Australia (W) vs New Zealand (W) / Batter Total Match Fours / I Sharp under 1.5** - why: Model 56% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 8, 4, 0, 0), bats in 85% of games played; context adj: venue environment +14%, team H2H context -12%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.557 vs market 0.423; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / GE Plimmer over 0.5** - why: Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%; weather: high humidity 76%. Notes: 1 market source(s) for fair price; model 0.217 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Hayleys Group A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Slc Emerging (male), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
 
-Runtime 23.1s. Snapshot: `odds_20261017T114147Z.jsonl.gz`
+Runtime 25.0s. Snapshot: `odds_20261017T115923Z.jsonl.gz`
