@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-17 19:25 IST
+# Cricket value bets - 2026-10-17 20:26 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1603 prices
-- **smarkets**: ok, 535 prices
+- **moviodds_bet365**: ok, 1290 prices
+- **smarkets**: ok, 496 prices
 
-Matches starting in next 24h: **19**, markets priced: **157**, value bets: **9** (new alerts: 3). Min edge 5%.
+Matches starting in next 24h: **20**, markets priced: **157**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -31,6 +31,6 @@ Matches starting in next 24h: **19**, markets priced: **157**, value bets: **9**
 - **India (W) vs Zimbabwe (W) / Bowler Milestones / M Mavunga 2+ yes** - why: Model 19% vs market 12% for 2+ wkts; form 0.7 wkts/spell recency-weighted T20 (n_eff 12.1; last 5: 0, 0, 3, 0, 0), bowls in 91% of games, 3.0 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%. Notes: 1 market source(s) for fair price; model 0.193 vs market 0.124; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.136); price via unofficial bet365 mirror - confirm on bet365 before betting
 - **India (W) vs Zimbabwe (W) / Bowler Milestones / F Chipare 2+ yes** - why: Model 17% vs market 11% for 2+ wkts; form 0.6 wkts/spell recency-weighted T20 (n_eff 13.6; last 5: 0, 0, 1, 2, 0), bowls in 90% of games, 3.5 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%. Notes: 1 market source(s) for fair price; model 0.167 vs market 0.108; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.119); price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Colombo Aces (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), East Bay Blazers (male), Eastern Storm (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Slc Emerging (male), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
+Unmatched team names (add to mappings/teams.csv): Atlanta Fire (W) (female), Atlanta Fire (male), Atlanta Lightning (male), BBK Partnership (male), Colombo Aces (male), Diasqua Little Sai Wan Cricket Club (male), East Bay Blazers (male), Eastern Storm (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Rangers (male), Seattle Thunders (W) (female), Slc Emerging (male), Southern Strikers (W) (female), Tuskers (male), United Services Recreation Club (male)
 
-Runtime 37.5s. Snapshot: `odds_20261017T135513Z.jsonl.gz`
+Runtime 28.4s. Snapshot: `odds_20261017T145607Z.jsonl.gz`
