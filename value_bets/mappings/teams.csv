@@ -1,0 +1,8 @@
+# raw source name (case-insensitive), canonical cricket-data team name
+# Add lines when a team is listed under unmatched_teams in out/value_bets_latest.json.
+# Only map to names that exist in cricket-data (check data/matches).
+Queensland Bulls,Queensland
+Mpumalanga Rhinos,Mpumalanga
+North West Dragons,North West
+USA,United States of America
+UAE,United Arab Emirates

@@ -10,3 +10,10 @@ __pycache__/
 diagnostics/
 data/scraper_run_report.json
 data/state/last_backfill.json
+
+# value-bet pipeline: only small outputs + dedupe state are committed (see docs/VALUE_BETS.md)
+value_bets/out/snapshots/
+value_bets/out/last_error.txt
+value_bets/state/*.pkl
+value_bets/state/data_last_pull
+value_bets/logs/

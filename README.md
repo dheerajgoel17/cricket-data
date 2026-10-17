@@ -31,3 +31,6 @@ This project is free and ad-free. If it's useful to you, you can support it:
 </p>
 
 Questions: dheerajgoeldsuperdude@gmail.com
+
+## Value bets (optional)
+An hourly player-prop value-bet finder runs on top of this dataset: see [docs/VALUE_BETS.md](docs/VALUE_BETS.md).

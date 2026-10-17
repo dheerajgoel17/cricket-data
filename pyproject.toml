@@ -14,6 +14,8 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5"]
+# value-bet pipeline (src/value_bets, docs/VALUE_BETS.md); the dataset itself stays dependency-free
+value-bets = ["numpy>=1.26", "pandas>=2.1", "scipy>=1.11", "rapidfuzz>=3.5"]
 
 [project.scripts]
 cricket-data = "cricket_data.cli:main"
@@ -31,3 +33,7 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# value-bet pipeline: compact numeric code; closures are called immediately inside their loop
+"src/value_bets/**" = ["E702", "B007", "B023"]
