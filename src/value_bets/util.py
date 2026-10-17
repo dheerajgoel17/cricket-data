@@ -1,5 +1,6 @@
 import datetime as dt
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -27,11 +28,9 @@ def parse_ts(s):
     if len(s) >= 3 and (s[-3] in "+-") and s[-3:].lstrip("+-").isdigit():  # '+00'
         s = s + ":00"
     # trim nanoseconds
-    if "." in s:
-        head, tail = s.split(".", 1)
-        frac = "".join(ch for ch in tail if ch.isdigit())
-        rest = tail[len(frac):]
-        s = head + "." + frac[:6] + rest
+    m = re.match(r"^(.*?T\d{2}:\d{2}:\d{2})\.(\d+)(.*)$", s)
+    if m:  # exactly 6 fractional digits (Python 3.10's fromisoformat is strict), keep the offset
+        s = m.group(1) + "." + m.group(2)[:6].ljust(6, "0") + m.group(3)
     d = dt.datetime.fromisoformat(s)
     return d if d.tzinfo else d.replace(tzinfo=UTC)
 
