@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-17T17:57:08Z",
- "generated_at_ist": "2026-10-17 23:27 IST",
- "runtime_secs": 22.6,
+ "generated_at_utc": "2026-10-17T18:39:56Z",
+ "generated_at_ist": "2026-10-18 00:09 IST",
+ "runtime_secs": 29.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "a134d583b1"
+  "commit": "f447e1febd"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1312,
-   "secs": 0.4
+   "secs": 1.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 491,
-   "secs": 2.2
+   "rows": 504,
+   "secs": 2.4
   }
  },
- "snapshot": "odds_20261017T175708Z.jsonl.gz",
+ "snapshot": "odds_20261017T183956Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,8 +65,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 22,
-  "rows_in_window": 1579,
+  "events_in_window": 21,
+  "rows_in_window": 1575,
   "selections_with_model": 1017,
   "selections_with_market_fair": 1018,
   "markets_in_window": 185,
@@ -163,16 +163,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|atlanta fire|atlanta lightning|2026-10-17",
-   "start_ist": "2026-10-17 23:45 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|Hobart Hurricanes|Melbourne Renegades|2026-10-17",
    "start_ist": "2026-10-18 04:30 IST",
@@ -906,7 +896,6 @@
   "Colombo Aces (male)",
   "Diasqua Little Sai Wan Cricket Club (male)",
   "Dolphins (W) (female)",
-  "East Bay Blazers (male)",
   "Eastern Storm (male)",
   "Fairfirst Insurance (male)",
   "Hayleys Group A (male)",
@@ -917,7 +906,6 @@
   "Northern Cape (male)",
   "Northern Cape Heat (male)",
   "Pakistan Association of Hong Kong (male)",
-  "Prime Raider Gladiators (male)",
   "Slc Emerging (male)",
   "Southern Strikers (W) (female)",
   "Tuskers (W) (female)",
@@ -1171,14 +1159,14 @@
   }
  },
  "log": [
-  "[23:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[23:27 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[23:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1312, 'secs': 0.4}",
-  "[23:27 IST] source smarkets: {'status': 'ok', 'rows': 491, 'secs': 2.2}",
-  "[23:27 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[23:27 IST] 43 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[23:27 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[23:27 IST] weather: forecasts for 1 events, 0 failed",
-  "[23:27 IST] prop model: 717 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[00:09 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[00:10 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[00:10 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1312, 'secs': 1.5}",
+  "[00:10 IST] source smarkets: {'status': 'ok', 'rows': 504, 'secs': 2.4}",
+  "[00:10 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[00:10 IST] 43 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[00:10 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[00:10 IST] weather: forecasts for 1 events, 0 failed",
+  "[00:10 IST] prop model: 717 prop selections modelled, 331 milestone ladder prices anchored to O/U"
  ]
 }
