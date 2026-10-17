@@ -1,0 +1,84 @@
+name: Value bets
+
+# Hourly 03:30-17:30 UTC (09:00-23:00 IST): pull free odds (Smarkets, bet365 via MoviOdds), price player props
+# against the cricket-data history and commit ONLY the small outputs under value_bets/out + dedupe state.
+# Independent of the data workflows (own concurrency group, touches no files under data/).
+# Weekly (Sun 07:00 UTC) or on demand with refit=true: re-run the prop backtest and refit state/prop_model.json.
+on:
+  schedule:
+    - cron: "30 3-17 * * *"
+    - cron: "0 7 * * 0"
+  pull_request:  # dry run on PRs that touch the pipeline (proves the sources work from GitHub's runners; never commits)
+    paths: ["src/value_bets/**", "value_bets/**", ".github/workflows/value-bets.yml"]
+  workflow_dispatch:
+    inputs:
+      refit:
+        description: "Re-run the prop backtest and refit the model (~4 min)"
+        type: boolean
+        default: false
+      commit:
+        description: "Commit outputs (turn off for a dry run on a branch)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: value-bets
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CV_SOURCES: ${{ vars.CV_SOURCES || 'smarkets,moviodds_bet365' }}
+      ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
+      BETFAIR_USERNAME: ${{ secrets.BETFAIR_USERNAME }}
+      BETFAIR_PASSWORD: ${{ secrets.BETFAIR_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Refit prop model (weekly / on demand)
+        if: github.event.schedule == '0 7 * * 0' || inputs.refit
+        run: python -m value_bets.backtest
+      - name: Find value bets
+        if: github.event.schedule != '0 7 * * 0'
+        run: |
+          export CV_SNAPSHOTS="$RUNNER_TEMP/snapshots"
+          timeout 600 python -m value_bets.pipeline | tee value_bets_run.log
+          {
+            echo '### Value bets'
+            cat value_bets/out/value_bets_latest.md
+          } >> "$GITHUB_STEP_SUMMARY"
+          test ! -f value_bets/out/last_error.txt || { echo "::warning::pipeline error, see value_bets_run.log"; }
+      - name: Commit outputs
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A value_bets/out value_bets/state  # .gitignore keeps caches/snapshots out
+          if git diff --cached --quiet; then echo "No changes."; exit 0; fi
+          git commit -q -m "value-bets: $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase -q && git push -q && exit 0
+            sleep $((i * 10))
+          done
+          echo "::error::push failed after retries"; exit 1
+      - name: Upload odds snapshots (rotated by artifact retention, not committed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: odds-snapshots-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/snapshots/
+            value_bets_run.log
+          retention-days: 30
+          if-no-files-found: ignore

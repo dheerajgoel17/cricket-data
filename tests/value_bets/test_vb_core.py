@@ -1,0 +1,110 @@
+import json
+
+import pytest
+
+from value_bets import config, store
+from value_bets.adapters import betfair, moviodds, oddsapi, smarkets
+from value_bets.names import PlayerResolver, TeamResolver, norm_team
+from value_bets.pricing import devig, edge, effective_odds, exchange_mid, kelly_pct
+from value_bets.util import ist, parse_ts
+
+
+def test_devig_two_way_and_power():
+    p = devig([1.83, 1.83])
+    assert abs(sum(p) - 1) < 1e-9 and abs(p[0] - 0.5) < 1e-9
+    q = devig([2.0, 4.0, 6.0, 15.0, 30.0])
+    assert abs(sum(q) - 1) < 1e-6
+    raw = [1 / o for o in (2.0, 4.0, 6.0, 15.0, 30.0)]
+    # power method takes proportionally more margin off longshots
+    assert q[-1] / (raw[-1] / sum(raw)) < q[0] / (raw[0] / sum(raw))
+
+
+def test_edge_kelly_commission():
+    assert abs(edge(0.5, 2.2, "moviodds_bet365") - 0.1) < 1e-9
+    assert effective_odds(3.0, "smarkets") == pytest.approx(1 + 2 * 0.98)
+    assert kelly_pct(0.4, 2.0, "x") == 0.0
+    k = kelly_pct(0.55, 2.0, "x")
+    assert 0 < k <= config.get("MAX_STAKE_PCT")
+    assert exchange_mid(2.0, 2.04) == pytest.approx((0.5 + 1 / 2.04) / 2)
+    assert exchange_mid(2.0, 4.0) is None  # spread too wide
+
+
+def test_parse_ts_variants():
+    assert ist(parse_ts("2026-10-17T13:30:00Z")) == "2026-10-17 19:00 IST"
+    assert ist(parse_ts("2026-10-17 13:30:00+00")) == "2026-10-17 19:00 IST"
+    assert ist(parse_ts("2026-10-17T03:38:15.875591596Z"))[:10] == "2026-10-17"
+
+
+def test_team_resolver():
+    t = TeamResolver({"male": {"India": 100, "Queensland": 50, "West Indies": 90},
+                      "female": {"Australia": 40, "New Zealand": 40}})
+    assert t.resolve("India T20", "male") == "India"
+    assert t.resolve("Queensland Bulls", "male") == "Queensland"
+    assert norm_team("Australia (W)") == ("australia", "female")
+    assert t.resolve("New Zealand Women", "female") == "New Zealand"
+    assert t.resolve("Afghanistan", "male") is None
+
+
+def test_player_resolver():
+    ros = {"India": [("Ishan Kishan", "a1", "2026-10-11", 30), ("Kuldeep Yadav", "a2", "2026-10-11", 40),
+                     ("MP Yadav", "a3", "2026-10-11", 10), ("Prince Yadav", "a4", "2026-10-11", 5)],
+           "West Indies": [("SD Hope", "b1", "2026-10-11", 60)]}
+    p = PlayerResolver(ros)
+    assert p.resolve("IPKP Kishan", ["India", "West Indies"])["player_id"] == "a1"
+    assert p.resolve("Shai Hope", ["India", "West Indies"])["player_id"] == "b1"
+    assert p.resolve("Kuldeep Singh Yadav", ["India"])["player_id"] == "a2"
+    assert p.resolve("Mayank Yadav", ["India"])["player_id"] == "a3"
+    assert p.resolve("Nobody Atall", ["India"]) is None
+
+
+def test_optional_adapters_noop(monkeypatch):
+    for k in ("ODDS_API_KEY", "BETFAIR_APP_KEY", "BETFAIR_USERNAME", "BETFAIR_PASSWORD"):
+        monkeypatch.delenv(k, raising=False)
+    with pytest.raises(oddsapi.Skip):
+        oddsapi.fetch("t")
+    with pytest.raises(betfair.Skip):
+        betfair.fetch("t")
+
+
+def test_oddsapi_budget_guard(monkeypatch, tmp_path):
+    monkeypatch.setenv("ODDS_API_KEY", "dummy")
+    st = tmp_path / "u.json"
+    from value_bets.util import iso, now_utc
+    st.write_text(json.dumps({"month": now_utc().strftime("%Y-%m"), "credits": 3, "last_call": iso(now_utc())}))
+    monkeypatch.setattr(oddsapi, "STATE", st)
+    with pytest.raises(oddsapi.Skip):  # called within the min interval -> no network, no credits spent
+        oddsapi.fetch("t")
+
+
+def test_smarkets_classifier():
+    assert smarkets.classify("Winner") == ("match_winner", None)
+    assert smarkets.classify("India top batsman") == ("top_batter_team", "India")
+    assert smarkets.classify("Team with Top Batsman") == (None, None)
+    assert smarkets.classify("India top batsman - Innings 1") == (None, None)
+
+
+def test_moviodds_parse(monkeypatch):
+    sample = {"matches": [{"id": "1", "home": "India", "away": "West Indies", "league": "x T20", "in_play": False,
+                           "kickoff_utc": "2026-10-17T13:30:00Z", "quotes": [
+        {"group_name": "To Win the Match", "label": "India", "odds_dec": 1.33, "market_id": "1246"},
+        {"group_name": "Batsman Match Runs", "side": "Over", "line": "SV Samson", "handicap": "27.5",
+         "label": "27.5", "n2": "India", "odds_dec": 1.8333, "market_id": "300331"},
+        {"group_name": "Player of the Match", "label": "X", "odds_dec": 9.0, "market_id": "346"}]}]}
+    monkeypatch.setattr(moviodds, "http_json", lambda *a, **k: (sample, {}))
+    rows, _ = moviodds.fetch("t")
+    assert len(rows) == 2
+    r = rows[1]
+    assert r["market_type"] == "batter_runs" and r["line"] == 27.5 and r["side"] == "over"
+    assert r["start_ist"] == "2026-10-17 19:00 IST"
+
+
+def test_alert_dedupe(monkeypatch, tmp_path):
+    monkeypatch.setattr(store, "ALERTS", tmp_path / "alerted.json")
+    monkeypatch.setattr(config, "OUT", tmp_path)
+    v = {"event_key": "e", "market_type": "match_winner", "team_scope": "", "selection": "India", "line": None,
+         "side": None, "edge": 0.06, "start_utc": "2999-01-01T00:00:00Z"}
+    assert len(store.new_alerts([v])) == 1
+    assert len(store.new_alerts([v])) == 0                      # same bet: no repeat
+    assert len(store.new_alerts([{**v, "edge": 0.08}])) == 0    # +2pp: below re-alert delta
+    out = store.new_alerts([{**v, "edge": 0.095}])               # +3.5pp vs last alert
+    assert len(out) == 1 and out[0]["realert"]
