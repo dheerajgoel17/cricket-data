@@ -4,7 +4,7 @@ from ..util import decimal_ok, iso, ist, parse_ts
 
 FIELDS = ["source", "source_type", "event_id", "match", "team_a", "team_b", "gender_hint", "competition",
           "start_utc", "start_ist", "in_play", "market_type", "market_raw", "group_key", "selection",
-          "player", "team", "line", "side", "back", "lay", "back_size", "liquidity", "fetched_at", "venue"]
+          "player", "team", "line", "side", "back", "lay", "back_size", "liquidity", "fetched_at", "venue", "ms_scope"]
 
 
 def row(**kw):

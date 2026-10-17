@@ -18,7 +18,10 @@ MAP = {
     "Batsman Total Match Sixes": "batter_sixes",
     "Bowler Total Match Wickets": "bowler_wickets",
     "Batter Total Match Fours": "batter_fours",
-    # milestones: two-way Yes/No (de-viggable) and one-sided ladders (priced off the player's O/U market)
+    # milestones: two-way Yes/No (de-viggable) and one-sided ladders (priced off the player's O/U market).
+    # NB they are DIFFERENT markets in multi-day games: "to score a Fifty/Hundred in the match" is settled on a single
+    # innings (50+ in either innings), the "Batter Milestones" ladder on the player's match aggregate (both innings,
+    # same basis as "Batsman Match Runs"). Rows carry ms_scope = "innings" | "match" so the pipeline can split them.
     "Batsman to Score a Fifty in the Match": "batter_milestone",
     "Batsman to score a Hundred in the match": "batter_milestone",
     "Batter Milestones": "batter_milestone",
@@ -38,7 +41,7 @@ def fetch(fetched_at):
             mt = MAP.get((q.get("group_name") or "").strip())
             if not mt:
                 continue
-            player = team = line = side = None
+            player = team = line = side = ms_scope = None
             if mt == "match_winner":
                 sel = q.get("label")
                 team = sel
@@ -54,11 +57,13 @@ def fetch(fetched_at):
                     if raw_side.lower() not in ("yes", "no"):
                         continue
                     line, side = YESNO_LINE[g], ("over" if raw_side.lower() == "yes" else "under")
+                    ms_scope = "innings"
                 else:
                     mm = LADDER_RE.match(raw_side)
                     if not mm:
                         continue
                     line, side = int(mm.group(1)) - 0.5, "over"
+                    ms_scope = "match"
                 sel = f"{player} {int(line + 0.5)}+ {'yes' if side == 'over' else 'no'}"
             else:
                 player = q.get("line")
@@ -77,5 +82,5 @@ def fetch(fetched_at):
                             competition=m.get("league"), start_utc=m.get("kickoff_utc"), in_play=bool(m.get("in_play")),
                             market_type=mt, market_raw=q.get("group_name"), group_key=gk, selection=sel,
                             player=player, team=team, line=line, side=side, back=q.get("odds_dec"),
-                            fetched_at=fetched_at))
+                            fetched_at=fetched_at, ms_scope=ms_scope))
     return rows, d

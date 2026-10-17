@@ -57,6 +57,7 @@ DEFAULTS = {
     "RAIN_PROB_WARN": 50,          # rain-risk flag if max hourly precipitation probability in the match window >= this
     "RAIN_MM_WARN": 2.0,           # ... or forecast rain in the window >= this many mm
     "MAX_ODDS_MILESTONE": 10.0,
+    "MAX_EDGE": 0.30,              # edges above this are flagged 'suspect' (likely mapping/pricing error), never alerted
 }
 
 def get(key):

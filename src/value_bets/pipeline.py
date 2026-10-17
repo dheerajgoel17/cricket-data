@@ -32,6 +32,63 @@ TOP_MKTS = ("top_batter_team", "top_bowler_team", "top_batter_match", "top_bowle
 OU_MKTS = {"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wkts"}
 MS_MKTS = {"batter_milestone": "runs", "bowler_milestone": "wkts"}
 PLAYER_STAT_MKTS = {**OU_MKTS, **MS_MKTS}
+# Single-innings milestones in multi-day games ("to score a Hundred in the match" = 100+ in ONE innings). The history
+# has one row per player per match (both innings summed), so these cannot be modelled and must never be merged with
+# the match-aggregate ladder / O/U markets. Kept out of PLAYER_STAT_MKTS: no model, no market blend, never alerted.
+INNINGS_MS_MKT = "batter_innings_milestone"
+SINGLE_INNINGS_FMTS = ("T20", "ODI")  # one innings per side: innings milestone == match milestone
+
+
+def split_innings_milestones(rows):
+    """Re-type Yes/No 'in the match' milestones of multi-day (or unknown-format) games so they get their own
+    selection key instead of colliding with the aggregate-runs ladder rung of the same number. Returns count."""
+    n = 0
+    for r in rows:
+        if r.get("market_type") == "batter_milestone" and r.get("ms_scope") == "innings" and \
+                r.get("fmt") not in SINGLE_INNINGS_FMTS:
+            r["market_type"] = INNINGS_MS_MKT
+            r["selection"] = f"{r['player']} {int(r['line'] + 0.5)}+ in an innings {'yes' if r['side'] == 'over' else 'no'}"
+            n += 1
+    return n
+
+
+def fill_team_scope(rows):
+    """Team top-batter/bowler: a book's market id is already one team's market (MoviOdds/bet365 rows carry no team),
+    and the team scope is inferred from the resolved players. Players we fail to match to history used to fall into a
+    separate ':?' group, leaving the team group incomplete (implied probs summing < 1), which the de-vig then scaled
+    UP (e.g. H Nawaz @ 6.0 -> 'fair' 21.8%). Put them back into the team the rest of that market resolved to."""
+    by = defaultdict(list)
+    for r in rows:
+        if r.get("market_type") in TEAM_MKTS and r.get("group_key_raw"):
+            by[r["group_key_raw"]].append(r)
+    n = 0
+    for g in by.values():
+        teams = [r["team_scope"] for r in g if r["team_scope"] not in ("?", None)]
+        if len(teams) < 3:
+            continue
+        top = max(set(teams), key=teams.count)
+        if teams.count(top) < 0.8 * len(teams):
+            continue  # market genuinely mixes teams (or resolution is unreliable): leave as is
+        for r in g:
+            if r["team_scope"] in ("?", None):
+                r["team_scope"], r["player_team"] = top, r.get("player_team") or top
+                r["group_key"] = f"{r['group_key_raw']}:{top}"
+                n += 1
+    return n
+
+
+def guard_value(pm, pf, odds, source):
+    """Sanity guard for a candidate value bet. Returns (ok, reason):
+    - 'model_disagrees': the model alone says the offered price is NOT value (model prob below the probability implied
+      by the odds after commission), so any edge comes purely from the market-consensus input -> never alert;
+    - 'suspect_edge': edge above MAX_EDGE - real edges that size on liquid books are almost always a pricing/mapping
+      error (wrong market, wrong line, wrong format), so flag it for a human instead of alerting."""
+    eff = effective_odds(odds, source)
+    if pm is not None and pm < 1 / eff:
+        return False, "model_disagrees"
+    if pf * eff - 1 > config.get("MAX_EDGE"):
+        return False, "suspect_edge"
+    return True, None
 LOG = []
 
 
@@ -122,7 +179,7 @@ def detect_fmt(texts, has_draw, fixture_fmt, last_meeting_fmt):
     t = " ".join(x for x in texts if x).lower()
     if "test" in t or "first class" in t or "shield" in t or "trophy-grade" in t or "ranji" in t:
         return "MULTI", "name"
-    if "t20" in t or "t10" in t or "hundred" in t or "twenty20" in t or "bash" in t or "premier league" in t:
+    if "t20" in t or "t10" in t or "the hundred" in t or "twenty20" in t or "bash" in t or "premier league" in t:
         return "T20", "name"
     if "odi" in t or "one day" in t or "one-day" in t or "50 over" in t or "league 2" in t or "list a" in t:
         return "ODI", "name"
@@ -279,7 +336,15 @@ def run():
             r["player_team"] = scope_team
             if mt in TEAM_MKTS:
                 r["team_scope"] = scope_team or "?"
+                r["group_key_raw"] = r["group_key"]
                 r["group_key"] = f"{r['group_key']}:{r['team_scope']}"
+    n_scope_fix = fill_team_scope(rows)
+    if n_scope_fix:
+        log(f"{n_scope_fix} unmatched players kept in their team top-batter/bowler market (team taken from market)")
+
+    n_inns_ms = split_innings_milestones(rows)
+    if n_inns_ms:
+        log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")
 
     # ---- fair-price signals per source group
     groups = defaultdict(list)
@@ -301,6 +366,8 @@ def run():
         if stype == "bookmaker":
             if any(not x["back"] for x in g):
                 continue
+            if sum(1 / x["back"] for x in g) < 1.0:
+                continue  # incomplete market (runners missing): de-vig would inflate every probability
             ps = devig([x["back"] for x in g])
             for x, p in zip(g, ps, strict=False):
                 x["p_src"] = p
@@ -462,7 +529,7 @@ def run():
     log(f"prop model: {len(why_ctx)} prop selections modelled, {n_anch} milestone ladder prices anchored to O/U")
 
     # ---- value search
-    values, dropped = [], defaultdict(int)
+    values, suspect, dropped = [], [], defaultdict(int)
     diag = defaultdict(list)
     stats = {"events_in_window": 0, "rows_in_window": 0, "selections_with_model": 0, "selections_with_market_fair": 0}
     evs_in_window = set()
@@ -540,6 +607,18 @@ def run():
             if mt in TOP_MKTS and mi.get("p_selected", 1) < config.get("MIN_P_SELECTED"):
                 dropped["rarely_selected"] += 1
                 continue
+            ok, why_bad = guard_value(pm, pf, o, x["source"])
+            if not ok:
+                dropped[why_bad] += 1
+                if why_bad == "suspect_edge":
+                    suspect.append({"match": x["match"], "start_ist": r0["start_ist"], "market_type": mt,
+                                    "market": x["market_raw"], "selection": x["selection"], "odds": round(o, 3),
+                                    "source": x["source"], "fair_prob": round(pf, 4),
+                                    "model_prob": round(pm, 4) if pm is not None else None,
+                                    "market_prob": round(pc, 4) if pc is not None else None,
+                                    "edge_pct": round(100 * e, 2), "fair_basis": basis,
+                                    "market_fair_from": x.get("p_src_from") or [y.get("p_src_from") for y in pool if y.get("p_src_from")] or None})
+                continue
             n_src = len({y["source"] for y in sig})
             notes.append(f"{n_src} market source(s) for fair price")
             if pm is not None and pc is not None:
@@ -613,6 +692,8 @@ def run():
     stats["markets_in_window"] = len(n_priced_markets)
     stats["value_bets"] = len(values)
     stats["dropped_by_filter"] = dict(dropped)
+    stats["suspect_edges"] = len(suspect)
+    stats["innings_milestones_unmodelled"] = n_inns_ms
     calib = {}
     for mt, xs in diag.items():
         import numpy as np
@@ -639,7 +720,7 @@ def run():
         "data": {**data_status, "history_last_match": str(H.last_date.date()), "commit": history.repo_commit()[:10]},
         "sources": src_status, "snapshot": snap, "settings": {k: config.get(k) for k in config.DEFAULTS},
         "stats": stats, "events_in_window": sorted(events_out, key=lambda e: e["start_ist"]),
-        "value_bets": values, "unmatched_teams": unmatched_teams, "unmatched_players_in_window": unmatched_players[:200],
+        "value_bets": values, "suspect_not_alerted": suspect, "unmatched_teams": unmatched_teams, "unmatched_players_in_window": unmatched_players[:200],
         "model_backtest": _prop_backtest_summary(), "log": LOG,
     }
     (config.OUT / "value_bets_latest.json").write_text(json.dumps(result, indent=1, default=str))
@@ -701,6 +782,11 @@ def render_md(res, alerts):
             L.append(f"- **{v['match']} / {v['market']} / {v['selection']}** - why: {v.get('why') or '-'}. Notes: {v['notes']}")
     else:
         L.append("_No value bets passed the filters this run._")
+    if res.get("suspect_not_alerted"):
+        L += ["", f"### Suspect edges (> {100 * res['settings']['MAX_EDGE']:.0f}%, NOT alerted - likely a pricing/mapping error)"]
+        for v in res["suspect_not_alerted"]:
+            L.append(f"- {v['start_ist'][5:]} {v['match']} / {v['market']} / {v['selection']} @ {v['odds']:.2f} ({v['source']}): "
+                     f"edge {v['edge_pct']:.1f}%, model {v['model_prob']}, market {v['market_prob']}")
     if res["unmatched_teams"]:
         L += ["", "Unmatched team names (add to mappings/teams.csv): " + ", ".join(res["unmatched_teams"][:40])]
     L += ["", f"Runtime {res['runtime_secs']}s. Snapshot: `{res['snapshot']}`"]
