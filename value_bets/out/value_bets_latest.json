@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T14:58:40Z",
- "generated_at_ist": "2026-10-18 20:28 IST",
- "runtime_secs": 121.7,
+ "generated_at_utc": "2026-10-18T15:56:13Z",
+ "generated_at_ist": "2026-10-18 21:26 IST",
+ "runtime_secs": 122.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "3b659e14cb"
+  "commit": "0132132522"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 373,
-   "secs": 1.8
+   "rows": 378,
+   "secs": 1.9
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T145840Z.jsonl.gz",
+ "snapshot": "odds_20261018T155613Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -64,8 +64,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 8,
-  "rows_in_window": 99,
+  "events_in_window": 7,
+  "rows_in_window": 95,
   "selections_with_model": 37,
   "selections_with_market_fair": 0,
   "markets_in_window": 4,
@@ -78,19 +78,6 @@
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "male|England|West Indies|2026-10-18",
-   "start_ist": "2026-10-18 21:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "England",
-    "West Indies"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|atlanta fire|prime raider gladiators|2026-10-18",
    "start_ist": "2026-10-18 23:45 IST",
@@ -172,12 +159,16 @@
  "suspect_not_alerted": [],
  "unmatched_teams": [
   "Afghanistan (male)",
+  "Ajman (male)",
   "Atlanta Fire (male)",
   "Challengers (W) (female)",
   "Colombo Aces (male)",
   "Eastern Storm (male)",
+  "Emirates Blues (male)",
   "Emirates Red (male)",
   "Fairfirst Insurance (male)",
+  "Garden Route Badgers (male)",
+  "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
   "Sharjah (male)",
@@ -343,12 +334,12 @@
   }
  },
  "log": [
-  "[20:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[20:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[20:30 IST] source smarkets: {'status': 'ok', 'rows': 373, 'secs': 1.8}",
-  "[20:30 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[20:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[20:30 IST] weather: forecasts for 0 events, 0 failed",
-  "[20:30 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[21:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[21:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[21:28 IST] source smarkets: {'status': 'ok', 'rows': 378, 'secs': 1.9}",
+  "[21:28 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[21:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[21:28 IST] weather: forecasts for 0 events, 0 failed",
+  "[21:28 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
