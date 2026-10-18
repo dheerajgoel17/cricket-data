@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T16:56:31Z",
- "generated_at_ist": "2026-10-18 22:26 IST",
- "runtime_secs": 115.0,
+ "generated_at_utc": "2026-10-18T17:59:03Z",
+ "generated_at_ist": "2026-10-18 23:29 IST",
+ "runtime_secs": 113.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "da622085be"
+  "commit": "14a692d952"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 341,
-   "secs": 2.3
+   "rows": 424,
+   "secs": 2.1
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T165631Z.jsonl.gz",
+ "snapshot": "odds_20261018T175903Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -180,7 +180,6 @@
   "Garden Route Badgers (male)",
   "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
-  "Seattle Thunders (W) (female)",
   "Sharjah (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
@@ -344,12 +343,12 @@
   }
  },
  "log": [
-  "[22:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[22:28 IST] source smarkets: {'status': 'ok', 'rows': 341, 'secs': 2.3}",
-  "[22:28 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[22:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:28 IST] weather: forecasts for 0 events, 0 failed",
-  "[22:28 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[23:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[23:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[23:30 IST] source smarkets: {'status': 'ok', 'rows': 424, 'secs': 2.1}",
+  "[23:30 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[23:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[23:30 IST] weather: forecasts for 0 events, 0 failed",
+  "[23:30 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
