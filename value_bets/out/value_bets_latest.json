@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T03:54:02Z",
- "generated_at_ist": "2026-10-18 09:24 IST",
- "runtime_secs": 34.9,
+ "generated_at_utc": "2026-10-18T04:53:04Z",
+ "generated_at_ist": "2026-10-18 10:23 IST",
+ "runtime_secs": 32.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "949d4fcd37"
+  "commit": "ddf47ecd02"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1660,
-   "secs": 1.7
+   "rows": 1658,
+   "secs": 1.0
   },
   "smarkets": {
    "status": "ok",
-   "rows": 564,
-   "secs": 2.9
+   "rows": 553,
+   "secs": 2.0
   }
  },
- "snapshot": "odds_20261018T035402Z.jsonl.gz",
+ "snapshot": "odds_20261018T045304Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,8 +65,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 22,
-  "rows_in_window": 1634,
+  "events_in_window": 19,
+  "rows_in_window": 1620,
   "selections_with_model": 1080,
   "selections_with_market_fair": 1083,
   "markets_in_window": 187,
@@ -78,7 +78,7 @@
    "model_only_no_market": 105
   },
   "suspect_edges": 0,
-  "innings_milestones_unmodelled": 36,
+  "innings_milestones_unmodelled": 34,
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 161,
@@ -163,36 +163,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|bbk partnership|hayleys group a|2026-10-18",
-   "start_ist": "2026-10-18 09:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|hnb a|slc emerging|2026-10-18",
-   "start_ist": "2026-10-18 09:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|colombo aces|fairfirst insurance|2026-10-18",
-   "start_ist": "2026-10-18 09:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|mpumalanga rhinos|tuskers|2026-10-18",
    "start_ist": "2026-10-18 12:30 IST",
@@ -1167,14 +1137,14 @@
   }
  },
  "log": [
-  "[09:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[09:24 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[09:24 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1660, 'secs': 1.7}",
-  "[09:24 IST] source smarkets: {'status': 'ok', 'rows': 564, 'secs': 2.9}",
-  "[09:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[09:24 IST] 44 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[09:24 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[09:24 IST] weather: forecasts for 1 events, 0 failed",
-  "[09:24 IST] prop model: 730 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[10:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[10:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[10:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1658, 'secs': 1.0}",
+  "[10:23 IST] source smarkets: {'status': 'ok', 'rows': 553, 'secs': 2.0}",
+  "[10:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[10:23 IST] 44 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[10:23 IST] 34 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[10:23 IST] weather: forecasts for 1 events, 0 failed",
+  "[10:23 IST] prop model: 730 prop selections modelled, 331 milestone ladder prices anchored to O/U"
  ]
 }
