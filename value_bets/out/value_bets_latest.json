@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-17T18:39:56Z",
- "generated_at_ist": "2026-10-18 00:09 IST",
- "runtime_secs": 29.7,
+ "generated_at_utc": "2026-10-18T03:54:02Z",
+ "generated_at_ist": "2026-10-18 09:24 IST",
+ "runtime_secs": 34.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "f447e1febd"
+  "commit": "949d4fcd37"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1312,
-   "secs": 1.5
+   "rows": 1660,
+   "secs": 1.7
   },
   "smarkets": {
    "status": "ok",
-   "rows": 504,
-   "secs": 2.4
+   "rows": 564,
+   "secs": 2.9
   }
  },
- "snapshot": "odds_20261017T183956Z.jsonl.gz",
+ "snapshot": "odds_20261018T035402Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,15 +65,15 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 21,
-  "rows_in_window": 1575,
-  "selections_with_model": 1017,
-  "selections_with_market_fair": 1018,
-  "markets_in_window": 185,
+  "events_in_window": 22,
+  "rows_in_window": 1634,
+  "selections_with_model": 1080,
+  "selections_with_market_fair": 1083,
+  "markets_in_window": 187,
   "value_bets": 10,
   "dropped_by_filter": {
-   "model_market_gap": 317,
-   "odds_range": 16,
+   "model_market_gap": 344,
+   "odds_range": 13,
    "liquidity": 1,
    "model_only_no_market": 105
   },
@@ -84,9 +84,9 @@
     "n_prices": 161,
     "mean_model_p": 0.048,
     "mean_market_p": 0.064,
-    "mean_logit_diff_model_minus_market": 0.159,
-    "mean_abs_logit_diff": 0.803,
-    "corr": 0.84
+    "mean_logit_diff_model_minus_market": 0.16,
+    "mean_abs_logit_diff": 0.804,
+    "corr": 0.844
    },
    "top_bowler_team": {
     "n_prices": 61,
@@ -101,7 +101,7 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.552,
+    "mean_abs_logit_diff": 0.555,
     "corr": null
    },
    "batter_sixes": {
@@ -109,16 +109,16 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.393,
-    "corr": 0.83
+    "mean_abs_logit_diff": 0.382,
+    "corr": 0.87
    },
    "batter_fours": {
     "n_prices": 66,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.603,
-    "corr": 0.4
+    "mean_abs_logit_diff": 0.623,
+    "corr": 0.485
    },
    "bowler_wickets": {
     "n_prices": 68,
@@ -129,12 +129,12 @@
     "corr": 0.781
    },
    "batter_milestone": {
-    "n_prices": 225,
-    "mean_model_p": 0.365,
-    "mean_market_p": 0.434,
-    "mean_logit_diff_model_minus_market": -0.437,
-    "mean_abs_logit_diff": 0.622,
-    "corr": 0.954
+    "n_prices": 237,
+    "mean_model_p": 0.372,
+    "mean_market_p": 0.437,
+    "mean_logit_diff_model_minus_market": -0.412,
+    "mean_abs_logit_diff": 0.656,
+    "corr": 0.957
    },
    "bowler_milestone": {
     "n_prices": 166,
@@ -145,86 +145,24 @@
     "corr": 0.966
    },
    "top_batter_match": {
-    "n_prices": 97,
-    "mean_model_p": 0.011,
-    "mean_market_p": 0.031,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 1.195,
-    "corr": 0.826
+    "n_prices": 125,
+    "mean_model_p": 0.014,
+    "mean_market_p": 0.032,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 1.092,
+    "corr": 0.806
    },
    "top_bowler_match": {
-    "n_prices": 42,
-    "mean_model_p": 0.04,
-    "mean_market_p": 0.048,
+    "n_prices": 64,
+    "mean_model_p": 0.039,
+    "mean_market_p": 0.047,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.681,
-    "corr": 0.75
+    "mean_abs_logit_diff": 0.679,
+    "corr": 0.707
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "female|Hobart Hurricanes|Melbourne Renegades|2026-10-17",
-   "start_ist": "2026-10-18 04:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Hobart Hurricanes",
-    "Melbourne Renegades"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|diasqua little sai wan club|united services recreation club|2026-10-18",
-   "start_ist": "2026-10-18 06:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|kowloon club|pakistan association of hong kong|2026-10-18",
-   "start_ist": "2026-10-18 07:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Adelaide Strikers|Brisbane Heat|2026-10-18",
-   "start_ist": "2026-10-18 09:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Adelaide Strikers",
-    "Brisbane Heat"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Perth Scorchers|Sydney Thunder|2026-10-18",
-   "start_ist": "2026-10-18 09:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Perth Scorchers",
-    "Sydney Thunder"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|bbk partnership|hayleys group a|2026-10-18",
    "start_ist": "2026-10-18 09:30 IST",
@@ -266,6 +204,19 @@
    ]
   },
   {
+   "event": "male|Jersey|Uganda|2026-10-18",
+   "start_ist": "2026-10-18 12:30 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "Jersey",
+    "Uganda"
+   ],
+   "sources": [
+    "moviodds_bet365"
+   ]
+  },
+  {
    "event": "female|Austria|Bulgaria|2026-10-18",
    "start_ist": "2026-10-18 12:30 IST",
    "format": "T20",
@@ -273,6 +224,19 @@
    "teams_matched": [
     "Austria",
     "Bulgaria"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Austria|Sweden|2026-10-18",
+   "start_ist": "2026-10-18 12:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Austria",
+    "Sweden"
    ],
    "sources": [
     "smarkets"
@@ -342,6 +306,16 @@
    ]
   },
   {
+   "event": "female|boland|border|2026-10-18",
+   "start_ist": "2026-10-18 13:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "moviodds_bet365"
+   ]
+  },
+  {
    "event": "female|Australia|New Zealand|2026-10-18",
    "start_ist": "2026-10-18 13:45 IST",
    "format": "T20",
@@ -390,6 +364,19 @@
    ]
   },
   {
+   "event": "female|Bulgaria|Romania|2026-10-18",
+   "start_ist": "2026-10-18 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Bulgaria",
+    "Romania"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "female|India|Zimbabwe|2026-10-18",
    "start_ist": "2026-10-18 19:00 IST",
    "format": "T20",
@@ -404,6 +391,16 @@
    ]
   },
   {
+   "event": "female|Hobart Hurricanes|seattle thunders|2026-10-18",
+   "start_ist": "2026-10-18 19:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|England|West Indies|2026-10-18",
    "start_ist": "2026-10-18 21:00 IST",
    "format": "T20",
@@ -414,6 +411,16 @@
    ],
    "sources": [
     "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|atlanta fire|prime raider gladiators|2026-10-18",
+   "start_ist": "2026-10-18 23:45 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
     "smarkets"
    ]
   }
@@ -438,8 +445,8 @@
    "effective_odds_after_commission": 2.1,
    "lay_odds": null,
    "back_liquidity": null,
-   "fair_odds": 1.988,
-   "fair_prob": 0.5031,
+   "fair_odds": 1.987,
+   "fair_prob": 0.5032,
    "model_prob": 0.5773,
    "market_prob": 0.4425,
    "fair_basis": "blend 0.45 model + 0.55 market",
@@ -447,11 +454,11 @@
    "edge_pct": 5.66,
    "kelly_quarter_stake_pct": 1.29,
    "confidence": "low",
-   "why": "Model 58% vs market 44% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted ODI (n_eff 26.3; last 5: 1, 0, 1, 1, 1), bats in 94% of games played; venue unknown/unmatched (venue terms neutral); vs Sri Lanka: 2 inns avg 0.5",
+   "why": "Model 58% vs market 44% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted ODI (n_eff 26.2; last 5: 1, 0, 1, 1, 1), bats in 94% of games played; venue unknown/unmatched (venue terms neutral); vs Sri Lanka: 2 inns avg 0.5",
    "notes": "1 market source(s) for fair price; model 0.577 vs market 0.442; name matched loosely: 'S Ayub' -> 'Saim Ayub' (score 80) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
    "model_detail": {
-    "n_eff": 26.3,
-    "expected": 1.04,
+    "n_eff": 26.2,
+    "expected": 1.03,
     "nb_alpha": 2.105,
     "p_bats_or_bowls": 0.935,
     "venue_matched": null,
@@ -529,9 +536,9 @@
    "effective_odds_after_commission": 2.2,
    "lay_odds": null,
    "back_liquidity": null,
-   "fair_odds": 2.091,
-   "fair_prob": 0.4783,
-   "model_prob": 0.5455,
+   "fair_odds": 2.09,
+   "fair_prob": 0.4784,
+   "model_prob": 0.5456,
    "market_prob": 0.4234,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "edge": 0.0524,
@@ -579,11 +586,11 @@
    "model_prob": 0.2634,
    "market_prob": 0.1579,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.2323,
-   "edge_pct": 23.23,
+   "edge": 0.2322,
+   "edge_pct": 23.22,
    "kelly_quarter_stake_pct": 1.16,
    "confidence": "low",
-   "why": "Model 26% vs market 16% for over 0.5 sixes; form 0.3 sixes/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 1, 0, 0, 0), bats in 85% of games played; context adj: venue environment +67%; weather: high humidity 76%",
+   "why": "Model 26% vs market 16% for over 0.5 sixes; form 0.3 sixes/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 1, 0, 0, 0), bats in 85% of games played; context adj: venue environment +67%",
    "notes": "1 market source(s) for fair price; model 0.263 vs market 0.158; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
    "model_detail": {
     "n_eff": 26.1,
@@ -598,10 +605,10 @@
    },
    "rain_risk": false,
    "weather": {
-    "rain_prob_max_pct": 6,
+    "rain_prob_max_pct": 0,
     "rain_mm_in_window": 0.0,
-    "humidity_pct": 76,
-    "cloud_pct": 23,
+    "humidity_pct": 74,
+    "cloud_pct": 10,
     "source": "Open-Meteo forecast"
    }
   },
@@ -633,10 +640,10 @@
    "edge_pct": 11.8,
    "kelly_quarter_stake_pct": 0.66,
    "confidence": "low",
-   "why": "Model 24% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 79.1; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%; weather: high humidity 76%",
+   "why": "Model 24% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 79.0; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%",
    "notes": "1 market source(s) for fair price; model 0.241 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
    "model_detail": {
-    "n_eff": 79.1,
+    "n_eff": 79.0,
     "expected": 0.34,
     "nb_alpha": 1.536,
     "p_bats_or_bowls": 0.899,
@@ -648,10 +655,10 @@
    },
    "rain_risk": false,
    "weather": {
-    "rain_prob_max_pct": 6,
+    "rain_prob_max_pct": 0,
     "rain_mm_in_window": 0.0,
-    "humidity_pct": 76,
-    "cloud_pct": 23,
+    "humidity_pct": 74,
+    "cloud_pct": 10,
     "source": "Open-Meteo forecast"
    }
   },
@@ -683,7 +690,7 @@
    "edge_pct": 5.71,
    "kelly_quarter_stake_pct": 0.32,
    "confidence": "low",
-   "why": "Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%; weather: high humidity 76%",
+   "why": "Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%",
    "notes": "1 market source(s) for fair price; model 0.217 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
    "model_detail": {
     "n_eff": 35.1,
@@ -698,10 +705,10 @@
    },
    "rain_risk": false,
    "weather": {
-    "rain_prob_max_pct": 6,
+    "rain_prob_max_pct": 0,
     "rain_mm_in_window": 0.0,
-    "humidity_pct": 76,
-    "cloud_pct": 23,
+    "humidity_pct": 74,
+    "cloud_pct": 10,
     "source": "Open-Meteo forecast"
    }
   },
@@ -729,8 +736,8 @@
    "model_prob": 0.1559,
    "market_prob": 0.0865,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1772,
-   "edge_pct": 17.72,
+   "edge": 0.1771,
+   "edge_pct": 17.71,
    "kelly_quarter_stake_pct": 0.49,
    "confidence": "low",
    "why": "Model 16% vs market 9% for 2+ wkts; form 0.5 wkts/spell recency-weighted T20 (n_eff 9.7; last 5: 0, 1, 1, 0, 0), bowls in 90% of games, 3.4 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%",
@@ -769,13 +776,13 @@
    "effective_odds_after_commission": 7.0,
    "lay_odds": null,
    "back_liquidity": null,
-   "fair_odds": 6.46,
+   "fair_odds": 6.461,
    "fair_prob": 0.1548,
    "model_prob": 0.1928,
    "market_prob": 0.1237,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0836,
-   "edge_pct": 8.36,
+   "edge": 0.0835,
+   "edge_pct": 8.35,
    "kelly_quarter_stake_pct": 0.35,
    "confidence": "low",
    "why": "Model 19% vs market 12% for 2+ wkts; form 0.7 wkts/spell recency-weighted T20 (n_eff 12.1; last 5: 0, 0, 3, 0, 0), bowls in 91% of games, 3.0 overs/spell; venue unknown/unmatched (venue terms neutral); context adj: opposition strength -7%",
@@ -815,8 +822,8 @@
    "lay_odds": null,
    "back_liquidity": null,
    "fair_odds": 7.432,
-   "fair_prob": 0.1346,
-   "model_prob": 0.1674,
+   "fair_prob": 0.1345,
+   "model_prob": 0.1673,
    "market_prob": 0.1077,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "edge": 0.0764,
@@ -868,13 +875,13 @@
    "edge_pct": 14.93,
    "kelly_quarter_stake_pct": 0.47,
    "confidence": "low",
-   "why": "Model 14% vs market 11% for 3+ wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 55.6; last 5: 2, 3, 2, 0, 1), bowls in 98% of games, 3.5 overs/spell; venue unknown/unmatched (venue terms neutral); vs West Indies: 8 spells avg 0.6; context adj: opposition strength +3%",
+   "why": "Model 14% vs market 11% for 3+ wkts; form 1.4 wkts/spell recency-weighted T20 (n_eff 55.5; last 5: 2, 3, 2, 0, 1), bowls in 98% of games, 3.5 overs/spell; venue unknown/unmatched (venue terms neutral); vs West Indies: 8 spells avg 0.6; context adj: opposition strength +3%",
    "notes": "1 market source(s) for fair price; model 0.143 vs market 0.115; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.312); price via unofficial bet365 mirror - confirm on bet365 before betting",
    "model_detail": {
-    "n_eff": 55.6,
+    "n_eff": 55.5,
     "expected": 1.27,
     "nb_alpha": 0.106,
-    "p_bats_or_bowls": 0.978,
+    "p_bats_or_bowls": 0.977,
     "venue_matched": null,
     "context_terms": [
      "oppstr_wkts",
@@ -889,10 +896,10 @@
  "suspect_not_alerted": [],
  "unmatched_teams": [
   "Afghanistan (male)",
-  "Atlanta Fire (W) (female)",
   "Atlanta Fire (male)",
-  "Atlanta Lightning (male)",
   "BBK Partnership (male)",
+  "Boland (W) (female)",
+  "Border (W) (female)",
   "Colombo Aces (male)",
   "Diasqua Little Sai Wan Cricket Club (male)",
   "Dolphins (W) (female)",
@@ -906,8 +913,9 @@
   "Northern Cape (male)",
   "Northern Cape Heat (male)",
   "Pakistan Association of Hong Kong (male)",
+  "Prime Raider Gladiators (male)",
+  "Seattle Thunders (W) (female)",
   "Slc Emerging (male)",
-  "Southern Strikers (W) (female)",
   "Tuskers (W) (female)",
   "Tuskers (male)",
   "United Services Recreation Club (male)",
@@ -1159,14 +1167,14 @@
   }
  },
  "log": [
-  "[00:09 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:10 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[00:10 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1312, 'secs': 1.5}",
-  "[00:10 IST] source smarkets: {'status': 'ok', 'rows': 504, 'secs': 2.4}",
-  "[00:10 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:10 IST] 43 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[00:10 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[00:10 IST] weather: forecasts for 1 events, 0 failed",
-  "[00:10 IST] prop model: 717 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[09:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[09:24 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[09:24 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1660, 'secs': 1.7}",
+  "[09:24 IST] source smarkets: {'status': 'ok', 'rows': 564, 'secs': 2.9}",
+  "[09:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[09:24 IST] 44 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[09:24 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[09:24 IST] weather: forecasts for 1 events, 0 failed",
+  "[09:24 IST] prop model: 730 prop selections modelled, 331 milestone ladder prices anchored to O/U"
  ]
 }
