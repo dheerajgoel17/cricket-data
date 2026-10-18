@@ -1,10 +1,10 @@
-# Cricket value bets - 2026-10-18 14:27 IST
+# Cricket value bets - 2026-10-18 15:26 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 856 prices
-- **smarkets**: ok, 523 prices
+- **smarkets**: ok, 534 prices
 
 Matches starting in next 24h: **10**, markets priced: **70**, value bets: **4** (new alerts: 0). Min edge 5%.
 
@@ -23,4 +23,4 @@ Matches starting in next 24h: **10**, markets priced: **70**, value bets: **4** 
 
 Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Atlanta Fire (male), BBK Partnership (male), Colombo Aces (male), Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Eastern Storm (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Kowloon Cricket Club (male), Lions (W) (female), Northern Cape (male), Northern Cape Heat (male), Pakistan Association of Hong Kong (male), Prime Raider Gladiators (male), Seattle Thunders (W) (female), Slc Emerging (male), Tuskers (male), United Services Recreation Club (male), Western Province (W) (female)
 
-Runtime 27.9s. Snapshot: `odds_20261018T085734Z.jsonl.gz`
+Runtime 29.4s. Snapshot: `odds_20261018T095646Z.jsonl.gz`
