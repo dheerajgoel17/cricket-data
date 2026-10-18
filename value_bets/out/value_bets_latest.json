@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T16:39:44Z",
- "generated_at_ist": "2026-10-18 22:09 IST",
- "runtime_secs": 120.7,
+ "generated_at_utc": "2026-10-18T16:56:31Z",
+ "generated_at_ist": "2026-10-18 22:26 IST",
+ "runtime_secs": 115.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "5234da272c"
+  "commit": "da622085be"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
    "rows": 341,
-   "secs": 1.7
+   "secs": 2.3
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T163944Z.jsonl.gz",
+ "snapshot": "odds_20261018T165631Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -344,12 +344,12 @@
   }
  },
  "log": [
-  "[22:09 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:09 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[22:11 IST] source smarkets: {'status': 'ok', 'rows': 341, 'secs': 1.7}",
-  "[22:11 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[22:11 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:11 IST] weather: forecasts for 0 events, 0 failed",
-  "[22:11 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[22:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[22:28 IST] source smarkets: {'status': 'ok', 'rows': 341, 'secs': 2.3}",
+  "[22:28 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[22:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:28 IST] weather: forecasts for 0 events, 0 failed",
+  "[22:28 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
