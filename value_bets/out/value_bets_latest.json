@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T09:56:46Z",
- "generated_at_ist": "2026-10-18 15:26 IST",
- "runtime_secs": 29.4,
+ "generated_at_utc": "2026-10-18T11:00:02Z",
+ "generated_at_ist": "2026-10-18 16:30 IST",
+ "runtime_secs": 23.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "5ca319a7a3"
+  "commit": "9a7ff548a1"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 856,
-   "secs": 0.6
+   "secs": 1.0
   },
   "smarkets": {
    "status": "ok",
-   "rows": 534,
-   "secs": 1.8
+   "rows": 427,
+   "secs": 1.9
   }
  },
- "snapshot": "odds_20261018T095646Z.jsonl.gz",
+ "snapshot": "odds_20261018T110002Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,11 +65,11 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 10,
-  "rows_in_window": 714,
+  "events_in_window": 6,
+  "rows_in_window": 626,
   "selections_with_model": 385,
   "selections_with_market_fair": 388,
-  "markets_in_window": 70,
+  "markets_in_window": 66,
   "value_bets": 4,
   "dropped_by_filter": {
    "odds_range": 6,
@@ -99,7 +99,7 @@
     "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.707,
     "corr": null
    },
@@ -162,53 +162,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Lions|northern cape heat|2026-10-18",
-   "start_ist": "2026-10-18 16:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "moviodds_bet365"
-   ]
-  },
-  {
-   "event": "male|Knights|South Africa|2026-10-18",
-   "start_ist": "2026-10-18 16:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Knights",
-    "South Africa"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Lions|northern cape|2026-10-18",
-   "start_ist": "2026-10-18 16:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Bulgaria|Romania|2026-10-18",
-   "start_ist": "2026-10-18 16:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Bulgaria",
-    "Romania"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|India|Zimbabwe|2026-10-18",
    "start_ist": "2026-10-18 19:00 IST",
@@ -470,105 +423,56 @@
   "Atlanta Fire (male)",
   "BBK Partnership (male)",
   "Colombo Aces (male)",
-  "Diasqua Little Sai Wan Cricket Club (male)",
   "Dolphins (W) (female)",
   "Eastern Storm (male)",
   "Fairfirst Insurance (male)",
   "Hayleys Group A (male)",
   "Hnb A (male)",
-  "Kowloon Cricket Club (male)",
-  "Lions (W) (female)",
   "Northern Cape (male)",
   "Northern Cape Heat (male)",
-  "Pakistan Association of Hong Kong (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
   "Slc Emerging (male)",
-  "Tuskers (male)",
-  "United Services Recreation Club (male)",
-  "Western Province (W) (female)"
+  "Tuskers (male)"
  ],
  "unmatched_players_in_window": [
   "A Shahzad",
-  "Abel Mokwena",
-  "Adnaan Lagadien",
   "Ajmal Shahzad",
-  "Alexander Moegamat",
-  "Ayabonga Tongo",
-  "Bandile Mbatha",
   "Bashir Ahmed",
-  "Bjorn Fortuin",
-  "Blake Simpson",
   "C Walton",
   "CR Brathwaite",
   "Carlos Brathwaite",
   "Chadwick Walton",
-  "Charl Prinsloo",
   "Chipo Mugeri",
-  "Codi Ethan Yusuf",
-  "Connor Esterhuizen",
   "D Mohammed",
   "Dave Mohammed",
-  "Dayalan Boyce",
-  "Delano Potgieter",
-  "Divan de Villiers",
   "Dwayne Bravo",
   "FH Edwards",
   "Fidel Edwards",
-  "GJ Maree",
   "IJL Trott",
   "J Kalita",
-  "JJ Basson",
   "JL Denly",
-  "Jacques Snyman",
-  "Jason Rowles",
-  "Jaydon Brooker",
   "Jintimoni Kalita",
   "Joe Denly",
-  "Johan van Dyk",
   "Jonathan Trott",
-  "Junaid Dawood",
   "K Gaud",
-  "Kamo Phiri",
-  "Khaya Fakude",
   "Kranti Munna Gaud",
-  "Kyle Jacobs",
   "LE Plunkett",
-  "Liam Conor Doherty",
   "Liam Plunkett",
-  "Lleyton Troskie",
-  "Lutho Sipamla",
   "MS Panesar",
-  "Mitchell van Buuren",
   "Monty Panesar",
   "NO Miller",
   "NS Prasad",
-  "Neil Timmers",
-  "Neill Jordaan",
-  "Nico van Zyl",
   "Nikita Miller",
   "Nikki Siribhagwan Prasad",
-  "Nonelela Yikha",
-  "Nqabayomzi Peter",
-  "Ntando Soni",
-  "Odirile Modimokoane",
-  "Ombesa Matsha",
-  "Orapeleng Motlhoaring",
   "Owais Shah",
   "P Mustard",
   "Phil Mustard",
   "RJ Sidebottom",
   "RS Bopara",
-  "Rassie Van der Dussen",
   "Ravi Bopara",
   "Rayad Emrit",
-  "Reeza Hendricks",
-  "Richard Seletswane",
   "Rohit Kumar",
-  "Romano Terblanche",
-  "Ross Boast",
-  "Ruan van Rooyen",
-  "Ruben Maree",
   "Ryan Sidebottom",
   "S Chanderpaul",
   "SC Meaker",
@@ -576,29 +480,15 @@
   "SR Patel",
   "Samit Patel",
   "Sammay S",
-  "Schalk Engelbrecht",
   "Shivnarine Chanderpaul",
   "Siddharth Bukkapatnam",
-  "Siya Plaatjie",
-  "Steve Stolk",
   "Sulieman Benn",
   "TR Ambrose",
   "TS Roland-Jones",
-  "Taheer Isaacs",
-  "Tiaan Brits",
   "Timothy Raymond Ambrose",
   "Toby Roland-Jones",
-  "Tristan van Rensburg",
-  "Tshepo Ntuli",
   "U Afzaal",
-  "Ulrich Haasbroek",
-  "Usman Afzaal",
-  "Vihan Pretorius",
-  "Wandile Makwetu",
-  "Wian Ruthven",
-  "Zakwan Patel",
-  "Zizi Mkhize",
-  "Zubayr Hamza"
+  "Usman Afzaal"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -723,13 +613,13 @@
   }
  },
  "log": [
-  "[15:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[15:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[15:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 856, 'secs': 0.6}",
-  "[15:27 IST] source smarkets: {'status': 'ok', 'rows': 534, 'secs': 1.8}",
-  "[15:27 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[15:27 IST] 35 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[15:27 IST] weather: forecasts for 0 events, 0 failed",
-  "[15:27 IST] prop model: 245 prop selections modelled, 106 milestone ladder prices anchored to O/U"
+  "[16:30 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[16:30 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[16:30 IST] source moviodds_bet365: {'status': 'ok', 'rows': 856, 'secs': 1.0}",
+  "[16:30 IST] source smarkets: {'status': 'ok', 'rows': 427, 'secs': 1.9}",
+  "[16:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[16:30 IST] 35 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[16:30 IST] weather: forecasts for 0 events, 0 failed",
+  "[16:30 IST] prop model: 245 prop selections modelled, 106 milestone ladder prices anchored to O/U"
  ]
 }
