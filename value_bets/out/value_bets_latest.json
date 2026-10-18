@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T13:51:10Z",
- "generated_at_ist": "2026-10-18 19:21 IST",
- "runtime_secs": 117.5,
+ "generated_at_utc": "2026-10-18T14:58:40Z",
+ "generated_at_ist": "2026-10-18 20:28 IST",
+ "runtime_secs": 121.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "3bc7889f4f"
+  "commit": "3b659e14cb"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 447,
-   "secs": 2.6
+   "rows": 373,
+   "secs": 1.8
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T135110Z.jsonl.gz",
+ "snapshot": "odds_20261018T145840Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -64,11 +64,11 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 9,
-  "rows_in_window": 135,
+  "events_in_window": 8,
+  "rows_in_window": 99,
   "selections_with_model": 37,
   "selections_with_market_fair": 0,
-  "markets_in_window": 6,
+  "markets_in_window": 4,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_only_no_market": 37
@@ -78,16 +78,6 @@
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "female|Hobart Hurricanes|seattle thunders|2026-10-18",
-   "start_ist": "2026-10-18 20:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|England|West Indies|2026-10-18",
    "start_ist": "2026-10-18 21:00 IST",
@@ -186,8 +176,8 @@
   "Challengers (W) (female)",
   "Colombo Aces (male)",
   "Eastern Storm (male)",
+  "Emirates Red (male)",
   "Fairfirst Insurance (male)",
-  "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
   "Sharjah (male)",
@@ -195,7 +185,6 @@
   "Tuskers (male)"
  ],
  "unmatched_players_in_window": [
-  "Ajmal Shahzad",
   "Allah Mohammad Ghazanfar",
   "Azmatullah Omarzai",
   "Bashir Ahmed",
@@ -205,47 +194,26 @@
   "Brad Evans",
   "Brendan Taylor",
   "Brian Bennet",
-  "Carlos Brathwaite",
-  "Chadwick Walton",
   "Craig Ervine",
-  "Dave Mohammed",
-  "Dwayne Bravo",
   "Ernest Masuku",
   "Fazalhaq Farooqi",
-  "Fidel Edwards",
   "Hashmatullah Shahidi",
   "Ibrahim Zadran",
   "Ikram Alikhil",
-  "Joe Denly",
-  "Jonathan Trott",
-  "Liam Plunkett",
   "Mohammad Nabi",
-  "Monty Panesar",
   "Nangeyalia Kharote",
   "Newman Takudzwa Nyamhuri",
-  "Nikita Miller",
-  "Owais Shah",
-  "Phil Mustard",
   "Rahmanullah Gurbaz",
   "Rahmat Shah",
   "Rashid Khan",
-  "Ravi Bopara",
-  "Rayad Emrit",
   "Rohit Kumar",
   "Ryan Burl",
-  "Ryan Sidebottom",
-  "Samit Patel",
   "Sammay S",
   "Sediqullah Atal",
-  "Shivnarine Chanderpaul",
   "Siddharth Bukkapatnam",
   "Sikandar Raza",
-  "Sulieman Benn",
   "Tadiwanashe Marumani",
   "Tafadzwa Tsiga",
-  "Timothy Raymond Ambrose",
-  "Toby Roland-Jones",
-  "Usman Afzaal",
   "Vincent Masekesa",
   "Wellington Masakadza",
   "Wesley Madhevere",
@@ -375,12 +343,12 @@
   }
  },
  "log": [
-  "[19:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[19:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[19:22 IST] source smarkets: {'status': 'ok', 'rows': 447, 'secs': 2.6}",
-  "[19:22 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[19:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[19:23 IST] weather: forecasts for 0 events, 0 failed",
-  "[19:23 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[20:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[20:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[20:30 IST] source smarkets: {'status': 'ok', 'rows': 373, 'secs': 1.8}",
+  "[20:30 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[20:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[20:30 IST] weather: forecasts for 0 events, 0 failed",
+  "[20:30 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
