@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T11:52:22Z",
- "generated_at_ist": "2026-10-18 17:22 IST",
- "runtime_secs": 112.0,
+ "generated_at_utc": "2026-10-18T12:41:52Z",
+ "generated_at_ist": "2026-10-18 18:11 IST",
+ "runtime_secs": 120.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "72efcba94c"
+  "commit": "a6422283d7"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 371,
-   "secs": 1.9
+   "rows": 428,
+   "secs": 1.6
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T115222Z.jsonl.gz",
+ "snapshot": "odds_20261018T124152Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -163,17 +163,12 @@
  "unmatched_teams": [
   "Afghanistan (male)",
   "Atlanta Fire (male)",
-  "BBK Partnership (male)",
   "Colombo Aces (male)",
-  "Dolphins (W) (female)",
   "Eastern Storm (male)",
   "Fairfirst Insurance (male)",
-  "Hayleys Group A (male)",
-  "Hnb A (male)",
   "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
-  "Slc Emerging (male)",
   "Tuskers (male)"
  ],
  "unmatched_players_in_window": [
@@ -361,12 +356,12 @@
   }
  },
  "log": [
-  "[17:22 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[17:22 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[17:24 IST] source smarkets: {'status': 'ok', 'rows': 371, 'secs': 1.9}",
-  "[17:24 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[17:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[17:24 IST] weather: forecasts for 0 events, 0 failed",
-  "[17:24 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[18:11 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:12 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[18:13 IST] source smarkets: {'status': 'ok', 'rows': 428, 'secs': 1.6}",
+  "[18:13 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[18:13 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:13 IST] weather: forecasts for 0 events, 0 failed",
+  "[18:13 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
