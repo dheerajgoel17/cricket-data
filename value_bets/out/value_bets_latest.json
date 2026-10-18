@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T12:54:16Z",
- "generated_at_ist": "2026-10-18 18:24 IST",
- "runtime_secs": 118.9,
+ "generated_at_utc": "2026-10-18T13:51:10Z",
+ "generated_at_ist": "2026-10-18 19:21 IST",
+ "runtime_secs": 117.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "528696db10"
+  "commit": "3bc7889f4f"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 436,
-   "secs": 2.8
+   "rows": 447,
+   "secs": 2.6
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T125416Z.jsonl.gz",
+ "snapshot": "odds_20261018T135110Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,32 +65,19 @@
  },
  "stats": {
   "events_in_window": 9,
-  "rows_in_window": 165,
-  "selections_with_model": 67,
+  "rows_in_window": 135,
+  "selections_with_model": 37,
   "selections_with_market_fair": 0,
-  "markets_in_window": 8,
+  "markets_in_window": 6,
   "value_bets": 0,
   "dropped_by_filter": {
-   "model_only_no_market": 67
+   "model_only_no_market": 37
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "female|India|Zimbabwe|2026-10-18",
-   "start_ist": "2026-10-18 19:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "India",
-    "Zimbabwe"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|Hobart Hurricanes|seattle thunders|2026-10-18",
    "start_ist": "2026-10-18 20:00 IST",
@@ -179,6 +166,16 @@
    "sources": [
     "smarkets"
    ]
+  },
+  {
+   "event": "male|Dubai Capitals|sharjah|2026-10-19",
+   "start_ist": "2026-10-19 18:00 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -193,6 +190,7 @@
   "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
+  "Sharjah (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
  ],
@@ -209,7 +207,6 @@
   "Brian Bennet",
   "Carlos Brathwaite",
   "Chadwick Walton",
-  "Chipo Mugeri",
   "Craig Ervine",
   "Dave Mohammed",
   "Dwayne Bravo",
@@ -219,17 +216,14 @@
   "Hashmatullah Shahidi",
   "Ibrahim Zadran",
   "Ikram Alikhil",
-  "Jintimoni Kalita",
   "Joe Denly",
   "Jonathan Trott",
-  "Kranti Munna Gaud",
   "Liam Plunkett",
   "Mohammad Nabi",
   "Monty Panesar",
   "Nangeyalia Kharote",
   "Newman Takudzwa Nyamhuri",
   "Nikita Miller",
-  "Nikki Siribhagwan Prasad",
   "Owais Shah",
   "Phil Mustard",
   "Rahmanullah Gurbaz",
@@ -381,12 +375,12 @@
   }
  },
  "log": [
-  "[18:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[18:24 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[18:26 IST] source smarkets: {'status': 'ok', 'rows': 436, 'secs': 2.8}",
-  "[18:26 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[18:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[18:26 IST] weather: forecasts for 0 events, 0 failed",
-  "[18:26 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[19:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[19:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[19:22 IST] source smarkets: {'status': 'ok', 'rows': 447, 'secs': 2.6}",
+  "[19:22 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[19:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[19:23 IST] weather: forecasts for 0 events, 0 failed",
+  "[19:23 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
