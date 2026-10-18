@@ -1,24 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T17:59:03Z",
- "generated_at_ist": "2026-10-18 23:29 IST",
- "runtime_secs": 113.7,
+ "generated_at_utc": "2026-10-18T19:31:17Z",
+ "generated_at_ist": "2026-10-19 01:01 IST",
+ "runtime_secs": 28.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "14a692d952"
+  "commit": "623d2c46fb"
  },
  "sources": {
+  "moviodds_bet365": {
+   "status": "ok",
+   "rows": 1013,
+   "secs": 0.7
+  },
   "smarkets": {
    "status": "ok",
-   "rows": 424,
-   "secs": 2.1
-  },
-  "moviodds_bet365": {
-   "status": "error",
-   "reason": "timeout"
+   "rows": 388,
+   "secs": 2.4
   }
  },
- "snapshot": "odds_20261018T175903Z.jsonl.gz",
+ "snapshot": "odds_20261018T193117Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -64,11 +65,11 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 8,
-  "rows_in_window": 99,
+  "events_in_window": 7,
+  "rows_in_window": 384,
   "selections_with_model": 37,
-  "selections_with_market_fair": 0,
-  "markets_in_window": 4,
+  "selections_with_market_fair": 130,
+  "markets_in_window": 14,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_only_no_market": 37
@@ -78,16 +79,6 @@
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "male|atlanta fire|prime raider gladiators|2026-10-18",
-   "start_ist": "2026-10-18 23:45 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|challengers|stars|2026-10-19",
    "start_ist": "2026-10-19 10:30 IST",
@@ -112,19 +103,6 @@
    ]
   },
   {
-   "event": "male|Nepal|Oman|2026-10-19",
-   "start_ist": "2026-10-19 11:00 IST",
-   "format": "ODI",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Nepal",
-    "Oman"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
    "event": "male|Bangladesh|afghanistan|2026-10-19",
    "start_ist": "2026-10-19 11:00 IST",
    "format": "ODI",
@@ -135,12 +113,27 @@
    ]
   },
   {
+   "event": "male|Nepal|Oman|2026-10-19",
+   "start_ist": "2026-10-19 11:30 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "Nepal",
+    "Oman"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|Zimbabwe|afghanistan|2026-10-19",
    "start_ist": "2026-10-19 17:00 IST",
    "format": "ODI",
    "format_source": "name",
    "teams_matched": null,
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -185,8 +178,15 @@
   "Tuskers (male)"
  ],
  "unmatched_players_in_window": [
+  "AM Ghazanfar",
   "Allah Mohammad Ghazanfar",
   "Azmatullah Omarzai",
+  "B Evans",
+  "B Muzarabani",
+  "B Sami",
+  "BJ Curran",
+  "BL Bennett",
+  "BRM Taylor",
   "Bashir Ahmed",
   "Ben Curran",
   "Bilal Sami",
@@ -194,27 +194,42 @@
   "Brad Evans",
   "Brendan Taylor",
   "Brian Bennet",
+  "CR Ervine",
   "Craig Ervine",
+  "E Masuku",
   "Ernest Masuku",
+  "F Farooqi",
   "Fazalhaq Farooqi",
   "Hashmatullah Shahidi",
+  "I Alikhil",
   "Ibrahim Zadran",
   "Ikram Alikhil",
+  "M Nabi",
   "Mohammad Nabi",
+  "N Nyamhuri",
+  "Nangeyalia Khan",
   "Nangeyalia Kharote",
   "Newman Takudzwa Nyamhuri",
+  "R Gurbaz",
+  "RP Burl",
   "Rahmanullah Gurbaz",
   "Rahmat Shah",
   "Rashid Khan",
   "Rohit Kumar",
   "Ryan Burl",
+  "S Atal",
   "Sammay S",
   "Sediqullah Atal",
   "Siddharth Bukkapatnam",
   "Sikandar Raza",
+  "T Marumani",
+  "T Tsiga",
   "Tadiwanashe Marumani",
   "Tafadzwa Tsiga",
+  "V Masekesa",
   "Vincent Masekesa",
+  "W Madhevere",
+  "WP Masakadza",
   "Wellington Masakadza",
   "Wesley Madhevere",
   "Yamin Ahmadzai",
@@ -343,12 +358,13 @@
   }
  },
  "log": [
-  "[23:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[23:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[23:30 IST] source smarkets: {'status': 'ok', 'rows': 424, 'secs': 2.1}",
-  "[23:30 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[23:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[23:30 IST] weather: forecasts for 0 events, 0 failed",
-  "[23:30 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[01:01 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[01:01 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[01:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1013, 'secs': 0.7}",
+  "[01:01 IST] source smarkets: {'status': 'ok', 'rows': 388, 'secs': 2.4}",
+  "[01:01 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[01:01 IST] 34 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[01:01 IST] weather: forecasts for 1 events, 0 failed",
+  "[01:01 IST] prop model: 409 prop selections modelled, 186 milestone ladder prices anchored to O/U"
  ]
 }
