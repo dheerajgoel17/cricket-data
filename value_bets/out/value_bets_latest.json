@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T08:12:45Z",
- "generated_at_ist": "2026-10-18 13:42 IST",
- "runtime_secs": 32.8,
+ "generated_at_utc": "2026-10-18T08:57:34Z",
+ "generated_at_ist": "2026-10-18 14:27 IST",
+ "runtime_secs": 27.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "376db6336f"
+  "commit": "ba6069c1bf"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1366,
-   "secs": 0.8
+   "rows": 856,
+   "secs": 0.9
   },
   "smarkets": {
    "status": "ok",
-   "rows": 489,
+   "rows": 523,
    "secs": 1.7
   }
  },
- "snapshot": "odds_20261018T081245Z.jsonl.gz",
+ "snapshot": "odds_20261018T085734Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -77,7 +77,7 @@
    "model_only_no_market": 72
   },
   "suspect_edges": 0,
-  "innings_milestones_unmodelled": 16,
+  "innings_milestones_unmodelled": 0,
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 55,
@@ -469,8 +469,6 @@
   "Afghanistan (male)",
   "Atlanta Fire (male)",
   "BBK Partnership (male)",
-  "Boland (W) (female)",
-  "Border (W) (female)",
   "Colombo Aces (male)",
   "Diasqua Little Sai Wan Cricket Club (male)",
   "Dolphins (W) (female)",
@@ -725,14 +723,13 @@
   }
  },
  "log": [
-  "[13:42 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[13:42 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[13:43 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1366, 'secs': 0.8}",
-  "[13:43 IST] source smarkets: {'status': 'ok', 'rows': 489, 'secs': 1.7}",
-  "[13:43 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[13:43 IST] 36 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[13:43 IST] 16 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[13:43 IST] weather: forecasts for 1 events, 0 failed",
-  "[13:43 IST] prop model: 588 prop selections modelled, 261 milestone ladder prices anchored to O/U"
+  "[14:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[14:27 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[14:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 856, 'secs': 0.9}",
+  "[14:27 IST] source smarkets: {'status': 'ok', 'rows': 523, 'secs': 1.7}",
+  "[14:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[14:28 IST] 35 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[14:28 IST] weather: forecasts for 0 events, 0 failed",
+  "[14:28 IST] prop model: 245 prop selections modelled, 106 milestone ladder prices anchored to O/U"
  ]
 }
