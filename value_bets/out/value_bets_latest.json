@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T07:56:03Z",
- "generated_at_ist": "2026-10-18 13:26 IST",
- "runtime_secs": 20.8,
+ "generated_at_utc": "2026-10-18T08:12:45Z",
+ "generated_at_ist": "2026-10-18 13:42 IST",
+ "runtime_secs": 32.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "a4cab02e23"
+  "commit": "376db6336f"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1661,
-   "secs": 0.5
+   "rows": 1366,
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 451,
-   "secs": 1.9
+   "rows": 489,
+   "secs": 1.7
   }
  },
- "snapshot": "odds_20261018T075603Z.jsonl.gz",
+ "snapshot": "odds_20261018T081245Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,91 +65,91 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 11,
-  "rows_in_window": 975,
-  "selections_with_model": 618,
-  "selections_with_market_fair": 606,
-  "markets_in_window": 109,
-  "value_bets": 7,
+  "events_in_window": 10,
+  "rows_in_window": 714,
+  "selections_with_model": 385,
+  "selections_with_market_fair": 388,
+  "markets_in_window": 70,
+  "value_bets": 4,
   "dropped_by_filter": {
-   "odds_range": 5,
-   "model_market_gap": 185,
-   "model_only_no_market": 97
+   "odds_range": 6,
+   "model_market_gap": 138,
+   "model_only_no_market": 72
   },
   "suspect_edges": 0,
-  "innings_milestones_unmodelled": 36,
+  "innings_milestones_unmodelled": 16,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 83,
-    "mean_model_p": 0.046,
-    "mean_market_p": 0.07,
-    "mean_logit_diff_model_minus_market": -0.026,
-    "mean_abs_logit_diff": 0.797,
-    "corr": 0.879
+    "n_prices": 55,
+    "mean_model_p": 0.044,
+    "mean_market_p": 0.069,
+    "mean_logit_diff_model_minus_market": -0.04,
+    "mean_abs_logit_diff": 0.836,
+    "corr": 0.883
    },
    "top_bowler_team": {
-    "n_prices": 39,
-    "mean_model_p": 0.11,
-    "mean_market_p": 0.103,
+    "n_prices": 19,
+    "mean_model_p": 0.113,
+    "mean_market_p": 0.105,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.307,
-    "corr": 0.834
+    "mean_abs_logit_diff": 0.313,
+    "corr": 0.876
    },
    "batter_runs": {
-    "n_prices": 36,
+    "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.633,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.707,
     "corr": null
    },
    "batter_sixes": {
-    "n_prices": 36,
+    "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.469,
-    "corr": 0.882
+    "mean_abs_logit_diff": 0.583,
+    "corr": 0.857
    },
    "batter_fours": {
-    "n_prices": 36,
+    "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.581,
-    "corr": 0.601
+    "mean_abs_logit_diff": 0.743,
+    "corr": 0.76
    },
    "bowler_wickets": {
-    "n_prices": 38,
+    "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.441,
-    "corr": 0.892
+    "mean_abs_logit_diff": 0.498,
+    "corr": 0.903
    },
    "batter_milestone": {
-    "n_prices": 126,
-    "mean_model_p": 0.334,
-    "mean_market_p": 0.406,
-    "mean_logit_diff_model_minus_market": -0.507,
-    "mean_abs_logit_diff": 0.811,
-    "corr": 0.943
+    "n_prices": 85,
+    "mean_model_p": 0.343,
+    "mean_market_p": 0.411,
+    "mean_logit_diff_model_minus_market": -0.496,
+    "mean_abs_logit_diff": 1.028,
+    "corr": 0.939
    },
    "bowler_milestone": {
-    "n_prices": 91,
-    "mean_model_p": 0.191,
-    "mean_market_p": 0.22,
-    "mean_logit_diff_model_minus_market": -0.206,
-    "mean_abs_logit_diff": 0.558,
-    "corr": 0.953
+    "n_prices": 51,
+    "mean_model_p": 0.19,
+    "mean_market_p": 0.21,
+    "mean_logit_diff_model_minus_market": -0.072,
+    "mean_abs_logit_diff": 0.618,
+    "corr": 0.939
    },
    "top_batter_match": {
-    "n_prices": 58,
-    "mean_model_p": 0.017,
-    "mean_market_p": 0.034,
+    "n_prices": 30,
+    "mean_model_p": 0.013,
+    "mean_market_p": 0.033,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.978,
-    "corr": 0.865
+    "mean_abs_logit_diff": 1.167,
+    "corr": 0.93
    },
    "top_bowler_match": {
     "n_prices": 19,
@@ -162,20 +162,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "female|Australia|New Zealand|2026-10-18",
-   "start_ist": "2026-10-18 13:45 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Australia",
-    "New Zealand"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Lions|northern cape heat|2026-10-18",
    "start_ist": "2026-10-18 16:30 IST",
@@ -297,156 +283,6 @@
   }
  ],
  "value_bets": [
-  {
-   "event_key": "female|Australia|New Zealand|2026-10-18",
-   "match": "Australia (W) vs New Zealand (W)",
-   "start_utc": "2026-10-18T08:15:00Z",
-   "start_ist": "2026-10-18 13:45 IST",
-   "format": "T20",
-   "gender": "female",
-   "market_type": "batter_sixes",
-   "market": "Batsman Total Match Sixes",
-   "team_scope": "",
-   "selection": "I Sharp over 0.5",
-   "player_matched_as": "IG Sharp",
-   "line": 0.5,
-   "side": "over",
-   "best_odds": 6.0,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 6.0,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 4.869,
-   "fair_prob": 0.2054,
-   "model_prob": 0.2634,
-   "market_prob": 0.1579,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.2322,
-   "edge_pct": 23.22,
-   "kelly_quarter_stake_pct": 1.16,
-   "confidence": "low",
-   "why": "Model 26% vs market 16% for over 0.5 sixes; form 0.3 sixes/inn recency-weighted T20 (n_eff 26.1; last 5: 0, 1, 0, 0, 0), bats in 85% of games played; context adj: venue environment +67%",
-   "notes": "1 market source(s) for fair price; model 0.263 vs market 0.158; name matched loosely: 'I Sharp' -> 'IG Sharp' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 26.1,
-    "expected": 0.39,
-    "nb_alpha": 1.536,
-    "p_bats_or_bowls": 0.847,
-    "venue_matched": "north sydney oval",
-    "context_terms": [
-     "env_sixes",
-     "p_bat"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 0,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 74,
-    "cloud_pct": 10,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "female|Australia|New Zealand|2026-10-18",
-   "match": "Australia (W) vs New Zealand (W)",
-   "start_utc": "2026-10-18T08:15:00Z",
-   "start_ist": "2026-10-18 13:45 IST",
-   "format": "T20",
-   "gender": "female",
-   "market_type": "batter_sixes",
-   "market": "Batsman Total Match Sixes",
-   "team_scope": "",
-   "selection": "AC Kerr over 0.5",
-   "player_matched_as": "AC Kerr",
-   "line": 0.5,
-   "side": "over",
-   "best_odds": 5.5,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 5.5,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 4.92,
-   "fair_prob": 0.2033,
-   "model_prob": 0.2414,
-   "market_prob": 0.172,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.118,
-   "edge_pct": 11.8,
-   "kelly_quarter_stake_pct": 0.66,
-   "confidence": "low",
-   "why": "Model 24% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 79.0; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%",
-   "notes": "1 market source(s) for fair price; model 0.241 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 79.0,
-    "expected": 0.34,
-    "nb_alpha": 1.536,
-    "p_bats_or_bowls": 0.899,
-    "venue_matched": "north sydney oval",
-    "context_terms": [
-     "env_sixes",
-     "p_bat"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 0,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 74,
-    "cloud_pct": 10,
-    "source": "Open-Meteo forecast"
-   }
-  },
-  {
-   "event_key": "female|Australia|New Zealand|2026-10-18",
-   "match": "Australia (W) vs New Zealand (W)",
-   "start_utc": "2026-10-18T08:15:00Z",
-   "start_ist": "2026-10-18 13:45 IST",
-   "format": "T20",
-   "gender": "female",
-   "market_type": "batter_sixes",
-   "market": "Batsman Total Match Sixes",
-   "team_scope": "",
-   "selection": "GE Plimmer over 0.5",
-   "player_matched_as": "GE Plimmer",
-   "line": 0.5,
-   "side": "over",
-   "best_odds": 5.5,
-   "best_source": "moviodds_bet365",
-   "effective_odds_after_commission": 5.5,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 5.203,
-   "fair_prob": 0.1922,
-   "model_prob": 0.2168,
-   "market_prob": 0.172,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0571,
-   "edge_pct": 5.71,
-   "kelly_quarter_stake_pct": 0.32,
-   "confidence": "low",
-   "why": "Model 22% vs market 17% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 35.1; last 5: 0, 0, 0, 0, 0), bats in 91% of games played; vs Australia: 8 inns avg 0.1; context adj: venue environment +67%",
-   "notes": "1 market source(s) for fair price; model 0.217 vs market 0.172; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting",
-   "model_detail": {
-    "n_eff": 35.1,
-    "expected": 0.3,
-    "nb_alpha": 1.536,
-    "p_bats_or_bowls": 0.911,
-    "venue_matched": "north sydney oval",
-    "context_terms": [
-     "env_sixes",
-     "p_bat"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 0,
-    "rain_mm_in_window": 0.0,
-    "humidity_pct": 74,
-    "cloud_pct": 10,
-    "source": "Open-Meteo forecast"
-   }
-  },
   {
    "event_key": "female|India|Zimbabwe|2026-10-18",
    "match": "India (W) vs Zimbabwe (W)",
@@ -661,7 +497,6 @@
   "Ajmal Shahzad",
   "Alexander Moegamat",
   "Ayabonga Tongo",
-  "B James",
   "Bandile Mbatha",
   "Bashir Ahmed",
   "Bjorn Fortuin",
@@ -890,14 +725,14 @@
   }
  },
  "log": [
-  "[13:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[13:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[13:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1661, 'secs': 0.5}",
-  "[13:26 IST] source smarkets: {'status': 'ok', 'rows': 451, 'secs': 1.9}",
-  "[13:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[13:26 IST] 45 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[13:26 IST] 36 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[13:26 IST] weather: forecasts for 1 events, 0 failed",
-  "[13:26 IST] prop model: 719 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[13:42 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[13:42 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[13:43 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1366, 'secs': 0.8}",
+  "[13:43 IST] source smarkets: {'status': 'ok', 'rows': 489, 'secs': 1.7}",
+  "[13:43 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[13:43 IST] 36 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[13:43 IST] 16 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[13:43 IST] weather: forecasts for 1 events, 0 failed",
+  "[13:43 IST] prop model: 588 prop selections modelled, 261 milestone ladder prices anchored to O/U"
  ]
 }

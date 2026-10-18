@@ -1,74 +1,4 @@
 {
- "male|Australia|South Africa|2026-10-18|batter_milestone||T Bavuma 100+ yes|99.5|over": {
-  "edge": 0.8784,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_milestone||D Bedingham 100+ yes|99.5|over": {
-  "edge": 0.8072,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_milestone||M Labuschagne 100+ yes|99.5|over": {
-  "edge": 0.4597,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_milestone||TM Head 100+ yes|99.5|over": {
-  "edge": 0.3208,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_milestone||D Bedingham 50+ yes|49.5|over": {
-  "edge": 0.217,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|top_batter_team|Pakistan|H Nawaz||": {
-  "edge": 0.2165,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||WIA Fernando over 0.5|0.5|over": {
-  "edge": 0.093,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||BKG Mendis over 0.5|0.5|over": {
-  "edge": 0.0756,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|batter_fours||BKG Mendis under 2.5|2.5|under": {
-  "edge": 0.0709,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_sixes||D Bedingham over 0.5|0.5|over": {
-  "edge": 0.069,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_fours||M Labuschagne under 6.5|6.5|under": {
-  "edge": 0.0549,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|bowler_wickets||SR Harmer under 3.5|3.5|under": {
-  "edge": 0.0531,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Australia|South Africa|2026-10-18|batter_milestone||TM Head 50+ yes|49.5|over": {
-  "edge": 0.0521,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T08:13:45.907329+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||H Nawaz under 0.5|0.5|under": {
-  "edge": 0.0524,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T09:03:09.537988+00:00"
- },
  "female|Australia|New Zealand|2026-10-18|batter_sixes||AC Kerr over 0.5|0.5|over": {
   "edge": 0.118,
   "start_utc": "2026-10-18T08:15:00Z",
@@ -83,11 +13,6 @@
   "edge": 0.0571,
   "start_utc": "2026-10-18T08:15:00Z",
   "alerted_at": "2026-10-17T09:03:09.537988+00:00"
- },
- "male|Pakistan|Sri Lanka|2026-10-18|batter_sixes||S Ayub under 0.5|0.5|under": {
-  "edge": 0.0566,
-  "start_utc": "2026-10-18T08:00:00Z",
-  "alerted_at": "2026-10-17T10:52:56.309473+00:00"
  },
  "female|Australia|New Zealand|2026-10-18|batter_sixes||I Sharp over 0.5|0.5|over": {
   "edge": 0.2323,
