@@ -212,8 +212,8 @@ def cmd_health(a: argparse.Namespace) -> int:
 
 
 def cmd_backfill(a: argparse.Namespace) -> int:
-    a.dataset = a.dataset or "all_json.zip"
-    a.provisional_days = 30
+    # Same pipeline as `update`, on the full archive. Its options come from _add_update_options,
+    # so every attribute _cmd_update reads exists here too (a missing one crashed the weekly heal).
     return cmd_update(a)
 
 
@@ -287,6 +287,18 @@ def cmd_export_sqlite(a: argparse.Namespace) -> int:
     return 0
 
 
+def _add_update_options(p: argparse.ArgumentParser, *, dataset: str, provisional_days: int) -> None:
+    """Options read by _cmd_update. Shared by `update` and `backfill` so they cannot drift apart."""
+    p.add_argument("--dataset", default=dataset, help=f"Cricsheet zip to download (default: {dataset})")
+    p.add_argument("--zip", help="use a local zip instead of downloading")
+    p.add_argument("--provisional-days", type=int, default=provisional_days)
+    p.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
+    p.add_argument("--backfill-batch-size", type=int, default=5,
+                   help="number of historical missing matches to backfill per run (default: 5, 0 to disable)")
+    p.add_argument("--backfill-priority", default="",
+                   help="comma-separated task-key prefixes (e.g. 2025-12-18-Jharkhand) to backfill first this run")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="cricket-data", description=__doc__)
     ap.add_argument("--version", action="version", version=__version__)
@@ -294,23 +306,15 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     u = sub.add_parser("update", help="daily update: Cricsheet delta + extra sources + reconcile")
-    u.add_argument("--dataset", default="recently_added_30_json.zip")
-    u.add_argument("--zip", help="use a local zip instead of downloading")
-    u.add_argument("--provisional-days", type=int, default=14)
-    u.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
-    u.add_argument("--backfill-batch-size", type=int, default=5,
-                   help="number of historical missing matches to backfill per run (default: 5, 0 to disable)")
-    u.add_argument("--backfill-priority", default="",
-                   help="comma-separated task-key prefixes (e.g. 2025-12-18-Jharkhand) to backfill first this run")
+    _add_update_options(u, dataset="recently_added_30_json.zip", provisional_days=14)
     u.set_defaults(fn=cmd_update)
 
     h = sub.add_parser("health", help="check the CREX scraper's assumptions; save raw pages on failure")
     h.add_argument("--out", default="diagnostics")
     h.set_defaults(fn=cmd_health)
 
-    b = sub.add_parser("backfill", help="load full history (all_json.zip)")
-    b.add_argument("--dataset")
-    b.add_argument("--zip")
+    b = sub.add_parser("backfill", help="load full history (all_json.zip); used by the weekly re-sync")
+    _add_update_options(b, dataset="all_json.zip", provisional_days=30)
     b.set_defaults(fn=cmd_backfill)
 
     f = sub.add_parser("fixtures", help="refresh upcoming fixtures / schedule (data/fixtures/upcoming.csv)")

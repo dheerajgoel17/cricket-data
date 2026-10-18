@@ -104,3 +104,23 @@ def test_update_with_scraper_enabled(tmp_path, make_zip, monkeypatch):
     
     # Restore original method
     monkeypatch.setattr(ScraperSource, "fetch", original_fetch)
+
+
+def test_backfill_command_runs_end_to_end(tmp_path, make_zip):
+    """`backfill` (the weekly re-sync) shares update's pipeline; it once crashed on a missing option."""
+    z = make_zip(make_match(date="2020-01-01"))
+    assert main(["--data-dir", str(tmp_path), "backfill", "--zip", str(z)]) == 0
+    assert Store(tmp_path).months("matches")
+
+
+def test_backfill_accepts_every_update_option(monkeypatch):
+    """Every option `update` has, `backfill` has too, so _cmd_update never meets a missing attribute."""
+    from cricket_data import cli
+
+    seen = {}
+    monkeypatch.setattr(cli, "cmd_update", lambda a: seen.setdefault("update", a) and 0)
+    monkeypatch.setattr(cli, "cmd_backfill", lambda a: seen.setdefault("backfill", a) and 0)
+    cli.main(["update", "--zip", "x.zip"])
+    cli.main(["backfill", "--zip", "x.zip"])
+    assert set(vars(seen["update"])) <= set(vars(seen["backfill"]))
+    assert seen["backfill"].dataset == "all_json.zip" and seen["backfill"].provisional_days == 30
