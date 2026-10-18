@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T04:53:04Z",
- "generated_at_ist": "2026-10-18 10:23 IST",
- "runtime_secs": 32.2,
+ "generated_at_utc": "2026-10-18T05:53:38Z",
+ "generated_at_ist": "2026-10-18 11:23 IST",
+ "runtime_secs": 33.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "ddf47ecd02"
+  "commit": "cfcaf99994"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1658,
-   "secs": 1.0
+   "secs": 1.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 553,
-   "secs": 2.0
+   "rows": 542,
+   "secs": 2.8
   }
  },
- "snapshot": "odds_20261018T045304Z.jsonl.gz",
+ "snapshot": "odds_20261018T055338Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,17 +65,17 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 19,
-  "rows_in_window": 1620,
-  "selections_with_model": 1080,
+  "events_in_window": 21,
+  "rows_in_window": 1661,
+  "selections_with_model": 1117,
   "selections_with_market_fair": 1083,
-  "markets_in_window": 187,
+  "markets_in_window": 189,
   "value_bets": 10,
   "dropped_by_filter": {
    "model_market_gap": 344,
    "odds_range": 13,
    "liquidity": 1,
-   "model_only_no_market": 105
+   "model_only_no_market": 142
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 34,
@@ -388,6 +388,16 @@
    "event": "male|atlanta fire|prime raider gladiators|2026-10-18",
    "start_ist": "2026-10-18 23:45 IST",
    "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Bangladesh|afghanistan|2026-10-19",
+   "start_ist": "2026-10-19 11:00 IST",
+   "format": "ODI",
    "format_source": "name",
    "teams_matched": null,
    "sources": [
@@ -900,6 +910,7 @@
   "Ayabonga Tongo",
   "B James",
   "Bandile Mbatha",
+  "Bashir Ahmed",
   "Bella James",
   "Bjorn Fortuin",
   "Blake Simpson",
@@ -975,6 +986,7 @@
   "Rayad Emrit",
   "Reeza Hendricks",
   "Richard Seletswane",
+  "Rohit Kumar",
   "Romano Terblanche",
   "Ross Boast",
   "Ruan van Rooyen",
@@ -990,8 +1002,10 @@
   "SR Patel",
   "Saad Baig",
   "Samit Patel",
+  "Sammay S",
   "Schalk Engelbrecht",
   "Shivnarine Chanderpaul",
+  "Siddharth Bukkapatnam",
   "Siya Plaatjie",
   "Steve Stolk",
   "Sufyan Moqim",
@@ -1137,14 +1151,14 @@
   }
  },
  "log": [
-  "[10:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[10:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1658, 'secs': 1.0}",
-  "[10:23 IST] source smarkets: {'status': 'ok', 'rows': 553, 'secs': 2.0}",
-  "[10:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:23 IST] 44 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[10:23 IST] 34 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[10:23 IST] weather: forecasts for 1 events, 0 failed",
-  "[10:23 IST] prop model: 730 prop selections modelled, 331 milestone ladder prices anchored to O/U"
+  "[11:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[11:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[11:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1658, 'secs': 1.5}",
+  "[11:23 IST] source smarkets: {'status': 'ok', 'rows': 542, 'secs': 2.8}",
+  "[11:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[11:24 IST] 44 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[11:24 IST] 34 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[11:24 IST] weather: forecasts for 1 events, 0 failed",
+  "[11:24 IST] prop model: 730 prop selections modelled, 331 milestone ladder prices anchored to O/U"
  ]
 }
