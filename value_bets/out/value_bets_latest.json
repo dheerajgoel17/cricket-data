@@ -1,24 +1,24 @@
 {
- "generated_at_utc": "2026-10-18T12:41:52Z",
- "generated_at_ist": "2026-10-18 18:11 IST",
- "runtime_secs": 120.2,
+ "generated_at_utc": "2026-10-18T12:54:16Z",
+ "generated_at_ist": "2026-10-18 18:24 IST",
+ "runtime_secs": 118.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "a6422283d7"
+  "commit": "528696db10"
  },
  "sources": {
   "smarkets": {
    "status": "ok",
-   "rows": 428,
-   "secs": 1.6
+   "rows": 436,
+   "secs": 2.8
   },
   "moviodds_bet365": {
    "status": "error",
    "reason": "timeout"
   }
  },
- "snapshot": "odds_20261018T124152Z.jsonl.gz",
+ "snapshot": "odds_20261018T125416Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -64,8 +64,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 7,
-  "rows_in_window": 157,
+  "events_in_window": 9,
+  "rows_in_window": 165,
   "selections_with_model": 67,
   "selections_with_market_fair": 0,
   "markets_in_window": 8,
@@ -125,6 +125,29 @@
    ]
   },
   {
+   "event": "female|challengers|stars|2026-10-19",
+   "start_ist": "2026-10-19 10:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Adelaide Strikers|Oval Invincibles|2026-10-19",
+   "start_ist": "2026-10-19 10:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Adelaide Strikers",
+    "Oval Invincibles"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|Nepal|Oman|2026-10-19",
    "start_ist": "2026-10-19 11:00 IST",
    "format": "ODI",
@@ -163,12 +186,14 @@
  "unmatched_teams": [
   "Afghanistan (male)",
   "Atlanta Fire (male)",
+  "Challengers (W) (female)",
   "Colombo Aces (male)",
   "Eastern Storm (male)",
   "Fairfirst Insurance (male)",
   "Northern Cape (male)",
   "Prime Raider Gladiators (male)",
   "Seattle Thunders (W) (female)",
+  "Stars (W) (female)",
   "Tuskers (male)"
  ],
  "unmatched_players_in_window": [
@@ -356,12 +381,12 @@
   }
  },
  "log": [
-  "[18:11 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[18:12 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[18:13 IST] source smarkets: {'status': 'ok', 'rows': 428, 'secs': 1.6}",
-  "[18:13 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
-  "[18:13 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[18:13 IST] weather: forecasts for 0 events, 0 failed",
-  "[18:13 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
+  "[18:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:24 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[18:26 IST] source smarkets: {'status': 'ok', 'rows': 436, 'secs': 2.8}",
+  "[18:26 IST] source moviodds_bet365: {'status': 'error', 'reason': 'timeout'}",
+  "[18:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:26 IST] weather: forecasts for 0 events, 0 failed",
+  "[18:26 IST] prop model: 0 prop selections modelled, 0 milestone ladder prices anchored to O/U"
  ]
 }
