@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-19T16:11:40Z",
- "generated_at_ist": "2026-10-19 21:41 IST",
- "runtime_secs": 23.5,
+ "generated_at_utc": "2026-10-19T16:34:47Z",
+ "generated_at_ist": "2026-10-19 22:04 IST",
+ "runtime_secs": 35.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "e1932f7530"
+  "commit": "83434f04df"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1150,
-   "secs": 0.5
+   "secs": 0.9
   },
   "smarkets": {
    "status": "ok",
-   "rows": 274,
-   "secs": 2.8
+   "rows": 289,
+   "secs": 3.2
   }
  },
- "snapshot": "odds_20261019T161140Z.jsonl.gz",
+ "snapshot": "odds_20261019T163447Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,15 +65,15 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 15,
-  "rows_in_window": 1051,
+  "events_in_window": 14,
+  "rows_in_window": 1047,
   "selections_with_model": 804,
   "selections_with_market_fair": 735,
   "markets_in_window": 112,
   "value_bets": 8,
   "dropped_by_filter": {
-   "model_market_gap": 216,
-   "odds_range": 15,
+   "model_market_gap": 214,
+   "odds_range": 16,
    "model_disagrees": 2,
    "model_only_no_market": 94
   },
@@ -84,9 +84,9 @@
     "n_prices": 162,
     "mean_model_p": 0.049,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.11,
-    "mean_abs_logit_diff": 0.802,
-    "corr": 0.862
+    "mean_logit_diff_model_minus_market": 0.112,
+    "mean_abs_logit_diff": 0.806,
+    "corr": 0.859
    },
    "top_bowler_team": {
     "n_prices": 63,
@@ -163,16 +163,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Abu Dhabi Knight Riders|emirates red|2026-10-19",
-   "start_ist": "2026-10-19 22:00 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "female|Adelaide Strikers|Perth Scorchers|2026-10-19",
    "start_ist": "2026-10-20 04:30 IST",
@@ -906,13 +896,13 @@
   }
  },
  "log": [
-  "[21:41 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[21:41 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[21:41 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1150, 'secs': 0.5}",
-  "[21:41 IST] source smarkets: {'status': 'ok', 'rows': 274, 'secs': 2.8}",
-  "[21:42 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[21:42 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[21:42 IST] weather: forecasts for 1 events, 0 failed",
-  "[21:42 IST] prop model: 666 prop selections modelled, 291 milestone ladder prices anchored to O/U"
+  "[22:04 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:05 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[22:05 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1150, 'secs': 0.9}",
+  "[22:05 IST] source smarkets: {'status': 'ok', 'rows': 289, 'secs': 3.2}",
+  "[22:05 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:05 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[22:05 IST] weather: forecasts for 1 events, 0 failed",
+  "[22:05 IST] prop model: 666 prop selections modelled, 291 milestone ladder prices anchored to O/U"
  ]
 }
