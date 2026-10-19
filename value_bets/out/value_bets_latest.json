@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-18T19:31:17Z",
- "generated_at_ist": "2026-10-19 01:01 IST",
- "runtime_secs": 28.0,
+ "generated_at_utc": "2026-10-19T03:54:33Z",
+ "generated_at_ist": "2026-10-19 09:24 IST",
+ "runtime_secs": 23.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "623d2c46fb"
+  "commit": "beb1ddc514"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1013,
-   "secs": 0.7
+   "rows": 1133,
+   "secs": 0.4
   },
   "smarkets": {
    "status": "ok",
-   "rows": 388,
+   "rows": 384,
    "secs": 2.4
   }
  },
- "snapshot": "odds_20261018T193117Z.jsonl.gz",
+ "snapshot": "odds_20261019T035433Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,8 +65,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 7,
-  "rows_in_window": 384,
+  "events_in_window": 9,
+  "rows_in_window": 396,
   "selections_with_model": 37,
   "selections_with_market_fair": 130,
   "markets_in_window": 14,
@@ -103,18 +103,8 @@
    ]
   },
   {
-   "event": "male|Bangladesh|afghanistan|2026-10-19",
-   "start_ist": "2026-10-19 11:00 IST",
-   "format": "ODI",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
    "event": "male|Nepal|Oman|2026-10-19",
-   "start_ist": "2026-10-19 11:30 IST",
+   "start_ist": "2026-10-19 11:00 IST",
    "format": "ODI",
    "format_source": "name",
    "teams_matched": [
@@ -123,6 +113,16 @@
    ],
    "sources": [
     "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Bangladesh|afghanistan|2026-10-19",
+   "start_ist": "2026-10-19 11:00 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
     "smarkets"
    ]
   },
@@ -156,6 +156,34 @@
    "sources": [
     "smarkets"
    ]
+  },
+  {
+   "event": "female|Adelaide Strikers|Perth Scorchers|2026-10-19",
+   "start_ist": "2026-10-20 04:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Adelaide Strikers",
+    "Perth Scorchers"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Sydney Sixers|Sydney Thunder|2026-10-20",
+   "start_ist": "2026-10-20 09:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Sydney Sixers",
+    "Sydney Thunder"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -163,7 +191,6 @@
  "unmatched_teams": [
   "Afghanistan (male)",
   "Ajman (male)",
-  "Atlanta Fire (male)",
   "Challengers (W) (female)",
   "Colombo Aces (male)",
   "Eastern Storm (male)",
@@ -172,7 +199,6 @@
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
   "Northern Cape (male)",
-  "Prime Raider Gladiators (male)",
   "Sharjah (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
@@ -358,13 +384,13 @@
   }
  },
  "log": [
-  "[01:01 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[01:01 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[01:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1013, 'secs': 0.7}",
-  "[01:01 IST] source smarkets: {'status': 'ok', 'rows': 388, 'secs': 2.4}",
-  "[01:01 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[01:01 IST] 34 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[01:01 IST] weather: forecasts for 1 events, 0 failed",
-  "[01:01 IST] prop model: 409 prop selections modelled, 186 milestone ladder prices anchored to O/U"
+  "[09:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[09:24 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[09:24 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1133, 'secs': 0.4}",
+  "[09:24 IST] source smarkets: {'status': 'ok', 'rows': 384, 'secs': 2.4}",
+  "[09:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[09:24 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[09:24 IST] weather: forecasts for 1 events, 0 failed",
+  "[09:24 IST] prop model: 475 prop selections modelled, 211 milestone ladder prices anchored to O/U"
  ]
 }
