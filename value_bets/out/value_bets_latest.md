@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-19 14:23 IST
+# Cricket value bets - 2026-10-19 14:40 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1396 prices
-- **smarkets**: ok, 379 prices
+- **smarkets**: ok, 387 prices
 
-Matches starting in next 24h: **10**, markets priced: **88**, value bets: **4** (new alerts: 4). Min edge 5%.
+Matches starting in next 24h: **9**, markets priced: **88**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -23,4 +23,4 @@ Matches starting in next 24h: **10**, markets priced: **88**, value bets: **4** 
 
 Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Challengers (W) (female), Colombo Aces (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Getafe Tigers (male), Madrid Blues (male), Madrid Cc (male), Northern Cape (male), Sharjah (male), Sonseca Sultans (male), Stars (W) (female), Tuskers (male)
 
-Runtime 26.2s. Snapshot: `odds_20261019T085353Z.jsonl.gz`
+Runtime 31.2s. Snapshot: `odds_20261019T091007Z.jsonl.gz`
