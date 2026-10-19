@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-19T06:51:30Z",
- "generated_at_ist": "2026-10-19 12:21 IST",
- "runtime_secs": 30.8,
+ "generated_at_utc": "2026-10-19T07:57:24Z",
+ "generated_at_ist": "2026-10-19 13:27 IST",
+ "runtime_secs": 33.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "fffe7be239"
+  "commit": "b39689b067"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1184,
-   "secs": 1.1
+   "rows": 1375,
+   "secs": 1.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 384,
-   "secs": 2.0
+   "rows": 392,
+   "secs": 2.2
   }
  },
- "snapshot": "odds_20261019T065130Z.jsonl.gz",
+ "snapshot": "odds_20261019T075724Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,8 +65,8 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 5,
-  "rows_in_window": 357,
+  "events_in_window": 6,
+  "rows_in_window": 361,
   "selections_with_model": 0,
   "selections_with_market_fair": 146,
   "markets_in_window": 12,
@@ -77,6 +77,16 @@
   "model_vs_market": {}
  },
  "events_in_window": [
+  {
+   "event": "male|getafe tigers|madrid blues|2026-10-19",
+   "start_ist": "2026-10-19 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
   {
    "event": "male|Zimbabwe|afghanistan|2026-10-19",
    "start_ist": "2026-10-19 17:00 IST",
@@ -149,8 +159,12 @@
   "Emirates Red (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
+  "Getafe Tigers (male)",
+  "Madrid Blues (male)",
+  "Madrid Cc (male)",
   "Northern Cape (male)",
   "Sharjah (male)",
+  "Sonseca Sultans (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
  ],
@@ -331,13 +345,13 @@
   }
  },
  "log": [
-  "[12:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[12:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[12:21 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1184, 'secs': 1.1}",
-  "[12:21 IST] source smarkets: {'status': 'ok', 'rows': 384, 'secs': 2.0}",
-  "[12:21 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[12:21 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[12:22 IST] weather: forecasts for 1 events, 0 failed",
-  "[12:22 IST] prop model: 491 prop selections modelled, 211 milestone ladder prices anchored to O/U"
+  "[13:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[13:27 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[13:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1375, 'secs': 1.8}",
+  "[13:27 IST] source smarkets: {'status': 'ok', 'rows': 392, 'secs': 2.2}",
+  "[13:27 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[13:27 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[13:27 IST] weather: forecasts for 1 events, 0 failed",
+  "[13:27 IST] prop model: 666 prop selections modelled, 291 milestone ladder prices anchored to O/U"
  ]
 }
