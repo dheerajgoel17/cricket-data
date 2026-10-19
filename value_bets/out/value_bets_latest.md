@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-10-19 22:04 IST
+# Cricket value bets - 2026-10-19 22:21 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -31,4 +31,4 @@ Matches starting in next 24h: **14**, markets priced: **112**, value bets: **8**
 
 Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Baltimore Royals (male), Challengers (W) (female), Chicago Kingsmen (male), Colombo Aces (male), Conquerors (W) (female), Dallas Xforia Giants (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Los Angeles Lashings (male), Madrid Blues (male), Madrid Cc (male), Madrid United (male), Manhattan Yorkers (male), Northern Cape (male), Northern Cape Heat (male), San Ramon Grizzlies (male), Sonseca Sultans (male), Stars (W) (female), Tuskers (male)
 
-Runtime 35.4s. Snapshot: `odds_20261019T163447Z.jsonl.gz`
+Runtime 31.9s. Snapshot: `odds_20261019T165115Z.jsonl.gz`
