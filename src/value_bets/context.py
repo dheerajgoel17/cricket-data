@@ -9,6 +9,8 @@ import math
 import re
 from collections import defaultdict
 
+from . import config
+
 H_FORM = 540.0   # days, player form half-life
 H_TEAM = 365.0   # days, team strength half-life
 K_FORM = 3.0     # pseudo-innings toward population
@@ -86,8 +88,10 @@ class Context:
         s = e.read(day, H_FORM) if e else [0.0] * 9
         a = self.form_all.get((pid, g))
         sa = a.read(day, H_FORM) if a else [0.0] * 9
-        # other formats count a quarter (mirrors the v1 model)
-        mix = [x + 0.25 * (y - x) for x, y in zip(s, sa, strict=False)]
+        # other formats: weight CROSS_FORMAT_WEIGHT (default 0). The walk-forward backtest showed mixing T20 form into
+        # ODI/Test (and vice versa) hurts log-loss in every market, worst for sixes (ODI sixes alerts were T20-priced).
+        cw = config.get("CROSS_FORMAT_WEIGHT")
+        mix = [x + cw * (y - x) for x, y in zip(s, sa, strict=False)]
         return {"w_app": mix[0], "w_bat": mix[1], "runs": mix[2], "balls": mix[3], "sixes": mix[4],
                 "fours": mix[5], "w_bowl": mix[6], "wkts": mix[7], "bb": mix[8], "w_bat_fmt": s[1], "w_bowl_fmt": s[6]}
 
