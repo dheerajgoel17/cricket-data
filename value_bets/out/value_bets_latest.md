@@ -1,26 +1,28 @@
-# Cricket value bets - 2026-10-19 17:28 IST
+# Cricket value bets - 2026-10-19 18:23 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **smarkets**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
 - **moviodds_bet365**: ok, 1089 prices
+- **smarkets**: ok, 376 prices
 
-Matches starting in next 24h: **4**, markets priced: **76**, value bets: **4** (new alerts: 1). Min edge 5%.
+Matches starting in next 24h: **11**, markets priced: **76**, value bets: **5** (new alerts: 1). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
 | 10-20 13:30 IST | Pakistan vs England | Batsman to Score a Fifty in the Match | BM Duckett 50+ yes | 3.50 @ moviodds_bet365 | 3.19 | 0.3228 | 9.6% | 0.96% | low |
+| 10-20 13:30 IST | Pakistan vs England | Batsman Total Match Sixes | T Banton under 0.5 | 2.10 @ moviodds_bet365 | 1.98 | 0.5808 | 6.0% | 1.36% | low |
 | 10-20 13:45 IST | Australia (W) vs New Zealand (W) | Bowler Milestones | AC Kerr 3+ yes | 10.00 @ moviodds_bet365 | 8.43 | 0.1044 | 18.7% | 0.52% | low |
 | 10-20 13:45 IST | Australia (W) vs New Zealand (W) | Batsman Total Match Sixes | AC Kerr over 0.5 | 6.00 @ moviodds_bet365 | 5.12 | 0.2414 | 17.3% | 0.86% | low |
 | 10-20 13:45 IST | Australia (W) vs New Zealand (W) | Batter Total Match Fours | ML Green under 1.5 | 2.20 @ moviodds_bet365 | 2.05 | 0.5656 | 7.2% | 1.51% | low |
 
 ### Why / notes per bet
 - **Pakistan vs England / Batsman to Score a Fifty in the Match / BM Duckett 50+ yes** - why: Model 32% vs market 31% for 50+ runs; form 44.3 runs/inn recency-weighted ODI (n_eff 35.6; last 5: 0, 67, 32, 141, 0), bats in 98% of games played; venue unknown/unmatched (venue terms neutral). Notes: 1 market source(s) for fair price; model 0.323 vs market 0.305; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); price via unofficial bet365 mirror - confirm on bet365 before betting
-- **Australia (W) vs New Zealand (W) / Bowler Milestones / AC Kerr 3+ yes** - why: Model 10% vs market 13% for 3+ wkts; form 1.3 wkts/spell recency-weighted T20 (n_eff 86.4; last 5: 1, 0, 1, 2, 0), bowls in 98% of games, 3.8 overs/spell; at North Sydney Oval: 14 spells avg 1.3; vs Australia: 20 spells avg 1.1; context adj: opposition strength -5%; weather: high humidity 80%. Notes: 1 market source(s) for fair price; model 0.104 vs market 0.130; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.337); price via unofficial bet365 mirror - confirm on bet365 before betting
-- **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / AC Kerr over 0.5** - why: Model 24% vs market 16% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 78.9; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%; weather: high humidity 80%. Notes: 1 market source(s) for fair price; model 0.241 vs market 0.158; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
-- **Australia (W) vs New Zealand (W) / Batter Total Match Fours / ML Green under 1.5** - why: Model 57% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 54.9; last 5: 3, 1, 1, 3, 1), bats in 88% of games played; at North Sydney Oval: 6 inns avg 1.3; vs Australia: 20 inns avg 0.9; context adj: venue environment +14%, at this venue -5%, team H2H context -12%; weather: high humidity 80%. Notes: 1 market source(s) for fair price; model 0.566 vs market 0.423; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
+- **Pakistan vs England / Batsman Total Match Sixes / T Banton under 0.5** - why: Model 58% vs market 44% for under 0.5 sixes; form 1.2 sixes/inn recency-weighted ODI (n_eff 25.9; last 5: 5, 3, 0, 2, 1), bats in 90% of games played; venue unknown/unmatched (venue terms neutral). Notes: 1 market source(s) for fair price; model 0.581 vs market 0.442; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
+- **Australia (W) vs New Zealand (W) / Bowler Milestones / AC Kerr 3+ yes** - why: Model 10% vs market 13% for 3+ wkts; form 1.3 wkts/spell recency-weighted T20 (n_eff 86.4; last 5: 1, 0, 1, 2, 0), bowls in 98% of games, 3.8 overs/spell; at North Sydney Oval: 14 spells avg 1.3; vs Australia: 20 spells avg 1.1; context adj: opposition strength -5%; weather: high humidity 81%. Notes: 1 market source(s) for fair price; model 0.104 vs market 0.130; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 1.5 (de-vigged 0.337); price via unofficial bet365 mirror - confirm on bet365 before betting
+- **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / AC Kerr over 0.5** - why: Model 24% vs market 16% for over 0.5 sixes; form 0.2 sixes/inn recency-weighted T20 (n_eff 78.9; last 5: 0, 1, 4, 0, 0), bats in 90% of games played; at North Sydney Oval: 9 inns avg 0.0; vs Australia: 19 inns avg 0.0; context adj: venue environment +67%; weather: high humidity 81%. Notes: 1 market source(s) for fair price; model 0.241 vs market 0.158; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
+- **Australia (W) vs New Zealand (W) / Batter Total Match Fours / ML Green under 1.5** - why: Model 57% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 54.9; last 5: 3, 1, 1, 3, 1), bats in 88% of games played; at North Sydney Oval: 6 inns avg 1.3; vs Australia: 20 inns avg 0.9; context adj: venue environment +14%, at this venue -5%, team H2H context -12%; weather: high humidity 81%. Notes: 1 market source(s) for fair price; model 0.566 vs market 0.423; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Eastern Storm (male), Tuskers (male)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Challengers (W) (female), Colombo Aces (male), Conquerors (W) (female), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Northern Cape (male), Sharjah (male), Stars (W) (female), Tuskers (male)
 
-Runtime 25.1s. Snapshot: `odds_20261019T115800Z.jsonl.gz`
+Runtime 32.0s. Snapshot: `odds_20261019T125304Z.jsonl.gz`

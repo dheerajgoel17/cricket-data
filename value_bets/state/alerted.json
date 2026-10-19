@@ -23,5 +23,10 @@
   "edge": 0.1868,
   "start_utc": "2026-10-20T08:15:00Z",
   "alerted_at": "2026-10-19T11:58:25.742836+00:00"
+ },
+ "male|England|Pakistan|2026-10-20|batter_sixes||T Banton under 0.5|0.5|under": {
+  "edge": 0.0599,
+  "start_utc": "2026-10-20T08:00:00Z",
+  "alerted_at": "2026-10-19T12:53:36.679505+00:00"
  }
 }
