@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-19 20:34 IST
+# Cricket value bets - 2026-10-19 21:41 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1099 prices
+- **moviodds_bet365**: ok, 1150 prices
 - **smarkets**: ok, 274 prices
 
-Matches starting in next 24h: **14**, markets priced: **109**, value bets: **8** (new alerts: 0). Min edge 5%.
+Matches starting in next 24h: **15**, markets priced: **112**, value bets: **8** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -29,6 +29,6 @@ Matches starting in next 24h: **14**, markets priced: **109**, value bets: **8**
 - **India (W) vs Zimbabwe (W) / Zimbabwe (W) top batsman / Modester Mupachikwa** - why: Model 12% vs market 12%: Monte Carlo over both XIs from recency-weighted T20 scores, picked 75% of last team games; model re-centred on the market (offset 0.615). Notes: 1 market source(s) for fair price; model 0.122 vs market 0.121; name matched loosely: 'Modester Mupachikwa' -> 'M Mupachikwa' (score 80) - verify
 - **India (W) vs Zimbabwe (W) / Batsman to Score a Fifty in the Match / S Verma 50+ no** - why: Model 78% vs market 64% for 50+ runs; form 32.2 runs/inn recency-weighted T20 (n_eff 61.4; last 5: 48, 100, 40, 68, 64), bats in 98% of games played; venue unknown/unmatched (venue terms neutral). Notes: 1 market source(s) for fair price; model 0.781 vs market 0.636; name matched loosely: 'S Verma' -> 'Shafali Verma' (score 80) - verify; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Baltimore Royals (male), Challengers (W) (female), Colombo Aces (male), Conquerors (W) (female), Dallas Xforia Giants (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Madrid Blues (male), Madrid Cc (male), Madrid United (male), Manhattan Yorkers (male), Northern Cape (male), Northern Cape Heat (male), San Ramon Grizzlies (male), Sharjah (male), Sonseca Sultans (male), Stars (W) (female), Tuskers (male)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Baltimore Royals (male), Challengers (W) (female), Chicago Kingsmen (male), Colombo Aces (male), Conquerors (W) (female), Dallas Xforia Giants (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Los Angeles Lashings (male), Madrid Blues (male), Madrid Cc (male), Madrid United (male), Manhattan Yorkers (male), Northern Cape (male), Northern Cape Heat (male), San Ramon Grizzlies (male), Sonseca Sultans (male), Stars (W) (female), Tuskers (male)
 
-Runtime 28.2s. Snapshot: `odds_20261019T150441Z.jsonl.gz`
+Runtime 23.5s. Snapshot: `odds_20261019T161140Z.jsonl.gz`
