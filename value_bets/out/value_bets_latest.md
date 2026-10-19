@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-10-19 15:25 IST
+# Cricket value bets - 2026-10-19 16:25 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1396 prices
-- **smarkets**: ok, 404 prices
+- **moviodds_bet365**: ok, 1392 prices
+- **smarkets**: ok, 392 prices
 
-Matches starting in next 24h: **9**, markets priced: **88**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 24h: **8**, markets priced: **88**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -21,6 +21,6 @@ Matches starting in next 24h: **9**, markets priced: **88**, value bets: **4** (
 - **Australia (W) vs New Zealand (W) / Batter Total Match Fours / ML Green under 1.5** - why: Model 57% vs market 42% for under 1.5 fours; form 2.1 fours/inn recency-weighted T20 (n_eff 54.9; last 5: 3, 1, 1, 3, 1), bats in 88% of games played; at North Sydney Oval: 6 inns avg 1.3; vs Australia: 20 inns avg 0.9; context adj: venue environment +14%, at this venue -5%, team H2H context -12%; weather: high humidity 80%. Notes: 1 market source(s) for fair price; model 0.566 vs market 0.423; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 - **Australia (W) vs New Zealand (W) / Batsman Total Match Sixes / AK Gardner under 0.5** - why: Model 60% vs market 46% for under 0.5 sixes; form 0.6 sixes/inn recency-weighted T20 (n_eff 68.2; last 5: 0, 1, 0, 1, 0), bats in 89% of games played; at North Sydney Oval: 37 inns avg 1.0; vs New Zealand: 17 inns avg 0.4; context adj: venue environment +67%; weather: high humidity 80%. Notes: 1 market source(s) for fair price; model 0.601 vs market 0.463; name matched loosely: 'AK Gardner' -> 'A Gardner' (score 75) - verify; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial bet365 mirror - confirm on bet365 before betting
 
-Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Challengers (W) (female), Colombo Aces (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Getafe Tigers (male), Madrid Blues (male), Madrid Cc (male), Northern Cape (male), Sharjah (male), Sonseca Sultans (male), Stars (W) (female), Tuskers (male)
+Unmatched team names (add to mappings/teams.csv): Afghanistan (male), Ajman (male), Colombo Aces (male), Eastern Storm (male), Emirates Blues (male), Emirates Red (male), Fairfirst Insurance (male), Garden Route Badgers (male), Getafe Tigers (male), Madrid Blues (male), Northern Cape (male), Sharjah (male), Tuskers (male)
 
-Runtime 64.9s. Snapshot: `odds_20261019T095516Z.jsonl.gz`
+Runtime 32.9s. Snapshot: `odds_20261019T105542Z.jsonl.gz`
