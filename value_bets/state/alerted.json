@@ -1,1 +1,22 @@
-{}
+{
+ "male|England|Pakistan|2026-10-20|batter_milestone||BM Duckett 50+ yes|49.5|over": {
+  "edge": 0.0955,
+  "start_utc": "2026-10-20T08:00:00Z",
+  "alerted_at": "2026-10-19T08:54:20.111881+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-20|batter_sixes||AC Kerr over 0.5|0.5|over": {
+  "edge": 0.1728,
+  "start_utc": "2026-10-20T08:15:00Z",
+  "alerted_at": "2026-10-19T08:54:20.111881+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-20|batter_fours||ML Green under 1.5|1.5|under": {
+  "edge": 0.0723,
+  "start_utc": "2026-10-20T08:15:00Z",
+  "alerted_at": "2026-10-19T08:54:20.111881+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-20|batter_sixes||AK Gardner under 0.5|0.5|under": {
+  "edge": 0.0507,
+  "start_utc": "2026-10-20T08:15:00Z",
+  "alerted_at": "2026-10-19T08:54:20.111881+00:00"
+ }
+}
