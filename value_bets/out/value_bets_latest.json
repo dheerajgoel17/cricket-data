@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-19T04:53:29Z",
- "generated_at_ist": "2026-10-19 10:23 IST",
- "runtime_secs": 31.1,
+ "generated_at_utc": "2026-10-19T05:58:01Z",
+ "generated_at_ist": "2026-10-19 11:28 IST",
+ "runtime_secs": 26.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "147bd14c25"
+  "commit": "8069601bda"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1170,
+   "rows": 1184,
    "secs": 0.7
   },
   "smarkets": {
    "status": "ok",
    "rows": 384,
-   "secs": 2.2
+   "secs": 2.4
   }
  },
- "snapshot": "odds_20261019T045329Z.jsonl.gz",
+ "snapshot": "odds_20261019T055801Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -65,67 +65,18 @@
   "MAX_EDGE": 0.3
  },
  "stats": {
-  "events_in_window": 9,
-  "rows_in_window": 396,
-  "selections_with_model": 37,
-  "selections_with_market_fair": 130,
-  "markets_in_window": 14,
+  "events_in_window": 5,
+  "rows_in_window": 357,
+  "selections_with_model": 0,
+  "selections_with_market_fair": 146,
+  "markets_in_window": 12,
   "value_bets": 0,
-  "dropped_by_filter": {
-   "model_only_no_market": 37
-  },
+  "dropped_by_filter": {},
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "female|challengers|stars|2026-10-19",
-   "start_ist": "2026-10-19 10:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Adelaide Strikers|Oval Invincibles|2026-10-19",
-   "start_ist": "2026-10-19 10:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Adelaide Strikers",
-    "Oval Invincibles"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Nepal|Oman|2026-10-19",
-   "start_ist": "2026-10-19 11:00 IST",
-   "format": "ODI",
-   "format_source": "name",
-   "teams_matched": [
-    "Nepal",
-    "Oman"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Bangladesh|afghanistan|2026-10-19",
-   "start_ist": "2026-10-19 11:00 IST",
-   "format": "ODI",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Zimbabwe|afghanistan|2026-10-19",
    "start_ist": "2026-10-19 17:00 IST",
@@ -213,7 +164,6 @@
   "BJ Curran",
   "BL Bennett",
   "BRM Taylor",
-  "Bashir Ahmed",
   "Ben Curran",
   "Bilal Sami",
   "Blessing Muzarabani",
@@ -241,12 +191,9 @@
   "Rahmanullah Gurbaz",
   "Rahmat Shah",
   "Rashid Khan",
-  "Rohit Kumar",
   "Ryan Burl",
   "S Atal",
-  "Sammay S",
   "Sediqullah Atal",
-  "Siddharth Bukkapatnam",
   "Sikandar Raza",
   "T Marumani",
   "T Tsiga",
@@ -384,13 +331,13 @@
   }
  },
  "log": [
-  "[10:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[10:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1170, 'secs': 0.7}",
-  "[10:23 IST] source smarkets: {'status': 'ok', 'rows': 384, 'secs': 2.2}",
-  "[10:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:23 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[10:24 IST] weather: forecasts for 1 events, 0 failed",
-  "[10:24 IST] prop model: 491 prop selections modelled, 211 milestone ladder prices anchored to O/U"
+  "[11:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[11:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[11:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1184, 'secs': 0.7}",
+  "[11:28 IST] source smarkets: {'status': 'ok', 'rows': 384, 'secs': 2.4}",
+  "[11:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[11:28 IST] 21 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[11:28 IST] weather: forecasts for 1 events, 0 failed",
+  "[11:28 IST] prop model: 491 prop selections modelled, 211 milestone ladder prices anchored to O/U"
  ]
 }
