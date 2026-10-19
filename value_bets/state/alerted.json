@@ -18,5 +18,10 @@
   "edge": 0.0507,
   "start_utc": "2026-10-20T08:15:00Z",
   "alerted_at": "2026-10-19T08:54:20.111881+00:00"
+ },
+ "female|Australia|New Zealand|2026-10-20|bowler_milestone||AC Kerr 3+ yes|2.5|over": {
+  "edge": 0.1868,
+  "start_utc": "2026-10-20T08:15:00Z",
+  "alerted_at": "2026-10-19T11:58:25.742836+00:00"
  }
 }
