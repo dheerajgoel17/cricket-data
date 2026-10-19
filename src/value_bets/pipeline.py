@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import config, history, store, weather
+from . import config, history, store, strategy, weather
 from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
@@ -620,6 +620,11 @@ def run():
                                     "market_fair_from": x.get("p_src_from") or [y.get("p_src_from") for y in pool if y.get("p_src_from")] or None})
                 continue
             n_src = len({y["source"] for y in sig})
+            ok, why_bad = strategy.gate(mt, x.get("side"), pm, o, x["source"], n_src=n_src,
+                                        name_score=x.get("match_score"), overround=x.get("overround"), edge=e)
+            if not ok:
+                dropped[why_bad] += 1
+                continue
             notes.append(f"{n_src} market source(s) for fair price")
             if pm is not None and pc is not None:
                 notes.append(f"model {pm:.3f} vs market {pc:.3f}")

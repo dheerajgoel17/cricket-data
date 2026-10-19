@@ -139,7 +139,7 @@ class PlayerResolver:
                 s = 50 if ct[-1].lower() == rsur else 45
                 rf, cf = rt[0], ct[0]
                 if len(rt) == 1 or len(ct) == 1:
-                    s += 10
+                    s += 0  # surname only: below the accept bar unless mapped in players.csv
                 elif rf.lower() == cf.lower():
                     s += 45
                 elif _is_initials(rf) and _is_initials(cf):
@@ -164,6 +164,13 @@ class PlayerResolver:
         top = scored[0]
         if top[0] < 55:
             return None
+        rt0 = rt[0]
+        if _is_initials(rt0) and len(rt) >= 2:
+            # 'S Verma': an initial + surname is ambiguous if any other roster player shares surname and initial
+            same = {pid for t, name, pid, last, n in cands
+                    if _tokens(name) and _tokens(name)[-1].lower() == rsur and _tokens(name)[0][0].upper() == rt0[0].upper()}
+            if len(same) > 1:
+                return None
         if len(scored) > 1 and scored[1][0] >= top[0] - 5 and scored[1][4] != top[4]:
             # same name, two registry ids: accept only a clearly dominant, active one
             if not (scored[1][0] <= top[0] and top[1] >= 5 * max(1, scored[1][1])):
