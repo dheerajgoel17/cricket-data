@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T14:59:27Z",
- "generated_at_ist": "2026-10-20 20:29 IST",
- "runtime_secs": 29.7,
+ "generated_at_utc": "2026-10-20T15:58:24Z",
+ "generated_at_ist": "2026-10-20 21:28 IST",
+ "runtime_secs": 30.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "15f73a5048"
+  "commit": "5258cf5b75"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 621,
-   "secs": 0.6
+   "rows": 834,
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 365,
-   "secs": 2.6
+   "rows": 349,
+   "secs": 1.9
   }
  },
- "snapshot": "odds_20261020T145927Z.jsonl.gz",
+ "snapshot": "odds_20261020T155824Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,34 +66,18 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 9,
-  "rows_in_window": 392,
-  "selections_with_model": 20,
-  "selections_with_market_fair": 130,
-  "markets_in_window": 14,
+  "events_in_window": 10,
+  "rows_in_window": 365,
+  "selections_with_model": 0,
+  "selections_with_market_fair": 140,
+  "markets_in_window": 12,
   "value_bets": 0,
-  "dropped_by_filter": {
-   "model_only_no_market": 20
-  },
+  "dropped_by_filter": {},
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "male|Dolphins|Warriors|2026-10-20",
-   "start_ist": "2026-10-20 21:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Dolphins",
-    "Warriors"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|emirates red|sharjah|2026-10-20",
    "start_ist": "2026-10-20 22:00 IST",
@@ -182,13 +166,32 @@
     "moviodds_bet365",
     "smarkets"
    ]
+  },
+  {
+   "event": "male|dallas xforia giants|san ramon grizzlies|2026-10-21",
+   "start_ist": "2026-10-21 20:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|baltimore royals|manhattan yorkers|2026-10-21",
+   "start_ist": "2026-10-21 20:45 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
  "suspect_not_alerted": [],
  "unmatched_teams": [
   "Afghanistan (male)",
-  "Ajman (male)",
   "Baltimore Royals (male)",
   "Challengers (W) (female)",
   "Chicago Kingsmen (male)",
@@ -196,7 +199,6 @@
   "Conquerors (W) (female)",
   "Dallas Xforia Giants (male)",
   "Eastern Storm (male)",
-  "Emirates Blues (male)",
   "Emirates Red (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
@@ -221,33 +223,24 @@
   "Allah Mohammad Ghazanfar",
   "Azmatullah Omarzai",
   "B Sami",
-  "Bandile Mbatha",
   "Bilal Sami",
-  "Ethan Frosler",
   "F Farooqi",
   "Fazalhaq Farooqi",
-  "Gideon Peters",
   "Hasan Mahmud",
   "Hashmatullah Shahidi",
   "I Alikhil",
   "Ibrahim Zadran",
   "Ikram Alikhil",
-  "Jason Raubenheimer",
-  "Joshua Richards",
   "LK Das",
   "M Nabi",
-  "Matthew Boast",
   "Mehidy Hasan Miraz",
-  "Modiri Litheko",
   "Mohammad Nabi",
   "Mosaddek Hossain",
-  "Muhammad Manack",
   "Mustafizur Rahman",
   "N Hasan",
   "Najmul Hossain Shanto",
   "Nangeyalia Khan",
   "Nangeyalia Kharote",
-  "Ntando Zuma",
   "Nurul Hasan Sohan",
   "Parvez Hossain Emon",
   "R Gurbaz",
@@ -259,16 +252,12 @@
   "S Sarkar",
   "Saif Hassan",
   "Sediqullah Atal",
-  "Semal Pillay",
   "Shoriful Islam",
-  "Sibonelo Makhanya",
   "Soumya Sarkar",
   "Tanvir Islam",
   "Tanzid Hasan",
   "Tanzid Hasan Tamin",
   "Taskin Ahmed",
-  "Tim Saulez",
-  "Tladi Bokako",
   "Towhid Hridoy",
   "Yamin Ahmadzai",
   "Ziaur Rahman"
@@ -396,13 +385,13 @@
   }
  },
  "log": [
-  "[20:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[20:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[20:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 621, 'secs': 0.6}",
-  "[20:29 IST] source smarkets: {'status': 'ok', 'rows': 365, 'secs': 2.6}",
-  "[20:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[20:29 IST] 4 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[20:29 IST] weather: forecasts for 0 events, 0 failed",
-  "[20:29 IST] prop model: 195 prop selections modelled, 80 milestone ladder prices anchored to O/U"
+  "[21:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[21:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[21:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 834, 'secs': 0.8}",
+  "[21:28 IST] source smarkets: {'status': 'ok', 'rows': 349, 'secs': 1.9}",
+  "[21:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[21:28 IST] 5 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[21:28 IST] weather: forecasts for 1 events, 0 failed",
+  "[21:28 IST] prop model: 363 prop selections modelled, 160 milestone ladder prices anchored to O/U"
  ]
 }
