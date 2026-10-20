@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T14:24:41Z",
- "generated_at_ist": "2026-10-20 19:54 IST",
- "runtime_secs": 31.1,
+ "generated_at_utc": "2026-10-20T14:59:27Z",
+ "generated_at_ist": "2026-10-20 20:29 IST",
+ "runtime_secs": 29.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "233f186b22"
+  "commit": "15f73a5048"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 621,
-   "secs": 1.4
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 361,
+   "rows": 365,
    "secs": 2.6
   }
  },
- "snapshot": "odds_20261020T142441Z.jsonl.gz",
+ "snapshot": "odds_20261020T145927Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,8 +66,8 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 7,
-  "rows_in_window": 384,
+  "events_in_window": 9,
+  "rows_in_window": 392,
   "selections_with_model": 20,
   "selections_with_market_fair": 130,
   "markets_in_window": 14,
@@ -133,6 +133,16 @@
    ]
   },
   {
+   "event": "male|getafe tigers|madrid|2026-10-21",
+   "start_ist": "2026-10-21 12:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|garden route badgers|northern cape heat|2026-10-21",
    "start_ist": "2026-10-21 16:30 IST",
    "format": null,
@@ -144,6 +154,16 @@
   },
   {
    "event": "male|garden route badgers|northern cape|2026-10-21",
+   "start_ist": "2026-10-21 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|madrid united|sonseca sultans|2026-10-21",
    "start_ist": "2026-10-21 16:30 IST",
    "format": "T20",
    "format_source": "name",
@@ -180,8 +200,10 @@
   "Emirates Red (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
+  "Getafe Tigers (male)",
   "Los Angeles Lashings (male)",
-  "Madrid Blues (male)",
+  "Madrid Cc (male)",
+  "Madrid United (male)",
   "Manhattan Yorkers (male)",
   "Morrisville Raptors (male)",
   "Northern Cape (male)",
@@ -374,13 +396,13 @@
   }
  },
  "log": [
-  "[19:54 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[19:54 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[19:54 IST] source moviodds_bet365: {'status': 'ok', 'rows': 621, 'secs': 1.4}",
-  "[19:54 IST] source smarkets: {'status': 'ok', 'rows': 361, 'secs': 2.6}",
-  "[19:55 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[19:55 IST] 4 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[19:55 IST] weather: forecasts for 0 events, 0 failed",
-  "[19:55 IST] prop model: 195 prop selections modelled, 80 milestone ladder prices anchored to O/U"
+  "[20:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[20:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[20:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 621, 'secs': 0.6}",
+  "[20:29 IST] source smarkets: {'status': 'ok', 'rows': 365, 'secs': 2.6}",
+  "[20:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[20:29 IST] 4 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[20:29 IST] weather: forecasts for 0 events, 0 failed",
+  "[20:29 IST] prop model: 195 prop selections modelled, 80 milestone ladder prices anchored to O/U"
  ]
 }
