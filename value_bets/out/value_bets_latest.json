@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T10:55:52Z",
- "generated_at_ist": "2026-10-20 16:25 IST",
- "runtime_secs": 21.7,
+ "generated_at_utc": "2026-10-20T11:52:09Z",
+ "generated_at_ist": "2026-10-20 17:22 IST",
+ "runtime_secs": 25.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "6e0ff904fc"
+  "commit": "d25a7df235"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 797,
-   "secs": 0.5
+   "rows": 823,
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 333,
-   "secs": 2.9
+   "rows": 331,
+   "secs": 2.6
   }
  },
- "snapshot": "odds_20261020T105552Z.jsonl.gz",
+ "snapshot": "odds_20261020T115209Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,15 +66,15 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 8,
-  "rows_in_window": 379,
+  "events_in_window": 11,
+  "rows_in_window": 656,
   "selections_with_model": 270,
-  "selections_with_market_fair": 225,
-  "markets_in_window": 36,
+  "selections_with_market_fair": 305,
+  "markets_in_window": 46,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 8,
-   "model_market_gap": 76,
+   "model_market_gap": 77,
    "top_thin_market": 1,
    "market_disabled": 1,
    "model_only_no_market": 49,
@@ -128,8 +128,8 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.548,
-    "corr": 0.915
+    "mean_abs_logit_diff": 0.566,
+    "corr": 0.903
    },
    "batter_milestone": {
     "n_prices": 50,
@@ -142,10 +142,10 @@
    "bowler_milestone": {
     "n_prices": 31,
     "mean_model_p": 0.2,
-    "mean_market_p": 0.225,
-    "mean_logit_diff_model_minus_market": -0.095,
-    "mean_abs_logit_diff": 0.693,
-    "corr": 0.949
+    "mean_market_p": 0.229,
+    "mean_logit_diff_model_minus_market": -0.12,
+    "mean_abs_logit_diff": 0.717,
+    "corr": 0.943
    },
    "top_batter_match": {
     "n_prices": 30,
@@ -252,6 +252,7 @@
     "Sydney Sixers"
    ],
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -265,6 +266,38 @@
     "Kenya"
    ],
    "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|garden route badgers|northern cape heat|2026-10-21",
+   "start_ist": "2026-10-21 16:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "moviodds_bet365"
+   ]
+  },
+  {
+   "event": "male|garden route badgers|northern cape|2026-10-21",
+   "start_ist": "2026-10-21 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Bangladesh|afghanistan|2026-10-21",
+   "start_ist": "2026-10-21 17:00 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   }
@@ -297,26 +330,70 @@
  ],
  "unmatched_players_in_window": [
   "A Sharma",
+  "AM Ghazanfar",
+  "Al Islam",
+  "Aliss Islam",
+  "Allah Mohammad Ghazanfar",
+  "Azmatullah Omarzai",
+  "B Sami",
   "Bandile Mbatha",
+  "Bilal Sami",
   "Chipo Mugeri",
   "Ethan Frosler",
+  "F Farooqi",
+  "Fazalhaq Farooqi",
   "Gideon Peters",
+  "Hasan Mahmud",
+  "Hashmatullah Shahidi",
+  "I Alikhil",
+  "Ibrahim Zadran",
+  "Ikram Alikhil",
   "J Kalita",
   "Jason Raubenheimer",
   "Jintimoni Kalita",
   "Joshua Richards",
   "K Gaud",
   "Kranti Munna Gaud",
+  "LK Das",
+  "M Nabi",
   "Matthew Boast",
+  "Mehidy Hasan Miraz",
   "Modiri Litheko",
+  "Mohammad Nabi",
+  "Mosaddek Hossain",
   "Muhammad Manack",
+  "Mustafizur Rahman",
+  "N Hasan",
   "NS Prasad",
+  "Najmul Hossain Shanto",
+  "Nangeyalia Khan",
+  "Nangeyalia Kharote",
   "Nikki Siribhagwan Prasad",
   "Ntando Zuma",
+  "Nurul Hasan Sohan",
+  "Parvez Hossain Emon",
+  "R Gurbaz",
+  "Rahmanullah Gurbaz",
+  "Rahmat Shah",
+  "Rashid Khan",
+  "Rishad Hossain",
+  "S Atal",
+  "S Sarkar",
+  "Saif Hassan",
+  "Sediqullah Atal",
   "Semal Pillay",
+  "Shoriful Islam",
   "Sibonelo Makhanya",
+  "Soumya Sarkar",
+  "Tanvir Islam",
+  "Tanzid Hasan",
+  "Tanzid Hasan Tamin",
+  "Taskin Ahmed",
   "Tim Saulez",
-  "Tladi Bokako"
+  "Tladi Bokako",
+  "Towhid Hridoy",
+  "Yamin Ahmadzai",
+  "Ziaur Rahman"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -441,13 +518,13 @@
   }
  },
  "log": [
-  "[16:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[16:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[16:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 797, 'secs': 0.5}",
-  "[16:26 IST] source smarkets: {'status': 'ok', 'rows': 333, 'secs': 2.9}",
-  "[16:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[16:26 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[16:26 IST] weather: forecasts for 0 events, 0 failed",
-  "[16:26 IST] prop model: 324 prop selections modelled, 136 milestone ladder prices anchored to O/U"
+  "[17:22 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[17:22 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[17:22 IST] source moviodds_bet365: {'status': 'ok', 'rows': 823, 'secs': 0.6}",
+  "[17:22 IST] source smarkets: {'status': 'ok', 'rows': 331, 'secs': 2.6}",
+  "[17:22 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[17:22 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[17:22 IST] weather: forecasts for 0 events, 0 failed",
+  "[17:22 IST] prop model: 342 prop selections modelled, 136 milestone ladder prices anchored to O/U"
  ]
 }
