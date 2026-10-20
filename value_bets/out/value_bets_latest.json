@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T16:53:04Z",
- "generated_at_ist": "2026-10-20 22:23 IST",
- "runtime_secs": 24.6,
+ "generated_at_utc": "2026-10-20T17:51:51Z",
+ "generated_at_ist": "2026-10-20 23:21 IST",
+ "runtime_secs": 32.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "5d4c4add92"
+  "commit": "0462309a00"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 844,
-   "secs": 0.6
+   "rows": 978,
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 386,
-   "secs": 2.9
+   "rows": 420,
+   "secs": 2.2
   }
  },
- "snapshot": "odds_20261020T165304Z.jsonl.gz",
+ "snapshot": "odds_20261020T175151Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -467,13 +467,13 @@
   }
  },
  "log": [
-  "[22:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[22:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 844, 'secs': 0.6}",
-  "[22:23 IST] source smarkets: {'status': 'ok', 'rows': 386, 'secs': 2.9}",
-  "[22:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:23 IST] 5 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:23 IST] weather: forecasts for 1 events, 0 failed",
-  "[22:23 IST] prop model: 367 prop selections modelled, 160 milestone ladder prices anchored to O/U"
+  "[23:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[23:22 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[23:22 IST] source moviodds_bet365: {'status': 'ok', 'rows': 978, 'secs': 0.2}",
+  "[23:22 IST] source smarkets: {'status': 'ok', 'rows': 420, 'secs': 2.2}",
+  "[23:22 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[23:22 IST] 6 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[23:22 IST] weather: forecasts for 1 events, 0 failed",
+  "[23:22 IST] prop model: 467 prop selections modelled, 160 milestone ladder prices anchored to O/U"
  ]
 }
