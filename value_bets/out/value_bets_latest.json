@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-19T21:38:50Z",
- "generated_at_ist": "2026-10-20 03:08 IST",
- "runtime_secs": 32.5,
+ "generated_at_utc": "2026-10-20T03:53:12Z",
+ "generated_at_ist": "2026-10-20 09:23 IST",
+ "runtime_secs": 32.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "e4cc847fb7"
+  "commit": "6781f51b62"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1150,
-   "secs": 0.7
+   "rows": 1374,
+   "secs": 1.0
   },
   "smarkets": {
    "status": "ok",
-   "rows": 294,
-   "secs": 2.3
+   "rows": 348,
+   "secs": 1.9
   }
  },
- "snapshot": "odds_20261019T213850Z.jsonl.gz",
+ "snapshot": "odds_20261020T035312Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,11 +66,11 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 15,
-  "rows_in_window": 1053,
-  "selections_with_model": 797,
-  "selections_with_market_fair": 730,
-  "markets_in_window": 112,
+  "events_in_window": 13,
+  "rows_in_window": 1056,
+  "selections_with_model": 816,
+  "selections_with_market_fair": 749,
+  "markets_in_window": 113,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_market_gap": 215,
@@ -88,9 +88,9 @@
     "n_prices": 162,
     "mean_model_p": 0.049,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.112,
-    "mean_abs_logit_diff": 0.808,
-    "corr": 0.864
+    "mean_logit_diff_model_minus_market": 0.11,
+    "mean_abs_logit_diff": 0.806,
+    "corr": 0.866
    },
    "top_bowler_team": {
     "n_prices": 63,
@@ -122,7 +122,7 @@
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.415,
-    "corr": 0.351
+    "corr": 0.35
    },
    "bowler_wickets": {
     "n_prices": 46,
@@ -133,12 +133,12 @@
     "corr": 0.904
    },
    "batter_milestone": {
-    "n_prices": 174,
-    "mean_model_p": 0.375,
-    "mean_market_p": 0.421,
-    "mean_logit_diff_model_minus_market": -0.316,
-    "mean_abs_logit_diff": 0.658,
-    "corr": 0.98
+    "n_prices": 166,
+    "mean_model_p": 0.369,
+    "mean_market_p": 0.417,
+    "mean_logit_diff_model_minus_market": -0.333,
+    "mean_abs_logit_diff": 0.647,
+    "corr": 0.981
    },
    "bowler_milestone": {
     "n_prices": 111,
@@ -157,44 +157,16 @@
     "corr": 0.864
    },
    "top_bowler_match": {
-    "n_prices": 40,
-    "mean_model_p": 0.042,
-    "mean_market_p": 0.05,
+    "n_prices": 63,
+    "mean_model_p": 0.045,
+    "mean_market_p": 0.048,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.676,
-    "corr": 0.721
+    "mean_abs_logit_diff": 0.627,
+    "corr": 0.528
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "female|Adelaide Strikers|Perth Scorchers|2026-10-19",
-   "start_ist": "2026-10-20 04:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Adelaide Strikers",
-    "Perth Scorchers"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Sydney Sixers|Sydney Thunder|2026-10-20",
-   "start_ist": "2026-10-20 09:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Sydney Sixers",
-    "Sydney Thunder"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "female|challengers|conquerors|2026-10-20",
    "start_ist": "2026-10-20 10:30 IST",
@@ -545,13 +517,13 @@
   }
  },
  "log": [
-  "[03:08 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:09 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[03:09 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1150, 'secs': 0.7}",
-  "[03:09 IST] source smarkets: {'status': 'ok', 'rows': 294, 'secs': 2.3}",
-  "[03:09 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:09 IST] 26 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[03:09 IST] weather: forecasts for 1 events, 0 failed",
-  "[03:09 IST] prop model: 659 prop selections modelled, 286 milestone ladder prices anchored to O/U"
+  "[09:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[09:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[09:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1374, 'secs': 1.0}",
+  "[09:23 IST] source smarkets: {'status': 'ok', 'rows': 348, 'secs': 1.9}",
+  "[09:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[09:23 IST] 26 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[09:23 IST] weather: forecasts for 1 events, 0 failed",
+  "[09:23 IST] prop model: 655 prop selections modelled, 286 milestone ladder prices anchored to O/U"
  ]
 }
