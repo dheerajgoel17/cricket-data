@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T09:51:44Z",
- "generated_at_ist": "2026-10-20 15:21 IST",
- "runtime_secs": 25.2,
+ "generated_at_utc": "2026-10-20T10:55:52Z",
+ "generated_at_ist": "2026-10-20 16:25 IST",
+ "runtime_secs": 21.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "51ff8d4b96"
+  "commit": "6e0ff904fc"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 795,
+   "rows": 797,
    "secs": 0.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 368,
-   "secs": 2.8
+   "rows": 333,
+   "secs": 2.9
   }
  },
- "snapshot": "odds_20261020T095144Z.jsonl.gz",
+ "snapshot": "odds_20261020T105552Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,8 +66,8 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 9,
-  "rows_in_window": 383,
+  "events_in_window": 8,
+  "rows_in_window": 379,
   "selections_with_model": 270,
   "selections_with_market_fair": 225,
   "markets_in_window": 36,
@@ -167,16 +167,6 @@
  },
  "events_in_window": [
   {
-   "event": "male|madrid blues|sonseca sultans|2026-10-20",
-   "start_ist": "2026-10-20 16:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
    "event": "male|ajman|emirates blues|2026-10-20",
    "start_ist": "2026-10-20 18:00 IST",
    "format": null,
@@ -261,16 +251,6 @@
     "Perth Scorchers",
     "Sydney Sixers"
    ],
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Bangladesh|afghanistan|2026-10-21",
-   "start_ist": "2026-10-21 11:00 IST",
-   "format": "ODI",
-   "format_source": "name",
-   "teams_matched": null,
    "sources": [
     "smarkets"
    ]
@@ -461,13 +441,13 @@
   }
  },
  "log": [
-  "[15:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[15:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[15:21 IST] source moviodds_bet365: {'status': 'ok', 'rows': 795, 'secs': 0.5}",
-  "[15:21 IST] source smarkets: {'status': 'ok', 'rows': 368, 'secs': 2.8}",
-  "[15:22 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[15:22 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[15:22 IST] weather: forecasts for 0 events, 0 failed",
-  "[15:22 IST] prop model: 324 prop selections modelled, 136 milestone ladder prices anchored to O/U"
+  "[16:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[16:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[16:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 797, 'secs': 0.5}",
+  "[16:26 IST] source smarkets: {'status': 'ok', 'rows': 333, 'secs': 2.9}",
+  "[16:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[16:26 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[16:26 IST] weather: forecasts for 0 events, 0 failed",
+  "[16:26 IST] prop model: 324 prop selections modelled, 136 milestone ladder prices anchored to O/U"
  ]
 }
