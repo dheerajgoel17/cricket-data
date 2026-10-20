@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T05:55:35Z",
- "generated_at_ist": "2026-10-20 11:25 IST",
- "runtime_secs": 32.1,
+ "generated_at_utc": "2026-10-20T06:53:24Z",
+ "generated_at_ist": "2026-10-20 12:23 IST",
+ "runtime_secs": 28.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "4182fcd476"
+  "commit": "3cb4d468ce"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1376,
-   "secs": 0.9
+   "rows": 1372,
+   "secs": 1.1
   },
   "smarkets": {
    "status": "ok",
-   "rows": 375,
-   "secs": 2.0
+   "rows": 364,
+   "secs": 2.8
   }
  },
- "snapshot": "odds_20261020T055535Z.jsonl.gz",
+ "snapshot": "odds_20261020T065324Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -67,14 +67,14 @@
  },
  "stats": {
   "events_in_window": 11,
-  "rows_in_window": 1052,
-  "selections_with_model": 818,
-  "selections_with_market_fair": 751,
+  "rows_in_window": 1048,
+  "selections_with_model": 814,
+  "selections_with_market_fair": 747,
   "markets_in_window": 113,
   "value_bets": 0,
   "dropped_by_filter": {
-   "model_market_gap": 215,
-   "odds_range": 16,
+   "model_market_gap": 217,
+   "odds_range": 14,
    "model_only_no_market": 94,
    "market_disabled": 2,
    "policy_max_odds": 1,
@@ -88,9 +88,9 @@
     "n_prices": 162,
     "mean_model_p": 0.049,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.11,
+    "mean_logit_diff_model_minus_market": 0.111,
     "mean_abs_logit_diff": 0.806,
-    "corr": 0.865
+    "corr": 0.863
    },
    "top_bowler_team": {
     "n_prices": 63,
@@ -104,7 +104,7 @@
     "n_prices": 38,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.452,
     "corr": null
    },
@@ -112,7 +112,7 @@
     "n_prices": 40,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.41,
     "corr": 0.867
    },
@@ -133,12 +133,12 @@
     "corr": 0.904
    },
    "batter_milestone": {
-    "n_prices": 170,
-    "mean_model_p": 0.372,
-    "mean_market_p": 0.419,
-    "mean_logit_diff_model_minus_market": -0.324,
-    "mean_abs_logit_diff": 0.651,
-    "corr": 0.98
+    "n_prices": 166,
+    "mean_model_p": 0.369,
+    "mean_market_p": 0.417,
+    "mean_logit_diff_model_minus_market": -0.332,
+    "mean_abs_logit_diff": 0.655,
+    "corr": 0.979
    },
    "bowler_milestone": {
     "n_prices": 111,
@@ -507,13 +507,13 @@
   }
  },
  "log": [
-  "[11:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[11:25 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[11:25 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1376, 'secs': 0.9}",
-  "[11:25 IST] source smarkets: {'status': 'ok', 'rows': 375, 'secs': 2.0}",
-  "[11:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[11:26 IST] 26 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[11:26 IST] weather: forecasts for 1 events, 0 failed",
-  "[11:26 IST] prop model: 657 prop selections modelled, 286 milestone ladder prices anchored to O/U"
+  "[12:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[12:23 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[12:23 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1372, 'secs': 1.1}",
+  "[12:23 IST] source smarkets: {'status': 'ok', 'rows': 364, 'secs': 2.8}",
+  "[12:23 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[12:23 IST] 26 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[12:23 IST] weather: forecasts for 1 events, 0 failed",
+  "[12:23 IST] prop model: 653 prop selections modelled, 286 milestone ladder prices anchored to O/U"
  ]
 }
