@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T11:52:09Z",
- "generated_at_ist": "2026-10-20 17:22 IST",
- "runtime_secs": 25.6,
+ "generated_at_utc": "2026-10-20T12:55:54Z",
+ "generated_at_ist": "2026-10-20 18:25 IST",
+ "runtime_secs": 24.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "d25a7df235"
+  "commit": "ed9eb6388a"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 823,
-   "secs": 0.6
+   "rows": 819,
+   "secs": 0.3
   },
   "smarkets": {
    "status": "ok",
-   "rows": 331,
-   "secs": 2.6
+   "rows": 335,
+   "secs": 2.7
   }
  },
- "snapshot": "odds_20261020T115209Z.jsonl.gz",
+ "snapshot": "odds_20261020T125554Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,8 +66,8 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 11,
-  "rows_in_window": 656,
+  "events_in_window": 8,
+  "rows_in_window": 640,
   "selections_with_model": 270,
   "selections_with_market_fair": 305,
   "markets_in_window": 46,
@@ -157,53 +157,15 @@
    },
    "top_bowler_match": {
     "n_prices": 19,
-    "mean_model_p": 0.038,
+    "mean_model_p": 0.037,
     "mean_market_p": 0.053,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.777,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.804,
     "corr": 0.837
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|ajman|emirates blues|2026-10-20",
-   "start_ist": "2026-10-20 18:00 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Lesotho|Mozambique|2026-10-20",
-   "start_ist": "2026-10-20 18:20 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Lesotho",
-    "Mozambique"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Gambia|Nigeria|2026-10-20",
-   "start_ist": "2026-10-20 18:20 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Gambia",
-    "Nigeria"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "female|India|Zimbabwe|2026-10-20",
    "start_ist": "2026-10-20 19:00 IST",
@@ -518,13 +480,13 @@
   }
  },
  "log": [
-  "[17:22 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[17:22 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[17:22 IST] source moviodds_bet365: {'status': 'ok', 'rows': 823, 'secs': 0.6}",
-  "[17:22 IST] source smarkets: {'status': 'ok', 'rows': 331, 'secs': 2.6}",
-  "[17:22 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[17:22 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[17:22 IST] weather: forecasts for 0 events, 0 failed",
-  "[17:22 IST] prop model: 342 prop selections modelled, 136 milestone ladder prices anchored to O/U"
+  "[18:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[18:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 819, 'secs': 0.3}",
+  "[18:26 IST] source smarkets: {'status': 'ok', 'rows': 335, 'secs': 2.7}",
+  "[18:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:26 IST] 10 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[18:26 IST] weather: forecasts for 0 events, 0 failed",
+  "[18:26 IST] prop model: 342 prop selections modelled, 136 milestone ladder prices anchored to O/U"
  ]
 }
