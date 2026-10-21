@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T14:51:00Z",
- "generated_at_ist": "2026-10-21 20:21 IST",
- "runtime_secs": 32.8,
+ "generated_at_utc": "2026-10-21T15:57:57Z",
+ "generated_at_ist": "2026-10-21 21:27 IST",
+ "runtime_secs": 32.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "0ea7b875ee"
+  "commit": "aea134d082"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1391,
-   "secs": 0.8
+   "rows": 1395,
+   "secs": 0.9
   },
   "smarkets": {
    "status": "ok",
-   "rows": 463,
-   "secs": 2.3
+   "rows": 438,
+   "secs": 1.7
   }
  },
- "snapshot": "odds_20261021T145100Z.jsonl.gz",
+ "snapshot": "odds_20261021T155757Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,17 +66,17 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 18,
-  "rows_in_window": 1347,
-  "selections_with_model": 1081,
-  "selections_with_market_fair": 890,
-  "markets_in_window": 132,
+  "events_in_window": 15,
+  "rows_in_window": 1300,
+  "selections_with_model": 1066,
+  "selections_with_market_fair": 894,
+  "markets_in_window": 130,
   "value_bets": 0,
   "dropped_by_filter": {
-   "odds_range": 16,
-   "model_market_gap": 168,
+   "odds_range": 15,
+   "model_market_gap": 171,
    "loose_name_match": 1,
-   "model_only_no_market": 201,
+   "model_only_no_market": 184,
    "policy_max_odds": 6,
    "market_disabled": 1
   },
@@ -92,12 +92,12 @@
     "corr": 0.893
    },
    "top_bowler_team": {
-    "n_prices": 86,
-    "mean_model_p": 0.098,
-    "mean_market_p": 0.093,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.347,
-    "corr": 0.747
+    "n_prices": 87,
+    "mean_model_p": 0.096,
+    "mean_market_p": 0.092,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.35,
+    "corr": 0.736
    },
    "batter_runs": {
     "n_prices": 48,
@@ -127,7 +127,7 @@
     "n_prices": 46,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.333,
     "corr": 0.903
    },
@@ -136,8 +136,8 @@
     "mean_model_p": 0.385,
     "mean_market_p": 0.42,
     "mean_logit_diff_model_minus_market": -0.236,
-    "mean_abs_logit_diff": 0.498,
-    "corr": 0.985
+    "mean_abs_logit_diff": 0.506,
+    "corr": 0.986
    },
    "bowler_milestone": {
     "n_prices": 115,
@@ -156,50 +156,16 @@
     "corr": 0.86
    },
    "top_bowler_match": {
-    "n_prices": 63,
-    "mean_model_p": 0.049,
-    "mean_market_p": 0.048,
+    "n_prices": 64,
+    "mean_model_p": 0.048,
+    "mean_market_p": 0.047,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.583,
-    "corr": 0.467
+    "mean_abs_logit_diff": 0.596,
+    "corr": 0.448
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|dallas xforia giants|san ramon grizzlies|2026-10-21",
-   "start_ist": "2026-10-21 20:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|baltimore royals|manhattan yorkers|2026-10-21",
-   "start_ist": "2026-10-21 20:45 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Limpopo|North West|2026-10-21",
-   "start_ist": "2026-10-21 21:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Limpopo",
-    "North West"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Abu Dhabi Knight Riders|ajman|2026-10-21",
    "start_ist": "2026-10-21 22:00 IST",
@@ -392,7 +358,6 @@
   "Dallas Xforia Giants (male)",
   "Eastern Cape Linyathi (male)",
   "Eastern Storm (male)",
-  "Emirates Blues (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
   "Getafe Tigers (male)",
@@ -408,41 +373,26 @@
  ],
  "unmatched_players_in_window": [
   "AR Patel",
-  "Alfred Mothoa",
   "B James",
   "B McDonough",
   "Bella James",
   "Byron McDonough",
-  "CC Oberholzer",
   "Dasun Shanaka",
-  "Dian Forrester",
   "Dushmantha Chameera",
   "Gerhard Erasmus",
   "Gus Atkinson",
   "HT Crocombe",
   "Henry T Crocombe",
-  "Hlompo Modimokwane",
   "J Coles",
-  "Jade de Klerk",
   "James Matthew Coles",
   "Kamindu Mendis",
   "Kusal Mendis",
-  "Kyle Landsberg",
-  "Lesego Kokohlabana",
-  "Liam Peters",
-  "Lukas Janse van Rensburg",
   "MS Crane",
   "Mason Crane",
   "Nicol Loftie-Eaton",
-  "Nyiko Shikwambana",
-  "Onke Nyaku",
   "P Yadav",
-  "Paul James",
-  "Raynard Van Tonder",
-  "Richard Williams",
   "V Chakravarthy",
-  "Varun Chakravarthy",
-  "Ximus du Plooy"
+  "Varun Chakravarthy"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -567,13 +517,13 @@
   }
  },
  "log": [
-  "[20:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[20:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[20:21 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1391, 'secs': 0.8}",
-  "[20:21 IST] source smarkets: {'status': 'ok', 'rows': 463, 'secs': 2.3}",
-  "[20:21 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[20:21 IST] 18 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[20:21 IST] weather: forecasts for 1 events, 0 failed",
-  "[20:21 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[21:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[21:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[21:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1395, 'secs': 0.9}",
+  "[21:28 IST] source smarkets: {'status': 'ok', 'rows': 438, 'secs': 1.7}",
+  "[21:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[21:28 IST] 19 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[21:28 IST] weather: forecasts for 1 events, 0 failed",
+  "[21:28 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
