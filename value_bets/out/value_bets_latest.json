@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T13:57:35Z",
- "generated_at_ist": "2026-10-21 19:27 IST",
- "runtime_secs": 33.3,
+ "generated_at_utc": "2026-10-21T14:33:58Z",
+ "generated_at_ist": "2026-10-21 20:03 IST",
+ "runtime_secs": 34.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "5a4bc1dafa"
+  "commit": "418534f9d8"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1389,
-   "secs": 0.5
+   "rows": 1390,
+   "secs": 0.9
   },
   "smarkets": {
    "status": "ok",
-   "rows": 449,
-   "secs": 1.6
+   "rows": 414,
+   "secs": 3.9
   }
  },
- "snapshot": "odds_20261021T135735Z.jsonl.gz",
+ "snapshot": "odds_20261021T143358Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -67,14 +67,14 @@
  },
  "stats": {
   "events_in_window": 16,
-  "rows_in_window": 1337,
-  "selections_with_model": 1079,
-  "selections_with_market_fair": 888,
+  "rows_in_window": 1338,
+  "selections_with_model": 1080,
+  "selections_with_market_fair": 889,
   "markets_in_window": 132,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 16,
-   "model_market_gap": 169,
+   "model_market_gap": 170,
    "loose_name_match": 1,
    "model_only_no_market": 201,
    "policy_max_odds": 6,
@@ -84,12 +84,12 @@
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 235,
-    "mean_model_p": 0.044,
+    "n_prices": 236,
+    "mean_model_p": 0.043,
     "mean_market_p": 0.065,
-    "mean_logit_diff_model_minus_market": -0.03,
-    "mean_abs_logit_diff": 0.7,
-    "corr": 0.894
+    "mean_logit_diff_model_minus_market": -0.035,
+    "mean_abs_logit_diff": 0.703,
+    "corr": 0.893
    },
    "top_bowler_team": {
     "n_prices": 86,
@@ -374,14 +374,10 @@
   "Eastern Storm (male)",
   "Emirates Blues (male)",
   "Fairfirst Insurance (male)",
-  "Garden Route Badgers (male)",
   "Los Angeles Lashings (male)",
-  "Madrid United (male)",
   "Manhattan Yorkers (male)",
   "Morrisville Raptors (male)",
-  "Northern Cape (male)",
   "San Ramon Grizzlies (male)",
-  "Sonseca Sultans (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
  ],
@@ -419,6 +415,7 @@
   "Paul James",
   "Raynard Van Tonder",
   "Richard Williams",
+  "V Chakravarthy",
   "Varun Chakravarthy",
   "Ximus du Plooy"
  ],
@@ -545,13 +542,13 @@
   }
  },
  "log": [
-  "[19:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[19:27 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[19:27 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1389, 'secs': 0.5}",
-  "[19:27 IST] source smarkets: {'status': 'ok', 'rows': 449, 'secs': 1.6}",
-  "[19:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[19:28 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[19:28 IST] weather: forecasts for 1 events, 0 failed",
-  "[19:28 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[20:03 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[20:04 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[20:04 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1390, 'secs': 0.9}",
+  "[20:04 IST] source smarkets: {'status': 'ok', 'rows': 414, 'secs': 3.9}",
+  "[20:04 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[20:04 IST] 18 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[20:04 IST] weather: forecasts for 1 events, 0 failed",
+  "[20:04 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
