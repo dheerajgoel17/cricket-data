@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T07:59:03Z",
- "generated_at_ist": "2026-10-21 13:29 IST",
- "runtime_secs": 28.7,
+ "generated_at_utc": "2026-10-21T08:45:41Z",
+ "generated_at_ist": "2026-10-21 14:15 IST",
+ "runtime_secs": 25.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "c0ca084209"
+  "commit": "506575179a"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1611,
-   "secs": 0.2
+   "rows": 1664,
+   "secs": 2.2
   },
   "smarkets": {
    "status": "ok",
    "rows": 408,
-   "secs": 2.1
+   "secs": 2.7
   }
  },
- "snapshot": "odds_20261021T075903Z.jsonl.gz",
+ "snapshot": "odds_20261021T084541Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,130 +66,115 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 20,
-  "rows_in_window": 813,
-  "selections_with_model": 327,
-  "selections_with_market_fair": 435,
-  "markets_in_window": 57,
+  "events_in_window": 22,
+  "rows_in_window": 1677,
+  "selections_with_model": 1068,
+  "selections_with_market_fair": 1023,
+  "markets_in_window": 143,
   "value_bets": 0,
   "dropped_by_filter": {
-   "odds_range": 4,
-   "model_market_gap": 26,
+   "odds_range": 15,
+   "model_market_gap": 167,
    "policy_min_edge": 2,
-   "model_only_no_market": 40,
-   "model_disagrees": 1
+   "model_only_no_market": 201,
+   "model_disagrees": 1,
+   "small_sample": 1,
+   "policy_max_odds": 2,
+   "market_disabled": 1
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 61,
-    "mean_model_p": 0.045,
+    "n_prices": 235,
+    "mean_model_p": 0.044,
     "mean_market_p": 0.065,
-    "mean_logit_diff_model_minus_market": -0.067,
-    "mean_abs_logit_diff": 0.604,
-    "corr": 0.957
+    "mean_logit_diff_model_minus_market": -0.027,
+    "mean_abs_logit_diff": 0.692,
+    "corr": 0.896
    },
    "top_bowler_team": {
-    "n_prices": 24,
-    "mean_model_p": 0.09,
-    "mean_market_p": 0.083,
+    "n_prices": 86,
+    "mean_model_p": 0.097,
+    "mean_market_p": 0.093,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.398,
-    "corr": 0.828
+    "mean_abs_logit_diff": 0.349,
+    "corr": 0.74
    },
    "batter_runs": {
-    "n_prices": 18,
+    "n_prices": 48,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.233,
+    "mean_abs_logit_diff": 0.319,
     "corr": null
    },
    "batter_sixes": {
-    "n_prices": 18,
+    "n_prices": 48,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.188,
-    "corr": 0.887
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.214,
+    "corr": 0.922
    },
    "batter_fours": {
-    "n_prices": 18,
+    "n_prices": 48,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.292,
-    "corr": 0.61
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.277,
+    "corr": 0.488
    },
    "bowler_wickets": {
-    "n_prices": 14,
+    "n_prices": 46,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.31,
-    "corr": 0.925
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.333,
+    "corr": 0.903
    },
    "batter_milestone": {
-    "n_prices": 81,
-    "mean_model_p": 0.412,
-    "mean_market_p": 0.438,
-    "mean_logit_diff_model_minus_market": -0.148,
-    "mean_abs_logit_diff": 0.329,
-    "corr": 0.992
-   },
-   "bowler_milestone": {
-    "n_prices": 35,
-    "mean_model_p": 0.211,
-    "mean_market_p": 0.237,
-    "mean_logit_diff_model_minus_market": -0.265,
-    "mean_abs_logit_diff": 0.412,
+    "n_prices": 210,
+    "mean_model_p": 0.39,
+    "mean_market_p": 0.423,
+    "mean_logit_diff_model_minus_market": -0.228,
+    "mean_abs_logit_diff": 0.489,
     "corr": 0.986
    },
+   "bowler_milestone": {
+    "n_prices": 115,
+    "mean_model_p": 0.212,
+    "mean_market_p": 0.235,
+    "mean_logit_diff_model_minus_market": -0.226,
+    "mean_abs_logit_diff": 0.437,
+    "corr": 0.978
+   },
    "top_batter_match": {
-    "n_prices": 32,
+    "n_prices": 125,
     "mean_model_p": 0.017,
-    "mean_market_p": 0.031,
+    "mean_market_p": 0.032,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.749,
-    "corr": 0.939
+    "mean_abs_logit_diff": 0.925,
+    "corr": 0.86
    },
    "top_bowler_match": {
-    "n_prices": 24,
+    "n_prices": 44,
     "mean_model_p": 0.047,
-    "mean_market_p": 0.042,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.742,
-    "corr": 0.403
+    "mean_market_p": 0.045,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.676,
+    "corr": 0.437
    }
   }
  },
  "events_in_window": [
   {
-   "event": "male|Gambia|Mozambique|2026-10-21",
-   "start_ist": "2026-10-21 14:00 IST",
+   "event": "male|getafe tigers|madrid|2026-10-21",
+   "start_ist": "2026-10-21 14:30 IST",
    "format": "T20",
    "format_source": "name",
-   "teams_matched": [
-    "Gambia",
-    "Mozambique"
-   ],
+   "teams_matched": null,
    "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Lesotho|Uganda|2026-10-21",
-   "start_ist": "2026-10-21 14:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Lesotho",
-    "Uganda"
-   ],
-   "sources": [
-    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -393,6 +378,48 @@
     "moviodds_bet365",
     "smarkets"
    ]
+  },
+  {
+   "event": "male|England|Sri Lanka|2026-10-22",
+   "start_ist": "2026-10-22 13:30 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "England",
+    "Sri Lanka"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Ireland|Namibia|2026-10-22",
+   "start_ist": "2026-10-22 13:30 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "Ireland",
+    "Namibia"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Australia|New Zealand|2026-10-22",
+   "start_ist": "2026-10-22 13:45 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Australia",
+    "New Zealand"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -432,25 +459,41 @@
   "Aliss Islam",
   "Allah Mohammad Ghazanfar",
   "Azmatullah Omarzai",
+  "B James",
+  "B McDonough",
   "B Sami",
+  "Bella James",
   "Bilal Sami",
+  "Byron McDonough",
   "CC Oberholzer",
+  "Dasun Shanaka",
   "Dian Forrester",
+  "Dushmantha Chameera",
   "F Farooqi",
   "Fazalhaq Farooqi",
+  "Gerhard Erasmus",
+  "Gus Atkinson",
+  "HT Crocombe",
   "Hasan Mahmud",
   "Hashmatullah Shahidi",
+  "Henry T Crocombe",
   "Hlompo Modimokwane",
   "I Alikhil",
   "Ibrahim Zadran",
   "Ikram Alikhil",
+  "J Coles",
   "Jade de Klerk",
+  "James Matthew Coles",
+  "Kamindu Mendis",
+  "Kusal Mendis",
   "Kyle Landsberg",
   "LK Das",
   "Lesego Kokohlabana",
   "Liam Peters",
   "Lukas Janse van Rensburg",
   "M Nabi",
+  "MS Crane",
+  "Mason Crane",
   "Mehidy Hasan Miraz",
   "Mohammad Nabi",
   "Mosaddek Hossain",
@@ -459,6 +502,7 @@
   "Najmul Hossain Shanto",
   "Nangeyalia Khan",
   "Nangeyalia Kharote",
+  "Nicol Loftie-Eaton",
   "Nurul Hasan Sohan",
   "Nyiko Shikwambana",
   "Onke Nyaku",
@@ -611,13 +655,13 @@
   }
  },
  "log": [
-  "[13:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[13:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[13:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1611, 'secs': 0.2}",
-  "[13:29 IST] source smarkets: {'status': 'ok', 'rows': 408, 'secs': 2.1}",
-  "[13:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[13:29 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[13:29 IST] weather: forecasts for 1 events, 0 failed",
-  "[13:29 IST] prop model: 814 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[14:15 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[14:15 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[14:15 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1664, 'secs': 2.2}",
+  "[14:15 IST] source smarkets: {'status': 'ok', 'rows': 408, 'secs': 2.7}",
+  "[14:16 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[14:16 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[14:16 IST] weather: forecasts for 1 events, 0 failed",
+  "[14:16 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
