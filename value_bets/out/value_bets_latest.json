@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T05:59:42Z",
- "generated_at_ist": "2026-10-21 11:29 IST",
- "runtime_secs": 36.9,
+ "generated_at_utc": "2026-10-21T06:59:28Z",
+ "generated_at_ist": "2026-10-21 12:29 IST",
+ "runtime_secs": 32.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "d16488e4b0"
+  "commit": "ae157d7842"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1587,
-   "secs": 0.2
+   "rows": 1581,
+   "secs": 0.3
   },
   "smarkets": {
    "status": "ok",
    "rows": 407,
-   "secs": 2.2
+   "secs": 1.8
   }
  },
- "snapshot": "odds_20261021T055942Z.jsonl.gz",
+ "snapshot": "odds_20261021T065928Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -67,9 +67,9 @@
  },
  "stats": {
   "events_in_window": 19,
-  "rows_in_window": 446,
+  "rows_in_window": 452,
   "selections_with_model": 17,
-  "selections_with_market_fair": 142,
+  "selections_with_market_fair": 146,
   "markets_in_window": 14,
   "value_bets": 0,
   "dropped_by_filter": {
@@ -80,30 +80,6 @@
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "male|Denmark|Kenya|2026-10-21",
-   "start_ist": "2026-10-21 12:00 IST",
-   "format": "ODI",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Denmark",
-    "Kenya"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|getafe tigers|madrid|2026-10-21",
-   "start_ist": "2026-10-21 12:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Gambia|Mozambique|2026-10-21",
    "start_ist": "2026-10-21 14:00 IST",
@@ -288,6 +264,34 @@
    "format_source": "name",
    "teams_matched": null,
    "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Jersey|Papua New Guinea|2026-10-22",
+   "start_ist": "2026-10-22 12:00 IST",
+   "format": "ODI",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Jersey",
+    "Papua New Guinea"
+   ],
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Kuwait|Qatar|2026-10-22",
+   "start_ist": "2026-10-22 12:00 IST",
+   "format": "T20",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Kuwait",
+    "Qatar"
+   ],
+   "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   }
@@ -505,13 +509,13 @@
   }
  },
  "log": [
-  "[11:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[11:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[11:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1587, 'secs': 0.2}",
-  "[11:29 IST] source smarkets: {'status': 'ok', 'rows': 407, 'secs': 2.2}",
-  "[11:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[11:30 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[11:30 IST] weather: forecasts for 1 events, 0 failed",
-  "[11:30 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[12:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[12:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[12:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1581, 'secs': 0.3}",
+  "[12:29 IST] source smarkets: {'status': 'ok', 'rows': 407, 'secs': 1.8}",
+  "[12:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[12:29 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[12:30 IST] weather: forecasts for 1 events, 0 failed",
+  "[12:30 IST] prop model: 814 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
