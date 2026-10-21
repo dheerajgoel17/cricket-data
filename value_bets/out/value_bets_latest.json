@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T11:58:39Z",
- "generated_at_ist": "2026-10-21 17:28 IST",
- "runtime_secs": 28.6,
+ "generated_at_utc": "2026-10-21T12:58:16Z",
+ "generated_at_ist": "2026-10-21 18:28 IST",
+ "runtime_secs": 24.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "fce22b425a"
+  "commit": "58a4ecff1c"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1399,
-   "secs": 0.7
+   "rows": 1389,
+   "secs": 0.4
   },
   "smarkets": {
    "status": "ok",
-   "rows": 418,
-   "secs": 2.1
+   "rows": 460,
+   "secs": 2.4
   }
  },
- "snapshot": "odds_20261021T115839Z.jsonl.gz",
+ "snapshot": "odds_20261021T125816Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,14 +66,14 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 18,
-  "rows_in_window": 1355,
-  "selections_with_model": 1087,
-  "selections_with_market_fair": 896,
+  "events_in_window": 16,
+  "rows_in_window": 1337,
+  "selections_with_model": 1079,
+  "selections_with_market_fair": 888,
   "markets_in_window": 132,
   "value_bets": 0,
   "dropped_by_filter": {
-   "odds_range": 18,
+   "odds_range": 16,
    "model_market_gap": 169,
    "loose_name_match": 1,
    "model_only_no_market": 201,
@@ -132,12 +132,12 @@
     "corr": 0.903
    },
    "batter_milestone": {
-    "n_prices": 210,
-    "mean_model_p": 0.39,
-    "mean_market_p": 0.423,
-    "mean_logit_diff_model_minus_market": -0.228,
-    "mean_abs_logit_diff": 0.494,
-    "corr": 0.986
+    "n_prices": 202,
+    "mean_model_p": 0.385,
+    "mean_market_p": 0.42,
+    "mean_logit_diff_model_minus_market": -0.236,
+    "mean_abs_logit_diff": 0.498,
+    "corr": 0.985
    },
    "bowler_milestone": {
     "n_prices": 115,
@@ -166,30 +166,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Dubai Capitals|emirates blues|2026-10-21",
-   "start_ist": "2026-10-21 18:00 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Nigeria|Zambia|2026-10-21",
-   "start_ist": "2026-10-21 18:20 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Nigeria",
-    "Zambia"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|dallas xforia giants|san ramon grizzlies|2026-10-21",
    "start_ist": "2026-10-21 20:30 IST",
@@ -569,13 +545,13 @@
   }
  },
  "log": [
-  "[17:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[17:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[17:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1399, 'secs': 0.7}",
-  "[17:28 IST] source smarkets: {'status': 'ok', 'rows': 418, 'secs': 2.1}",
-  "[17:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[17:29 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[17:29 IST] weather: forecasts for 1 events, 0 failed",
-  "[17:29 IST] prop model: 826 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[18:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[18:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1389, 'secs': 0.4}",
+  "[18:28 IST] source smarkets: {'status': 'ok', 'rows': 460, 'secs': 2.4}",
+  "[18:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:28 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[18:28 IST] weather: forecasts for 1 events, 0 failed",
+  "[18:28 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
