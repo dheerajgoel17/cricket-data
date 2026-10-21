@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T14:33:58Z",
- "generated_at_ist": "2026-10-21 20:03 IST",
- "runtime_secs": 34.0,
+ "generated_at_utc": "2026-10-21T14:51:00Z",
+ "generated_at_ist": "2026-10-21 20:21 IST",
+ "runtime_secs": 32.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "418534f9d8"
+  "commit": "0ea7b875ee"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1390,
-   "secs": 0.9
+   "rows": 1391,
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 414,
-   "secs": 3.9
+   "rows": 463,
+   "secs": 2.3
   }
  },
- "snapshot": "odds_20261021T143358Z.jsonl.gz",
+ "snapshot": "odds_20261021T145100Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,15 +66,15 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 16,
-  "rows_in_window": 1338,
-  "selections_with_model": 1080,
-  "selections_with_market_fair": 889,
+  "events_in_window": 18,
+  "rows_in_window": 1347,
+  "selections_with_model": 1081,
+  "selections_with_market_fair": 890,
   "markets_in_window": 132,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 16,
-   "model_market_gap": 170,
+   "model_market_gap": 168,
    "loose_name_match": 1,
    "model_only_no_market": 201,
    "policy_max_odds": 6,
@@ -127,7 +127,7 @@
     "n_prices": 46,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.333,
     "corr": 0.903
    },
@@ -148,11 +148,11 @@
     "corr": 0.978
    },
    "top_batter_match": {
-    "n_prices": 125,
+    "n_prices": 126,
     "mean_model_p": 0.017,
     "mean_market_p": 0.032,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.925,
+    "mean_abs_logit_diff": 0.924,
     "corr": 0.86
    },
    "top_bowler_match": {
@@ -303,6 +303,16 @@
    ]
   },
   {
+   "event": "male|madrid blues|madrid united|2026-10-22",
+   "start_ist": "2026-10-22 12:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|England|Sri Lanka|2026-10-22",
    "start_ist": "2026-10-22 13:30 IST",
    "format": "ODI",
@@ -357,6 +367,16 @@
     "moviodds_bet365",
     "smarkets"
    ]
+  },
+  {
+   "event": "male|getafe tigers|sonseca sultans|2026-10-22",
+   "start_ist": "2026-10-22 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -374,10 +394,15 @@
   "Eastern Storm (male)",
   "Emirates Blues (male)",
   "Fairfirst Insurance (male)",
+  "Garden Route Badgers (male)",
+  "Getafe Tigers (male)",
   "Los Angeles Lashings (male)",
+  "Madrid Blues (male)",
+  "Madrid United (male)",
   "Manhattan Yorkers (male)",
   "Morrisville Raptors (male)",
   "San Ramon Grizzlies (male)",
+  "Sonseca Sultans (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
  ],
@@ -542,13 +567,13 @@
   }
  },
  "log": [
-  "[20:03 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[20:04 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[20:04 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1390, 'secs': 0.9}",
-  "[20:04 IST] source smarkets: {'status': 'ok', 'rows': 414, 'secs': 3.9}",
-  "[20:04 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[20:04 IST] 18 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[20:04 IST] weather: forecasts for 1 events, 0 failed",
-  "[20:04 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[20:21 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[20:21 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[20:21 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1391, 'secs': 0.8}",
+  "[20:21 IST] source smarkets: {'status': 'ok', 'rows': 463, 'secs': 2.3}",
+  "[20:21 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[20:21 IST] 18 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[20:21 IST] weather: forecasts for 1 events, 0 failed",
+  "[20:21 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
