@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-20T18:35:00Z",
- "generated_at_ist": "2026-10-21 00:05 IST",
- "runtime_secs": 27.6,
+ "generated_at_utc": "2026-10-21T04:00:30Z",
+ "generated_at_ist": "2026-10-21 09:30 IST",
+ "runtime_secs": 35.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "7a944d6c44"
+  "commit": "ddce7da380"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1010,
-   "secs": 0.7
+   "rows": 1571,
+   "secs": 1.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 420,
-   "secs": 3.0
+   "rows": 422,
+   "secs": 2.9
   }
  },
- "snapshot": "odds_20261020T183500Z.jsonl.gz",
+ "snapshot": "odds_20261021T040030Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,10 +66,10 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 15,
-  "rows_in_window": 424,
+  "events_in_window": 17,
+  "rows_in_window": 438,
   "selections_with_model": 17,
-  "selections_with_market_fair": 140,
+  "selections_with_market_fair": 142,
   "markets_in_window": 14,
   "value_bets": 0,
   "dropped_by_filter": {
@@ -80,20 +80,6 @@
   "model_vs_market": {}
  },
  "events_in_window": [
-  {
-   "event": "female|Perth Scorchers|Sydney Sixers|2026-10-21",
-   "start_ist": "2026-10-21 08:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Perth Scorchers",
-    "Sydney Sixers"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Denmark|Kenya|2026-10-21",
    "start_ist": "2026-10-21 12:00 IST",
@@ -119,19 +105,6 @@
    ]
   },
   {
-   "event": "male|Lesotho|Uganda|2026-10-21",
-   "start_ist": "2026-10-21 14:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": [
-    "Lesotho",
-    "Uganda"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
    "event": "male|Gambia|Mozambique|2026-10-21",
    "start_ist": "2026-10-21 14:00 IST",
    "format": "T20",
@@ -141,6 +114,21 @@
     "Mozambique"
    ],
    "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Lesotho|Uganda|2026-10-21",
+   "start_ist": "2026-10-21 14:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Lesotho",
+    "Uganda"
+   ],
+   "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -205,6 +193,7 @@
     "Zambia"
    ],
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -251,6 +240,36 @@
    "sources": [
     "smarkets"
    ]
+  },
+  {
+   "event": "male|chicago kingsmen|los angeles lashings|2026-10-21",
+   "start_ist": "2026-10-22 00:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Somerset|morrisville raptors|2026-10-21",
+   "start_ist": "2026-10-22 00:45 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|colombo aces|fairfirst insurance|2026-10-22",
+   "start_ist": "2026-10-22 09:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -264,9 +283,9 @@
   "Colombo Aces (male)",
   "Conquerors (W) (female)",
   "Dallas Xforia Giants (male)",
+  "Eastern Cape Linyathi (male)",
   "Eastern Storm (male)",
   "Emirates Blues (male)",
-  "Emirates Red (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
   "Getafe Tigers (male)",
@@ -278,7 +297,6 @@
   "Northern Cape (male)",
   "Northern Cape Heat (male)",
   "San Ramon Grizzlies (male)",
-  "Sharjah (male)",
   "Sonseca Sultans (male)",
   "Stars (W) (female)",
   "Tuskers (male)"
@@ -467,13 +485,13 @@
   }
  },
  "log": [
-  "[00:05 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:05 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[00:05 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1010, 'secs': 0.7}",
-  "[00:05 IST] source smarkets: {'status': 'ok', 'rows': 420, 'secs': 3.0}",
-  "[00:05 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:05 IST] 6 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[00:05 IST] weather: forecasts for 1 events, 0 failed",
-  "[00:05 IST] prop model: 467 prop selections modelled, 160 milestone ladder prices anchored to O/U"
+  "[09:30 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[09:30 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[09:30 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1571, 'secs': 1.2}",
+  "[09:30 IST] source smarkets: {'status': 'ok', 'rows': 422, 'secs': 2.9}",
+  "[09:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[09:30 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[09:31 IST] weather: forecasts for 1 events, 0 failed",
+  "[09:31 IST] prop model: 810 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
