@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T15:57:57Z",
- "generated_at_ist": "2026-10-21 21:27 IST",
- "runtime_secs": 32.2,
+ "generated_at_utc": "2026-10-21T16:59:08Z",
+ "generated_at_ist": "2026-10-21 22:29 IST",
+ "runtime_secs": 33.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "aea134d082"
+  "commit": "75be823ff9"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1395,
-   "secs": 0.9
+   "rows": 1393,
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 438,
+   "rows": 440,
    "secs": 1.7
   }
  },
- "snapshot": "odds_20261021T155757Z.jsonl.gz",
+ "snapshot": "odds_20261021T165908Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,11 +66,11 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 15,
-  "rows_in_window": 1300,
+  "events_in_window": 16,
+  "rows_in_window": 1344,
   "selections_with_model": 1066,
   "selections_with_market_fair": 894,
-  "markets_in_window": 130,
+  "markets_in_window": 132,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 15,
@@ -87,8 +87,8 @@
     "n_prices": 236,
     "mean_model_p": 0.043,
     "mean_market_p": 0.065,
-    "mean_logit_diff_model_minus_market": -0.035,
-    "mean_abs_logit_diff": 0.703,
+    "mean_logit_diff_model_minus_market": -0.034,
+    "mean_abs_logit_diff": 0.702,
     "corr": 0.893
    },
    "top_bowler_team": {
@@ -166,16 +166,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Abu Dhabi Knight Riders|ajman|2026-10-21",
-   "start_ist": "2026-10-21 22:00 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|chicago kingsmen|los angeles lashings|2026-10-21",
    "start_ist": "2026-10-22 00:30 IST",
@@ -343,6 +333,27 @@
    "sources": [
     "smarkets"
    ]
+  },
+  {
+   "event": "male|Dubai Capitals|emirates red|2026-10-22",
+   "start_ist": "2026-10-22 18:00 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|eastern storm|tuskers|2026-10-22",
+   "start_ist": "2026-10-22 21:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "moviodds_bet365",
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
@@ -358,6 +369,7 @@
   "Dallas Xforia Giants (male)",
   "Eastern Cape Linyathi (male)",
   "Eastern Storm (male)",
+  "Emirates Red (male)",
   "Fairfirst Insurance (male)",
   "Garden Route Badgers (male)",
   "Getafe Tigers (male)",
@@ -373,26 +385,64 @@
  ],
  "unmatched_players_in_window": [
   "AR Patel",
+  "Adam Kruger",
+  "Amaan Khan",
+  "Andrew Rasemene",
+  "Aryan Gopalan",
   "B James",
   "B McDonough",
+  "Bamanye Xengxe",
   "Bella James",
+  "Brayden Hicks",
   "Byron McDonough",
+  "CD Shekleton",
+  "Chad Classen",
+  "Chad Laycock",
+  "Christopher Britz",
+  "Daelen Fynn",
+  "Daniel Louis Rossouw",
   "Dasun Shanaka",
+  "Dewan Marais",
   "Dushmantha Chameera",
+  "Gareth Dukes",
   "Gerhard Erasmus",
   "Gus Atkinson",
   "HT Crocombe",
   "Henry T Crocombe",
   "J Coles",
+  "Jack Lees",
   "James Matthew Coles",
+  "Jared Meiring",
+  "Joshua Van Biljon",
+  "Jurie Snyman",
+  "Kabelo Walter Sekhukhune",
+  "Kagiso Rapulana",
   "Kamindu Mendis",
   "Kusal Mendis",
+  "Leander Juan Lubbe",
+  "Liyema Waqu",
+  "Ludwig Kaestner",
   "MS Crane",
+  "Malcolm John Nofal",
+  "Martin Khumalo",
   "Mason Crane",
+  "Matthew Urquhart",
+  "Mekyle Pillay",
+  "Merrick Brett",
+  "Michael Erlank",
+  "Muhammed Bulbulia",
   "Nicol Loftie-Eaton",
   "P Yadav",
+  "Parth Patel",
+  "Ronan Hermann",
+  "Sabelo Mabanga",
+  "Shaveer Khan",
+  "Thabiso Lekhoana",
+  "Thandolwami Ndlovu",
+  "Tumelo Simelane",
   "V Chakravarthy",
-  "Varun Chakravarthy"
+  "Varun Chakravarthy",
+  "Ziyaad Abrahams"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -517,13 +567,13 @@
   }
  },
  "log": [
-  "[21:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[21:28 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[21:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1395, 'secs': 0.9}",
-  "[21:28 IST] source smarkets: {'status': 'ok', 'rows': 438, 'secs': 1.7}",
-  "[21:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[21:28 IST] 19 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[21:28 IST] weather: forecasts for 1 events, 0 failed",
-  "[21:28 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[22:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[22:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1393, 'secs': 0.2}",
+  "[22:29 IST] source smarkets: {'status': 'ok', 'rows': 440, 'secs': 1.7}",
+  "[22:29 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:29 IST] 19 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[22:29 IST] weather: forecasts for 1 events, 0 failed",
+  "[22:29 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
