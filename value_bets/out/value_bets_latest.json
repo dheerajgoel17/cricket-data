@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-21T08:45:41Z",
- "generated_at_ist": "2026-10-21 14:15 IST",
- "runtime_secs": 25.6,
+ "generated_at_utc": "2026-10-21T08:55:46Z",
+ "generated_at_ist": "2026-10-21 14:25 IST",
+ "runtime_secs": 34.7,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "506575179a"
+  "commit": "829d242799"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1664,
-   "secs": 2.2
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
    "rows": 408,
-   "secs": 2.7
+   "secs": 2.4
   }
  },
- "snapshot": "odds_20261021T084541Z.jsonl.gz",
+ "snapshot": "odds_20261021T085546Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,8 +66,8 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 22,
-  "rows_in_window": 1677,
+  "events_in_window": 21,
+  "rows_in_window": 1673,
   "selections_with_model": 1068,
   "selections_with_market_fair": 1023,
   "markets_in_window": 143,
@@ -129,7 +129,7 @@
     "n_prices": 46,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.333,
     "corr": 0.903
    },
@@ -168,16 +168,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|getafe tigers|madrid|2026-10-21",
-   "start_ist": "2026-10-21 14:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|garden route badgers|northern cape heat|2026-10-21",
    "start_ist": "2026-10-21 16:30 IST",
@@ -655,13 +645,13 @@
   }
  },
  "log": [
-  "[14:15 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[14:15 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[14:15 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1664, 'secs': 2.2}",
-  "[14:15 IST] source smarkets: {'status': 'ok', 'rows': 408, 'secs': 2.7}",
-  "[14:16 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[14:16 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[14:16 IST] weather: forecasts for 1 events, 0 failed",
-  "[14:16 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[14:25 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[14:25 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[14:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1664, 'secs': 0.8}",
+  "[14:26 IST] source smarkets: {'status': 'ok', 'rows': 408, 'secs': 2.4}",
+  "[14:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[14:26 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[14:26 IST] weather: forecasts for 1 events, 0 failed",
+  "[14:26 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
