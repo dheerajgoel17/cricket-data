@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-10-21T04:56:42Z",
- "generated_at_ist": "2026-10-21 10:26 IST",
- "runtime_secs": 36.2,
+ "generated_at_utc": "2026-10-21T05:59:42Z",
+ "generated_at_ist": "2026-10-21 11:29 IST",
+ "runtime_secs": 36.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-14",
-  "commit": "9979861fd7"
+  "commit": "d16488e4b0"
  },
  "sources": {
   "moviodds_bet365": {
@@ -15,11 +15,11 @@
   },
   "smarkets": {
    "status": "ok",
-   "rows": 422,
-   "secs": 1.8
+   "rows": 407,
+   "secs": 2.2
   }
  },
- "snapshot": "odds_20261021T045642Z.jsonl.gz",
+ "snapshot": "odds_20261021T055942Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,8 +66,8 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 17,
-  "rows_in_window": 438,
+  "events_in_window": 19,
+  "rows_in_window": 446,
   "selections_with_model": 17,
   "selections_with_market_fair": 142,
   "markets_in_window": 14,
@@ -266,6 +266,26 @@
    "start_ist": "2026-10-22 09:30 IST",
    "format": null,
    "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Oval Invincibles|challengers|2026-10-22",
+   "start_ist": "2026-10-22 10:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|conquerors|stars|2026-10-22",
+   "start_ist": "2026-10-22 10:30 IST",
+   "format": "T20",
+   "format_source": "name",
    "teams_matched": null,
    "sources": [
     "smarkets"
@@ -485,13 +505,13 @@
   }
  },
  "log": [
-  "[10:26 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:26 IST] history: 23132 matches, last 2026-10-14, players 413352",
-  "[10:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1587, 'secs': 0.2}",
-  "[10:26 IST] source smarkets: {'status': 'ok', 'rows': 422, 'secs': 1.8}",
-  "[10:27 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:27 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[10:27 IST] weather: forecasts for 1 events, 0 failed",
-  "[10:27 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
+  "[11:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[11:29 IST] history: 23132 matches, last 2026-10-14, players 413352",
+  "[11:29 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1587, 'secs': 0.2}",
+  "[11:29 IST] source smarkets: {'status': 'ok', 'rows': 407, 'secs': 2.2}",
+  "[11:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[11:30 IST] 17 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[11:30 IST] weather: forecasts for 1 events, 0 failed",
+  "[11:30 IST] prop model: 818 prop selections modelled, 306 milestone ladder prices anchored to O/U"
  ]
 }
