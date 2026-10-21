@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-20T08:39:53",
+ "afghanistan_enumerated_at": "2026-10-21T08:40:32",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -1467,6 +1467,114 @@
    "key": "2024-11-25-Haryana-Arunachal Pradesh",
    "match_id": "crex-ap-vs-har-29th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWS",
    "saved_at": "2026-10-20T08:47:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
+   "key": "2024-11-25-Nagaland-Andhra",
+   "match_id": "crex-andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
+   "saved_at": "2026-10-21T08:41:56"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
+   "key": "2024-11-23-Rajasthan-Bihar",
+   "match_id": "crex-bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
+   "saved_at": "2026-10-21T08:42:30"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
+   "key": "2024-11-23-Hyderabad (India)-Meghalaya",
+   "match_id": "crex-hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
+   "saved_at": "2026-10-21T08:42:53"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/miz-vs-mp-4th-match-syed-mushtaq-ali-trophy-2024-match-updates-PVY",
+   "key": "2024-11-23-Madhya Pradesh-Mizoram",
+   "match_id": "crex-miz-vs-mp-4th-match-syed-mushtaq-ali-trophy-2024-match-updates-PVY",
+   "saved_at": "2026-10-21T08:43:05"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
+   "key": "2024-11-23-Saurashtra-Sikkim",
+   "match_id": "crex-saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
+   "saved_at": "2026-10-21T08:43:41"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tn-vs-tri-10th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW6",
+   "key": "2024-11-23-Tamil Nadu-Tripura",
+   "match_id": "crex-tn-vs-tri-10th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW6",
+   "saved_at": "2026-10-21T08:43:53"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
+   "key": "2024-11-23-Jammu  Kashmir-Jharkhand",
+   "match_id": "crex-jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
+   "saved_at": "2026-10-21T08:44:29"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
+   "key": "2024-11-23-Vidarbha-Odisha",
+   "match_id": "crex-odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
+   "saved_at": "2026-10-21T08:44:51"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
+   "key": "2024-11-23-Services-Kerala",
+   "match_id": "crex-ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
+   "saved_at": "2026-10-21T08:45:10"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
+   "key": "2024-11-23-Nagaland-Maharashtra",
+   "match_id": "crex-mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
+   "saved_at": "2026-10-21T08:45:24"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
+   "key": "2024-11-11-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
+   "saved_at": "2026-10-21T08:45:37"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
+   "key": "2024-11-09-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
+   "saved_at": "2026-10-21T08:45:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
+   "key": "2024-11-06-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
+   "saved_at": "2026-10-21T08:46:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
+   "key": "2024-10-04-Lions-Warriors",
+   "match_id": "crex-lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
+   "saved_at": "2026-10-21T08:46:23"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
+   "key": "2024-09-22-Afghanistan-South Africa",
+   "match_id": "crex-afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
+   "saved_at": "2026-10-21T08:46:44"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
+   "key": "2024-09-20-Afghanistan-South Africa",
+   "match_id": "crex-afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
+   "saved_at": "2026-10-21T08:46:56"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
+   "key": "2024-09-18-Afghanistan-South Africa",
+   "match_id": "crex-afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
+   "saved_at": "2026-10-21T08:47:09"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
+   "key": "2024-09-09-Afghanistan-New Zealand",
+   "match_id": "crex-afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
+   "saved_at": "2026-10-21T08:47:22"
   }
  ],
  "failed": [],
@@ -2281,451 +2389,172 @@
    "checked_at": "2026-10-20T08:47:20",
    "key": "2024-11-25-Jharkhand-Manipur",
    "reason": "rendered 1 candidate page(s) for 2024-11-25; none confirmed"
+  },
+  {
+   "checked": [
+    "13TJ"
+   ],
+   "checked_at": "2026-10-21T08:40:34",
+   "key": "2026-10-20-Afghanistan-Zimbabwe",
+   "reason": "sitemap date 2026-10-20 != page date 2026-10-19"
+  },
+  {
+   "checked": [
+    "13TK"
+   ],
+   "checked_at": "2026-10-21T08:40:41",
+   "key": "2026-10-20-Afghanistan-Bangladesh",
+   "reason": "sitemap date 2026-10-20 != page date 2026-10-21; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14P4"
+   ],
+   "checked_at": "2026-10-21T08:40:50",
+   "key": "2026-10-20-Afghanistan-Pakistan",
+   "reason": "date 2027-10-08 != 2026-10-20; sitemap date 2026-10-20 != page date 2027-10-08; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PF"
+   ],
+   "checked_at": "2026-10-21T08:41:00",
+   "key": "2026-10-20-Afghanistan-India",
+   "reason": "date 2027-10-14 != 2026-10-20; sitemap date 2026-10-20 != page date 2027-10-14; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PM"
+   ],
+   "checked_at": "2026-10-21T08:41:10",
+   "key": "2026-10-20-Afghanistan-Australia",
+   "reason": "date 2027-10-18 != 2026-10-20; sitemap date 2026-10-20 != page date 2027-10-18; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14UP"
+   ],
+   "checked_at": "2026-10-21T08:41:18",
+   "key": "2026-10-20-Afghanistan-South Africa",
+   "reason": "date 2026-10-30 != 2026-10-20; sitemap date 2026-10-20 != page date 2026-10-30; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14UR"
+   ],
+   "checked_at": "2026-10-21T08:41:25",
+   "key": "2026-10-20-Afghanistan-Oman",
+   "reason": "date 2026-10-31 != 2026-10-20; sitemap date 2026-10-20 != page date 2026-10-31; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:41:30",
+   "key": "2024-11-25-Chandigarh-Vidarbha",
+   "reason": "no CREX match within a day of 2024-11-25 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:41:35",
+   "key": "2024-11-25-Chhattisgarh-Puducherry",
+   "reason": "no CREX match within a day of 2024-11-25 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:41:40",
+   "key": "2024-11-25-Odisha-Railways",
+   "reason": "no CREX match within a day of 2024-11-25 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:42:01",
+   "key": "2024-11-25-Services-Goa",
+   "reason": "no CREX match within a day of 2024-11-25 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "RWC"
+   ],
+   "checked_at": "2026-10-21T08:42:08",
+   "key": "2024-11-25-Kerala-Maharashtra",
+   "reason": "rendered 1 candidate page(s) for 2024-11-25; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:42:13",
+   "key": "2024-11-23-Punjab-Bengal",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:43:10",
+   "key": "2024-11-23-Gujarat-Baroda",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "RVX",
+    "RW3"
+   ],
+   "checked_at": "2026-10-21T08:43:24",
+   "key": "2024-11-23-Uttarakhand-Karnataka",
+   "reason": "rendered 2 candidate page(s) for 2024-11-23; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:43:59",
+   "key": "2024-11-23-Arunachal Pradesh-Himachal Pradesh",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "RZX"
+   ],
+   "checked_at": "2026-10-21T08:44:06",
+   "key": "2024-11-23-Delhi-Uttar Pradesh",
+   "reason": "rendered 1 candidate page(s) for 2024-11-23; none confirmed"
+  },
+  {
+   "checked": [
+    "PVY"
+   ],
+   "checked_at": "2026-10-21T08:44:14",
+   "key": "2024-11-23-Manipur-Haryana",
+   "reason": "rendered 1 candidate page(s) for 2024-11-23; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:44:34",
+   "key": "2024-11-23-Railways-Assam",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:44:39",
+   "key": "2024-11-23-Puducherry-Chandigarh",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:44:56",
+   "key": "2024-11-23-Mumbai-Goa",
+   "reason": "no CREX match within a day of 2024-11-23 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-21T08:46:06",
+   "key": "2024-10-06-Titans-Western Province",
+   "reason": "no CREX match within a day of 2024-10-06 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "QO4"
+   ],
+   "checked_at": "2026-10-21T08:46:31",
+   "key": "2024-10-04-Boland-Knights",
+   "reason": "rendered 1 candidate page(s) for 2024-10-04; none confirmed"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chandigarh",
-   "team_b": "Vidarbha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chhattisgarh",
-   "team_b": "Puducherry"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Odisha",
-   "team_b": "Railways"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Nagaland",
-   "team_b": "Andhra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Goa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Kerala",
-   "team_b": "Maharashtra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Punjab",
-   "team_b": "Bengal"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Rajasthan",
-   "team_b": "Bihar"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Hyderabad (India)",
-   "team_b": "Meghalaya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Madhya Pradesh",
-   "team_b": "Mizoram"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Gujarat",
-   "team_b": "Baroda"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Uttarakhand",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Saurashtra",
-   "team_b": "Sikkim"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tamil Nadu",
-   "team_b": "Tripura"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Arunachal Pradesh",
-   "team_b": "Himachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Delhi",
-   "team_b": "Uttar Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Manipur",
-   "team_b": "Haryana"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jammu  Kashmir",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Railways",
-   "team_b": "Assam"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Vidarbha",
-   "team_b": "Odisha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mumbai",
-   "team_b": "Goa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Nagaland",
-   "team_b": "Maharashtra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
-   "date": "2024-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
-   "date": "2024-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
-   "date": "2024-11-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-10-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-10-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-10-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Knights"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
-   "date": "2024-09-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
-   "date": "2024-09-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
-   "date": "2024-09-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
-   "date": "2024-09-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "New Zealand"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
