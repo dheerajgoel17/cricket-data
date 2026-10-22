@@ -62,7 +62,7 @@ Python tests: `pytest -q tests/site`. The JS tests run on a tiny synthetic datas
 ## Deploy (Vercel Hobby, free)
 The Vercel project root is `site/` (static `public/` + `api/ask.js`; `site/vercel.json` already sets this).
 1. **Once:** `cd site && npx vercel link --project cricket-props-hub` then, after building the data, `npx vercel deploy --prod`.
-2. **Gemini (free tier) for the chat box:** create a key in Google AI Studio, then add it as the *Vercel* environment variable `GEMINI_API_KEY`
+2. **AI key for the chat box.** Either **xAI Grok**: create a key at console.x.ai (API Keys), add it as the Vercel env var `XAI_API_KEY`, and set `XAI_MODEL` to a model name from the console's Models page (Grok API usage is billed per token, a few hundred tokens per question; check your credits). Or **Gemini (free tier):** create a key in Google AI Studio, then add it as the *Vercel* environment variable `GEMINI_API_KEY`
    (Project → Settings → Environment Variables, Production) and redeploy. Optional: `GEMINI_MODELS` (comma list, default
    `gemini-2.5-flash-lite,gemini-2.5-flash`; change it if Google retires a model), `ASK_PER_MINUTE` (default 12 per IP), `ASK_DAILY_CAP`
    (default 800 calls/day, under the free-tier limits). Without a key the site still answers with the built-in parser.

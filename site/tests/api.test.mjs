@@ -61,6 +61,22 @@ test("validates input and rate-limits per IP", async () => {
   assert.equal((await call({ question: "q" }, { ip: "9.9.9.6" })).code, 429);
 });
 
+test("xAI Grok is used when XAI_API_KEY is set (key in the header, plan sanitised)", async () => {
+  process.env.XAI_API_KEY = ["xai", "fake", "key"].join("-");
+  globalThis.fetch = async (url, init) => {
+    seen.push({ url: String(url), init });
+    return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: JSON.stringify({ kind: "player_prop", player: "Brook", stat: "sixes", line: 0.5, side: "over", hit_rate: 1, filters: {} }) } }] }) };
+  };
+  const r = await call({ question: "brook sixes over 0.5" }, { ip: "9.9.9.8" });
+  delete process.env.XAI_API_KEY;
+  assert.equal(r.code, 200);
+  assert.equal(r.body.plan.stat, "sixes");
+  assert.ok(!("hit_rate" in r.body.plan));
+  assert.match(seen[0].url, /api\.x\.ai\/v1\/chat\/completions/);
+  assert.ok(seen[0].init.headers.authorization.startsWith("Bearer "));
+  assert.ok(!seen[0].url.includes("fake"));
+});
+
 test("without a key the endpoint says so (the site then uses its built-in parser)", async () => {
   const k = process.env.GEMINI_API_KEY;
   delete process.env.GEMINI_API_KEY;
