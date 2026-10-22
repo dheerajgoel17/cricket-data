@@ -68,8 +68,8 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js`; `site/verce
    (Project → Settings → Environment Variables, Production) and redeploy. Optional: `GEMINI_MODELS` (comma list, default
    `gemini-2.5-flash-lite,gemini-2.5-flash`; change it if Google retires a model), `ASK_PER_MINUTE` (default 12 per IP), `ASK_DAILY_CAP`
    (default 800 calls/day, under the free-tier limits). Without a key the site still answers with the built-in parser.
-3. **Daily refresh:** `.github/workflows/site.yml` runs after "Daily update" (plus a 07:45 UTC fallback and manual dispatch), downloads Cricsheet,
-   rebuilds `site/public/data`, runs the JS tests and deploys. Add three **GitHub repository secrets**: `VERCEL_TOKEN` (vercel.com/account/tokens),
+3. **Daily refresh:** `.github/workflows/site.yml` runs **every hour** (and after "Daily update", and on demand): the scraper commits new provisional matches every 30 minutes, so each run rebuilds
+   `site/public/data` from the latest repo data and deploys. The Cricsheet zip, people register and player photos are cached once a day, so hourly runs stay light. Add three **GitHub repository secrets**: `VERCEL_TOKEN` (vercel.com/account/tokens),
    `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `site/.vercel/project.json` after `vercel link`). Without them it builds and tests but does not deploy.
    PRs touching the site build and test only.
 4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.

@@ -1,6 +1,6 @@
 name: Site
 
-# Rebuilds the stats site's data (Cricsheet ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
+# Rebuilds the stats site's data hourly (Cricsheet ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
 # Runs after "Daily update" finishes, daily as a fallback, on demand, and (build + tests only, no deploy) on PRs that touch the site.
 # Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID. Without them the job still builds and
 # tests, then skips the deploy. GEMINI_API_KEY is a *Vercel* project environment variable, not a GitHub secret: see docs/SITE.md.
@@ -9,7 +9,7 @@ on:
     workflows: ["Daily update"]
     types: [completed]
   schedule:
-    - cron: "45 7 * * *"
+    - cron: "50 * * * *"  # hourly: picks up the scraper's provisional matches (it commits every 30 min) and fixtures
   workflow_dispatch:
   push:
     branches: [main]
@@ -48,15 +48,28 @@ jobs:
       - name: JS tests (engine, resolver, rule parser, API handler)
         working-directory: site
         run: npm test
-      - name: Download Cricsheet ball-by-ball (all_json.zip)
-        run: curl -fsSL --retry 4 --retry-delay 20 -o all_json.zip https://cricsheet.org/downloads/all_json.zip
-      - name: Download Cricsheet people register (player photo ids)
+      - name: Today's date (cache key for the daily-changing downloads)
+        id: day
+        run: echo "d=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+      - name: Restore today's Cricsheet download and player photos
+        id: dl
+        uses: actions/cache@v4
+        with:
+          path: .sitecache
+          key: site-dl-${{ steps.day.outputs.d }}
+      - name: Download Cricsheet ball-by-ball and the people register (once a day)
+        if: steps.dl.outputs.cache-hit != 'true'
         run: |
-          curl -fsSL --retry 3 -o people.csv https://cricsheet.org/register/people.csv || echo "::warning::people.csv unavailable, so no player photos"
+          mkdir -p .sitecache
+          curl -fsSL --retry 4 --retry-delay 20 -o .sitecache/all_json.zip https://cricsheet.org/downloads/all_json.zip
+          curl -fsSL --retry 3 -o .sitecache/people.csv https://cricsheet.org/register/people.csv || echo "::warning::people.csv unavailable, so no player photos"
       - name: Build site data
         run: |
-          python -m cricket_site.build --zip all_json.zip --data data --out site/public/data --value-bets value_bets/out --people people.csv --photos --site-url "${{ vars.SITE_URL }}" | tee build.json
-          rm -f all_json.zip
+          PEOPLE=""; [ -f .sitecache/people.csv ] && PEOPLE="--people .sitecache/people.csv"
+          PHOTOS=""; [ -n "$PEOPLE" ] && [ ! -f .sitecache/photos.json ] && PHOTOS="--photos"
+          python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out site/public/data --value-bets value_bets/out $PEOPLE $PHOTOS --site-url "${{ vars.SITE_URL }}" | tee build.json
+          if [ -f site/public/data/photos.json ] && [ ! -f .sitecache/photos.json ]; then cp site/public/data/photos.json .sitecache/photos.json; fi
+          if [ -f .sitecache/photos.json ] && [ ! -f site/public/data/photos.json ]; then cp .sitecache/photos.json site/public/data/photos.json; fi
           python - <<'PY'
           import json
           from datetime import date
