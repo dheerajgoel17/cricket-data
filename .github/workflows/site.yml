@@ -72,7 +72,8 @@ jobs:
           PEOPLE=""; [ -f .sitecache/people.csv ] && PEOPLE="--people .sitecache/people.csv"
           PHOTOS=""; [ -n "$PEOPLE" ] && [ ! -f .sitecache/photos.json ] && PHOTOS="--photos"
           python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out site/public/data --value-bets value_bets/out $PEOPLE $PHOTOS --site-url "${{ vars.SITE_URL }}" | tee build.json
-          if [ -f site/public/data/photos.json ] && [ ! -f .sitecache/photos.json ]; then cp site/public/data/photos.json .sitecache/photos.json; fi
+          if [ -f site/public/data/photos.json ] && [ ! -f .sitecache/photos.json ]; then cp site/public/data/photos.json .sitecache/photos.json; cp site/public/data/crex_index.json .sitecache/crex_index.json 2>/dev/null || true; fi
+          if [ -f .sitecache/crex_index.json ] && [ ! -f site/public/data/crex_index.json ]; then cp .sitecache/crex_index.json site/public/data/crex_index.json; fi
           if [ -f .sitecache/photos.json ] && [ ! -f site/public/data/photos.json ]; then cp .sitecache/photos.json site/public/data/photos.json; fi
           python - <<'PY'
           import json
