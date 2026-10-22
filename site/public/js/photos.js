@@ -4,16 +4,23 @@ export const CREX_CDN = "https://cricketvectors.akamaized.net";
 
 export const fold = (s) => String(s ?? "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 
-/** Player photo URL (CREX first, Wikimedia Commons otherwise) or null. */
-export function playerPhoto(photos, pidx) {
-  const v = photos?.p?.[pidx];
-  if (!v) return null;
-  return v.startsWith("c:") ? `${CREX_CDN}/players/org/${v.slice(2)}.png` : `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(v.slice(2))}?width=240`;
-}
+const held = (photos, kind, id) => photos?.base && photos?.s?.[kind]?.includes(id);
 
-/** Team logo URL from CREX by display name ("India", "India (W)", "Mumbai Indians"), or null. */
-export function teamLogo(photos, name) {
+/** Image URLs to try in order for a player: our own copy (Supabase Storage) first, then CREX, then Commons. */
+export function playerPhotos(photos, pidx) {
+  const v = photos?.p?.[pidx];
+  if (!v) return [];
+  if (v.startsWith("w:")) return [`https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(v.slice(2))}?width=240`];
+  const id = v.slice(2);
+  return [held(photos, "p", id) ? `${photos.base}/players/${id}.png` : null, `${CREX_CDN}/players/org/${id}.png`].filter(Boolean);
+}
+export const playerPhoto = (photos, pidx) => playerPhotos(photos, pidx)[0] ?? null;
+
+/** Team logo URLs to try in order, by display name ("India", "India (W)", "Mumbai Indians"). */
+export function teamLogos(photos, name) {
   const key = fold(String(name).replace(/\(w\)/i, "").replace(/\bwomen\b/i, ""));
   const id = photos?.t?.[key];
-  return id ? `${CREX_CDN}/Teams/${id}.png` : null;
+  if (!id) return [];
+  return [held(photos, "t", id) ? `${photos.base}/teams/${id}.png` : null, `${CREX_CDN}/Teams/${id}.png`].filter(Boolean);
 }
+export const teamLogo = (photos, name) => teamLogos(photos, name)[0] ?? null;

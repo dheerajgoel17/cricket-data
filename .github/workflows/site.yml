@@ -11,6 +11,10 @@ on:
   schedule:
     - cron: "50 * * * *"  # hourly: picks up the scraper's provisional matches (it commits every 30 min) and fixtures
   workflow_dispatch:
+    inputs:
+      sync_limit:
+        description: "Max images to copy into our own store this run (first backfill: 6000)"
+        default: "1500"
   push:
     branches: [main]
     paths: ["site/**", "src/cricket_site/**", ".github/workflows/site.yml"]
@@ -68,7 +72,8 @@ jobs:
           PEOPLE=""; [ -f .sitecache/people.csv ] && PEOPLE="--people .sitecache/people.csv"
           PHOTOS=""; [ -n "$PEOPLE" ] && [ ! -f .sitecache/photos.json ] && PHOTOS="--photos"
           python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out site/public/data --value-bets value_bets/out $PEOPLE $PHOTOS --site-url "${{ vars.SITE_URL }}" | tee build.json
-          if [ -f site/public/data/photos.json ] && [ ! -f .sitecache/photos.json ]; then cp site/public/data/photos.json .sitecache/photos.json; fi
+          if [ -f site/public/data/photos.json ] && [ ! -f .sitecache/photos.json ]; then cp site/public/data/photos.json .sitecache/photos.json; cp site/public/data/crex_index.json .sitecache/crex_index.json 2>/dev/null || true; fi
+          if [ -f .sitecache/crex_index.json ] && [ ! -f site/public/data/crex_index.json ]; then cp .sitecache/crex_index.json site/public/data/crex_index.json; fi
           if [ -f .sitecache/photos.json ] && [ ! -f site/public/data/photos.json ]; then cp .sitecache/photos.json site/public/data/photos.json; fi
           python - <<'PY'
           import json
@@ -81,6 +86,15 @@ jobs:
               print("::warning::Cricsheet data on the site is more than 3 days old")
           PY
           du -sh site/public/data
+      - name: Keep our own copy of CREX images and id maps (Supabase Storage + Postgres)
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SYNC_LIMIT: ${{ inputs.sync_limit || '1500' }}
+        run: |
+          python -m cricket_site.assets_sync --photos site/public/data/photos.json --index site/public/data/crex_index.json
+          rm -f site/public/data/crex_index.json
       - name: Deploy to Vercel
         if: github.event_name != 'pull_request' && env.VERCEL_PROJECT_ID != ''
         env:

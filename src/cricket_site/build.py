@@ -374,12 +374,16 @@ def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], A: dict | None =
 
     from . import crex_assets as ca
 
-    out: dict = {"p": {}, "t": {}}
+    out: dict = {"p": {}, "t": {}, "index": {"players": [], "teams": []}}
     if A is not None and names is not None:
         try:
             players = [{"idx": A["pix"][p], "name": names.get(p, p), "n": A["pstat"][p]["n"], "last": A["pstat"][p]["last"]} for p in A["pids"]]
             out["p"] = {str(i): "c:" + c for i, c in ca.match_players(players, ca.parse_sitemap(ca.fetch_sitemap("player"), "player")).items()}
-            out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in A["teams"]], ca.parse_sitemap(ca.fetch_sitemap("team"), "team"))
+            crex_teams = ca.parse_sitemap(ca.fetch_sitemap("team"), "team")
+            out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in A["teams"]], crex_teams)
+            crex_players = ca.parse_sitemap(ca.fetch_sitemap("player"), "player")
+            owner = {c.removeprefix("c:"): A["pids"][int(i)] for i, c in out["p"].items()}
+            out["index"] = {"players": [[cid, nm, owner.get(cid)] for nm, cid in crex_players], "teams": [[cid, nm, ca.fold(nm)] for nm, cid in crex_teams]}
         except Exception as exc:  # noqa: BLE001
             print(f"photos: CREX sitemaps failed: {exc}", file=sys.stderr)
     by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix and str(pix[p]) not in out["p"]}
@@ -537,7 +541,10 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     build_sitemap(out, A, names, site_url)
     if photos:
-        (out / "photos.json").write_text(json.dumps(fetch_photos(load_cricinfo(people_path), A["pix"], A, names), separators=(",", ":")), encoding="utf-8")
+        ph = fetch_photos(load_cricinfo(people_path), A["pix"], A, names)
+        index = ph.pop("index")
+        (out / "photos.json").write_text(json.dumps(ph, separators=(",", ":")), encoding="utf-8")
+        (out / "crex_index.json").write_text(json.dumps(index, separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta
 
