@@ -54,7 +54,7 @@ jobs:
         run: curl -fsSL --retry 3 -o people.csv https://cricsheet.org/register/people.csv || echo "::warning::people.csv unavailable: no player photos"
       - name: Build site data
         run: |
-          python -m cricket_site.build --zip all_json.zip --data data --out site/public/data --value-bets value_bets/out --people people.csv | tee build.json
+          python -m cricket_site.build --zip all_json.zip --data data --out site/public/data --value-bets value_bets/out --people people.csv --photos | tee build.json
           rm -f all_json.zip
           python - <<'PY'
           import json

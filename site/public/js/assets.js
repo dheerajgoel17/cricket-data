@@ -34,44 +34,22 @@ export function teamBadge(name, cls = "dot") {
   return el;
 }
 
-// ---- player photos
-const KEY = "cph1";
-let cache = {};
-try { cache = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { cache = {}; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(cache)); } catch { /* private mode */ } };
-const pending = new Map();
-
-/** Resolve photos for Cricinfo ids in one SPARQL call. Returns {id: url|null}. */
-export async function photosFor(ids) {
-  const need = ids.filter((i) => !(i in cache));
-  if (need.length) {
-    try {
-      const q = `SELECT ?id ?img WHERE { VALUES ?id { ${need.map((i) => `"${i}"`).join(" ")} } ?p wdt:P2697 ?id; wdt:P18 ?img }`;
-      const r = await fetch(`https://query.wikidata.org/sparql?format=json&query=${encodeURIComponent(q)}`);
-      if (r.ok) {
-        const j = await r.json();
-        for (const i of need) cache[i] = null;
-        for (const b of j.results.bindings) cache[b.id.value] = b.img.value.replace(/^http:/, "https:") + "?width=240";
-        save();
-      }
-    } catch { /* offline: initials stay */ }
-  }
-  return Object.fromEntries(ids.map((i) => [i, cache[i] ?? null]));
-}
-
-// Player photos are switched off for now (no reliable free source covers everyone): every player gets a neutral silhouette.
-// To add real photos later, set PHOTOS_ENABLED and/or return a URL from `playerPhotoUrl(store, pidx)` (a licensed API, say).
-const PHOTOS_ENABLED = false;
-export const playerPhotoUrl = () => null;
-
+// ---- player photos: data/photos.json maps player index -> Wikimedia Commons file (built daily from Wikidata, free licences).
+// Players without one (roughly: everyone but internationals and stars) get a silhouette. Swap in a licensed API later via `playerPhotoUrl`.
 const SILHOUETTE = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="7"/><path d="M5 40c1-9 7-14 15-14s14 5 15 14z"/></svg>';
+let photos = null;
+export async function loadPhotos(base = "data/") {
+  try { photos = await (await fetch(`${base}photos.json`)).json(); } catch { photos = {}; }
+}
+export const playerPhotoUrl = (store, pidx) => (photos?.[pidx] ? `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(photos[pidx])}?width=240` : null);
 
-/** Avatar for a player index: silhouette placeholder (photo when PHOTOS_ENABLED and a URL exists). */
+/** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function playerBadge(store, pidx, cls = "dot") {
+  const url = playerPhotoUrl(store, pidx);
   const el = h("span", { class: `${cls} ph`, title: store.playerName(pidx), html: SILHOUETTE });
-  if (PHOTOS_ENABLED) {
-    const ci = store.index.cricinfo?.[pidx];
-    if (ci) photosFor([ci]).then((m) => { if (m[ci]) el.replaceChildren(h("img", { src: m[ci], alt: store.playerName(pidx), loading: "lazy" })); });
+  if (url) {
+    const img = h("img", { src: url, alt: store.playerName(pidx), loading: "lazy", onerror: () => img.remove() });
+    el.append(img);
   }
   return el;
 }

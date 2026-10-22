@@ -81,7 +81,8 @@ export async function playerReport(store, pidx, q) {
   if (kept.some((r) => r.pv)) notes.push(`${kept.filter((r) => r.pv).length} of these rows come from provisional (scraped) matches that Cricsheet has not published yet.`);
   for (const [k, v] of Object.entries(dropped)) if (v) notes.push(`${v} rows left out of this view: ${k.replace(/_/g, " ")}.`);
   const chart = buildChart(store, base.filter((r) => r.fmt === fmt), chartRows, def, f, fmt, { line: q.line ?? lineForSplit, side: q.side || "over", aggregate: fmt === 2 });
-  return { ok: true, chart, pidx, name: store.playerName(pidx), stat: q.stat, statLabel: def.label, fmt, fmtName: FORMATS[fmt], scope,
+  const corr = q.line != null || lineForSplit != null ? correlated(rows, q.stat, q.line ?? lineForSplit, q.side || "over") : null;
+  return { ok: true, chart, corr, pidx, name: store.playerName(pidx), stat: q.stat, statLabel: def.label, fmt, fmtName: FORMATS[fmt], scope,
     n: rows.length, line: q.line ?? null, lineForSplit, summary, ladder, splits, last, notes, filters: f,
     rawMedian: median(values), mean: round(summary.mean, 2) };
 }
@@ -143,4 +144,29 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
       pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
   });
   return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };
+}
+
+
+const CORR = {
+  bat: [["runs", [19.5, 29.5, 49.5]], ["balls", [19.5, 29.5]], ["fours", [0.5, 1.5, 2.5]], ["sixes", [0.5, 1.5]]],
+  bowl: [["wickets", [0.5, 1.5, 2.5]], ["runs_conceded", [24.5, 34.5]], ["balls_bowled", [11.5, 23.5]]],
+};
+
+/** "When this prop clears, how often do the player's other props clear?" vs their normal rate (same rows, one format). */
+export function correlated(rows, stat, line, side = "over") {
+  const def = STATS[stat];
+  const main = (r) => (side === "over" ? r[def.key] > line : r[def.key] < line);
+  const hit = rows.filter(main);
+  if (hit.length < 5 || !rows.length) return null;
+  const out = [];
+  for (const [st, lines] of CORR[def.side]) {
+    if (st === stat) continue;
+    const k = STATS[st].key;
+    for (const l of lines) {
+      const base = rows.filter((r) => r[k] > l).length / rows.length;
+      const cond = hit.filter((r) => r[k] > l).length / hit.length;
+      out.push({ stat: st, label: STATS[st].label, line: l, base: round(base, 4), cond: round(cond, 4), lift: round(cond - base, 4) });
+    }
+  }
+  return { n: hit.length, of: rows.length, rows: out };
 }

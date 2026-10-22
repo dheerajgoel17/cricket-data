@@ -362,6 +362,30 @@ def load_cricinfo(path: Path | None) -> dict[str, str]:
     return out
 
 
+def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], chunk: int = 400) -> dict[str, str]:
+    """{player idx: Wikimedia Commons file name} via Wikidata (P2697 Cricinfo id -> P18 image). Free licences; best effort.
+
+    A network failure just yields fewer photos: the site falls back to a silhouette.
+    """
+    import urllib.parse
+    import urllib.request
+
+    by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix}
+    ids, out = sorted(by_ci), {}
+    for i in range(0, len(ids), chunk):
+        q = "SELECT ?id ?img WHERE { VALUES ?id { %s } ?p wdt:P2697 ?id; wdt:P18 ?img }" % " ".join(f'"{x}"' for x in ids[i:i + chunk])
+        req = urllib.request.Request("https://query.wikidata.org/sparql", data=urllib.parse.urlencode({"query": q, "format": "json"}).encode(),
+                                     headers={"User-Agent": "cricket-props-hub/0.1 (https://github.com/dheerajgoel17/cricket-data)",
+                                              "Accept": "application/sparql-results+json"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                for b in json.load(r)["results"]["bindings"]:
+                    out.setdefault(str(by_ci[b["id"]["value"]]), urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
+        except Exception as exc:  # noqa: BLE001 - photos are optional
+            print(f"photos: chunk {i} failed: {exc}", file=sys.stderr)
+    return out
+
+
 def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo: dict[str, str] | None = None) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     (out / "p").mkdir(exist_ok=True)
@@ -380,7 +404,7 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
     index = {"players": pcols, "aliases": {k: v for k, v in al.items() if v},
              "teams": [{"n": t, "g": g} for t, g in A["teams"]], "venues": A["venues"], "events": A["events"],
              "hosts": A["hosts"],
-             "cricinfo": {str(A["pix"][p]): c for p, c in (cricinfo or {}).items() if p in A["pix"]},
+
              "kinds": KINDS, "formats": FORMAT_NAMES, "nshard": NSHARD}
     (out / "index.json").write_text(dump(index), encoding="utf-8")
     for s, d in sorted(A["shards"].items()):
@@ -458,7 +482,7 @@ def build_props(vb_dir: Path | None) -> dict:
 
 # ------------------------------------------------------------------ main
 def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, workers: int = 4,
-          geo_path: Path | None = None, people_path: Path | None = None) -> dict:
+          geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False) -> dict:
     canonical = parse_zip(zpath, workers)
     prov, pstat = load_provisional(data_dir, canonical)
     A = assemble(canonical, prov, _load_geo(geo_path))
@@ -471,6 +495,8 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    if photos:
+        (out / "photos.json").write_text(json.dumps(fetch_photos(load_cricinfo(people_path), A["pix"]), separators=(",", ":")), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta
 
@@ -483,9 +509,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--value-bets", default="value_bets/out")
     ap.add_argument("--geo", default="value_bets/mappings/venue_geo.csv", help="venue -> country (optional)")
     ap.add_argument("--people", default="", help="Cricsheet register people.csv (optional: enables player photos)")
+    ap.add_argument("--photos", action="store_true", help="look up player photos on Wikidata (needs --people)")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args(argv)
-    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None)
+    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people))
     print(json.dumps(meta))
     return 0
 

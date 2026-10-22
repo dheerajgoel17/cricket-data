@@ -6,7 +6,7 @@ import { createStore } from "./engine/store.js";
 import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
 import { SPLITS } from "./engine/props.js";
-import { playerBadge, teamBadge } from "./assets.js";
+import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
 import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
@@ -22,7 +22,7 @@ const EXAMPLES = [
 ];
 
 // ---------------------------------------------------------------- routing
-const routes = { "": home, fixtures: home, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
+const routes = { saved: savedPage, "": home, fixtures: home, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
 
 async function boot() {
   try {
@@ -32,6 +32,7 @@ async function boot() {
     return;
   }
   rz = new Resolver(store);
+  await loadPhotos("data/");
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
   initSearch();
   window.addEventListener("hashchange", render);
@@ -118,18 +119,35 @@ function askBox(initial = "", onResult) {
 }
 
 // ---------------------------------------------------------------- pages
+const SAVE_KEY = "cph-saved";
+const getSaved = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "[]"); } catch { return []; } };
+const setSaved = (l) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(l)); } catch { /* private mode */ } };
+const star = (kind, idx) => {
+  const key = `${kind}:${idx}`;
+  const b = h("button", { type: "button", class: "star", "aria-label": "Save", onclick: () => { const l = getSaved(); const i = l.indexOf(key); i >= 0 ? l.splice(i, 1) : l.push(key); setSaved(l); b.classList.toggle("on", i < 0); } },
+    h("span", { html: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>' }));
+  b.classList.toggle("on", getSaved().includes(key));
+  return b;
+};
+async function savedPage() {
+  const l = getSaved();
+  const items = l.map((k) => { const [kind, i] = k.split(":"); return kind === "player" ? { href: `#/player/${i}`, name: store.playerName(+i), sub: store.teamName(store.P.tm[+i]), b: playerBadge(store, +i) } : { href: `#/team/${i}`, name: store.teamName(+i), sub: "Team", b: teamBadge(store.teams[+i].n) }; });
+  return h("div", {}, crumbs(["Home", "#/"], ["Saved"]), h("h1", {}, "Saved"),
+    items.length ? h("div", { class: "card flat" }, items.map((it) => h("a", { class: "match", href: it.href }, h("div", { class: "teams" }, h("div", { class: "tm" }, it.b, it.name)), h("div", { class: "meta" }, it.sub), h("span", { class: "arrow" }, "→"))))
+      : h("div", { class: "card muted" }, "Tap the star on a player or team to keep it here. Saved items live in this browser only."));
+}
 const crumbs = (...items) => h("div", { class: "crumbs" }, items.flatMap((it, i) => [i ? h("span", { class: "sep" }, "›") : null,
   i === items.length - 1 ? h("span", { class: "cur" }, it[0]) : h("a", { href: it[1] }, it[0])]));
 
 /** StatsHub-style hero card: crest, name, meta pills and in-card tabs that switch the page sections. */
-function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [] }, root) {
+function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [], save = null }, root) {
   const bar = h("div", { class: "hero-tabs" });
   const set = (id) => {
     bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.t === id));
     root.querySelectorAll("[data-sec]").forEach((el) => { el.hidden = el.dataset.sec !== id; });
   };
   tabs.forEach(([id, label]) => bar.append(h("button", { type: "button", "data-t": id, onclick: () => set(id) }, label)));
-  const el = h("div", { class: `hero-card ${cls}` }, h("div", { class: "hero-top" }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name),
+  const el = h("div", { class: `hero-card ${cls}` }, save ? h("div", { class: "hero-star" }, star(save[0], save[1])) : null, h("div", { class: "hero-top" }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name),
     sub ? h("p", {}, sub) : null, meta.length ? h("div", { class: "hero-meta" }, meta.map((m) => h("span", {}, m))) : null), tabs.length ? bar : null);
   return { el, set: () => tabs.length && set(tabs[0][0]) };
 }
@@ -158,12 +176,26 @@ async function home(_, q = {}) {
   };
   draw();
   const side = await sidebar();
-  return h("div", { class: "layout has-side" }, h("div", {},
+  return h("div", {}, landing(), h("div", { class: "layout has-side" }, h("div", {},
     h("h1", {}, "Today's cricket fixtures, player stats & team stats"),
     h("p", { class: "muted" }, new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" })),
     h("p", { class: "muted" }, `Hit rates over any line, fair decimal odds, partnerships and fancy markets from ${store.meta.matches.toLocaleString()} matches since 2001, men's and women's.`),
     tabs, chipRow, h("div", { class: "sec-title" }, days.length ? "Matches" : "No upcoming fixtures"), body,
-    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.")), side);
+    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.")), side));
+}
+
+function landing() {
+  const words = ["T20", "ODI", "TEST", "IPL", "BBL", "PSL", "T20I", "WOMEN'S", "THE HUNDRED", "SA20", "CPL", "LIST A"];
+  const feats = [["BALL-BY-BALL DEPTH", "Batting position, innings order, partnerships and 20+ years of Cricsheet data behind every number."],
+    ["FIND THE EDGE", "Hit rates over any line, fair decimal odds and the exchange void rules built in."],
+    ["ADVANCED FILTERS", "Format, opposition, venue, home/away, batting first or chasing, position and dates."],
+    ["CORRELATED PROPS", "When a line clears, see how often the player's other props clear too."]];
+  return h("section", { class: "lp" },
+    h("div", { class: "lp-copy" }, h("h1", { class: "lp-h" }, "FIND THE", h("br"), h("span", {}, "EDGE")),
+      h("p", { class: "muted lp-p" }, "Free cricket player props: scan hit rates over any line, DNP-aware form charts, partnerships and fancy markets, then compare with the market in Prop Hunter."),
+      h("div", { class: "pills" }, h("a", { class: "btn", href: "#/ask" }, "Ask a question →"), h("a", { class: "btn ghost", href: "#/props" }, "Open Prop Hunter"))),
+    h("div", { class: "marq", "aria-hidden": "true" }, h("div", { class: "marq-in" }, [...words, ...words].map((w) => h("span", {}, w)))),
+    h("div", { class: "lp-feats" }, feats.map(([t, d]) => h("div", { class: "lp-f" }, h("h3", {}, t), h("p", { class: "muted small" }, d)))));
 }
 
 async function sidebar() {
@@ -187,6 +219,21 @@ async function upcoming() {
   return fx.filter((f) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= cut);
 }
 
+function nextMatchCard(f) {
+  const when = f.start.length > 10 ? new Date(f.start) : new Date(`${f.start}T12:00:00`);
+  const cd = h("div", { class: "cd" });
+  const tick = () => {
+    const ms = Math.max(0, when - Date.now()), d = Math.floor(ms / 864e5), hh = Math.floor(ms / 36e5) % 24, mm = Math.floor(ms / 6e4) % 60;
+    cd.replaceChildren(...[[d, "d"], [String(hh).padStart(2, "0"), "h"], [String(mm).padStart(2, "0"), "m"]].map(([v, u]) => h("div", {}, h("b", {}, String(v)), h("span", {}, u))));
+  };
+  tick();
+  const id = setInterval(() => { if (!cd.isConnected) clearInterval(id); else tick(); }, 30000);
+  return h("div", { class: "card nextm" }, h("div", { class: "nm-h" }, h("h3", {}, "Next match"), h("span", { class: "chip" }, `${f.fmt || ""} ${f.gender === "female" ? "women" : "men"}`)),
+    h("div", { class: "nm-b" }, h("div", { class: "nm-t" }, teamBadge(f.a, "crest"), h("b", {}, f.a)), h("div", { class: "nm-c" }, h("div", { class: "nm-time" }, f.start.length > 10 ? when.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC"),
+      h("small", { class: "muted" }, when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })), h("div", { class: "muted small", style: "margin-top:8px" }, "Kicks off in"), cd), h("div", { class: "nm-t" }, teamBadge(f.b, "crest"), h("b", {}, f.b))),
+    f.venue ? h("div", { class: "muted small", style: "text-align:center" }, f.venue) : null);
+}
+
 function fixtureGroups(fx) {
   if (!fx.length) return h("div", { class: "card muted" }, "Nothing scheduled for this selection.");
   const groups = new Map();
@@ -195,11 +242,15 @@ function fixtureGroups(fx) {
     (groups.get(key) || groups.set(key, []).get(key)).push(f);
   }
   const time = (s) => (s.length > 10 ? new Date(s).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC");
-  return h("div", {}, [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
+  const promo = h("div", { class: "promo" }, h("h3", {}, "Unlock advanced stats"), h("p", { class: "muted" }, "Hit rates over any line, DNP-aware form charts and fair decimal odds for every player."),
+    h("div", { class: "pills" }, h("a", { class: "btn", href: "#/props" }, "Prop Hunter →"), h("a", { class: "btn ghost", href: "#/ask" }, "Ask anything →")));
+  const cards = [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
     h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
     list.map((f) => h("a", { class: "match", href: f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
       h("div", { class: "teams" }, h("div", { class: "tm" }, teamBadge(f.a), f.a), h("div", { class: "tm" }, teamBadge(f.b), f.b)),
-      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→"))))));
+      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))));
+  if (cards.length > 1) cards.splice(1, 0, promo);
+  return h("div", { class: "stagger" }, cards);
 }
 
 function playerSource(text) {
@@ -264,7 +315,7 @@ async function player(args, q) {
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
   const body = h("div", {}, renderResult(res, { onLine: (l) => go(`player/${idx}`, { ...q, line: l }), onStat: (k) => go(`player/${idx}`, { ...q, stat: k, line: "" }), stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), badge: () => playerBadge(store, idx) }));
-  const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", badge: playerBadge(store, idx, "crest"),
+  const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", save: ["player", idx], badge: playerBadge(store, idx, "crest"),
     tabs: [["props", "Charts"], ["logs", "Game logs"], ["splits", "Table & splits"]] }, body);
   const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
   hc.set();
@@ -346,8 +397,11 @@ async function marketPage(kind, args, q) {
   const b3 = isTeam ? await playerGrid(idx, FORMATS.includes(fmt) ? fmt : "T20", q) : null;
   const root = h("div", {}, b1, b2, b3);
   const hc = heroCard({ name: label, sub: isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue", meta: [`${FORMATS.includes(fmt) ? fmt : "T20"} markets`, isTeam ? "team markets use the side batting first" : "match markets"],
-    cls: isTeam ? "" : "v", badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]] }, root);
-  const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, ...datalists(), root);
+    cls: isTeam ? "" : "v", save: isTeam ? ["team", idx] : null, badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]] }, root);
+  const nextFx = isTeam ? (await store.loadFixtures()).find((f) => (f.a_ix === idx || f.b_ix === idx) && (f.start.length > 10 ? Date.parse(f.start) > Date.now() : f.start >= new Date().toISOString().slice(0, 10))) : null;
+  const nextCard = nextFx ? nextMatchCard(nextFx) : null;
+  const about = isTeam ? h("div", { class: "card about" }, h("h3", {}, `About ${label}`), h("p", { class: "muted" }, `${label} ${FORMATS.includes(fmt) ? fmt : "T20"} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair odds are 1 ÷ hit rate and carry no margin.`)) : null;
+  const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, nextCard, ...datalists(), root, about);
   hc.set();
   return out;
 }

@@ -121,7 +121,10 @@ export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
     if (r.player.alternatives?.length) out.append(h("p", { class: "muted small" }, "Also matched: ", r.player.alternatives.join(", "), " (be more specific to pick another)."));
     const fc = r.chart && formChart(r, { onLine, onStat, stats });
     const logs = r.chart ? [...r.chart.entries].reverse() : [];
-    out.append(h("div", { "data-sec": "props" }, fc || trendCard(r)),
+    const corr = r.corr ? h("div", { class: "card" }, h("h3", {}, `Correlated props: when ${r.statLabel.toLowerCase()} ${r.plan.side || "over"} ${r.chart?.line ?? r.line} hits`),
+      h("p", { class: "muted small" }, `${r.corr.n} of ${r.corr.of} ${r.sample.unit}. Shows how often his other props also clear in those games versus his normal rate.`),
+      table(["Prop", "Normal", "When it hits", "Lift"], r.corr.rows.map((c) => [`${c.label} over ${c.line}`, pc(c.base), pc(c.cond), h("span", { class: `pcell ${c.lift >= 0.1 ? "hi" : c.lift <= -0.1 ? "lo" : "mid"}` }, `${c.lift >= 0 ? "+" : ""}${Math.round(c.lift * 100)}pp`)]))) : null;
+    out.append(h("div", { "data-sec": "props" }, fc || trendCard(r), corr),
       h("div", { "data-sec": "logs" }, h("div", { class: "card flat" }, table(["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."],
         logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? h("span", { class: "muted" }, "DNP") : e.value, e.aux ?? "–", e.pos ?? "–"])))),
       h("div", { "data-sec": "splits" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder)), ...splitTables(r.splits)));

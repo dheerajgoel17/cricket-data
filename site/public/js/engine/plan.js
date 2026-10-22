@@ -165,7 +165,7 @@ async function runPlayerProp(store, rz, plan, hints) {
   if (s.n && s.pOverLo != null) allNotes.push(`90% interval for the hit rate: ${P(s.pOverLo)} to ${P(s.pOverHi)} (fair odds ${d2(s.fairOverWorst)} to ${d2(s.fairOverBest)} on the over).`);
   return {
     ok: true, kind: "player_prop", headline, title: `${rep.name}: ${rep.fmtName} ${rep.statLabel}`, player: { idx: who.idx, name: rep.name, alternatives: alt },
-    sample: { n: s.n, unit: rep.scope === "match" ? "matches" : "innings" }, summary: s, ladder: rep.ladder, splits: rep.splits, last: rep.last, chart: rep.chart ? { ...rep.chart, entries: rep.chart.entries.map((e) => ({ ...e, opp: store.teamName(e.opp, true), venueName: store.venueName(e.venue) })) } : null,
+    sample: { n: s.n, unit: rep.scope === "match" ? "matches" : "innings" }, summary: s, ladder: rep.ladder, splits: rep.splits, last: rep.last, corr: rep.corr, chart: rep.chart ? { ...rep.chart, entries: rep.chart.entries.map((e) => ({ ...e, opp: store.teamName(e.opp, true), venueName: store.venueName(e.venue) })) } : null,
     filters: chips(store, plan, [["Player", rep.name], ["Stat", rep.statLabel], ...(plan.line != null ? [["Line", `${side} ${plan.line}`]] : [])]),
     notes: allNotes, freshness: freshness(store), plan, statLabel: rep.statLabel, fmtName: rep.fmtName,
   };
