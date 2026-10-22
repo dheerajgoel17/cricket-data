@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-21T08:40:32",
+ "afghanistan_enumerated_at": "2026-10-22T08:46:52",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -1575,6 +1575,102 @@
    "key": "2024-09-09-Afghanistan-New Zealand",
    "match_id": "crex-afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
    "saved_at": "2026-10-21T08:47:22"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
+   "key": "2024-06-27-Afghanistan-South Africa",
+   "match_id": "crex-afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
+   "saved_at": "2026-10-22T08:46:59"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
+   "key": "2024-06-25-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
+   "saved_at": "2026-10-22T08:47:12"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
+   "key": "2024-06-23-Afghanistan-Australia",
+   "match_id": "crex-afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
+   "saved_at": "2026-10-22T08:47:24"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
+   "key": "2024-06-20-Afghanistan-India",
+   "match_id": "crex-afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
+   "saved_at": "2026-10-22T08:47:36"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
+   "key": "2024-05-31-Afghanistan-Scotland",
+   "match_id": "crex-afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
+   "saved_at": "2026-10-22T08:48:09"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
+   "key": "2024-04-28-Dolphins-Lions",
+   "match_id": "crex-dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
+   "saved_at": "2026-10-22T08:48:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-2nd-semi-final-csa-t20-challenge-2024-match-updates-OON",
+   "key": "2024-04-25-Warriors-Dolphins",
+   "match_id": "crex-dol-vs-war-2nd-semi-final-csa-t20-challenge-2024-match-updates-OON",
+   "saved_at": "2026-10-22T08:48:38"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
+   "key": "2024-04-24-Titans-Lions",
+   "match_id": "crex-lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
+   "saved_at": "2026-10-22T08:48:50"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
+   "key": "2024-04-21-Western Province-Titans",
+   "match_id": "crex-tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
+   "saved_at": "2026-10-22T08:49:07"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
+   "key": "2024-04-21-Warriors-Dolphins",
+   "match_id": "crex-dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
+   "saved_at": "2026-10-22T08:49:20"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
+   "key": "2024-04-19-Warriors-North West",
+   "match_id": "crex-nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
+   "saved_at": "2026-10-22T08:50:00"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
+   "key": "2024-04-17-Lions-Warriors",
+   "match_id": "crex-lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
+   "saved_at": "2026-10-22T08:50:17"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-43rd-match-csa-t20-challenge-2024-match-updates-OO8",
+   "key": "2024-04-14-Western Province-Dolphins",
+   "match_id": "crex-dol-vs-wp-43rd-match-csa-t20-challenge-2024-match-updates-OO8",
+   "saved_at": "2026-10-22T08:50:37"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
+   "key": "2024-04-14-North West-Lions",
+   "match_id": "crex-lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
+   "saved_at": "2026-10-22T08:50:50"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-34th-match-csa-t20-challenge-2024-match-updates-ONZ",
+   "key": "2024-04-05-Titans-Warriors",
+   "match_id": "crex-tit-vs-war-34th-match-csa-t20-challenge-2024-match-updates-ONZ",
+   "saved_at": "2026-10-22T08:51:56"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
+   "key": "2024-04-03-Lions-Western Province",
+   "match_id": "crex-lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
+   "saved_at": "2026-10-22T08:52:13"
   }
  ],
  "failed": [],
@@ -2552,516 +2648,165 @@
    "checked_at": "2026-10-21T08:46:31",
    "key": "2024-10-04-Boland-Knights",
    "reason": "rendered 1 candidate page(s) for 2024-10-04; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:47:41",
+   "key": "2024-06-18-Afghanistan-West Indies",
+   "reason": "afg-vs-wi-40th-match-t20-world-cup-2024-match-updates-ORM is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:47:46",
+   "key": "2024-06-14-Afghanistan-Papua New Guinea",
+   "reason": "afg-vs-png-29th-match-t20-world-cup-2024-match-updates-NU1 is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:47:51",
+   "key": "2024-06-08-Afghanistan-New Zealand",
+   "reason": "afg-vs-nz-14th-match-t20-world-cup-2024-match-updates-NTK is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:47:56",
+   "key": "2024-06-04-Afghanistan-Uganda",
+   "reason": "afg-vs-ugn-5th-match-t20-world-cup-2024-match-updates-NTB is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:48:14",
+   "key": "2024-05-29-Afghanistan-Oman",
+   "reason": "afg-vs-oma-7th-match-t20-world-cup-2024-warm-up-match-updates-PIX is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:48:55",
+   "key": "2024-04-21-Boland-North West",
+   "reason": "no CREX match within a day of 2024-04-21 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "OOI"
+   ],
+   "checked_at": "2026-10-22T08:49:28",
+   "key": "2024-04-21-KwaZulu-Natal Inland-Lions",
+   "reason": "rendered 1 candidate page(s) for 2024-04-21; none confirmed"
+  },
+  {
+   "checked": [
+    "OOF"
+   ],
+   "checked_at": "2026-10-22T08:49:35",
+   "key": "2024-04-19-KwaZulu-Natal Inland-Dolphins",
+   "reason": "rendered 1 candidate page(s) for 2024-04-19; none confirmed"
+  },
+  {
+   "checked": [
+    "OOE"
+   ],
+   "checked_at": "2026-10-22T08:49:43",
+   "key": "2024-04-19-Western Province-Boland",
+   "reason": "rendered 1 candidate page(s) for 2024-04-19; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:49:48",
+   "key": "2024-04-19-Lions-Titans",
+   "reason": "no CREX match within a day of 2024-04-19 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:50:05",
+   "key": "2024-04-17-KwaZulu-Natal Inland-Boland",
+   "reason": "no CREX match within a day of 2024-04-17 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "OOB"
+   ],
+   "checked_at": "2026-10-22T08:50:24",
+   "key": "2024-04-14-Warriors-Boland",
+   "reason": "rendered 1 candidate page(s) for 2024-04-14; none confirmed"
+  },
+  {
+   "checked": [
+    "OOA"
+   ],
+   "checked_at": "2026-10-22T08:50:57",
+   "key": "2024-04-14-KwaZulu-Natal Inland-Titans",
+   "reason": "rendered 1 candidate page(s) for 2024-04-14; none confirmed"
+  },
+  {
+   "checked": [
+    "OO5"
+   ],
+   "checked_at": "2026-10-22T08:51:04",
+   "key": "2024-04-12-Warriors-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2024-04-12; none confirmed"
+  },
+  {
+   "checked": [
+    "OO6"
+   ],
+   "checked_at": "2026-10-22T08:51:12",
+   "key": "2024-04-12-Boland-Titans",
+   "reason": "rendered 1 candidate page(s) for 2024-04-12; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:51:17",
+   "key": "2024-04-12-North West-Western Province",
+   "reason": "no CREX match within a day of 2024-04-12 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:51:22",
+   "key": "2024-04-10-Dolphins-Titans",
+   "reason": "no CREX match within a day of 2024-04-10 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:51:27",
+   "key": "2024-04-07-Western Province-Boland",
+   "reason": "no CREX match within a day of 2024-04-07 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "OO1"
+   ],
+   "checked_at": "2026-10-22T08:51:34",
+   "key": "2024-04-07-Titans-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2024-04-07; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:51:39",
+   "key": "2024-04-07-Dolphins-North West",
+   "reason": "no CREX match within a day of 2024-04-07 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:51:44",
+   "key": "2024-04-05-KwaZulu-Natal Inland-Boland",
+   "reason": "no CREX match within a day of 2024-04-05 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-22T08:52:02",
+   "key": "2024-04-05-Dolphins-Lions",
+   "reason": "no CREX match within a day of 2024-04-05 with plausible teams (sitemap covers 1993-01-02..2026-10-20)"
+  },
+  {
+   "checked": [
+    "ONU"
+   ],
+   "checked_at": "2026-10-22T08:52:20",
+   "key": "2024-04-01-Dolphins-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2024-04-01; none confirmed"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
-   "date": "2024-06-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
-   "date": "2024-06-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
-   "date": "2024-06-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
-   "date": "2024-06-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-40th-match-t20-world-cup-2024-match-updates-ORM",
-   "date": "2024-06-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-png-29th-match-t20-world-cup-2024-match-updates-NU1",
-   "date": "2024-06-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Papua New Guinea"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-14th-match-t20-world-cup-2024-match-updates-NTK",
-   "date": "2024-06-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ugn-5th-match-t20-world-cup-2024-match-updates-NTB",
-   "date": "2024-06-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Uganda"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
-   "date": "2024-05-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-oma-7th-match-t20-world-cup-2024-warm-up-match-updates-PIX",
-   "date": "2024-05-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Oman"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "KwaZulu-Natal Inland"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
