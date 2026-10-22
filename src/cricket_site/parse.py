@@ -26,6 +26,12 @@ INN_FIELDS = ["team", "runs", "wkts", "balls", "f4", "f6", "n30", "n50", "n100",
 OVERS_QUAL = 0.8  # T20/ODI summary markets: void unless 80% of the scheduled overs were bowled in BOTH innings
 
 
+def squad_quality(sizes: list[int], lo: int = 9, hi: int = 13) -> int:
+    """1 when both sides' named XI looks complete (9-13 players). Anything else (missing list, a half-scraped scorecard, a whole
+    15-man squad) is unreliable: "not in the XI" / "in the XI" cannot be trusted, so the site shows N/A instead of DNP / VOID."""
+    return int(len(sizes) == 2 and all(lo <= n <= hi for n in sizes))
+
+
 def kind_code(kind: str) -> int:
     return KIND_CODE.get(kind, KIND_CODE["other"])
 

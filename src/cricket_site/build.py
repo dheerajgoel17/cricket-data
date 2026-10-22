@@ -98,18 +98,25 @@ def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict],
 
     store = Store(data_dir)
     gen = {"male": 0, "female": 1}
-    seen = set()
+    seen: dict[tuple, list[int | None]] = {}  # (date, teams, gender) -> total batter runs of each canonical match that day
     for m in canonical:
+        runs = sum(r[5] for r in m["bat"]) if m["bat"] else None
         for dd in (-1, 0, 1):
             d = (date.fromisoformat(m["date"]) + timedelta(days=dd)).isoformat()
-            seen.add((d, frozenset(_norm_team(t) for t in m["teams"]), m["gender"]))
+            seen.setdefault((d, frozenset(_norm_team(t) for t in m["teams"]), m["gender"]), []).append(runs if dd else -1)
     out, stat = [], {"files": 0, "matches": 0, "rows": 0, "rows_unlinked": 0, "unlinked_names": []}
     for d in pending_provisional(store):
         stat["files"] += 1
         g = gen.get(d.get("gender", ""), 0)
         key = (d.get("date", ""), frozenset((_norm_team(d["team_a"]), _norm_team(d["team_b"]))), g)
-        if key in seen or not d.get("date"):
+        if not d.get("date"):
             continue
+        if key in seen:
+            # same fixture +/-1 day, but consecutive-day games between the same two sides are real: an adjacent-date "duplicate" only
+            # counts when the batter-run totals agree (CREX and Cricsheet can differ by a day across time zones)
+            prov_runs = sum(int(p.get("runs") or 0) for p in d.get("players", []))
+            if any(r == -1 or r is None or not prov_runs or r == prov_runs for r in seen[key]):
+                continue
         fmt = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2}.get(d.get("match_type", ""))
         if fmt is None:
             continue
@@ -137,9 +144,13 @@ def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict],
                 m["bat"].append((pid, 0, p["team"], p["opponent"], 0, n("runs"), n("balls"), n("fours"), n("sixes"), -1, -1, -1))
             if n("balls_bowled"):
                 m["bowl"].append((pid, 0, p["team"], p["opponent"], n("wickets"), n("runs_conceded"), n("balls_bowled")))
+        sides: dict[str, int] = {}
+        for p in d.get("players", []):
+            sides[p.get("team", "")] = sides.get(p.get("team", ""), 0) + 1
+        m["xq"] = squad_quality(list(sides.values()), lo=10)  # scraped squads: stricter, a side with 1-2 players is a failed scrape
         out.append(m)
         stat["matches"] += 1
-        seen.add(key)
+        seen.setdefault(key, []).append(-1)
     return out, stat
 
 
@@ -224,7 +235,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
     return hosts, venue_host, per_match
 
 
-MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts")
+MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "xq")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
 XI_KEYS = ("p", "m")
@@ -292,7 +303,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         hn = host_of_match.get(m["id"]) or venue_host.get((m["venue"] or "?", m["intl"]))
         hs = -2 if hn is None else -1 if hn == "-" else host_ix[hn]  # -1 neutral ground, -2 host unknown
         _push(cols, MATCH_KEYS, (m["id"], m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
-                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"]))
+                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m["xq"]))
         m["_ix"] = mi
         m["_tix"] = (a, b)
 

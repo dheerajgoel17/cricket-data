@@ -104,13 +104,13 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     if (!s) span.set(r.t, [r.date, r.date]);
     else { if (r.date < s[0]) s[0] = r.date; if (r.date > s[1]) s[1] = r.date; }
   }
-  // A player who is still active with his current team keeps appearing in that team's fixtures after his last
-  // innings: those are DNPs (e.g. in the squad but did not bat). Otherwise the span ends at his last innings with the team.
-  if (pidx != null) {
-    const cur = store.P.tm[pidx], lastAny = store.P.last[pidx], newest = store.M.d[store.n - 1];
-    const s = span.get(cur);
-    if (s && lastAny >= s[1] && daysBetween(lastAny, newest) <= 120) s[1] = newest;
-  }
+  // A player who is still active keeps appearing in his side's later fixtures as DNP / VOID. "Active" is judged in THIS format only: the team
+  // he last played for in this format, with that last innings no more than 120 days before the newest match in the data. (Otherwise a Test-only
+  // player would show a long run of T20 DNPs, and a player who moved clubs would be blamed for his old club's fixtures.)
+  const newest = store.M.d[store.n - 1];
+  let curTeam = null;
+  for (const [t, sp] of span) if (curTeam == null || sp[1] > span.get(curTeam)[1]) curTeam = t;
+  if (curTeam != null && daysBetween(span.get(curTeam)[1], newest) <= 120) span.get(curTeam)[1] = newest;
   const byMatch = new Map();
   const auxKey = def.side === "bat" ? "b" : "n";
   for (const r of (aggregate ? aggregateByMatch(rows, [def.key, auxKey]) : rows)) byMatch.set(r.m, r);
