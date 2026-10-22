@@ -20,12 +20,13 @@ import urllib.error
 import urllib.request
 
 CREX_CDN = "https://cricketvectors.akamaized.net"
-UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"
+UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"  # for CREX
+API_UA = "cricket-props-hub-sync/0.1 (server)"  # Supabase rejects secret keys sent with a browser-like User-Agent
 MAX_BYTES = 200_000
 
 
 def _req(method: str, url: str, key: str, data: bytes | None = None, headers: dict | None = None, timeout: int = 60):
-    h = {"apikey": key, "User-Agent": UA, **(headers or {})}
+    h = {"apikey": key, "User-Agent": API_UA, **(headers or {})}
     if not key.startswith("sb_"):  # new-style secret keys (sb_secret_...) go only in `apikey`; legacy service_role JWTs also go in Authorization
         h["Authorization"] = f"Bearer {key}"
     r = urllib.request.Request(url, data=data, method=method, headers=h)

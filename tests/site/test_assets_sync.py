@@ -111,6 +111,7 @@ def test_request_headers_fit_both_key_styles(monkeypatch):
     monkeypatch.setattr(s.urllib.request, "urlopen", fake_open)
     s._req("GET", BASE + "/rest/v1/assets", "sb_secret_abc")
     assert seen["apikey"] == "sb_secret_abc" and "authorization" not in seen
+    assert "mozilla" not in seen["user-agent"].lower()  # Supabase refuses secret keys from browser-like clients
     s._req("GET", BASE + "/rest/v1/assets", "eyJlegacy.jwt.key")
     assert seen["authorization"] == "Bearer eyJlegacy.jwt.key"
 
