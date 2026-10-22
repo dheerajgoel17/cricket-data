@@ -94,6 +94,8 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
     rows = [(shard["r"][k], shard["s"][k], shard["o"][k], shard["k"][k]) for k in range(len(shard["p"]))
             if shard["p"][k] == brook and shard["m"][k] == m]
     assert rows == [(40, 2, 0, -1)]  # no batting position / dismissal for scraped games
+    xi = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())["xi"]
+    assert (brook, m) in list(zip(xi["p"], xi["m"], strict=True))  # named in the scraped squad: in the XI
     assert "crex-dup" not in M["id"]
 
 

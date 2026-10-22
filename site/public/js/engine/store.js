@@ -93,8 +93,11 @@ export class Store {
       if (w.p[k] !== pidx) continue;
       bowl.push(this._row(w.m[k], w.t[k], { i: w.i[k], t: w.t[k], opp: w.q[k], w: w.w[k], c: w.c[k], n: w.n[k] }));
     }
+    const xi = new Set();
+    const x = d.xi || {};
+    for (let k = 0; k < (x.p?.length || 0); k++) if (x.p[k] === pidx) xi.add(x.m[k]);
     const ord = (x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : x.m - y.m || x.i - y.i);
-    return { bat: bat.sort(ord), bowl: bowl.sort(ord) };
+    return { bat: bat.sort(ord), bowl: bowl.sort(ord), xi };
   }
 
   /** Partnerships between two players (any order), oldest first. */

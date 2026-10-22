@@ -24,7 +24,7 @@ export async function collectGrid(teamIdx, fmtName, stat, nFx = 10) {
   const rows = await Promise.all(cand.slice(0, 22).map(async (p) => {
     const r = await store.playerRows(p);
     const list = (def.side === "bat" ? r.bat : r.bowl).filter((x) => x.fmt === fmt && x.t === teamIdx);
-    return { p, map: new Map(list.map((x) => [x.m, x])) };
+    return { p, map: new Map(list.map((x) => [x.m, x])), xi: r.xi };
   }));
   const body = rows.map((r) => ({ ...r, n: fx.filter((m) => r.map.has(m)).length })).filter((r) => r.n > 0).sort((a, b) => b.n - a.n).slice(0, 15);
   return { fx, body, def };
@@ -34,11 +34,11 @@ export function gridTable(g, teamIdx, line) {
   const { store } = C, M = store.M;
   if (!g.fx.length) return h("p", { class: "muted" }, "No fixtures for this format.");
   const head = h("tr", {}, h("th", {}, "Player"), h("th", {}, "Hit"), g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return h("th", { class: "gh" }, teamBadge(store.teamName(opp, true)), h("div", {}, M.d[m].slice(5).split("-").reverse().join("/"))); }));
-  const trs = g.body.map(({ p, map }) => {
+  const trs = g.body.map(({ p, map, xi }) => {
     const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key]);
     const k = vals.filter((v) => v > line).length;
     return h("tr", {}, h("td", {}, h("a", { class: "tm", href: `#/player/${p}` }, playerBadge(store, p), store.playerName(p))), h("td", { class: "odds" }, vals.length ? `${k}/${vals.length}` : "–"),
-      g.fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[g.def.key] > line ? "hit" : "miss"}` }, String(x[g.def.key])) : h("span", { class: "gv dnp" }, "–")); }));
+      g.fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[g.def.key] > line ? "hit" : "miss"}` }, String(x[g.def.key])) : xi?.has(m) ? h("span", { class: "gv void", title: "In the XI but did not bat/bowl: bet void" }, "VOID") : h("span", { class: "gv dnp" }, "–")); }));
   });
   return h("div", { class: "card flat scroll" }, h("table", { class: "gridt" }, h("thead", {}, head), h("tbody", {}, trs)));
 }
@@ -204,7 +204,8 @@ const GLOSS = [
   ["Hit rate", "Basic", "Betting", "Share of games where the stat cleared the line (over: strictly more than the line). Pushes on whole-number lines are void."],
   ["Fair decimal odds", "Basic", "Betting", "1 ÷ hit rate. The price at which the historical rate breaks even, with no bookmaker margin."],
   ["Line", "Basic", "Betting", "The threshold in a prop, e.g. sixes over 0.5 or runs over 24.5."],
-  ["DNP", "Basic", "Form", "Did not play: the team had a fixture but the player did not bat or bowl. Shown on charts, left out of hit rates."],
+  ["DNP", "Basic", "Form", "Did not play: the team had a fixture but the player was not in the playing XI. Shown on charts, left out of hit rates."],
+  ["VOID (did not bat / bowl)", "Intermediate", "Rules", "Named in the playing XI but never reached the crease (or never bowled): bets on that player's batting (or bowling) stats are void and the stake is returned. Left out of hit rates."],
   ["30s", "Basic", "Markets", "Innings of 30-49 runs. Counted per match as a fancy market."],
   ["50s", "Basic", "Markets", "Innings of 50-99 runs (100+ are centuries)."],
   ["Double-digit scores", "Basic", "Markets", "Batters reaching 10 or more."],
