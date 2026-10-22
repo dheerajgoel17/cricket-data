@@ -83,3 +83,11 @@ names conservatively (surname + first initial, ambiguous names skipped, see `src
 The browser loads images from CREX's CDN (`cricketvectors.akamaized.net/players/org/<id>.png`, `/Teams/<id>.png`); nothing is copied into the repo.
 About 54% of recently active players and most national and franchise teams get a CREX image today; the rest fall back. Those images belong to CREX:
 check their terms before using the site commercially, or replace the source later by returning a different URL from `playerPhoto` in `site/public/js/photos.js`.
+
+## Our own copy of the images and id maps (Supabase, free plan)
+So the site keeps working if CREX changes or removes its images, `src/cricket_site/assets_sync.py` copies each player photo / team logo once into a
+public Supabase Storage bucket (`avatars`) and records it in Postgres (`assets`, `crex_players`, `crex_teams`; public read, writes only with the service key).
+The Site workflow runs it hourly (resumable, at most `SYNC_LIMIT` new images per run, politely paced) and adds `base` + `s` (ids we hold) to `photos.json`;
+the browser then tries our copy first and CREX second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
+(dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and CREX is used directly.
+Schema: see the `cricket_assets_schema` migration (tables above plus the `avatars` bucket: public, 200 KB limit, png/webp/jpeg only).

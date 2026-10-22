@@ -1,7 +1,7 @@
 // Free image sources, loaded lazily in the browser (nothing is stored in the repo):
 //  * team logos and player photos: CREX's public image CDN (ids from CREX's sitemaps, matched at build time), see photos.js
 //  * fallbacks: flagcdn.com flags for national sides, Wikimedia Commons photos via Wikidata, then initials / a silhouette
-import { playerPhoto, teamLogo } from "./photos.js";
+import { playerPhotos, teamLogos } from "./photos.js";
 import { h } from "./ui.js";
 
 const FLAGS = {
@@ -30,14 +30,14 @@ export const initials = (n) => String(n).replace(/\(W\)/, "").trim().split(/\s+/
 /** Round badge: CREX logo when we know the team, else a flag, else initials. `cls` is "dot" (small) or "crest" (hero). */
 export function teamBadge(name, cls = "dot") {
   const flag = flagUrl(name, cls === "crest" ? 160 : 40);
-  const logo = teamLogo(photos, name);
-  const el = h("span", { class: cls }, logo || flag ? null : initials(name));
-  const show = (src, next) => {
-    const img = h("img", { src, alt: "", loading: "lazy", onerror: () => { img.remove(); next ? next() : (el.textContent = initials(name)); } });
+  const urls = [...teamLogos(photos, name), flag].filter(Boolean);
+  const el = h("span", { class: cls }, urls.length ? null : initials(name));
+  const show = (i) => {
+    if (i >= urls.length) { el.textContent = initials(name); return; }
+    const img = h("img", { src: urls[i], alt: "", loading: "lazy", onerror: () => { img.remove(); show(i + 1); } });
     el.replaceChildren(img);
   };
-  if (logo) show(logo, flag ? () => show(flag) : null);
-  else if (flag) show(flag);
+  if (urls.length) show(0);
   return el;
 }
 
@@ -48,15 +48,17 @@ let photos = null;
 export async function loadPhotos(base = "data/") {
   try { photos = await (await fetch(`${base}photos.json`)).json(); } catch { photos = {}; }
 }
-export const playerPhotoUrl = (store, pidx) => playerPhoto(photos, pidx);
+export const playerPhotoUrl = (store, pidx) => playerPhotos(photos, pidx)[0] ?? null;
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function playerBadge(store, pidx, cls = "dot") {
-  const url = playerPhotoUrl(store, pidx);
+  const urls = playerPhotos(photos, pidx);
   const el = h("span", { class: `${cls} ph`, title: store.playerName(pidx), html: SILHOUETTE });
-  if (url) {
-    const img = h("img", { src: url, alt: store.playerName(pidx), loading: "lazy", onerror: () => img.remove() });
+  const show = (i) => {
+    if (i >= urls.length) return; // the silhouette stays
+    const img = h("img", { src: urls[i], alt: store.playerName(pidx), loading: "lazy", onerror: () => { img.remove(); show(i + 1); } });
     el.append(img);
-  }
+  };
+  show(0);
   return el;
 }
