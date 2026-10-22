@@ -44,6 +44,7 @@ def _compact(m: dict) -> dict:
                   for i in m["innings"] for p, v in i["bat"].items()]
     out["bowl"] = [(p, i["no"], i["opp"], i["team"], v["w"], v["rc"], v["bb"])
                    for i in m["innings"] for p, v in i["bowl"].items()]
+    out["xi"] = m.get("xi", [])
     out["parts"] = [(t["a"], t["b"], i["no"], t["open"], t["w"], t["runs"], t["balls"], t["ra"], t["rb"], t["x"], t["kd"])
                     for i in m["innings"] for t in i["parts"]]
     return out
@@ -119,10 +120,12 @@ def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict],
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
-             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": []}
+             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": [], "xi": []}
         for p in d.get("players", []):
             stat["rows"] += 1
             pid = p.get("player_id", "")
+            if pid:
+                m["xi"].append(pid)  # scraped squads list everyone named for the match, batting or not
             if not pid:
                 stat["rows_unlinked"] += 1
                 if len(stat["unlinked_names"]) < 50:
@@ -224,6 +227,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
 MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
+XI_KEYS = ("p", "m")
 PART_KEYS = ("a", "b", "m", "i", "o", "w", "r", "n", "ra", "rb", "x", "kd")
 
 
@@ -296,7 +300,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
     pids = sorted({r[0] for m in ms for r in m["bat"]} | {r[0] for m in ms for r in m["bowl"]})
     pix = {p: i for i, p in enumerate(pids)}
 
-    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "pt": defaultdict(list)})
+    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "pt": defaultdict(list), "xi": defaultdict(list)})
 
     def shard_of(pid: str) -> int:
         try:
@@ -327,6 +331,9 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
                 continue
             S = shards[shard_of(r[0])]["pt"]
             _push(S, PART_KEYS, (a_, b_, mi, r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10]))
+        for pid in set(m.get("xi", [])):
+            if pid in pix:
+                _push(shards[shard_of(pid)]["xi"], XI_KEYS, (pix[pid], mi))
         for pid, nm in m.get("aliases", []):
             aliases[pid].add(nm)
     return {"ms": ms, "cols": cols, "inn": inn_col, "teams": teams, "venues": venues, "events": events, "hosts": hosts,

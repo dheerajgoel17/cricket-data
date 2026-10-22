@@ -109,3 +109,12 @@ def test_hundred_is_its_own_format_and_first_class_is_ignored():
     assert parse_match("h", d)["fmt"] == 3
     assert parse_match("f", doc("2024-08-01", ("X", "Y"), [inn], mtype="MDM")) is None
     assert synth.make_dataset()[1]["t20"][0]["id"] == "t20_00"
+
+
+def test_playing_xi_includes_players_who_never_reached_the_crease():
+    st = {"A": dict(runs=5, out=True), "B": dict(runs=0, out=False), "C": dict(runs=0, out=False)}
+    a = scripted("X", ["A", "B", "C"], st, ["Z"], pad_to=60)
+    b = scripted("Y", ["P", "Q"], {"P": dict(runs=0), "Q": dict(runs=0)}, ["Z"], pad_to=60)
+    m = parse_match("m", doc("2024-01-01", ("X", "Y"), [a, b], xi_extra={"X": ["Benched DNB"]}))
+    assert pid("Benched DNB") in m["xi"]            # named in the XI ...
+    assert pid("Benched DNB") not in {r["pid"] for r in m["bat"]}   # ... but no batting row: a void bet

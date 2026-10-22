@@ -225,3 +225,6 @@ button:active, .btn:active, .pill:active { transform: scale(.96); }
 .vs { display: flex; align-items: center; gap: 18px; } .vs > span { color: var(--mute); font: 400 28px var(--head); } .vs .crest { width: 76px; height: 76px; }
 .hero-top .vs { grid-row: span 3; }
 .toolc { display: grid; gap: 6px; margin: 0; text-decoration: none; color: var(--ink); transition: transform .15s, border-color .2s; } .toolc:hover { transform: translateY(-3px); border-color: #3a3f43; text-decoration: none; } .toolc .badge { justify-self: start; }
+
+.fchart .bar.dnp.void { border-color: #b8860b; background: repeating-linear-gradient(135deg, transparent 0 5px, rgba(245,197,66,.10) 5px 10px); } .fchart .bar.dnp.void em { color: var(--warn); }
+.gv.void { color: var(--warn); font-size: 11px; border: 1px dashed #8a6a10; background: rgba(245,197,66,.06); }

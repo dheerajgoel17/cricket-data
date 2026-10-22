@@ -88,6 +88,8 @@ def parse_match(mid: str, doc: dict) -> dict | None:
             parts.append({"inn": k, **pt})
     m["innings"] = innings
     m["bat"], m["bowl"], m["parts"] = bat, bowl, parts
+    # the named playing XI (registry ids): in the XI but never batting / bowling means player bets on that stat are void
+    m["xi"] = [people[n] for names in (info.get("players") or {}).values() for n in names if people.get(n)]
     m["first"] = innings[0]["team"] if innings else ""
     _market_aggregates(m)
     return m

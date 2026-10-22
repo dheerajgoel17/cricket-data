@@ -54,8 +54,8 @@ function formChart(r, { onLine, onStat, stats } = {}) {
         h("div", { class: "plot" },
           ...ticks.map((t) => h("i", { class: "grid", style: `bottom:${(t / top) * 100}%` })),
           h("div", { class: "lineMark", style: `bottom:${(Math.min(st.line, top) / top) * 100}%` }, h("span", {}, String(st.line))),
-          h("div", { class: "bars2" }, ents.map((e) => h("div", { class: "col", title: `${e.date} v ${e.opp}${e.venueName ? ` · ${e.venueName}` : ""}${e.value == null ? " · did not feature" : ` · ${e.value}`}` },
-            e.value == null ? h("div", { class: "bar dnp" }, h("em", {}, "DNP")) : h("div", { class: `bar ${hitOf(e.value) ? "hit" : "miss"}`, style: `height:${(Math.min(e.value, top) / top) * 100}%` }, h("em", {}, String(e.value))))))),
+          h("div", { class: "bars2" }, ents.map((e) => h("div", { class: "col", title: `${e.date} v ${e.opp}${e.venueName ? ` · ${e.venueName}` : ""}${e.value == null ? (e.void ? " · in the XI but did not bat/bowl: bet void" : " · not in the XI") : ` · ${e.value}`}` },
+            e.value == null ? h("div", { class: `bar dnp${e.void ? " void" : ""}` }, h("em", {}, e.void ? "VOID" : "DNP")) : h("div", { class: `bar ${hitOf(e.value) ? "hit" : "miss"}`, style: `height:${(Math.min(e.value, top) / top) * 100}%` }, h("em", {}, String(e.value))))))),
         h("div", { class: "yax r" }, [1, 0.66, 0.33, 0].map((f) => h("span", {}, String(Math.round(auxMax * f))))),
         h("div", { class: "auxwrap", html: svg })),
       h("div", { class: "xlab" }, ents.map((e) => h("div", { class: "col" }, e.pos ? h("small", {}, `No.${e.pos}`) : h("small", {}, "·"), teamBadge(e.opp), h("small", {}, e.date.slice(5).split("-").reverse().map((x, i) => (i ? x : x)).join("/"))))),
@@ -126,7 +126,7 @@ export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
       table(["Prop", "Normal", "When it hits", "Lift"], r.corr.rows.map((c) => [`${c.label} over ${c.line}`, pc(c.base), pc(c.cond), h("span", { class: `pcell ${c.lift >= 0.1 ? "hi" : c.lift <= -0.1 ? "lo" : "mid"}` }, `${c.lift >= 0 ? "+" : ""}${Math.round(c.lift * 100)}pp`)]))) : null;
     out.append(h("div", { "data-sec": "props" }, fc || trendCard(r), corr),
       h("div", { "data-sec": "logs" }, h("div", { class: "card flat" }, table(["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."],
-        logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? h("span", { class: "muted" }, "DNP") : e.value, e.aux ?? "–", e.pos ?? "–"])))),
+        logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? h("span", { class: "muted" }, e.void ? "VOID (in XI, did not bat/bowl)" : "DNP") : e.value, e.aux ?? "–", e.pos ?? "–"])))),
       h("div", { "data-sec": "splits" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder)), ...splitTables(r.splits)));
   } else if (r.kind === "partnership") {
     const s = r.summary;

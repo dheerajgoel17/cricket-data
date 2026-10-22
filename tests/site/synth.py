@@ -71,13 +71,22 @@ def scripted(team, order, stats, bowlers, pad_to=120, extra=None):
 
 
 def doc(date, teams, innings, *, event="Test Series", venue="Ground", mtype="T20", gender="male", winner=None,
-        overs=20, bpo=6, team_type="international", people=None, dates=None):
+        overs=20, bpo=6, team_type="international", people=None, dates=None, xi_extra=None):
     dl = [d for i in innings for o in i["overs"] for d in o["deliveries"]]
-    names = sorted({d["batter"] for d in dl} | {d["non_striker"] for d in dl} | {d["bowler"] for d in dl})
+    extra = xi_extra or {}
+    names = sorted({d["batter"] for d in dl} | {d["non_striker"] for d in dl} | {d["bowler"] for d in dl} | {n for v in extra.values() for n in v})
     info = {"dates": dates or [date], "match_type": mtype, "team_type": team_type, "gender": gender, "event": {"name": event},
             "venue": venue, "teams": list(teams), "balls_per_over": bpo, "toss": {"winner": teams[0], "decision": "bat"},
             "outcome": {"winner": winner or teams[0], "by": {"runs": 1}},
             "registry": {"people": people or {n: pid(n) for n in names}}}
+    xi: dict[str, set] = {t: set(extra.get(t, [])) for t in teams}
+    for inn in innings:
+        other = teams[1 - list(teams).index(inn["team"])]
+        for o in inn["overs"]:
+            for d in o["deliveries"]:
+                xi[inn["team"]] |= {d["batter"], d["non_striker"]}
+                xi[other].add(d["bowler"])
+    info["players"] = {t: sorted(v) for t, v in xi.items()}
     if overs:
         info["overs"] = overs
     return {"info": info, "innings": innings}

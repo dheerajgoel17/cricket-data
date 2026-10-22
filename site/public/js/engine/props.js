@@ -80,7 +80,7 @@ export async function playerReport(store, pidx, q) {
     venue: store.venueName(r.v), value: r[def.key], home: r.home, innings: r.bf == null ? null : r.bf ? "1st" : "2nd" }));
   if (kept.some((r) => r.pv)) notes.push(`${kept.filter((r) => r.pv).length} of these rows come from provisional (scraped) matches that Cricsheet has not published yet.`);
   for (const [k, v] of Object.entries(dropped)) if (v) notes.push(`${v} rows left out of this view: ${k.replace(/_/g, " ")}.`);
-  const chart = buildChart(store, base.filter((r) => r.fmt === fmt), chartRows, def, f, fmt, { line: q.line ?? lineForSplit, side: q.side || "over", aggregate: fmt === 2, pidx });
+  const chart = buildChart(store, base.filter((r) => r.fmt === fmt), chartRows, def, f, fmt, { line: q.line ?? lineForSplit, side: q.side || "over", aggregate: fmt === 2, pidx, xi: all.xi });
   const corr = q.line != null || lineForSplit != null ? correlated(rows, q.stat, q.line ?? lineForSplit, q.side || "over") : null;
   return { ok: true, chart, corr, pidx, name: store.playerName(pidx), stat: q.stat, statLabel: def.label, fmt, fmtName: FORMATS[fmt], scope,
     n: rows.length, line: q.line ?? null, lineForSplit, summary, ladder, splits, last, notes, filters: f,
@@ -97,7 +97,7 @@ export const WINDOWS = [5, 10, 20, 30, 50, 0]; // 0 = every fixture
  * (not in the XI, did not bat/bowl) is kept as unavailable (value null) and excluded from hit rates.
  * `base` = all rows of that side in this format, `rows` = filtered rows (without lastN).
  */
-export function buildChart(store, base, rows, def, f, fmt, { line, side = "over", aggregate, pidx = null }) {
+export function buildChart(store, base, rows, def, f, fmt, { line, side = "over", aggregate, pidx = null, xi = null }) {
   const span = new Map();
   for (const r of base) {
     const s = span.get(r.t);
@@ -137,7 +137,8 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
         if (f.innings) { const bf = store.battedFirst(m, t); if (bf == null || (f.innings === "first") !== bf) continue; }
         if (f.full && M.q[m] !== 1) continue;
         if (f.gender != null && M.g[m] !== f.gender) continue;
-        entries.push({ m, date: M.d[m], opp, value: null, venue: M.v[m] });
+        // in the named XI but never batted / bowled: player bets are VOID (stake returned); not named at all: DNP
+        entries.push({ m, date: M.d[m], opp, value: null, void: !!xi?.has(m), venue: M.v[m] });
       } else entries.push({ m, date: M.d[m], opp, value: hit[def.key], aux: hit[auxKey], pos: hit.o || null, pv: M.pv[m], venue: M.v[m] });
       break;
     }
@@ -149,7 +150,7 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     const sm = summarize(vals, line);
     const k = side === "over" ? sm.over : sm.under;
     const p = side === "over" ? sm.pOver : sm.pUnder;
-    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.length - vals.length, hits: k ?? null,
+    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void).length, voided: w.filter((e) => e.void).length, hits: k ?? null,
       pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
   });
   return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };

@@ -5,6 +5,7 @@ export const RULES = [
   "30s = scores of 30-49, 50s = 50-99, 100s = 100+. Double-digit = 10+. Single-digit = 1-9 (ducks are not single-digit).",
   "Team-specific markets count only the team batting first.",
   "Retired hurt is not a wicket. Penalty runs count. Super overs are ignored.",
+  "A player named in the XI who never reaches the crease (or never bowls) has his bat (or bowl) bets voided: shown as VOID and left out of hit rates. Not in the XI at all = DNP.",
   "Formats are never mixed: T20 form never feeds ODI or Test numbers. T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, The Hundred is its own format; first-class cricket is not included.",
 ];
 

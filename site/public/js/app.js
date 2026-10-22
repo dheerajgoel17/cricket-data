@@ -8,7 +8,7 @@ import { renderResult } from "./render.js";
 import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
-import { initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
+import { collectGrid, gridTable, initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
 import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
@@ -367,35 +367,13 @@ async function teamsPage(_, q) {
 
 /** StatsHub-style fixture grid: players down, the team's last fixtures across, cell = stat value (green when it clears the line). */
 async function playerGrid(teamIdx, fmtName, q) {
-  const fmt = FORMATS.indexOf(fmtName);
-  const M = store.M;
   const stat = STATDEF[q.gstat] ? q.gstat : "sixes";
-  const def = STATDEF[stat];
   const line = q.gline !== undefined && q.gline !== "" ? Number(q.gline) : 0.5;
-  const fx = [];
-  for (let m = store.n - 1; m >= 0 && fx.length < 10; m--) if (M.f[m] === fmt && (M.a[m] === teamIdx || M.b[m] === teamIdx)) fx.push(m);
-  fx.reverse();
   const out = h("div", { "data-sec": "grid" });
-  const controls = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`team/${teamIdx}`, { ...q, gstat: f.gstat, gline: f.gline, tab: "grid" }); } },
-    field("Stat", sel("gstat", Object.entries(STATDEF).map(([k, v]) => [k, v.label]), stat)), field("Line", inp("gline", line, { type: "number", step: "0.5", style: "width:90px" })), h("button", { type: "submit" }, "Update"));
-  out.append(controls);
-  if (!fx.length) { out.append(h("p", { class: "muted" }, "No fixtures for this format.")); return out; }
-  const cutoff = M.d[fx[0]];
-  const cand = [];
-  for (let i = 0; i < store.P.id.length; i++) if (store.P.tm[i] === teamIdx && store.P.last[i] >= cutoff && ((store.P.fm[i] >> fmt) & 1)) cand.push(i);
-  cand.sort((x, y) => store.P.n[y] - store.P.n[x]);
-  const ps = cand.slice(0, 24);
-  const rows = await Promise.all(ps.map(async (p) => { const r = await store.playerRows(p); const list = (def.side === "bat" ? r.bat : r.bowl).filter((x) => x.fmt === fmt && x.t === teamIdx); return [p, new Map(list.map((x) => [x.m, x]))]; }));
-  const body = rows.map(([p, map]) => ({ p, map, n: fx.filter((m) => map.has(m)).length })).filter((r) => r.n > 0).sort((a, b) => b.n - a.n).slice(0, 16);
-  const head = h("tr", {}, h("th", {}, "Player"), h("th", {}, "Hit"), fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return h("th", { class: "gh" }, teamBadge(store.teamName(opp, true)), h("div", {}, M.d[m].slice(5).split("-").reverse().join("/"))); }));
-  const trs = body.map(({ p, map }) => {
-    const vals = fx.filter((m) => map.has(m)).map((m) => map.get(m)[def.key]);
-    const k = vals.filter((v) => v > line).length;
-    return h("tr", {}, h("td", {}, h("a", { class: "tm", href: `#/player/${p}` }, playerBadge(store, p), store.playerName(p))), h("td", { class: "odds" }, vals.length ? `${k}/${vals.length}` : "–"),
-      fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[def.key] > line ? "hit" : "miss"}` }, String(x[def.key])) : h("span", { class: "gv dnp" }, "–")); }));
-  });
-  out.append(h("div", { class: "card flat scroll" }, h("table", { class: "gridt" }, h("thead", {}, head), h("tbody", {}, trs))),
-    h("p", { class: "muted small" }, `${def.label} over ${line} across this team's last ${fx.length} ${fmtName} fixtures. A dash means the player did not ${def.side === "bat" ? "bat" : "bowl"}.`));
+  out.append(h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`team/${teamIdx}`, { ...q, gstat: f.gstat, gline: f.gline, tab: "grid" }); } },
+    field("Stat", sel("gstat", Object.entries(STATDEF).map(([k, v]) => [k, v.label]), stat)), field("Line", inp("gline", line, { type: "number", step: "0.5", style: "width:90px" })), h("button", { type: "submit" }, "Update")));
+  const g = await collectGrid(teamIdx, fmtName, stat);
+  out.append(gridTable(g, teamIdx, line), h("p", { class: "muted small" }, `${STATDEF[stat].label} over ${line} across this team's last ${g.fx.length} ${fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not ${STATDEF[stat].side === "bat" ? "bat" : "bowl"}, so the bet is void.`));
   return out;
 }
 
