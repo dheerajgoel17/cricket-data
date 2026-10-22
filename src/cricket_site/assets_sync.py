@@ -33,6 +33,25 @@ def _req(method: str, url: str, key: str, data: bytes | None = None, headers: di
         return resp.status, resp.headers.get("Content-Type", ""), resp.read()
 
 
+def describe_key(key: str) -> str:
+    """What kind of key this is (never the key itself): helps diagnose a wrong secret."""
+    import base64
+
+    if key.startswith("sb_publishable_"):
+        return "a PUBLISHABLE key (read-only: use the secret / service_role key)"
+    if key.startswith("sb_secret_"):
+        return f"a secret key (length {len(key)})"
+    parts = key.split(".")
+    if len(parts) == 3:
+        try:
+            pad = parts[1] + "=" * (-len(parts[1]) % 4)
+            claims = json.loads(base64.urlsafe_b64decode(pad))
+            return f"a JWT with role={claims.get('role')!r} for project {claims.get('ref')!r}"
+        except (ValueError, UnicodeDecodeError):
+            return "a malformed JWT"
+    return f"an unrecognised format (length {len(key)}, expected sb_secret_... or a JWT starting eyJ)"
+
+
 def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
     """{'player': {ids}, 'team': {ids}} already in the assets table (paged)."""
     out: dict[str, set[str]] = {"player": set(), "team": set()}
@@ -129,7 +148,13 @@ def main(argv: list[str] | None = None) -> int:
     try:
         print(json.dumps(sync(a.photos, a.index or None, a.url.rstrip("/"), key, a.limit)))
     except (urllib.error.URLError, OSError, ValueError) as exc:
-        print(f"assets_sync: failed ({exc}); the site keeps using CREX images", file=sys.stderr)
+        detail = ""
+        if isinstance(exc, urllib.error.HTTPError):
+            try:
+                detail = f" body={exc.read(300).decode('utf-8', 'replace')!r}"
+            except OSError:
+                pass
+        print(f"assets_sync: failed ({exc}){detail}; SUPABASE_SERVICE_KEY is {describe_key(key)}; the site keeps using CREX images", file=sys.stderr)
         return 0
     return 0
 

@@ -113,3 +113,12 @@ def test_request_headers_fit_both_key_styles(monkeypatch):
     assert seen["apikey"] == "sb_secret_abc" and "authorization" not in seen
     s._req("GET", BASE + "/rest/v1/assets", "eyJlegacy.jwt.key")
     assert seen["authorization"] == "Bearer eyJlegacy.jwt.key"
+
+
+def test_describe_key_never_reveals_the_key():
+    import base64
+    payload = base64.urlsafe_b64encode(json.dumps({"role": "anon", "ref": "abc"}).encode()).decode().rstrip("=")
+    assert "role='anon'" in s.describe_key(f"eyJhbGciOiJIUzI1NiJ9.{payload}.sig")
+    assert "PUBLISHABLE" in s.describe_key("sb_publishable_xyz")
+    assert "sb_secret_secretvalue" not in s.describe_key("sb_secret_secretvalue")
+    assert "unrecognised" in s.describe_key("short")
