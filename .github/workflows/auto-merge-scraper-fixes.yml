@@ -23,7 +23,8 @@ jobs:
           REPO: ${{ github.repository }}
           SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          PR=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.state=="open")][0].number')
+          # the PR may already be merged and its branch deleted by the time CI finishes: then the lookup fails or is empty, which is fine
+          PR=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.state=="open")][0].number // empty' 2>/dev/null || true)
           [ -z "$PR" ] && { echo "no open PR for $SHA"; exit 0; }
           gh pr view "$PR" --repo "$REPO" --json labels --jq '.labels[].name' | grep -qx scraper-fix \
             || { echo "PR #$PR is not labelled scraper-fix"; exit 0; }
