@@ -1,7 +1,7 @@
 // Player prop analysis: hit rates over/under any line, median, form, fair decimal odds, and splits.
 import { applyFilters, aggregateByMatch, assertSingleFormat } from "./filters.js";
 import { STATS } from "./rules.js";
-import { summarize, suggestLines } from "./stats.js";
+import { fairOdds, summarize, suggestLines } from "./stats.js";
 import { FORMATS, median, round } from "./util.js";
 
 const LADDERS = {
@@ -57,6 +57,7 @@ export async function playerReport(store, pidx, q) {
   const { rows: kept, dropped } = applyFilters(base, f, store);
   assertSingleFormat(kept);
   const scope = q.scope === "match" && fmt === 2 ? "match" : "innings";
+  const { rows: chartRows } = applyFilters(base, { ...f, lastN: null }, store);
   const rows = scope === "match" ? aggregateByMatch(kept, [def.key]) : kept;
   const values = rows.map((r) => r[def.key]);
   const summary = summarize(values, q.line ?? null);
@@ -79,7 +80,67 @@ export async function playerReport(store, pidx, q) {
     venue: store.venueName(r.v), value: r[def.key], home: r.home, innings: r.bf == null ? null : r.bf ? "1st" : "2nd" }));
   if (kept.some((r) => r.pv)) notes.push(`${kept.filter((r) => r.pv).length} of these rows come from provisional (scraped) matches that Cricsheet has not published yet.`);
   for (const [k, v] of Object.entries(dropped)) if (v) notes.push(`${v} rows left out of this view: ${k.replace(/_/g, " ")}.`);
-  return { ok: true, pidx, name: store.playerName(pidx), stat: q.stat, statLabel: def.label, fmt, fmtName: FORMATS[fmt], scope,
+  const chart = buildChart(store, base.filter((r) => r.fmt === fmt), chartRows, def, f, fmt, { line: q.line ?? lineForSplit, side: q.side || "over", aggregate: fmt === 2 });
+  return { ok: true, chart, pidx, name: store.playerName(pidx), stat: q.stat, statLabel: def.label, fmt, fmtName: FORMATS[fmt], scope,
     n: rows.length, line: q.line ?? null, lineForSplit, summary, ladder, splits, last, notes, filters: f,
     rawMedian: median(values), mean: round(summary.mean, 2) };
+}
+
+
+export const WINDOWS = [5, 10, 20, 30, 50, 0]; // 0 = every fixture
+
+/**
+ * Form chart over the player's team fixtures (not just the games he played): a fixture where he did not feature
+ * (not in the XI, did not bat/bowl) is kept as unavailable (value null) and excluded from hit rates.
+ * `base` = all rows of that side in this format, `rows` = filtered rows (without lastN).
+ */
+export function buildChart(store, base, rows, def, f, fmt, { line, side = "over", aggregate }) {
+  const span = new Map();
+  for (const r of base) {
+    const s = span.get(r.t);
+    if (!s) span.set(r.t, [r.date, r.date]);
+    else { if (r.date < s[0]) s[0] = r.date; if (r.date > s[1]) s[1] = r.date; }
+  }
+  const byMatch = new Map();
+  const auxKey = def.side === "bat" ? "b" : "n";
+  for (const r of (aggregate ? aggregateByMatch(rows, [def.key, auxKey]) : rows)) byMatch.set(r.m, r);
+  const M = store.M;
+  const entries = [];
+  const wantVenue = f.venue == null ? null : Array.isArray(f.venue) ? f.venue : [f.venue];
+  for (let m = 0; m < store.n; m++) {
+    if (M.f[m] !== fmt) continue;
+    for (const t of [M.a[m], M.b[m]]) {
+      const sp = span.get(t);
+      if (!sp || M.d[m] < sp[0] || M.d[m] > sp[1]) continue;
+      const opp = M.a[m] === t ? M.b[m] : M.a[m];
+      const hit = byMatch.get(m);
+      if (!hit || hit.t !== t) {
+        // fixture filters (a DNP row has no stats, so only fixture-level filters can apply)
+        if (f.pos) continue;
+        if (f.since && M.d[m] < f.since) continue;
+        if (f.until && M.d[m] > f.until) continue;
+        if (f.intl != null && M.i[m] !== f.intl) continue;
+        if (f.event && !f.event.includes(M.e[m])) continue;
+        if (wantVenue && !wantVenue.includes(M.v[m])) continue;
+        if (f.opp != null && !(Array.isArray(f.opp) ? f.opp : [f.opp]).includes(opp)) continue;
+        if (f.venueType && store.venueType(m, t) !== f.venueType) continue;
+        if (f.innings) { const bf = store.battedFirst(m, t); if (bf == null || (f.innings === "first") !== bf) continue; }
+        if (f.full && M.q[m] !== 1) continue;
+        if (f.gender != null && M.g[m] !== f.gender) continue;
+        entries.push({ m, date: M.d[m], opp, value: null, venue: M.v[m] });
+      } else entries.push({ m, date: M.d[m], opp, value: hit[def.key], aux: hit[auxKey], pos: hit.o || null, pv: M.pv[m], venue: M.v[m] });
+      break;
+    }
+  }
+  entries.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.m - b.m));
+  const windows = WINDOWS.map((n) => {
+    const w = n ? entries.slice(-n) : entries;
+    const vals = w.filter((e) => e.value != null).map((e) => e.value);
+    const sm = summarize(vals, line);
+    const k = side === "over" ? sm.over : sm.under;
+    const p = side === "over" ? sm.pOver : sm.pUnder;
+    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.length - vals.length, hits: k ?? null,
+      pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
+  });
+  return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };
 }

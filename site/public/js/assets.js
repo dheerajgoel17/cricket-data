@@ -59,18 +59,19 @@ export async function photosFor(ids) {
   return Object.fromEntries(ids.map((i) => [i, cache[i] ?? null]));
 }
 
-/** Avatar for a player index; fills in a photo when Wikidata has one. */
+// Player photos are switched off for now (no reliable free source covers everyone): every player gets a neutral silhouette.
+// To add real photos later, set PHOTOS_ENABLED and/or return a URL from `playerPhotoUrl(store, pidx)` (a licensed API, say).
+const PHOTOS_ENABLED = false;
+export const playerPhotoUrl = () => null;
+
+const SILHOUETTE = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="7"/><path d="M5 40c1-9 7-14 15-14s14 5 15 14z"/></svg>';
+
+/** Avatar for a player index: silhouette placeholder (photo when PHOTOS_ENABLED and a URL exists). */
 export function playerBadge(store, pidx, cls = "dot") {
-  const name = store.playerName(pidx);
-  const el = h("span", { class: `${cls} ph` }, initials(name));
-  const ci = store.index.cricinfo?.[pidx];
-  if (ci) {
-    const run = async () => {
-      const url = (await photosFor([ci]))[ci];
-      if (url) { el.textContent = ""; el.append(h("img", { src: url, alt: name, loading: "lazy", onerror: (e) => { e.target.remove(); el.textContent = initials(name); } })); }
-    };
-    pending.set(el, run);
-    queueMicrotask(() => { const f = pending.get(el); pending.delete(el); f?.(); });
+  const el = h("span", { class: `${cls} ph`, title: store.playerName(pidx), html: SILHOUETTE });
+  if (PHOTOS_ENABLED) {
+    const ci = store.index.cricinfo?.[pidx];
+    if (ci) photosFor([ci]).then((m) => { if (m[ci]) el.replaceChildren(h("img", { src: m[ci], alt: store.playerName(pidx), loading: "lazy" })); });
   }
   return el;
 }

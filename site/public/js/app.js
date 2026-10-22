@@ -7,6 +7,7 @@ import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
 import { SPLITS } from "./engine/props.js";
 import { playerBadge, teamBadge } from "./assets.js";
+import { STATS as STATDEF } from "./engine/rules.js";
 import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
@@ -262,9 +263,9 @@ async function player(args, q) {
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  const body = h("div", {}, renderResult(res));
+  const body = h("div", {}, renderResult(res, { onLine: (l) => go(`player/${idx}`, { ...q, line: l }), onStat: (k) => go(`player/${idx}`, { ...q, stat: k, line: "" }), stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), badge: () => playerBadge(store, idx) }));
   const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", badge: playerBadge(store, idx, "crest"),
-    tabs: [["props", "Props & form"], ["splits", "Splits"]] }, body);
+    tabs: [["props", "Charts"], ["logs", "Game logs"], ["splits", "Table & splits"]] }, body);
   const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
   hc.set();
   return out;
@@ -288,6 +289,40 @@ async function teamsPage(_, q) {
     input, list);
 }
 
+/** StatsHub-style fixture grid: players down, the team's last fixtures across, cell = stat value (green when it clears the line). */
+async function playerGrid(teamIdx, fmtName, q) {
+  const fmt = FORMATS.indexOf(fmtName);
+  const M = store.M;
+  const stat = STATDEF[q.gstat] ? q.gstat : "sixes";
+  const def = STATDEF[stat];
+  const line = q.gline !== undefined && q.gline !== "" ? Number(q.gline) : 0.5;
+  const fx = [];
+  for (let m = store.n - 1; m >= 0 && fx.length < 10; m--) if (M.f[m] === fmt && (M.a[m] === teamIdx || M.b[m] === teamIdx)) fx.push(m);
+  fx.reverse();
+  const out = h("div", { "data-sec": "grid" });
+  const controls = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`team/${teamIdx}`, { ...q, gstat: f.gstat, gline: f.gline, tab: "grid" }); } },
+    field("Stat", sel("gstat", Object.entries(STATDEF).map(([k, v]) => [k, v.label]), stat)), field("Line", inp("gline", line, { type: "number", step: "0.5", style: "width:90px" })), h("button", { type: "submit" }, "Update"));
+  out.append(controls);
+  if (!fx.length) { out.append(h("p", { class: "muted" }, "No fixtures for this format.")); return out; }
+  const cutoff = M.d[fx[0]];
+  const cand = [];
+  for (let i = 0; i < store.P.id.length; i++) if (store.P.tm[i] === teamIdx && store.P.last[i] >= cutoff && ((store.P.fm[i] >> fmt) & 1)) cand.push(i);
+  cand.sort((x, y) => store.P.n[y] - store.P.n[x]);
+  const ps = cand.slice(0, 24);
+  const rows = await Promise.all(ps.map(async (p) => { const r = await store.playerRows(p); const list = (def.side === "bat" ? r.bat : r.bowl).filter((x) => x.fmt === fmt && x.t === teamIdx); return [p, new Map(list.map((x) => [x.m, x]))]; }));
+  const body = rows.map(([p, map]) => ({ p, map, n: fx.filter((m) => map.has(m)).length })).filter((r) => r.n > 0).sort((a, b) => b.n - a.n).slice(0, 16);
+  const head = h("tr", {}, h("th", {}, "Player"), h("th", {}, "Hit"), fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return h("th", { class: "gh" }, teamBadge(store.teamName(opp, true)), h("div", {}, M.d[m].slice(5).split("-").reverse().join("/"))); }));
+  const trs = body.map(({ p, map }) => {
+    const vals = fx.filter((m) => map.has(m)).map((m) => map.get(m)[def.key]);
+    const k = vals.filter((v) => v > line).length;
+    return h("tr", {}, h("td", {}, h("a", { class: "tm", href: `#/player/${p}` }, playerBadge(store, p), store.playerName(p))), h("td", { class: "odds" }, vals.length ? `${k}/${vals.length}` : "–"),
+      fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[def.key] > line ? "hit" : "miss"}` }, String(x[def.key])) : h("span", { class: "gv dnp" }, "–")); }));
+  });
+  out.append(h("div", { class: "card flat scroll" }, h("table", { class: "gridt" }, h("thead", {}, head), h("tbody", {}, trs))),
+    h("p", { class: "muted small" }, `${def.label} over ${line} across this team's last ${fx.length} ${fmtName} fixtures. A dash means the player did not ${def.side === "bat" ? "bat" : "bowl"}.`));
+  return out;
+}
+
 async function marketPage(kind, args, q) {
   const idx = Number(args[0]);
   const isTeam = kind === "team";
@@ -307,11 +342,12 @@ async function marketPage(kind, args, q) {
       gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
   const [res, top] = await Promise.all([runPlan(store, rz, plan, hints), runPlan(store, rz, { ...plan, kind: "top_batter", market: null }, hints)]);
-  const b1 = h("div", { "data-sec": "markets" }, renderResult(res)), b2 = h("div", { "data-sec": "top" }, h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
-  const root = h("div", {}, b1, b2);
+  const b1 = h("div", { "data-sec": "markets" }, form, renderResult(res)), b2 = h("div", { "data-sec": "top" }, h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
+  const b3 = isTeam ? await playerGrid(idx, FORMATS.includes(fmt) ? fmt : "T20", q) : null;
+  const root = h("div", {}, b1, b2, b3);
   const hc = heroCard({ name: label, sub: isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue", meta: [`${FORMATS.includes(fmt) ? fmt : "T20"} markets`, isTeam ? "team markets use the side batting first" : "match markets"],
-    cls: isTeam ? "" : "v", badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: [["markets", "Markets"], ["top", "Top batter"]] }, root);
-  const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, ...datalists(), form, root);
+    cls: isTeam ? "" : "v", badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]] }, root);
+  const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, ...datalists(), root);
   hc.set();
   return out;
 }

@@ -18,6 +18,72 @@ function summaryCards(r) {
   return h("div", { class: "grid" }, cards);
 }
 
+function formChart(r, { onLine, onStat, stats } = {}) {
+  const c = r.chart;
+  if (!c.entries.length) return null;
+  const root = h("div", { class: "trend fchart" });
+  const st = { line: c.line, side: c.side, games: Math.min(20, c.entries.length) };
+  const hitOf = (v) => (st.side === "over" ? v > st.line : v < st.line);
+  const step = (el, key, delta, min, max, fixed) => { st[key] = Math.min(max, Math.max(min, Math.round((st[key] + delta) * 100) / 100)); draw(); };
+  const draw = () => {
+    const ents = c.entries.slice(-st.games);
+    const played = ents.filter((e) => e.value != null);
+    const vals = played.map((e) => e.value);
+    const hits = vals.filter(hitOf).length;
+    const p = vals.length ? hits / vals.length : null;
+    const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    const auxAvg = played.length ? played.reduce((a, e) => a + (e.aux || 0), 0) / played.length : null;
+    const top = Math.max(2, Math.ceil(Math.max(st.line + 0.5, ...vals)));
+    const ticks = Array.from({ length: Math.min(top, 8) + 1 }, (_, i) => Math.round((top / Math.min(top, 8)) * i * 10) / 10);
+    const auxMax = Math.max(1, ...played.map((e) => e.aux || 0));
+    const colw = 100 / ents.length;
+    const pts = ents.map((e, i) => (e.value == null ? null : [(i + 0.5) * colw, 100 - ((e.aux || 0) / auxMax) * 100])).filter(Boolean);
+    const svg = `<svg class="auxline" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline fill="none" stroke="#4c8dff" stroke-width="2" vector-effect="non-scaling-stroke" points="${pts.map((q) => q.join(",")).join(" ")}"/></svg>`;
+    const cw = (w) => Math.max(w, 0);
+    root.replaceChildren(
+      stats ? h("div", { class: "stabs" }, stats.map(([k, l]) => h("button", { type: "button", class: k === r.stat ? "on" : "", onclick: () => onStat?.(k) }, l))) : null,
+      h("div", { class: "chead" }, h("div", { class: "who" }, playerBadge0(r), h("div", { class: "nm" }, r.player?.name || r.name || "")),
+        h("div", { class: "cstats" },
+          h("div", {}, h("span", {}, "Graph avg"), h("b", {}, num(avg))),
+          h("div", {}, h("span", {}, "Hit rate"), h("b", {}, p == null ? "–" : `${Math.round(p * 100)}% (${hits}/${vals.length})`)),
+          h("div", {}, h("span", {}, `Avg ${c.auxLabel.toLowerCase()}`), h("b", {}, num(auxAvg))),
+          h("div", {}, h("span", {}, "Fair odds"), h("b", { class: "odds" }, p ? odds(1 / p) : "–")),
+          h("div", {}, h("span", {}, "Line"), h("b", { class: "lp" }, `${st.side === "over" ? "Over" : "Under"} ${st.line}`)))),
+      h("div", { class: "chartwrap" },
+        h("div", { class: "yax" }, ticks.slice().reverse().map((t) => h("span", {}, String(t)))),
+        h("div", { class: "plot" },
+          ...ticks.map((t) => h("i", { class: "grid", style: `bottom:${(t / top) * 100}%` })),
+          h("div", { class: "lineMark", style: `bottom:${(Math.min(st.line, top) / top) * 100}%` }, h("span", {}, String(st.line))),
+          h("div", { class: "bars2" }, ents.map((e) => h("div", { class: "col", title: `${e.date} v ${e.opp}${e.venueName ? ` · ${e.venueName}` : ""}${e.value == null ? " · did not feature" : ` · ${e.value}`}` },
+            e.value == null ? h("div", { class: "bar dnp" }, h("em", {}, "DNP")) : h("div", { class: `bar ${hitOf(e.value) ? "hit" : "miss"}`, style: `height:${(Math.min(e.value, top) / top) * 100}%` }, h("em", {}, String(e.value))))))),
+        h("div", { class: "yax r" }, [1, 0.66, 0.33, 0].map((f) => h("span", {}, String(Math.round(auxMax * f))))),
+        h("div", { class: "auxwrap", html: svg })),
+      h("div", { class: "xlab" }, ents.map((e) => h("div", { class: "col" }, e.pos ? h("small", {}, `No.${e.pos}`) : h("small", {}, "·"), teamBadge(e.opp), h("small", {}, e.date.slice(5).split("-").reverse().map((x, i) => (i ? x : x)).join("/"))))),
+      h("div", { class: "legend" }, h("span", {}, h("i", { style: "background:#f5c542" }), "Line"), h("span", {}, h("i", { style: "background:#4c8dff" }), c.auxLabel)),
+      h("div", { class: "steppers" },
+        h("div", { class: "stp" }, h("span", {}, "Line"), h("button", { type: "button", class: "ghost", onclick: () => step(0, "line", -0.5, 0.5, 999) }, "−"), h("b", {}, String(st.line)), h("button", { type: "button", class: "ghost", onclick: () => step(0, "line", 0.5, 0.5, 999) }, "+")),
+        h("div", { class: "stp" }, h("span", {}, "Games"), h("button", { type: "button", class: "ghost", onclick: () => step(0, "games", -5, 5, c.entries.length) }, "−"), h("b", {}, String(st.games)), h("button", { type: "button", class: "ghost", onclick: () => step(0, "games", 5, 5, c.entries.length) }, "+")),
+        h("div", { class: "pills" }, [5, 10, 20, 30, 50].filter((n) => n <= c.entries.length || n === 5).map((n) => h("button", { type: "button", class: `pill ${st.games === Math.min(n, c.entries.length) ? "on" : ""}`, onclick: () => { st.games = Math.min(n, c.entries.length); draw(); } }, `L${n}`)),
+          h("button", { type: "button", class: `pill ${st.games === c.entries.length ? "on" : ""}`, onclick: () => { st.games = c.entries.length; draw(); } }, "All")),
+        st.side ? h("div", { class: "seg2" }, ["over", "under"].map((sd) => h("button", { type: "button", class: sd === st.side ? "on" : "", onclick: () => { st.side = sd; draw(); } }, sd === "over" ? "Over" : "Under"))) : null),
+      h("details", { class: "winTable" }, h("summary", {}, "Compare windows: last 5 / 10 / 20 / 30 / all"),
+        table(["Window", "Fixtures", "Played", "DNP", "Hit", "Hit rate", "Avg", "Median", "Fair odds"], WINROWS(c, st))));
+  };
+  draw();
+  return root;
+}
+const WINROWS = (c, st) => [5, 10, 20, 30, 50, 0].map((n) => {
+  const w = n ? c.entries.slice(-n) : c.entries;
+  const v = w.filter((e) => e.value != null).map((e) => e.value);
+  const k = v.filter((x) => (st.side === "over" ? x > st.line : x < st.line)).length;
+  const p = v.length ? k / v.length : null;
+  const sorted = [...v].sort((a, b) => a - b);
+  const med = sorted.length ? (sorted.length % 2 ? sorted[sorted.length >> 1] : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2) : null;
+  return [n ? `Last ${n}` : "All", w.length, v.length, w.length - v.length, `${k}`, cell(p), num(v.length ? v.reduce((a, b) => a + b, 0) / v.length : null), num(med), h("span", { class: "odds" }, p ? odds(1 / p) : "–")];
+});
+const playerBadge0 = (r) => (r.badge ? r.badge() : h("span", { class: "dot ph", style: "width:46px;height:46px" }));
+const store0 = (r, id) => (typeof id === "string" ? id : r.teamNames?.[id] ?? "?");
+
 function trendCard(r) {
   const s = r.summary, side = r.plan.side || "over", line = s.line;
   const hitCount = (v) => (line == null ? false : side === "over" ? v > line : v < line);
@@ -41,7 +107,8 @@ function splitTables(splits, title = (k) => k) {
       rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), cell(x.pOver), h("span", { class: "odds" }, odds(x.fairOver))]))));
 }
 
-export function renderResult(r, { source } = {}) {
+export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
+  if (r.chart && badge) r.badge = badge;
   if (!r.ok) return h("div", { class: "card err" }, h("p", {}, r.error));
   const out = h("div", { class: "answer" });
   out.append(h("div", { class: "card" },
@@ -52,13 +119,12 @@ export function renderResult(r, { source } = {}) {
   if (r.kind === "player_prop") {
     out.append(summaryCards(r));
     if (r.player.alternatives?.length) out.append(h("p", { class: "muted small" }, "Also matched: ", r.player.alternatives.join(", "), " (be more specific to pick another)."));
-    out.append(h("div", { "data-sec": "props" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder))));
-    const sec = h("div", { "data-sec": "props" });
-    if (r.last.length) {
-      sec.append(trendCard(r), h("h2", {}, `Last ${r.last.length} games`), h("div", { class: "card flat" },
-        table(["Date", "Opponent", "Venue", "Value", "Home/away", "Innings"], r.last.map((x) => [x.date, x.opp, x.venue, x.value, x.home ?? "?", x.innings ?? "?"]))));
-    }
-    out.append(sec, h("div", { "data-sec": "splits" }, ...splitTables(r.splits)));
+    const fc = r.chart && formChart(r, { onLine, onStat, stats });
+    const logs = r.chart ? [...r.chart.entries].reverse() : [];
+    out.append(h("div", { "data-sec": "props" }, fc || trendCard(r)),
+      h("div", { "data-sec": "logs" }, h("div", { class: "card flat" }, table(["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."],
+        logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? h("span", { class: "muted" }, "DNP") : e.value, e.aux ?? "–", e.pos ?? "–"])))),
+      h("div", { "data-sec": "splits" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder)), ...splitTables(r.splits)));
   } else if (r.kind === "partnership") {
     const s = r.summary;
     out.append(h("div", { class: "grid" },
