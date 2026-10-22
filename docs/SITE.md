@@ -1,0 +1,77 @@
+# Cricket Props Hub: the free stats site (`site/`)
+
+A free player-props and fancy-markets stats site built on this repo's data. Static pages plus one small serverless function,
+hosted on **Vercel Hobby**. Nothing paid, no database, no model hosting.
+
+## What it does
+| Page | What you get |
+|---|---|
+| Home / **Ask** | Type a question in your own words (typos fine). A free Gemini model turns it into a *query plan*; the site runs that plan on the real data and shows the answer, the filters used, the sample size and the data freshness. |
+| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` plus matches that currently have bookmaker prop markets (`value_bets/out`). |
+| **Players** | Runs, balls, 4s, 6s, wickets, runs conceded. Hit rate over/under any line, a ladder of lines, median/mean, last-N form, fair decimal odds, split by opposition, venue, home/away/neutral, batting first/chasing, batting position, year and competition. One format at a time, never mixed. |
+| **Teams & venues** | Match totals and fancy markets: match 4s/6s, 30s, 50s, 100s, double-digit and single-digit scores, ducks, highest over, most runs conceded by a bowler, top score, team markets (team batting first only), and who tops the batting card. |
+| **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |
+| **Prop Hunter** | The best-value props for upcoming matches from `value_bets/out/value_bets_latest.json`, read live from GitHub (falls back to the snapshot built into the site). |
+
+See [SITE_MAP.md](SITE_MAP.md) for the page-by-page comparison with StatsHub.
+
+## How the numbers are produced
+```
+Cricsheet all_json.zip ─┐
+data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/public/js/engine)
+data/fixtures, value_bets ┘                                                              ▲
+                                                question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
+```
+* **Builder** (`src/cricket_site`, stdlib only): parses the ball-by-ball JSON into per-innings batting rows (position, innings order,
+  runs/balls/4s/6s, dismissal), bowling spells, partnerships (who was out, runs, balls, opening flag) and match-market aggregates.
+  Provisional (scraped) matches are added as player-total rows when Cricsheet does not have the fixture yet (same dedupe as
+  `cricket-data query`: same teams, +/-1 day) and only when `link-players` gave the player a Cricsheet id.
+  Output is ~35 MB of JSON (~12 MB compressed): `meta.json`, `index.json`, `matches.json`, 64 player shards `p/NN.json`, `fixtures.json`, `props.json`.
+  I checked ~71,000 player rows against `data/players`: every difference was a super-over (the site ignores super overs on purpose).
+* **Engine** (`site/public/js/engine`, no dependencies, runs in the browser and in node): filters, hit rates, fair odds, markets, partnerships,
+  name resolution with typo tolerance, and the plan runner. **Every number on a page is computed here from the rows.**
+* **The model never supplies a number.** `/api/ask` (`site/api/ask.js`) sends only the question text to Gemini with a fixed instruction and gets
+  back JSON, which `sanitizePlan` reduces to whitelisted fields. The plan is then resolved against the real player/team/venue tables and executed
+  in the browser. If the key is missing, rate-limited or the reply is unusable, the built-in rule parser (`engine/nl.js`) answers instead.
+
+## Settlement rules and definitions
+* T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100.
+  Tests: void unless there is a result, or 300 overs (5-day) / 200 overs (4-day) were bowled. Void matches are left out of match/team markets.
+* 30s = 30-49, 50s = 50-99, 100s = 100+, double-digit = 10+, single-digit = 1-9 (ducks excluded). Team markets count only the team batting first.
+* Retired hurt is not a wicket. Penalty runs count. Runs conceded = batter runs + wides + no-balls + penalty (as in `data/players`). Super overs are ignored.
+* Formats: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**. First-class (`MDM`) is not included.
+* Fair decimal odds = 1 / hit rate on the filtered sample (pushes on whole-number lines are void). Decimal odds only.
+* Home/away/neutral is *inferred*, because Cricsheet has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
+  `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.
+
+## Known limits (be aware before betting)
+* Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
+  partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
+* Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
+* Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
+
+## Run it locally
+```bash
+pip install -e .
+curl -fsSL -o all_json.zip https://cricsheet.org/downloads/all_json.zip
+python -m cricket_site.build --zip all_json.zip --data data --out site/public/data     # ~30 s
+cd site && npm test                    # engine + resolver + parser + API handler (node >= 20, no install)
+node scripts/serve.mjs 4173            # http://localhost:4173  (set GEMINI_API_KEY to try the AI parse)
+```
+Python tests: `pytest -q tests/site`. The JS tests run on a tiny synthetic dataset with hand-known numbers
+(`tests/site/synth.py`, regenerated by `python scripts/make_site_fixture.py`; a pytest fails if the committed fixture is stale).
+
+## Deploy (Vercel Hobby, free)
+The Vercel project root is `site/` (static `public/` + `api/ask.js`; `site/vercel.json` already sets this).
+1. **Once:** `cd site && npx vercel link --project cricket-props-hub` then, after building the data, `npx vercel deploy --prod`.
+2. **AI key for the chat box.** Either **xAI Grok**: create a key at console.x.ai (API Keys), add it as the Vercel env var `XAI_API_KEY`, and set `XAI_MODEL` to a model name from the console's Models page (Grok API usage is billed per token, a few hundred tokens per question; check your credits). Or **Gemini (free tier):** create a key in Google AI Studio, then add it as the *Vercel* environment variable `GEMINI_API_KEY`
+   (Project → Settings → Environment Variables, Production) and redeploy. Optional: `GEMINI_MODELS` (comma list, default
+   `gemini-2.5-flash-lite,gemini-2.5-flash`; change it if Google retires a model), `ASK_PER_MINUTE` (default 12 per IP), `ASK_DAILY_CAP`
+   (default 800 calls/day, under the free-tier limits). Without a key the site still answers with the built-in parser.
+3. **Daily refresh:** `.github/workflows/site.yml` runs **every hour** (and after "Daily update", and on demand): the scraper commits new provisional matches every 30 minutes, so each run rebuilds
+   `site/public/data` from the latest repo data and deploys. The Cricsheet zip, people register and player photos are cached once a day, so hourly runs stay light. Add three **GitHub repository secrets**: `VERCEL_TOKEN` (vercel.com/account/tokens),
+   `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `site/.vercel/project.json` after `vercel link`). Without them it builds and tests but does not deploy.
+   PRs touching the site build and test only.
+4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.
+
+Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI).

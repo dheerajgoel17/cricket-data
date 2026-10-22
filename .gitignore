@@ -17,3 +17,10 @@ value_bets/out/last_error.txt
 value_bets/state/*.pkl
 value_bets/state/data_last_pull
 value_bets/logs/
+
+# generated site data (built by cricket_site.build)
+site/public/data
+site/node_modules/
+.vercel
+site/public/sitemap.xml
+site/public/robots.txt

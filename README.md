@@ -35,6 +35,9 @@ Questions: dheerajgoeldsuperdude@gmail.com
 ## Value bets (optional)
 An hourly player-prop value-bet finder runs on top of this dataset: see [docs/VALUE_BETS.md](docs/VALUE_BETS.md).
 
+## Stats site
+A free player-props site (hit rates over any line, fair decimal odds, partnerships, fancy markets, ask-anything box) lives in [`site/`](site); see [docs/SITE.md](docs/SITE.md).
+
 ### Provisional matches and player IDs
 
 `query` and the value-bets pipeline read provisional (scraped) matches together with the monthly

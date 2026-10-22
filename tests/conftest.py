@@ -1,7 +1,11 @@
 import json
+import sys
 import zipfile
+from pathlib import Path
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).parent / "site"))  # synthetic-match helpers for the site tests
 
 
 def make_match(date="2026-09-30", teams=("Australia", "South Africa"), runs=30, winner="Australia"):
