@@ -20,7 +20,7 @@ const EXAMPLES = [
 ];
 
 // ---------------------------------------------------------------- routing
-const routes = { "": home, fixtures, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
+const routes = { "": home, fixtures: home, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
 
 async function boot() {
   try {
@@ -48,7 +48,9 @@ const go = (path, q = {}) => {
 
 async function render() {
   const { name, args, q } = parseHash();
-  document.querySelectorAll("nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${name}`));
+  const cur = name === "fixtures" ? "" : name;
+  document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${cur}`));
+  document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
   app.replaceChildren(h("p", { class: "muted pad" }, "Crunching…"));
   try {
@@ -103,35 +105,59 @@ function askBox(initial = "", onResult) {
 }
 
 // ---------------------------------------------------------------- pages
-async function home() {
-  const fx = await upcoming(8);
+const hero = (name, sub, cls = "") => h("div", { class: `hero-e ${cls}` }, h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name), h("p", {}, sub));
+const pretty = (s) => (s || "").replace(/-/g, " ").replace(/\b(\d{4})\b/g, "$1").replace(/\b[a-z]/g, (c) => c.toUpperCase());
+const initials = (n) => n.replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
+const dayKey = (f) => (f.start.length > 10 ? new Date(f.start) : new Date(`${f.start}T12:00:00`)).toLocaleDateString("en-CA");
+const dayLabel = (k, i) => {
+  const d = new Date(`${k}T12:00:00`), t = new Date();
+  const diff = Math.round((new Date(`${k}T12:00:00`) - new Date(`${t.toLocaleDateString("en-CA")}T12:00:00`)) / 864e5);
+  return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+};
+
+async function home(_, q = {}) {
+  const fx = await upcoming();
+  const days = [...new Set(fx.map(dayKey))].slice(0, 12);
+  const sel_ = days.includes(q.d) ? q.d : days[0];
+  const state = { g: "all", f: "all" };
+  const body = h("div");
+  const tabs = h("div", { class: "dtabs" }, days.map((k) => h("button", { class: k === sel_ ? "on" : "", onclick: () => go("", { d: k }) }, dayLabel(k), h("small", {}, String(fx.filter((f) => dayKey(f) === k).length)))));
+  const chipRow = h("div", { class: "strip" });
+  const draw = () => {
+    chipRow.replaceChildren(...[["all", "ALL"], ["T20", "T20"], ["ODI", "ODI"], ["Test", "TEST"], ["male", "MEN"], ["female", "WOMEN"]].map(([v, l]) =>
+      h("button", { class: (v === state.f ? "on" : ""), onclick: () => { state.f = v; draw(); } }, l)));
+    const list = fx.filter((f) => dayKey(f) === sel_ && (state.f === "all" || f.fmt === state.f || f.gender === state.f));
+    body.replaceChildren(fixtureGroups(list));
+  };
+  draw();
   return h("div", {},
-    h("div", { class: "hero" }, h("h1", {}, "Cricket player props, from the real data"),
-      h("p", { class: "muted" }, `Hit rates over any line, fair decimal odds, partnerships and fancy markets from ${store.meta.matches.toLocaleString()} matches since 2001 (men's and women's). Ask in your own words or browse.`)),
-    askBox(""),
-    h("h2", {}, "Next matches"), fixtureList(fx),
-    h("p", {}, h("a", { href: "#/fixtures" }, "All fixtures →"), " · ", h("a", { href: "#/props" }, "Prop Hunter: best-value props →")));
+    h("h1", {}, "Today's cricket fixtures, player stats & team stats"),
+    h("p", { class: "muted" }, new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" })),
+    h("p", { class: "muted" }, `Hit rates over any line, fair decimal odds, partnerships and fancy markets from ${store.meta.matches.toLocaleString()} matches since 2001, men's and women's.`),
+    h("div", { class: "banner" }, h("div", { class: "ico" }, "?"), h("div", { class: "t" }, h("div", { class: "k" }, "● FREE ASK-ANYTHING BOX"), h("div", { class: "v" }, "Ask in your own words, typos fine.")), h("a", { class: "go", href: "#/ask" }, "Ask →")),
+    tabs, chipRow, h("div", { class: "sec-title" }, days.length ? "Matches" : "No upcoming fixtures"), body,
+    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone."));
 }
 
-async function upcoming(limit = 200) {
+async function upcoming() {
   const fx = await store.loadFixtures();
   const cut = new Date(Date.now() - 4 * 3600e3).toISOString();
-  return fx.filter((f) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= cut).slice(0, limit);
+  return fx.filter((f) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= cut);
 }
 
-function fixtureList(fx) {
-  if (!fx.length) return h("p", { class: "muted" }, "No upcoming fixtures in the schedule files right now.");
-  const when = (s) => (s.length > 10 ? new Date(s).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : s);
-  const link = (name, ix) => (ix >= 0 ? h("a", { href: `#/team/${ix}` }, name) : name);
-  return h("div", { class: "card" }, table(["When", "Match", "Format", "Venue", "Source"], fx.map((f) => [when(f.start),
-    h("span", {}, link(f.a, f.a_ix), " v ", link(f.b, f.b_ix), f.gender === "female" ? " (W)" : ""), f.fmt || "?", f.venue || "–",
-    h("span", { class: "badge" }, f.source === "markets" ? "bookmaker markets" : "schedule")])));
-}
-
-async function fixtures() {
-  const fx = await upcoming();
-  return h("div", {}, h("h1", {}, "Fixtures"), h("p", { class: "muted" }, "Internationals and leagues from the schedule scrape plus matches that currently have player-prop markets. Times are in your local time zone."),
-    fixtureList(fx), h("p", { class: "muted small" }, "Coverage is limited to what the free sources list; see Rules for details."));
+function fixtureGroups(fx) {
+  if (!fx.length) return h("div", { class: "card muted" }, "Nothing scheduled for this selection.");
+  const groups = new Map();
+  for (const f of fx) {
+    const key = f.series ? pretty(f.series.replace(/-\d{4}$/, "")) : f.source === "markets" ? "Matches with prop markets" : `${f.fmt || ""} ${f.gender === "female" ? "women's" : "men's"} cricket`.trim();
+    (groups.get(key) || groups.set(key, []).get(key)).push(f);
+  }
+  const time = (s) => (s.length > 10 ? new Date(s).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC");
+  return h("div", {}, [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
+    h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
+    list.map((f) => h("a", { class: "match", href: f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
+      h("div", { class: "teams" }, h("div", { class: "tm" }, h("span", { class: "dot" }, initials(f.a)), f.a), h("div", { class: "tm" }, h("span", { class: "dot" }, initials(f.b)), f.b)),
+      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→"))))));
 }
 
 function playerSource(text) {
@@ -192,7 +218,7 @@ async function player(args, q) {
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  return h("div", {}, h("h1", {}, name), h("p", { class: "muted" }, `${store.teamName(store.P.tm[idx])} · last played ${store.P.last[idx]}`), ...datalists(), form, renderResult(res));
+  return h("div", {}, hero(name, `${store.teamName(store.P.tm[idx])} · last played ${store.P.last[idx]}`, "p"), ...datalists(), form, renderResult(res));
 }
 
 async function teamsPage(_, q) {
@@ -232,7 +258,7 @@ async function marketPage(kind, args, q) {
       gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
   const [res, top] = await Promise.all([runPlan(store, rz, plan, hints), runPlan(store, rz, { ...plan, kind: "top_batter", market: null }, hints)]);
-  return h("div", {}, h("h1", {}, label), h("p", { class: "muted" }, isTeam ? "Match and team-specific markets (team markets count only matches where this team batted first)." : "Match markets at this venue."), ...datalists(), form,
+  return h("div", {}, hero(label, isTeam ? "Match and team markets (team markets use the side batting first)" : "Match markets at this venue", isTeam ? "" : "v"), ...datalists(), form,
     renderResult(res), h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
 }
 

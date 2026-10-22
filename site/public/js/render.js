@@ -2,8 +2,9 @@
 import { FORMATS } from "./engine/util.js";
 import { bars, chips, freshText, h, num, odds, pc, stat, table } from "./ui.js";
 
+const cell = (p) => (p == null ? "–" : h("span", { class: `pcell ${p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo"}` }, pc(p)));
 const ladderTable = (ladder, label = "Line") => table([label, "Over %", "Fair over", "Under %", "Fair under", "n"],
-  ladder.filter((l) => l.n).map((l) => [`${l.line}`, pc(l.pOver), h("span", { class: "odds" }, odds(l.fairOver)), pc(l.pUnder), h("span", { class: "odds" }, odds(l.fairUnder)), l.n]));
+  ladder.filter((l) => l.n).map((l) => [`${l.line}`, cell(l.pOver), h("span", { class: "odds" }, odds(l.fairOver)), cell(l.pUnder), h("span", { class: "odds" }, odds(l.fairUnder)), l.n]));
 
 function summaryCards(r) {
   const s = r.summary;
@@ -20,7 +21,7 @@ function splitTables(splits, title = (k) => k) {
   return Object.entries(splits).filter(([, rows]) => rows.length).map(([kind, rows]) => h("details", { open: kind === "opposition" || kind === "venue_type" },
     h("summary", {}, `Split by ${title(kind).replace("_", " ")}`),
     table([title(kind).replace("_", " "), "n", "Median", "Mean", "Over %", "Fair over"],
-      rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), pc(x.pOver), h("span", { class: "odds" }, odds(x.fairOver))]))));
+      rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), cell(x.pOver), h("span", { class: "odds" }, odds(x.fairOver))]))));
 }
 
 export function renderResult(r, { source } = {}) {
