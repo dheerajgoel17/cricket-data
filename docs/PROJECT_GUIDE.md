@@ -141,7 +141,7 @@ Add `--people people.csv --photos` (people.csv from `cricsheet.org/register/peop
 * Home/away is **inferred** (tour name "X tour of Y", venue history, venue_geo country, majority host). Unknown hosts are excluded from home/away filters.
 * `check_public_safe.py` fails on Vercel/Supabase hostnames in tracked files: pass URLs through repo variables, never write them in tracked files. Generated `sitemap.xml`/`robots.txt` are gitignored for that reason.
 * YAML in workflows: an unquoted `: ` inside a `run:` one-liner breaks the whole file (GitHub reports only "workflow file issue"). Lint with `actionlint`.
-* Cache key `site-dl2-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
+* Cache key `site-dl3-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
 * The dev server `site/scripts/serve.mjs` has the same SPA fallback as the Vercel rewrite.
