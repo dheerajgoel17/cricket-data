@@ -22,3 +22,5 @@ value_bets/logs/
 site/public/data
 site/node_modules/
 .vercel
+site/public/sitemap.xml
+site/public/robots.txt

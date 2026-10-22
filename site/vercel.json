@@ -4,6 +4,7 @@
   "buildCommand": null,
   "outputDirectory": "public",
   "cleanUrls": true,
+  "rewrites": [{ "source": "/((?!api/|data/|css/|js/|sitemap\\.xml|robots\\.txt|favicon).*)", "destination": "/index.html" }],
   "functions": { "api/ask.js": { "maxDuration": 20 } },
   "headers": [
     { "source": "/data/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }] },

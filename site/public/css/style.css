@@ -218,3 +218,10 @@ button:active, .btn:active, .pill:active { transform: scale(.96); }
 .lp-feats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); padding: 22px 0 16px; }
 .lp-f { border-left: 3px solid var(--btn); padding: 2px 0 2px 14px; } .lp-f h3 { font-size: 26px; line-height: 1; }
 @media (min-width: 768px) { .lp { margin: 0 -24px 8px; padding: 56px 24px 8px; } }
+
+#foot { max-width: 1180px; margin: 24px auto 0; padding: 28px 16px 40px; border-top: 1px solid var(--line); }
+.fcols { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } .fcols h4 { margin: 0 0 10px; font-size: 14px; } .fcols a { display: block; color: var(--mute); padding: 4px 0; font-size: 14px; } .fcols a:hover { color: var(--acc); text-decoration: none; }
+.fcopy { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--dim); font-size: 12.5px; }
+.vs { display: flex; align-items: center; gap: 18px; } .vs > span { color: var(--mute); font: 400 28px var(--head); } .vs .crest { width: 76px; height: 76px; }
+.hero-top .vs { grid-row: span 3; }
+.toolc { display: grid; gap: 6px; margin: 0; text-decoration: none; color: var(--ink); transition: transform .15s, border-color .2s; } .toolc:hover { transform: translateY(-3px); border-color: #3a3f43; text-decoration: none; } .toolc .badge { justify-self: start; }

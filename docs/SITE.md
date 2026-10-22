@@ -13,6 +13,8 @@ hosted on **Vercel Hobby**. Nothing paid, no database, no model hosting.
 | **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |
 | **Prop Hunter** | The best-value props for upcoming matches from `value_bets/out/value_bets_latest.json`, read live from GitHub (falls back to the snapshot built into the site). |
 
+See [SITE_MAP.md](SITE_MAP.md) for the page-by-page comparison with StatsHub.
+
 ## How the numbers are produced
 ```
 Cricsheet all_json.zip ─┐

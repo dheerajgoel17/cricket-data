@@ -8,6 +8,7 @@ import { renderResult } from "./render.js";
 import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
+import { initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
 import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
@@ -22,9 +23,29 @@ const EXAMPLES = [
 ];
 
 // ---------------------------------------------------------------- routing
-const routes = { saved: savedPage, "": home, fixtures: home, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
+const routes = { fixture: fixturePage, trends: trendsPage, competitions: competitionsPage, league: leaguePage, tools: toolsPage, features: featuresPage, odds: oddsPage, glossary: glossaryPage, saved: savedPage, "": home, fixtures: home, players: playersPage, player, teams: teamsPage, team: (a, q) => marketPage("team", a, q), venue: (a, q) => marketPage("venue", a, q), pair, props, ask: askPage, about };
+
+function pathToHash() {
+  if (location.pathname !== "/" && !location.hash) {
+    const p = location.pathname.replace(/^\/|\/$/g, "");
+    history.replaceState(null, "", "/");
+    location.hash = `#/${p}${location.search}`;
+  }
+}
+
+const TITLES = { "": "Cricket fixtures, player props and stats", players: "Cricket player stats", player: "Player stats, hit rates and form chart", teams: "Teams and venues", team: "Team stats and player grid", venue: "Venue stats", props: "Prop Hunter: value cricket props", pair: "Batting partnerships", ask: "Ask anything about cricket stats", about: "Rules and data", fixture: "Match preview, player grid and trends", trends: "Player trends", competitions: "Cricket competitions", league: "Competition stats", tools: "Free cricket betting tools", odds: "Odds and probability calculator", glossary: "Cricket stats explained", saved: "Saved" };
+function drawFooter() {
+  const f = document.getElementById("foot");
+  const col = (t, items) => h("div", {}, h("h4", {}, t), items.map(([l, hr]) => h("a", { href: hr }, l)));
+  f.replaceChildren(h("div", { class: "fcols" }, col("Tools & features", [["Free tools", "#/tools"], ["Player trends", "#/trends"], ["Prop Hunter", "#/props"], ["Odds calculator", "#/odds"], ["Partnerships", "#/pair"], ["Ask anything", "#/ask"]]),
+    col("Popular competitions", [["IPL", "#/competitions?q=indian premier"], ["Big Bash", "#/competitions?q=big bash"], ["PSL", "#/competitions?q=pakistan super"], ["World Cups", "#/competitions?q=world cup"], ["All competitions", "#/competitions"]]),
+    col("Resources", [["Cricket stats explained", "#/glossary"], ["Rules & data", "#/about"], ["Saved", "#/saved"], ["Cricsheet", "https://cricsheet.org"]])),
+    h("div", { class: "fcopy" }, "Free cricket stats and player props. Photos: Wikimedia Commons (free licences, where available). Data: Cricsheet ball-by-ball (ODbL) plus provisional scorecards. Decimal odds only; fair odds are 1 ÷ historical hit rate with no margin: a guide, not betting advice. 18+, gamble responsibly."));
+  f.hidden = false;
+}
 
 async function boot() {
+  pathToHash();
   try {
     store = await createStore({ base: "data/" });
   } catch (e) {
@@ -34,7 +55,9 @@ async function boot() {
   rz = new Resolver(store);
   await loadPhotos("data/");
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
+  initPages({ store, rz, go, crumbs, heroCard, nextCountdown: (when) => nextMatchCard({ a: "", b: "", start: when.toISOString(), venue: "", countdownOnly: true }) });
   initSearch();
+  drawFooter();
   window.addEventListener("hashchange", render);
   render();
 }
@@ -66,6 +89,7 @@ async function render() {
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.dataset.r === cur));
   document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
+  document.title = `${TITLES[cur] || "Cricket Props Hub"} | Cricket Props Hub`;
   app.replaceChildren(h("p", { class: "muted pad" }, "Crunching…"));
   try {
     const el = await page(args, q);
@@ -228,6 +252,7 @@ function nextMatchCard(f) {
   };
   tick();
   const id = setInterval(() => { if (!cd.isConnected) clearInterval(id); else tick(); }, 30000);
+  if (f.countdownOnly) return h("div", { class: "card nextm" }, h("div", { class: "nm-c" }, h("div", { class: "muted small" }, "Starts in"), cd));
   return h("div", { class: "card nextm" }, h("div", { class: "nm-h" }, h("h3", {}, "Next match"), h("span", { class: "chip" }, `${f.fmt || ""} ${f.gender === "female" ? "women" : "men"}`)),
     h("div", { class: "nm-b" }, h("div", { class: "nm-t" }, teamBadge(f.a, "crest"), h("b", {}, f.a)), h("div", { class: "nm-c" }, h("div", { class: "nm-time" }, f.start.length > 10 ? when.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC"),
       h("small", { class: "muted" }, when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })), h("div", { class: "muted small", style: "margin-top:8px" }, "Kicks off in"), cd), h("div", { class: "nm-t" }, teamBadge(f.b, "crest"), h("b", {}, f.b))),
@@ -246,7 +271,7 @@ function fixtureGroups(fx) {
     h("div", { class: "pills" }, h("a", { class: "btn", href: "#/props" }, "Prop Hunter →"), h("a", { class: "btn ghost", href: "#/ask" }, "Ask anything →")));
   const cards = [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
     h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
-    list.map((f) => h("a", { class: "match", href: f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
+    list.map((f) => h("a", { class: "match", href: f.id ? `#/fixture/${f.id}` : f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
       h("div", { class: "teams" }, h("div", { class: "tm" }, teamBadge(f.a), f.a), h("div", { class: "tm" }, teamBadge(f.b), f.b)),
       h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))));
   if (cards.length > 1) cards.splice(1, 0, promo);

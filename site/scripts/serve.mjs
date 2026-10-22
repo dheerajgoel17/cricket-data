@@ -25,5 +25,9 @@ createServer(async (req, res) => {
     if ((await stat(p)).isDirectory()) p = join(p, "index.html");
     res.setHeader("content-type", types[extname(p)] || "application/octet-stream");
     res.end(await readFile(p));
-  } catch { res.statusCode = 404; res.end("not found"); }
+  } catch {
+    if (extname(p)) { res.statusCode = 404; return res.end("not found"); }
+    res.setHeader("content-type", "text/html");
+    res.end(await readFile(join(root, "index.html"))); // SPA fallback, like the vercel.json rewrite
+  }
 }).listen(port, () => console.log(`http://localhost:${port}`));

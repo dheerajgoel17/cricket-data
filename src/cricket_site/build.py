@@ -418,6 +418,32 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
 
 
 # ------------------------------------------------------------------ fixtures
+def _slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
+
+
+def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> int:
+    """sitemap.xml + robots.txt next to the site (the app maps /player/12 style paths onto its hash routes)."""
+    if not site_url:
+        return 0
+    base = site_url.rstrip("/")
+    urls = [f"{base}/{p}" for p in ("", "players", "teams", "competitions", "props", "trends", "tools", "odds", "glossary", "features", "about", "pair", "ask")]
+    top = sorted(range(len(A["pids"])), key=lambda i: -A["pstat"][A["pids"][i]]["n"])[:3000]
+    urls += [f"{base}/player/{i}" for i in top]
+    cnt = Counter(m["event"] for m in A["ms"] if m["event"])
+    urls += [f"{base}/league/{A['events'].index(e)}" for e, c in cnt.most_common(400) if c >= 20]
+    tcnt = Counter()
+    for m in A["ms"]:
+        for t in m["teams"]:
+            tcnt[(t, m["gender"])] += 1
+    urls += [f"{base}/team/{A['team_ix'][k]}" for k, c in tcnt.most_common(800) if c >= 10]
+    body = "".join(f"<url><loc>{u}</loc></url>" for u in urls)
+    root = out.parent
+    (root / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + body + "</urlset>", encoding="utf-8")
+    (root / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
+    return len(urls)
+
+
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
     rows = []
     p = data_dir / "fixtures" / "upcoming.csv"
@@ -453,6 +479,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
         for side in ("a", "b"):
             n = canon.get((_norm_team(r[side]), g))
             r[side + "_ix"] = team_ix.get((n, g), -1) if n else -1
+        r["id"] = f"{r['start'][:10]}-{_slug(r['a'])}-v-{_slug(r['b'])}"
         out.append(r)
     return out
 
@@ -483,7 +510,7 @@ def build_props(vb_dir: Path | None) -> dict:
 
 # ------------------------------------------------------------------ main
 def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, workers: int = 4,
-          geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False) -> dict:
+          geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False, site_url: str = "") -> dict:
     canonical = parse_zip(zpath, workers)
     prov, pstat = load_provisional(data_dir, canonical)
     A = assemble(canonical, prov, _load_geo(geo_path))
@@ -496,6 +523,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    build_sitemap(out, A, names, site_url)
     if photos:
         (out / "photos.json").write_text(json.dumps(fetch_photos(load_cricinfo(people_path), A["pix"]), separators=(",", ":")), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
@@ -511,9 +539,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--geo", default="value_bets/mappings/venue_geo.csv", help="venue -> country (optional)")
     ap.add_argument("--people", default="", help="Cricsheet register people.csv (optional: enables player photos)")
     ap.add_argument("--photos", action="store_true", help="look up player photos on Wikidata (needs --people)")
+    ap.add_argument("--site-url", default="", help="public base URL: enables sitemap.xml and robots.txt")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args(argv)
-    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people))
+    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people), a.site_url)
     print(json.dumps(meta))
     return 0
 
