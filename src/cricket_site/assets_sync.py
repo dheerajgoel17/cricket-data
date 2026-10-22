@@ -25,7 +25,9 @@ MAX_BYTES = 200_000
 
 
 def _req(method: str, url: str, key: str, data: bytes | None = None, headers: dict | None = None, timeout: int = 60):
-    h = {"apikey": key, "Authorization": f"Bearer {key}", "User-Agent": UA, **(headers or {})}
+    h = {"apikey": key, "User-Agent": UA, **(headers or {})}
+    if not key.startswith("sb_"):  # new-style secret keys (sb_secret_...) go only in `apikey`; legacy service_role JWTs also go in Authorization
+        h["Authorization"] = f"Bearer {key}"
     r = urllib.request.Request(url, data=data, method=method, headers=h)
     with urllib.request.urlopen(r, timeout=timeout) as resp:
         return resp.status, resp.headers.get("Content-Type", ""), resp.read()
@@ -120,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--url", default=os.environ.get("SUPABASE_URL", ""))
     ap.add_argument("--limit", type=int, default=int(os.environ.get("SYNC_LIMIT", "1500")))
     a = ap.parse_args(argv)
-    key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+    key = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
     if not a.url or not key:
         print("assets_sync: SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping")
         return 0

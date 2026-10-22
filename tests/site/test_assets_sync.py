@@ -87,3 +87,29 @@ def test_main_without_credentials_is_a_noop(tmp_path, monkeypatch, capsys):
     monkeypatch.delenv("SUPABASE_SERVICE_KEY", raising=False)
     assert s.main(["--photos", write_photos(tmp_path), "--url", BASE]) == 0
     assert "skipping" in capsys.readouterr().out
+
+
+def test_request_headers_fit_both_key_styles(monkeypatch):
+    seen = {}
+
+    class R:
+        status, headers = 200, {"Content-Type": "application/json"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b"[]"
+
+    def fake_open(req, timeout=60):
+        seen.update({k.lower(): v for k, v in req.header_items()})
+        return R()
+
+    monkeypatch.setattr(s.urllib.request, "urlopen", fake_open)
+    s._req("GET", BASE + "/rest/v1/assets", "sb_secret_abc")
+    assert seen["apikey"] == "sb_secret_abc" and "authorization" not in seen
+    s._req("GET", BASE + "/rest/v1/assets", "eyJlegacy.jwt.key")
+    assert seen["authorization"] == "Bearer eyJlegacy.jwt.key"
