@@ -18,6 +18,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 CREX_CDN = "https://cricketvectors.akamaized.net"
 UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"  # for CREX
@@ -96,35 +97,49 @@ def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None
 
 
 def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: int = 1500, pause: float = 0.05,
-         http=_req, fetch=None) -> dict:
+         http=_req, fetch=None, workers: int = 6) -> dict:
     ph = json.load(open(photos_path, encoding="utf-8"))
     want = {"player": sorted({v[2:] for v in ph.get("p", {}).values() if v.startswith("c:")}),
             "team": sorted(set(ph.get("t", {}).values()))}
     have = stored_ids(base, key, http)  # a bad key / unreachable project raises here, before anything is changed
     stats = {"downloaded": 0, "missing_at_crex": 0, "already": sum(len(v) for v in have.values()), "pending": 0}
-    new_rows: list[dict] = []
-    budget = limit
+    todo: list[tuple[str, str]] = []
     for kind in ("team", "player"):  # logos first: few and the most visible
         for cid in want[kind]:
-            if cid in have.get(kind, set()):
-                continue
-            if budget <= 0:
-                stats["pending"] += 1
-                continue
-            got = download(kind, cid, fetch)
-            budget -= 1
-            if got is None:
+            if cid not in have.get(kind, set()):
+                todo.append((kind, cid))
+    stats["pending"] = max(0, len(todo) - limit)
+    todo = todo[:limit]
+
+    def work(item: tuple[str, str]):
+        kind, cid = item
+        got = download(kind, cid, fetch)
+        if got is None:
+            return item, "missing"
+        try:
+            row = upload(base, key, kind, cid, got[0], got[1], http)
+        except (urllib.error.URLError, OSError) as exc:
+            print(f"upload {kind}/{cid} failed: {exc}", file=sys.stderr)
+            return item, "failed"
+        time.sleep(pause)
+        return item, row
+
+    pending_rows: list[dict] = []
+    with ThreadPoolExecutor(max_workers=workers) as ex:  # a few at a time: polite to CREX, ~8x faster than one by one
+        for (kind, cid), res in ex.map(work, todo):
+            if res == "missing":
                 stats["missing_at_crex"] += 1
+            elif res == "failed":
                 continue
-            try:
-                new_rows.append(upload(base, key, kind, cid, got[0], got[1], http))
+            else:
                 have.setdefault(kind, set()).add(cid)
                 stats["downloaded"] += 1
-            except (urllib.error.URLError, OSError) as exc:
-                print(f"upload {kind}/{cid} failed: {exc}", file=sys.stderr)
-            time.sleep(pause)
-    if new_rows:
-        upsert(base, key, "assets", new_rows, http)
+                pending_rows.append(res)
+                if len(pending_rows) >= 200:  # persist progress as we go: a cancelled or timed-out run keeps what it copied
+                    upsert(base, key, "assets", pending_rows, http)
+                    pending_rows = []
+    if pending_rows:
+        upsert(base, key, "assets", pending_rows, http)
     if index_path and os.path.exists(index_path):
         idx = json.load(open(index_path, encoding="utf-8"))
         upsert(base, key, "crex_players", [{"crex_id": c, "name": n, "cricsheet_id": p or None} for c, n, p in idx.get("players", [])], http)
