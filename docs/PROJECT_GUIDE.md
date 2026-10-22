@@ -18,7 +18,7 @@ Two products in one repo, both **100% free to run**:
 * **Decimal odds only** (never American/fractional). Player props and fancy markets only; no match-winner focus.
 * **Exchange rules**: T20/ODI summary markets void unless 80% of overs are bowled in both innings (Hundred 80/100 balls); Tests void unless a result or 300 (5-day) / 200 (4-day) overs;
   30s = 30-49, 50s = 50-99, 100s = 100+; double-digit = 10+; single-digit = 1-9 (ducks excluded); team markets count only the team batting first; retired hurt is not a wicket;
-  penalty runs count; super overs ignored.
+  penalty runs count; super overs ignored; **a player named in the XI who never batted (bowled) has his batting (bowling) bets void**: the chart shows VOID (named in `xi`, no row) vs DNP (not in the XI), both excluded from hit rates.
 * **Never mix formats**: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**, first-class (`MDM`) is excluded.
 * **Show freshness** on every page: newest Cricsheet match date + whether provisional games are included.
 * **Never print or commit secrets** (`scripts/check_public_safe.py` runs in CI and also bans hosted-service hostnames (Vercel, Supabase and Workers subdomains), absolute home paths and `.env*` files).
@@ -75,7 +75,7 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 | `meta.json` | schema, build time, counts, `newest_cricsheet`, `provisional_matches`, `newest_provisional`, `provisional_included` |
 | `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred"], `nshard` |
 | `matches.json` | per match: `id d(date) f(format idx) g(0 male/1 female) i(intl) e(event idx) v(venue idx) a b(team idx) w(winner idx/-1) r(result 0 win,1 tie,2 none,3 draw) o(overs) dy(days) h(host: idx into hosts, -1 neutral, -2 unknown) fi(team idx batting first/-1) pv(provisional) q(valid for summary markets 1/0, -1 unknown) ho mc ts` and `inn` = per innings `[team, runs, wkts, balls, f4, f6, n30, n50, n100, n10, nsd, nduck, highest_over, most_conceded, top_score, ...topScorerPlayerIdx]` |
-| `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
+| `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
 | `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` + bookmaker events, with stable `id` (`date-team-v-team`) and team idx |
 | `props.json` | snapshot of the value-bets output (Prop Hunter fallback) |
 | `photos.json` | `{p: {playerIdx: "c:<CREX id>"|"w:<Commons file>"}, t: {foldedTeamName: crexTeamId}, base, s}` (`base`/`s` added by assets_sync) |
