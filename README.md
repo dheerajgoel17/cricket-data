@@ -34,3 +34,13 @@ Questions: dheerajgoeldsuperdude@gmail.com
 
 ## Value bets (optional)
 An hourly player-prop value-bet finder runs on top of this dataset: see [docs/VALUE_BETS.md](docs/VALUE_BETS.md).
+
+### Provisional matches and player IDs
+
+`query` and the value-bets pipeline read provisional (scraped) matches together with the monthly
+Cricsheet CSVs, dropping a provisional match once Cricsheet publishes the same fixture (+/-1 day).
+Use `cricket-data query NAME --canonical-only` to ignore them. `cricket-data link-players` (also run by
+`update`) fills `player_id` in provisional files with Cricsheet registry IDs ("Harry Brook" -> "HC Brook");
+names it cannot match unambiguously go to `data/provisional_unmatched.csv` and can be fixed in
+`data/mappings/player_aliases.csv`. `cricket-data freshness` exits 1 when the newest canonical match is more
+than 3 days old; the daily update then opens a `data-stale` issue.

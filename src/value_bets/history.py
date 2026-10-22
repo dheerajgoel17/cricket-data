@@ -22,11 +22,34 @@ def repo_commit():
         return "unknown"
 
 
-def _read(kind, since=None):
+def _read(kind, since=None, include_provisional=True):
+    """Monthly canonical CSVs plus provisional (scraped) matches Cricsheet has not published yet."""
     fs = sorted(glob.glob(str(config.DATA_REPO / "data" / kind / "*.csv.gz")))
     if since:
         fs = [f for f in fs if f.rsplit("/", 1)[-1] >= since]
-    return pd.concat([pd.read_csv(f, low_memory=False) for f in fs], ignore_index=True)
+    df = pd.concat([pd.read_csv(f, low_memory=False) for f in fs], ignore_index=True)
+    if include_provisional:
+        from cricket_data.models import MATCH_FIELDS, PLAYER_FIELDS
+        from cricket_data.registry import pending_provisional
+        from cricket_data.store import Store
+        fields = MATCH_FIELDS if kind == "matches" else PLAYER_FIELDS
+        canon_ids = set(df["match_id"].astype(str))
+        rows = []
+        for d in pending_provisional(Store(config.DATA_REPO / "data")):
+            if str(d.get("match_id")) in canon_ids:
+                continue
+            src = [d] if kind == "matches" else d.get("players", [])
+            rows += [{f: s.get(f, "") for f in fields} for s in src]
+        if rows:
+            extra = pd.DataFrame(rows)
+            if kind == "players":
+                extra["player_id"] = extra["player_id"].replace("", None)
+            df["match_id"] = df["match_id"].astype(str)
+            for c in df.columns:
+                if c in extra and c != "match_id" and pd.api.types.is_numeric_dtype(df[c]):
+                    extra[c] = pd.to_numeric(extra[c], errors="coerce").fillna(0)
+            df = pd.concat([df, extra[[c for c in df.columns if c in extra]]], ignore_index=True)
+    return df
 
 
 class History:

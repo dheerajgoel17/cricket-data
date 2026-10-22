@@ -27,6 +27,10 @@ jobs:
         run: pip install -e .
       - name: Update (Cricsheet delta + inbox/extra sources + reconcile; scraping runs in scraper-update.yml)
         run: cricket-data update
+      - name: Freshness check (canonical Cricsheet data <= 3 days old)
+        id: freshness
+        continue-on-error: true
+        run: cricket-data freshness --max-age-days 3
       - name: Size guard (stay inside GitHub's free limits)
         run: |
           du -sh .git data
@@ -40,6 +44,18 @@ jobs:
           if git diff --cached --quiet; then echo "No new data."; else
             git commit -m "data: daily update $(date -u +%F)"
             git pull --rebase -q && git push
+          fi
+      - name: Open an issue if Cricsheet data is stale
+        if: steps.freshness.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MSG="$(cricket-data freshness --max-age-days 3 2>&1 || true)"
+          echo "::warning::$MSG"
+          if [ -z "$(gh issue list --label data-stale --state open --json number -q '.[0].number')" ]; then
+            gh label create data-stale --color FBCA04 2>/dev/null || true
+            gh issue create --label data-stale --title "Cricsheet data is stale (>3 days)" \
+              --body "$MSG. Provisional (scraped) matches are still read by query/value-bets. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
       - name: Open an issue if the update failed
         if: failure()

@@ -1,4 +1,4 @@
-"""Command line: `cricket-data update | backfill | fixtures | query | stats | export-sqlite`."""
+"""Command line: `cricket-data update | backfill | fixtures | query | stats | link-players | freshness | export-sqlite`."""
 from __future__ import annotations
 
 import argparse
@@ -13,6 +13,7 @@ from .cricsheet import download, iter_zip
 from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .polite import PoliteFetcher
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
+from .registry import freshness, iter_combined, link_players
 from .scraper_monitor import ScraperFailure, ScraperRunReport, save_report
 from .scrapers import ScraperSource
 from .sources import InboxSource, load_extra_sources
@@ -168,6 +169,7 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
         print(f"inbox: {removed} landed file(s) deleted")
     rstats = reconcile(store)
     print(f"reconcile: {rstats}")
+    print(f"link-players: {link_players(store)}")
     if rstats["mismatched"]:
         print("warning: provisional data disagreed with Cricsheet; see reconcile_log.csv", file=sys.stderr)
     
@@ -248,19 +250,37 @@ def cmd_stats(a: argparse.Namespace) -> int:
 def cmd_query(a: argparse.Namespace) -> int:
     store = Store(a.data_dir)
     q = a.player.lower()
-    rows = [r for r in store.iter_all("players")
+    inc = not a.canonical_only
+    rows = [r for r in iter_combined(store, "players", inc)
             if q in r["player"].lower() and (not a.since or r["date"] >= a.since)
             and (not a.until or r["date"] <= a.until)]
-    matches = {r["match_id"]: r for r in store.iter_all("matches")}
+    matches = {r["match_id"]: r for r in iter_combined(store, "matches", inc)}
     if a.format:
         rows = [r for r in rows if matches.get(r["match_id"], {}).get("match_type") == a.format]
     rows.sort(key=lambda r: r["date"])
     w = csv.writer(sys.stdout, lineterminator="\n")
-    w.writerow(["date", "type", "player", "team", "vs", "runs", "balls", "wkts", "catches", "stumpings", "points"])
+    w.writerow(["date", "type", "player", "player_id", "team", "vs", "runs", "balls", "wkts", "catches", "stumpings", "points"])
     for r in rows[-a.limit:]:
         w.writerow([r["date"], matches.get(r["match_id"], {}).get("match_type", ""), r["player"],
-                    r["team"], r["opponent"], r["runs"], r["balls"], r["wickets"],
+                    r["player_id"], r["team"], r["opponent"], r["runs"], r["balls"], r["wickets"],
                     r["catches"], r["stumpings"], r["points"]])
+    return 0
+
+
+def cmd_link_players(a: argparse.Namespace) -> int:
+    st = link_players(Store(a.data_dir))
+    print(f"link-players: {st}  (unmatched rows -> provisional_unmatched.csv)")
+    return 0
+
+
+def cmd_freshness(a: argparse.Namespace) -> int:
+    f = freshness(Store(a.data_dir))
+    print(f"newest canonical match: {f['newest_canonical'] or '-'} ({f['age_days']} days old); "
+          f"provisional pending: {f['provisional_pending']}, newer than canonical: "
+          f"{f['provisional_after_canonical']}, newest provisional: {f['newest_provisional'] or '-'}")
+    if f["age_days"] is None or f["age_days"] > a.max_age_days:
+        print(f"STALE: canonical data is older than {a.max_age_days} days", file=sys.stderr)
+        return 1
     return 0
 
 
@@ -332,7 +352,15 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("--until")
     q.add_argument("--format", help="match_type, e.g. ODI, T20, Test")
     q.add_argument("--limit", type=int, default=50)
+    q.add_argument("--canonical-only", action="store_true", help="ignore provisional (scraped) matches")
     q.set_defaults(fn=cmd_query)
+
+    lp = sub.add_parser("link-players", help="fill Cricsheet player_id in provisional files; report unmatched")
+    lp.set_defaults(fn=cmd_link_players)
+
+    fr = sub.add_parser("freshness", help="exit 1 if the newest canonical match is too old")
+    fr.add_argument("--max-age-days", type=int, default=3)
+    fr.set_defaults(fn=cmd_freshness)
 
     e = sub.add_parser("export-sqlite", help="write a SQLite file for SQL tools / IDEs")
     e.add_argument("--out", default="cricket.db")
