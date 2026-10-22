@@ -121,3 +121,34 @@ def test_committed_js_fixture_is_in_sync(tmp_path):
         committed = root / "site" / "tests" / "fixtures" / ("data" if name != "expectations.json" else "") / name
         fresh = tmp_path / ("data" if name != "expectations.json" else "") / name
         assert committed.read_text() == fresh.read_text(), f"{name} is stale: run python scripts/make_site_fixture.py"
+
+
+def _prov_game(date, runs, team_a="Alpha", team_b="Beta", extra_players=0):
+    pl = [{"player": f"P{i}", "player_id": "", "team": team_a if i < 11 else team_b, "opponent": team_b if i < 11 else team_a,
+           "runs": str(runs if i == 0 else 0), "balls": "10"} for i in range(22 + extra_players)]
+    return _prov(f"crex-{date}-{runs}", date, team_a, team_b, pl)
+
+
+def test_consecutive_day_games_between_the_same_sides_are_not_mistaken_for_duplicates(tmp_path):
+    z, data, out, _ = _out(tmp_path)  # Cricsheet has the short Alpha v Beta game on 2024-06-01 (Brook 10 + Duckett 20 + Kohli 30 + Gill 3 = 63 batter runs)
+    canonical_runs = 10 + 20 + 30 + 3
+    next_day = _prov_game("2024-06-02", 99)           # different totals the next day: a genuinely different game
+    same_game = _prov_game("2024-05-31", canonical_runs)  # same totals one day earlier (time-zone shift): the same game
+    for d in (next_day, same_game):
+        (data / "provisional" / f"{d['match_id']}.json").write_text(json.dumps(d))
+    meta = B.build(z, data, out, None, workers=1)
+    assert meta["provisional_matches"] == 1
+    M, _ = _load(out)
+    assert any("-99" in i for i in M["id"]) and not any(i.endswith(f"-{canonical_runs}") for i in M["id"])
+
+
+def test_half_scraped_scorecards_are_marked_unreliable(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    ok = _prov_game("2025-07-01", 5)
+    thin = _prov("crex-thin", "2025-07-02", "Alpha", "Beta", [{"player": "Solo", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "3", "balls": "4"}])
+    for d in (ok, thin):
+        (data / "provisional" / f"{d['match_id']}.json").write_text(json.dumps(d))
+    B.build(z, data, out, None, workers=1)
+    M, _ = _load(out)
+    xq = {M["id"][i]: M["xq"][i] for i in range(len(M["id"]))}
+    assert xq["crex-2025-07-01-5"] == 1 and xq["crex-thin"] == 0

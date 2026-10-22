@@ -75,7 +75,7 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 | `meta.json` | schema, build time, counts, `newest_cricsheet`, `provisional_matches`, `newest_provisional`, `provisional_included` |
 | `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred"], `nshard` |
 | `matches.json` | per match: `id d(date) f(format idx) g(0 male/1 female) i(intl) e(event idx) v(venue idx) a b(team idx) w(winner idx/-1) r(result 0 win,1 tie,2 none,3 draw) o(overs) dy(days) h(host: idx into hosts, -1 neutral, -2 unknown) fi(team idx batting first/-1) pv(provisional) q(valid for summary markets 1/0, -1 unknown) ho mc ts` and `inn` = per innings `[team, runs, wkts, balls, f4, f6, n30, n50, n100, n10, nsd, nduck, highest_over, most_conceded, top_score, ...topScorerPlayerIdx]` |
-| `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
+| `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI); `matches.json` also has `xq` (1 = the named XI is reliable), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
 | `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` + bookmaker events, with stable `id` (`date-team-v-team`) and team idx |
 | `props.json` | snapshot of the value-bets output (Prop Hunter fallback) |
 | `photos.json` | `{p: {playerIdx: "c:<CREX id>"|"w:<Commons file>"}, t: {foldedTeamName: crexTeamId}, base, s}` (`base`/`s` added by assets_sync) |
@@ -133,6 +133,8 @@ Add `--people people.csv --photos` (people.csv from `cricsheet.org/register/peop
   `test_crex_assets.py` the name matcher, `test_assets_sync.py` the sync with a fake HTTP layer.
 * `site/tests/*.test.mjs` run the engine on the generated mini dataset (`site/tests/fixtures`): arithmetic, resolver typos, rule parser, plan sanitizing, API handler (mocked fetch), photo URL logic.
 * The Gemini/Grok calls are never made in tests. Live behaviour was checked manually.
+
+See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (void / DNP / N/A and why).
 
 ## 9. Gotchas and decisions (read before changing things)
 * **No ball-level data in `data/`**: the CSVs hold per-player match totals only. Batting position, partnerships and fancy markets exist only because the site builder re-parses the Cricsheet zip.

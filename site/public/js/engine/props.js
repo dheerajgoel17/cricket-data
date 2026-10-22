@@ -104,13 +104,13 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     if (!s) span.set(r.t, [r.date, r.date]);
     else { if (r.date < s[0]) s[0] = r.date; if (r.date > s[1]) s[1] = r.date; }
   }
-  // A player who is still active with his current team keeps appearing in that team's fixtures after his last
-  // innings: those are DNPs (e.g. in the squad but did not bat). Otherwise the span ends at his last innings with the team.
-  if (pidx != null) {
-    const cur = store.P.tm[pidx], lastAny = store.P.last[pidx], newest = store.M.d[store.n - 1];
-    const s = span.get(cur);
-    if (s && lastAny >= s[1] && daysBetween(lastAny, newest) <= 120) s[1] = newest;
-  }
+  // A player who is still active keeps appearing in his side's later fixtures as DNP / VOID. "Active" is judged in THIS format only: the team
+  // he last played for in this format, with that last innings no more than 120 days before the newest match in the data. (Otherwise a Test-only
+  // player would show a long run of T20 DNPs, and a player who moved clubs would be blamed for his old club's fixtures.)
+  const newest = store.M.d[store.n - 1];
+  let curTeam = null;
+  for (const [t, sp] of span) if (curTeam == null || sp[1] > span.get(curTeam)[1]) curTeam = t;
+  if (curTeam != null && daysBetween(span.get(curTeam)[1], newest) <= 120) span.get(curTeam)[1] = newest;
   const byMatch = new Map();
   const auxKey = def.side === "bat" ? "b" : "n";
   for (const r of (aggregate ? aggregateByMatch(rows, [def.key, auxKey]) : rows)) byMatch.set(r.m, r);
@@ -138,7 +138,9 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
         if (f.full && M.q[m] !== 1) continue;
         if (f.gender != null && M.g[m] !== f.gender) continue;
         // in the named XI but never batted / bowled: player bets are VOID (stake returned); not named at all: DNP
-        entries.push({ m, date: M.d[m], opp, value: null, void: !!xi?.has(m), venue: M.v[m] });
+        // XI not recorded reliably for this match (xq = 0): neither DNP nor VOID can be claimed, so it is unknown (n/a) and kept out of every count
+        const unknown = M.xq ? M.xq[m] === 0 : false;
+        entries.push({ m, date: M.d[m], opp, value: null, void: !unknown && !!xi?.has(m), unknown, venue: M.v[m] });
       } else entries.push({ m, date: M.d[m], opp, value: hit[def.key], aux: hit[auxKey], pos: hit.o || null, pv: M.pv[m], venue: M.v[m] });
       break;
     }
@@ -150,7 +152,7 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     const sm = summarize(vals, line);
     const k = side === "over" ? sm.over : sm.under;
     const p = side === "over" ? sm.pOver : sm.pUnder;
-    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void).length, voided: w.filter((e) => e.void).length, hits: k ?? null,
+    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void && !e.unknown).length, voided: w.filter((e) => e.void).length, unknown: w.filter((e) => e.unknown).length, hits: k ?? null,
       pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
   });
   return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };

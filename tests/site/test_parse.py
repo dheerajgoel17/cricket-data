@@ -118,3 +118,11 @@ def test_playing_xi_includes_players_who_never_reached_the_crease():
     m = parse_match("m", doc("2024-01-01", ("X", "Y"), [a, b], xi_extra={"X": ["Benched DNB"]}))
     assert pid("Benched DNB") in m["xi"]            # named in the XI ...
     assert pid("Benched DNB") not in {r["pid"] for r in m["bat"]}   # ... but no batting row: a void bet
+
+
+def test_squad_quality_flags_unreliable_xi_lists():
+    from cricket_site.parse import squad_quality
+    assert squad_quality([11, 11]) == 1 and squad_quality([12, 11]) == 1 and squad_quality([13, 13]) == 1   # impact subs named
+    assert squad_quality([11]) == 0 and squad_quality([]) == 0                                              # list missing
+    assert squad_quality([11, 8]) == 0 and squad_quality([15, 11]) == 0                                    # half a scorecard / a whole squad
+    assert squad_quality([10, 10], lo=10) == 1 and squad_quality([9, 11], lo=10) == 0                       # scraped squads are stricter
