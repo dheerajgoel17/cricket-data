@@ -362,16 +362,28 @@ def load_cricinfo(path: Path | None) -> dict[str, str]:
     return out
 
 
-def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], chunk: int = 400) -> dict[str, str]:
-    """{player idx: Wikimedia Commons file name} via Wikidata (P2697 Cricinfo id -> P18 image). Free licences; best effort.
+def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], A: dict | None = None, names: dict[str, str] | None = None,
+                 chunk: int = 400) -> dict:
+    """{"p": {player idx: "c:<CREX id>" | "w:<Commons file>"}, "t": {folded team name: CREX id}}.
 
-    A network failure just yields fewer photos: the site falls back to a silhouette.
+    CREX first (public sitemaps; ~8.6k players, ~1.5k teams), Wikidata (P2697 Cricinfo id -> P18 image, free licences) as the fallback.
+    Best effort: a network failure just yields fewer images and the site falls back to flags / silhouettes.
     """
     import urllib.parse
     import urllib.request
 
-    by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix}
-    ids, out = sorted(by_ci), {}
+    from . import crex_assets as ca
+
+    out: dict = {"p": {}, "t": {}}
+    if A is not None and names is not None:
+        try:
+            players = [{"idx": A["pix"][p], "name": names.get(p, p), "n": A["pstat"][p]["n"], "last": A["pstat"][p]["last"]} for p in A["pids"]]
+            out["p"] = {str(i): "c:" + c for i, c in ca.match_players(players, ca.parse_sitemap(ca.fetch_sitemap("player"), "player")).items()}
+            out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in A["teams"]], ca.parse_sitemap(ca.fetch_sitemap("team"), "team"))
+        except Exception as exc:  # noqa: BLE001
+            print(f"photos: CREX sitemaps failed: {exc}", file=sys.stderr)
+    by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix and str(pix[p]) not in out["p"]}
+    ids = sorted(by_ci)
     for i in range(0, len(ids), chunk):
         values = " ".join(f'"{x}"' for x in ids[i:i + chunk])
         q = "SELECT ?id ?img WHERE { VALUES ?id { " + values + " } ?p wdt:P2697 ?id; wdt:P18 ?img }"
@@ -381,9 +393,9 @@ def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], chunk: int = 400
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 for b in json.load(r)["results"]["bindings"]:
-                    out.setdefault(str(by_ci[b["id"]["value"]]), urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
+                    out["p"].setdefault(str(by_ci[b["id"]["value"]]), "w:" + urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
         except Exception as exc:  # noqa: BLE001 - photos are optional
-            print(f"photos: chunk {i} failed: {exc}", file=sys.stderr)
+            print(f"photos: wikidata chunk {i} failed: {exc}", file=sys.stderr)
     return out
 
 
@@ -525,7 +537,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     build_sitemap(out, A, names, site_url)
     if photos:
-        (out / "photos.json").write_text(json.dumps(fetch_photos(load_cricinfo(people_path), A["pix"]), separators=(",", ":")), encoding="utf-8")
+        (out / "photos.json").write_text(json.dumps(fetch_photos(load_cricinfo(people_path), A["pix"], A, names), separators=(",", ":")), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta
 

@@ -75,3 +75,11 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js`; `site/verce
 4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.
 
 Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI).
+
+## Player photos and team logos
+Sources, in order: **CREX** (the repo already scrapes it) then **Wikidata/Wikimedia Commons**, then a flag (national sides) or initials/silhouette.
+The builder reads CREX's public sitemaps (`crex.com/crex_sitemap/player.xml`, `team.xml`: ~9.8k players, ~1k teams), matches CREX full names to Cricsheet
+names conservatively (surname + first initial, ambiguous names skipped, see `src/cricket_site/crex_assets.py`) and stores only ids in `data/photos.json`.
+The browser loads images from CREX's CDN (`cricketvectors.akamaized.net/players/org/<id>.png`, `/Teams/<id>.png`); nothing is copied into the repo.
+About 54% of recently active players and most national and franchise teams get a CREX image today; the rest fall back. Those images belong to CREX:
+check their terms before using the site commercially, or replace the source later by returning a different URL from `playerPhoto` in `site/public/js/photos.js`.
