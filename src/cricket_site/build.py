@@ -351,7 +351,18 @@ def player_names(zpath: Path | None) -> dict[str, str]:
     return {p: v[1] for p, v in names.items()}
 
 
-def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict) -> dict:
+def load_cricinfo(path: Path | None) -> dict[str, str]:
+    """Cricsheet register people.csv -> {player id: ESPNcricinfo id}; the site maps it to Wikidata photos."""
+    out: dict[str, str] = {}
+    if path and path.exists():
+        with path.open(encoding="utf-8", newline="") as fh:
+            for r in csv.DictReader(fh):
+                if r.get("key_cricinfo"):
+                    out[r["identifier"]] = r["key_cricinfo"]
+    return out
+
+
+def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo: dict[str, str] | None = None) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     (out / "p").mkdir(exist_ok=True)
     for f in (out / "p").glob("*.json"):
@@ -369,6 +380,7 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict) -> dict:
     index = {"players": pcols, "aliases": {k: v for k, v in al.items() if v},
              "teams": [{"n": t, "g": g} for t, g in A["teams"]], "venues": A["venues"], "events": A["events"],
              "hosts": A["hosts"],
+             "cricinfo": {str(A["pix"][p]): c for p, c in (cricinfo or {}).items() if p in A["pix"]},
              "kinds": KINDS, "formats": FORMAT_NAMES, "nshard": NSHARD}
     (out / "index.json").write_text(dump(index), encoding="utf-8")
     for s, d in sorted(A["shards"].items()):
@@ -446,7 +458,7 @@ def build_props(vb_dir: Path | None) -> dict:
 
 # ------------------------------------------------------------------ main
 def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, workers: int = 4,
-          geo_path: Path | None = None) -> dict:
+          geo_path: Path | None = None, people_path: Path | None = None) -> dict:
     canonical = parse_zip(zpath, workers)
     prov, pstat = load_provisional(data_dir, canonical)
     A = assemble(canonical, prov, _load_geo(geo_path))
@@ -456,7 +468,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     meta = write(out, A, names, {
         "newest_cricsheet": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
-        "zip_matches": len(canonical)})
+        "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
@@ -470,9 +482,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default="site/public/data")
     ap.add_argument("--value-bets", default="value_bets/out")
     ap.add_argument("--geo", default="value_bets/mappings/venue_geo.csv", help="venue -> country (optional)")
+    ap.add_argument("--people", default="", help="Cricsheet register people.csv (optional: enables player photos)")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args(argv)
-    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo))
+    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None)
     print(json.dumps(meta))
     return 0
 

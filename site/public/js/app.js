@@ -6,6 +6,7 @@ import { createStore } from "./engine/store.js";
 import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
 import { SPLITS } from "./engine/props.js";
+import { playerBadge, teamBadge } from "./assets.js";
 import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
@@ -105,7 +106,7 @@ function askBox(initial = "", onResult) {
 }
 
 // ---------------------------------------------------------------- pages
-const hero = (name, sub, cls = "") => h("div", { class: `hero-e ${cls}` }, h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name), h("p", {}, sub));
+const hero = (name, sub, cls = "", badge = null) => h("div", { class: `hero-e ${cls}` }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name), h("p", {}, sub));
 const pretty = (s) => (s || "").replace(/-/g, " ").replace(/\b(\d{4})\b/g, "$1").replace(/\b[a-z]/g, (c) => c.toUpperCase());
 const initials = (n) => n.replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 const dayKey = (f) => (f.start.length > 10 ? new Date(f.start) : new Date(`${f.start}T12:00:00`)).toLocaleDateString("en-CA");
@@ -156,7 +157,7 @@ function fixtureGroups(fx) {
   return h("div", {}, [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
     h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
     list.map((f) => h("a", { class: "match", href: f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
-      h("div", { class: "teams" }, h("div", { class: "tm" }, h("span", { class: "dot" }, initials(f.a)), f.a), h("div", { class: "tm" }, h("span", { class: "dot" }, initials(f.b)), f.b)),
+      h("div", { class: "teams" }, h("div", { class: "tm" }, teamBadge(f.a), f.a), h("div", { class: "tm" }, teamBadge(f.b), f.b)),
       h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→"))))));
 }
 
@@ -171,7 +172,7 @@ async function playersPage(_, q) {
     const t = input.value.trim();
     if (t.length < 2) { list.replaceChildren(h("p", { class: "muted" }, "Type at least two letters.")); return; }
     const c = rz.players(t, {}, 20);
-    list.replaceChildren(table(["Player", "Team", "Formats", "Last match", "Innings/spells"], c.map((p) => [h("a", { href: `#/player/${p.idx}` }, p.name),
+    list.replaceChildren(table(["Player", "Team", "Formats", "Last match", "Innings/spells"], c.map((p) => [h("a", { class: "tm", href: `#/player/${p.idx}` }, playerBadge(store, p.idx), p.name),
       store.teamName(p.team), FORMATS.filter((_, i) => (store.P.fm[p.idx] >> i) & 1).join(" "), p.last, store.P.n[p.idx]])));
   };
   input.addEventListener("input", draw);
@@ -218,7 +219,7 @@ async function player(args, q) {
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  return h("div", {}, hero(name, `${store.teamName(store.P.tm[idx])} · last played ${store.P.last[idx]}`, "p"), ...datalists(), form, renderResult(res));
+  return h("div", {}, hero(name, `${store.teamName(store.P.tm[idx])} · last played ${store.P.last[idx]}`, "p", playerBadge(store, idx, "crest")), ...datalists(), form, renderResult(res));
 }
 
 async function teamsPage(_, q) {
@@ -258,7 +259,7 @@ async function marketPage(kind, args, q) {
       gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
   const [res, top] = await Promise.all([runPlan(store, rz, plan, hints), runPlan(store, rz, { ...plan, kind: "top_batter", market: null }, hints)]);
-  return h("div", {}, hero(label, isTeam ? "Match and team markets (team markets use the side batting first)" : "Match markets at this venue", isTeam ? "" : "v"), ...datalists(), form,
+  return h("div", {}, hero(label, isTeam ? "Match and team markets (team markets use the side batting first)" : "Match markets at this venue", isTeam ? "" : "v", isTeam ? teamBadge(store.teams[idx].n, "crest") : null), ...datalists(), form,
     renderResult(res), h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
 }
 

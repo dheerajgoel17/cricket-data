@@ -58,7 +58,7 @@ footer { max-width: 960px; margin: 0 auto; padding: 8px 20px 40px; color: var(--
 .match { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-top: 1px solid var(--line); color: var(--ink); }
 .match:hover { background: var(--s2); text-decoration: none; }
 .match .teams { flex: 1; display: grid; gap: 8px; font-weight: 600; font-size: 16px; }
-.match .tm { display: flex; align-items: center; gap: 10px; } .dot { width: 22px; height: 22px; border-radius: 50%; background: var(--s2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 10px; color: var(--muted); font-weight: 800; flex: none; }
+.match .tm { display: flex; align-items: center; gap: 10px; } .dot { overflow: hidden; width: 26px; height: 26px; border-radius: 50%; background: var(--s2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 10px; color: var(--muted); font-weight: 800; flex: none; }
 .match .meta { text-align: right; color: var(--muted); font-size: 13.5px; } .match .meta b { color: var(--ink); display: block; font-size: 15px; }
 .match .arrow { color: var(--acc); font-size: 20px; }
 
@@ -120,3 +120,8 @@ details.card > summary { font-size: 17px; }
 .edge { background: #0f3a2a; color: var(--acc); font-weight: 800; border-radius: 8px; padding: 3px 10px; }
 .two { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 @media (max-width: 560px) { h1 { font-size: 30px; } .hero-name { font-size: 34px; } .banner .v { font-size: 20px; } }
+
+.dot img, .crest img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-e .crest { overflow: hidden; width: 88px; height: 88px; border: 2px solid rgba(255,255,255,.25); }
+.hero-e .crest.ph { font-size: 34px; }
+td a.tm { display: inline-flex; align-items: center; gap: 10px; }
