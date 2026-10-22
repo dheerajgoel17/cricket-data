@@ -22,7 +22,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from .parse import FORMAT_NAMES, KINDS, parse_match
+from .parse import FORMAT_NAMES, KINDS, parse_match, squad_quality
 
 NSHARD = 64
 SCHEMA = 1
@@ -45,6 +45,7 @@ def _compact(m: dict) -> dict:
     out["bowl"] = [(p, i["no"], i["opp"], i["team"], v["w"], v["rc"], v["bb"])
                    for i in m["innings"] for p, v in i["bowl"].items()]
     out["xi"] = m.get("xi", [])
+    out["xq"] = m.get("xq", 0)
     out["parts"] = [(t["a"], t["b"], i["no"], t["open"], t["w"], t["runs"], t["balls"], t["ra"], t["rb"], t["x"], t["kd"])
                     for i in m["innings"] for t in i["parts"]]
     return out
@@ -127,7 +128,7 @@ def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict],
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
-             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": [], "xi": []}
+             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
         for p in d.get("players", []):
             stat["rows"] += 1
             pid = p.get("player_id", "")

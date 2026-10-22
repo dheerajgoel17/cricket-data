@@ -138,7 +138,9 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
         if (f.full && M.q[m] !== 1) continue;
         if (f.gender != null && M.g[m] !== f.gender) continue;
         // in the named XI but never batted / bowled: player bets are VOID (stake returned); not named at all: DNP
-        entries.push({ m, date: M.d[m], opp, value: null, void: !!xi?.has(m), venue: M.v[m] });
+        // XI not recorded reliably for this match (xq = 0): neither DNP nor VOID can be claimed, so it is unknown (n/a) and kept out of every count
+        const unknown = M.xq ? M.xq[m] === 0 : false;
+        entries.push({ m, date: M.d[m], opp, value: null, void: !unknown && !!xi?.has(m), unknown, venue: M.v[m] });
       } else entries.push({ m, date: M.d[m], opp, value: hit[def.key], aux: hit[auxKey], pos: hit.o || null, pv: M.pv[m], venue: M.v[m] });
       break;
     }
@@ -150,7 +152,7 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     const sm = summarize(vals, line);
     const k = side === "over" ? sm.over : sm.under;
     const p = side === "over" ? sm.pOver : sm.pUnder;
-    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void).length, voided: w.filter((e) => e.void).length, hits: k ?? null,
+    return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void && !e.unknown).length, voided: w.filter((e) => e.void).length, unknown: w.filter((e) => e.unknown).length, hits: k ?? null,
       pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
   });
   return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };

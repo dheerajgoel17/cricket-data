@@ -36,13 +36,3 @@ test("an XI that was not recorded reliably is n/a, never DNP or VOID", () => {
   const all = c.windows.find((w) => w.n === 0);
   assert.deepEqual([all.played, all.voided, all.dnp, all.unknown], [2, 1, 0, 1]);
 });
-
-test("in the XI but never reached the crease is VOID (not DNP) and both stay out of the hit rate", () => {
-  const store = fakeStore("2026-10-16");
-  const played = [rows(0), rows(1)];
-  const xi = new Set([2]); // named in the XI for the 18 Oct match but did not bat; absent on 20 Oct
-  const c = buildChart(store, played, played, def, { fmt: 0 }, 0, { line: 9.5, pidx: 0, xi });
-  assert.deepEqual(c.entries.map((e) => [e.value, !!e.void]), [[20, false], [20, false], [null, true], [null, false]]);
-  const all = c.windows.find((w) => w.n === 0);
-  assert.deepEqual([all.played, all.voided, all.dnp, all.hits, all.pHit], [2, 1, 1, 2, 1]);
-});

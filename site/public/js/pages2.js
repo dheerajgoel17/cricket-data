@@ -38,7 +38,7 @@ export function gridTable(g, teamIdx, line) {
     const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key]);
     const k = vals.filter((v) => v > line).length;
     return h("tr", {}, h("td", {}, h("a", { class: "tm", href: `#/player/${p}` }, playerBadge(store, p), store.playerName(p))), h("td", { class: "odds" }, vals.length ? `${k}/${vals.length}` : "–"),
-      g.fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[g.def.key] > line ? "hit" : "miss"}` }, String(x[g.def.key])) : xi?.has(m) ? h("span", { class: "gv void", title: "In the XI but did not bat/bowl: bet void" }, "VOID") : h("span", { class: "gv dnp" }, "–")); }));
+      g.fx.map((m) => { const x = map.get(m); return h("td", { class: "gcellx" }, x ? h("span", { class: `gv ${x[g.def.key] > line ? "hit" : "miss"}` }, String(x[g.def.key])) : xi?.has(m) && store.M.xq?.[m] !== 0 ? h("span", { class: "gv void", title: "In the XI but did not bat/bowl: bet void" }, "VOID") : h("span", { class: "gv dnp" }, "–")); }));
   });
   return h("div", { class: "card flat scroll" }, h("table", { class: "gridt" }, h("thead", {}, head), h("tbody", {}, trs)));
 }
