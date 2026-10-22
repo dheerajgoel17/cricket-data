@@ -1,0 +1,76 @@
+name: Site
+
+# Rebuilds the stats site's data (Cricsheet ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
+# Runs after "Daily update" finishes, daily as a fallback, on demand, and (build + tests only, no deploy) on PRs that touch the site.
+# Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID. Without them the job still builds and
+# tests, then skips the deploy. GEMINI_API_KEY is a *Vercel* project environment variable, not a GitHub secret: see docs/SITE.md.
+on:
+  workflow_run:
+    workflows: ["Daily update"]
+    types: [completed]
+  schedule:
+    - cron: "45 7 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", "src/cricket_site/**", ".github/workflows/site.yml"]
+  pull_request:
+    paths: ["site/**", "src/cricket_site/**", "tests/site/**", "scripts/make_site_fixture.py", ".github/workflows/site.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-deploy-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # when triggered by workflow_run, only deploy if the data update itself succeeded
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: pip install -e .
+      - name: JS tests (engine, resolver, rule parser, API handler)
+        working-directory: site
+        run: npm test
+      - name: Download Cricsheet ball-by-ball (all_json.zip)
+        run: curl -fsSL --retry 4 --retry-delay 20 -o all_json.zip https://cricsheet.org/downloads/all_json.zip
+      - name: Build site data
+        run: |
+          python -m cricket_site.build --zip all_json.zip --data data --out site/public/data --value-bets value_bets/out | tee build.json
+          rm -f all_json.zip
+          python - <<'PY'
+          import json
+          from datetime import date
+          meta = json.load(open("site/public/data/meta.json"))
+          assert meta["matches"] > 20000, f"suspiciously few matches: {meta['matches']}"
+          age = (date.today() - date.fromisoformat(meta["newest_cricsheet"])).days
+          print(f"newest Cricsheet match {meta['newest_cricsheet']} ({age} days old); provisional {meta['provisional_matches']}")
+          if age > 3:
+              print("::warning::Cricsheet data on the site is more than 3 days old")
+          PY
+          du -sh site/public/data
+      - name: Deploy to Vercel
+        if: github.event_name != 'pull_request' && env.VERCEL_PROJECT_ID != ''
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        working-directory: site
+        run: npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
+      - name: Deploy skipped
+        if: github.event_name == 'pull_request' || env.VERCEL_PROJECT_ID == ''
+        run: echo "::notice::Built and tested; not deployed (pull request, or VERCEL_* secrets are not set)."

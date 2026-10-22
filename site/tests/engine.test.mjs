@@ -1,0 +1,117 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { loadFixture, sum } from "./helpers.mjs";
+import { runPlan } from "../public/js/engine/plan.js";
+import { playerReport } from "../public/js/engine/props.js";
+import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "../public/js/engine/markets.js";
+
+const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
+
+test("player report: hit rate over 0.5 sixes, split by format (T20 never feeds ODI)", async () => {
+  const { store, idx } = await loadFixture();
+  const brook = idx("HC Brook");
+  const t20 = await playerReport(store, brook, { stat: "sixes", line: 0.5, fmt: 0, filters: { full: true } });
+  assert.equal(t20.n, 10);
+  assert.equal(t20.summary.over, 5);
+  assert.equal(t20.summary.fairOver, 2);
+  const odi = await playerReport(store, brook, { stat: "sixes", line: 0.5, fmt: 1, filters: {} });
+  assert.equal(odi.n, 4);
+  assert.equal(odi.summary.over, 4); // ODI: one six every game
+  assert.equal(odi.summary.fairOver, 1);
+  // the short rain-hit T20 still counts for player props when `full` is off
+  const all = await playerReport(store, brook, { stat: "sixes", line: 0.5, fmt: 0, filters: {} });
+  assert.equal(all.n, 11);
+});
+
+test("filters: away, batting first, position and last N", async () => {
+  const { store, idx, exp } = await loadFixture();
+  const brook = idx("HC Brook");
+  const run = (filters) => playerReport(store, brook, { stat: "sixes", line: 0.5, fmt: 0, filters: { full: true, ...filters } });
+  const away = await run({ venueType: "away" });
+  const awayIdx = exp.t20.map((m, i) => (m.away ? i : -1)).filter((i) => i >= 0);
+  assert.equal(away.n, awayIdx.length);
+  assert.equal(away.summary.over, awayIdx.filter((i) => BROOK_F6[i] > 0).length);
+  const first = await run({ innings: "first" });
+  const firstIdx = exp.t20.map((m, i) => (m.alpha_first ? i : -1)).filter((i) => i >= 0);
+  assert.equal(first.n, firstIdx.length);
+  const opener = await run({ pos: [1, 1] });
+  assert.equal(opener.n, exp.t20.filter((m) => m.brook_pos === 1).length);
+  const last3 = await run({ lastN: 3 });
+  assert.equal(last3.n, 3);
+  assert.deepEqual(last3.last.map((r) => r.value).reverse(), BROOK_F6.slice(-3));
+});
+
+test("splits by venue type partition the sample", async () => {
+  const { store, idx } = await loadFixture();
+  const r = await playerReport(store, idx("HC Brook"), { stat: "runs", line: 24.5, fmt: 0, filters: {}, splits: ["venue_type", "innings", "position"] });
+  assert.equal(sum(r.splits.venue_type.map((x) => x.n)), r.n);
+  assert.equal(sum(r.splits.innings.map((x) => x.n)), r.n);
+  assert.equal(sum(r.splits.position.map((x) => x.n)), r.n);
+});
+
+test("team markets use only valid matches and the team batting first", async () => {
+  const { store, exp } = await loadFixture();
+  const alpha = store.teams.findIndex((t) => t.n === "Alpha");
+  const ms = selectMatches(store, { fmt: 0, team: alpha });
+  assert.equal(ms.length, 10, "the 5-over game is void and must be left out");
+  const sixes = marketReport(store, ms, "match_sixes", 4.5);
+  assert.deepEqual(sixes.values.sort((a, b) => a - b), exp.t20.map((m) => m.sixes).sort((a, b) => a - b));
+  assert.equal(sixes.summary.over, exp.t20.filter((m) => m.sixes > 4.5).length);
+  const first = selectMatches(store, { fmt: 0, team: alpha, teamFirst: true });
+  assert.equal(first.length, exp.t20.filter((m) => m.alpha_first).length);
+  const tot = marketReport(store, first, "team_runs");
+  assert.deepEqual(tot.values.sort((a, b) => a - b), exp.t20.filter((m) => m.alpha_first).map((m) => m.alpha_runs).sort((a, b) => a - b));
+  const fifties = marketReport(store, ms, "match_50s");
+  assert.equal(sum(fifties.values), sum(exp.t20.map((m) => m.n50)));
+  const thirties = marketReport(store, ms, "match_30s");
+  assert.equal(sum(thirties.values), sum(exp.t20.map((m) => m.n30)));
+  assert.deepEqual(marketReport(store, ms, "top_score").values, exp.t20.map((m) => m.top));
+  assert.ok(Object.keys(MATCH_MARKETS).includes("highest_over"));
+});
+
+test("top batter counts sole vs tied", async () => {
+  const { store, exp } = await loadFixture();
+  const ms = selectMatches(store, { fmt: 0 });
+  const t = topBatters(store, ms, { scope: "match" });
+  const brook = t.rows.find((r) => r.name === "HC Brook");
+  assert.equal(brook.sole, exp.t20.filter((m) => m.top_name === "brook").length);
+});
+
+test("partnership: who gets out first, opening pair", async () => {
+  const { store, rz, exp } = await loadFixture();
+  const res = await runPlan(store, rz, { kind: "partnership", player: "Brook", player2: "Duckett", opening: true, filters: { format: "T20" } });
+  assert.ok(res.ok, res.error);
+  const s = res.summary;
+  assert.equal(s.n, 11); // ten full games plus the short one: partnerships do not need the game to be valid
+  const brookFirst = exp.t20.filter((m) => m.first_out === "brook").length + 1; // + the short game (Brook first)
+  const duckFirst = exp.t20.filter((m) => m.first_out === "duckett").length;
+  const [x, y] = s.nameA === "HC Brook" ? [s.aOut, s.bOut] : [s.bOut, s.aOut];
+  assert.deepEqual([x, y], [brookFirst, duckFirst]);
+  assert.equal(s.ended, 11);
+  const px = s.nameA === "HC Brook" ? s.fairFirstOutA : s.fairFirstOutB;
+  assert.equal(px, Math.round((100 * 11) / brookFirst) / 100);
+  assert.ok(res.headline.includes("11 stands"));
+  // formats are reported separately and never pooled
+  const fm = Object.fromEntries(res.splits.format.map((f) => [f.label, f.n]));
+  assert.deepEqual(fm, { T20: 11, ODI: 4 });
+});
+
+test("partnership picks the pair's busiest format and explains when there is nothing", async () => {
+  const { store, rz } = await loadFixture();
+  const auto = await runPlan(store, rz, { kind: "partnership", player: "Brook", player2: "Duckett", opening: true, filters: {} });
+  assert.ok(auto.ok && auto.notes.some((n) => n.includes("No format given")));
+  assert.equal(auto.summary.n, 11);
+  const none = await runPlan(store, rz, { kind: "partnership", player: "Brook", player2: "Kohli", opening: true, filters: { format: "T20" } });
+  assert.ok(none.ok);
+  assert.equal(none.summary.n, 0);
+  assert.ok(none.notes.some((n) => n.includes("never batted for the same team")));
+});
+
+test("freshness is reported on every answer", async () => {
+  const { store, rz } = await loadFixture();
+  const res = await runPlan(store, rz, { kind: "player_prop", player: "Brook", stat: "sixes", line: 0.5, side: "over", filters: { format: "T20" } });
+  assert.match(res.freshness, /Newest Cricsheet match: 2025-04-05/);
+  assert.match(res.freshness, /No provisional matches included/);
+  assert.equal(res.sample.n, res.summary.n);
+  assert.ok(res.filters.some(([k]) => k === "Format"));
+});
