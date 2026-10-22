@@ -1,6 +1,7 @@
 // Free image sources, loaded lazily in the browser (nothing is stored in the repo):
-//  * team flags: flagcdn.com (national sides only)
-//  * player photos: Wikidata (ESPNcricinfo id -> P18 image) served by Wikimedia Commons; initials are the fallback.
+//  * team logos and player photos: CREX's public image CDN (ids from CREX's sitemaps, matched at build time), see photos.js
+//  * fallbacks: flagcdn.com flags for national sides, Wikimedia Commons photos via Wikidata, then initials / a silhouette
+import { playerPhoto, teamLogo } from "./photos.js";
 import { h } from "./ui.js";
 
 const FLAGS = {
@@ -26,11 +27,17 @@ export const flagUrl = (name, w = 80) => {
 
 export const initials = (n) => String(n).replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 
-/** Round badge: flag if the side is a country, else initials. `cls` is "dot" (small) or "crest" (hero). */
+/** Round badge: CREX logo when we know the team, else a flag, else initials. `cls` is "dot" (small) or "crest" (hero). */
 export function teamBadge(name, cls = "dot") {
-  const url = flagUrl(name, cls === "crest" ? 160 : 40);
-  const el = h("span", { class: cls }, url ? null : initials(name));
-  if (url) el.append(h("img", { src: url, alt: "", loading: "lazy", onerror: (e) => { e.target.remove(); el.textContent = initials(name); } }));
+  const flag = flagUrl(name, cls === "crest" ? 160 : 40);
+  const logo = teamLogo(photos, name);
+  const el = h("span", { class: cls }, logo || flag ? null : initials(name));
+  const show = (src, next) => {
+    const img = h("img", { src, alt: "", loading: "lazy", onerror: () => { img.remove(); next ? next() : (el.textContent = initials(name)); } });
+    el.replaceChildren(img);
+  };
+  if (logo) show(logo, flag ? () => show(flag) : null);
+  else if (flag) show(flag);
   return el;
 }
 
@@ -41,7 +48,7 @@ let photos = null;
 export async function loadPhotos(base = "data/") {
   try { photos = await (await fetch(`${base}photos.json`)).json(); } catch { photos = {}; }
 }
-export const playerPhotoUrl = (store, pidx) => (photos?.[pidx] ? `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(photos[pidx])}?width=240` : null);
+export const playerPhotoUrl = (store, pidx) => playerPhoto(photos, pidx);
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function playerBadge(store, pidx, cls = "dot") {

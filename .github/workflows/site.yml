@@ -56,7 +56,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .sitecache
-          key: site-dl-${{ steps.day.outputs.d }}
+          key: site-dl2-${{ steps.day.outputs.d }}
       - name: Download Cricsheet ball-by-ball and the people register (once a day)
         if: steps.dl.outputs.cache-hit != 'true'
         run: |
