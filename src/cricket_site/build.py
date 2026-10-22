@@ -373,7 +373,8 @@ def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], chunk: int = 400
     by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix}
     ids, out = sorted(by_ci), {}
     for i in range(0, len(ids), chunk):
-        q = "SELECT ?id ?img WHERE { VALUES ?id { %s } ?p wdt:P2697 ?id; wdt:P18 ?img }" % " ".join(f'"{x}"' for x in ids[i:i + chunk])
+        values = " ".join(f'"{x}"' for x in ids[i:i + chunk])
+        q = "SELECT ?id ?img WHERE { VALUES ?id { " + values + " } ?p wdt:P2697 ?id; wdt:P18 ?img }"
         req = urllib.request.Request("https://query.wikidata.org/sparql", data=urllib.parse.urlencode({"query": q, "format": "json"}).encode(),
                                      headers={"User-Agent": "cricket-props-hub/0.1 (https://github.com/dheerajgoel17/cricket-data)",
                                               "Accept": "application/sparql-results+json"})
