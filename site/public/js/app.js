@@ -32,8 +32,19 @@ async function boot() {
   }
   rz = new Resolver(store);
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
+  initSearch();
   window.addEventListener("hashchange", render);
   render();
+}
+
+function initSearch() {
+  const input = document.getElementById("gs");
+  suggest(input, (t) => {
+    if (t.length < 2) return [];
+    const ps = rz.players(t, {}, 5).map((p) => ({ label: p.name, sub: `${store.teamName(p.team)}`, href: `#/player/${p.idx}` }));
+    const tm = rz.team(t) ? [{ label: rz.team(t).name, sub: "team", href: `#/team/${rz.team(t).idx}` }] : [];
+    return [...tm, ...ps];
+  }, (it) => { input.value = ""; location.hash = it.href; });
 }
 
 function parseHash() {
@@ -50,7 +61,7 @@ const go = (path, q = {}) => {
 async function render() {
   const { name, args, q } = parseHash();
   const cur = name === "fixtures" ? "" : name;
-  document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#/${cur}`));
+  document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.dataset.r === cur));
   document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
   app.replaceChildren(h("p", { class: "muted pad" }, "Crunching…"));
@@ -106,7 +117,21 @@ function askBox(initial = "", onResult) {
 }
 
 // ---------------------------------------------------------------- pages
-const hero = (name, sub, cls = "", badge = null) => h("div", { class: `hero-e ${cls}` }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name), h("p", {}, sub));
+const crumbs = (...items) => h("div", { class: "crumbs" }, items.flatMap((it, i) => [i ? h("span", { class: "sep" }, "›") : null,
+  i === items.length - 1 ? h("span", { class: "cur" }, it[0]) : h("a", { href: it[1] }, it[0])]));
+
+/** StatsHub-style hero card: crest, name, meta pills and in-card tabs that switch the page sections. */
+function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [] }, root) {
+  const bar = h("div", { class: "hero-tabs" });
+  const set = (id) => {
+    bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.t === id));
+    root.querySelectorAll("[data-sec]").forEach((el) => { el.hidden = el.dataset.sec !== id; });
+  };
+  tabs.forEach(([id, label]) => bar.append(h("button", { type: "button", "data-t": id, onclick: () => set(id) }, label)));
+  const el = h("div", { class: `hero-card ${cls}` }, h("div", { class: "hero-top" }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name),
+    sub ? h("p", {}, sub) : null, meta.length ? h("div", { class: "hero-meta" }, meta.map((m) => h("span", {}, m))) : null), tabs.length ? bar : null);
+  return { el, set: () => tabs.length && set(tabs[0][0]) };
+}
 const pretty = (s) => (s || "").replace(/-/g, " ").replace(/\b(\d{4})\b/g, "$1").replace(/\b[a-z]/g, (c) => c.toUpperCase());
 const initials = (n) => n.replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 const dayKey = (f) => (f.start.length > 10 ? new Date(f.start) : new Date(`${f.start}T12:00:00`)).toLocaleDateString("en-CA");
@@ -131,13 +156,28 @@ async function home(_, q = {}) {
     body.replaceChildren(fixtureGroups(list));
   };
   draw();
-  return h("div", {},
+  const side = await sidebar();
+  return h("div", { class: "layout has-side" }, h("div", {},
     h("h1", {}, "Today's cricket fixtures, player stats & team stats"),
     h("p", { class: "muted" }, new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" })),
     h("p", { class: "muted" }, `Hit rates over any line, fair decimal odds, partnerships and fancy markets from ${store.meta.matches.toLocaleString()} matches since 2001, men's and women's.`),
-    h("div", { class: "banner" }, h("div", { class: "ico" }, "?"), h("div", { class: "t" }, h("div", { class: "k" }, "● FREE ASK-ANYTHING BOX"), h("div", { class: "v" }, "Ask in your own words, typos fine.")), h("a", { class: "go", href: "#/ask" }, "Ask →")),
     tabs, chipRow, h("div", { class: "sec-title" }, days.length ? "Matches" : "No upcoming fixtures"), body,
-    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone."));
+    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.")), side);
+}
+
+async function sidebar() {
+  let snap = null;
+  try { snap = await (await fetch("data/props.json")).json(); } catch { /* none */ }
+  const bets = (snap?.value_bets || []).slice(0, 5);
+  const alerts = (snap?.recent_alerts || []).slice(-5).reverse();
+  const rows = bets.length ? bets.map((b) => ({ t: b.selection, s: `${b.match} · ${b.market}`, o: b.best_odds })) : alerts.map((b) => ({ t: b.selection, s: `${b.match} · ${b.market}`, o: b.best_odds }));
+  return h("aside", { class: "side" },
+    h("div", { class: "banner" }, h("div", { class: "t" }, h("div", { class: "k" }, "● PROP HUNTER"), h("div", { class: "v" }, bets.length ? `${bets.length} value bets now` : "Best-value props"),
+      h("a", { class: "go", href: "#/props", style: "display:inline-block;margin-top:10px" }, "Open Prop Hunter →"))),
+    h("div", { class: "card" }, h("h3", {}, bets.length ? "Top value bets" : "Recent alerts"),
+      rows.length ? h("div", { class: "mini" }, rows.map((r) => h("a", { href: "#/props" }, h("span", {}, r.t, h("small", {}, r.s)), h("span", { class: "odds" }, odds(r.o))))) : h("p", { class: "muted small" }, "Nothing flagged right now.")),
+    h("div", { class: "card" }, h("h3", {}, "Ask anything"), h("p", { class: "muted small" }, "Write your question your own way; typos are fine."),
+      h("a", { class: "btn", href: "#/ask" }, "Ask a question")));
 }
 
 async function upcoming() {
@@ -196,11 +236,15 @@ async function player(args, q) {
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f, i) => [i, f]).filter(([i]) => (fm >> i) & 1);
   const fmtVal = q.fmt ?? (fmts.length ? fmts[0][0] : 0);
-  const form = h("form", { class: "card row", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`player/${idx}`, f); } },
+  const form = h("form", { class: "card", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`player/${idx}`, { ...f, tab: q.tab }); } },
+   h("div", { class: "filters" },
     field("Format", sel("fmt", fmts, fmtVal)),
     field("Stat", sel("stat", Object.entries(STATS).map(([k, v]) => [k, v.label]), q.stat || "runs")),
     field("Line", inp("line", q.line, { type: "number", step: "0.5", placeholder: "e.g. 0.5", style: "width:90px" })),
     field("Side", sel("side", [["over", "Over"], ["under", "Under"]], q.side || "over")),
+    h("button", { type: "submit" }, "Update")),
+   h("details", { class: "filters-wrap", open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl) }, h("summary", { class: "muted small" }, "More filters: opposition, venue, home/away, innings, position, dates…"),
+    h("div", { class: "filters", style: "margin-top:10px" },
     field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })),
     field("Venue", inp("venue", q.venue, { list: "dl-venues", style: "width:170px" })),
     field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)),
@@ -209,8 +253,7 @@ async function player(args, q) {
     field("From", inp("since", q.since, { type: "date" })), field("To", inp("until", q.until, { type: "date" })),
     field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })),
     field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…", style: "width:110px" })),
-    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl)),
-    h("button", { type: "submit" }, "Update"));
+    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl)))));
   const plan = {
     kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
@@ -219,7 +262,12 @@ async function player(args, q) {
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  return h("div", {}, hero(name, `${store.teamName(store.P.tm[idx])} · last played ${store.P.last[idx]}`, "p", playerBadge(store, idx, "crest")), ...datalists(), form, renderResult(res));
+  const body = h("div", {}, renderResult(res));
+  const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", badge: playerBadge(store, idx, "crest"),
+    tabs: [["props", "Props & form"], ["splits", "Splits"]] }, body);
+  const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
+  hc.set();
+  return out;
 }
 
 async function teamsPage(_, q) {
@@ -245,7 +293,7 @@ async function marketPage(kind, args, q) {
   const isTeam = kind === "team";
   const label = isTeam ? store.teamName(idx) : store.venueName(idx);
   const fmt = q.fmt ?? "T20";
-  const form = h("form", { class: "card row", onsubmit: (e) => { e.preventDefault(); go(`${kind}/${idx}`, Object.fromEntries(new FormData(e.target))); } },
+  const form = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); go(`${kind}/${idx}`, Object.fromEntries(new FormData(e.target))); } },
     field("Format", sel("fmt", FORMATS.map((f) => [f, f]), fmt)),
     isTeam ? field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })) : null,
     isTeam ? field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)) : null,
@@ -259,8 +307,13 @@ async function marketPage(kind, args, q) {
       gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
   const [res, top] = await Promise.all([runPlan(store, rz, plan, hints), runPlan(store, rz, { ...plan, kind: "top_batter", market: null }, hints)]);
-  return h("div", {}, hero(label, isTeam ? "Match and team markets (team markets use the side batting first)" : "Match markets at this venue", isTeam ? "" : "v", isTeam ? teamBadge(store.teams[idx].n, "crest") : null), ...datalists(), form,
-    renderResult(res), h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
+  const b1 = h("div", { "data-sec": "markets" }, renderResult(res)), b2 = h("div", { "data-sec": "top" }, h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
+  const root = h("div", {}, b1, b2);
+  const hc = heroCard({ name: label, sub: isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue", meta: [`${FORMATS.includes(fmt) ? fmt : "T20"} markets`, isTeam ? "team markets use the side batting first" : "match markets"],
+    cls: isTeam ? "" : "v", badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: [["markets", "Markets"], ["top", "Top batter"]] }, root);
+  const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, ...datalists(), form, root);
+  hc.set();
+  return out;
 }
 
 async function pair(_, q) {
@@ -286,7 +339,7 @@ async function pair(_, q) {
     const res = await runPlan(store, rz, { kind: "partnership", opening: q.open === "1", filters: { format: q.fmt || null, opposition: q.opp || null, venue_type: q.vt || null }, venue: q.venue || null }, { playerIdx: state.a, player2Idx: state.b });
     result = renderResult(res);
   }
-  return h("div", {}, h("h1", {}, "Partnerships"), h("p", { class: "muted" }, "For any pair: who is dismissed first, stand sizes, split by format, opposition and venue. Needs ball-by-ball data, so only Cricsheet-published matches count."), ...datalists(), form, result);
+  return h("div", {}, crumbs(["Home", "#/"], ["Partnerships"]), h("h1", {}, "Partnerships"), h("p", { class: "muted" }, "For any pair: who is dismissed first, stand sizes, split by format, opposition and venue. Needs ball-by-ball data, so only Cricsheet-published matches count."), ...datalists(), form, result);
 }
 
 async function props() {
@@ -304,17 +357,20 @@ async function props() {
   const now = Date.now();
   const bets = (snap.value_bets || []).filter((b) => !b.start_utc || Date.parse(b.start_utc) > now - 3600e3).sort((a, b) => b.edge_pct - a.edge_pct);
   const link = (b) => { const nm = (b.player_matched_as || (b.selection || "").replace(/\s+(over|under|\d+\+).*$/i, "")).trim(); const p = nm && rz.player(nm); return p ? h("a", { href: `#/player/${p.idx}` }, b.selection) : b.selection; };
-  const rows = (list) => list.map((b) => [b.start_ist || "", b.match, b.market, link(b), h("span", { class: "odds" }, odds(b.best_odds)), h("span", { class: "odds" }, odds(b.fair_odds)),
-    b.edge_pct != null ? `${b.edge_pct}%` : "–", b.kelly_quarter_stake_pct != null ? `${b.kelly_quarter_stake_pct}%` : "–", b.best_source || ""]);
-  const cols = ["Start (IST)", "Match", "Market", "Selection", "Best odds", "Fair odds", "Edge", "¼-Kelly stake", "Source"];
+  const card = (b) => h("div", { class: "trend" },
+    h("div", { class: "tt" }, h("span", { class: "muted small" }, `${b.start_ist || b.alerted_at_ist || ""}`), b.edge_pct != null ? h("span", { class: "edge" }, `+${b.edge_pct}%`) : null),
+    h("div", { class: "who", style: "margin-top:8px" }, h("div", {}, link(b), h("small", {}, b.match))),
+    h("div", { class: "lab" }, b.market),
+    h("div", { class: "nums" }, h("div", { class: "l" }, h("b", {}, odds(b.best_odds)), h("span", {}, b.best_source || "Best odds")), h("div", {}, h("b", {}, odds(b.fair_odds)), h("span", {}, "Fair odds")),
+      h("div", {}, h("b", {}, b.kelly_quarter_stake_pct != null ? `${b.kelly_quarter_stake_pct}%` : "–"), h("span", {}, "¼-Kelly"))),
+    b.why ? h("p", { class: "muted small", style: "margin:12px 0 0" }, b.why) : null);
   const hist = (snap.recent_alerts || []).slice().reverse().filter((b) => !bets.some((x) => x.selection === b.selection && x.match === b.match));
-  return h("div", {}, h("h1", {}, "Prop Hunter"),
+  return h("div", {}, crumbs(["Home", "#/"], ["Prop Hunter"]), h("h1", {}, "Prop Hunter"),
     h("p", { class: "muted" }, "Player-prop value bets for upcoming matches, produced hourly by the repo's value-bets pipeline (free odds sources vs the model). Decimal odds. Not betting advice: most edges are information the model lacks (XIs, batting order, pitch, injuries)."),
     h("p", { class: "small" }, h("span", { class: `badge ${live ? "live" : ""}` }, live ? "live from GitHub" : "bundled snapshot"), ` generated ${snap.generated_at_ist || "?"}`),
-    bets.length ? h("div", { class: "card" }, table(cols, rows(bets))) : h("div", { class: "card" }, h("p", {}, "No value bets passed the filters in the latest run."),
+    bets.length ? h("div", { class: "cards2" }, bets.map(card)) : h("div", { class: "card" }, h("p", {}, "No value bets passed the filters in the latest run."),
       h("p", { class: "muted small" }, `Markets priced: ${snap.stats?.markets_in_window ?? "?"} across ${snap.stats?.events_in_window ?? "?"} matches in the next 24 h; sources: ${Object.entries(snap.sources || {}).map(([k, v]) => `${k} ${v.status}`).join(", ") || "n/a"}.`)),
-    bets.length ? h("details", {}, h("summary", {}, "Why each bet"), h("ul", {}, bets.map((b) => h("li", { class: "small" }, h("b", {}, b.selection), `: ${b.why || b.notes || ""}`)))) : null,
-    hist.length ? [h("h2", {}, "Recent alerts"), h("div", { class: "card" }, table(["Alerted", "Match", "Market", "Selection", "Odds", "Fair", "Edge"], hist.slice(0, 25).map((b) => [b.alerted_at_ist, b.match, b.market, b.selection, h("span", { class: "odds" }, odds(b.best_odds)), h("span", { class: "odds" }, odds(b.fair_odds)), `${b.edge_pct}%`])))] : null);
+    hist.length ? [h("h2", {}, "Recent alerts"), h("div", { class: "cards2" }, hist.slice(0, 12).map(card))] : null);
 }
 
 async function askPage(_, q) {

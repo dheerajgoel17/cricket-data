@@ -1,5 +1,6 @@
 // Turns a runPlan() result into DOM. Every number shown here was computed by the engine from the data.
 import { FORMATS } from "./engine/util.js";
+import { teamBadge } from "./assets.js";
 import { bars, chips, freshText, h, num, odds, pc, stat, table } from "./ui.js";
 
 const cell = (p) => (p == null ? "–" : h("span", { class: `pcell ${p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo"}` }, pc(p)));
@@ -15,6 +16,22 @@ function summaryCards(r) {
     cards.push(stat("Fair decimal odds", h("span", { class: "odds" }, odds(side === "over" ? s.fairOver : s.fairUnder)), `other side ${odds(side === "over" ? s.fairUnder : s.fairOver)}`));
   }
   return h("div", { class: "grid" }, cards);
+}
+
+function trendCard(r) {
+  const s = r.summary, side = r.plan.side || "over", line = s.line;
+  const hitCount = (v) => (line == null ? false : side === "over" ? v > line : v < line);
+  const p = side === "over" ? s.pOver : s.pUnder;
+  const recent = r.last.slice(0, 15).reverse();
+  return h("div", { class: "trend" },
+    h("div", { class: "tt" }, h("div", { class: "who" }, h("div", {}, r.player.name, h("small", {}, `${r.fmtName} · ${r.sample.n} ${r.sample.unit}`))),
+      h("span", { class: "linepill" }, line != null ? `${side === "over" ? "O" : "U"} ${line}` : "Median", h("b", {}, line != null ? odds(side === "over" ? s.fairOver : s.fairUnder) : num(s.median)))),
+    h("div", { class: "lab" }, `${r.statLabel} ${line != null ? `${side} ${line}` : "recent form"}`),
+    h("div", { class: "nums" },
+      h("div", { class: "l" }, h("b", {}, line != null ? `${side === "over" ? s.over : s.under}/${s.n}` : String(s.n)), h("span", {}, line != null ? "Record" : "Sample")),
+      h("div", {}, h("b", {}, line != null ? pc(p) : "–"), h("span", {}, "Hit rate")), h("div", {}, h("b", {}, num(s.median)), h("span", {}, "Median")), h("div", {}, h("b", {}, num(s.mean)), h("span", {}, "Average"))),
+    h("div", { class: "gstrip" }, recent.map((x) => h("div", { class: "gcell", title: `${x.date} v ${x.opp} at ${x.venue}` },
+      h("div", { class: `v ${hitCount(x.value) ? "hit" : ""}` }, String(x.value)), teamBadge(x.opp), h("em", {}, x.date.slice(5).split("-").reverse().join("/"))))));
 }
 
 function splitTables(splits, title = (k) => k) {
@@ -35,13 +52,13 @@ export function renderResult(r, { source } = {}) {
   if (r.kind === "player_prop") {
     out.append(summaryCards(r));
     if (r.player.alternatives?.length) out.append(h("p", { class: "muted small" }, "Also matched: ", r.player.alternatives.join(", "), " (be more specific to pick another)."));
-    out.append(h("h2", {}, "Hit rate at every line"), h("div", { class: "card" }, ladderTable(r.ladder)));
+    out.append(h("div", { "data-sec": "props" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder))));
+    const sec = h("div", { "data-sec": "props" });
     if (r.last.length) {
-      const vals = r.last.map((x) => x.value).reverse();
-      out.append(h("h2", {}, `Last ${r.last.length} (oldest → newest)`), h("div", { class: "card" }, bars(vals, r.summary.line),
+      sec.append(trendCard(r), h("h2", {}, `Last ${r.last.length} games`), h("div", { class: "card flat" },
         table(["Date", "Opponent", "Venue", "Value", "Home/away", "Innings"], r.last.map((x) => [x.date, x.opp, x.venue, x.value, x.home ?? "?", x.innings ?? "?"]))));
     }
-    out.append(...splitTables(r.splits));
+    out.append(sec, h("div", { "data-sec": "splits" }, ...splitTables(r.splits)));
   } else if (r.kind === "partnership") {
     const s = r.summary;
     out.append(h("div", { class: "grid" },
