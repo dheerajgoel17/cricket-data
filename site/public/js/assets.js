@@ -48,11 +48,11 @@ let photos = null;
 export async function loadPhotos(base = "data/") {
   try { photos = await (await fetch(`${base}photos.json`)).json(); } catch { photos = {}; }
 }
-export const playerPhotoUrl = (store, pidx) => playerPhotos(photos, pidx)[0] ?? null;
+export const playerPhotoUrl = (store, pidx) => playerPhotos(photos, store.P.id[pidx])[0] ?? null;
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function playerBadge(store, pidx, cls = "dot") {
-  const urls = playerPhotos(photos, pidx);
+  const urls = playerPhotos(photos, store.P.id[pidx]);
   const el = h("span", { class: `${cls} ph`, title: store.playerName(pidx), html: SILHOUETTE });
   const show = (i) => {
     if (i >= urls.length) return; // the silhouette stays

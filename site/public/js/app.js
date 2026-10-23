@@ -263,7 +263,7 @@ function fixtureGroups(fx) {
   if (!fx.length) return h("div", { class: "card muted" }, "Nothing scheduled for this selection.");
   const groups = new Map();
   for (const f of fx) {
-    const key = f.series ? pretty(f.series.replace(/-\d{4}$/, "")) : f.source === "markets" ? "Matches with prop markets" : `${f.fmt || ""} ${f.gender === "female" ? "women's" : "men's"} cricket`.trim();
+    const key = f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : f.source === "markets" ? "Matches with prop markets" : `${f.fmt || ""} ${f.gender === "female" ? "women's" : "men's"} cricket`.trim();
     (groups.get(key) || groups.set(key, []).get(key)).push(f);
   }
   const time = (s) => (s.length > 10 ? new Date(s).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC");

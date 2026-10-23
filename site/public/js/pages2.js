@@ -70,6 +70,7 @@ export async function fixturePage(args, q) {
   const { store, crumbs, heroCard, go, nextCountdown } = C;
   const fx = (await store.loadFixtures()).find((f) => f.id === args.join("/"));
   if (!fx) return h("div", {}, crumbs(["Home", "#/"], ["Fixture"]), h("div", { class: "card err" }, "That fixture is no longer in the schedule."));
+  if (fx.fmt === "FC") return h("div", {}, crumbs(["Home", "#/"], ["Fixtures", "#/"], [`${fx.a} v ${fx.b}`]), h("div", { class: "card" }, h("h2", {}, `${fx.a} v ${fx.b}`), h("p", { class: "muted" }, `${fx.series || ""} · ${fx.venue || ""}`), h("p", {}, "This is a first-class match. First-class cricket is not part of the stats here (no Test or limited-overs form is mixed in), so there is no player grid or trends for it.")));
   const fmt = fmtOf(fx), stat = STATS[q.stat] ? q.stat : "sixes", line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
   const when = fx.start.length > 10 ? new Date(fx.start) : new Date(`${fx.start}T12:00:00`);
   const root = h("div");

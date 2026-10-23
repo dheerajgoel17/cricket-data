@@ -54,8 +54,11 @@ def _split_cricsheet(name: str) -> tuple[str, str, str]:
     return initials, given, sur
 
 
-def match_players(players: list[dict], crex: list[tuple[str, str]]) -> dict[int, str]:
-    """players: [{'idx', 'name', 'n', 'last'}] -> {player idx: CREX id}. Unique or clearly dominant matches only."""
+def match_players(players: list[dict], crex: list[tuple[str, str]], named: dict[str, int] | None = None) -> dict[int, str]:
+    """players: [{'idx', 'name', 'n', 'last'}] -> {player idx: CREX id}. Unique or clearly dominant matches only.
+
+    If `named` is given it is filled with {folded CREX full name: player idx} for every accepted match (used to link scraped names).
+    """
     by_sur: dict[str, list[tuple[dict, str, str]]] = {}
     for p in players:
         ini, given, sur = _split_cricsheet(p["name"])
@@ -99,8 +102,15 @@ def match_players(players: list[dict], crex: list[tuple[str, str]]) -> dict[int,
             continue  # ambiguous: leave the silhouette
         p = ranked[0]
         if p["idx"] not in best or p["n"] > 0 and best[p["idx"]][0] < len(toks):
-            best[p["idx"]] = (len(toks), cid)
-    return {i: cid for i, (_, cid) in best.items()}
+            best[p["idx"]] = (len(toks), cid, fold(name))
+    if named is not None:
+        counts: dict[str, int] = {}
+        for _, _, nm in best.values():
+            counts[nm] = counts.get(nm, 0) + 1
+        for i, (_, _, nm) in best.items():
+            if counts[nm] == 1:  # two Cricsheet players behind one CREX name would be a guess: leave it out
+                named[nm] = i
+    return {i: cid for i, (_, cid, _) in best.items()}
 
 
 # Cricsheet names for franchises that were renamed or spelled differently on CREX (folded names)

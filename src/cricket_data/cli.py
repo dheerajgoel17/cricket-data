@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import sqlite3
 import sys
 from datetime import date, datetime, timedelta
@@ -219,20 +220,49 @@ def cmd_backfill(a: argparse.Namespace) -> int:
     return cmd_update(a)
 
 
-def cmd_fixtures(a: argparse.Namespace) -> int:
-    from .crex_sitemap import CREXSitemapIndex
-    from .fixtures import collect, write_fixtures
+def _merge_fixtures(fresh: list[dict], path: Path) -> list[dict]:
+    """The schedule page only reaches ~1-2 days ahead. Rows we already hold that start after its horizon (e.g. tours announced weeks
+    ahead) are kept until they pass; anything inside the horizon is replaced by the page, so cancelled or moved games drop out."""
+    if not path.exists() or not fresh:
+        return fresh
+    horizon = max(r["start_utc"] for r in fresh)
+    now = datetime.now().strftime("%Y-%m-%dT%H:%MZ")
+    with path.open(encoding="utf-8", newline="") as fh:
+        old = [r for r in csv.DictReader(fh) if r["start_utc"] > max(horizon, now)]
+    seen = {(r["start_utc"][:10], frozenset((r["team_a"], r["team_b"]))) for r in fresh}
+    keep = [r for r in old if (r["start_utc"][:10], frozenset((r["team_a"], r["team_b"]))) not in seen]
+    return sorted(fresh + keep, key=lambda r: (r["start_utc"], r["match_id"]))
 
-    index = CREXSitemapIndex(cache_path=Path(".cache") / "crex_index.json")
-    index.load()
-    teams = [t.strip().lower() for t in a.team.split(",") if t.strip()]
-    found = collect(index.matches, PoliteFetcher(min_interval=3.0), teams=teams, days=a.days,
-                    max_pages=a.max_pages)
+
+def cmd_fixtures(a: argparse.Namespace) -> int:
+    from .crex_schedule import fetch_schedule
+    from .fixtures import FIELDS
+
     out = Path(a.data_dir) / "fixtures" / "upcoming.csv"
-    write_fixtures(out, found)
-    print(f"{len(found)} upcoming fixtures -> {out}")
-    for f in found[:20]:
-        r = f.row()
+    if a.sitemap:  # the old candidate-page crawl (kept for team-filtered runs)
+        from .crex_sitemap import CREXSitemapIndex
+        from .fixtures import collect, write_fixtures
+
+        index = CREXSitemapIndex(cache_path=Path(".cache") / "crex_index.json")
+        index.load()
+        teams = [t.strip().lower() for t in a.team.split(",") if t.strip()]
+        found = collect(index.matches, PoliteFetcher(min_interval=3.0), teams=teams, days=a.days, max_pages=a.max_pages)
+        write_fixtures(out, found)
+        rows = [f.row() for f in found]
+    else:
+        rows = fetch_schedule()
+        if not rows:  # a failed or empty fetch must never wipe the schedule we already have
+            print("no fixtures parsed from the CREX schedule page; leaving the existing file alone", file=sys.stderr)
+            return 1
+        rows = _merge_fixtures(rows, out)
+        buf = io.StringIO(newline="")
+        w = csv.DictWriter(buf, fieldnames=FIELDS, lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(buf.getvalue(), encoding="utf-8")
+    print(f"{len(rows)} upcoming fixtures -> {out}")
+    for r in rows[:20]:
         print(f"  {r['start_utc']}  {r['team_a']} v {r['team_b']}  ({r['format']}, {r['venue']})")
     return 0
 
@@ -338,7 +368,8 @@ def main(argv: list[str] | None = None) -> int:
     b.set_defaults(fn=cmd_backfill)
 
     f = sub.add_parser("fixtures", help="refresh upcoming fixtures / schedule (data/fixtures/upcoming.csv)")
-    f.add_argument("--team", default="", help="comma-separated CREX team codes, e.g. aus-w,ban-w (default: all)")
+    f.add_argument("--sitemap", action="store_true", help="use the older CREX sitemap crawl instead of the schedule page")
+    f.add_argument("--team", default="", help="with --sitemap: comma-separated CREX team codes, e.g. aus-w,ban-w")
     f.add_argument("--days", type=int, default=30, help="only fixtures starting within this many days")
     f.add_argument("--max-pages", type=int, default=40, help="cap on match pages fetched per run")
     f.set_defaults(fn=cmd_fixtures)
