@@ -7,7 +7,7 @@ hosted on **Vercel Hobby**. Nothing paid, no database, no model hosting.
 | Page | What you get |
 |---|---|
 | Home / **Ask** | Type a question in your own words (typos fine). A free Gemini model turns it into a *query plan*; the site runs that plan on the real data and shows the answer, the filters used, the sample size and the data freshness. |
-| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` plus matches that currently have bookmaker prop markets (`value_bets/out`). |
+| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). |
 | **Players** | Runs, balls, 4s, 6s, wickets, runs conceded. Hit rate over/under any line, a ladder of lines, median/mean, last-N form, fair decimal odds, split by opposition, venue, home/away/neutral, batting first/chasing, batting position, year and competition. One format at a time, never mixed. |
 | **Teams & venues** | Match totals and fancy markets: match 4s/6s, 30s, 50s, 100s, double-digit and single-digit scores, ducks, highest over, most runs conceded by a bowler, top score, team markets (team batting first only), and who tops the batting card. |
 | **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |

@@ -518,6 +518,10 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> i
 
 
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
+    """Fixtures and start times come from CREX's schedule only (data/fixtures/upcoming.csv).
+
+    The bookmaker feed (vb_dir) is for odds: books serve different regions, so its start times and team labels
+    are not trustworthy as a schedule. vb_dir is accepted for call compatibility and deliberately unused."""
     rows = []
     p = data_dir / "fixtures" / "upcoming.csv"
     if p.exists():
@@ -526,51 +530,20 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                 rows.append({"start": r["start_utc"], "fmt": r["format"], "gender": r["gender"], "a": r["team_a"],
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
                              "source": "crex"})
-    if vb_dir and (vb_dir / "value_bets_latest.json").exists():
-        d = json.loads((vb_dir / "value_bets_latest.json").read_text(encoding="utf-8"))
-        for e in d.get("events_in_window", []):
-            parts = (e.get("event") or "").split("|")
-            if len(parts) < 4:
-                continue
-            g, a, b, day = parts[0], parts[1], parts[2], parts[3]
-            start = e.get("start_ist", "")
-            m = re.match(r"(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2}) IST", start)
-            iso = ""
-            if m:
-                dt = datetime.fromisoformat(f"{m[1]}T{m[2]}:{m[3]}:00") - timedelta(hours=5, minutes=30)
-                iso = dt.strftime("%Y-%m-%dT%H:%MZ")
-            rows.append({"start": iso or day, "fmt": e.get("format") or "", "gender": g, "a": a.title(), "b": b.title(),
-                         "venue": "", "series": "", "source": "markets"})
-    crex_rows = [r for r in rows if r["source"] == "crex"]
-
-    def duplicate_of_crex(r: dict) -> bool:
-        """A bookmaker event that is the same game as a CREX row: start within 20 min and each side matches (the book often drops 'U19' / 'Women')."""
-        if r["source"] == "crex" or len(r["start"]) <= 10:
-            return False
-        for c in crex_rows:
-            if len(c["start"]) > 10 and abs(_minutes(c["start"]) - _minutes(r["start"])) <= 20:
-                ca_, cb_ = _norm_team(c["a"]), _norm_team(c["b"])
-                ra, rb = _norm_team(r["a"]), _norm_team(r["b"])
-                same = lambda x, y: x == y or x.startswith(y) or y.startswith(x)  # noqa: E731
-                if (same(ca_, ra) and same(cb_, rb)) or (same(ca_, rb) and same(cb_, ra)):
-                    return True
-        return False
-
     out, seen = [], set()
-    # CREX's schedule has the format, venue and series; the bookmaker feed often does not: let CREX win a duplicate
-    for r in sorted(rows, key=lambda r: (r["start"][:10], r["source"] != "crex", r["start"])):
+    canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
+    for r in sorted(rows, key=lambda r: r["start"]):
         key = (r["start"][:10], frozenset((_norm_team(r["a"]), _norm_team(r["b"]))))
-        if key in seen or duplicate_of_crex(r):
+        if key in seen:
             continue
         seen.add(key)
         g = 1 if r["gender"] == "female" else 0
-        canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
         for side in ("a", "b"):
             n = canon.get((_norm_team(r[side]), g))
             r[side + "_ix"] = team_ix.get((n, g), -1) if n else -1
         r["id"] = f"{r['start'][:10]}-{_slug(r['a'])}-v-{_slug(r['b'])}"
         out.append(r)
-    return sorted(out, key=lambda r: r["start"])
+    return out
 
 
 # ------------------------------------------------------------------ prop hunter snapshot
