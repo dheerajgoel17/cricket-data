@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-22T08:46:52",
+ "afghanistan_enumerated_at": "2026-10-23T08:48:58",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -1671,6 +1671,150 @@
    "key": "2024-04-03-Lions-Western Province",
    "match_id": "crex-lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
    "saved_at": "2026-10-22T08:52:13"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TK",
+   "key": "2026-10-21-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TK",
+   "saved_at": "2026-10-23T08:49:04"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TJ",
+   "key": "2026-10-19-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TJ",
+   "saved_at": "2026-10-23T08:49:16"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
+   "key": "2024-03-31-Western Province-Warriors",
+   "match_id": "crex-war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
+   "saved_at": "2026-10-23T08:49:33"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-26th-match-csa-t20-challenge-2024-match-updates-ONR",
+   "key": "2024-03-27-Warriors-Lions",
+   "match_id": "crex-lio-vs-war-26th-match-csa-t20-challenge-2024-match-updates-ONR",
+   "saved_at": "2026-10-23T08:49:58"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
+   "key": "2024-03-24-Papua New Guinea-Zimbabwe",
+   "match_id": "crex-png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
+   "saved_at": "2026-10-23T08:50:10"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-war-24th-match-csa-t20-challenge-2024-match-updates-ONP",
+   "key": "2024-03-24-Warriors-North West",
+   "match_id": "crex-nwd-vs-war-24th-match-csa-t20-challenge-2024-match-updates-ONP",
+   "saved_at": "2026-10-23T08:50:27"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
+   "key": "2024-03-21-Western Province-Warriors",
+   "match_id": "crex-war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
+   "saved_at": "2026-10-23T08:50:51"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
+   "key": "2024-03-18-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
+   "saved_at": "2026-10-23T08:51:16"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-17th-match-csa-t20-challenge-2024-match-updates-ONI",
+   "key": "2024-03-17-Western Province-Lions",
+   "match_id": "crex-lio-vs-wp-17th-match-csa-t20-challenge-2024-match-updates-ONI",
+   "saved_at": "2026-10-23T08:51:41"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
+   "key": "2024-03-17-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
+   "saved_at": "2026-10-23T08:51:53"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
+   "key": "2024-03-15-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
+   "saved_at": "2026-10-23T08:52:21"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
+   "key": "2024-03-13-Warriors-Titans",
+   "match_id": "crex-tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
+   "saved_at": "2026-10-23T08:52:43"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
+   "key": "2024-03-12-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
+   "saved_at": "2026-10-23T08:52:55"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-8th-match-csa-t20-challenge-2024-match-updates-ON9",
+   "key": "2024-03-10-North West-Lions",
+   "match_id": "crex-lio-vs-nwd-8th-match-csa-t20-challenge-2024-match-updates-ON9",
+   "saved_at": "2026-10-23T08:53:37"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
+   "key": "2024-03-09-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
+   "saved_at": "2026-10-23T08:53:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
+   "key": "2024-03-07-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
+   "saved_at": "2026-10-23T08:54:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
+   "key": "2024-02-28-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
+   "saved_at": "2026-10-23T08:54:13"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
+   "key": "2024-02-21-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
+   "saved_at": "2026-10-23T08:54:25"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
+   "key": "2024-02-19-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
+   "saved_at": "2026-10-23T08:54:38"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
+   "key": "2024-02-17-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
+   "saved_at": "2026-10-23T08:54:50"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
+   "key": "2024-02-14-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
+   "saved_at": "2026-10-23T08:55:02"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
+   "key": "2024-02-11-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
+   "saved_at": "2026-10-23T08:55:14"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
+   "key": "2024-02-09-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
+   "saved_at": "2026-10-23T08:55:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
+   "key": "2024-02-02-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
+   "saved_at": "2026-10-23T08:55:38"
   }
  ],
  "failed": [],
@@ -2804,529 +2948,131 @@
    "checked_at": "2026-10-22T08:52:20",
    "key": "2024-04-01-Dolphins-KwaZulu-Natal Inland",
    "reason": "rendered 1 candidate page(s) for 2024-04-01; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:49:21",
+   "key": "2024-04-01-Titans-North West",
+   "reason": "no CREX match within a day of 2024-04-01 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:49:38",
+   "key": "2024-03-31-Boland-Lions",
+   "reason": "no CREX match within a day of 2024-03-31 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "ONQ"
+   ],
+   "checked_at": "2026-10-23T08:49:45",
+   "key": "2024-03-27-Western Province-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2024-03-27; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:50:15",
+   "key": "2024-03-24-Dolphins-Boland",
+   "reason": "no CREX match within a day of 2024-03-24 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:50:32",
+   "key": "2024-03-23-Titans-Western Province",
+   "reason": "no CREX match within a day of 2024-03-23 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "ONN"
+   ],
+   "checked_at": "2026-10-23T08:50:39",
+   "key": "2024-03-23-Lions-KwaZulu-Natal Inland",
+   "reason": "rendered 1 candidate page(s) for 2024-03-23; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:50:56",
+   "key": "2024-03-21-Boland-North West",
+   "reason": "no CREX match within a day of 2024-03-21 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "OPS"
+   ],
+   "checked_at": "2026-10-23T08:51:04",
+   "key": "2024-03-20-Dolphins-Titans",
+   "reason": "rendered 1 candidate page(s) for 2024-03-20; none confirmed"
+  },
+  {
+   "checked": [
+    "ONG"
+   ],
+   "checked_at": "2026-10-23T08:51:23",
+   "key": "2024-03-17-Warriors-Boland",
+   "reason": "rendered 1 candidate page(s) for 2024-03-17; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:51:28",
+   "key": "2024-03-17-North West-Dolphins",
+   "reason": "no CREX match within a day of 2024-03-17 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:51:58",
+   "key": "2024-03-15-Boland-Dolphins",
+   "reason": "no CREX match within a day of 2024-03-15 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:52:04",
+   "key": "2024-03-15-North West-KwaZulu-Natal Inland",
+   "reason": "no CREX match within a day of 2024-03-15 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:52:09",
+   "key": "2024-03-15-Lions-Titans",
+   "reason": "no CREX match within a day of 2024-03-15 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:52:26",
+   "key": "2024-03-13-Western Province-North West",
+   "reason": "no CREX match within a day of 2024-03-13 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:52:31",
+   "key": "2024-03-13-Lions-Dolphins",
+   "reason": "no CREX match within a day of 2024-03-13 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "OJH",
+    "ON6",
+    "OJF"
+   ],
+   "checked_at": "2026-10-23T08:53:13",
+   "key": "2024-03-10-Boland-Titans",
+   "reason": "rendered 3 candidate page(s) for 2024-03-10; none confirmed"
+  },
+  {
+   "checked": [
+    "ON7"
+   ],
+   "checked_at": "2026-10-23T08:53:20",
+   "key": "2024-03-10-KwaZulu-Natal Inland-Western Province",
+   "reason": "rendered 1 candidate page(s) for 2024-03-10; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-23T08:53:25",
+   "key": "2024-03-10-Dolphins-Warriors",
+   "reason": "no CREX match within a day of 2024-03-10 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-04-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Papua New Guinea",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
-   "date": "2024-03-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Boland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
-   "date": "2024-03-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "KwaZulu-Natal Inland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
-   "date": "2024-03-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Western Province",
-   "team_b": "North West"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Dolphins"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
-   "date": "2024-03-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Boland",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "KwaZulu-Natal Inland",
-   "team_b": "Western Province"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2024-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "North West",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
-   "date": "2024-03-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
-   "date": "2024-03-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
-   "date": "2024-02-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
-   "date": "2024-02-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
-   "date": "2024-02-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
-   "date": "2024-02-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
-   "date": "2024-02-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
-   "date": "2024-02-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
-   "date": "2024-02-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
-   "date": "2024-02-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
@@ -4808,6 +4554,32 @@
    "rejected_ids": [],
    "team_a": "Afghanistan",
    "team_b": "Bangladesh"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
+   "date": "2023-08-26",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "ODI",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Pakistan"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
+   "date": "2023-08-24",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "ODI",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Pakistan"
   },
   {
    "attempts": 0,
@@ -6320,6 +6092,19 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E68",
+   "date": "2022-06-11",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "T20I",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Zimbabwe"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
    "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E67",
    "date": "2022-06-09",
    "gender": "male",
@@ -7788,6 +7573,19 @@
   },
   {
    "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-match-bangladesh-tri-series-2019-match-updates-7PR",
+   "date": "2019-09-14",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Zimbabwe"
+  },
+  {
+   "attempts": 0,
    "category": "cricsheet_missing",
    "crex_url": null,
    "date": "2019-09-10",
@@ -7889,6 +7687,32 @@
    "rejected_ids": [],
    "team_a": "Glamorgan",
    "team_b": "Worcestershire"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-36th-match-world-cup-2019-match-updates-L8",
+   "date": "2019-06-29",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Pakistan"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-28th-match-world-cup-2019-match-updates-L0",
+   "date": "2019-06-22",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "India"
   },
   {
    "attempts": 0,
@@ -8071,6 +7895,19 @@
    "rejected_ids": [],
    "team_a": "Essex",
    "team_b": "Worcestershire"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-4th-match-world-cup-2019-match-updates-KC",
+   "date": "2019-06-01",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Australia"
   },
   {
    "attempts": 0,
@@ -15121,6 +14958,45 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-final-desert-t20-2017-match-updates-A5F",
+   "date": "2017-01-20",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "T20I",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Ireland"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-oma-1st-semi-final-desert-t20-2017-match-updates-A5D",
+   "date": "2017-01-20",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "T20I",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Oman"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nam-11th-match-desert-t20-2017-match-updates-A5B",
+   "date": "2017-01-19",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "T20I",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Namibia"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
    "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-6th-match-desert-t20-2017-match-updates-A56",
    "date": "2017-01-16",
    "gender": "male",
@@ -16176,6 +16052,19 @@
    "category": "cricsheet_withheld",
    "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42U",
    "date": "2016-10-01",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "ODI",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Bangladesh"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42T",
+   "date": "2016-09-28",
    "gender": "male",
    "last_attempt": null,
    "last_error": null,
@@ -18484,6 +18373,19 @@
    "rejected_ids": [],
    "team_a": "Tamil Nadu",
    "team_b": "Vidarbha"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-5th-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3I6",
+   "date": "2016-01-06",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "ODI",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Zimbabwe"
   },
   {
    "attempts": 0,
@@ -21373,6 +21275,19 @@
   },
   {
    "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-1st-match-dubai-triangular-series-2015-match-updates-4JT",
+   "date": "2015-01-08",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Scotland"
+  },
+  {
+   "attempts": 0,
    "category": "cricsheet_missing",
    "crex_url": null,
    "date": "2015-01-02",
@@ -22452,6 +22367,19 @@
   },
   {
    "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-5th-match-t20-world-cup-2014-match-updates-377",
+   "date": "2014-03-18",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "T20I",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Hong Kong"
+  },
+  {
+   "attempts": 0,
    "category": "cricsheet_missing",
    "crex_url": null,
    "date": "2014-03-06",
@@ -22475,6 +22403,19 @@
    "rejected_ids": [],
    "team_a": "Bangladesh",
    "team_b": "Pakistan"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
+   "date": "2014-03-03",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Sri Lanka"
   },
   {
    "attempts": 0,
@@ -24831,6 +24772,19 @@
   },
   {
    "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-only-odi-australia-in-uae-2012-match-updates-3LS",
+   "date": "2012-08-25",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "ODI",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Australia"
+  },
+  {
+   "attempts": 0,
    "category": "cricsheet_missing",
    "crex_url": null,
    "date": "2012-08-24",
@@ -24971,6 +24925,19 @@
    "rejected_ids": [],
    "team_a": "West Indies",
    "team_b": "Sri Lanka"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-22nd-match-intercontinental-cup-2011-2013-match-updates-BF2",
+   "date": "2012-03-31",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Netherlands"
   },
   {
    "attempts": 0,
@@ -26141,6 +26108,32 @@
    "rejected_ids": [],
    "team_a": "Netherlands",
    "team_b": "Ireland"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-4th-match-intercontinental-cup-2011-2013-match-updates-BEM",
+   "date": "2011-08-09",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Canada"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-3rd-match-intercontinental-cup-2011-2013-match-updates-BEK",
+   "date": "2011-08-07",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Canada"
   },
   {
    "attempts": 0,
@@ -27350,6 +27343,19 @@
    "rejected_ids": [],
    "team_a": "Canada",
    "team_b": "Kenya"
+  },
+  {
+   "attempts": 0,
+   "category": "cricsheet_withheld",
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
+   "date": "2010-07-10",
+   "gender": "male",
+   "last_attempt": null,
+   "last_error": null,
+   "match_type": "",
+   "rejected_ids": [],
+   "team_a": "Afghanistan",
+   "team_b": "Netherlands"
   },
   {
    "attempts": 0,
