@@ -76,10 +76,12 @@ jobs:
           from datetime import date
           meta = json.load(open("site/public/data/meta.json"))
           assert meta["matches"] > 20000, f"suspiciously few matches: {meta['matches']}"
-          age = (date.today() - date.fromisoformat(meta["newest_cricsheet"])).days
-          print(f"newest Cricsheet match {meta['newest_cricsheet']} ({age} days old); provisional {meta['provisional_matches']}")
+          # the scraper's provisional matches cover the gap until Cricsheet publishes, so judge freshness on whichever is newer
+          newest = max(meta["newest_cricsheet"], meta.get("newest_provisional") or "")
+          age = (date.today() - date.fromisoformat(newest)).days
+          print(f"newest Cricsheet match {meta['newest_cricsheet']}, newest provisional {meta.get('newest_provisional')}; provisional {meta['provisional_matches']}")
           if age > 3:
-              print("::warning::Cricsheet data on the site is more than 3 days old")
+              print("::warning::Neither Cricsheet nor the scraper has data newer than 3 days")
           PY
           du -sh site/public/data
       - name: Keep our own copy of CREX images and id maps (Supabase Storage + Postgres)
