@@ -9,7 +9,8 @@ import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
 import { collectGrid, gridTable, initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
-import { chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
+import { Accordion, Badge, PageSkeleton, TabsList, toast } from "./shadcn.js";
+import { fromIst, hashQuery, live, localTime, localWhen, chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
 let store, rz;
@@ -83,6 +84,7 @@ const go = (path, q = {}) => {
   location.hash = `#/${path}${qs ? `?${qs}` : ""}`;
 };
 
+let lastRoute = "";
 async function render() {
   const { name, args, q } = parseHash();
   const cur = name === "fixtures" ? "" : name;
@@ -90,11 +92,14 @@ async function render() {
   document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
   document.title = `${TITLES[cur] || "Cricket Props Hub"} | Cricket Props Hub`;
-  app.replaceChildren(h("p", { class: "muted pad" }, "Crunching…"));
+  const same = lastRoute === `${name}/${args.join("/")}`; // only a filter changed: keep the page and the scroll position
+  lastRoute = `${name}/${args.join("/")}`;
+  if (!same) app.replaceChildren(PageSkeleton());
   try {
+    const y = window.scrollY;
     const el = await page(args, q);
     app.replaceChildren(el);
-    window.scrollTo(0, 0);
+    window.scrollTo(0, same ? y : 0);
   } catch (e) {
     console.error(e);
     app.replaceChildren(h("div", { class: "card err" }, h("p", {}, `Something went wrong: ${e.message}`)));
@@ -148,7 +153,7 @@ const getSaved = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY) 
 const setSaved = (l) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(l)); } catch { /* private mode */ } };
 const star = (kind, idx) => {
   const key = `${kind}:${idx}`;
-  const b = h("button", { type: "button", class: "star", "aria-label": "Save", onclick: () => { const l = getSaved(); const i = l.indexOf(key); i >= 0 ? l.splice(i, 1) : l.push(key); setSaved(l); b.classList.toggle("on", i < 0); } },
+  const b = h("button", { type: "button", class: "star", "aria-label": "Save", onclick: () => { const l = getSaved(); const i = l.indexOf(key); i >= 0 ? l.splice(i, 1) : l.push(key); setSaved(l); b.classList.toggle("on", i < 0); toast(i < 0 ? "Saved. Find it under Saved." : "Removed from Saved"); } },
     h("span", { html: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>' }));
   b.classList.toggle("on", getSaved().includes(key));
   return b;
@@ -165,15 +170,16 @@ const crumbs = (...items) => h("div", { class: "crumbs" }, items.flatMap((it, i)
 
 /** StatsHub-style hero card: crest, name, meta pills and in-card tabs that switch the page sections. */
 function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [], save = null }, root) {
-  const bar = h("div", { class: "hero-tabs" });
+  const list = tabs.length ? TabsList(tabs, tabs[0][0], (id) => { set(id); const q = hashQuery(); q.tab = id; history.replaceState(null, "", `#/${location.hash.slice(2).split("?")[0]}?${new URLSearchParams(q)}`); }) : null;
+  const bar = h("div", { class: "hero-tabs" }, list);
   const set = (id) => {
-    bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.t === id));
+    if (!tabs.some(([t]) => t === id)) id = tabs[0]?.[0];
+    list?.select(id);
     root.querySelectorAll("[data-sec]").forEach((el) => { el.hidden = el.dataset.sec !== id; });
   };
-  tabs.forEach(([id, label]) => bar.append(h("button", { type: "button", "data-t": id, onclick: () => set(id) }, label)));
   const el = h("div", { class: `hero-card ${cls}` }, save ? h("div", { class: "hero-star" }, star(save[0], save[1])) : null, h("div", { class: "hero-top" }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name),
     sub ? h("p", {}, sub) : null, meta.length ? h("div", { class: "hero-meta" }, meta.map((m) => h("span", {}, m))) : null), tabs.length ? bar : null);
-  return { el, set: () => tabs.length && set(tabs[0][0]) };
+  return { el, set: (id) => tabs.length && set(id || tabs[0][0]) };
 }
 const pretty = (s) => (s || "").replace(/-/g, " ").replace(/\b(\d{4})\b/g, "$1").replace(/\b[a-z]/g, (c) => c.toUpperCase());
 const initials = (n) => n.replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
@@ -254,7 +260,7 @@ function nextMatchCard(f) {
   const id = setInterval(() => { if (!cd.isConnected) clearInterval(id); else tick(); }, 30000);
   if (f.countdownOnly) return h("div", { class: "card nextm" }, h("div", { class: "nm-c" }, h("div", { class: "muted small" }, "Starts in"), cd));
   return h("div", { class: "card nextm" }, h("div", { class: "nm-h" }, h("h3", {}, "Next match"), h("span", { class: "chip" }, `${f.fmt || ""} ${f.gender === "female" ? "women" : "men"}`)),
-    h("div", { class: "nm-b" }, h("div", { class: "nm-t" }, teamBadge(f.a, "crest"), h("b", {}, f.a)), h("div", { class: "nm-c" }, h("div", { class: "nm-time" }, f.start.length > 10 ? when.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC"),
+    h("div", { class: "nm-b" }, h("div", { class: "nm-t" }, teamBadge(f.a, "crest"), h("b", {}, f.a)), h("div", { class: "nm-c" }, h("div", { class: "nm-time" }, f.start.length > 10 ? localTime(when) : "TBC"),
       h("small", { class: "muted" }, when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })), h("div", { class: "muted small", style: "margin-top:8px" }, "Kicks off in"), cd), h("div", { class: "nm-t" }, teamBadge(f.b, "crest"), h("b", {}, f.b))),
     f.venue ? h("div", { class: "muted small", style: "text-align:center" }, f.venue) : null);
 }
@@ -266,15 +272,20 @@ function fixtureGroups(fx) {
     const key = f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : f.source === "markets" ? "Matches with prop markets" : `${f.fmt || ""} ${f.gender === "female" ? "women's" : "men's"} cricket`.trim();
     (groups.get(key) || groups.set(key, []).get(key)).push(f);
   }
-  const time = (s) => (s.length > 10 ? new Date(s).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "TBC");
+  const time = (s) => (s.length > 10 ? localTime(s) : "TBC");
   const promo = h("div", { class: "promo" }, h("h3", {}, "Unlock advanced stats"), h("p", { class: "muted" }, "Hit rates over any line, DNP-aware form charts and fair decimal odds for every player."),
     h("div", { class: "pills" }, h("a", { class: "btn", href: "#/props" }, "Prop Hunter →"), h("a", { class: "btn ghost", href: "#/ask" }, "Ask anything →")));
-  const cards = [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
-    h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
-    list.map((f) => h("a", { class: "match", href: f.id ? `#/fixture/${f.id}` : f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
+  const items = [...groups.entries()].map(([name, list], i) => ({
+    open: i < 6,
+    title: h("span", { class: "comp-title" }, h("span", { class: "badge-ico" }, list[0].fmt || "·"), h("span", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men"))),
+    meta: Badge(String(list.length), "secondary"),
+    content: h("div", {}, list.map((f) => h("a", { class: "match", href: f.id ? `#/fixture/${f.id}` : f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
       h("div", { class: "teams" }, h("div", { class: "tm" }, teamBadge(f.a), f.a), h("div", { class: "tm" }, teamBadge(f.b), f.b)),
-      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))));
-  if (cards.length > 1) cards.splice(1, 0, promo);
+      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))),
+  }));
+  const acc = Accordion(items, { type: "multiple", cls: "cards" });
+  if (items.length > 1) acc.children[0].after(promo);
+  const cards = [acc];
   return h("div", { class: "stagger" }, cards);
 }
 
@@ -313,15 +324,13 @@ async function player(args, q) {
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f, i) => [i, f]).filter(([i]) => (fm >> i) & 1);
   const fmtVal = q.fmt ?? (fmts.length ? fmts[0][0] : 0);
-  const form = h("form", { class: "card", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`player/${idx}`, { ...f, tab: q.tab }); } },
+  const form = h("form", { class: "card", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`player/${idx}`, { ...f, tab: hashQuery().tab }); } },
    h("div", { class: "filters" },
     field("Format", sel("fmt", fmts, fmtVal)),
     field("Stat", sel("stat", Object.entries(STATS).map(([k, v]) => [k, v.label]), q.stat || "runs")),
     field("Line", inp("line", q.line, { type: "number", step: "0.5", placeholder: "e.g. 0.5", style: "width:90px" })),
-    field("Side", sel("side", [["over", "Over"], ["under", "Under"]], q.side || "over")),
-    h("button", { type: "submit" }, "Update")),
-   h("details", { class: "filters-wrap", open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl) }, h("summary", { class: "muted small" }, "More filters: opposition, venue, home/away, innings, position, dates…"),
-    h("div", { class: "filters", style: "margin-top:10px" },
+    field("Side", sel("side", [["over", "Over"], ["under", "Under"]], q.side || "over"))),
+   Accordion([{ open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl), title: "More filters: opposition, venue, home/away, innings, position, dates…", content: h("div", { class: "filters", style: "padding-top:4px" },
     field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })),
     field("Venue", inp("venue", q.venue, { list: "dl-venues", style: "width:170px" })),
     field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)),
@@ -330,7 +339,8 @@ async function player(args, q) {
     field("From", inp("since", q.since, { type: "date" })), field("To", inp("until", q.until, { type: "date" })),
     field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })),
     field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…", style: "width:110px" })),
-    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl)))));
+    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))) }], { cls: "flush" }));
+  live(form);
   const plan = {
     kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
@@ -343,7 +353,7 @@ async function player(args, q) {
   const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", save: ["player", idx], badge: playerBadge(store, idx, "crest"),
     tabs: [["props", "Charts"], ["logs", "Game logs"], ["splits", "Table & splits"]] }, body);
   const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
-  hc.set();
+  hc.set(q.tab);
   return out;
 }
 
@@ -370,8 +380,9 @@ async function playerGrid(teamIdx, fmtName, q) {
   const stat = STATDEF[q.gstat] ? q.gstat : "sixes";
   const line = q.gline !== undefined && q.gline !== "" ? Number(q.gline) : 0.5;
   const out = h("div", { "data-sec": "grid" });
-  out.append(h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`team/${teamIdx}`, { ...q, gstat: f.gstat, gline: f.gline, tab: "grid" }); } },
-    field("Stat", sel("gstat", Object.entries(STATDEF).map(([k, v]) => [k, v.label]), stat)), field("Line", inp("gline", line, { type: "number", step: "0.5", style: "width:90px" })), h("button", { type: "submit" }, "Update")));
+  out.append(h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`team/${teamIdx}`, { ...q, gstat: f.gstat, gline: f.gline, tab: hashQuery().tab }); } },
+    field("Stat", sel("gstat", Object.entries(STATDEF).map(([k, v]) => [k, v.label]), stat)), field("Line", inp("gline", line, { type: "number", step: "0.5", style: "width:90px" }))));
+  live(out.querySelector("form"));
   const g = await collectGrid(teamIdx, fmtName, stat);
   out.append(gridTable(g, teamIdx, line), h("p", { class: "muted small" }, `${STATDEF[stat].label} over ${line} across this team's last ${g.fx.length} ${fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not ${STATDEF[stat].side === "bat" ? "bat" : "bowl"}, so the bet is void.`));
   return out;
@@ -382,15 +393,15 @@ async function marketPage(kind, args, q) {
   const isTeam = kind === "team";
   const label = isTeam ? store.teamName(idx) : store.venueName(idx);
   const fmt = q.fmt ?? "T20";
-  const form = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); go(`${kind}/${idx}`, Object.fromEntries(new FormData(e.target))); } },
+  const form = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); go(`${kind}/${idx}`, { ...Object.fromEntries(new FormData(e.target)), tab: hashQuery().tab }); } },
     field("Format", sel("fmt", FORMATS.map((f) => [f, f]), fmt)),
     isTeam ? field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })) : null,
     isTeam ? field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)) : null,
     field("Market", sel("market", [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]], q.market)),
     field("Line", inp("line", q.line, { type: "number", step: "0.5", style: "width:90px" })),
     field("From", inp("since", q.since, { type: "date" })), field("To", inp("until", q.until, { type: "date" })),
-    field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })),
-    h("button", { type: "submit" }, "Update"));
+    field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })));
+  live(form);
   const plan = { kind: "match_market", market: q.market || null, line: q.line ? Number(q.line) : null, side: "over",
     filters: { format: fmt, opposition: q.opp || null, venue_type: q.vt || null, since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null,
       gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
@@ -405,7 +416,7 @@ async function marketPage(kind, args, q) {
   const nextCard = nextFx ? nextMatchCard(nextFx) : null;
   const about = isTeam ? h("div", { class: "card about" }, h("h3", {}, `About ${label}`), h("p", { class: "muted" }, `${label} ${FORMATS.includes(fmt) ? fmt : "T20"} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair odds are 1 ÷ hit rate and carry no margin.`)) : null;
   const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, nextCard, ...datalists(), root, about);
-  hc.set();
+  hc.set(q.tab);
   return out;
 }
 
@@ -451,7 +462,7 @@ async function props() {
   const bets = (snap.value_bets || []).filter((b) => !b.start_utc || Date.parse(b.start_utc) > now - 3600e3).sort((a, b) => b.edge_pct - a.edge_pct);
   const link = (b) => { const nm = (b.player_matched_as || (b.selection || "").replace(/\s+(over|under|\d+\+).*$/i, "")).trim(); const p = nm && rz.player(nm); return p ? h("a", { href: `#/player/${p.idx}` }, b.selection) : b.selection; };
   const card = (b) => h("div", { class: "trend" },
-    h("div", { class: "tt" }, h("span", { class: "muted small" }, `${b.start_ist || b.alerted_at_ist || ""}`), b.edge_pct != null ? h("span", { class: "edge" }, `+${b.edge_pct}%`) : null),
+    h("div", { class: "tt" }, h("span", { class: "muted small", title: "your local time" }, localWhen(b.start_utc || fromIst(b.start_ist) || fromIst(b.alerted_at_ist)) || b.start_ist || b.alerted_at_ist || ""), b.edge_pct != null ? h("span", { class: "edge" }, `+${b.edge_pct}%`) : null),
     h("div", { class: "who", style: "margin-top:8px" }, h("div", {}, link(b), h("small", {}, b.match))),
     h("div", { class: "lab" }, b.market),
     h("div", { class: "nums" }, h("div", { class: "l" }, h("b", {}, odds(b.best_odds)), h("span", {}, b.best_source || "Best odds")), h("div", {}, h("b", {}, odds(b.fair_odds)), h("span", {}, "Fair odds")),
@@ -471,15 +482,22 @@ async function askPage(_, q) {
 }
 
 async function about() {
-  return h("div", {}, h("h1", {}, "Rules, definitions and data"),
-    h("div", { class: "card" }, h("h3", {}, "Settlement rules applied"), h("ul", {}, RULES.map((r) => h("li", {}, r)))),
-    h("div", { class: "card" }, h("h3", {}, "Definitions"), h("ul", {},
-      h("li", {}, "Fair decimal odds = 1 ÷ hit rate on the filtered sample. Pushes (whole-number lines) are void. A 90% interval shows how far small samples can mislead."),
-      h("li", {}, "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: Cricsheet has no home flag."),
-      h("li", {}, "Batting position is the order batters first appear at the crease. Batting first / chasing is the player's team."),
-      h("li", {}, "Runs conceded include penalty runs, exclude byes and leg byes. Super overs are ignored."),
-      h("li", {}, "Provisional (scraped) matches fill the gap before Cricsheet publishes: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets."))),
-    h("div", { class: "card" }, h("h3", {}, "Data freshness"), h("p", {}, ...freshText(store))));
+  const defs = [
+    "Fair decimal odds = 1 ÷ hit rate on the filtered sample. Pushes (whole-number lines) are void. A 90% interval shows how far small samples can mislead.",
+    "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: Cricsheet has no home flag.",
+    "Batting position is the order batters first appear at the crease. Batting first / chasing is the player's team.",
+    "Runs conceded include penalty runs, exclude byes and leg byes. Super overs are ignored.",
+    "A player named in the XI who never batted or bowled shows as VOID (the bet is void); a player not named shows as DNP; an XI that was not recorded reliably shows N/A. None of the three counts in a hit rate.",
+    "Provisional (scraped) matches fill the gap before Cricsheet publishes: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets.",
+  ];
+  const list = (xs) => h("ul", { style: "margin:0 0 4px; padding-left: 20px" }, xs.map((r) => h("li", { class: "muted", style: "margin: 4px 0" }, r)));
+  return h("div", {}, crumbs(["Home", "#/"], ["Rules & data"]), h("h1", {}, "Rules, definitions and data"),
+    Accordion([
+      { open: true, title: "Settlement rules applied", meta: Badge(String(RULES.length), "secondary"), content: list(RULES) },
+      { title: "Definitions", meta: Badge(String(defs.length), "secondary"), content: list(defs) },
+      { title: "Data freshness", content: h("p", { class: "muted", style: "margin:0" }, ...freshText(store)) },
+    ], { type: "single", cls: "faq" }),
+    h("p", { class: "muted small", style: "margin-top:14px" }, "See also: ", h("a", { href: "#/glossary" }, "Cricket stats explained"), "."));
 }
 
 boot();

@@ -1,6 +1,7 @@
 // Turns a runPlan() result into DOM. Every number shown here was computed by the engine from the data.
 import { FORMATS } from "./engine/util.js";
 import { teamBadge } from "./assets.js";
+import { Accordion, Badge } from "./shadcn.js";
 import { bars, chips, freshText, h, num, odds, pc, stat, table } from "./ui.js";
 
 const cell = (p) => (p == null ? "–" : h("span", { class: `pcell ${p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo"}` }, pc(p)));
@@ -101,10 +102,13 @@ function trendCard(r) {
 }
 
 function splitTables(splits, title = (k) => k) {
-  return Object.entries(splits).filter(([, rows]) => rows.length).map(([kind, rows]) => h("details", { open: kind === "opposition" || kind === "venue_type" },
-    h("summary", {}, `Split by ${title(kind).replace("_", " ")}`),
-    table([title(kind).replace("_", " "), "n", "Median", "Mean", "Over %", "Fair over"],
-      rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), cell(x.pOver), h("span", { class: "odds" }, odds(x.fairOver))]))));
+  const items = Object.entries(splits).filter(([, rows]) => rows.length).map(([kind, rows]) => ({
+    open: kind === "opposition" || kind === "venue_type",
+    title: `Split by ${title(kind).replace("_", " ")}`, meta: Badge(String(rows.length), "secondary"),
+    content: table([title(kind).replace("_", " "), "n", "Median", "Mean", "Over %", "Fair over"],
+      rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), cell(x.pOver), h("span", { class: "odds" }, odds(x.fairOver))])),
+  }));
+  return items.length ? [Accordion(items, { type: "multiple", cls: "faq" })] : [];
 }
 
 export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
@@ -126,7 +130,7 @@ export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
       table(["Prop", "Normal", "When it hits", "Lift"], r.corr.rows.map((c) => [`${c.label} over ${c.line}`, pc(c.base), pc(c.cond), h("span", { class: `pcell ${c.lift >= 0.1 ? "hi" : c.lift <= -0.1 ? "lo" : "mid"}` }, `${c.lift >= 0 ? "+" : ""}${Math.round(c.lift * 100)}pp`)]))) : null;
     out.append(h("div", { "data-sec": "props" }, fc || trendCard(r), corr),
       h("div", { "data-sec": "logs" }, h("div", { class: "card flat" }, table(["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."],
-        logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? h("span", { class: "muted" }, e.void ? "VOID (in XI, did not bat/bowl)" : e.unknown ? "n/a (XI not recorded)" : "DNP") : e.value, e.aux ?? "–", e.pos ?? "–"])))),
+        logs.map((e) => [e.date, e.opp, e.venueName || "", e.value == null ? (e.void ? Badge("VOID: in XI, did not bat/bowl", "warning") : e.unknown ? Badge("N/A: XI not recorded", "outline") : Badge("DNP", "secondary")) : e.value, e.aux ?? "–", e.pos ?? "–"])))),
       h("div", { "data-sec": "splits" }, h("h2", {}, "Hit rate at every line"), h("div", { class: "card flat" }, ladderTable(r.ladder)), ...splitTables(r.splits)));
   } else if (r.kind === "partnership") {
     const s = r.summary;
