@@ -3,7 +3,7 @@ import { STATS } from "./engine/rules.js";
 import { FORMATS } from "./engine/util.js";
 import { MATCH_MARKETS, marketReport, selectMatches } from "./engine/markets.js";
 import { playerBadge, teamBadge } from "./assets.js";
-import { h, num, odds, pc, table } from "./ui.js";
+import { H12, h, hashQuery, live, localWhen, num, odds, pc, table } from "./ui.js";
 
 let C = null; // shared context from app.js
 export const initPages = (ctx) => { C = ctx; };
@@ -11,6 +11,7 @@ const fmtOf = (f) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
 // ---------------------------------------------------------------- grid data shared by fixture page and trends
 export async function collectGrid(teamIdx, fmtName, stat, nFx = 10) {
+  nFx = Math.max(3, Math.min(30, Number(nFx) || 10));
   const { store } = C;
   const fmt = FORMATS.indexOf(fmtName), M = store.M, def = STATS[stat];
   const fx = [];
@@ -71,23 +72,27 @@ export async function fixturePage(args, q) {
   const fx = (await store.loadFixtures()).find((f) => f.id === args.join("/"));
   if (!fx) return h("div", {}, crumbs(["Home", "#/"], ["Fixture"]), h("div", { class: "card err" }, "That fixture is no longer in the schedule."));
   if (fx.fmt === "FC") return h("div", {}, crumbs(["Home", "#/"], ["Fixtures", "#/"], [`${fx.a} v ${fx.b}`]), h("div", { class: "card" }, h("h2", {}, `${fx.a} v ${fx.b}`), h("p", { class: "muted" }, `${fx.series || ""} · ${fx.venue || ""}`), h("p", {}, "This is a first-class match. First-class cricket is not part of the stats here (no Test or limited-overs form is mixed in), so there is no player grid or trends for it.")));
-  const fmt = fmtOf(fx), stat = STATS[q.stat] ? q.stat : "sixes", line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
+  const fmt = FORMATS.includes(q.fmt) ? q.fmt : fmtOf(fx), stat = STATS[q.stat] ? q.stat : "sixes", line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5, games = [5, 10, 15, 20, 30].includes(Number(q.n)) ? Number(q.n) : 10;
   const when = fx.start.length > 10 ? new Date(fx.start) : new Date(`${fx.start}T12:00:00`);
   const root = h("div");
-  const hc = heroCard({ name: `${fx.a} v ${fx.b}`, sub: fx.venue || "", meta: [fmt, fx.gender === "female" ? "Women" : "Men", when.toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })],
+  const hc = heroCard({ name: `${fx.a} v ${fx.b}`, sub: fx.venue || "", meta: [fmt, fx.gender === "female" ? "Women" : "Men", localWhen(when)],
     badge: h("div", { class: "vs" }, teamBadge(fx.a, "crest"), h("span", {}, "v"), teamBadge(fx.b, "crest")), tabs: [["grid", "Player grid"], ["trends", "Trends"], ["markets", "Team markets"]] }, root);
-  const mkForm = () => h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`fixture/${fx.id}`, { stat: f.stat, line: f.line, hit: f.hit }); } },
-    h("label", {}, "Stat", h("select", { name: "stat" }, statOptions(stat))), h("label", {}, "Line", h("input", { name: "line", type: "number", step: "0.5", value: line, style: "width:90px" })), h("label", {}, "Min hit rate (trends)", h("select", { name: "hit" }, [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]].map(([v, l]) => h("option", { value: v, selected: String(v) === (q.hit || "0.6") }, l)))), h("button", { type: "submit" }, "Update"));
+  const hitSel = (cur) => [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]].map(([v, l]) => h("option", { value: v, selected: String(v) === String(cur || "0.6") }, l));
+  const mkForm = () => live(h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`fixture/${fx.id}`, { ...f, tab: hashQuery().tab }); } },
+    h("label", {}, "Format", h("select", { name: "fmt" }, FORMATS.map((f) => h("option", { value: f, selected: f === fmt }, f)))),
+    h("label", {}, "Stat", h("select", { name: "stat" }, statOptions(stat))), h("label", {}, "Line", h("input", { name: "line", type: "number", step: "0.5", value: line, style: "width:90px" })),
+    h("label", {}, "Games", h("select", { name: "n" }, [5, 10, 15, 20, 30].map((n) => h("option", { value: n, selected: n === games }, `Last ${n}`)))),
+    h("label", {}, "Min hit rate (trends)", h("select", { name: "hit" }, hitSel(q.hit)))));
   const teams = [[fx.a, fx.a_ix], [fx.b, fx.b_ix]];
   const known = teams.filter(([, i]) => i >= 0);
-  const grids = await Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(i, fmt, stat) })));
+  const grids = await Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(i, fmt, stat, games) })));
   const sGrid = h("div", { "data-sec": "grid" }, mkForm(), ...grids.map(({ name, team, g }) => h("div", {}, h("h2", {}, `${name}: ${STATS[stat].label} over ${line}`), gridTable(g, team, line))),
     !known.length ? h("div", { class: "card muted" }, "These teams are not in the dataset yet.") : null);
   const sTrends = h("div", { "data-sec": "trends" }, mkForm(), trendCards(grids, line, Number(q.hit || 0.6), stat));
   const sMarkets = h("div", { "data-sec": "markets" }, known.length ? h("div", { class: "two" }, known.map(([name, i]) => marketCard(name, i, fmt))) : h("div", { class: "card muted" }, "No team data."));
   root.append(sGrid, sTrends, sMarkets);
   const out = h("div", {}, crumbs(["Home", "#/"], ["Fixtures", "#/"], [`${fx.a} v ${fx.b}`]), hc.el, nextCountdown ? nextCountdown(when) : null, root);
-  hc.set();
+  hc.set(q.tab);
   return out;
 }
 
@@ -103,16 +108,19 @@ export async function trendsPage(_, q) {
   const { store, crumbs, go } = C;
   const fxs = (await store.loadFixtures()).filter((f) => f.a_ix >= 0 && f.b_ix >= 0 && (f.start.length > 10 ? Date.parse(f.start) > Date.now() - 4 * 36e5 : true)).slice(0, 40);
   const sel = fxs.find((f) => f.id === q.f) || fxs[0];
-  const form = h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go("trends", f); } },
-    h("label", {}, "Fixture", h("select", { name: "f" }, fxs.map((f) => h("option", { value: f.id, selected: f === sel }, `${f.start.slice(0, 10)} ${f.a} v ${f.b} (${f.fmt || "T20"})`)))),
+  const fmtQ = FORMATS.includes(q.fmt) ? q.fmt : null;
+  const form = live(h("form", { class: "card filters", onsubmit: (e) => { e.preventDefault(); go("trends", Object.fromEntries(new FormData(e.target))); } },
+    h("label", {}, "Fixture", h("select", { name: "f" }, fxs.map((f) => h("option", { value: f.id, selected: f === sel }, `${localWhen(f.start.length > 10 ? f.start : `${f.start}T12:00:00`, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}  ${f.a} v ${f.b} (${f.fmt || "T20"})`)))),
+    h("label", {}, "Format", h("select", { name: "fmt" }, FORMATS.map((f) => h("option", { value: f, selected: f === (fmtQ || (sel ? fmtOf(sel) : "T20")) }, f)))),
     h("label", {}, "Stat", h("select", { name: "stat" }, statOptions(q.stat || "sixes"))), h("label", {}, "Line", h("input", { name: "line", type: "number", step: "0.5", value: q.line ?? 0.5, style: "width:90px" })),
-    h("label", {}, "Min hit rate", h("select", { name: "hit" }, [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]].map(([v, l]) => h("option", { value: v, selected: String(v) === (q.hit || "0.6") }, l)))), h("button", { type: "submit" }, "Find players"));
+    h("label", {}, "Games", h("select", { name: "n" }, [5, 10, 15, 20, 30].map((n) => h("option", { value: n, selected: n === (Number(q.n) || 10) }, `Last ${n}`)))),
+    h("label", {}, "Min hit rate", h("select", { name: "hit" }, [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]].map(([v, l]) => h("option", { value: v, selected: String(v) === (q.hit || "0.6") }, l))))));
   let body = h("div", { class: "card muted" }, "No upcoming fixtures with known teams right now.");
   if (sel) {
     const stat = STATS[q.stat] ? q.stat : "sixes", line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
-    const fmt = fmtOf(sel);
-    const grids = await Promise.all([[sel.a, sel.a_ix], [sel.b, sel.b_ix]].map(async ([name, i]) => ({ name, team: i, g: await collectGrid(i, fmt, stat) })));
-    body = h("div", {}, h("h2", {}, `${sel.a} v ${sel.b}`), trendCards(grids, line, Number(q.hit || 0.6), stat), h("p", { class: "muted small" }, `Players whose last ${fmt} games for their team cleared ${STATS[stat].label.toLowerCase()} over ${line}. Games he did not feature in are excluded.`));
+    const fmt = fmtQ || fmtOf(sel);
+    const grids = await Promise.all([[sel.a, sel.a_ix], [sel.b, sel.b_ix]].map(async ([name, i]) => ({ name, team: i, g: await collectGrid(i, fmt, stat, Number(q.n) || 10) })));
+    body = h("div", {}, h("h2", {}, `${sel.a} v ${sel.b}`), trendCards(grids, line, Number(q.hit || 0.6), stat), h("p", { class: "muted small" }, `Players whose last ${Number(q.n) || 10} ${fmt} games for their team cleared ${STATS[stat].label.toLowerCase()} over ${line}. Games he did not feature in are excluded.`));
   }
   return h("div", {}, crumbs(["Home", "#/"], ["Tools", "#/tools"], ["Player trends"]), h("h1", {}, "Player trends"), h("p", { class: "muted" }, "Strongest recent hit-rate streaks for the players in an upcoming match."), form, body);
 }

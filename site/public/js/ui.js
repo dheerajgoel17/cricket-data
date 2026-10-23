@@ -42,6 +42,7 @@ export function bars(values, line) {
 
 export function freshText(store) {
   const f = store.freshness();
+  f.builtAt = f.builtAt ? `${localWhen(f.builtAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} (${TZ})` : "";
   return [`Cricsheet data through `, h("b", {}, f.newestCricsheet), f.provisionalIncluded
     ? [` · includes `, h("b", {}, String(f.provisionalMatches)), ` provisional matches up to `, h("b", {}, f.newestProvisional || "?")]
     : " · no provisional matches included", ` · built ${f.builtAt}`];
@@ -73,4 +74,28 @@ export function suggest(input, source, onPick) {
     else return;
     kids.forEach((k, i) => k.classList.toggle("on", i === cur));
   });
+}
+
+/** Filters apply as you change them (no Update button): selects/checkboxes on change, typed fields shortly after you stop. */
+export function live(form, delay = 350) {
+  let t;
+  const fire = () => form.requestSubmit();
+  form.addEventListener("change", (e) => { if (e.target.matches("select, input[type=checkbox], input[type=date]")) fire(); else if (e.target.matches("input")) fire(); });
+  form.addEventListener("input", (e) => { if (e.target.matches("input[type=number], input[type=search]")) { clearTimeout(t); t = setTimeout(fire, delay); } });
+  return form;
+}
+
+export const hashQuery = () => Object.fromEntries(new URLSearchParams(location.hash.split("?")[1] || ""));
+
+/** Times are shown in the viewer's own time zone (with its short name on hover). */
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+/** 12-hour clock for Indian viewers (IST zone or an -IN locale); everyone else gets their locale default. */
+export const H12 = TZ === "Asia/Kolkata" || /-IN$/.test(navigator.language || "") ? { hour12: true } : {};
+export const localWhen = (d, opts = { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) => (d ? new Date(d).toLocaleString(undefined, { ...opts, ...H12 }) : "");
+export const localTime = (d) => (d ? new Date(d).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", ...H12 }) : "");
+export const tzName = () => TZ;
+/** "2026-10-23 17:00 IST" (the value-bets feed) -> a Date. */
+export function fromIst(str) {
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}) IST$/.exec(str || "");
+  return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) - 330 * 60000) : null;
 }
