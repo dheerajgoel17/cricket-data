@@ -90,8 +90,8 @@ fixtures, correlated props) · `markets.js` (match/team markets, top batter) · 
 resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `rules.js`, `util.js`.
 **Invariant: every number shown comes from the engine; the LLM only emits a validated plan** (`sanitizePlan` whitelists fields; see `site/tests/nlp.test.mjs`).
 
-### 5.3 UI (`site/public/index.html`, `css/style.css`, `js/app.js`, `pages2.js`, `render.js`, `assets.js`, `photos.js`, `ui.js`)
-Vanilla JS, no build step. Hash routes internally (`#/player/123`), but path URLs also work (`/player/123`): `vercel.json` rewrites unknown paths to `/` and `app.js` maps the path to the hash route.
+### 5.3 UI (`site/public/index.html`, `css/style.css`, `css/ui.css`, `js/shadcn.js`, `js/app.js`, `pages2.js`, `render.js`, `assets.js`, `photos.js`, `ui.js`)
+Vanilla JS, no build step. Design tokens follow shadcn/ui's zinc dark theme (`:root` in `style.css`), and `js/shadcn.js` + `css/ui.css` port shadcn's Accordion, Tabs, Badge, Switch, Toggle group, Skeleton, Sonner-style toast and Tooltip (same anatomy, ARIA roles and keyboard behaviour; the real library needs React + Radix). Filters apply live (no Update buttons, `live()` in `ui.js`); times render in the viewer's zone, 12-hour for Indian viewers. Hash routes internally (`#/player/123`), but path URLs also work (`/player/123`): `vercel.json` rewrites unknown paths to `/` and `app.js` maps the path to the hash route.
 Routes: `/` fixtures + landing, `players`, `player/<idx>`, `teams`, `team/<idx>`, `venue/<idx>`, `fixture/<id>`, `trends`, `competitions`, `league/<eventIdx>`, `props`, `pair`, `ask`, `tools`, `odds`
 (decimal-only calculator), `glossary`, `saved` (stars in localStorage), `about`. Dark StatsHub-inspired design (Bebas Neue + Manrope, `#151719`/`#1f2123`, pills, 24px cards), animations respect
 `prefers-reduced-motion`. Mobile: bottom tab bar; desktop: top nav + search + home side rail.

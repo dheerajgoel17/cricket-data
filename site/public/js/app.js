@@ -9,6 +9,7 @@ import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
 import { collectGrid, gridTable, initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
+import { Accordion, Badge, PageSkeleton, TabsList, toast } from "./shadcn.js";
 import { fromIst, hashQuery, live, localTime, localWhen, chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
 
 const app = document.getElementById("app");
@@ -93,7 +94,7 @@ async function render() {
   document.title = `${TITLES[cur] || "Cricket Props Hub"} | Cricket Props Hub`;
   const same = lastRoute === `${name}/${args.join("/")}`; // only a filter changed: keep the page and the scroll position
   lastRoute = `${name}/${args.join("/")}`;
-  if (!same) app.replaceChildren(h("p", { class: "muted pad" }, "Crunching…"));
+  if (!same) app.replaceChildren(PageSkeleton());
   try {
     const y = window.scrollY;
     const el = await page(args, q);
@@ -152,7 +153,7 @@ const getSaved = () => { try { return JSON.parse(localStorage.getItem(SAVE_KEY) 
 const setSaved = (l) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(l)); } catch { /* private mode */ } };
 const star = (kind, idx) => {
   const key = `${kind}:${idx}`;
-  const b = h("button", { type: "button", class: "star", "aria-label": "Save", onclick: () => { const l = getSaved(); const i = l.indexOf(key); i >= 0 ? l.splice(i, 1) : l.push(key); setSaved(l); b.classList.toggle("on", i < 0); } },
+  const b = h("button", { type: "button", class: "star", "aria-label": "Save", onclick: () => { const l = getSaved(); const i = l.indexOf(key); i >= 0 ? l.splice(i, 1) : l.push(key); setSaved(l); b.classList.toggle("on", i < 0); toast(i < 0 ? "Saved. Find it under Saved." : "Removed from Saved"); } },
     h("span", { html: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>' }));
   b.classList.toggle("on", getSaved().includes(key));
   return b;
@@ -169,13 +170,13 @@ const crumbs = (...items) => h("div", { class: "crumbs" }, items.flatMap((it, i)
 
 /** StatsHub-style hero card: crest, name, meta pills and in-card tabs that switch the page sections. */
 function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [], save = null }, root) {
-  const bar = h("div", { class: "hero-tabs" });
+  const list = tabs.length ? TabsList(tabs, tabs[0][0], (id) => { set(id); const q = hashQuery(); q.tab = id; history.replaceState(null, "", `#/${location.hash.slice(2).split("?")[0]}?${new URLSearchParams(q)}`); }) : null;
+  const bar = h("div", { class: "hero-tabs" }, list);
   const set = (id) => {
     if (!tabs.some(([t]) => t === id)) id = tabs[0]?.[0];
-    bar.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.t === id));
+    list?.select(id);
     root.querySelectorAll("[data-sec]").forEach((el) => { el.hidden = el.dataset.sec !== id; });
   };
-  tabs.forEach(([id, label]) => bar.append(h("button", { type: "button", "data-t": id, onclick: () => { set(id); const q = hashQuery(); q.tab = id; history.replaceState(null, "", `#/${location.hash.slice(2).split("?")[0]}?${new URLSearchParams(q)}`); } }, label)));
   const el = h("div", { class: `hero-card ${cls}` }, save ? h("div", { class: "hero-star" }, star(save[0], save[1])) : null, h("div", { class: "hero-top" }, badge || h("div", { class: "crest" }, initials(name)), h("h1", { class: "hero-name" }, name),
     sub ? h("p", {}, sub) : null, meta.length ? h("div", { class: "hero-meta" }, meta.map((m) => h("span", {}, m))) : null), tabs.length ? bar : null);
   return { el, set: (id) => tabs.length && set(id || tabs[0][0]) };
@@ -274,12 +275,17 @@ function fixtureGroups(fx) {
   const time = (s) => (s.length > 10 ? localTime(s) : "TBC");
   const promo = h("div", { class: "promo" }, h("h3", {}, "Unlock advanced stats"), h("p", { class: "muted" }, "Hit rates over any line, DNP-aware form charts and fair decimal odds for every player."),
     h("div", { class: "pills" }, h("a", { class: "btn", href: "#/props" }, "Prop Hunter →"), h("a", { class: "btn ghost", href: "#/ask" }, "Ask anything →")));
-  const cards = [...groups.entries()].map(([name, list], i) => h("details", { class: "comp", open: i < 6 },
-    h("summary", {}, h("div", { class: "badge-ico" }, list[0].fmt || "·"), h("div", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men")), h("div", { class: "cnt" }, String(list.length)), h("div", { class: "chev" }, "⌄")),
-    list.map((f) => h("a", { class: "match", href: f.id ? `#/fixture/${f.id}` : f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
+  const items = [...groups.entries()].map(([name, list], i) => ({
+    open: i < 6,
+    title: h("span", { class: "comp-title" }, h("span", { class: "badge-ico" }, list[0].fmt || "·"), h("span", { class: "ct" }, h("b", {}, name), h("span", {}, list[0].gender === "female" ? "Women" : "Men"))),
+    meta: Badge(String(list.length), "secondary"),
+    content: h("div", {}, list.map((f) => h("a", { class: "match", href: f.id ? `#/fixture/${f.id}` : f.a_ix >= 0 ? `#/team/${f.a_ix}` : "#/teams" },
       h("div", { class: "teams" }, h("div", { class: "tm" }, teamBadge(f.a), f.a), h("div", { class: "tm" }, teamBadge(f.b), f.b)),
-      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))));
-  if (cards.length > 1) cards.splice(1, 0, promo);
+      h("div", { class: "meta" }, h("b", {}, time(f.start)), f.venue || f.fmt || ""), h("span", { class: "arrow" }, "→")))),
+  }));
+  const acc = Accordion(items, { type: "multiple", cls: "cards" });
+  if (items.length > 1) acc.children[0].after(promo);
+  const cards = [acc];
   return h("div", { class: "stagger" }, cards);
 }
 
@@ -324,8 +330,7 @@ async function player(args, q) {
     field("Stat", sel("stat", Object.entries(STATS).map(([k, v]) => [k, v.label]), q.stat || "runs")),
     field("Line", inp("line", q.line, { type: "number", step: "0.5", placeholder: "e.g. 0.5", style: "width:90px" })),
     field("Side", sel("side", [["over", "Over"], ["under", "Under"]], q.side || "over"))),
-   h("details", { class: "filters-wrap", open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl) }, h("summary", { class: "muted small" }, "More filters: opposition, venue, home/away, innings, position, dates…"),
-    h("div", { class: "filters", style: "margin-top:10px" },
+   Accordion([{ open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl), title: "More filters: opposition, venue, home/away, innings, position, dates…", content: h("div", { class: "filters", style: "padding-top:4px" },
     field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })),
     field("Venue", inp("venue", q.venue, { list: "dl-venues", style: "width:170px" })),
     field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)),
@@ -334,7 +339,7 @@ async function player(args, q) {
     field("From", inp("since", q.since, { type: "date" })), field("To", inp("until", q.until, { type: "date" })),
     field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })),
     field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…", style: "width:110px" })),
-    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl)))));
+    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))) }], { cls: "flush" }));
   live(form);
   const plan = {
     kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
@@ -477,15 +482,22 @@ async function askPage(_, q) {
 }
 
 async function about() {
-  return h("div", {}, h("h1", {}, "Rules, definitions and data"),
-    h("div", { class: "card" }, h("h3", {}, "Settlement rules applied"), h("ul", {}, RULES.map((r) => h("li", {}, r)))),
-    h("div", { class: "card" }, h("h3", {}, "Definitions"), h("ul", {},
-      h("li", {}, "Fair decimal odds = 1 ÷ hit rate on the filtered sample. Pushes (whole-number lines) are void. A 90% interval shows how far small samples can mislead."),
-      h("li", {}, "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: Cricsheet has no home flag."),
-      h("li", {}, "Batting position is the order batters first appear at the crease. Batting first / chasing is the player's team."),
-      h("li", {}, "Runs conceded include penalty runs, exclude byes and leg byes. Super overs are ignored."),
-      h("li", {}, "Provisional (scraped) matches fill the gap before Cricsheet publishes: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets."))),
-    h("div", { class: "card" }, h("h3", {}, "Data freshness"), h("p", {}, ...freshText(store))));
+  const defs = [
+    "Fair decimal odds = 1 ÷ hit rate on the filtered sample. Pushes (whole-number lines) are void. A 90% interval shows how far small samples can mislead.",
+    "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: Cricsheet has no home flag.",
+    "Batting position is the order batters first appear at the crease. Batting first / chasing is the player's team.",
+    "Runs conceded include penalty runs, exclude byes and leg byes. Super overs are ignored.",
+    "A player named in the XI who never batted or bowled shows as VOID (the bet is void); a player not named shows as DNP; an XI that was not recorded reliably shows N/A. None of the three counts in a hit rate.",
+    "Provisional (scraped) matches fill the gap before Cricsheet publishes: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets.",
+  ];
+  const list = (xs) => h("ul", { style: "margin:0 0 4px; padding-left: 20px" }, xs.map((r) => h("li", { class: "muted", style: "margin: 4px 0" }, r)));
+  return h("div", {}, crumbs(["Home", "#/"], ["Rules & data"]), h("h1", {}, "Rules, definitions and data"),
+    Accordion([
+      { open: true, title: "Settlement rules applied", meta: Badge(String(RULES.length), "secondary"), content: list(RULES) },
+      { title: "Definitions", meta: Badge(String(defs.length), "secondary"), content: list(defs) },
+      { title: "Data freshness", content: h("p", { class: "muted", style: "margin:0" }, ...freshText(store)) },
+    ], { type: "single", cls: "faq" }),
+    h("p", { class: "muted small", style: "margin-top:14px" }, "See also: ", h("a", { href: "#/glossary" }, "Cricket stats explained"), "."));
 }
 
 boot();

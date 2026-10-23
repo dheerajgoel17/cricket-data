@@ -3,6 +3,7 @@ import { STATS } from "./engine/rules.js";
 import { FORMATS } from "./engine/util.js";
 import { MATCH_MARKETS, marketReport, selectMatches } from "./engine/markets.js";
 import { playerBadge, teamBadge } from "./assets.js";
+import { Accordion, Badge } from "./shadcn.js";
 import { H12, h, hashQuery, live, localWhen, num, odds, pc, table } from "./ui.js";
 
 let C = null; // shared context from app.js
@@ -236,9 +237,12 @@ export async function glossaryPage(_, q) {
   const { crumbs } = C;
   const cats = ["All", ...new Set(GLOSS.map((g) => g[2]))], levels = ["All", "Basic", "Intermediate", "Advanced"];
   const st = { c: "All", l: "All", t: q.q || "" };
-  const body = h("div", { class: "cards2 stagger" });
-  const draw = () => body.replaceChildren(...GLOSS.filter((g) => (st.c === "All" || g[2] === st.c) && (st.l === "All" || g[1] === st.l) && (!st.t || (g[0] + g[3]).toLowerCase().includes(st.t.toLowerCase())))
-    .map(([t, l, c, d]) => h("div", { class: "card", style: "margin:0" }, h("div", { class: "pills" }, h("span", { class: "badge" }, l), h("span", { class: "badge" }, c)), h("h3", { style: "margin-top:8px" }, t), h("p", { class: "muted small" }, d))));
+  const body = h("div");
+  const draw = () => {
+    const list = GLOSS.filter((g) => (st.c === "All" || g[2] === st.c) && (st.l === "All" || g[1] === st.l) && (!st.t || (g[0] + g[3]).toLowerCase().includes(st.t.toLowerCase())));
+    body.replaceChildren(list.length ? Accordion(list.map(([t, l, c, d]) => ({ title: t, meta: h("span", { class: "pills" }, Badge(l, "outline"), Badge(c, "secondary")), content: h("p", { class: "muted", style: "margin:0 4px" }, d) })), { type: "single", cls: "faq" })
+      : h("div", { class: "card muted" }, "Nothing matches."));
+  };
   const sel = (arr, key) => h("select", { onchange: (e) => { st[key] = e.target.value; draw(); } }, arr.map((x) => h("option", { value: x }, x)));
   const search = h("input", { type: "search", placeholder: "Search stats and rules", value: st.t, oninput: (e) => { st.t = e.target.value; draw(); }, style: "flex:1;min-width:200px" });
   draw();

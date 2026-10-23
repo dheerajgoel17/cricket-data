@@ -1,8 +1,15 @@
 /* Dark UI modelled on StatsHub: #151719 page, #1f2123 cards (24px radius, #2d2d2f hairline), pill controls, #62df6e / #00e68a accents */
 :root {
-  --bg: #151719; --bg2: #101214; --card: #1f2123; --card2: #27272a; --line: #2d2d2f; --ink: #f6fcfe; --mute: #a1a8aa; --dim: #71797c;
-  --acc: #00e68a; --btn: #62df6e; --btn-ink: #06240d; --link: #00e68a; --blue: #4c8dff; --good: #34d399; --bad: #ef5350; --warn: #f5c542;
-  --head: "Bebas Neue", Impact, sans-serif; --body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; --r: 24px; --pill: 9999px;
+  /* shadcn/ui "zinc" dark theme tokens (hsl channels), brand-green primary */
+  --background: 240 10% 3.9%; --foreground: 0 0% 98%; --card-h: 240 5.9% 8%; --popover: 240 10% 5%; --primary: 158 100% 45%; --primary-foreground: 240 5.9% 8%;
+  --secondary: 240 3.7% 15.9%; --muted: 240 3.7% 15.9%; --muted-foreground: 240 5% 64.9%; --accent: 240 3.7% 15.9%; --destructive: 0 72% 51%;
+  --border: 240 3.7% 15.9%; --input: 240 3.7% 18%; --ring: 158 100% 45%; --radius: 0.625rem;
+  /* legacy names used all over the stylesheet, now derived from the tokens */
+  --bg: hsl(var(--background)); --bg2: hsl(240 10% 2.5%); --card: hsl(var(--card-h)); --card2: hsl(var(--muted)); --line: hsl(var(--border));
+  --ink: hsl(var(--foreground)); --mute: hsl(var(--muted-foreground)); --dim: hsl(240 3.8% 46.1%);
+  --acc: hsl(var(--primary)); --btn: hsl(var(--primary)); --btn-ink: hsl(var(--primary-foreground)); --link: hsl(var(--primary));
+  --blue: #4c8dff; --good: #34d399; --bad: #ef5350; --warn: #f5c542;
+  --head: "Bebas Neue", Impact, sans-serif; --body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif; --r: 14px; --pill: 9999px;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; color-scheme: dark; scroll-behavior: smooth; }

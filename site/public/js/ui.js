@@ -90,7 +90,7 @@ export const hashQuery = () => Object.fromEntries(new URLSearchParams(location.h
 /** Times are shown in the viewer's own time zone (with its short name on hover). */
 const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
 /** 12-hour clock for Indian viewers (IST zone or an -IN locale); everyone else gets their locale default. */
-export const H12 = TZ === "Asia/Kolkata" || /-IN$/.test(navigator.language || "") ? { hour12: true } : {};
+export const H12 = /^Asia\/(Kolkata|Calcutta)$/.test(TZ) || /-IN$/.test(navigator.language || "") ? { hour12: true } : {};
 export const localWhen = (d, opts = { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) => (d ? new Date(d).toLocaleString(undefined, { ...opts, ...H12 }) : "");
 export const localTime = (d) => (d ? new Date(d).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", ...H12 }) : "");
 export const tzName = () => TZ;
