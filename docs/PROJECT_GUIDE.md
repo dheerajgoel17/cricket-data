@@ -47,6 +47,8 @@ AGENTS.md CLAUDE.md   instructions for AI coding agents (any IDE)
   [PROVISIONAL.md](PROVISIONAL.md), [PERMANENT_MATCHES.md](PERMANENT_MATCHES.md).
 * **Player ids**: `cricket-data link-players` fills Cricsheet registry ids ("Harry Brook" -> `4ae1755b`) into provisional files using `data/mappings/player_aliases.csv`; unmatched names land in
   `data/provisional_unmatched.csv`.
+* **Fixtures**: `cricket-data fixtures` reads CREX's `/schedule` page (server-rendered state with the next ~20 matches) every scraper run; it never overwrites the file with an empty result. The older sitemap crawl (`--sitemap`) surfaced stale placeholder pages and is no longer the default.
+* **Linking scraped players**: besides `link-players`, the site builder links still-unlinked scraped names through CREX's full-name list (e.g. Afghanistan, whose matches Cricsheet withholds): ~1.7k extra rows.
 * **CREX scraper**: `crex_*.py`, `scrapers.py` (Playwright for pages, plain HTTP for the CREX sitemaps; see [SCRAPER.md](SCRAPER.md), [SCRAPING_REALITY.md](SCRAPING_REALITY.md), [SELF_HEALING.md](SELF_HEALING.md)).
 * **CLI**: `cricket-data update | backfill | health | fixtures | stats | query | link-players | freshness | export-sqlite`.
 * **Freshness**: `cricket-data freshness --max-age-days 3` fails when the newest *canonical* match is old; the scraper's provisional matches still cover the gap on the site.
@@ -76,9 +78,9 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 | `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred"], `nshard` |
 | `matches.json` | per match: `id d(date) f(format idx) g(0 male/1 female) i(intl) e(event idx) v(venue idx) a b(team idx) w(winner idx/-1) r(result 0 win,1 tie,2 none,3 draw) o(overs) dy(days) h(host: idx into hosts, -1 neutral, -2 unknown) fi(team idx batting first/-1) pv(provisional) q(valid for summary markets 1/0, -1 unknown) ho mc ts` and `inn` = per innings `[team, runs, wkts, balls, f4, f6, n30, n50, n100, n10, nsd, nduck, highest_over, most_conceded, top_score, ...topScorerPlayerIdx]` |
 | `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI); `matches.json` also has `xq` (1 = the named XI is reliable), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
-| `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` + bookmaker events, with stable `id` (`date-team-v-team`) and team idx |
+| `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` (refreshed every scraper run from **CREX's own schedule page**, `src/cricket_data/crex_schedule.py`: the next ~20 matches with real times, format, venue; far-future tours are kept until they pass) + bookmaker events (dropped when they are the same game as a CREX row), with stable `id` (`date-team-v-team`) and team idx |
 | `props.json` | snapshot of the value-bets output (Prop Hunter fallback) |
-| `photos.json` | `{p: {playerIdx: "c:<CREX id>"|"w:<Commons file>"}, t: {foldedTeamName: crexTeamId}, base, s}` (`base`/`s` added by assets_sync) |
+| `photos.json` | `{p: {cricsheetPlayerId: "c:<CREX id>"|"w:<Commons file>"}, t: {foldedTeamName: crexTeamId}, base, s}` (`base`/`s` added by assets_sync). **Keyed by Cricsheet id, never by array index** (indices shift between builds) |
 
 Rebuilding is deterministic apart from timestamps. Size: ~35 MB raw, ~12 MB compressed.
 
@@ -143,7 +145,7 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * Home/away is **inferred** (tour name "X tour of Y", venue history, venue_geo country, majority host). Unknown hosts are excluded from home/away filters.
 * `check_public_safe.py` fails on Vercel/Supabase hostnames in tracked files: pass URLs through repo variables, never write them in tracked files. Generated `sitemap.xml`/`robots.txt` are gitignored for that reason.
 * YAML in workflows: an unquoted `: ` inside a `run:` one-liner breaks the whole file (GitHub reports only "workflow file issue"). Lint with `actionlint`.
-* Cache key `site-dl3-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
+* Cache key `site-dl4-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
 * The dev server `site/scripts/serve.mjs` has the same SPA fallback as the Vercel rewrite.

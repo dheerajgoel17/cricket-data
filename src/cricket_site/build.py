@@ -88,11 +88,17 @@ def _strip_women(s: str) -> str:
     return re.sub(r"\s+(women|\(w\)|w)$", "", (s or "").strip(), flags=re.I)
 
 
+def fold_name(s: str) -> str:
+    from .crex_assets import fold
+
+    return fold(s)
+
+
 def _int_getter(row: dict):
     return lambda k: int(row.get(k) or 0)
 
 
-def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict], dict]:
+def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, str] | None = None) -> tuple[list[dict], dict]:
     """Provisional (scraped) matches that Cricsheet has not published yet, as compact match dicts."""
     from cricket_data.registry import pending_provisional  # local import: keeps the parser usable standalone
     from cricket_data.store import Store
@@ -132,6 +138,9 @@ def load_provisional(data_dir: Path, canonical: list[dict]) -> tuple[list[dict],
         for p in d.get("players", []):
             stat["rows"] += 1
             pid = p.get("player_id", "")
+            if not pid and name_pid:  # not linked by `link-players` (e.g. Afghanistan, withheld by Cricsheet): use CREX's full-name match
+                pid = name_pid.get(fold_name(p.get("player", "")), "")
+                stat["rows_linked_by_crex"] = stat.get("rows_linked_by_crex", 0) + bool(pid)
             if pid:
                 m["xi"].append(pid)  # scraped squads list everyone named for the match, batting or not
             if not pid:
@@ -381,31 +390,44 @@ def load_cricinfo(path: Path | None) -> dict[str, str]:
     return out
 
 
-def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], A: dict | None = None, names: dict[str, str] | None = None,
-                 chunk: int = 400) -> dict:
-    """{"p": {player idx: "c:<CREX id>" | "w:<Commons file>"}, "t": {folded team name: CREX id}}.
+def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str], wikidata: bool = True, chunk: int = 400) -> dict:
+    """Match CREX's players and teams to ours, keyed by Cricsheet player id (never by array index: indices shift between builds).
 
-    CREX first (public sitemaps; ~8.6k players, ~1.5k teams), Wikidata (P2697 Cricinfo id -> P18 image, free licences) as the fallback.
-    Best effort: a network failure just yields fewer images and the site falls back to flags / silhouettes.
+    {"p": {pid: "c:<CREX id>" | "w:<Commons file>"}, "t": {folded team name: CREX id}, "names": {folded CREX full name: pid},
+     "index": {"players": [[crex id, name, pid|None]], "teams": [[crex id, name, folded]]}}.
+    CREX first (public sitemaps), Wikidata (P2697 Cricinfo id -> P18, free licences) as the photo fallback. Best effort: a network failure
+    yields less, never an error. Teams are matched on the Cricsheet team names seen in `canonical`.
     """
     import urllib.parse
     import urllib.request
 
     from . import crex_assets as ca
 
-    out: dict = {"p": {}, "t": {}, "index": {"players": [], "teams": []}}
-    if A is not None and names is not None:
-        try:
-            players = [{"idx": A["pix"][p], "name": names.get(p, p), "n": A["pstat"][p]["n"], "last": A["pstat"][p]["last"]} for p in A["pids"]]
-            out["p"] = {str(i): "c:" + c for i, c in ca.match_players(players, ca.parse_sitemap(ca.fetch_sitemap("player"), "player")).items()}
-            crex_teams = ca.parse_sitemap(ca.fetch_sitemap("team"), "team")
-            out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in A["teams"]], crex_teams)
-            crex_players = ca.parse_sitemap(ca.fetch_sitemap("player"), "player")
-            owner = {c.removeprefix("c:"): A["pids"][int(i)] for i, c in out["p"].items()}
-            out["index"] = {"players": [[cid, nm, owner.get(cid)] for nm, cid in crex_players], "teams": [[cid, nm, ca.fold(nm)] for nm, cid in crex_teams]}
-        except Exception as exc:  # noqa: BLE001
-            print(f"photos: CREX sitemaps failed: {exc}", file=sys.stderr)
-    by_ci = {c: pix[p] for p, c in cricinfo.items() if p in pix and str(pix[p]) not in out["p"]}
+    out: dict = {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
+    stat: dict[str, list] = {}
+    teams = set()
+    for m in canonical:
+        for r in m["bat"] + m["bowl"]:
+            s = stat.setdefault(r[0], [0, ""])
+            s[0] += 1
+            s[1] = max(s[1], m["date"])
+        teams.update((t, m["gender"]) for t in m["teams"])
+    pids = sorted(stat)
+    try:
+        players = [{"idx": i, "name": names.get(p, p), "n": stat[p][0], "last": stat[p][1]} for i, p in enumerate(pids)]
+        crex_players = ca.parse_sitemap(ca.fetch_sitemap("player"), "player")
+        crex_teams = ca.parse_sitemap(ca.fetch_sitemap("team"), "team")
+        named: dict[str, int] = {}
+        matched = ca.match_players(players, crex_players, named)
+        out["p"] = {pids[i]: "c:" + c for i, c in matched.items()}
+        out["names"] = {nm: pids[i] for nm, i in named.items()}
+        out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in sorted(teams)], crex_teams)
+        owner = {c.removeprefix("c:"): p for p, c in out["p"].items()}
+        out["index"] = {"players": [[cid, nm, owner.get(cid)] for nm, cid in crex_players], "teams": [[cid, nm, ca.fold(nm)] for nm, cid in crex_teams]}
+    except Exception as exc:  # noqa: BLE001
+        print(f"crex: sitemaps failed: {exc}", file=sys.stderr)
+        return out
+    by_ci = {c: p for p, c in cricinfo.items() if p in stat and p not in out["p"]} if wikidata else {}
     ids = sorted(by_ci)
     for i in range(0, len(ids), chunk):
         values = " ".join(f'"{x}"' for x in ids[i:i + chunk])
@@ -416,10 +438,22 @@ def fetch_photos(cricinfo: dict[str, str], pix: dict[str, int], A: dict | None =
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 for b in json.load(r)["results"]["bindings"]:
-                    out["p"].setdefault(str(by_ci[b["id"]["value"]]), "w:" + urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
+                    out["p"].setdefault(by_ci[b["id"]["value"]], "w:" + urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
         except Exception as exc:  # noqa: BLE001 - photos are optional
-            print(f"photos: wikidata chunk {i} failed: {exc}", file=sys.stderr)
+            print(f"crex: wikidata chunk {i} failed: {exc}", file=sys.stderr)
     return out
+
+
+def crex_cached(cache_dir: Path | None, canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str]) -> dict:
+    """crex_match() cached for the day in cache_dir/crex_match.json (an empty result is never cached)."""
+    f = cache_dir / "crex_match.json" if cache_dir else None
+    if f and f.exists():
+        return json.loads(f.read_text(encoding="utf-8"))
+    res = crex_match(canonical, names, cricinfo)
+    if f and res["p"]:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps(res, separators=(",", ":")), encoding="utf-8")
+    return res
 
 
 def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo: dict[str, str] | None = None) -> dict:
@@ -453,6 +487,10 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
 
 
 # ------------------------------------------------------------------ fixtures
+def _minutes(iso: str) -> int:
+    return int(datetime.strptime(iso[:16], "%Y-%m-%dT%H:%M").replace(tzinfo=timezone.utc).timestamp() // 60)
+
+
 def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
 
@@ -503,10 +541,26 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                 iso = dt.strftime("%Y-%m-%dT%H:%MZ")
             rows.append({"start": iso or day, "fmt": e.get("format") or "", "gender": g, "a": a.title(), "b": b.title(),
                          "venue": "", "series": "", "source": "markets"})
+    crex_rows = [r for r in rows if r["source"] == "crex"]
+
+    def duplicate_of_crex(r: dict) -> bool:
+        """A bookmaker event that is the same game as a CREX row: start within 20 min and each side matches (the book often drops 'U19' / 'Women')."""
+        if r["source"] == "crex" or len(r["start"]) <= 10:
+            return False
+        for c in crex_rows:
+            if len(c["start"]) > 10 and abs(_minutes(c["start"]) - _minutes(r["start"])) <= 20:
+                ca_, cb_ = _norm_team(c["a"]), _norm_team(c["b"])
+                ra, rb = _norm_team(r["a"]), _norm_team(r["b"])
+                same = lambda x, y: x == y or x.startswith(y) or y.startswith(x)  # noqa: E731
+                if (same(ca_, ra) and same(cb_, rb)) or (same(ca_, rb) and same(cb_, ra)):
+                    return True
+        return False
+
     out, seen = [], set()
-    for r in sorted(rows, key=lambda r: r["start"]):
+    # CREX's schedule has the format, venue and series; the bookmaker feed often does not: let CREX win a duplicate
+    for r in sorted(rows, key=lambda r: (r["start"][:10], r["source"] != "crex", r["start"])):
         key = (r["start"][:10], frozenset((_norm_team(r["a"]), _norm_team(r["b"]))))
-        if key in seen:
+        if key in seen or duplicate_of_crex(r):
             continue
         seen.add(key)
         g = 1 if r["gender"] == "female" else 0
@@ -516,7 +570,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
             r[side + "_ix"] = team_ix.get((n, g), -1) if n else -1
         r["id"] = f"{r['start'][:10]}-{_slug(r['a'])}-v-{_slug(r['b'])}"
         out.append(r)
-    return out
+    return sorted(out, key=lambda r: r["start"])
 
 
 # ------------------------------------------------------------------ prop hunter snapshot
@@ -545,25 +599,27 @@ def build_props(vb_dir: Path | None) -> dict:
 
 # ------------------------------------------------------------------ main
 def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, workers: int = 4,
-          geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False, site_url: str = "") -> dict:
+          geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False, site_url: str = "",
+          crex_cache: Path | None = None) -> dict:
     canonical = parse_zip(zpath, workers)
-    prov, pstat = load_provisional(data_dir, canonical)
-    A = assemble(canonical, prov, _load_geo(geo_path))
     names = player_names(zpath)
+    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
+    prov, pstat = load_provisional(data_dir, canonical, cx["names"])
+    A = assemble(canonical, prov, _load_geo(geo_path))
     newest = max((m["date"] for m in canonical), default="")
     newest_prov = max((m["date"] for m in prov), default="")
     meta = write(out, A, names, {
         "newest_cricsheet": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
+        "provisional_rows_linked_by_crex": pstat.get("rows_linked_by_crex", 0),
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     build_sitemap(out, A, names, site_url)
     if photos:
-        ph = fetch_photos(load_cricinfo(people_path), A["pix"], A, names)
-        index = ph.pop("index")
-        (out / "photos.json").write_text(json.dumps(ph, separators=(",", ":")), encoding="utf-8")
-        (out / "crex_index.json").write_text(json.dumps(index, separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
+        keep = set(A["pids"])
+        (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"]}, separators=(",", ":")), encoding="utf-8")
+        (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta
 
@@ -578,9 +634,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--people", default="", help="Cricsheet register people.csv (optional: enables player photos)")
     ap.add_argument("--photos", action="store_true", help="look up player photos on Wikidata (needs --people)")
     ap.add_argument("--site-url", default="", help="public base URL: enables sitemap.xml and robots.txt")
+    ap.add_argument("--crex-cache", default="", help="directory caching the CREX/Wikidata matching for the day")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args(argv)
-    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people), a.site_url)
+    meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people), a.site_url, Path(a.crex_cache) if a.crex_cache else None)
     print(json.dumps(meta))
     return 0
 

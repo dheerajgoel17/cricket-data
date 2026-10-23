@@ -152,3 +152,43 @@ def test_half_scraped_scorecards_are_marked_unreliable(tmp_path):
     M, _ = _load(out)
     xq = {M["id"][i]: M["xq"][i] for i in range(len(M["id"]))}
     assert xq["crex-2025-07-01-5"] == 1 and xq["crex-thin"] == 0
+
+
+def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are_keyed_by_cricsheet_id(tmp_path, monkeypatch):
+    from cricket_site import crex_assets as ca
+
+    sitemaps = {"player": "<urlset><url><loc>https://crex.com/player/harry-brook-1IG</loc></url><url><loc>https://crex.com/player/ben-duckett-ZZ</loc></url></urlset>",
+                "team": "<urlset><url><loc>https://crex.com/team/alpha-A1</loc></url></urlset>"}
+    monkeypatch.setattr(ca, "fetch_sitemap", lambda kind: sitemaps[kind])
+    z, data, out, _ = _out(tmp_path)
+    pl = [{"player": "Harry Brook", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "40", "balls": "20", "fours": "3", "sixes": "2"},
+          {"player": "Nobody Known", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "5", "balls": "4"}] + [
+          {"player": f"F{i}", "player_id": "", "team": "Alpha" if i < 10 else "Beta", "opponent": "Beta" if i < 10 else "Alpha", "runs": "0", "balls": "0"} for i in range(20)]
+    d = _prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)
+    (data / "provisional" / "crex-new.json").write_text(json.dumps(d))
+    meta = B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    assert meta["provisional_rows_linked_by_crex"] == 1 and meta["provisional_rows_unlinked"] == 21
+    M, IX = _load(out)
+    brook = synth.pid(synth.BROOK)
+    shard = json.loads((out / "p" / f"{int(brook, 16) % IX['nshard']:02d}.json").read_text())["bat"]
+    m = M["id"].index("crex-new")
+    assert any(shard["m"][k] == m and shard["r"][k] == 40 for k in range(len(shard["p"])) if IX["players"]["id"][shard["p"][k]] == brook)
+    ph = json.loads((out / "photos.json").read_text())
+    assert ph["p"][brook] == "c:1IG" and ph["p"][synth.pid(synth.DUCKETT)] == "c:ZZ"   # keyed by Cricsheet id, so a shifting index cannot mismatch photos
+    assert (tmp_path / "cache" / "crex_match.json").exists()
+
+
+def test_bookmaker_events_that_are_crex_games_are_not_listed_twice(tmp_path):
+    (tmp_path / "fixtures").mkdir()
+    (tmp_path / "fixtures" / "upcoming.csv").write_text(
+        "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url\n"
+        "2026-10-23T05:00Z,afg-u19-x-14SY,Afghanistan U19 vs Bangladesh U19,ODI,male,Afghanistan U19,Bangladesh U19,Oman,Live,u\n"
+        "2026-10-23T11:30Z,afg-zim-x,ODI Tri-Nation,ODI,male,Afghanistan,Zimbabwe,Sharjah,Upcoming,u\n")
+    vb = tmp_path / "vb"
+    vb.mkdir()
+    (vb / "value_bets_latest.json").write_text(json.dumps({"events_in_window": [
+        {"event": "male|afghanistan|bangladesh|2026-10-23", "start_ist": "2026-10-23 10:30 IST", "format": None},   # = the U19 game (book drops 'U19')
+        {"event": "male|afghanistan|zimbabwe|2026-10-23", "start_ist": "2026-10-23 17:00 IST", "format": "ODI"},     # = the senior game
+        {"event": "male|dolphins|badgers|2026-10-23", "start_ist": "2026-10-23 21:30 IST", "format": "T20"}]}))
+    fx = B.build_fixtures(tmp_path, vb, {})
+    assert [(f["a"], f["source"]) for f in fx] == [("Afghanistan U19", "crex"), ("Afghanistan", "crex"), ("Dolphins", "markets")]
