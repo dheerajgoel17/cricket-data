@@ -178,7 +178,7 @@ def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are
     assert (tmp_path / "cache" / "crex_match.json").exists()
 
 
-def test_bookmaker_events_that_are_crex_games_are_not_listed_twice(tmp_path):
+def test_bookmaker_feed_is_odds_only_never_a_fixture_or_start_time(tmp_path):
     (tmp_path / "fixtures").mkdir()
     (tmp_path / "fixtures" / "upcoming.csv").write_text(
         "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url\n"
@@ -187,8 +187,8 @@ def test_bookmaker_events_that_are_crex_games_are_not_listed_twice(tmp_path):
     vb = tmp_path / "vb"
     vb.mkdir()
     (vb / "value_bets_latest.json").write_text(json.dumps({"events_in_window": [
-        {"event": "male|afghanistan|bangladesh|2026-10-23", "start_ist": "2026-10-23 10:30 IST", "format": None},   # = the U19 game (book drops 'U19')
-        {"event": "male|afghanistan|zimbabwe|2026-10-23", "start_ist": "2026-10-23 17:00 IST", "format": "ODI"},     # = the senior game
+        {"event": "male|afghanistan|bangladesh|2026-10-23", "start_ist": "2026-10-23 10:30 IST", "format": None},
         {"event": "male|dolphins|badgers|2026-10-23", "start_ist": "2026-10-23 21:30 IST", "format": "T20"}]}))
     fx = B.build_fixtures(tmp_path, vb, {})
-    assert [(f["a"], f["source"]) for f in fx] == [("Afghanistan U19", "crex"), ("Afghanistan", "crex"), ("Dolphins", "markets")]
+    assert [(f["a"], f["start"], f["source"]) for f in fx] == [
+        ("Afghanistan U19", "2026-10-23T05:00Z", "crex"), ("Afghanistan", "2026-10-23T11:30Z", "crex")]
