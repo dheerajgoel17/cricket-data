@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-24T16:46:17Z",
- "generated_at_ist": "2026-10-24 22:16 IST",
- "runtime_secs": 32.7,
+ "generated_at_utc": "2026-10-24T19:36:58Z",
+ "generated_at_ist": "2026-10-25 01:06 IST",
+ "runtime_secs": 29.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-24",
-  "commit": "0bfc255fd6"
+  "commit": "679a97e99d"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1196,
+   "rows": 1221,
    "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 603,
-   "secs": 2.4
+   "rows": 575,
+   "secs": 2.8
   }
  },
- "snapshot": "odds_20261024T164617Z.jsonl.gz",
+ "snapshot": "odds_20261024T193658Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -67,10 +67,10 @@
  },
  "stats": {
   "events_in_window": 19,
-  "rows_in_window": 1082,
+  "rows_in_window": 1107,
   "selections_with_model": 513,
   "selections_with_market_fair": 476,
-  "markets_in_window": 86,
+  "markets_in_window": 87,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_market_gap": 175,
@@ -89,9 +89,9 @@
     "n_prices": 79,
     "mean_model_p": 0.045,
     "mean_market_p": 0.061,
-    "mean_logit_diff_model_minus_market": 0.287,
+    "mean_logit_diff_model_minus_market": 0.286,
     "mean_abs_logit_diff": 1.171,
-    "corr": 0.699
+    "corr": 0.697
    },
    "top_bowler_team": {
     "n_prices": 22,
@@ -105,7 +105,7 @@
     "n_prices": 24,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.402,
     "corr": null
    },
@@ -114,8 +114,8 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.703,
-    "corr": 0.758
+    "mean_abs_logit_diff": 0.686,
+    "corr": 0.771
    },
    "batter_fours": {
     "n_prices": 24,
@@ -409,7 +409,7 @@
    "event": "male|Nigeria|Uganda|2026-10-25",
    "start_ist": "2026-10-25 18:20 IST",
    "format": "T20",
-   "format_source": "name",
+   "format_source": "fixtures",
    "teams_matched": [
     "Nigeria",
     "Uganda"
@@ -439,7 +439,6 @@
   "Kerala (W) (female)",
   "Madhya Pradesh (W) (female)",
   "Maharashtra (W) (female)",
-  "Mississauga Skyhawks (male)",
   "Mountaineers (male)",
   "Odisha (W) (female)",
   "Punjab (W) (female)",
@@ -782,14 +781,14 @@
   }
  },
  "log": [
-  "[22:16 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:16 IST] history: 23573 matches, last 2026-10-24, players 423104",
-  "[22:16 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1196, 'secs': 0.8}",
-  "[22:16 IST] source smarkets: {'status': 'ok', 'rows': 603, 'secs': 2.4}",
-  "[22:16 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:16 IST] 32 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:16 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[22:16 IST] weather: forecasts for 2 events, 0 failed",
-  "[22:16 IST] prop model: 593 prop selections modelled, 256 milestone ladder prices anchored to O/U"
+  "[01:06 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[01:07 IST] history: 23575 matches, last 2026-10-24, players 423150",
+  "[01:07 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1221, 'secs': 0.8}",
+  "[01:07 IST] source smarkets: {'status': 'ok', 'rows': 575, 'secs': 2.8}",
+  "[01:07 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[01:07 IST] 32 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[01:07 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[01:07 IST] weather: forecasts for 2 events, 0 failed",
+  "[01:07 IST] prop model: 593 prop selections modelled, 256 milestone ladder prices anchored to O/U"
  ]
 }
