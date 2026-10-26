@@ -266,7 +266,7 @@ async loadFixtures() {
 }
 ```
 
-Two callers before the first assignment both fetch. Home and the sidebar can do that.
+Two callers before the first assignment both fetch. `home()` reaches this through `upcoming()`, and any other page that calls `loadFixtures()` in the same turn (boot does not) can race it. `sidebar()` does not; it only fetches `props.json`.
 3. Prop Hunter is not shared. `sidebar()` fetches `data/props.json` on every home render. `props()` fetches `data/props.json` again and then `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/value_bets_latest.json` with `cache: "no-cache"`. Book lines are the exception: `loadLines()` memoizes one promise. Props do not.
 
 There is no websocket and no stats poll. The only `setInterval` in `app.js` is the next-match countdown (30s), and it clears itself when the node disconnects. That is display, not data.
@@ -301,7 +301,7 @@ A `<link rel="preload" as="fetch">` for the big JSON files is a known footgun: C
 
 Props.cash uses `animate-pulse` inside an already-mounted shell, plus `Suspense` around route chunks. **Confirmed** as code; the exact fallback UI is **assumed**.
 
-Cricket’s skeleton replaces all of `#app` immediately (`if (!same) app.replaceChildren(PageSkeleton())`), including for a filter change that is a different path (home day tab calls `go("", { d })`, which is the same route and keeps scroll, but a player stat change that calls `go(\`player/${idx}\`, …)` is also the same route). Cross-route taps (home → player → Prop Hunter) always flash the full skeleton, and the skeleton stays up until the slowest await in that page function returns. `player()` has no intermediate paint: the sticky bar is built only inside `playerScreen()`, which runs after `runPlan`.
+Cricket’s skeleton replaces all of `#app` as soon as the route name or id changes (`if (!same) app.replaceChildren(PageSkeleton())`). A home day tab (`go("", { d })`) and a player stat change (`go(\`player/${idx}\`, …)`) stay on `lastRoute`, so they keep the old page and the scroll position until the new tree is ready. A cross-route tap (home → player → Prop Hunter) always flashes the full skeleton, and that skeleton stays up until the slowest await in the page function returns. `player()` has no intermediate paint: the sticky bar is built only inside `playerScreen()`, which runs after `runPlan`.
 
 `Skeleton()` exists and is used by `PageSkeleton`. It is not used as a placeholder inside an already-visible player or fixture layout.
 
