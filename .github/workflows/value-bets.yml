@@ -84,5 +84,5 @@ jobs:
           path: |
             ${{ runner.temp }}/snapshots/
             value_bets_run.log
-          retention-days: 30
+          retention-days: 90  # the most GitHub allows; odds history is useful data, so keep it as long as possible
           if-no-files-found: ignore

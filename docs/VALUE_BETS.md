@@ -31,7 +31,7 @@ scraper files, so it never merges value-bet changes.
 Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json`
 
 **Odds snapshots** (every normalised pull plus raw responses, gzip) are **not committed**. They are uploaded as the workflow
-artifact `odds-snapshots-<run_id>` and kept 30 days, which keeps `main` small. Caches (`*.pkl`) are rebuilt each run in about 25 s.
+artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `main` small. Caches (`*.pkl`) are rebuilt each run in about 25 s.
 
 ## Sources
 * `smarkets`: public exchange API (top batsman/bowler, venue). `moviodds_bet365`: unofficial bet365 mirror (batter runs, sixes and fours

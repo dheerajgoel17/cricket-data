@@ -5,6 +5,8 @@ import { RULES, STATS } from "./engine/rules.js";
 import { createStore } from "./engine/store.js";
 import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
+import { loadIonic } from "./ionic.js";
+import { playerScreen } from "./playerapp.js";
 import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
@@ -54,6 +56,7 @@ async function boot() {
     return;
   }
   rz = new Resolver(store);
+  loadIonic(); // starts in the background; pages that use it wait for it
   await loadPhotos("data/");
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
   initPages({ store, rz, go, crumbs, heroCard, nextCountdown: (when) => nextMatchCard({ a: "", b: "", start: when.toISOString(), venue: "", countdownOnly: true }) });
@@ -87,10 +90,12 @@ const go = (path, q = {}) => {
 let lastRoute = "";
 async function render() {
   const { name, args, q } = parseHash();
+  document.querySelectorAll("ion-modal.sheet").forEach((m) => m.dismiss()); // any navigation (a filter applied, a link) closes open sheets
   const cur = name === "fixtures" ? "" : name;
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.dataset.r === cur));
   document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
+  document.body.classList.toggle("app-screen", name === "player"); // the player page is an app screen with its own bar
   document.title = `${TITLES[cur] || "Cricket Props Hub"} | Cricket Props Hub`;
   const same = lastRoute === `${name}/${args.join("/")}`; // only a filter changed: keep the page and the scroll position
   lastRoute = `${name}/${args.join("/")}`;
@@ -320,27 +325,24 @@ function datalists() {
 async function player(args, q) {
   const idx = Number(args[0]);
   if (!(idx >= 0 && idx < store.P.id.length)) return h("p", {}, "Unknown player.");
-  const name = store.playerName(idx);
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f, i) => [i, f]).filter(([i]) => (fm >> i) & 1);
-  const fmtVal = q.fmt ?? (fmts.length ? fmts[0][0] : 0);
-  const form = h("form", { class: "card", onsubmit: (e) => { e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); go(`player/${idx}`, { ...f, tab: hashQuery().tab }); } },
+  const fmtVal = Number(q.fmt ?? (fmts.length ? fmts[0][0] : 0));
+  await loadIonic();
+  // The prop, format, line and side live on screen (rail, segments, chart); everything else is in the filter sheet.
+  // hashQuery(), not q: the chart changes line / side locally and keeps them in the URL
+  const moreFilters = h("form", { class: "sheet-form", onsubmit: (e) => { e.preventDefault(); go(`player/${idx}`, { ...hashQuery(), ...Object.fromEntries(new FormData(e.target)) }); } },
    h("div", { class: "filters" },
-    field("Format", sel("fmt", fmts, fmtVal)),
-    field("Stat", sel("stat", Object.entries(STATS).map(([k, v]) => [k, v.label]), q.stat || "runs")),
-    field("Line", inp("line", q.line, { type: "number", step: "0.5", placeholder: "e.g. 0.5", style: "width:90px" })),
-    field("Side", sel("side", [["over", "Over"], ["under", "Under"]], q.side || "over"))),
-   Accordion([{ open: !!(q.opp || q.venue || q.vt || q.inn || q.pos || q.since || q.until || q.last || q.comp || q.lvl), title: "More filters: opposition, venue, home/away, innings, position, dates…", content: h("div", { class: "filters", style: "padding-top:4px" },
-    field("Opposition", inp("opp", q.opp, { list: "dl-teams", style: "width:150px" })),
-    field("Venue", inp("venue", q.venue, { list: "dl-venues", style: "width:170px" })),
+    field("Opposition", inp("opp", q.opp, { list: "dl-teams" })),
+    field("Venue", inp("venue", q.venue, { list: "dl-venues" })),
     field("Home/away", sel("vt", [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]], q.vt)),
     field("Innings", sel("inn", [["", "any"], ["first", "batting first"], ["second", "chasing"]], q.inn)),
     field("Position", sel("pos", [["", "any"], ["1-2", "openers"], ["1-3", "top 3"], ["4-6", "middle"], ["7-11", "lower"], ...Array.from({ length: 11 }, (_, i) => [`${i + 1}`, `No. ${i + 1}`])], q.pos)),
     field("From", inp("since", q.since, { type: "date" })), field("To", inp("until", q.until, { type: "date" })),
-    field("Last N", inp("last", q.last, { type: "number", min: "1", style: "width:70px" })),
-    field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…", style: "width:110px" })),
-    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))) }], { cls: "flush" }));
-  live(form);
+    field("Last N", inp("last", q.last, { type: "number", min: "1" })),
+    field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…" })),
+    field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))), ...datalists());
+  live(moreFilters);
   const plan = {
     kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
@@ -349,12 +351,8 @@ async function player(args, q) {
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  const body = h("div", {}, renderResult(res, { onLine: (l) => go(`player/${idx}`, { ...q, line: l }), onStat: (k) => go(`player/${idx}`, { ...q, stat: k, line: "" }), stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), badge: () => playerBadge(store, idx) }));
-  const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", save: ["player", idx], badge: playerBadge(store, idx, "crest"),
-    tabs: [["props", "Charts"], ["logs", "Game logs"], ["splits", "Table & splits"]] }, body);
-  const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
-  hc.set(q.tab);
-  return out;
+  return playerScreen({ store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), moreFilters,
+    back: () => (history.length > 1 ? history.back() : go("players")) });
 }
 
 async function teamsPage(_, q) {
