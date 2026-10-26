@@ -91,7 +91,7 @@ export function playerScreen(deps) {
       tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : ""));
 
     const arc = cur.p == null ? 0 : cur.p;
-    gauge.replaceChildren(h("div", { html: `<svg viewBox="0 0 48 48" width="52" height="52"><circle cx="24" cy="24" r="19" fill="none" stroke="#3a3a3a" stroke-width="4" stroke-dasharray="89.6 29.9" stroke-linecap="round" transform="rotate(135 24 24)"/><circle cx="24" cy="24" r="19" fill="none" stroke="${arc >= 0.6 ? "#27da8e" : arc >= 0.4 ? "#f5a524" : "#ff4444"}" stroke-width="4" stroke-dasharray="${(89.6 * arc).toFixed(1)} 200" stroke-linecap="round" transform="rotate(135 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">${cur.p == null ? "–" : Math.round(arc * 100) + "%"}</text></svg>` }), h("span", {}, `${cur.label} hit`));
+    gauge.replaceChildren(h("div", { html: `<svg viewBox="0 0 48 48" width="52" height="52"><circle cx="24" cy="24" r="19" fill="none" style="stroke:var(--pc-line)" stroke-width="4" stroke-dasharray="89.6 29.9" stroke-linecap="round" transform="rotate(135 24 24)"/><circle cx="24" cy="24" r="19" fill="none" style="stroke:var(${arc >= 0.6 ? "--pc-accent" : arc >= 0.4 ? "--pc-amber" : "--pc-red"})" stroke-width="4" stroke-dasharray="${(89.6 * arc).toFixed(1)} 200" stroke-linecap="round" transform="rotate(135 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor">${cur.p == null ? "–" : Math.round(arc * 100) + "%"}</text></svg>` }), h("span", {}, `${cur.label} hit`));
 
     const bars = shown.map((e) => {
       const s = barState(e, st.line, st.side);
