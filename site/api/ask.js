@@ -2,8 +2,8 @@
 // The model never sees data and never supplies numbers; the browser runs the validated plan on the real rows.
 // Provider: xAI Grok when XAI_API_KEY is set (OpenAI-compatible endpoint, model from XAI_MODEL), else Gemini when GEMINI_API_KEY is set.
 // Without a key the site uses its built-in parser. Keys live only in Vercel environment variables.
-import { buildPrompt } from "../public/js/engine/prompt.js";
-import { sanitizePlan } from "../public/js/engine/plan.js";
+import { buildPrompt } from "../src/engine/prompt.js";
+import { sanitizePlan } from "../src/engine/plan.js";
 
 const MODELS = (process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || "gemini-2.5-flash-lite,gemini-2.5-flash").split(",").map((s) => s.trim()).filter(Boolean);
 const PER_MINUTE = Number(process.env.ASK_PER_MINUTE || 12);

@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { createStore } from "../public/js/engine/store.js";
-import { Resolver } from "../public/js/engine/resolve.js";
+import { createStore } from "../src/engine/store.js";
+import { Resolver } from "../src/engine/resolve.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const fixtureDir = join(here, "fixtures");

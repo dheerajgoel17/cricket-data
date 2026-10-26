@@ -49,11 +49,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
       - name: Install
         run: pip install -e .
-      - name: JS tests (engine, resolver, rule parser, API handler)
+      - name: Install site dependencies
+        working-directory: site
+        run: npm ci
+      - name: JS tests (engine, resolver, rule parser, API handler, components)
         working-directory: site
         run: npm test
+      - name: Type-check and build the site (Vite)
+        working-directory: site
+        run: npm run build
       - name: Today's date (cache key for the daily-changing downloads)
         id: day
         run: echo "d=$(date -u +%F)" >> "$GITHUB_OUTPUT"

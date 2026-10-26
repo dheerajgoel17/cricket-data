@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { loadFixture, sum } from "./helpers.mjs";
-import { runPlan } from "../public/js/engine/plan.js";
-import { playerReport } from "../public/js/engine/props.js";
-import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "../public/js/engine/markets.js";
+import { runPlan } from "../src/engine/plan.js";
+import { playerReport } from "../src/engine/props.js";
+import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "../src/engine/markets.js";
 
 const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
 
