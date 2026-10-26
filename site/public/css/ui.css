@@ -75,6 +75,8 @@ label { font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground)); 
 @keyframes ui-pulse { 50% { opacity: .45; } }
 .ui-page-skel { display: grid; gap: 14px; padding: 20px 0; }
 .ui-skel-row { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 560px) { .ui-skel-row { grid-template-columns: 1fr; } }
+.ui-skel + .ui-skel { margin-top: 10px; }
 
 /* Toast (Sonner) */
 .ui-toaster { position: fixed; right: 16px; bottom: 88px; z-index: 100; display: grid; gap: 8px; }

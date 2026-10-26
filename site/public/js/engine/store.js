@@ -4,7 +4,8 @@ import { norm } from "./util.js";
 
 export async function createStore({ base = "data/", fetchJson } = {}) {
   const get = fetchJson || (async (p) => {
-    const r = await fetch(base + p);
+    // credentials omitted so a <link rel=preload as=fetch crossorigin> can be reused
+    const r = await fetch(base + p, { credentials: "omit" });
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
     return r.json();
   });
@@ -20,6 +21,8 @@ export class Store {
     this.P = index.players;
     this.get = get;
     this.shards = new Map();
+    this.rows = new Map(); // playerRows, immutable for the session
+    this.pairs = new Map();
     this.nshard = index.nshard;
     this.teams = index.teams;
     this.venues = index.venues;
@@ -72,6 +75,16 @@ export class Store {
     return this.shards.get(n);
   }
 
+  /** True after this player's rows have been built, so a filter change can paint immediately. */
+  hasPlayer(pidx) { return this.rows.has(pidx); }
+
+  /** Warm the shard a player link will need. Safe to call on hover. */
+  prefetchPlayer(pidx) {
+    if (pidx == null || pidx < 0 || !this.P.id[pidx]) return;
+    const n = this.shardOf(pidx);
+    if (!this.shards.has(n)) this.shard(n);
+  }
+
   _row(m, t, extra) {
     const M = this.M;
     return { m, date: M.d[m], fmt: M.f[m], g: M.g[m], intl: M.i[m], e: M.e[m], v: M.v[m], pv: M.pv[m], q: M.q[m],
@@ -80,6 +93,11 @@ export class Store {
 
   /** Every batting innings and bowling spell of one player, joined to its match, oldest first. */
   async playerRows(pidx) {
+    if (!this.rows.has(pidx)) this.rows.set(pidx, this._playerRows(pidx));
+    return this.rows.get(pidx);
+  }
+
+  async _playerRows(pidx) {
     const d = await this.shard(this.shardOf(pidx));
     const bat = [], bowl = [];
     const b = d.bat || {};
@@ -102,6 +120,12 @@ export class Store {
 
   /** Partnerships between two players (any order), oldest first. */
   async pairRows(p1, p2) {
+    const key = p1 < p2 ? `${p1}:${p2}` : `${p2}:${p1}`;
+    if (!this.pairs.has(key)) this.pairs.set(key, this._pairRows(p1, p2));
+    return this.pairs.get(key);
+  }
+
+  async _pairRows(p1, p2) {
     const [a, b] = p1 < p2 ? [p1, p2] : [p2, p1];
     const d = await this.shard(this.shardOf(a));
     const t = d.pt || {};
@@ -119,7 +143,7 @@ export class Store {
   }
 
   async loadFixtures() {
-    if (!this.fixtures) this.fixtures = await this.get("fixtures.json").catch(() => []);
+    if (!this.fixtures) this.fixtures = this.get("fixtures.json").catch(() => []);
     return this.fixtures;
   }
 

@@ -50,6 +50,21 @@ data/fixtures, value_bets ┘                                                   
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
+## App shell, caching and persistence
+
+The site is one HTML document. Routes are hash URLs (`#/player/3`), and `vercel.json` rewrites a path such as `/player/3` to that document. Moving between players, teams and tabs does not download the document again.
+
+What makes a repeat visit feel immediate:
+
+* **One data load.** `meta.json`, `index.json` and `matches.json` load in parallel with the photo map. Player shards and partnership rows stay in memory for the session, so changing a line or coming back to a player does not hit the network again. Hovering a player link starts that player's shard early.
+* **Prop Hunter is shared.** The home rail and the Prop Hunter page use one request for `props.json` plus the hourly GitHub snapshot. The result is reused for 5 minutes, then the GitHub file is revalidated. The pipeline itself is hourly, so this is the freshness window.
+* **HTTP cache.** HTML is `max-age=0, must-revalidate` (a deploy shows up on the next load). `/data/*` is `max-age=300, stale-while-revalidate=3300`: fresh for 5 minutes, then the previous hourly build can be shown while the next one is checked. `/js` and `/css` use the same 5-minute fresh window plus a day of stale-while-revalidate. They are not fingerprinted, so they cannot be cached for a year. The dev server (`scripts/serve.mjs`) sends the same rules.
+* **Screens keep their filters.** The last filters, tab, day and search for each screen are stored in `sessionStorage` (`cph-view`). Opening that screen with no query restores them. A link that already has a query is used as-is, so a shared URL is not mixed with this browser's last visit. Stars stay in `localStorage`, as before.
+* **The shell paints first.** A player, fixture or trends page shows its title and filters while the shard math is still running, with a skeleton in the results. A full-page skeleton appears only if a route takes longer than a moment. Filter changes keep scroll position and the field you were typing in. Back and forward restore the scroll position of that screen.
+* **Small screens.** The header search keeps the width (the Ask button hides, because Ask is on the bottom bar), fixture cards and stat grids shrink instead of forcing a horizontal page scroll, and the bottom bar already clears the home-indicator inset.
+
+There is no service worker and no web app manifest. The numbers have to follow the hourly data build; a worker holding yesterday's JSON would be a second cache to get wrong. Install-to-home-screen is not the job of this site.
+
 ## Run it locally
 ```bash
 pip install -e .

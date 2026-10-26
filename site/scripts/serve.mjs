@@ -21,13 +21,21 @@ createServer(async (req, res) => {
   }
   let p = normalize(join(root, decodeURIComponent(url.pathname)));
   if (!p.startsWith(root)) { res.statusCode = 403; return res.end(); }
+  const cacheFor = (urlPath, file) => {
+    if (urlPath.startsWith("/data/")) return "public, max-age=300, stale-while-revalidate=3300";
+    if (urlPath.startsWith("/js/") || urlPath.startsWith("/css/")) return "public, max-age=300, stale-while-revalidate=86400";
+    if (file.endsWith(".html")) return "public, max-age=0, must-revalidate";
+    return "public, max-age=0, must-revalidate";
+  };
   try {
     if ((await stat(p)).isDirectory()) p = join(p, "index.html");
     res.setHeader("content-type", types[extname(p)] || "application/octet-stream");
+    res.setHeader("cache-control", cacheFor(url.pathname, p));
     res.end(await readFile(p));
   } catch {
     if (extname(p)) { res.statusCode = 404; return res.end("not found"); }
     res.setHeader("content-type", "text/html");
+    res.setHeader("cache-control", "public, max-age=0, must-revalidate");
     res.end(await readFile(join(root, "index.html"))); // SPA fallback, like the vercel.json rewrite
   }
 }).listen(port, () => console.log(`http://localhost:${port}`));

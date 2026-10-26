@@ -9,8 +9,12 @@ import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
 import { STATS as STATDEF } from "./engine/rules.js";
 import { collectGrid, gridTable, initPages, fixturePage, trendsPage, competitionsPage, leaguePage, toolsPage, featuresPage, oddsPage, glossaryPage } from "./pages2.js";
-import { Accordion, Badge, PageSkeleton, TabsList, toast } from "./shadcn.js";
+import { Accordion, Badge, PageSkeleton, Skeleton, TabsList, toast } from "./shadcn.js";
+import { createPropsFeed } from "./feeds.js";
+import { adoptQuery, hasQuery, hashFor, readView, remember, scopeFor, writeView } from "./persist.js";
 import { fromIst, hashQuery, live, localTime, localWhen, chips, freshText, h, odds, pc, suggest, table } from "./ui.js";
+
+const propsFeed = createPropsFeed();
 
 const app = document.getElementById("app");
 let store, rz;
@@ -45,21 +49,43 @@ function drawFooter() {
   f.hidden = false;
 }
 
+function viewStorage() {
+  try { return sessionStorage; } catch { return null; }
+}
+function saveScope(scope, q) {
+  if (!scope) return;
+  const storage = viewStorage();
+  writeView(storage, remember(readView(storage), scope, q));
+}
+const pending = (label) => h("div", { class: "card", role: "status", "aria-label": label }, Skeleton("42%", "22px"), Skeleton("100%", "96px"), Skeleton("70%", "14px"));
+
 async function boot() {
   pathToHash();
+  const photosP = loadPhotos("data/");
   try {
     store = await createStore({ base: "data/" });
   } catch (e) {
     app.replaceChildren(h("div", { class: "card err" }, h("h2", {}, "Data not found"), h("p", {}, `Could not load data files (${e.message}). Run the site build first: see docs/SITE.md.`)));
     return;
   }
+  await photosP;
   rz = new Resolver(store);
-  await loadPhotos("data/");
+  store.loadFixtures(); // home always needs this; start it before the first paint waits
+  propsFeed.load(); // shared by the rail and Prop Hunter; do not block the shell
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
   initPages({ store, rz, go, crumbs, heroCard, nextCountdown: (when) => nextMatchCard({ a: "", b: "", start: when.toISOString(), venue: "", countdownOnly: true }) });
   initSearch();
   drawFooter();
+  window.addEventListener("popstate", () => { navPop = true; });
   window.addEventListener("hashchange", render);
+  document.addEventListener("pointerover", (e) => {
+    const a = e.target.closest?.("a[href]");
+    if (!a || !store) return;
+    const href = a.getAttribute("href") || "";
+    const player = /^#\/player\/(\d+)/.exec(href);
+    if (player) store.prefetchPlayer(Number(player[1]));
+    if (href === "#/props") propsFeed.load();
+  }, { passive: true });
   render();
 }
 
@@ -85,22 +111,57 @@ const go = (path, q = {}) => {
 };
 
 let lastRoute = "";
+let renderGen = 0;
+let navPop = false;
+const scrollMem = new Map();
 async function render() {
-  const { name, args, q } = parseHash();
+  const gen = ++renderGen;
+  let { name, args, q } = parseHash();
+  const scope = scopeFor(name, args);
+  if (scope) {
+    const saved = readView(viewStorage())[scope];
+    const adopted = adoptQuery(q, saved);
+    if (!hasQuery(q) && hasQuery(adopted)) {
+      q = adopted;
+      const next = hashFor(name, args, q);
+      if (location.hash !== next) history.replaceState(null, "", next);
+    }
+    if (hasQuery(q)) saveScope(scope, q);
+  }
   const cur = name === "fixtures" ? "" : name;
   document.querySelectorAll("#nav a").forEach((a) => a.classList.toggle("on", a.dataset.r === cur));
   document.querySelectorAll("#tabbar a").forEach((a) => a.classList.toggle("on", a.dataset.r === (["player", "team", "venue"].includes(cur) ? { player: "players", team: "teams", venue: "teams" }[cur] : cur === "pair" ? "teams" : cur)));
   const page = routes[name] || home;
   document.title = `${TITLES[cur] || "Cricket Props Hub"} | Cricket Props Hub`;
-  const same = lastRoute === `${name}/${args.join("/")}`; // only a filter changed: keep the page and the scroll position
-  lastRoute = `${name}/${args.join("/")}`;
-  if (!same) app.replaceChildren(PageSkeleton());
+  const key = `${name}/${args.join("/")}`;
+  const same = lastRoute === key; // only a filter changed: keep the page and the scroll position
+  if (lastRoute) scrollMem.set(lastRoute, window.scrollY);
+  const restore = navPop;
+  navPop = false;
+  lastRoute = key;
+  const focusName = same && document.activeElement?.name ? document.activeElement.name : "";
+  const caret = focusName && typeof document.activeElement.selectionStart === "number" ? document.activeElement.selectionStart : null;
+  // Skeleton only if the screen is actually waiting. Cached screens paint inside this gap.
+  const skel = same ? 0 : setTimeout(() => { if (gen === renderGen) app.replaceChildren(PageSkeleton()); }, 140);
   try {
     const y = window.scrollY;
     const el = await page(args, q);
+    clearTimeout(skel);
+    if (gen !== renderGen || !el) return;
+    if (same) el.classList.add("quiet");
     app.replaceChildren(el);
-    window.scrollTo(0, same ? y : 0);
+    const top = same ? y : (restore ? (scrollMem.get(key) || 0) : 0);
+    window.scrollTo(0, top);
+    if (focusName) {
+      const field = app.querySelector(`[name="${CSS.escape(focusName)}"]`);
+      if (field) {
+        field.focus();
+        if (caret != null) try { field.setSelectionRange(caret, caret); } catch { /* number inputs */ }
+      }
+    }
   } catch (e) {
+    clearTimeout(skel);
+    if (gen !== renderGen) return;
     console.error(e);
     app.replaceChildren(h("div", { class: "card err" }, h("p", {}, `Something went wrong: ${e.message}`)));
   }
@@ -170,7 +231,15 @@ const crumbs = (...items) => h("div", { class: "crumbs" }, items.flatMap((it, i)
 
 /** StatsHub-style hero card: crest, name, meta pills and in-card tabs that switch the page sections. */
 function heroCard({ name, sub, meta = [], cls = "", badge = null, tabs = [], save = null }, root) {
-  const list = tabs.length ? TabsList(tabs, tabs[0][0], (id) => { set(id); const q = hashQuery(); q.tab = id; history.replaceState(null, "", `#/${location.hash.slice(2).split("?")[0]}?${new URLSearchParams(q)}`); }) : null;
+  const list = tabs.length ? TabsList(tabs, tabs[0][0], (id) => {
+    set(id);
+    const q = hashQuery();
+    q.tab = id;
+    const { name, args } = parseHash();
+    const next = hashFor(name, args, q);
+    history.replaceState(null, "", next);
+    saveScope(scopeFor(name, args), q);
+  }) : null;
   const bar = h("div", { class: "hero-tabs" }, list);
   const set = (id) => {
     if (!tabs.some(([t]) => t === id)) id = tabs[0]?.[0];
@@ -190,28 +259,35 @@ const dayLabel = (k, i) => {
   return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 };
 
+const HOME_CHIPS = [["all", "ALL"], ["T20", "T20"], ["ODI", "ODI"], ["Test", "TEST"], ["male", "MEN"], ["female", "WOMEN"]];
 async function home(_, q = {}) {
-  const fx = await upcoming();
-  const days = [...new Set(fx.map(dayKey))].slice(0, 12);
-  const sel_ = days.includes(q.d) ? q.d : days[0];
-  const state = { g: "all", f: "all" };
-  const body = h("div");
-  const tabs = h("div", { class: "dtabs" }, days.map((k) => h("button", { class: k === sel_ ? "on" : "", onclick: () => go("", { d: k }) }, dayLabel(k), h("small", {}, String(fx.filter((f) => dayKey(f) === k).length)))));
+  const body = h("div", {}, pending("Loading fixtures"));
+  const tabs = h("div", { class: "dtabs" });
   const chipRow = h("div", { class: "strip" });
-  const draw = () => {
-    chipRow.replaceChildren(...[["all", "ALL"], ["T20", "T20"], ["ODI", "ODI"], ["Test", "TEST"], ["male", "MEN"], ["female", "WOMEN"]].map(([v, l]) =>
-      h("button", { class: (v === state.f ? "on" : ""), onclick: () => { state.f = v; draw(); } }, l)));
-    const list = fx.filter((f) => dayKey(f) === sel_ && (state.f === "all" || f.fmt === state.f || f.gender === state.f));
-    body.replaceChildren(fixtureGroups(list));
-  };
-  draw();
-  const side = await sidebar();
-  return h("div", {}, landing(), h("div", { class: "layout has-side" }, h("div", {},
+  const title = h("div", { class: "sec-title" }, "Matches");
+  const shell = h("div", {}, landing(), h("div", { class: "layout has-side" }, h("div", {},
     h("h1", {}, "Today's cricket fixtures, player stats & team stats"),
     h("p", { class: "muted" }, new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long", year: "numeric" })),
     h("p", { class: "muted" }, `Hit rates over any line, fair decimal odds, partnerships and fancy markets from ${store.meta.matches.toLocaleString()} matches since 2001, men's and women's.`),
-    tabs, chipRow, h("div", { class: "sec-title" }, days.length ? "Matches" : "No upcoming fixtures"), body,
-    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.")), side));
+    tabs, chipRow, title, body,
+    h("p", { class: "muted small" }, "Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.")), sidebar()));
+  upcoming().then((fx) => {
+    if (!shell.isConnected) return;
+    const days = [...new Set(fx.map(dayKey))].slice(0, 12);
+    const sel_ = days.includes(q.d) ? q.d : days[0];
+    const state = { f: HOME_CHIPS.some(([v]) => v === q.f) ? q.f : "all" };
+    const stick = () => saveScope("home", { d: sel_ || "", f: state.f === "all" ? "" : state.f });
+    const draw = () => {
+      chipRow.replaceChildren(...HOME_CHIPS.map(([v, l]) => h("button", { class: v === state.f ? "on" : "", onclick: () => { state.f = v; stick(); history.replaceState(null, "", hashFor("", [], { d: sel_ || "", f: state.f === "all" ? "" : state.f })); draw(); } }, l)));
+      const list = fx.filter((f) => dayKey(f) === sel_ && (state.f === "all" || f.fmt === state.f || f.gender === state.f));
+      body.replaceChildren(fixtureGroups(list));
+    };
+    tabs.replaceChildren(...days.map((k) => h("button", { class: k === sel_ ? "on" : "", onclick: () => go("", { d: k, f: state.f === "all" ? "" : state.f }) }, dayLabel(k), h("small", {}, String(fx.filter((f) => dayKey(f) === k).length)))));
+    title.textContent = days.length ? "Matches" : "No upcoming fixtures";
+    if (days.length) stick();
+    draw();
+  }).catch((e) => { if (shell.isConnected) body.replaceChildren(h("div", { class: "card err" }, e.message)); });
+  return shell;
 }
 
 function landing() {
@@ -228,9 +304,7 @@ function landing() {
     h("div", { class: "lp-feats" }, feats.map(([t, d]) => h("div", { class: "lp-f" }, h("h3", {}, t), h("p", { class: "muted small" }, d)))));
 }
 
-async function sidebar() {
-  let snap = null;
-  try { snap = await (await fetch("data/props.json")).json(); } catch { /* none */ }
+function propsRail(snap) {
   const bets = (snap?.value_bets || []).slice(0, 5);
   const alerts = (snap?.recent_alerts || []).slice(-5).reverse();
   const rows = bets.length ? bets.map((b) => ({ t: b.selection, s: `${b.match} · ${b.market}`, o: b.best_odds })) : alerts.map((b) => ({ t: b.selection, s: `${b.match} · ${b.market}`, o: b.best_odds }));
@@ -241,6 +315,14 @@ async function sidebar() {
       rows.length ? h("div", { class: "mini" }, rows.map((r) => h("a", { href: "#/props" }, h("span", {}, r.t, h("small", {}, r.s)), h("span", { class: "odds" }, odds(r.o))))) : h("p", { class: "muted small" }, "Nothing flagged right now.")),
     h("div", { class: "card" }, h("h3", {}, "Ask anything"), h("p", { class: "muted small" }, "Write your question your own way; typos are fine."),
       h("a", { class: "btn", href: "#/ask" }, "Ask a question")));
+}
+
+function sidebar() {
+  const warm = propsFeed.peek();
+  if (warm) return propsRail(warm.snap);
+  const slot = h("aside", { class: "side" }, pending("Loading value bets"));
+  propsFeed.load().then(({ snap }) => { if (slot.isConnected) slot.replaceWith(propsRail(snap)); }).catch(() => {});
+  return slot;
 }
 
 async function upcoming() {
@@ -303,7 +385,7 @@ async function playersPage(_, q) {
     list.replaceChildren(table(["Player", "Team", "Formats", "Last match", "Innings/spells"], c.map((p) => [h("a", { class: "tm", href: `#/player/${p.idx}` }, playerBadge(store, p.idx), p.name),
       store.teamName(p.team), FORMATS.filter((_, i) => (store.P.fm[p.idx] >> i) & 1).join(" "), p.last, store.P.n[p.idx]])));
   };
-  input.addEventListener("input", draw);
+  input.addEventListener("input", () => { draw(); saveScope("players", { q: input.value.trim() }); history.replaceState(null, "", hashFor("players", [], { q: input.value.trim() })); });
   draw();
   return h("div", {}, h("h1", {}, "Players"), input, list);
 }
@@ -341,6 +423,7 @@ async function player(args, q) {
     field("Competition", inp("comp", q.comp, { placeholder: "IPL, BBL…", style: "width:110px" })),
     field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))) }], { cls: "flush" }));
   live(form);
+  const body = h("div", {}, pending("Loading player stats"));
   const plan = {
     kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
@@ -348,12 +431,20 @@ async function player(args, q) {
       since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null, international: q.lvl === "intl" ? true : q.lvl === "club" ? false : null },
     venue: q.venue || null,
   };
-  const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  const body = h("div", {}, renderResult(res, { onLine: (l) => go(`player/${idx}`, { ...q, line: l }), onStat: (k) => go(`player/${idx}`, { ...q, stat: k, line: "" }), stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), badge: () => playerBadge(store, idx) }));
   const hc = heroCard({ name, sub: store.teamName(store.P.tm[idx]), meta: [`Last played ${store.P.last[idx]}`, FORMATS.filter((_, i) => (fm >> i) & 1).join(" · ")], cls: "p", save: ["player", idx], badge: playerBadge(store, idx, "crest"),
     tabs: [["props", "Charts"], ["logs", "Game logs"], ["splits", "Table & splits"]] }, body);
   const out = h("div", {}, crumbs(["Home", "#/"], ["Players", "#/players"], [name]), hc.el, ...datalists(), form, body);
   hc.set(q.tab);
+  const opts = { onLine: (l) => go(`player/${idx}`, { ...q, line: l }), onStat: (k) => go(`player/${idx}`, { ...q, stat: k, line: "" }), stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), badge: () => playerBadge(store, idx) };
+  const paint = (res) => body.replaceChildren(renderResult(res, opts));
+  // Shard already in memory (filter change, or a hover prefetch): paint the numbers with the shell.
+  if (store.hasPlayer(idx)) {
+    try { paint(await runPlan(store, rz, plan, { playerIdx: idx })); }
+    catch (e) { body.replaceChildren(h("div", { class: "card err" }, e.message)); }
+  } else {
+    runPlan(store, rz, plan, { playerIdx: idx }).then((res) => { if (out.isConnected) paint(res); })
+      .catch((e) => { if (out.isConnected) body.replaceChildren(h("div", { class: "card err" }, e.message)); });
+  }
   return out;
 }
 
@@ -368,7 +459,7 @@ async function teamsPage(_, q) {
     const rows = names.map((n, i) => [n, i]).filter(([n]) => !t || n.toLowerCase().includes(t)).sort((a, b) => counts[b[1]] - counts[a[1]]).slice(0, 60);
     list.replaceChildren(table([tab === "teams" ? "Team" : "Venue", "Matches"], rows.map(([n, i]) => [h("a", { href: `#/${tab === "teams" ? "team" : "venue"}/${i}` }, n), counts[i]])));
   };
-  input.addEventListener("input", draw);
+  input.addEventListener("input", () => { draw(); saveScope("teams", { tab, q: input.value.trim() }); history.replaceState(null, "", hashFor("teams", [], { tab, q: input.value.trim() })); });
   draw();
   return h("div", {}, h("h1", {}, "Teams & venues"),
     h("div", { class: "tabs" }, h("button", { class: tab === "teams" ? "on" : "", onclick: () => go("teams", { tab: "teams" }) }, "Teams"), h("button", { class: tab === "venues" ? "on" : "", onclick: () => go("teams", { tab: "venues" }) }, "Venues")),
@@ -408,7 +499,7 @@ async function marketPage(kind, args, q) {
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
   const [res, top] = await Promise.all([runPlan(store, rz, plan, hints), runPlan(store, rz, { ...plan, kind: "top_batter", market: null }, hints)]);
   const b1 = h("div", { "data-sec": "markets" }, form, renderResult(res)), b2 = h("div", { "data-sec": "top" }, h("h2", {}, isTeam ? "Top batter (team batting first)" : "Top batter in the match"), renderResult(top));
-  const b3 = isTeam ? await playerGrid(idx, FORMATS.includes(fmt) ? fmt : "T20", q) : null;
+  const b3 = isTeam ? h("div", { "data-sec": "grid" }, pending("Loading player grid")) : null;
   const root = h("div", {}, b1, b2, b3);
   const hc = heroCard({ name: label, sub: isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue", meta: [`${FORMATS.includes(fmt) ? fmt : "T20"} markets`, isTeam ? "team markets use the side batting first" : "match markets"],
     cls: isTeam ? "" : "v", save: isTeam ? ["team", idx] : null, badge: isTeam ? teamBadge(store.teams[idx].n, "crest") : null, tabs: isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]] }, root);
@@ -417,6 +508,10 @@ async function marketPage(kind, args, q) {
   const about = isTeam ? h("div", { class: "card about" }, h("h3", {}, `About ${label}`), h("p", { class: "muted" }, `${label} ${FORMATS.includes(fmt) ? fmt : "T20"} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair odds are 1 ÷ hit rate and carry no margin.`)) : null;
   const out = h("div", {}, crumbs(["Home", "#/"], [isTeam ? "Teams" : "Venues", `#/teams?tab=${isTeam ? "teams" : "venues"}`], [label]), hc.el, nextCard, ...datalists(), root, about);
   hc.set(q.tab);
+  if (isTeam) {
+    playerGrid(idx, FORMATS.includes(fmt) ? fmt : "T20", q).then((el) => { if (out.isConnected) b3.replaceWith(el); })
+      .catch((e) => { if (out.isConnected) b3.replaceChildren(h("div", { class: "card err" }, e.message)); });
+  }
   return out;
 }
 
@@ -446,17 +541,7 @@ async function pair(_, q) {
   return h("div", {}, crumbs(["Home", "#/"], ["Partnerships"]), h("h1", {}, "Partnerships"), h("p", { class: "muted" }, "For any pair: who is dismissed first, stand sizes, split by format, opposition and venue. Needs ball-by-ball data, so only Cricsheet-published matches count."), ...datalists(), form, result);
 }
 
-async function props() {
-  const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/value_bets_latest.json";
-  let snap = null, live = false;
-  try { snap = await (await fetch("data/props.json")).json(); } catch { /* none */ }
-  try {
-    const r = await fetch(RAW, { cache: "no-cache" });
-    if (r.ok) {
-      const d = await r.json();
-      if (!snap || (d.generated_at_utc || "") >= (snap.generated_at_utc || "")) { snap = { ...snap, ...d, value_bets: d.value_bets, recent_alerts: snap?.recent_alerts || [] }; live = true; }
-    }
-  } catch { /* offline: bundled snapshot */ }
+function propsView(snap, live) {
   if (!snap) return h("div", { class: "card" }, "Prop Hunter data is not available yet.");
   const now = Date.now();
   const bets = (snap.value_bets || []).filter((b) => !b.start_utc || Date.parse(b.start_utc) > now - 3600e3).sort((a, b) => b.edge_pct - a.edge_pct);
@@ -475,6 +560,15 @@ async function props() {
     bets.length ? h("div", { class: "cards2" }, bets.map(card)) : h("div", { class: "card" }, h("p", {}, "No value bets passed the filters in the latest run."),
       h("p", { class: "muted small" }, `Markets priced: ${snap.stats?.markets_in_window ?? "?"} across ${snap.stats?.events_in_window ?? "?"} matches in the next 24 h; sources: ${Object.entries(snap.sources || {}).map(([k, v]) => `${k} ${v.status}`).join(", ") || "n/a"}.`)),
     hist.length ? [h("h2", {}, "Recent alerts"), h("div", { class: "cards2" }, hist.slice(0, 12).map(card))] : null);
+}
+
+async function props() {
+  const warm = propsFeed.peek();
+  if (warm) return propsView(warm.snap, warm.live);
+  const shell = h("div", {}, pending("Loading Prop Hunter"));
+  propsFeed.load().then(({ snap, live }) => { if (shell.isConnected) shell.replaceWith(propsView(snap, live)); })
+    .catch((e) => { if (shell.isConnected) shell.replaceWith(h("div", { class: "card err" }, e.message)); });
+  return shell;
 }
 
 async function askPage(_, q) {
