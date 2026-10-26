@@ -5,13 +5,14 @@ import { bookName } from "./engine/lines.js";
 import { barState, windowRate, windowRates } from "./engine/windows.js";
 import { ladderTable, splitTables } from "./render.js";
 import { segment, sheet } from "./ionic.js";
+import { Card, Gauge, Hero, IconButton, Stat, StatGrid } from "./components.js";
+import { growBars, enter } from "./motion.js";
 import { chips, h, hashQuery, localWhen, num, odds, pc, table } from "./ui.js";
 
 const BACK = '<svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const SLIDERS = '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>';
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side"]); // those are on screen already
 
-const tile = (k, v, sub, cls = "") => h("div", { class: `pa-tile ${cls}` }, h("span", { class: "k" }, k), h("b", { class: "v" }, v), sub ? h("span", { class: "s" }, sub) : null);
 const SHARE = '<svg class="i" viewBox="0 0 24 24"><path d="M21 3L3 10.5l7 3 3 7z"/><path d="M10 13.5L21 3"/></svg>';
 const abbr = (n) => { const w = String(n).replace(/\(W\)/, "").trim().split(/\s+/); return (w.length > 1 ? w.map((x) => x[0]).join("") : w[0]).slice(0, 3).toUpperCase(); };
 const shortDate = (d) => d.slice(5).split("-").reverse().join("/");
@@ -32,14 +33,11 @@ export function playerScreen(deps) {
   const bar = h("div", { class: "pa-bar" },
     h("button", { type: "button", class: "pa-back", "aria-label": "Back", onclick: back, html: BACK }),
     h("div", { class: "pa-title" }, name), star("player", idx));
-  const share = h("button", { type: "button", class: "pa-round", "aria-label": "Share", html: SHARE, onclick: () => { const u = location.href; (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u)).catch(() => {}); } });
-  const gauge = h("div", { class: "pa-gauge" });
-  const hero = h("section", { class: "pa-hero" },
-    h("div", { class: "pa-photo" }, playerBadge(store, idx, "crest")),
-    h("div", { class: "pa-id" }, h("h1", {}, name), h("div", { class: "pa-team" }, team), h("div", { class: "pa-team" }, fmts.map(([, f]) => f).join(" · ")),
-      h("div", { class: "pa-acts" }, h("span", { class: "pa-round" }, teamBadge(team)), star("player", idx), share)));
-  const strip = h("section", { class: "pa-strip" });
-  hero.append(h("div", { class: "pa-stats" }, strip, gauge));
+  const share = IconButton("Share", SHARE, () => { const u = location.href; (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u)).catch(() => {}); });
+  const gaugeHost = h("div", { class: "ui-gauge-host" });
+  const strip = h("div", { class: "ui-stat-grid" });
+  const hero = Hero({ photo: playerBadge(store, idx, "crest"), name, lines: [team, fmts.map(([, f]) => f).join(" · ")],
+    actions: [h("span", { class: "ui-icon-btn" }, teamBadge(team)), star("player", idx), share], stats: [strip, gaugeHost] });
   root.append(bar);
 
   if (!res.ok) { root.append(hero, h("div", { class: "card err" }, h("p", {}, res.error))); return root; }
@@ -65,8 +63,9 @@ export function playerScreen(deps) {
   };
 
   // ------------------------------------------------------------ chart + strip (redrawn locally when line / side / window change)
+  let animated = false;
   function drawChart() {
-    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); gauge.replaceChildren(); drawBook({ n: 0, label: "All" }); return; }
+    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); gaugeHost.replaceChildren(); drawBook({ n: 0, label: "All" }); return; }
     const ws = windowRates(entries, st.line, st.side);
     const cur = ws.find((w) => w.n === st.win) || ws[ws.length - 1];
     const shown = cur.n ? entries.slice(-cur.n) : entries;
@@ -83,15 +82,14 @@ export function playerScreen(deps) {
     const played = shown.filter((e) => e.value != null);
     const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
     strip.replaceChildren(
-      tile(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), "", cur.p != null && cur.mean > st.line ? "up" : ""),
-      tile("Line", `${st.side === "over" ? "O" : "U"} ${st.line}`, bookAt ? bookAt.books.map((b) => `${bookName(b.source)} ${odds(b[st.side])}`).join(" · ") : ""),
-      tile("Prop", res.statLabel, ""),
-      tile("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `${cur.hits}/${cur.played}`, `hit ${bandOf(cur.p)}`),
-      tile(`Avg ${(c.auxLabel || "").toLowerCase()}`, num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100), ""),
-      tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : ""));
+      Stat(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), cur.p != null && cur.mean > st.line ? "up" : ""),
+      Stat("Line", `${st.side === "over" ? "O" : "U"} ${st.line}`),
+      Stat("Prop", res.statLabel),
+      Stat("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `hit ${bandOf(cur.p)}`),
+      Stat(`Avg ${(c.auxLabel || "").toLowerCase()}`, num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)),
+      Stat("Fair odds", cur.p ? odds(1 / cur.p) : "–"));
 
-    const arc = cur.p == null ? 0 : cur.p;
-    gauge.replaceChildren(h("div", { html: `<svg viewBox="0 0 48 48" width="52" height="52"><circle cx="24" cy="24" r="19" fill="none" style="stroke:var(--pc-line)" stroke-width="4" stroke-dasharray="89.6 29.9" stroke-linecap="round" transform="rotate(135 24 24)"/><circle cx="24" cy="24" r="19" fill="none" style="stroke:var(${arc >= 0.6 ? "--pc-accent" : arc >= 0.4 ? "--pc-amber" : "--pc-red"})" stroke-width="4" stroke-dasharray="${(89.6 * arc).toFixed(1)} 200" stroke-linecap="round" transform="rotate(135 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor">${cur.p == null ? "–" : Math.round(arc * 100) + "%"}</text></svg>` }), h("span", {}, `${cur.label} hit`));
+    gaugeHost.replaceChildren(Gauge(cur.p, `${cur.label} hit`));
 
     const bars = shown.map((e) => {
       const s = barState(e, st.line, st.side);
@@ -123,6 +121,7 @@ export function playerScreen(deps) {
     drawBook(cur);
     // keep the newest games in view on a long, scrollable chart
     requestAnimationFrame(() => { const p = chartCard.querySelector(".pa-plot"); if (p) p.scrollLeft = p.scrollWidth; });
+    if (!animated) { animated = true; growBars(chartCard.querySelectorAll(".pa-bars .bar:not(.none)")); enter(strip.children, { y: 8, gap: 0.05 }); }
   }
 
   /** The market's lines next to his own hit rate over the same lines (window chosen on the chart): where they differ is what to look at. */
@@ -135,7 +134,7 @@ export function playerScreen(deps) {
         h("span", { class: "pa-odds" }, l.books.map((b) => h("span", {}, h("em", {}, bookName(b.source)), `${odds(b.over)} / ${odds(b.under)}`))),
         l.prob == null ? "–" : pc(l.prob), hist.p == null ? "–" : pc(hist.p)];
     });
-    bookHost.replaceChildren(h("section", { class: "pa-card pa-book" }, h("h3", {}, "Bookmaker lines"),
+    bookHost.replaceChildren(Card({ title: "Bookmaker lines", cls: "pa-book" },
       h("p", { class: "muted small" }, `${book.match}${book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}${book.competition ? ` · ${book.competition}` : ""}. Decimal odds, over / under. Tap a line to put it on the chart.${bookDefault ? " The chart opened on the main line." : ""}`),
       table(["Line", "Odds", "Market", `Hit ${cur.label}`], rows),
       h("p", { class: "muted small" }, "Market = the chance of the over once each book's margin is removed. Hit rate = how often he has gone over that line in the games shown on the chart.")));
@@ -169,12 +168,12 @@ export function playerScreen(deps) {
     }), logs.length > logCount ? h("button", { type: "button", class: "ghost pa-more", onclick: () => { logCount += 30; drawLogs(); } }, `Show more (${logs.length - logCount} left)`) : null);
   };
   drawLogs();
-  const corr = res.corr ? h("div", { class: "pa-card" }, h("h3", {}, `When ${res.statLabel.toLowerCase()} ${res.plan.side || "over"} ${c?.line ?? res.line} hits`),
+  const corr = res.corr ? Card({ title: `When ${res.statLabel.toLowerCase()} ${res.plan.side || "over"} ${c?.line ?? res.line} hits` },
     h("p", { class: "muted small" }, `${res.corr.n} of ${res.corr.of} ${res.sample.unit}: how often his other props also clear in those games.`),
     table(["Prop", "Normal", "When it hits", "Lift"], res.corr.rows.map((x) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`]))) : null;
   const sections = {
-    lines: h("div", {}, h("div", { class: "pa-card" }, h("h3", {}, "Hit rate at every line"), ladderTable(res.ladder)), corr),
-    logs: h("div", { class: "pa-card flat" }, logList),
+    lines: h("div", {}, Card({ title: "Hit rate at every line" }, ladderTable(res.ladder)), corr),
+    logs: Card({ flat: true }, logList),
     splits: h("div", {}, ...splitTables(res.splits)),
   };
   const showTab = (t) => { tab = t; for (const [k, el] of Object.entries(sections)) el.hidden = k !== t; };
@@ -182,7 +181,7 @@ export function playerScreen(deps) {
   showTab(tab);
   tabsHost.append(segment([["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]], tab, (v) => { showTab(v); saveView(); }, { cls: "pa-tabseg", label: "Section" }));
 
-  side.append(h("div", { class: "pa-card pa-insight" }, h("h3", {}, "At a glance"), h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
+  side.append(Card({ title: "At a glance", cls: "pa-insight" }, h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
   drawChart();
   root.append(h("div", { class: "pa-railwrap" }, rail), hero, ...(fmtSeg ? [fmtSeg] : []),
     h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, bookHost, filterBar, tabsHost, secs), side));

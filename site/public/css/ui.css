@@ -92,3 +92,88 @@ label { font-size: 12px; font-weight: 600; color: hsl(var(--muted-foreground)); 
 .ui-acc.faq .ui-acc-trigger { padding: 14px 2px; }
 .ui-acc.flush .ui-acc-item { border: 0; } .ui-acc.flush .ui-acc-trigger { padding: 10px 0; color: hsl(var(--muted-foreground)); font-size: 13px; }
 .ui-acc.faq .scroll { margin: 0 -4px; }
+
+/* =====================================================================
+   Design system: the props.cash look as tokens + components (values read from the live app's Tailwind classes / computed
+   styles). Components: Header, SideNav, PillRail, Card, IconButton, Stat/StatGrid, Gauge, Hero (see js/components.js).
+   ===================================================================== */
+:root {
+  --pc-bg: #0f0f0f; --pc-card: #151515; --pc-pill: #1a1a1a; --pc-input: #1c1c1c; --pc-line: #2a2a2a; --pc-sel: #2f2f2f;
+  --pc-accent: #27da8e; --pc-accent-bg: #0d3524; --pc-mute: #9f9f9f; --pc-red: #ff4444; --pc-miss: #f00; --pc-amber: #f5a524; --pc-dnp: #999;
+  --bg: var(--pc-bg); --bg2: var(--pc-bg); --card: var(--pc-card); --card2: var(--pc-line); --line: var(--pc-line); --mute: var(--pc-mute); --dim: #6e6e6e;
+  --acc: var(--pc-accent); --btn: var(--pc-accent); --btn-ink: var(--pc-bg); --link: var(--pc-accent); --good: var(--pc-accent); --bad: var(--pc-red); --warn: var(--pc-amber);
+  --body: "Diatype", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --cond: "Diatype Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+}
+body { background: var(--pc-bg); font-family: var(--body); }
+h1, h2, h3, h4, .hero-name, .answer h2, .sheet-head, .promo h3, .banner .v, .lp-f h3, .trend .lab { font-family: var(--body); font-weight: 500; text-transform: none; letter-spacing: 0; }
+h1 { font-size: 28px; } h2 { font-size: 22px; margin: 22px 0 10px; } h3 { font-size: 18px; } @media (min-width: 768px) { h1 { font-size: 32px; } }
+button.ghost, .btn.ghost { background: var(--pc-line); color: #fff; }
+input, select, textarea { background: var(--pc-input); border: 1px solid var(--pc-line); } input:focus, select:focus, textarea:focus { outline-color: var(--pc-accent); }
+th { font-family: var(--cond); font-weight: 400; font-size: 13px; letter-spacing: 0; color: var(--pc-mute); background: transparent; } th, td { border-bottom-color: var(--pc-line); }
+.chip, .badge, .crumbs .cur { background: var(--pc-line); } .crumbs { color: var(--pc-mute); }
+
+/* Card */
+.ui-card, .card, .trend, .comp, .stat, .promo, .toolc, .winTable, details.card, .pa-card { background: var(--pc-bg); border: 1px solid var(--pc-line); border-radius: 8px; }
+.ui-card { padding: 14px; min-width: 0; } .ui-card.flat { padding: 4px 6px; }
+.ui-card-title, .pa-card h3 { font: 500 20px var(--body); text-transform: none; letter-spacing: 0; margin: -2px -2px 10px; padding-bottom: 12px; border-bottom: 1px solid var(--pc-line); }
+.stat { padding: 12px 16px; } .stat .k { font: 400 13px var(--cond); letter-spacing: 0; color: var(--pc-mute); } .stat .v { font: 500 26px/1.2 var(--body); }
+.promo, .banner { background: var(--pc-card); } .promo::after { display: none; } .promo h3, .banner .k { color: var(--pc-accent); opacity: 1; } .banner { color: #fff; border-radius: 8px; border: 1px solid var(--pc-line); }
+.banner a.go { background: var(--pc-accent); color: var(--pc-bg); font-weight: 600; } .banner .ico { background: var(--pc-line); } .banner .v { font-size: 22px; }
+.trend .lab, .trend .nums b, .linepill b { color: var(--pc-accent); } .trend .lab { font-size: 20px; } .gcell .v.hit, .edge, .badge.live { background: var(--pc-accent-bg); color: var(--pc-accent); }
+
+/* Pill rail + every pill-shaped control: 40px, selected #2F2F2F */
+.ui-pill-rail { background: none; border-radius: 0; padding: 0; gap: 6px; height: auto; max-width: 100%; }
+.ui-pill-rail .ui-tab, .pill, .tabs button, .seg button, .dtabs button, .hero-tabs button, .strip button { height: 40px; padding: 0 16px; border-radius: 999px; background: transparent; color: #fff; font: 500 15px var(--body); border: 0; }
+.ui-pill-rail .ui-tab[aria-selected=true], .pill.on, .tabs button.on, .seg button.on, .dtabs button.on, .hero-tabs button.on, .strip button.on { background: var(--pc-sel); color: #fff; box-shadow: none; }
+.pill { background: var(--pc-pill); border: 1px solid var(--pc-line); } .seg { background: var(--pc-bg); border: 1px solid var(--pc-line); } .dtabs { border-bottom: 1px solid var(--pc-line); gap: 6px; padding-bottom: 8px; }
+.strip button { border: 1px solid var(--pc-line); } .hero-tabs { border-top: 0; padding: 0 0 8px; gap: 6px; }
+ion-segment.pa-rail ion-segment-button, .seg-plain.scrollable button { --indicator-color: var(--pc-sel); --color: #fff; --color-checked: #fff; background: transparent; margin-right: 0; min-height: 40px; font: 500 16px var(--body); }
+.seg-plain.scrollable button.on, .seg-plain button.on { background: var(--pc-sel); color: #fff; }
+
+/* IconButton + the star wrapper */
+.ui-icon-btn, .ui-hero-actions .star { width: 44px; height: 44px; border-radius: 50%; background: var(--pc-line); color: #fff; border: 0; padding: 0; display: grid; place-items: center; overflow: hidden; cursor: pointer; transform: none; }
+.ui-hero-actions .star:hover { transform: none; filter: brightness(1.2); } .ui-hero-actions .star.on svg { fill: var(--pc-amber); stroke: var(--pc-amber); }
+.ui-icon-btn svg, .ui-hero-actions .star svg { width: 20px; height: 20px; } .ui-icon-btn .dot { width: 100%; height: 100%; border: 0; background: #0c5a3a; }
+
+/* Stat + StatGrid + Gauge */
+.ui-stat-grid { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 14px 20px; }
+.ui-stat { display: grid; } .ui-stat .k { font: 400 13px/1.3 var(--cond); text-transform: uppercase; color: var(--pc-mute); } .ui-stat .v { font: 500 15px/1.4 var(--body); color: #fff; }
+.ui-stat.up .v::before, .ui-stat.hit.hi .v::before { content: "\25B2"; font-size: 9px; color: var(--pc-accent); margin-right: 5px; vertical-align: 2px; }
+.ui-stat.down .v::before, .ui-stat.hit.lo .v::before { content: "\25BC"; font-size: 9px; color: var(--pc-red); margin-right: 5px; vertical-align: 2px; }
+.ui-gauge { flex: none; width: 112px; height: 96px; background: var(--pc-card); border: 1px solid var(--pc-line); border-radius: 8px; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 14px; color: #fff; }
+
+/* Hero: phone = name | photo, stats below; >= 1024 = photo | name | stats */
+.ui-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id photo" "stats stats"; align-items: end; gap: 0 12px; padding: 16px 0 0; border-bottom: 1px solid var(--pc-line); }
+.ui-hero-photo { grid-area: photo; width: 150px; height: 138px; overflow: hidden; } .ui-hero-photo .crest { width: 150px; height: 150px; border: 0; border-radius: 0; background: none; align-items: start; } .ui-hero-photo .crest img { object-fit: cover; object-position: top center; }
+.ui-hero-id { grid-area: id; align-self: start; padding-bottom: 14px; } .ui-hero-id h1 { font: 500 24px/1.15 var(--body); margin: 0; }
+.ui-hero-sub { color: var(--pc-mute); font-size: 14px; line-height: 1.25; } .ui-hero-actions { display: flex; gap: 12px; margin-top: 14px; }
+.ui-hero-stats { grid-area: stats; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--pc-line); padding: 14px 16px 12px; margin: 0 -16px; }
+@media (min-width: 768px) {
+  .ui-hero { grid-template-columns: 190px minmax(0, 1fr) auto; grid-template-areas: "photo id stats"; align-items: center; gap: 0 24px; padding-top: 18px; }
+  .ui-hero-photo { width: 190px; height: 168px; align-self: end; } .ui-hero-photo .crest { width: 190px; height: 190px; }
+  .ui-hero-id { align-self: center; padding: 0; } .ui-hero-id h1 { font-size: 30px; } .ui-hero-sub { font-size: 16px; }
+  .ui-hero-stats { border-top: 0; padding: 0; margin: 0; gap: 40px; } .ui-stat-grid { grid-template-columns: repeat(3, 96px); gap: 14px 8px; } .ui-stat .k, .ui-stat .v { font-size: 16px; }
+}
+@media (min-width: 1280px) { .ui-hero-id h1 { font-size: 40px; } .ui-hero-photo { width: 190px; } }
+
+/* Team / venue / fixture hero (legacy heroCard): flat and left aligned */
+.hero-card:not(.p) { background: none; border: 0; border-radius: 0; border-bottom: 1px solid var(--pc-line); overflow: visible; margin-bottom: 12px; box-shadow: none; }
+.hero-card:not(.p) .hero-top { background: none; justify-items: start; text-align: left; padding: 18px 0 14px; } .hero-card:not(.p) .hero-name { font-size: 28px; }
+.hero-card:not(.p) .hero-meta { justify-content: flex-start; } .hero-card:not(.p) .hero-meta span { background: var(--pc-line); }
+@media (min-width: 768px) { .hero-card:not(.p) .hero-top { grid-template-columns: auto 1fr; column-gap: 24px; } .hero-card:not(.p) .hero-name { font-size: 40px; } }
+.lp { background: var(--pc-bg); } .lp-f { border-left-color: var(--pc-accent); } .lp-h span { color: var(--pc-accent); } .marq { background: transparent; }
+
+/* Header + SideNav (>= 768: 60px header, 268px left rail) */
+.ui-header .cta { background: var(--pc-accent); color: var(--pc-bg); font-weight: 600; }
+@media (min-width: 768px) {
+  .ui-header { height: 60px; margin: 0; max-width: none; width: 100%; border-radius: 0; border-width: 0 0 1px; background: var(--pc-bg); backdrop-filter: none; padding: 0 16px; position: sticky; top: 0; }
+  .ui-header .brand { font: 700 22px var(--body); letter-spacing: -.01em; text-transform: none; }
+  .ui-header .gsearch { position: absolute; left: 50%; transform: translateX(-50%); width: 100%; max-width: 620px; margin: 0; }
+  .ui-header .gsearch input { height: 40px; background: var(--pc-input); border: 1px solid var(--pc-line); font-size: 15px; }
+  .ui-header .cta { height: 34px; padding: 0 16px; display: inline-grid; place-items: center; font-size: 13px; margin-left: auto; }
+  #nav.ui-sidenav { position: fixed; left: 0; top: 60px; bottom: 0; width: 268px; flex-direction: column; align-items: stretch; gap: 4px; margin: 0; padding: 12px; border-right: 1px solid var(--pc-line); background: var(--pc-bg); overflow-y: auto; z-index: 40; }
+  #nav#nav.ui-sidenav a, #nav.ui-sidenav summary { height: 44px; border-radius: 24px; font: 600 15.5px var(--body); padding: 0 13px; color: #fff; background: none; } #nav.ui-sidenav a.on { background: none; color: var(--pc-accent); } #nav.ui-sidenav a:hover, #nav.ui-sidenav summary:hover { background: var(--pc-pill); }
+  #nav#nav.ui-sidenav a span.t { display: inline; } #nav.ui-sidenav .menu { position: static; box-shadow: none; border: 0; background: none; padding: 0 0 0 12px; }
+  main, #foot, footer { margin-left: 268px; margin-right: 0; max-width: none; width: auto; padding-left: 32px; padding-right: 32px; }
+}
