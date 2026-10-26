@@ -149,3 +149,75 @@ ion-segment.pa-side-seg, .pa-side-seg.seg-plain { width: 190px; flex: none; }
 }
 @media (min-width: 768px) { .pa-id h1 { font-size: 40px; } }
 @media (min-width: 1280px) { .pa-id h1 { font-size: 46px; } }
+
+/* =====================================================================
+   props.cash look (values read from the live app: Tailwind classes + computed styles)
+   page #0F0F0F, hairline #2A2A2A, card #151515/#1A1A1A, selected #2F2F2F, accent #27DA8E, muted #9F9F9F,
+   amber #F5A524, red #FF4444; Diatype (sans) + Diatype Condensed (labels); pills h-40, rounded-full
+   ===================================================================== */
+:root {
+  --bg: #0f0f0f; --bg2: #0f0f0f; --card: #151515; --card2: #2a2a2a; --line: #2a2a2a; --mute: #9f9f9f; --dim: #6e6e6e;
+  --acc: #27da8e; --btn: #27da8e; --btn-ink: #0f0f0f; --link: #27da8e; --good: #27da8e; --bad: #ff4444; --warn: #f5a524;
+  --body: "Diatype", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --cond: "Diatype Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+}
+body { background: #0f0f0f; font-family: var(--body); }
+/* rail: pills 40px, selected #2F2F2F */
+ion-segment.pa-rail ion-segment-button { --indicator-color: #2f2f2f; --color: #fff; --color-checked: #fff; background: transparent; margin-right: 0; min-height: 40px; font: 500 16px var(--body); }
+.seg-plain.scrollable button { background: transparent; color: #fff; font: 500 16px var(--body); } .seg-plain.scrollable button.on, .seg-plain button.on { background: #2f2f2f; color: #fff; }
+.pa-railwrap { background: #0f0f0f; border-bottom: 1px solid #2a2a2a; margin-bottom: 0; }
+/* hero */
+.pa-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "id photo" "stats stats"; align-items: end; gap: 0 12px; padding: 16px 0 0; border-bottom: 1px solid #2a2a2a; }
+.pa-photo { grid-area: photo; align-self: end; width: 150px; height: 138px; overflow: hidden; } .pa-photo .crest { width: 150px; height: 150px; border: 0; border-radius: 0; background: none; align-items: start; }
+.pa-photo .crest img { object-fit: cover; object-position: top center; }
+.pa-id { grid-area: id; align-self: start; padding-bottom: 14px; }
+.pa-id h1 { font: 500 24px/1.15 var(--body); text-transform: none; letter-spacing: 0; margin: 0; }
+.pa-team { color: #9f9f9f; font-size: 14px; line-height: 1.25; }
+.pa-acts { display: flex; gap: 12px; margin-top: 14px; }
+.pa-round, .pa-acts .star { width: 44px; height: 44px; border-radius: 50%; background: #2a2a2a; color: #fff; border: 0; padding: 0; display: grid; place-items: center; overflow: hidden; cursor: pointer; transform: none; } .pa-acts .star:hover { transform: none; filter: brightness(1.2); }
+.pa-acts .star.on { background: #2a2a2a; } .pa-acts .star.on svg { fill: #f5a524; stroke: #f5a524; } .pa-acts .star svg, .pa-round svg { width: 20px; height: 20px; }
+.pa-round .dot { width: 100%; height: 100%; border: 0; background: #0c5a3a; }
+.pa-stats { grid-area: stats; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #2a2a2a; padding: 14px 0 12px; margin: 0 -16px; padding-inline: 16px; }
+.pa-strip { flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 14px 20px; padding: 0; }
+.pa-tile { background: none; border: 0; padding: 0; border-radius: 0; gap: 0; }
+.pa-tile .k { font: 400 13px/1.3 var(--cond); letter-spacing: 0; text-transform: uppercase; color: #9f9f9f; }
+.pa-tile .v { font: 500 15px/1.4 var(--body); letter-spacing: 0; color: #fff; }
+.pa-tile .s { display: none; }
+.pa-tile.up .v::before, .pa-tile.hit.hi .v::before { content: "\25B2"; font-size: 9px; color: #27da8e; margin-right: 5px; vertical-align: 2px; }
+.pa-tile.hit.lo .v::before { content: "\25BC"; font-size: 9px; color: #ff4444; margin-right: 5px; vertical-align: 2px; }
+.pa-tile.hit.hi .v, .pa-tile.up .v { color: #fff; } .pa-tile.hit.lo .v, .pa-tile.hit.mid .v { color: #fff; }
+.pa-gauge { flex: none; width: 112px; height: 96px; background: #151515; border: 1px solid #2a2a2a; border-radius: 8px; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 14px; }
+.pa-gauge span { color: #fff; }
+/* chart: flat, full width, hairline white line, grey DNP, green/red bars */
+.pa-chart { background: none; border: 0; padding: 0; margin-top: 4px; }
+.pa-line { border-top: 1px solid #fff; } .pa-line span { background: none; padding: 0; font: 400 16px var(--body); transform: translateY(-110%); left: 0; }
+.pa-area .gl { display: none; }
+.pa-bars { gap: 4px; } .pa-bars .bar { background: #27da8e; border-radius: 0; } .pa-bars .bar em { color: #0f0f0f; font: 500 13px var(--body); }
+.pa-bars .miss .bar { background: #f00; } .pa-bars .miss .bar em { color: #fff; }
+.pa-bars .bar.none { height: 100% !important; background: none; opacity: 1; border-radius: 0; align-items: end; }
+.pa-bars .bar.none::after { content: ""; display: block; width: 100%; height: 20px; background: #999; align-self: flex-end; } .pa-bars .bar.none em { display: none; }
+.pa-xl { gap: 4px; } .pa-xl .col { gap: 0; } .pa-xl small { font-size: 10.5px; line-height: 1.5; color: #9f9f9f; }
+.pa-y { color: #fff; font-size: 14px; } .pa-chartwrap { grid-template-columns: 22px minmax(0, 1fr); }
+/* look-back bar */
+ion-segment.pa-range { --background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 999px; } ion-segment.pa-range ion-segment-button { --indicator-color: #2f2f2f; min-height: 52px; font: 400 14px var(--body); }
+.pa-win span { font-size: 14px; color: #fff; } .pa-win b { font: 500 15px var(--body); }
+.pa-win b.hi { color: #27da8e; } .pa-win b.mid { color: #f5a524; } .pa-win b.lo { color: #ff4444; }
+.pa-card { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 8px; } .pa-card h3 { font: 500 20px var(--body); text-transform: none; letter-spacing: 0; padding-bottom: 12px; border-bottom: 1px solid #2a2a2a; margin: -2px -2px 10px; }
+.pa-fbtn, .pa-clear { background: #0f0f0f; border-color: #2a2a2a; }
+@media (min-width: 768px) {
+  /* shell: 60px header, 268px left rail (md breakpoint in props.cash) */
+  .top { height: 60px; margin: 0; max-width: none; width: 100%; border-radius: 0; border-width: 0 0 1px; background: #0f0f0f; backdrop-filter: none; padding: 0 16px; position: sticky; top: 0; }
+  .brand { font: 700 22px var(--body); letter-spacing: -.01em; text-transform: none; }
+  .gsearch { position: absolute; left: 50%; transform: translateX(-50%); width: 100%; max-width: 620px; margin: 0; }
+  .gsearch input { height: 40px; background: #1c1c1c; border: 1px solid #2a2a2a; font-size: 15px; }
+  .top .cta { background: #27da8e; color: #0f0f0f; height: 34px; padding: 0 16px; display: inline-grid; place-items: center; font-size: 13px; font-weight: 600; margin-left: auto; }
+  #nav { position: fixed; left: 0; top: 60px; bottom: 0; width: 268px; flex-direction: column; align-items: stretch; gap: 4px; margin: 0; padding: 12px; border-right: 1px solid #2a2a2a; background: #0f0f0f; overflow-y: auto; z-index: 40; }
+  #nav a, #nav summary { height: 44px; border-radius: 24px; font: 600 15.5px var(--body); padding: 0 13px; color: #fff; background: none; } #nav a.on { background: none; color: #27da8e; } #nav a:hover, #nav summary:hover { background: #1a1a1a; }
+  #nav a span.t { display: inline; } #nav .menu { position: static; box-shadow: none; border: 0; background: none; padding: 0 0 0 12px; }
+  main, #foot, footer { margin-left: 268px; margin-right: 0; max-width: none; width: auto; padding-left: 32px; padding-right: 32px; }
+  .pa { padding-top: 0; } .pa-railwrap { margin: 0 -32px; padding: 0 32px; } .pa-stats { margin: 0; padding-inline: 0; }
+  .pa-hero { grid-template-columns: 190px minmax(0, 1fr) auto; grid-template-areas: "photo id stats"; align-items: center; gap: 0 24px; padding-top: 18px; }
+  .pa-photo { width: 190px; height: 168px; align-self: end; } .pa-photo .crest { width: 190px; height: 190px; }
+  .pa-id { align-self: center; padding: 0; } .pa-id h1 { font-size: 30px; } .pa-team { font-size: 16px; }
+  .pa-stats { border-top: 0; padding: 0; gap: 40px; } .pa-strip { grid-template-columns: repeat(3, 96px); gap: 14px 8px; } .pa-tile .k { font-size: 16px; } .pa-tile .v { font-size: 16px; }
+}

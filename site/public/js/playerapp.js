@@ -12,6 +12,8 @@ const SLIDERS = '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side"]); // those are on screen already
 
 const tile = (k, v, sub, cls = "") => h("div", { class: `pa-tile ${cls}` }, h("span", { class: "k" }, k), h("b", { class: "v" }, v), sub ? h("span", { class: "s" }, sub) : null);
+const SHARE = '<svg class="i" viewBox="0 0 24 24"><path d="M21 3L3 10.5l7 3 3 7z"/><path d="M10 13.5L21 3"/></svg>';
+const abbr = (n) => { const w = String(n).replace(/\(W\)/, "").trim().split(/\s+/); return (w.length > 1 ? w.map((x) => x[0]).join("") : w[0]).slice(0, 3).toUpperCase(); };
 const shortDate = (d) => d.slice(5).split("-").reverse().join("/");
 const bandOf = (p) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo");
 
@@ -30,14 +32,17 @@ export function playerScreen(deps) {
   const bar = h("div", { class: "pa-bar" },
     h("button", { type: "button", class: "pa-back", "aria-label": "Back", onclick: back, html: BACK }),
     h("div", { class: "pa-title" }, name), star("player", idx));
-  const hero = h("section", { class: "pa-hero" }, playerBadge(store, idx, "crest"),
-    h("div", { class: "pa-id" }, h("h1", {}, name), h("div", { class: "muted" }, team),
-      h("div", { class: "pa-chips" }, ...fmts.map(([, f]) => h("span", { class: "chip" }, f)), h("span", { class: "chip dim" }, `Last played ${store.P.last[idx]}`))));
+  const share = h("button", { type: "button", class: "pa-round", "aria-label": "Share", html: SHARE, onclick: () => { const u = location.href; (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u)).catch(() => {}); } });
+  const gauge = h("div", { class: "pa-gauge" });
+  const hero = h("section", { class: "pa-hero" },
+    h("div", { class: "pa-photo" }, playerBadge(store, idx, "crest")),
+    h("div", { class: "pa-id" }, h("h1", {}, name), h("div", { class: "pa-team" }, team), h("div", { class: "pa-team" }, fmts.map(([, f]) => f).join(" · ")),
+      h("div", { class: "pa-acts" }, h("span", { class: "pa-round" }, teamBadge(team)), star("player", idx), share)));
   const strip = h("section", { class: "pa-strip" });
-  hero.append(strip);
-  root.append(bar, hero);
+  hero.append(h("div", { class: "pa-stats" }, strip, gauge));
+  root.append(bar);
 
-  if (!res.ok) { root.append(h("div", { class: "card err" }, h("p", {}, res.error))); return root; }
+  if (!res.ok) { root.append(hero, h("div", { class: "card err" }, h("p", {}, res.error))); return root; }
 
   const rail = segment(stats, q.stat || "runs", (k) => go(`player/${idx}`, { ...hashQuery(), stat: k, line: "" }), { scrollable: true, cls: "pa-rail", label: "Prop" });
   const fmtSeg = fmts.length > 1 ? segment(fmts.map(([i, f]) => [i, f]), fmtVal, (v) => go(`player/${idx}`, { ...hashQuery(), fmt: v, line: "" }), { cls: "pa-fmt", label: "Format" }) : null;
@@ -61,7 +66,7 @@ export function playerScreen(deps) {
 
   // ------------------------------------------------------------ chart + strip (redrawn locally when line / side / window change)
   function drawChart() {
-    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); drawBook({ n: 0, label: "All" }); return; }
+    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); gauge.replaceChildren(); drawBook({ n: 0, label: "All" }); return; }
     const ws = windowRates(entries, st.line, st.side);
     const cur = ws.find((w) => w.n === st.win) || ws[ws.length - 1];
     const shown = cur.n ? entries.slice(-cur.n) : entries;
@@ -85,6 +90,9 @@ export function playerScreen(deps) {
       tile(`Avg ${(c.auxLabel || "").toLowerCase()}`, num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100), ""),
       tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : ""));
 
+    const arc = cur.p == null ? 0 : cur.p;
+    gauge.replaceChildren(h("div", { html: `<svg viewBox="0 0 48 48" width="52" height="52"><circle cx="24" cy="24" r="19" fill="none" stroke="#3a3a3a" stroke-width="4" stroke-dasharray="89.6 29.9" stroke-linecap="round" transform="rotate(135 24 24)"/><circle cx="24" cy="24" r="19" fill="none" stroke="${arc >= 0.6 ? "#27da8e" : arc >= 0.4 ? "#f5a524" : "#ff4444"}" stroke-width="4" stroke-dasharray="${(89.6 * arc).toFixed(1)} 200" stroke-linecap="round" transform="rotate(135 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#fff">${cur.p == null ? "–" : Math.round(arc * 100) + "%"}</text></svg>` }), h("span", {}, `${cur.label} hit`));
+
     const bars = shown.map((e) => {
       const s = barState(e, st.line, st.side);
       const tip = `${e.date} v ${e.opp}${e.venueName ? ` · ${e.venueName}` : ""}${e.value == null ? ({ void: " · in the XI, did not bat/bowl: bet void", na: " · XI not recorded", dnp: " · not in the XI" })[s] : ` · ${e.value}`}`;
@@ -92,7 +100,7 @@ export function playerScreen(deps) {
         e.value == null ? h("div", { class: "bar none" }, h("em", {}, s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP"))
           : h("div", { class: "bar", style: `height:${Math.max((Math.min(e.value, top) / top) * 100, 1.5)}%` }, h("em", {}, String(e.value))));
     });
-    const labels = shown.map((e) => h("div", { class: "col" }, teamBadge(e.opp), h("small", {}, shortDate(e.date))));
+    const labels = shown.map((e) => h("div", { class: "col" }, h("small", {}, shortDate(e.date)), h("small", {}, abbr(e.opp))));
     const plot = h("div", { class: "pa-plot", style: wide ? `--colw:${colw}px` : "" },
       h("div", { class: "pa-inner" },
         h("div", { class: "pa-area" },
@@ -176,7 +184,7 @@ export function playerScreen(deps) {
 
   side.append(h("div", { class: "pa-card pa-insight" }, h("h3", {}, "At a glance"), h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
   drawChart();
-  root.append(h("div", { class: "pa-railwrap" }, rail), ...(fmtSeg ? [fmtSeg] : []),
+  root.append(h("div", { class: "pa-railwrap" }, rail), hero, ...(fmtSeg ? [fmtSeg] : []),
     h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, bookHost, filterBar, tabsHost, secs), side));
   return root;
 }
