@@ -71,10 +71,13 @@ export function playerScreen(deps) {
     const wide = shown.length > 20;
     const colw = wide ? 30 : 0;
 
+    const bookAt = book ? book.lines.find((l) => l.line === st.line) : null;
+    const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b) => b[st.side] || 0)) : 0;
+    const edge = bestPrice && cur.p ? bestPrice * cur.p - 1 : 0;
     strip.replaceChildren(
       tile("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `${cur.hits}/${cur.played} · ${cur.label}`, `hit ${bandOf(cur.p)}`),
-      tile("Line", `${st.side === "over" ? "Over" : "Under"} ${st.line}`, book && st.line === book.main.line ? "bookmaker line" : res.statLabel),
-      tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", "no margin"),
+      tile("Line", `${st.side === "over" ? "Over" : "Under"} ${st.line}`, bookAt ? `${bookAt.books.map((b) => `${bookName(b.source)} ${odds(b[st.side])}`).join(" · ")}` : res.statLabel),
+      tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : "no margin"),
       tile(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), `mean ${num(res.summary.mean)} overall`),
       tile("Median", num(res.summary.median), "all fixtures"),
       tile("Sample", String(res.summary.n), res.sample.unit));
