@@ -307,6 +307,9 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             if m["winner"]:
                 m["winner"] = canon_name.get((_norm_team(m["winner"]), m["gender"]), _strip_women(m["winner"]))
             fix = _team_fixer(canon_name, m["gender"])
+            if m["first"]:  # deliveries carry CREX's spelling of the teams: use Cricsheet's, as for `teams` and `winner`
+                m["first"] = fix(m["first"])
+            m["inn"] = [[fix(i[0]), fix(i[1]), *i[2:]] for i in m["inn"]]
             m["bat"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m["bat"]]
             m["bowl"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m["bowl"]]
         for t in m["teams"]:

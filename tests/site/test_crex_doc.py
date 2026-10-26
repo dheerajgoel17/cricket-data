@@ -91,3 +91,24 @@ def test_rows_saved_before_the_name_columns_still_build(tmp_path):
     assert B.build(z, data, out, None, workers=1)["provisional_matches"] == 1
     M = json.loads((out / "matches.json").read_text())
     assert M["inn"][M["id"].index("crex-x")] == []
+
+
+def test_team_spelled_differently_from_cricsheet_does_not_break_the_build(tmp_path):
+    """CREX and Cricsheet can spell a team differently (same normalised name). teams, first innings and innings rows must agree."""
+    data = tmp_path / "data"
+    (data / "provisional").mkdir(parents=True)
+    d = {"match_id": "crex-x", "date": "2026-10-13", "match_type": "T20", "team_type": "club", "gender": "male", "event": "WCL",
+         "venue": "Sharjah", "team_a": "India Champions", "team_b": "West Indies Champions", "winner": "West Indies Champions",
+         "status": "provisional", "players": [{"player": n, "player_id": pid, "team": "India Champions", "opponent": "West Indies Champions",
+                                               "runs": "1", "balls": "1"} for n, pid in people().items()]}
+    (data / "provisional" / "crex-x.json").write_text(json.dumps(d))
+    Store(data).upsert_balls("crex-x", "2026-10-13", rows())
+    prov, _ = B.load_provisional(data, [], {})
+    assert prov[0]["first"] == "India Champions"
+    canon = {"id": "c1", "date": "2020-01-01", "fmt": 0, "gender": 0, "intl": 0, "event": "", "venue": "V", "city": "",
+             "teams": ["India  Champions", "West Indies  Champions"], "winner": "", "res": 2, "overs": 20, "bpo": 6, "days": 1, "first": "",
+             "q": 1, "mc": 0, "ts": 0, "ho": 0, "pv": 0, "inn": [], "bat": [], "bowl": [], "parts": [], "xi": [], "xq": 0}
+    B.assemble([canon], prov)  # KeyError before the fix: `first` kept CREX's spelling while `teams` took Cricsheet's
+    m = prov[0]
+    assert m["first"] in m["teams"] and all(i[0] in m["teams"] and i[1] in m["teams"] for i in m["inn"])
+
