@@ -6,6 +6,7 @@ import { createStore } from "./engine/store.js";
 import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
 import { loadIonic } from "./ionic.js";
+import { enter, loadMotion } from "./motion.js";
 import { bookLinesFor } from "./engine/lines.js";
 import { playerScreen } from "./playerapp.js";
 import { SPLITS } from "./engine/props.js";
@@ -58,6 +59,7 @@ async function boot() {
   }
   rz = new Resolver(store);
   loadIonic(); // starts in the background; pages that use it wait for it
+  loadMotion(); // animation engine, also in the background; without it pages simply appear
   await loadPhotos("data/");
   document.getElementById("fresh").replaceChildren(...freshText(store).flat(Infinity).map((x) => (x instanceof Node ? x : document.createTextNode(x))));
   initPages({ store, rz, go, crumbs, heroCard, nextCountdown: (when) => nextMatchCard({ a: "", b: "", start: when.toISOString(), venue: "", countdownOnly: true }) });
@@ -106,6 +108,7 @@ async function render() {
     const el = await page(args, q);
     app.replaceChildren(el);
     window.scrollTo(0, same ? y : 0);
+    if (!same) enter([...(el.children || [])].slice(0, 12), { y: 10, gap: 0.03 });
   } catch (e) {
     console.error(e);
     app.replaceChildren(h("div", { class: "card err" }, h("p", {}, `Something went wrong: ${e.message}`)));
