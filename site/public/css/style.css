@@ -243,3 +243,23 @@ button:active, .btn:active, .pill:active { transform: scale(.96); }
 
 .fchart .bar.dnp.void { border-color: #b8860b; background: repeating-linear-gradient(135deg, transparent 0 5px, rgba(245,197,66,.10) 5px 10px); } .fchart .bar.dnp.void em { color: var(--warn); }
 .gv.void { color: var(--warn); font-size: 11px; border: 1px dashed #8a6a10; background: rgba(245,197,66,.06); }
+
+/* ---------- player page: props.cash flat hero + chart colours ---------- */
+.hero-card.p { background: none; border: 0; border-radius: 0; margin: 4px 0 6px; overflow: visible; }
+.hero-card.p .hero-top { background: none; padding: 16px 0 12px; grid-template-columns: minmax(0, 1fr) auto; justify-items: start; text-align: left; align-items: center; column-gap: 16px; }
+.hero-card.p .hero-top .crest { grid-column: 2; grid-row: 1 / span 3; width: 96px; height: 96px; }
+.hero-card.p .hero-name { font: 600 28px/1.1 var(--body); text-transform: none; letter-spacing: 0; }
+.hero-card.p .hero-top p { color: var(--mute); }
+.hero-card.p .hero-meta { justify-content: flex-start; } .hero-card.p .hero-meta span { background: var(--card2); }
+.hero-card.p .hero-tabs { padding: 0; gap: 22px; border-top: 1px solid var(--line); }
+.fchart .bars2 .bar.hit { background: #2bdc8a; } .fchart .bars2 .bar.miss { background: #ff1a1a; opacity: 1; }
+.fchart .bars2 .bar.dnp { background: repeating-linear-gradient(135deg, #6b6b6b 0 5px, #7d7d7d 5px 10px); border: 0; }
+.fchart .lineMark { border-top: 1px solid #fff; } .fchart .lineMark span { background: none; color: #fff; right: auto; left: -30px; top: -9px; padding: 0; font-weight: 600; }
+.fchart .card, .card.fchart { border-radius: 16px; }
+@media (min-width: 768px) {
+  .hero-card.p .hero-top { grid-template-columns: auto minmax(0, 1fr); column-gap: 28px; padding: 20px 0 14px; }
+  .hero-card.p .hero-top .crest { grid-column: 1; width: 148px; height: 148px; }
+  .hero-card.p .hero-name { font-size: 36px; }
+}
+@media (min-width: 1280px) { .hero-card.p .hero-name { font-size: 42px; } .hero-card.p .hero-top .crest { width: 168px; height: 168px; } }
+.hero-card.p .hero-tabs button { padding-inline: 12px; } .hero-card.p .hero-tabs > * { display: flex; gap: 6px; }
