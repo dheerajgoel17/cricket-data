@@ -1,10 +1,11 @@
 // The player page as an app screen: sticky app bar, stat strip, stat rail, one big tappable chart with look-back pills,
 // filters in a bottom sheet and Lines / Game log / Splits as swipe-free tabs. Every number comes from the engine result
 // (`res`) or from windows.js over the chart entries: nothing is computed from an LLM or invented here.
-import { barState, windowRates } from "./engine/windows.js";
+import { bookName } from "./engine/lines.js";
+import { barState, windowRate, windowRates } from "./engine/windows.js";
 import { ladderTable, splitTables } from "./render.js";
 import { segment, sheet } from "./ionic.js";
-import { chips, h, hashQuery, num, odds, pc, table } from "./ui.js";
+import { chips, h, hashQuery, localWhen, num, odds, pc, table } from "./ui.js";
 
 const BACK = '<svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
 const SLIDERS = '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>';
@@ -18,9 +19,10 @@ const bandOf = (p) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo
  * deps: { store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats, moreFilters, back }
  *  - fmts: [[formatIndex, "T20"], ...] the player has data in; stats: [[key, label], ...]
  *  - moreFilters: a ready-made form node (opposition, venue, innings, ...) shown in the filter sheet
+ *  - book: the market's lines for his next match (engine/lines.js bookLinesFor) or null; bookDefault: the line shown was taken from it
  */
 export function playerScreen(deps) {
-  const { store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats, moreFilters, back } = deps;
+  const { store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats, moreFilters, back, book = null, bookDefault = false } = deps;
   const name = store.playerName(idx);
   const team = store.teamName(store.P.tm[idx]);
   const root = h("div", { class: "pa" });
@@ -39,6 +41,7 @@ export function playerScreen(deps) {
   const fmtSeg = fmts.length > 1 ? segment(fmts.map(([i, f]) => [i, f]), fmtVal, (v) => go(`player/${idx}`, { ...hashQuery(), fmt: v, line: "" }), { cls: "pa-fmt", label: "Format" }) : null;
   const strip = h("section", { class: "pa-strip" });
   const chartCard = h("section", { class: "pa-card pa-chart" });
+  const bookHost = h("div", { class: "pa-bookhost" });
   const side = h("aside", { class: "pa-side" });
   const filterBar = h("div", { class: "pa-filterbar" });
   const tabsHost = h("div", { class: "pa-tabs" });
@@ -57,7 +60,7 @@ export function playerScreen(deps) {
 
   // ------------------------------------------------------------ chart + strip (redrawn locally when line / side / window change)
   function drawChart() {
-    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); return; }
+    if (!c || !entries.length) { chartCard.replaceChildren(h("p", { class: "muted pad" }, "No fixtures match these filters.")); strip.replaceChildren(); drawBook({ n: 0, label: "All" }); return; }
     const ws = windowRates(entries, st.line, st.side);
     const cur = ws.find((w) => w.n === st.win) || ws[ws.length - 1];
     const shown = cur.n ? entries.slice(-cur.n) : entries;
@@ -70,7 +73,7 @@ export function playerScreen(deps) {
 
     strip.replaceChildren(
       tile("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `${cur.hits}/${cur.played} · ${cur.label}`, `hit ${bandOf(cur.p)}`),
-      tile("Line", `${st.side === "over" ? "Over" : "Under"} ${st.line}`, res.statLabel),
+      tile("Line", `${st.side === "over" ? "Over" : "Under"} ${st.line}`, book && st.line === book.main.line ? "bookmaker line" : res.statLabel),
       tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", "no margin"),
       tile(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), `mean ${num(res.summary.mean)} overall`),
       tile("Median", num(res.summary.median), "all fixtures"),
@@ -103,8 +106,25 @@ export function playerScreen(deps) {
       segment(ws.map((w) => [w.n, h("span", { class: "pa-win" }, h("span", {}, w.label), h("b", { class: bandOf(w.p) }, w.p == null ? "–" : `${Math.round(w.p * 100)}%`))]), cur.n,
         (v) => { st.win = Number(v); drawChart(); }, { cls: "pa-range", label: "Look-back" }),
       h("p", { class: "muted small pa-foot" }, `${res.statLabel} ${st.side} ${st.line} · green = cleared, red = missed · DNP/VOID fixtures are not counted`));
+    drawBook(cur);
     // keep the newest games in view on a long, scrollable chart
     requestAnimationFrame(() => { const p = chartCard.querySelector(".pa-plot"); if (p) p.scrollLeft = p.scrollWidth; });
+  }
+
+  /** The market's lines next to his own hit rate over the same lines (window chosen on the chart): where they differ is what to look at. */
+  function drawBook(cur) {
+    if (!book) { bookHost.replaceChildren(); return; }
+    const rows = book.lines.map((l) => {
+      const hist = windowRate(entries, cur.n, l.line, "over");
+      return [h("button", { type: "button", class: `pa-use ${st.line === l.line ? "on" : ""}`, "aria-label": `Use line ${l.line}`, onclick: () => { st.line = l.line; saveView(); drawChart(); } },
+          String(l.line), l === book.main ? h("small", {}, "main") : null),
+        h("span", { class: "pa-odds" }, l.books.map((b) => h("span", {}, h("em", {}, bookName(b.source)), `${odds(b.over)} / ${odds(b.under)}`))),
+        l.prob == null ? "–" : pc(l.prob), hist.p == null ? "–" : pc(hist.p)];
+    });
+    bookHost.replaceChildren(h("section", { class: "pa-card pa-book" }, h("h3", {}, "Bookmaker lines"),
+      h("p", { class: "muted small" }, `${book.match}${book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}${book.competition ? ` · ${book.competition}` : ""}. Decimal odds, over / under. Tap a line to put it on the chart.${bookDefault ? " The chart opened on the main line." : ""}`),
+      table(["Line", "Odds", "Market", `Hit ${cur.label}`], rows),
+      h("p", { class: "muted small" }, "Market = the chance of the over once each book's margin is removed. Hit rate = how often he has gone over that line in the games shown on the chart.")));
   }
 
   function openGame(e, s) {
@@ -151,6 +171,6 @@ export function playerScreen(deps) {
   side.append(h("div", { class: "pa-card pa-insight" }, h("h3", {}, "At a glance"), h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
   drawChart();
   root.append(h("div", { class: "pa-railwrap" }, rail), fmtSeg, strip,
-    h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, filterBar, tabsHost, secs), side));
+    h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, bookHost, filterBar, tabsHost, secs), side));
   return root;
 }

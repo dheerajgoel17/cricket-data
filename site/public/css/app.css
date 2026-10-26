@@ -98,3 +98,11 @@ ion-segment.pa-side-seg, .pa-side-seg.seg-plain { width: 190px; flex: none; }
 }
 @media (min-width: 1024px) { .pa-grid { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; } .pa-side { display: grid; gap: 12px; position: sticky; top: 190px; } }
 @media (prefers-reduced-motion: reduce) { .pa-bars .bar { transition: none; } }
+
+/* bookmaker lines card */
+.pa-bookhost:empty { display: none; }
+.pa-book table { font-size: 14px; } .pa-book td, .pa-book th { white-space: nowrap; }
+.pa-use { display: inline-flex; flex-direction: column; align-items: center; min-width: 58px; border: 1px solid var(--line); background: var(--card2); color: var(--ink); border-radius: 14px; padding: 6px 10px; font: 700 15px/1.2 var(--body); cursor: pointer; } .pa-use small { font: 600 10px var(--body); opacity: .7; text-transform: uppercase; letter-spacing: .05em; }
+.pa-odds { display: grid; gap: 2px; font-variant-numeric: tabular-nums; } .pa-odds em { font-style: normal; color: var(--mute); font-size: 11px; margin-right: 6px; }
+.pa-use.on { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: transparent; }
+.pa-book th, .pa-book td { padding-left: 6px; padding-right: 6px; } .pa-book td:first-child, .pa-book th:first-child { padding-left: 2px; }

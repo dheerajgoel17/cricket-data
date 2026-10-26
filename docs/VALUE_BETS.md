@@ -83,3 +83,6 @@ artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `
   have weather; set `CV_WEATHER=0` to turn the live forecast off.
 
 See `value_bets/out/backtest_props.md` for the current numbers.
+
+## Book lines for the site
+Every run also writes `value_bets/out/book_lines.json`: each two-sided over/under player line (runs, sixes, fours, wickets) with its decimal prices per source, for players matched to the Cricsheet registry (`src/value_bets/booklines.py`). The site shows them on the player page; they are prices as published, not a model output.
