@@ -6,6 +6,7 @@ import { createStore } from "./engine/store.js";
 import { FORMATS } from "./engine/util.js";
 import { renderResult } from "./render.js";
 import { loadIonic } from "./ionic.js";
+import { bookLinesFor } from "./engine/lines.js";
 import { playerScreen } from "./playerapp.js";
 import { SPLITS } from "./engine/props.js";
 import { loadPhotos, playerBadge, teamBadge } from "./assets.js";
@@ -322,6 +323,25 @@ function datalists() {
     h("datalist", { id: "dl-venues" }, store.venues.map((n) => h("option", { value: n })))];
 }
 
+/** Bookmaker / exchange player lines: the live file from GitHub (hourly), else the copy bundled with the site build. Loaded once per visit. */
+let linesDoc = null;
+async function loadLines() {
+  linesDoc ??= (async () => {
+    const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
+    let doc = null;
+    try { doc = await (await fetch("data/lines.json")).json(); } catch { /* none bundled */ }
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 3500);
+      const r = await fetch(RAW, { cache: "no-cache", signal: ctl.signal });
+      clearTimeout(t);
+      if (r.ok) { const d = await r.json(); if (!doc || (d.generated_at_utc || "") >= (doc.generated_at_utc || "")) doc = d; }
+    } catch { /* offline or slow: the bundled copy */ }
+    return doc || { lines: [] };
+  })();
+  return linesDoc;
+}
+
 async function player(args, q) {
   const idx = Number(args[0]);
   if (!(idx >= 0 && idx < store.P.id.length)) return h("p", {}, "Unknown player.");
@@ -329,6 +349,8 @@ async function player(args, q) {
   const fmts = FORMATS.map((f, i) => [i, f]).filter(([i]) => (fm >> i) & 1);
   const fmtVal = Number(q.fmt ?? (fmts.length ? fmts[0][0] : 0));
   await loadIonic();
+  const book = bookLinesFor(await loadLines(), store.P.id[idx], q.stat || "runs", FORMATS[fmtVal]); // the market's line for his next match, if priced
+  const bookDefault = !!book && (q.line === undefined || q.line === "");
   // The prop, format, line and side live on screen (rail, segments, chart); everything else is in the filter sheet.
   // hashQuery(), not q: the chart changes line / side locally and keeps them in the URL
   const moreFilters = h("form", { class: "sheet-form", onsubmit: (e) => { e.preventDefault(); go(`player/${idx}`, { ...hashQuery(), ...Object.fromEntries(new FormData(e.target)) }); } },
@@ -344,14 +366,14 @@ async function player(args, q) {
     field("Level", sel("lvl", [["", "all"], ["intl", "international"], ["club", "club / league"]], q.lvl))), ...datalists());
   live(moreFilters);
   const plan = {
-    kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : null, side: q.side || "over",
+    kind: "player_prop", stat: q.stat || "runs", line: q.line !== undefined && q.line !== "" ? Number(q.line) : bookDefault ? book.main.line : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
     filters: { format: FORMATS[fmtVal], opposition: q.opp || null, venue_type: q.vt || null, innings: q.inn || null, position: q.pos || null,
       since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null, international: q.lvl === "intl" ? true : q.lvl === "club" ? false : null },
     venue: q.venue || null,
   };
   const res = await runPlan(store, rz, plan, { playerIdx: idx });
-  return playerScreen({ store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), moreFilters,
+  return playerScreen({ store, idx, q, res, go, star, playerBadge, teamBadge, fmts, fmtVal, stats: Object.entries(STATS).map(([k, v]) => [k, v.label]), moreFilters, book, bookDefault,
     back: () => (history.length > 1 ? history.back() : go("players")) });
 }
 

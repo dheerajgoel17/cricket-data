@@ -1,0 +1,58 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { bookLinesFor, bookName, lineProb, overProb } from "../public/js/engine/lines.js";
+
+const NOW = Date.parse("2026-10-27T05:00:00Z");
+const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
+  start_utc: "2026-10-27T07:00:00Z", books: [{ source: "moviodds_bet365", kind: "bookmaker", over, under }], ...extra });
+
+test("overProb removes the margin (hand-computed)", () => {
+  // 1.90 / 1.90 -> evens; 1.50 / 2.75: (1/1.5)/((1/1.5)+(1/2.75)) = 0.66667/(0.66667+0.36364) = 0.6471
+  assert.ok(Math.abs(overProb(1.9, 1.9) - 0.5) < 1e-12);
+  assert.ok(Math.abs(overProb(1.5, 2.75) - 0.64706) < 1e-4);
+  assert.equal(overProb(1.0, 2), null);
+  assert.equal(overProb(null, 2), null);
+});
+
+test("lineProb averages the books that price the line", () => {
+  const p = lineProb([{ over: 1.9, under: 1.9 }, { over: 1.5, under: 2.75 }, { over: null, under: 2 }]);
+  assert.ok(Math.abs(p - (0.5 + 0.64706) / 2) < 1e-4);
+  assert.equal(lineProb([{ over: 1, under: 1 }]), null);
+});
+
+test("main line is the one priced closest to evens", () => {
+  const doc = { lines: [L(12.5, 1.4, 3.0), L(17.5, 1.85, 1.95), L(22.5, 2.6, 1.45)] };
+  const r = bookLinesFor(doc, "ab12", "runs", "T20", NOW);
+  assert.equal(r.main.line, 17.5);
+  assert.deepEqual(r.lines.map((x) => x.line), [12.5, 17.5, 22.5]);
+  assert.equal(r.match, "India vs NZ");
+});
+
+test("a tie in how close to evens goes to the lower line", () => {
+  const doc = { lines: [L(17.5, 1.8, 2.0), L(18.5, 2.0, 1.8)] }; // p(over) 0.5263 vs 0.4737: equally far from 0.5
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "T20", NOW).main.line, 17.5);
+});
+
+test("only this player, stat and format; none at all gives null", () => {
+  const doc = { lines: [L(17.5, 1.85, 1.95), L(1.5, 1.9, 1.9, { stat: "sixes" }), L(30.5, 1.9, 1.9, { fmt: "ODI" }), L(9.5, 1.9, 1.9, { pid: "zz99" })] };
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "T20", NOW).lines.length, 1);
+  assert.equal(bookLinesFor(doc, "ab12", "wickets", "T20", NOW), null);
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "Test", NOW), null);
+  assert.equal(bookLinesFor({ lines: [] }, "ab12", "runs", "T20", NOW), null);
+  assert.equal(bookLinesFor(null, "ab12", "runs", "T20", NOW), null);
+});
+
+test("the nearest upcoming match wins; a match that started long ago is ignored", () => {
+  const doc = { lines: [L(17.5, 1.85, 1.95, { match: "later", start_utc: "2026-10-29T07:00:00Z" }), L(20.5, 1.85, 1.95, { match: "sooner", start_utc: "2026-10-27T07:00:00Z" }),
+    L(5.5, 1.85, 1.95, { match: "done", start_utc: "2026-10-27T00:00:00Z" })]};
+  const r = bookLinesFor(doc, "ab12", "runs", "T20", NOW);
+  assert.equal(r.match, "sooner");
+  assert.equal(r.lines.length, 1);
+  assert.equal(bookLinesFor({ lines: [L(5.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" })] }, "ab12", "runs", "T20", NOW), null);
+});
+
+test("book names are readable, unknown sources are shown as-is", () => {
+  assert.equal(bookName("moviodds_bet365"), "bet365");
+  assert.equal(bookName("smarkets"), "Smarkets");
+  assert.equal(bookName("newbook"), "newbook");
+});

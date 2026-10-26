@@ -192,3 +192,18 @@ def test_bookmaker_feed_is_odds_only_never_a_fixture_or_start_time(tmp_path):
     fx = B.build_fixtures(tmp_path, vb, {})
     assert [(f["a"], f["start"], f["source"]) for f in fx] == [
         ("Afghanistan U19", "2026-10-23T05:00Z", "crex"), ("Afghanistan", "2026-10-23T11:30Z", "crex")]
+
+
+def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_never_fails_the_build(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    vb = tmp_path / "vb"
+    vb.mkdir()
+    doc = {"generated_at_utc": "2026-10-26T10:00:00Z", "lines": [{"pid": "ab12", "stat": "runs", "fmt": "T20", "line": 17.5, "books": [{"source": "smarkets", "over": 1.9, "under": 2.0}]}]}
+    (vb / "book_lines.json").write_text(json.dumps(doc))
+    B.build(z, data, out, vb, workers=1)
+    assert json.loads((out / "lines.json").read_text()) == doc
+    (vb / "book_lines.json").write_text('{"lines": [')  # half-written
+    B.build(z, data, tmp_path / "out2", vb, workers=1)
+    assert json.loads((tmp_path / "out2" / "lines.json").read_text()) == {"generated_at_utc": "", "lines": []}
+    B.build(z, data, tmp_path / "out3", None, workers=1)  # no value-bets output at all
+    assert json.loads((tmp_path / "out3" / "lines.json").read_text())["lines"] == []

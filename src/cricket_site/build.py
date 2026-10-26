@@ -604,6 +604,18 @@ def build_props(vb_dir: Path | None) -> dict:
     return out
 
 
+def build_lines(vb_dir: Path | None) -> dict:
+    """Bookmaker / exchange player lines (value_bets/out/book_lines.json); the site also reads the live file from GitHub at view time."""
+    f = vb_dir / "book_lines.json" if vb_dir else None
+    if f and f.exists():
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+            return {"generated_at_utc": d.get("generated_at_utc", ""), "lines": d.get("lines", [])}
+        except ValueError:
+            pass  # a half-written file must not fail the site build
+    return {"generated_at_utc": "", "lines": []}
+
+
 # ------------------------------------------------------------------ main
 def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, workers: int = 4,
           geo_path: Path | None = None, people_path: Path | None = None, photos: bool = False, site_url: str = "",
@@ -628,6 +640,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"]}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    (out / "lines.json").write_text(json.dumps(build_lines(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta
 
 

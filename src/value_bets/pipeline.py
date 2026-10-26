@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import config, history, store, strategy, weather
+from . import booklines, config, history, store, strategy, weather
 from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
@@ -345,6 +345,9 @@ def run():
     n_inns_ms = split_innings_milestones(rows)
     if n_inns_ms:
         log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")
+
+    book = booklines.book_lines(rows, stamp)  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
+    log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
 
     # ---- fair-price signals per source group
     groups = defaultdict(list)
@@ -729,6 +732,7 @@ def run():
         "model_backtest": _prop_backtest_summary(), "log": LOG,
     }
     (config.OUT / "value_bets_latest.json").write_text(json.dumps(result, indent=1, default=str))
+    (config.OUT / "book_lines.json").write_text(json.dumps(book, separators=(",", ":")))
     (config.OUT / "new_alerts.json").write_text(json.dumps({"generated_at_ist": ist(now), "alerts": alerts},
                                                           indent=1, default=str))
     (config.OUT / "value_bets_latest.md").write_text(render_md(result, alerts))

@@ -49,6 +49,8 @@ The player page (`#/player/<idx>`) is built as an app screen by `site/public/js/
 
 UI library: [Ionic web components](https://ionicframework.com) (`@ionic/core`, MIT), pinned to one exact version in `js/ionic.js` and loaded from the jsDelivr CDN as plain custom elements (no framework, no build step). They provide the sliding segmented controls and the draggable bottom sheets. If the CDN cannot be reached the same controls fall back to plain buttons and a `<dialog>`, so the page works either way. Theming is in `css/app.css` using the site's zinc tokens. Decimal odds only; phone first, two columns from 1024 px.
 
+**Bookmaker lines.** The value-bets pipeline saves every matched two-sided player line (runs, sixes, fours, wickets; decimal over/under per book) to `value_bets/out/book_lines.json` (`src/value_bets/booklines.py`, matched to Cricsheet player ids). The site builder bundles it as `data/lines.json`, and the player page reads the live file from GitHub (falling back to the bundle). For a player with a priced upcoming match, the chart opens on the market's **main line** (the one priced closest to evens, `engine/lines.js`) instead of the median-based default, and a "Bookmaker lines" card shows each book's prices, the no-margin market probability and his own hit rate over each line; tap a line to put it on the chart. Players or stats with no market line keep the median default (floor(median) + 0.5, `suggestLines`).
+
 ## Known limits (be aware before betting)
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
