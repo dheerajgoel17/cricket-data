@@ -3,6 +3,7 @@
 Layout (relative to the data dir):
   matches/YYYY-MM.csv.gz   one row per match
   players/YYYY-MM.csv.gz   one row per player per match
+  balls/YYYY-MM.csv.gz     one row per delivery (CREX ball-by-ball, see crex_balls.py)
 Files are written deterministically (sorted rows, fixed gzip mtime) so an
 unchanged partition is byte-identical and produces no git diff.
 """
@@ -64,6 +65,19 @@ class Store:
             return False
         p.write_bytes(data)
         return True
+
+    def upsert_balls(self, match_id: str, date: str, rows: list[dict]) -> bool:
+        """Replace every stored delivery of ``match_id`` (a re-scrape never duplicates). True if the file changed."""
+        from .crex_balls import BALL_COLUMNS
+
+        month = month_of(date)
+        keep = [r for r in self.read("balls", month) if r["match_id"] != match_id]
+        merged = keep + [{k: str({**r, "match_id": match_id, "date": date}.get(k, "")) for k in BALL_COLUMNS} for r in rows]
+        return self._write("balls", month, merged, list(BALL_COLUMNS),
+                           key=lambda r: (r["match_id"], int(r["innings"]), int(r["seq"])))
+
+    def balls_match_ids(self) -> set[str]:
+        return {r["match_id"] for m in self.months("balls") for r in self.read("balls", m)}
 
     def upsert(self, records: Iterable[MatchRecord]) -> dict[str, int]:
         """Insert or replace matches (and their players). Returns counts."""

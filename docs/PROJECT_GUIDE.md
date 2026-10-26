@@ -50,7 +50,8 @@ AGENTS.md CLAUDE.md   instructions for AI coding agents (any IDE)
 * **Fixtures**: `cricket-data fixtures` reads CREX's `/schedule` page (server-rendered state with the next ~20 matches) every scraper run; it never overwrites the file with an empty result. The older sitemap crawl (`--sitemap`) surfaced stale placeholder pages and is no longer the default.
 * **Linking scraped players**: besides `link-players`, the site builder links still-unlinked scraped names through CREX's full-name list (e.g. Afghanistan, whose matches Cricsheet withholds): ~1.7k extra rows.
 * **CREX scraper**: `crex_*.py`, `scrapers.py` (Playwright for pages, plain HTTP for the CREX sitemaps; see [SCRAPER.md](SCRAPER.md), [SCRAPING_REALITY.md](SCRAPING_REALITY.md), [SELF_HEALING.md](SELF_HEALING.md)).
-* **CLI**: `cricket-data update | backfill | health | fixtures | stats | query | link-players | freshness | export-sqlite`.
+* **Ball-by-ball**: `cricket-data crex-balls` scrapes CREX's commentary feed into `data/balls/` (verified against the scorecard before storing), see [CREX_BALLS.md](CREX_BALLS.md).
+* **CLI**: `cricket-data update | backfill | health | fixtures | crex-balls | stats | query | link-players | freshness | export-sqlite`.
 * **Freshness**: `cricket-data freshness --max-age-days 3` fails when the newest *canonical* match is old; the scraper's provisional matches still cover the gap on the site.
 
 ## 4. Value bets (`src/value_bets`)
