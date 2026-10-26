@@ -23,7 +23,9 @@ def test_winner_symmetric_and_backtest(H):
 def test_top_batter_probs_reasonable(H):
     pm = PlayerModel(H)
     team = "India"
-    ros = sorted(H.rosters[team], key=lambda x: x[2], reverse=True)[:15]
+    # "India" is the men's and women's team alike: take the squad the men's T20 model rates most likely to play,
+    # not the most recent names (whichever side played last would fill the list)
+    ros = sorted(H.rosters[team], key=lambda x: pm.p_selected(x[1], team, "T20"), reverse=True)[:15]
     ps = [{"key": r[1], "pid": r[1], "team": team} for r in ros]
     res, psel = pm.top_probs(ps, "male", "T20", sims=4000)
     vals = [v for v in res.values() if v is not None]

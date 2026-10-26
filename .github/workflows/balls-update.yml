@@ -1,0 +1,61 @@
+name: Ball-by-ball update
+
+# Every 2 hours: scrape CREX ball-by-ball for recent finished matches Cricsheet has not published yet
+# (data/balls/, only matches that reconcile with CREX's own scorecard). Matches Cricsheet has since
+# published are pruned: Cricsheet stays the source for everything older, CREX only bridges the gap.
+on:
+  schedule:
+    - cron: "47 */2 * * *"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max matches to scrape this run"
+        default: "12"
+      days:
+        description: "Look back this many days for provisional matches"
+        default: "3"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scraper-update  # same group as the 30-minute scraper: never two writers to data/ at once
+  cancel-in-progress: false
+
+jobs:
+  balls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          pip install -e .
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Scrape ball-by-ball
+        env:
+          LIMIT: ${{ inputs.limit || '12' }}
+          DAYS: ${{ inputs.days || '3' }}
+        run: cricket-data crex-balls --prune --provisional-days "$DAYS" --limit "$LIMIT" 2>&1 | tee balls_output.log
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/balls
+          if git diff --cached --quiet; then echo "Nothing new."; else
+            N=$(git diff --cached --name-only | wc -l)
+            git commit -m "data: CREX ball-by-ball ($N files, $(date -u +%F))"
+            # a clash with a concurrent prune is harmless: the next run prunes again, so keep this run's file
+            git pull --rebase -X theirs -q && git push
+          fi
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balls-log-${{ github.run_id }}
+          path: balls_output.log
+          if-no-files-found: ignore

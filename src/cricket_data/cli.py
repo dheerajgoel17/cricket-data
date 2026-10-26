@@ -200,6 +200,43 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     return 0
 
 
+def cmd_crex_balls(a: argparse.Namespace) -> int:
+    """Ball-by-ball for CREX matches into data/balls/ (only matches that reconcile with the scorecard)."""
+    import json as json_mod
+
+    from .crex_balls import collect
+    from .crex_browser import CREXBrowser
+
+    store = Store(a.data_dir)
+    if a.prune:  # a match's provisional file is deleted once Cricsheet publishes it: its CREX deliveries go with it
+        live = {json_mod.loads(f.read_text(encoding="utf-8"))["match_id"] for f in (store.root / "provisional").glob("crex-*.json")}
+        print(f"crex-balls: pruned {store.prune_balls(live)} delivery row(s) of matches Cricsheet now has")
+    base = "https://crex.com/cricket-live-score/"
+    targets: list[tuple[str, str, str]] = []
+    for u in a.url:
+        targets.append((f"crex-{u.rstrip('/').rsplit('/', 1)[-1]}", a.date or "", u))
+    if a.provisional_days:
+        since = (date.today() - timedelta(days=a.provisional_days)).isoformat()
+        have = set() if a.force else store.balls_match_ids()
+        for f in sorted((store.root / "provisional").glob("crex-*.json"), reverse=True):
+            d = json_mod.loads(f.read_text(encoding="utf-8"))
+            if d.get("date", "") >= since and d["match_id"] not in have:
+                targets.append((d["match_id"], d["date"], base + d["match_id"][len("crex-"):]))
+    if a.limit:
+        targets = targets[: a.limit]
+    if any(not d for _, d, _ in targets):
+        print("crex-balls: --url needs --date YYYY-MM-DD (the month file the deliveries go into)", file=sys.stderr)
+        return 2
+    print(f"crex-balls: {len(targets)} match(es) to scrape")
+    with CREXBrowser(min_interval=a.min_interval) as browser:
+        res = collect(browser, store, targets)
+    print(f"crex-balls: {res['saved']} saved ({res['healed']} healed), {res['no_feed']} without a feed, {res['rejected']} rejected, "
+          f"{res['failed']} failed, {res['warnings']} bowler warning(s)")
+    for p in res["problems"]:
+        print("  -", p)
+    return 0
+
+
 def cmd_health(a: argparse.Namespace) -> int:
     from .crex_browser import CREXBrowser
     from .health import run_checks, write_report
@@ -373,6 +410,18 @@ def main(argv: list[str] | None = None) -> int:
     f.add_argument("--days", type=int, default=30, help="only fixtures starting within this many days")
     f.add_argument("--max-pages", type=int, default=40, help="cap on match pages fetched per run")
     f.set_defaults(fn=cmd_fixtures)
+
+    cb = sub.add_parser("crex-balls", help="scrape CREX ball-by-ball into data/balls/ (verified against the scorecard)")
+    cb.add_argument("--url", action="append", default=[], help="a CREX match page URL (repeatable); needs --date")
+    cb.add_argument("--date", default="", help="match date for --url, YYYY-MM-DD")
+    cb.add_argument("--provisional-days", type=int, default=0,
+                    help="also scrape CREX provisional matches from the last N days that have no deliveries yet")
+    cb.add_argument("--limit", type=int, default=0, help="cap on matches per run (0 = no cap)")
+    cb.add_argument("--min-interval", type=float, default=1.5, help="seconds between page loads / scrolls")
+    cb.add_argument("--prune", action="store_true",
+                    help="first delete deliveries of matches whose provisional file is gone (Cricsheet has published them)")
+    cb.add_argument("--force", action="store_true", help="re-scrape matches that already have deliveries")
+    cb.set_defaults(fn=cmd_crex_balls)
 
     s = sub.add_parser("stats", help="dataset summary")
     s.set_defaults(fn=cmd_stats)
