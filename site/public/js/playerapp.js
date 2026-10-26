@@ -170,7 +170,7 @@ export function playerScreen(deps) {
 
   side.append(h("div", { class: "pa-card pa-insight" }, h("h3", {}, "At a glance"), h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
   drawChart();
-  root.append(h("div", { class: "pa-railwrap" }, rail), fmtSeg, strip,
+  root.append(h("div", { class: "pa-railwrap" }, rail), ...(fmtSeg ? [fmtSeg] : []), strip,
     h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, bookHost, filterBar, tabsHost, secs), side));
   return root;
 }
