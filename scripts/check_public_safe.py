@@ -16,7 +16,7 @@ PATTERNS = {
     "absolute home path": re.compile(r"(/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|C:\\Users\\[A-Za-z0-9._-]+)"),
     "cloud account id / worker url": re.compile(r"[a-z0-9-]+\.workers\.dev|\.supabase\.co|\.vercel\.app"),
 }
-SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".ruff_cache", "matches", "players", "node_modules"}
+SKIP_DIRS = {".git", "__pycache__", ".pytest_cache", ".ruff_cache", "matches", "players", "node_modules", "dist", ".vercel"}
 SKIP_FILES = {"check_public_safe.py"}
 
 

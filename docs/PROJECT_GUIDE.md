@@ -32,7 +32,7 @@ scripts/              check_public_safe.py, make_site_fixture.py, model_backtest
 src/cricket_data/     dataset package: Cricsheet ingest, store, provisional + reconcile, registry/link-players, CREX scraper, CLI
 src/value_bets/       hourly prop-pricing pipeline (model, adapters for Smarkets / MoviOdds, weather, alerts)
 src/cricket_site/     site builder (stdlib only): parse.py, build.py, crex_assets.py, assets_sync.py
-site/                 the website: public/ (static app + generated data/), api/ask.js (serverless), vercel.json, tests/ (node), scripts/serve.mjs
+site/                 the website: Vite + React app (src/, index.html), public/ (generated data/ + static files), api/ask.js (serverless), vercel.json, tests/ (node:test for engine + API)
 supabase/migrations/  SQL for the image/id store (applied to the Supabase project)
 tests/                pytest: dataset tests, tests/value_bets, tests/site (synthetic matches + builder + crex_assets + assets_sync)
 value_bets/           committed outputs of the value-bets pipeline (out/, state/, mappings/)
@@ -85,19 +85,18 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 
 Rebuilding is deterministic apart from timestamps. Size: ~35 MB raw, ~12 MB compressed.
 
-### 5.2 Engine (`site/public/js/engine`, dependency-free ES modules; runs in browser and node)
+### 5.2 Engine (`site/src/engine`, dependency-free ES modules; runs in browser and node)
 `store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `props.js` (player report, DNP-aware form chart over team
 fixtures, correlated props) · `markets.js` (match/team markets, top batter) · `partnership.js` · `resolve.js` (typo-tolerant player/team/venue/competition resolution) · `plan.js` (query plans: sanitize,
 resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `rules.js`, `util.js`.
 **Invariant: every number shown comes from the engine; the LLM only emits a validated plan** (`sanitizePlan` whitelists fields; see `site/tests/nlp.test.mjs`).
 
-### 5.3 UI (`site/public/index.html`, `css/style.css`, `css/ui.css`, `js/shadcn.js`, `js/app.js`, `pages2.js`, `render.js`, `assets.js`, `photos.js`, `ui.js`)
-Vanilla JS, no build step. Design tokens follow shadcn/ui's zinc dark theme (`:root` in `style.css`), and `js/shadcn.js` + `css/ui.css` port shadcn's Accordion, Tabs, Badge, Switch, Toggle group, Skeleton, Sonner-style toast and Tooltip (same anatomy, ARIA roles and keyboard behaviour; the real library needs React + Radix). Filters apply live (no Update buttons, `live()` in `ui.js`); times render in the viewer's zone, 12-hour for Indian viewers. Hash routes internally (`#/player/123`), but path URLs also work (`/player/123`): `vercel.json` rewrites unknown paths to `/` and `app.js` maps the path to the hash route.
-Routes: `/` fixtures + landing, `players`, `player/<idx>`, `teams`, `team/<idx>`, `venue/<idx>`, `fixture/<id>`, `trends`, `competitions`, `league/<eventIdx>`, `props`, `pair`, `ask`, `tools`, `odds`
-(decimal-only calculator), `glossary`, `saved` (stars in localStorage), `about`. Dark StatsHub-inspired design (Bebas Neue + Manrope, `#151719`/`#1f2123`, pills, 24px cards), animations respect
-`prefers-reduced-motion`. Mobile: bottom tab bar; desktop: top nav + search + home side rail.
-
-Page pieces are components in `js/components.js` (Card, PillRail, IconButton, Stat/StatGrid, Gauge, Hero) styled in `css/ui.css` from the `--pc-*` palette tokens (the props.cash look); animations use Motion (`js/motion.js`, the framework-free engine of Framer Motion, pinned CDN version, no-op fallback). The **player page is an app screen** (`js/playerapp.js`, Ionic web components from a pinned CDN version with plain fallbacks, `css/app.css`, `js/engine/windows.js` for the look-back hit rates): see [SITE.md](SITE.md).
+### 5.3 UI (`site/src`: Vite + React + TypeScript)
+Stack: React 19, React Router (path routes; old `#/player/12` links are redirected), TanStack Query, Tailwind CSS v4, **shadcn/ui** (components copied into `src/components/ui/` by the shadcn CLI, Radix underneath), **Motion** (`motion/react`, the Framer Motion engine) for page transitions, the sliding pill indicator, staggered tiles and bars growing from the baseline (`MotionConfig reducedMotion="user"`), Lucide icons. Fonts are bundled with Fontsource (Inter, Barlow Condensed, Bebas Neue for the wordmark).
+Design tokens (the props.cash palette: `#0F0F0F` page, `#2A2A2A` hairlines, `#27DA8E` accent, `#9F9F9F` muted, `#2F2F2F` selected pill) are the shadcn CSS variables in `src/index.css`: change colours there only.
+Layout: `components/layout/Shell.tsx` (60px header with centred search, 268px left rail from `md`, bottom tab bar on phones, animated route outlet). Pages are in `src/pages` (Home, Player, Markets = team/venue/competitions, Fixtures = fixture/trends, Tools = Prop Hunter/Ask/Partnerships, Simple = tools/odds/glossary/about/saved/players/teams); shared pieces in `src/components/app` (badges, chart, grid, result, pill-tabs, entity-hero, forms with live filters, star).
+Routes: `/` fixtures + landing, `players`, `player/<idx>`, `teams`, `team/<idx>`, `venue/<idx>`, `fixture/<id>`, `trends`, `competitions`, `league/<eventIdx>`, `props`, `pair`, `ask`, `tools`, `odds`, `glossary`, `saved`, `about`. `vercel.json` rewrites unknown paths to `index.html` and builds with `npm run build` into `dist/`.
+Tests: engine, API and photo helpers with `node --test` (`tests/`), components with Vitest + Testing Library (`src/**/*.test.tsx`). Pages never compute statistics: every figure comes from `src/engine` (hard rule 2).
 
 ### 5.4 Ask-anything API (`site/api/ask.js`)
 `POST /api/ask {question}` -> `{plan, model}`. Provider: **xAI Grok** if `XAI_API_KEY` (model `XAI_MODEL`, e.g. `grok-4.20-0309-non-reasoning`), else **Gemini** if `GEMINI_API_KEY`; none -> 503 and the client uses `nl.js`.
@@ -129,7 +128,7 @@ python -m venv .venv && source .venv/bin/activate && pip install -e ".[dev,value
 pytest -q && ruff check src tests && python scripts/check_public_safe.py
 curl -fsSL -o all_json.zip https://cricsheet.org/downloads/all_json.zip
 python -m cricket_site.build --zip all_json.zip --data data --out site/public/data      # ~30 s
-cd site && npm test && node scripts/serve.mjs 4173                                      # http://localhost:4173 (Node >= 20, no npm install)
+cd site && npm ci && npm test && npm run dev                                           # http://localhost:4173 (Node >= 20)
 python scripts/make_site_fixture.py       # regenerate site/tests/fixtures after changing the builder's output format (a pytest guards drift)
 ```
 Add `--people people.csv --photos` (people.csv from `cricsheet.org/register/people.csv`) to build photo/logo ids. Set `XAI_API_KEY` (+`XAI_MODEL`) or `GEMINI_API_KEY` to try the AI parser locally.
@@ -152,7 +151,7 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * Cache key `site-dl4-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
-* The dev server `site/scripts/serve.mjs` has the same SPA fallback as the Vercel rewrite.
+* The Vite dev server has the SPA fallback built in, and serves `/api/ask` with the same handler Vercel runs (`vite.config.ts`).
 
 ## 10. Roadmap ideas (not built)
 Umpire/match-referee stats (Cricsheet officials) · competition standings (per-tournament points rules) · minutes-style and traits panels on player pages · server-side rendering for SEO ·

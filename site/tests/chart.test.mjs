@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildChart } from "../public/js/engine/props.js";
+import { buildChart } from "../src/engine/props.js";
 
 // two teams (0 = the player's side), fixtures a few days apart; he batted in the first two
 function fakeStore(newest = "2026-10-20") {

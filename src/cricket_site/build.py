@@ -530,7 +530,7 @@ def _slug(s: str) -> str:
 
 
 def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> int:
-    """sitemap.xml + robots.txt next to the site (the app maps /player/12 style paths onto its hash routes)."""
+    """sitemap.xml + robots.txt next to the site (real paths such as /player/12: the app uses path routes)."""
     if not site_url:
         return 0
     base = site_url.rstrip("/")

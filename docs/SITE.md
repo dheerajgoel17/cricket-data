@@ -18,7 +18,7 @@ See [SITE_MAP.md](SITE_MAP.md) for the page-by-page comparison with StatsHub.
 ## How the numbers are produced
 ```
 Cricsheet all_json.zip ─┐
-data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/public/js/engine)
+data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/src/engine)
 data/fixtures, value_bets ┘                                                              ▲
                                                 question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
 ```
@@ -28,7 +28,7 @@ data/fixtures, value_bets ┘                                                   
   `cricket-data query`: same teams, +/-1 day) and only when `link-players` gave the player a Cricsheet id.
   Output is ~35 MB of JSON (~12 MB compressed): `meta.json`, `index.json`, `matches.json`, 64 player shards `p/NN.json`, `fixtures.json`, `props.json`.
   I checked ~71,000 player rows against `data/players`: every difference was a super-over (the site ignores super overs on purpose).
-* **Engine** (`site/public/js/engine`, no dependencies, runs in the browser and in node): filters, hit rates, fair odds, markets, partnerships,
+* **Engine** (`site/src/engine`, no dependencies, runs in the browser and in node): filters, hit rates, fair odds, markets, partnerships,
   name resolution with typo tolerance, and the plan runner. **Every number on a page is computed here from the rows.**
 * **The model never supplies a number.** `/api/ask` (`site/api/ask.js`) sends only the question text to Gemini with a fixed instruction and gets
   back JSON, which `sanitizePlan` reduces to whitelisted fields. The plan is then resolved against the real player/team/venue tables and executed
@@ -45,9 +45,7 @@ data/fixtures, value_bets ┘                                                   
   `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.
 
 ## Player screen (app-style UI)
-The player page (`#/player/<idx>`) is built as an app screen by `site/public/js/playerapp.js`: a sticky app bar on phones, a prop rail (stat), a format switch, six stat tiles (hit rate, line, fair odds, window average, median, sample), one tappable bar chart with Over/Under, a line stepper and look-back pills that show each window's hit rate (`engine/windows.js`, unit-tested by hand-computed numbers), filters in a bottom sheet, and Lines / Game log / Splits tabs. Tap a bar or a game-log row for that game's details. Line, side and tab are kept in the URL, so a view can be shared. All numbers come from the engine, never from the UI layer.
-
-UI library: [Ionic web components](https://ionicframework.com) (`@ionic/core`, MIT), pinned to one exact version in `js/ionic.js` and loaded from the jsDelivr CDN as plain custom elements (no framework, no build step). They provide the sliding segmented controls and the draggable bottom sheets. If the CDN cannot be reached the same controls fall back to plain buttons and a `<dialog>`, so the page works either way. Theming is in `css/app.css` using the site's zinc tokens. Decimal odds only; phone first, two columns from 1024 px.
+The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app bar on phones, a prop rail (stat), a hero (photo, name, round buttons, a 3x2 stat grid and a hit-rate ring), a format switch, one tappable bar chart with Over/Under, a line stepper and look-back pills that show each window's hit rate (`engine/windows.js`, unit-tested by hand-computed numbers), a bottom sheet for filters and for a tapped game, and Lines / Game log / Splits tabs. The chart keeps the line and side in the URL with `replaceState`, so a page can be shared. UI library: shadcn/ui (Radix) with Motion for animation; see PROJECT_GUIDE 5.3.
 
 **Bookmaker lines.** The value-bets pipeline saves every matched two-sided player line (runs, sixes, fours, wickets; decimal over/under per book) to `value_bets/out/book_lines.json` (`src/value_bets/booklines.py`, matched to Cricsheet player ids). The site builder bundles it as `data/lines.json`, and the player page reads the live file from GitHub (falling back to the bundle). For a player with a priced upcoming match, the chart opens on the market's **main line** (the one priced closest to evens, `engine/lines.js`) instead of the median-based default, and a "Bookmaker lines" card shows each book's prices, the no-margin market probability and his own hit rate over each line; tap a line to put it on the chart. Players or stats with no market line keep the median default (floor(median) + 0.5, `suggestLines`).
 
@@ -62,8 +60,8 @@ UI library: [Ionic web components](https://ionicframework.com) (`@ionic/core`, M
 pip install -e .
 curl -fsSL -o all_json.zip https://cricsheet.org/downloads/all_json.zip
 python -m cricket_site.build --zip all_json.zip --data data --out site/public/data     # ~30 s
-cd site && npm test                    # engine + resolver + parser + API handler (node >= 20, no install)
-node scripts/serve.mjs 4173            # http://localhost:4173  (set GEMINI_API_KEY to try the AI parse)
+cd site && npm ci && npm test          # engine + resolver + parser + API handler + components (node >= 20)
+npm run dev                            # http://localhost:4173  (set GEMINI_API_KEY to try the AI parse)
 ```
 Python tests: `pytest -q tests/site`. The JS tests run on a tiny synthetic dataset with hand-known numbers
 (`tests/site/synth.py`, regenerated by `python scripts/make_site_fixture.py`; a pytest fails if the committed fixture is stale).
@@ -89,7 +87,7 @@ The builder reads CREX's public sitemaps (`crex.com/crex_sitemap/player.xml`, `t
 names conservatively (surname + first initial, ambiguous names skipped, see `src/cricket_site/crex_assets.py`) and stores only ids in `data/photos.json`.
 The browser loads images from CREX's CDN (`cricketvectors.akamaized.net/players/org/<id>.png`, `/Teams/<id>.png`); nothing is copied into the repo.
 About 54% of recently active players and most national and franchise teams get a CREX image today; the rest fall back. Those images belong to CREX:
-check their terms before using the site commercially, or replace the source later by returning a different URL from `playerPhoto` in `site/public/js/photos.js`.
+check their terms before using the site commercially, or replace the source later by returning a different URL from `playerPhoto` in `site/src/lib/photos.js`.
 
 ## Our own copy of the images and id maps (Supabase, free plan)
 So the site keeps working if CREX changes or removes its images, `src/cricket_site/assets_sync.py` copies each player photo / team logo once into a

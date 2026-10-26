@@ -1,6 +1,6 @@
 # Plan: migrate the site to React + Vite (shadcn/ui, Framer Motion, Watermelon UI)
 
-Status: **plan only, nothing started.** Written 2026-10-27. Goal: the props.cash look built from real libraries instead of hand-written CSS, without touching the data pipeline or the stats engine.
+Status: **implemented** (see the PR that adds `site/src`). Written 2026-10-27. Decisions taken: TypeScript for new code; Tailwind v4 + shadcn CLI as the base; path routes with a redirect for old hash links; cutover in one go (no /classic); Watermelon UI not used (docs unreachable, licence unverified). Goal: the props.cash look built from real libraries instead of hand-written CSS, without touching the data pipeline or the stats engine.
 
 ## 1. What exists today (measured)
 

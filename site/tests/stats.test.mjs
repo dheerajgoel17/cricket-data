@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fairOdds, summarize, wilson } from "../public/js/engine/stats.js";
-import { assertSingleFormat } from "../public/js/engine/filters.js";
+import { fairOdds, summarize, wilson } from "../src/engine/stats.js";
+import { assertSingleFormat } from "../src/engine/filters.js";
 
 test("half lines: over/under hit rates and fair decimal odds", () => {
   const s = summarize([0, 2, 1, 0, 0, 3, 1, 0, 2, 0], 0.5);
