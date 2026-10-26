@@ -33,13 +33,14 @@ export function playerScreen(deps) {
   const hero = h("section", { class: "pa-hero" }, playerBadge(store, idx, "crest"),
     h("div", { class: "pa-id" }, h("h1", {}, name), h("div", { class: "muted" }, team),
       h("div", { class: "pa-chips" }, ...fmts.map(([, f]) => h("span", { class: "chip" }, f)), h("span", { class: "chip dim" }, `Last played ${store.P.last[idx]}`))));
+  const strip = h("section", { class: "pa-strip" });
+  hero.append(strip);
   root.append(bar, hero);
 
   if (!res.ok) { root.append(h("div", { class: "card err" }, h("p", {}, res.error))); return root; }
 
   const rail = segment(stats, q.stat || "runs", (k) => go(`player/${idx}`, { ...hashQuery(), stat: k, line: "" }), { scrollable: true, cls: "pa-rail", label: "Prop" });
   const fmtSeg = fmts.length > 1 ? segment(fmts.map(([i, f]) => [i, f]), fmtVal, (v) => go(`player/${idx}`, { ...hashQuery(), fmt: v, line: "" }), { cls: "pa-fmt", label: "Format" }) : null;
-  const strip = h("section", { class: "pa-strip" });
   const chartCard = h("section", { class: "pa-card pa-chart" });
   const bookHost = h("div", { class: "pa-bookhost" });
   const side = h("aside", { class: "pa-side" });
@@ -74,13 +75,15 @@ export function playerScreen(deps) {
     const bookAt = book ? book.lines.find((l) => l.line === st.line) : null;
     const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b) => b[st.side] || 0)) : 0;
     const edge = bestPrice && cur.p ? bestPrice * cur.p - 1 : 0;
+    const played = shown.filter((e) => e.value != null);
+    const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
     strip.replaceChildren(
-      tile("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `${cur.hits}/${cur.played} · ${cur.label}`, `hit ${bandOf(cur.p)}`),
-      tile("Line", `${st.side === "over" ? "Over" : "Under"} ${st.line}`, bookAt ? `${bookAt.books.map((b) => `${bookName(b.source)} ${odds(b[st.side])}`).join(" · ")}` : res.statLabel),
-      tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : "no margin"),
-      tile(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), `mean ${num(res.summary.mean)} overall`),
-      tile("Median", num(res.summary.median), "all fixtures"),
-      tile("Sample", String(res.summary.n), res.sample.unit));
+      tile(`${cur.label} avg`, num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100), "", cur.p != null && cur.mean > st.line ? "up" : ""),
+      tile("Line", `${st.side === "over" ? "O" : "U"} ${st.line}`, bookAt ? bookAt.books.map((b) => `${bookName(b.source)} ${odds(b[st.side])}`).join(" · ") : ""),
+      tile("Prop", res.statLabel, ""),
+      tile("Hit rate", cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`, `${cur.hits}/${cur.played}`, `hit ${bandOf(cur.p)}`),
+      tile(`Avg ${(c.auxLabel || "").toLowerCase()}`, num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100), ""),
+      tile("Fair odds", cur.p ? odds(1 / cur.p) : "–", bestPrice && cur.p ? `book ${odds(bestPrice)} · ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% edge` : ""));
 
     const bars = shown.map((e) => {
       const s = barState(e, st.line, st.side);
@@ -173,7 +176,7 @@ export function playerScreen(deps) {
 
   side.append(h("div", { class: "pa-card pa-insight" }, h("h3", {}, "At a glance"), h("p", {}, res.headline), h("p", { class: "muted small" }, res.freshness)));
   drawChart();
-  root.append(h("div", { class: "pa-railwrap" }, rail), ...(fmtSeg ? [fmtSeg] : []), strip,
+  root.append(h("div", { class: "pa-railwrap" }, rail), ...(fmtSeg ? [fmtSeg] : []),
     h("div", { class: "pa-grid" }, h("div", { class: "pa-main" }, chartCard, bookHost, filterBar, tabsHost, secs), side));
   return root;
 }
