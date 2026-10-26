@@ -230,7 +230,7 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
     print(f"crex-balls: {len(targets)} match(es) to scrape")
     with CREXBrowser(min_interval=a.min_interval) as browser:
         res = collect(browser, store, targets)
-    print(f"crex-balls: {res['saved']} saved, {res['no_feed']} without a feed, {res['rejected']} rejected, "
+    print(f"crex-balls: {res['saved']} saved ({res['healed']} healed), {res['no_feed']} without a feed, {res['rejected']} rejected, "
           f"{res['failed']} failed, {res['warnings']} bowler warning(s)")
     for p in res["problems"]:
         print("  -", p)

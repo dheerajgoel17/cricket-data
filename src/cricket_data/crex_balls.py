@@ -238,6 +238,82 @@ def reconcile(balls: list[Ball], scorecard) -> list[str]:
     return issues
 
 
+def _vec(b: Ball) -> tuple[int, int, int, int]:
+    """What a ball adds to its striker's line: runs, balls faced, fours, sixes."""
+    return (b.bat_runs, 0 if b.extra_type == "wd" else 1, int(b.bat_runs == 4), int(b.bat_runs == 6))
+
+
+def _solve_moves(to_b: dict, to_a: dict, want: tuple, limit: int) -> tuple[int, list[tuple]] | None:
+    """Fewest balls to move so that A's line drops by ``want`` (and B's rises by it).
+
+    ``to_b``/``to_a``: balls grouped by their (runs, faced, 4, 6) vector that A faced / that B faced.
+    Returns (balls moved, [(vector, net count)]) with a positive count meaning A -> B.
+    """
+    types = sorted(set(to_b) | set(to_a))
+    best: list = [None]
+
+    def rec(i: int, acc: tuple, moved: int, plan: list) -> None:
+        if moved > limit or (best[0] and moved >= best[0][0]):
+            return
+        if i == len(types):
+            if acc == want:
+                best[0] = (moved, list(plan))
+            return
+        t = types[i]
+        for n in range(-min(len(to_a.get(t, [])), limit), min(len(to_b.get(t, [])), limit) + 1):
+            plan.append((t, n))
+            rec(i + 1, tuple(a + n * x for a, x in zip(acc, t, strict=True)), moved + abs(n), plan)
+            plan.pop()
+
+    rec(0, (0, 0, 0, 0), 0, [])
+    return best[0]
+
+
+def heal(balls: list[Ball], scorecard, limit: int = 4) -> int:
+    """Repair the one error CREX's feed makes: a ball credited to the wrong one of the two batters at the crease.
+
+    When exactly two partners' lines are off by equal and opposite amounts against the scorecard, the fewest
+    balls (at most ``limit``) are moved between them until both lines match. The pair, the innings total, the
+    extras and every partnership are unchanged by such a move. Anything else (a lone line off, three batters,
+    no small fix) is left alone for ``reconcile`` to reject. Returns the number of balls moved.
+    """
+    names = scorecard.names
+    moved_total = 0
+    for i, inn in enumerate(scorecard.innings, 1):
+        mine = [b for b in balls if b.innings == i]
+        diffs: dict[str, tuple] = {}
+        got = totals(mine).get(i, {"bat": {}})["bat"]
+        for b in inn.batters:
+            d = tuple(g - w for g, w in zip(got.get(b.pid, [0, 0, 0, 0]), (b.runs, b.balls, b.fours, b.sixes), strict=True))
+            if any(d):
+                diffs[b.pid] = d
+        done: set[str] = set()
+        for a in list(diffs):
+            for c in list(diffs):
+                if a >= c or a in done or c in done or any(x + y for x, y in zip(diffs[a], diffs[c], strict=True)):
+                    continue
+                ab = {}, {}
+                for b in mine:
+                    if b.wicket:
+                        continue
+                    if (b.striker, b.non_striker) == (a, c):
+                        ab[0].setdefault(_vec(b), []).append(b)
+                    elif (b.striker, b.non_striker) == (c, a):
+                        ab[1].setdefault(_vec(b), []).append(b)
+                sol = _solve_moves(ab[0], ab[1], diffs[a], limit)
+                if not sol:
+                    continue
+                for vec, n in sol[1]:
+                    if n == 0:
+                        continue
+                    for b in (ab[0][vec][:n] if n > 0 else ab[1][vec][:-n]):
+                        b.striker, b.non_striker = b.non_striker, b.striker
+                        b.striker_name, b.non_striker_name = names.get(b.striker, ""), names.get(b.non_striker, "")
+                moved_total += sol[0]
+                done |= {a, c}
+    return moved_total
+
+
 def is_hard(issue: str) -> bool:
     return not issue.startswith("bowl:")
 
@@ -279,7 +355,7 @@ def collect(browser, store, targets: list[tuple[str, str, str]], min_balls: int 
     """
     from .crex_scorecard import parse_scorecard
 
-    out = {"saved": 0, "no_feed": 0, "rejected": 0, "failed": 0, "warnings": 0, "problems": []}
+    out = {"saved": 0, "healed": 0, "no_feed": 0, "rejected": 0, "failed": 0, "warnings": 0, "problems": []}
     for match_id, date, url in targets:
         try:
             events = fetch_events(browser, url)
@@ -295,6 +371,13 @@ def collect(browser, store, targets: list[tuple[str, str, str]], min_balls: int 
                 continue
             balls = parse_balls(events, match_key(url), sc)
             issues = reconcile(balls, sc)
+            if any(is_hard(i) for i in issues):
+                moved = heal(balls, sc)
+                if moved:
+                    issues = reconcile(balls, sc)
+                    if not any(is_hard(i) for i in issues):
+                        out["healed"] += 1
+                        out["problems"].append(f"{match_id}: healed, {moved} ball(s) credited to the other batter at the crease")
         except Exception as exc:  # one bad match must not stop the run
             out["failed"] += 1
             out["problems"].append(f"{match_id}: {str(exc).splitlines()[0][:160]}")

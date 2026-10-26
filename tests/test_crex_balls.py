@@ -192,3 +192,51 @@ def test_prune_balls_keeps_only_live_matches_and_removes_empty_files(tmp_path):
     assert store.balls_match_ids() == {"crex-b"} and store.months("balls") == ["2026-10"]
     assert store.prune_balls({"crex-b"}) == 0  # idempotent
     assert len(store.read("balls", "2026-10")) == 7
+
+
+def swapped(balls, pick):
+    """Credit one ball to the other batter at the crease, as CREX's feed sometimes does."""
+    b = pick(balls)
+    b.striker, b.non_striker = b.non_striker, b.striker
+    b.striker_name, b.non_striker_name = b.non_striker_name, b.striker_name
+    return b
+
+
+def test_heal_moves_a_misattributed_ball_back_to_its_batter():
+    balls = parse_balls(FIXTURE["events"], "13W5", card())
+    victim = swapped(balls, lambda bs: next(b for b in bs if b.innings == 2 and b.bat_runs == 4))
+    assert any(crex_balls.is_hard(i) for i in reconcile(balls, card()))
+    assert crex_balls.heal(balls, card()) == 1
+    assert [i for i in reconcile(balls, card()) if crex_balls.is_hard(i)] == []
+    assert victim.striker != victim.non_striker and victim.striker_name == card().names[victim.striker]
+    # the pair, the total and the partnership are untouched by the move
+    assert totals(balls)[2]["runs"] == 111
+
+
+def test_heal_leaves_a_lone_wrong_line_alone():
+    balls = parse_balls(FIXTURE["events"], "13W5", card())
+    next(b for b in balls if b.innings == 2 and b.bat_runs == 4).bat_runs = 2  # a wrong score, not a swapped batter
+    assert crex_balls.heal(balls, card()) == 0
+    assert any(crex_balls.is_hard(i) for i in reconcile(balls, card()))
+
+
+def test_heal_never_moves_a_wicket_ball():
+    balls = parse_balls(FIXTURE["events"], "13W5", card())
+    before = [(b.striker, b.non_striker) for b in balls if b.wicket]
+    swapped(balls, lambda bs: next(b for b in bs if b.innings == 1 and not b.wicket and b.bat_runs == 1))
+    crex_balls.heal(balls, card())
+    assert [(b.striker, b.non_striker) for b in balls if b.wicket] == before
+
+
+def test_collect_heals_before_it_rejects(tmp_path, monkeypatch):
+    victim = next(e for e in FIXTURE["events"] if e["type"] == "b" and e["inning"] == 1 and e["b"] == "4")
+    a, b = victim["pf"], next(e["pf"] for e in FIXTURE["events"] if e["type"] == "b" and e["inning"] == 1 and e["pf"] != victim["pf"])
+    events = [dict(e, pf=b) if e is victim else e for e in FIXTURE["events"]]  # CREX credits the four to somebody else
+    assert a != b
+    res, store = run_collect(tmp_path, monkeypatch, events, card())
+    # the only wrong ball is credited to a batter who may not be the partner: either healed or rejected, never stored wrong
+    assert res["saved"] + res["rejected"] == 1
+    if res["saved"]:
+        assert res["healed"] == 1 and len(store.read("balls", "2026-10")) == 215
+    else:
+        assert store.read("balls", "2026-10") == []
