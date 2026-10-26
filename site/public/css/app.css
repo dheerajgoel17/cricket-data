@@ -106,3 +106,25 @@ ion-segment.pa-side-seg, .pa-side-seg.seg-plain { width: 190px; flex: none; }
 .pa-odds { display: grid; gap: 2px; font-variant-numeric: tabular-nums; } .pa-odds em { font-style: normal; color: var(--mute); font-size: 11px; margin-right: 6px; }
 .pa-use.on { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: transparent; }
 .pa-book th, .pa-book td { padding-left: 6px; padding-right: 6px; } .pa-book td:first-child, .pa-book th:first-child { padding-left: 2px; }
+
+/* ---- props.cash desktop look: left rail nav, flat chart, sans name (>= 768 / 1024 / 1280) ---- */
+@media (min-width: 768px) {
+  .pa-id h1 { font: 700 40px/1.1 var(--body); text-transform: none; letter-spacing: 0; }
+  .pa-id .muted { font-size: 16px; }
+}
+@media (min-width: 1024px) {
+  .pa-chart { background: none; border: 0; padding: 0; }
+  .pa-y, .pa-area { height: 400px; }
+  .pa-bars { gap: 3px; } .pa-xl { gap: 3px; } .pa-bars .bar { border-radius: 3px 3px 0 0; background: #2bdc8a; } .pa-bars .miss .bar { background: #ff1a1a; }
+  .pa-line { border-top-width: 1px; }
+  .pa-tile { border-radius: 16px; }
+}
+@media (min-width: 1280px) {
+  .top { margin: 0; max-width: none; border-radius: 0; border-width: 0 0 1px; backdrop-filter: none; top: 0; padding: 0 24px; }
+  #nav { position: fixed; left: 0; top: 61px; bottom: 0; width: 232px; flex-direction: column; align-items: stretch; gap: 4px; margin: 0; padding: 18px 12px; border-right: 1px solid var(--line); background: var(--bg); overflow-y: auto; z-index: 40; }
+  #nav a, #nav summary { font-size: 17px; padding: 12px 16px; } #nav a span.t { display: inline; }
+  #nav .menu { position: static; box-shadow: none; border: 0; background: none; padding: 0 0 0 12px; }
+  main, #foot, footer { margin-left: 256px; margin-right: 24px; max-width: none; width: auto; }
+  .pa-hero .crest { width: 148px; height: 148px; } .pa-id h1 { font-size: 46px; }
+  .pa-grid { grid-template-columns: minmax(0, 1fr) 360px; }
+}
