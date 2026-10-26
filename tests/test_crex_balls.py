@@ -179,3 +179,19 @@ def test_match_key_and_feed_events_cover_every_endpoint_version():
     html = ('<script id="app-root-state" type="application/json">{&q;https://content.crickapi.com/commentary/v2/'
             'getBallFeeds&q;:[{&q;id&q;:1,&q;type&q;:&q;t&q;}]}</script>')
     assert crex_balls.feed_events(html, [[{"id": 2}], {"not": "a list"}]) == [{"id": 1, "type": "t"}, {"id": 2}]
+
+
+def test_over_summary_overrides_a_corrected_ball():
+    events = [dict(e) for e in FIXTURE["events"]]
+    over = [e for e in events if e["type"] == "b" and e["inning"] == 1 and e["on"] == 3]
+    over.sort(key=lambda e: e["delivery"])
+    tokens = [e["b"] for e in over]
+    victim = next(i for i, t in enumerate(tokens) if t == "0")
+    tokens[victim] = "2"  # the scorer fixed this ball in the over summary only
+    summary = {"id": over[-1]["id"] + 1, "type": "o", "inning": 1, "on": 3, "rb": ".".join(tokens)}
+    base = parse_balls(events, "13W5", card())
+    fixed = parse_balls(events + [summary], "13W5", card())
+    assert sum(b.bat_runs for b in fixed) == sum(b.bat_runs for b in base) + 2
+    # a summary with a different number of balls is ignored rather than guessed at
+    summary["rb"] = ".".join(tokens[:-1])
+    assert [b.row() for b in parse_balls(events + [summary], "13W5", card())] == [b.row() for b in base]

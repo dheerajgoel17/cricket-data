@@ -90,6 +90,30 @@ def dismissal_kind(desc: str) -> str:
     return (m.group("other") or "").strip().lower()
 
 
+def _final_codes(events: list[dict], deliveries: list[dict]) -> dict[int, str]:
+    """Ball code per delivery id, taken from the over summary's ``rb`` when it covers the over exactly.
+
+    A scorer who corrects a ball ("1" -> "2") updates the over summary but not always the ball card, so
+    the summary is the final word. Only used when the summary lists as many balls as the feed has.
+    """
+    latest: dict[tuple, dict] = {}
+    for e in events or []:
+        if isinstance(e, dict) and e.get("type") == "o" and e.get("inning", -1) >= 0 and e.get("rb"):
+            k = (e["inning"], e.get("on"))
+            if k not in latest or e.get("id", 0) > latest[k].get("id", 0):
+                latest[k] = e
+    by_over: dict[tuple, list[dict]] = {}
+    for d in deliveries:
+        by_over.setdefault((d["inning"], d.get("on")), []).append(d)
+    out: dict[int, str] = {}
+    for k, summary in latest.items():
+        tokens = str(summary["rb"]).split(".")
+        balls = sorted(by_over.get(k, []), key=lambda d: (d.get("delivery", 0), d["id"]))
+        if balls and len(tokens) == len(balls):
+            out.update({d["id"]: t for d, t in zip(balls, tokens, strict=True)})
+    return out
+
+
 def parse_balls(events: list[dict], key: str = "", scorecard=None) -> list[Ball]:
     """Normalise a captured feed (any order, duplicates and re-entered balls allowed), oldest first.
 
@@ -104,6 +128,7 @@ def parse_balls(events: list[dict], key: str = "", scorecard=None) -> list[Ball]
                 latest[slot] = e  # a corrected re-entry carries the same delivery number and a newer id
     deliveries = sorted((e for e in latest.values() if e["type"] == "b"), key=lambda e: (e["inning"], e["id"]))
     cards = {(e["inning"], e.get("o")): e for e in latest.values() if e["type"] == "w"}
+    codes = _final_codes(events, deliveries)
 
     order = {}
     if scorecard:
@@ -128,7 +153,7 @@ def parse_balls(events: list[dict], key: str = "", scorecard=None) -> list[Ball]
         non = next((x for x in p if x != striker), "")
         card = cards.get((inn, e.get("o")))
         kind = dismissal_kind(card.get("wicketDesc") or card.get("dismissal") or "") if card else ""
-        bat, ex_type, ex_runs, legal, wicket = decode(str(e.get("b", "")))
+        bat, ex_type, ex_runs, legal, wicket = decode(codes.get(e["id"], str(e.get("b", ""))))
         over = int(e.get("on", 0))
         lo = legal_in_over.get((inn, over), 0) + (1 if legal else 0)
         legal_in_over[(inn, over)] = lo
