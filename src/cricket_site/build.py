@@ -182,7 +182,11 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20"}[fmt],
             "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
             "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
-    parsed = parse_match(m["id"], balls_doc(rows, info))
+    try:
+        parsed = parse_match(m["id"], balls_doc(rows, info))
+    except (KeyError, ValueError) as exc:  # malformed stored rows: keep the totals-only match, never sink the build
+        print(f"skip deliveries of {m['id']}: {exc!r}", file=sys.stderr)
+        return
     if not parsed or len(parsed["innings"]) < 1:
         return
     c = _compact(parsed)

@@ -20,15 +20,17 @@ def balls_doc(rows: list[dict], info: dict) -> dict:
         overs: dict[int, list[dict]] = {}
         for r in deliveries:
             bat, extra, total = int(r["bat_runs"]), int(r["extra_runs"]), int(r["total"])
-            dl = {"batter": r["striker_name"] or r["striker"], "bowler": r["bowler_name"] or r["bowler"],
-                  "non_striker": r["non_striker_name"] or r["non_striker"] or r["striker_name"] or r["striker"],
+            g = r.get  # rows saved before the *_name columns existed still convert (by CREX id, so no site players)
+            striker = g("striker_name") or r["striker"]
+            dl = {"batter": striker, "bowler": g("bowler_name") or r["bowler"],
+                  "non_striker": g("non_striker_name") or r["non_striker"] or striker,
                   "runs": {"batter": bat, "extras": extra, "total": total}}
             if r["extra_type"] in EXTRA_KEY:
                 dl["extras"] = {EXTRA_KEY[r["extra_type"]]: extra}
             if r["wicket"] == "1":
-                dl["wickets"] = [{"player_out": r["dismissed_name"] or r["dismissed"] or dl["batter"],
+                dl["wickets"] = [{"player_out": g("dismissed_name") or r["dismissed"] or striker,
                                   "kind": r["dismissal"] or "caught"}]
             overs.setdefault(int(r["over"]), []).append(dl)
-        innings.append({"team": deliveries[0]["team_name"],
+        innings.append({"team": deliveries[0].get("team_name", ""),
                         "overs": [{"over": o, "deliveries": overs[o]} for o in sorted(overs)]})
     return {"info": info, "innings": innings}

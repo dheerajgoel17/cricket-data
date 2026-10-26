@@ -72,3 +72,22 @@ def test_build_gives_a_provisional_match_innings_and_markets_when_it_has_deliver
     m = M["id"].index("crex-x")
     assert M["pv"][m] == 1 and len(M["inn"][m]) == 2 and M["inn"][m][0][1:4] == [110, 8, 120]
     assert M["fi"][m] != -1 and M["q"][m] == 0
+
+
+def test_rows_saved_before_the_name_columns_still_build(tmp_path):
+    old = [{k: v for k, v in r.items() if not k.endswith("_name")} for r in stored(rows())]
+    doc = balls_doc(old, INFO)  # no KeyError: ids stand in for names
+    assert parse_match("crex-x", doc)["innings"] == []  # no team name either: nothing usable, the match stays totals-only
+    docs, _ = synth.make_dataset()
+    z = synth.write_zip(docs, tmp_path / "all_json.zip")
+    data = tmp_path / "data"
+    (data / "provisional").mkdir(parents=True)
+    d = {"match_id": "crex-x", "date": "2026-10-13", "match_type": "T20", "team_type": "club", "gender": "male",
+         "event": "WCL", "venue": "Sharjah", "team_a": "India Champions", "team_b": "West Indies Champions",
+         "winner": "West Indies Champions", "status": "provisional", "players": []}
+    (data / "provisional" / "crex-x.json").write_text(json.dumps(d))
+    Store(data).upsert_balls("crex-x", "2026-10-13", [{k: v for k, v in r.items() if not k.endswith("_name")} for r in rows()])
+    out = tmp_path / "out"
+    assert B.build(z, data, out, None, workers=1)["provisional_matches"] == 1
+    M = json.loads((out / "matches.json").read_text())
+    assert M["inn"][M["id"].index("crex-x")] == []
