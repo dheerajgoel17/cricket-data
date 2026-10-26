@@ -76,6 +76,22 @@ class Store:
         return self._write("balls", month, merged, list(BALL_COLUMNS),
                            key=lambda r: (r["match_id"], int(r["innings"]), int(r["seq"])))
 
+    def prune_balls(self, keep: set[str]) -> int:
+        """Drop deliveries of every match not in ``keep`` (matches Cricsheet has since published); returns rows removed."""
+        removed = 0
+        for month in self.months("balls"):
+            rows = self.read("balls", month)
+            kept = [r for r in rows if r["match_id"] in keep]
+            if len(kept) == len(rows):
+                continue
+            removed += len(rows) - len(kept)
+            if kept:
+                self._write("balls", month, kept, list(rows[0].keys()),
+                            key=lambda r: (r["match_id"], int(r["innings"]), int(r["seq"])))
+            else:
+                self.path("balls", month).unlink()
+        return removed
+
     def balls_match_ids(self) -> set[str]:
         return {r["match_id"] for m in self.months("balls") for r in self.read("balls", m)}
 

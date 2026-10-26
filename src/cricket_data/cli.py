@@ -208,6 +208,9 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
     from .crex_browser import CREXBrowser
 
     store = Store(a.data_dir)
+    if a.prune:  # a match's provisional file is deleted once Cricsheet publishes it: its CREX deliveries go with it
+        live = {json_mod.loads(f.read_text(encoding="utf-8"))["match_id"] for f in (store.root / "provisional").glob("crex-*.json")}
+        print(f"crex-balls: pruned {store.prune_balls(live)} delivery row(s) of matches Cricsheet now has")
     base = "https://crex.com/cricket-live-score/"
     targets: list[tuple[str, str, str]] = []
     for u in a.url:
@@ -415,6 +418,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="also scrape CREX provisional matches from the last N days that have no deliveries yet")
     cb.add_argument("--limit", type=int, default=0, help="cap on matches per run (0 = no cap)")
     cb.add_argument("--min-interval", type=float, default=1.5, help="seconds between page loads / scrolls")
+    cb.add_argument("--prune", action="store_true",
+                    help="first delete deliveries of matches whose provisional file is gone (Cricsheet has published them)")
     cb.add_argument("--force", action="store_true", help="re-scrape matches that already have deliveries")
     cb.set_defaults(fn=cmd_crex_balls)
 

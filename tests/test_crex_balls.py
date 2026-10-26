@@ -1,27 +1,12 @@
-import json
 import random
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from crex_fixture import FIXTURE, card
 
 from cricket_data import crex_balls, crex_scorecard
 from cricket_data.crex_balls import collect, decode, dismissal_kind, parse_balls, reconcile, totals
-from cricket_data.crex_scorecard import Batter, Bowler, Innings, Scorecard
 from cricket_data.store import Store
-
-FIXTURE = json.loads((Path(__file__).parent / "fixtures" / "crex_balls_13W5.json").read_text())
-
-
-def card() -> Scorecard:
-    c = FIXTURE["scorecard"]
-    return Scorecard(
-        teams=c["teams"], names=c["names"],
-        innings=[Innings(batting_team=i["team"],
-                         batters=[Batter(pid=b[0], runs=b[1], balls=b[2], fours=b[3], sixes=b[4], code=b[5])
-                                  for b in i["batters"]],
-                         bowlers=[Bowler(pid=w[0], runs=w[1], balls=w[2], wickets=w[3]) for w in i["bowlers"]])
-                 for i in c["innings"]])
 
 
 @pytest.mark.parametrize("code,expected", [
@@ -195,3 +180,15 @@ def test_over_summary_overrides_a_corrected_ball():
     # a summary with a different number of balls is ignored rather than guessed at
     summary["rb"] = ".".join(tokens[:-1])
     assert [b.row() for b in parse_balls(events + [summary], "13W5", card())] == [b.row() for b in base]
+
+
+def test_prune_balls_keeps_only_live_matches_and_removes_empty_files(tmp_path):
+    store = Store(tmp_path)
+    rows = crex_balls.rows_for("crex-a", "2026-10-13", parse_balls(FIXTURE["events"], "13W5", card()))
+    store.upsert_balls("crex-a", "2026-10-13", rows)
+    store.upsert_balls("crex-b", "2026-10-14", rows[:7])
+    store.upsert_balls("crex-c", "2026-09-30", rows[:3])
+    assert store.prune_balls({"crex-b"}) == len(rows) + 3
+    assert store.balls_match_ids() == {"crex-b"} and store.months("balls") == ["2026-10"]
+    assert store.prune_balls({"crex-b"}) == 0  # idempotent
+    assert len(store.read("balls", "2026-10")) == 7

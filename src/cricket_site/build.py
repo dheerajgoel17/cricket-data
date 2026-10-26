@@ -22,6 +22,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, KINDS, parse_match, squad_quality
 
 NSHARD = 64
@@ -111,7 +112,11 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
         for dd in (-1, 0, 1):
             d = (date.fromisoformat(m["date"]) + timedelta(days=dd)).isoformat()
             seen.setdefault((d, frozenset(_norm_team(t) for t in m["teams"]), m["gender"]), []).append(runs if dd else -1)
-    out, stat = [], {"files": 0, "matches": 0, "rows": 0, "rows_unlinked": 0, "unlinked_names": []}
+    out, stat = [], {"files": 0, "matches": 0, "rows": 0, "rows_unlinked": 0, "unlinked_names": [], "with_deliveries": 0}
+    deliveries: dict[str, list[dict]] = {}  # CREX ball-by-ball (data/balls), keyed by match id
+    for month in store.months("balls"):
+        for r in store.read("balls", month):
+            deliveries.setdefault(r["match_id"], []).append(r)
     for d in pending_provisional(store):
         stat["files"] += 1
         g = gen.get(d.get("gender", ""), 0)
@@ -135,6 +140,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
              "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
+        registry: dict[str, str] = {}
         for p in d.get("players", []):
             stat["rows"] += 1
             pid = p.get("player_id", "")
@@ -142,6 +148,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
                 pid = name_pid.get(fold_name(p.get("player", "")), "")
                 stat["rows_linked_by_crex"] = stat.get("rows_linked_by_crex", 0) + bool(pid)
             if pid:
+                registry[p.get("player", "")] = pid
                 m["xi"].append(pid)  # scraped squads list everyone named for the match, batting or not
             if not pid:
                 stat["rows_unlinked"] += 1
@@ -158,10 +165,30 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
         for p in d.get("players", []):
             sides[p.get("team", "")] = sides.get(p.get("team", ""), 0) + 1
         m["xq"] = squad_quality(list(sides.values()), lo=10)  # scraped squads: stricter, a side with 1-2 players is a failed scrape
+        if mid in deliveries:
+            _with_deliveries(m, d, fmt, deliveries[mid], registry, stat)
         out.append(m)
         stat["matches"] += 1
         seen.setdefault(key, []).append(-1)
     return out, stat
+
+
+def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dict[str, str], stat: dict) -> None:
+    """Replace a provisional match's totals-only rows with the full parse of its CREX deliveries.
+
+    Gives it innings, batting order, partnerships, extras-style aggregates and a valid ``q`` like a Cricsheet
+    match. Skipped (the match stays totals-only) if the deliveries do not form two innings of this fixture.
+    """
+    info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20"}[fmt],
+            "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
+            "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
+    parsed = parse_match(m["id"], balls_doc(rows, info))
+    if not parsed or len(parsed["innings"]) < 1:
+        return
+    c = _compact(parsed)
+    for k in ("first", "q", "mc", "ts", "ho", "inn", "bat", "bowl", "parts"):
+        m[k] = c[k]
+    stat["with_deliveries"] += 1
 
 
 # ------------------------------------------------------------------ assembly

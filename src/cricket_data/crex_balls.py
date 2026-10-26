@@ -20,7 +20,7 @@ from dataclasses import asdict, dataclass, fields
 
 BALL_FIELDS = ("match_key", "innings", "seq", "over", "ball", "legal", "batting_team", "striker", "non_striker",
                "bowler", "bat_runs", "extra_type", "extra_runs", "total", "wicket", "dismissed", "dismissal",
-               "score", "text")
+               "score", "text", "team_name", "striker_name", "non_striker_name", "bowler_name", "dismissed_name")
 BALL_COLUMNS = ("match_id", "date") + BALL_FIELDS
 FEED_PART = "/getBallFeeds"  # the version in the path (v1/v2/v3) differs from match to match
 
@@ -50,6 +50,11 @@ class Ball:
     dismissal: str = ""
     score: str = ""  # innings score after the ball as CREX stamped it, "111/4"
     text: str = ""  # start of the commentary
+    team_name: str = ""  # names come from the scorecard, so they are what the player table and the site use
+    striker_name: str = ""
+    non_striker_name: str = ""
+    bowler_name: str = ""
+    dismissed_name: str = ""
 
     def row(self) -> dict:
         return asdict(self)
@@ -130,6 +135,8 @@ def parse_balls(events: list[dict], key: str = "", scorecard=None) -> list[Ball]
     cards = {(e["inning"], e.get("o")): e for e in latest.values() if e["type"] == "w"}
     codes = _final_codes(events, deliveries)
 
+    names = scorecard.names if scorecard else {}
+    teams = scorecard.teams if scorecard else {}
     order = {}
     if scorecard:
         for i, inn in enumerate(scorecard.innings):
@@ -172,7 +179,10 @@ def parse_balls(events: list[dict], key: str = "", scorecard=None) -> list[Ball]
                         non_striker=non, bowler=e.get("bf", ""), bat_runs=bat, extra_type=ex_type,
                         extra_runs=ex_runs, total=bat + ex_runs, wicket=int(wicket), dismissed=dismissed,
                         dismissal=kind if wicket else "", score=e.get("s", ""),
-                        text=_plain(e.get("c2") or e.get("c1") or e.get("c") or "")[:200]))
+                        text=_plain(e.get("c2") or e.get("c1") or e.get("c") or "")[:200],
+                        team_name=teams.get(e.get("bat_team_fkey", ""), ""), striker_name=names.get(striker, ""),
+                        non_striker_name=names.get(non, ""), bowler_name=names.get(e.get("bf", ""), ""),
+                        dismissed_name=names.get(dismissed, "")))
     return out
 
 

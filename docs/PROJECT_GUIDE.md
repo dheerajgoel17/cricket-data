@@ -115,6 +115,7 @@ Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write)
 | `ci.yml` | push to main, PRs | ruff, pytest (py3.10 + 3.12), public-safety check, `site-js` node tests | none |
 | `daily-update.yml` | 05:30 UTC | Cricsheet delta + reconcile + link-players + freshness check; commits `data/`; opens `data-stale` / `update-failed` issues | none |
 | `scraper-update.yml` | every 30 min (+03:17 backfill) | CREX scrape of newly finished matches into `data/provisional/` | optional API keys |
+| `balls-update.yml` | every 2 h | CREX ball-by-ball for recent matches Cricsheet lacks (`data/balls/`), prune the ones it now has | none |
 | `weekly-heal.yml` | Sun 06:15 | full re-sync / healing | none |
 | `value-bets.yml` | hourly 03:30-17:30 UTC, weekly refit | odds -> value bets, commits `value_bets/out` | optional odds keys |
 | `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
