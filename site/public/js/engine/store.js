@@ -4,8 +4,7 @@ import { norm } from "./util.js";
 
 export async function createStore({ base = "data/", fetchJson } = {}) {
   const get = fetchJson || (async (p) => {
-    // credentials omitted so a <link rel=preload as=fetch crossorigin> can be reused
-    const r = await fetch(base + p, { credentials: "omit" });
+    const r = await fetch(base + p);
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
     return r.json();
   });
