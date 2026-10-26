@@ -28,3 +28,6 @@ Files: `data/matches/YYYY-MM.csv.gz`, `data/players/YYYY-MM.csv.gz` (UTF-8 CSV, 
 | catches | Includes caught-and-bowled |
 | stumpings, run_outs | Fielding credits |
 | points | `runs + 20*wickets + 10*catches + 25*stumpings` (a common "player performance" scoring) |
+
+## balls (one row per delivery, CREX only)
+See [CREX_BALLS.md](CREX_BALLS.md): `data/balls/YYYY-MM.csv.gz`, keyed by `match_id` + `innings` + `seq`. Players are CREX ids until mapped to Cricsheet ids.

@@ -162,6 +162,77 @@ class CREXBrowser:
                 time.sleep(self.backoff[attempt])
         raise BrowserError(f"{url}: {last_err} after {len(self.backoff) + 1} attempts")
 
+    def capture(self, url: str, url_part: str, max_scrolls: int = 150, idle_limit: int = 2,
+                timeout_ms: int = 45000, wait_s: float = 8.0) -> tuple[RenderedPage, list]:
+        """Open ``url`` like a reader, scroll to the bottom repeatedly and return the JSON bodies of the
+        page's own XHR responses whose URL contains ``url_part`` (the infinite-scroll feed).
+
+        Stops after ``idle_limit`` scrolls that bring no new response within ``wait_s`` seconds. Only the page itself is fetched
+        from our side, so robots.txt for ``url`` is the rule that applies. Raises RobotsDisallowed / BrowserError.
+        """
+        if not self.fetcher.allowed(url):
+            raise RobotsDisallowed(f"robots.txt disallows {url}")
+        self.start()
+        bodies: list = []
+        for attempt in range(len(self.backoff) + 1):
+            wait = self.min_interval - (time.monotonic() - self._last)
+            if wait > 0:
+                time.sleep(wait)
+            page = self._context.new_page()
+            seen: list = []  # bodies, read the moment the response arrives (they are gone once the page moves on)
+            failed: list = []
+
+            def on_response(r, seen=seen, failed=failed):
+                if url_part in r.url and r.status == 200:
+                    try:
+                        seen.append(r.json())
+                    except Exception as exc:
+                        failed.append(str(exc)[:80])
+
+            page.on("response", on_response)
+            try:
+                resp = page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+                status = resp.status if resp else 0
+                if status in RETRY_STATUSES or status >= 400:
+                    if status not in RETRY_STATUSES:
+                        return RenderedPage(url=url, status=status, html="", text="", title=""), []
+                    raise BrowserError(f"HTTP {status}")
+                try:
+                    page.wait_for_load_state("networkidle", timeout=timeout_ms)
+                except Exception:
+                    pass
+                done, idle = 0, 0
+                for _ in range(max_scrolls):
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    page.mouse.wheel(0, 6000)  # some lists only react to a real wheel event
+                    for _ in range(int(wait_s * 4)):  # up to wait_s for the page to request the next chunk
+                        if len(seen) > done:
+                            break
+                        page.wait_for_timeout(250)
+                    if len(seen) > done:
+                        page.wait_for_timeout(int(self.min_interval * 500))  # let the next request start
+                        done, idle = len(seen), 0
+                    else:
+                        idle += 1
+                        if idle >= idle_limit:
+                            break
+                bodies = list(seen)
+                if failed:
+                    raise BrowserError(f"{len(failed)} feed responses unreadable: {failed[0]}")
+                return RenderedPage(url=url, status=status, html=page.content(), text="", title=page.title()), bodies
+            except Exception as exc:
+                last_err = str(exc).splitlines()[0][:200]
+                bodies = []
+            finally:
+                self._last = time.monotonic()
+                try:
+                    page.close()
+                except Exception:
+                    pass
+            if attempt < len(self.backoff):
+                time.sleep(self.backoff[attempt])
+        raise BrowserError(f"{url}: {last_err} after {len(self.backoff) + 1} attempts")
+
     def links(self, url: str, href_contains: str, timeout_ms: int = 45000) -> tuple[RenderedPage, list[dict]]:
         """Render ``url`` and also return ``[{href, text}]`` for anchors containing ``href_contains``."""
         page_obj = self.render(url, wait_selector=f'a[href*="{href_contains}"]', timeout_ms=timeout_ms)

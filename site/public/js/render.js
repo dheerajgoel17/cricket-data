@@ -163,4 +163,4 @@ export function renderResult(r, { source, onLine, onStat, stats, badge } = {}) {
   return out;
 }
 
-export { FORMATS, freshText };
+export { FORMATS, freshText, ladderTable, splitTables };

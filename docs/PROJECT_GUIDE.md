@@ -50,7 +50,8 @@ AGENTS.md CLAUDE.md   instructions for AI coding agents (any IDE)
 * **Fixtures**: `cricket-data fixtures` reads CREX's `/schedule` page (server-rendered state with the next ~20 matches) every scraper run; it never overwrites the file with an empty result. The older sitemap crawl (`--sitemap`) surfaced stale placeholder pages and is no longer the default.
 * **Linking scraped players**: besides `link-players`, the site builder links still-unlinked scraped names through CREX's full-name list (e.g. Afghanistan, whose matches Cricsheet withholds): ~1.7k extra rows.
 * **CREX scraper**: `crex_*.py`, `scrapers.py` (Playwright for pages, plain HTTP for the CREX sitemaps; see [SCRAPER.md](SCRAPER.md), [SCRAPING_REALITY.md](SCRAPING_REALITY.md), [SELF_HEALING.md](SELF_HEALING.md)).
-* **CLI**: `cricket-data update | backfill | health | fixtures | stats | query | link-players | freshness | export-sqlite`.
+* **Ball-by-ball**: `cricket-data crex-balls` scrapes CREX's commentary feed into `data/balls/` (verified against the scorecard before storing), see [CREX_BALLS.md](CREX_BALLS.md).
+* **CLI**: `cricket-data update | backfill | health | fixtures | crex-balls | stats | query | link-players | freshness | export-sqlite`.
 * **Freshness**: `cricket-data freshness --max-age-days 3` fails when the newest *canonical* match is old; the scraper's provisional matches still cover the gap on the site.
 
 ## 4. Value bets (`src/value_bets`)
@@ -96,6 +97,8 @@ Routes: `/` fixtures + landing, `players`, `player/<idx>`, `teams`, `team/<idx>`
 (decimal-only calculator), `glossary`, `saved` (stars in localStorage), `about`. Dark StatsHub-inspired design (Bebas Neue + Manrope, `#151719`/`#1f2123`, pills, 24px cards), animations respect
 `prefers-reduced-motion`. Mobile: bottom tab bar; desktop: top nav + search + home side rail.
 
+The **player page is an app screen** (`js/playerapp.js`, Ionic web components from a pinned CDN version with plain fallbacks, `css/app.css`, `js/engine/windows.js` for the look-back hit rates): see [SITE.md](SITE.md).
+
 ### 5.4 Ask-anything API (`site/api/ask.js`)
 `POST /api/ask {question}` -> `{plan, model}`. Provider: **xAI Grok** if `XAI_API_KEY` (model `XAI_MODEL`, e.g. `grok-4.20-0309-non-reasoning`), else **Gemini** if `GEMINI_API_KEY`; none -> 503 and the client uses `nl.js`.
 Per-IP rate limit + daily cap, key only in headers, reply passed through `sanitizePlan`. The browser resolves names and runs the plan locally.
@@ -114,6 +117,7 @@ Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write)
 | `ci.yml` | push to main, PRs | ruff, pytest (py3.10 + 3.12), public-safety check, `site-js` node tests | none |
 | `daily-update.yml` | 05:30 UTC | Cricsheet delta + reconcile + link-players + freshness check; commits `data/`; opens `data-stale` / `update-failed` issues | none |
 | `scraper-update.yml` | every 30 min (+03:17 backfill) | CREX scrape of newly finished matches into `data/provisional/` | optional API keys |
+| `balls-update.yml` | every 2 h | CREX ball-by-ball for recent matches Cricsheet lacks (`data/balls/`), prune the ones it now has | none |
 | `weekly-heal.yml` | Sun 06:15 | full re-sync / healing | none |
 | `value-bets.yml` | hourly 03:30-17:30 UTC, weekly refit | odds -> value bets, commits `value_bets/out` | optional odds keys |
 | `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
