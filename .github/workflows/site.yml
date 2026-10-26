@@ -1,7 +1,8 @@
 name: Site
 
 # Rebuilds the stats site's data hourly (Cricsheet ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
-# Runs after "Daily update" finishes, daily as a fallback, on demand, and (build + tests only, no deploy) on PRs that touch the site.
+# Runs after "Daily update" finishes, daily as a fallback, on demand, and on PRs that touch the site (build + tests, plus a Vercel *preview*
+# deployment whose URL is commented on the PR; only PRs from this repository get one, because fork PRs cannot read the secrets).
 # Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID. Without them the job still builds and
 # tests, then skips the deploy. GEMINI_API_KEY is a *Vercel* project environment variable, not a GitHub secret: see docs/SITE.md.
 on:
@@ -23,6 +24,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write  # to comment the preview URL
 
 concurrency:
   group: site-deploy-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
@@ -99,6 +101,26 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         working-directory: site
         run: npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
+      - name: Deploy preview (pull requests from this repository)
+        id: preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.VERCEL_PROJECT_ID != ''
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        working-directory: site
+        run: |
+          URL=$(npx --yes vercel@latest deploy --yes --token "$VERCEL_TOKEN" | tail -n 1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "### Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
+      - name: Comment the preview URL on the PR
+        if: steps.preview.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --create-if-none \
+            --body "Preview of ${SHA:0:7}: $PREVIEW_URL (if it asks you to log in, sign in to the Vercel account that owns the project)"
       - name: Deploy skipped
-        if: github.event_name == 'pull_request' || env.VERCEL_PROJECT_ID == ''
-        run: echo "::notice::Built and tested; not deployed (pull request, or VERCEL_* secrets are not set)."
+        if: env.VERCEL_PROJECT_ID == '' || (github.event_name == 'pull_request' && steps.preview.outcome == 'skipped')
+        run: echo "::notice::Built and tested; not deployed (fork pull request, or the VERCEL_* secrets are not set)."
