@@ -8,7 +8,7 @@ import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { fixtureStart, localWhen, num } from "@/lib/format";
+import { fixtureStart, fixtureWhen, num } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { useFixtures } from "@/hooks/useEngine";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
@@ -63,7 +63,7 @@ export function FixturePage() {
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Fixtures", "/"], [title]]} />
-      <EntityHero badge={<div className="flex items-center gap-2"><TeamBadge name={fx.a} size="lg" /><span className="text-muted-foreground">v</span><TeamBadge name={fx.b} size="lg" /></div>} name={title} sub={fx.venue || ""} meta={[fmt, fx.gender === "female" ? "Women" : "Men", localWhen(when)]} />
+      <EntityHero badge={<div className="flex items-center gap-2"><TeamBadge name={fx.a} size="lg" /><span className="text-muted-foreground">v</span><TeamBadge name={fx.b} size="lg" /></div>} name={title} sub={fx.venue || ""} meta={[fmt, fx.gender === "female" ? "Women" : "Men", fixtureWhen(fx)]} />
       <NextMatch f={fx} />
       <PillTabs layoutId="fx-tab" tabs={[["grid", "Player grid"], ["trends", "Trends"], ["markets", "Team markets"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
         <TabsContent value="grid">{form}{grids.data?.map(({ name, team, g }) => <div key={name} className="mb-4"><h2 className="mb-2 text-xl font-medium">{name}: {(STATS as any)[stat].label} over {line}</h2><GridTable g={g} teamIdx={team} line={line} /></div>)}{!known.length && <EmptyNote>These teams are not in the dataset yet.</EmptyNote>}</TabsContent>
@@ -91,7 +91,7 @@ export function TrendsPage() {
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Player trends"]]} />
       <PageTitle sub="Strongest recent hit-rate streaks for the players in an upcoming match.">Player trends</PageTitle>
       <LiveForm onValues={(v) => setQ(v)} className="mb-3" key={sel?.id}>
-        <Field label="Fixture"><NativeSelect name="f" defaultValue={sel?.id} options={fxs.map((f) => [f.id, `${localWhen(f.start.length > 10 ? f.start : `${f.start}T12:00:00`, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}  ${f.a} v ${f.b} (${f.fmt || "T20"})`])} className="max-w-72" /></Field>
+        <Field label="Fixture"><NativeSelect name="f" defaultValue={sel?.id} options={fxs.map((f) => [f.id, `${fixtureWhen(f, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}  ${f.a} v ${f.b} (${f.fmt || "T20"})`])} className="max-w-72" /></Field>
         <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmt} /></Field>
         <Field label="Stat"><NativeSelect name="stat" options={STAT_OPTIONS} defaultValue={stat} /></Field>
         <Field label="Line"><Input name="line" type="number" step="0.5" defaultValue={line} className="w-24" /></Field>

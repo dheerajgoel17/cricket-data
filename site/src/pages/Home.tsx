@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useData } from "@/lib/data";
-import { dayKey, dayLabel, fixtureStart, localTime, odds, pretty } from "@/lib/format";
+import { dayKey, dayLabel, fixtureStart, localTime, odds, pretty, tzName } from "@/lib/format";
 import { loadProps } from "@/lib/feeds";
 import { setTitle } from "@/lib/title";
 import { useFixtures, upcomingOnly } from "@/hooks/useEngine";
@@ -117,7 +117,7 @@ export function HomePage() {
           <div className="my-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none]">{[["all", "ALL"], ["T20", "T20"], ["ODI", "ODI"], ["Test", "TEST"], ["male", "MEN"], ["female", "WOMEN"]].map(([v, l]) => <Button key={v} size="sm" variant={f === v ? "secondary" : "outline"} className="rounded-full" onClick={() => setF(v)}>{l}</Button>)}</div>
           <h2 className="mb-2 mt-4 text-lg font-medium">{days.length ? "Matches" : isLoading ? "Loading fixtures…" : "No upcoming fixtures"}</h2>
           {isLoading ? <div className="grid gap-3"><Skeleton className="h-20" /><Skeleton className="h-20" /></div> : <FixtureGroups fx={list} />}
-          <Muted className="mt-4">Coverage is what the free schedule scrape and odds sources list. Times are in your local time zone.</Muted>
+          <Muted className="mt-4">Coverage is what the free schedule scrape and odds sources list. Times are shown in your time zone ({tzName()}).</Muted>
         </div>
         <Sidebar />
       </div>

@@ -29,3 +29,7 @@ export function dayLabel(k: string) {
   const diff = Math.round((d.getTime() - new Date(`${t.toLocaleDateString("en-CA")}T12:00:00`).getTime()) / 864e5);
   return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 }
+
+/** Kick-off in the viewer's time zone; a fixture that only has a date (no time yet) shows the date alone, never an invented time. */
+export const fixtureWhen = (f: { start: string }, opts: Intl.DateTimeFormatOptions = DEFAULT_WHEN) =>
+  f.start.length > 10 ? localWhen(f.start, opts) : new Date(`${f.start}T12:00:00`).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) + " · time TBC";
