@@ -221,3 +221,35 @@ ion-segment.pa-range { --background: #0f0f0f; border: 1px solid #2a2a2a; border-
   .pa-id { align-self: center; padding: 0; } .pa-id h1 { font-size: 30px; } .pa-team { font-size: 16px; }
   .pa-stats { border-top: 0; padding: 0; gap: 40px; } .pa-strip { grid-template-columns: repeat(3, 96px); gap: 14px 8px; } .pa-tile .k { font-size: 16px; } .pa-tile .v { font-size: 16px; }
 }
+
+/* ---- props.cash look for every other page: sans titles, 8px bordered cards, #2F2F2F selected pills, flat entity hero ---- */
+h1, h2, h3, h4, .hero-name, .answer h2, .sheet-head, .promo h3, .banner .v, .lp-f h3, .trend .lab, .nm-time { font-family: var(--body); font-weight: 500; text-transform: none; letter-spacing: 0; }
+h1 { font-size: 28px; } h2 { font-size: 22px; margin: 22px 0 10px; } h3 { font-size: 18px; }
+@media (min-width: 768px) { h1 { font-size: 32px; } }
+.card, .trend, .comp, .stat, .promo, .toolc, .winTable, details.card { background: #0f0f0f; border: 1px solid #2a2a2a; border-radius: 8px; }
+.card.flat { background: #0f0f0f; }
+.stat { padding: 12px 16px; } .stat .k { font: 400 13px var(--cond); letter-spacing: 0; color: #9f9f9f; } .stat .v { font: 500 26px/1.2 var(--body); }
+.promo { background: #151515; } .promo::after { display: none; } .promo h3 { color: #27da8e; }
+.banner { background: #151515; border: 1px solid #2a2a2a; border-radius: 8px; color: #fff; } .banner .k { color: #27da8e; opacity: 1; } .banner .v { font-size: 22px; }
+.banner a.go { background: #27da8e; color: #0f0f0f; font-weight: 600; } .banner .ico { background: #2a2a2a; }
+.pill, .tabs button, .seg button { height: 40px; background: transparent; color: #fff; font: 500 15px var(--body); border: 0; } .pill.on, .tabs button.on, .seg button.on { background: #2f2f2f; color: #fff; }
+.pill { background: #1a1a1a; border: 1px solid #2a2a2a; } .pill.on { border-color: #2f2f2f; } .seg { background: #0f0f0f; border: 1px solid #2a2a2a; }
+.tabs button { border-radius: 999px; padding: 0 16px; } .tabs button.on, .dtabs button.on { background: #2f2f2f; color: #fff; }
+.dtabs { border-bottom: 1px solid #2a2a2a; gap: 6px; padding-bottom: 8px; } .dtabs button { border: 0; border-radius: 999px; height: 40px; padding: 0 16px; color: #fff; font: 500 15px var(--body); } .dtabs button.on { border: 0; }
+.strip button { background: transparent; border-radius: 999px; height: 40px; border-color: #2a2a2a; } .strip button.on { background: #2f2f2f; }
+.btn, button:not(.pill):not(.ghost):not([class*=pa-]):not(.star):not(.pill) { background: #27da8e; color: #0f0f0f; font-weight: 600; } button.ghost, .btn.ghost { background: #2a2a2a; color: #fff; }
+input, select, textarea { background: #1c1c1c; border: 1px solid #2a2a2a; } input:focus, select:focus, textarea:focus { outline-color: #27da8e; }
+th { font-family: var(--cond); font-weight: 400; font-size: 13px; letter-spacing: 0; color: #9f9f9f; background: transparent; }
+th, td { border-bottom-color: #2a2a2a; }
+.chip, .badge, .crumbs .cur { background: #2a2a2a; } .crumbs { color: #9f9f9f; }
+.match:hover { background: #151515; } .comp .badge-ico, .comp .chev, .comp .cnt { background: #2a2a2a; }
+/* team / venue / fixture hero: flat, left aligned, photo-style crest */
+.hero-card:not(.p) { background: none; border: 0; border-radius: 0; border-bottom: 1px solid #2a2a2a; overflow: visible; margin-bottom: 12px; }
+.hero-card:not(.p) .hero-top { background: none; justify-items: start; text-align: left; padding: 18px 0 14px; }
+.hero-card:not(.p) .hero-name { font-size: 28px; } .hero-card:not(.p) .hero-meta { justify-content: flex-start; } .hero-card:not(.p) .hero-meta span { background: #2a2a2a; }
+.hero-tabs { padding: 0 0 8px; gap: 6px; border-top: 0; } .hero-tabs button { border: 0; border-radius: 999px; height: 40px; padding: 0 16px; color: #fff; font: 500 15px var(--body); } .hero-tabs button.on { background: #2f2f2f; color: #fff; }
+.lp { background: #0f0f0f; } .lp-f { border-left-color: #27da8e; } .lp-h span { color: #27da8e; } .marq { background: transparent; }
+.badge.live { background: #0d3524; color: #27da8e; } .edge { background: #0d3524; color: #27da8e; }
+@media (min-width: 768px) { .hero-card:not(.p) .hero-top { grid-template-columns: auto 1fr; column-gap: 24px; } .hero-card:not(.p) .hero-name { font-size: 40px; } }
+.trend .lab { color: #27da8e; font-size: 20px; margin: 12px 0 4px; } .trend .nums b { color: #27da8e; } .linepill b { color: #27da8e; } .gcell .v.hit { background: #0d3524; color: #27da8e; }
+.top .cta { background: #27da8e; color: #0f0f0f; font-weight: 600; }
