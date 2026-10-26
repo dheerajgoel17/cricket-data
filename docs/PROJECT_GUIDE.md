@@ -97,6 +97,8 @@ Routes: `/` fixtures + landing, `players`, `player/<idx>`, `teams`, `team/<idx>`
 (decimal-only calculator), `glossary`, `saved` (stars in localStorage), `about`. Dark StatsHub-inspired design (Bebas Neue + Manrope, `#151719`/`#1f2123`, pills, 24px cards), animations respect
 `prefers-reduced-motion`. Mobile: bottom tab bar; desktop: top nav + search + home side rail.
 
+The **player page is an app screen** (`js/playerapp.js`, Ionic web components from a pinned CDN version with plain fallbacks, `css/app.css`, `js/engine/windows.js` for the look-back hit rates): see [SITE.md](SITE.md).
+
 ### 5.4 Ask-anything API (`site/api/ask.js`)
 `POST /api/ask {question}` -> `{plan, model}`. Provider: **xAI Grok** if `XAI_API_KEY` (model `XAI_MODEL`, e.g. `grok-4.20-0309-non-reasoning`), else **Gemini** if `GEMINI_API_KEY`; none -> 503 and the client uses `nl.js`.
 Per-IP rate limit + daily cap, key only in headers, reply passed through `sanitizePlan`. The browser resolves names and runs the plan locally.

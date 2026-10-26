@@ -44,6 +44,11 @@ data/fixtures, value_bets ┘                                                   
 * Home/away/neutral is *inferred*, because Cricsheet has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
   `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.
 
+## Player screen (app-style UI)
+The player page (`#/player/<idx>`) is built as an app screen by `site/public/js/playerapp.js`: a sticky app bar on phones, a prop rail (stat), a format switch, six stat tiles (hit rate, line, fair odds, window average, median, sample), one tappable bar chart with Over/Under, a line stepper and look-back pills that show each window's hit rate (`engine/windows.js`, unit-tested by hand-computed numbers), filters in a bottom sheet, and Lines / Game log / Splits tabs. Tap a bar or a game-log row for that game's details. Line, side and tab are kept in the URL, so a view can be shared. All numbers come from the engine, never from the UI layer.
+
+UI library: [Ionic web components](https://ionicframework.com) (`@ionic/core`, MIT), pinned to one exact version in `js/ionic.js` and loaded from the jsDelivr CDN as plain custom elements (no framework, no build step). They provide the sliding segmented controls and the draggable bottom sheets. If the CDN cannot be reached the same controls fall back to plain buttons and a `<dialog>`, so the page works either way. Theming is in `css/app.css` using the site's zinc tokens. Decimal odds only; phone first, two columns from 1024 px.
+
 ## Known limits (be aware before betting)
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
