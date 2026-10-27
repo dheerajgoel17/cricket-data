@@ -93,7 +93,7 @@ const SCHEDULE = pageHtml({ "https://src.test/fixture/getFixture": [nedOma, u19]
 const MATCH_PAGE = pageHtml({ "https://src.test/v3/getSV3": {
   team1_f_n: "Netherlands", team2_f_n: "Oman", team1short: "NED", team2short: "OMA", rt: "Netherlands", inning: 1, status: 1,
   score1: "19-0", over1: "3.1", score2: "", over2: "", comment1: "OMA opt to <b>Bowl</b>",
-  player_full_name1: "Vikramjit Singh", run1: "6", ball1: "(8)", four1: "1", six1: "0", st: "1",
+  player_full_name1: "Vikramjit Singh", run1: "6", ball1: "(8)", four1: "1", six1: "0", os1: 1, os2: 0,
   player_full_name2: "Michael Levitt", run2: "9", ball2: "(11)", four2: "1", six2: "0",
   bowler_full_name: "Bilal Khan", bwr: "0-11", bover: "2.0", partnerruns: 19, partnerballs: 19, crr: "6.00",
 } });

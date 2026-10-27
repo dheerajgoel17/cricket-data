@@ -27,7 +27,7 @@ const nzIndLive = pageHtml({ [LIVE]: {
   score1: "42-0", over1: "1.4", score2: "198-3", over2: "20.0",
   comment1: "IND need <b style='font-family: $font-DM; color: #cecece;'>157 runs </b> in <b>110 balls </b>",
   player_full_name1: "Vaibhav Sooryavanshi", run1: "13", ball1: "(5)", four1: "1", six1: "1", sr1: "260.00",
-  player_full_name2: "Abhishek Sharma", run2: "23", ball2: "(6)", four2: "3", six2: "2", sr2: "383.33", st: "1",
+  player_full_name2: "Abhishek Sharma", run2: "23", ball2: "(6)", four2: "3", six2: "2", sr2: "383.33", os1: 1, os2: 0,
   bowler_full_name: "Adam Milne", bwr: "0-22", bover: "0.4", beco: "33.00",
   partnerruns: 42, partnerballs: 10, crr: "25.20", rrr: "8.56",
   lastovers: [{ overinfo: ["4", "1", "0", "6", "1", "0"] }, { overinfo: ["6", "6", "4", "nb"] }],
@@ -172,7 +172,7 @@ test("parseMatchPage current batters and bowler (hand-computed)", () => {
     player_full_name2: "Cedric de Lange", run2: "37", ball2: "(34)", four2: "5", six2: "0",
     bowler_full_name: "Aryan Bisht", bwr: "2-8", bover: "3.3",
     lwname1: "Noah Croes", lwrun1: "5", lwball1: "(16)",
-    st: "2", partnerruns: 40, partnerballs: 43, crr: "6.80", rrr: "--", beco: "2.42",
+    os1: 0, os2: 1, partnerruns: 40, partnerballs: 43, crr: "6.80", rrr: "--", beco: "2.42",
     sr1: "33.33", sr2: "108.82",
     lastovers: [{ over: "Over 17", overinfo: ["1", "0", "4", "W", "0", "1"], total: 6 }, { over: "Over 18", overinfo: ["0", "1", "1"], total: 2 }],
   } });
@@ -372,7 +372,7 @@ test("the batting side is the page's first team, whatever the other fields say (
   const html = pageHtml({ [LIVE]: {
     team1_f_n: "Pakistan", team2_f_n: "Sri Lanka", team1short: "PAK", team2short: "SL", rt: "Sri Lanka", inning: 1, status: 1,
     score1: "93-9", over1: "23.4", score2: "", over2: "", comment1: "SL opt to Bowl",
-    player_full_name1: "Shaheen Afridi", run1: "0", ball1: "(4)", four1: "0", six1: "0", st: "1",
+    player_full_name1: "Shaheen Afridi", run1: "0", ball1: "(4)", four1: "0", six1: "0", os1: 1, os2: 0,
     player_full_name2: "Naseem Shah", run2: "1", ball2: "(3)", four2: "0", six2: "0",
     bowler_full_name: "Dilshan Madushanka", bwr: "3-20", bover: "5.0", partnerruns: 1, partnerballs: 3,
   } });
@@ -418,4 +418,60 @@ test("once a side has batted its XI is the batters and the yet to bat together",
   assert.equal(playingXI(m).get("srilanka").names.length, 11);
   assert.equal(notInXI(m, "Kusal Mendis", "Sri Lanka"), false);
   assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true);
+});
+
+test("a finished match is final: status 2, the winner as a team key, and the result line is its status", () => {
+  const [m] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, status: 2, w: "O", winningTeam: "O", s2: "199-4", o2: "13.2", statusText: "", result: "IND Won by 6 wickets" }] }));
+  assert.equal(m.status, "final");
+  assert.equal(liveBlurb(m), "IND Won by 6 wickets");
+  assert.equal(teamScore(m, "India").display, "199/4 (13.2 ov)");
+  assert.equal(wantsCard(m, Date.parse("2026-10-27T10:30:00Z")), false);
+  const [live] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, status: 1, w: -1, winningTeam: -1 }] }));
+  assert.equal(live.status, "live", "-1 means nobody has won yet");
+  const [innBreak] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, statusText: "Innings Break" }] }));
+  assert.equal(liveBlurb(innBreak), "Innings Break");
+});
+
+test("overs come as 20.0 or (20.0): the score never shows doubled brackets", () => {
+  const [m] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, o1: "(20.0)", o2: "(13.2)" }] }));
+  assert.equal(m.teams[0].display, "198/3 (20.0 ov)");
+  assert.equal(m.teams[1].display, "7/0 (13.2 ov)");
+  const live = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "Afghanistan", team2_f_n: "India", score1: "112-10", over1: "(35.5)", score2: "", over2: "" } }));
+  assert.equal(live.teams[0].display, "112/10 (35.5 ov)");
+  assert.equal(live.teams[0].overs, 35.5);
+});
+
+test("the striker is os1 / os2; st is a series-type code and says nothing about the pair", () => {
+  const page = (extra) => pageHtml({ [LIVE]: { team1_f_n: "SBP", team2_f_n: "MIT", score1: "66-1", over1: "18.0", player_full_name1: "Faham ul Haq", run1: "17", ball1: "(33)", player_full_name2: "Hasan Raza", run2: "35", ball2: "(55)", ...extra } });
+  const pair = (m) => m.players.filter((p) => p.runs != null).map((p) => [p.name, p.strike]);
+  assert.deepEqual(pair(parseMatchPage(page({ st: "27", os1: 1, os2: 0 }))), [["Faham ul Haq", true], ["Hasan Raza", false]]);
+  assert.deepEqual(pair(parseMatchPage(page({ st: "1", os1: 0, os2: 1 }))), [["Faham ul Haq", false], ["Hasan Raza", true]], "st = 1 no longer means the first batter");
+  assert.deepEqual(pair(parseMatchPage(page({ st: "1" }))), [["Faham ul Haq", false], ["Hasan Raza", false]], "no marker, no striker");
+});
+
+test("a batter the card has out is not added again from a match page a beat behind", () => {
+  const card = parseCardPage(pageHtml({
+    [CARD]: [{ c: "U", d: "110/10(153", e: "0.0.0.0.0", b: ["A.29.33.2.0.80.90.1.Z", "B.0.5.0.0.110.153.1.Z"], a: [] }],
+    [MAP]: { p: [{ f_key: "A", n: "Babar Azam" }, { f_key: "B", n: "Shaheen Afridi" }, { f_key: "Z", n: "Asitha Fernando" }], t: [{ f_key: "U", n: "Pakistan" }, { f_key: "T", n: "Sri Lanka" }] },
+  }));
+  const live = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "Pakistan", team2_f_n: "Sri Lanka", score1: "109-9", over1: "25.2", player_full_name1: "Shaheen Afridi", run1: "0", ball1: "(4)", os1: 1, os2: 0 } }));
+  const m = buildMatch({ id: "x", status: "live", start: "", teams: [{ name: "Pakistan", abbr: "PAK" }, { name: "Sri Lanka", abbr: "SL" }] }, live, card);
+  assert.deepEqual(m.players.filter((p) => p.name === "Shaheen Afridi").map((p) => p.out), [true]);
+});
+
+test("a Test gives each side its innings together: a schedule row's s1 / s3, and the card when the pages show one", () => {
+  const [m] = parseSchedule(pageHtml({ [FIXTURE]: [{ team1: "Afghanistan", team2: "India", s1: "152-10", o1: "58.4", s2: "564-8", o2: "127.0", s3: "112-10", o3: "35.5", s4: "", o4: "", status: 1, fo: "Test", mf: "10ZC", t: Date.parse("2026-10-27T04:00:00Z") }] }));
+  assert.equal(m.teams[0].display, "152 & 112/10 (35.5 ov)");
+  assert.equal(m.teams[0].runs, 112);
+  assert.equal(m.teams[1].display, "564/8 (127.0 ov)");
+  const card = parseCardPage(pageHtml({
+    [CARD]: [{ c: "O", d: "564/8(762", e: "0.0.0.0.0", b: ["A.100.150.10.2"], a: [] }, { c: "Y", d: "152/10(352", e: "0.0.0.0.0", b: ["B.20.30.2.0"], a: [] }, { c: "Y", d: "112/10(215", e: "0.0.0.0.0", b: ["B.9.20.1.0"], a: [] }],
+    [MAP]: { p: [{ f_key: "A", n: "Shubman Gill" }, { f_key: "B", n: "Rahmat Shah" }], t: [{ f_key: "O", n: "India" }, { f_key: "Y", n: "Afghanistan" }] },
+  }));
+  const live = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "Afghanistan", team2_f_n: "India", score1: "112-10", over1: "(35.5)", score2: "", over2: "" } }));
+  const row = { id: "x", status: "live", start: "", teams: [{ name: "Afghanistan", abbr: "AFG" }, { name: "India", abbr: "IND" }] };
+  const built = buildMatch(row, live, card);
+  assert.equal(teamScore(built, "Afghanistan").display, "152 & 112/10 (35.8 ov)".replace("35.8", "35.5"));
+  assert.equal(teamScore(built, "India").display, "564/8 (127.0 ov)");
+  assert.equal(teamScore(built, "Afghanistan").runs, 112);
 });

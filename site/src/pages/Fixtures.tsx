@@ -58,7 +58,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const { match } = useLiveMatch(f);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const on = hasScore || clock.tone === "live";
+  const final = match?.status === "final";
+  const on = !final && (hasScore || clock.tone === "live");
   const blurb = liveBlurb(match);
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
@@ -70,7 +71,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
       <div className="flex items-center gap-snug">
         <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", on ? "text-miss" : "text-muted-foreground")}>
-          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : clock.label}
+          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
@@ -94,7 +95,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         </div>
       )}
       <p className="text-callout text-muted-foreground">{[blurb, f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
-      {hasScore && <LiveBoard match={match} teams={sides} />}
+      {hasScore && !final && <LiveBoard match={match} teams={sides} />}
     </section>
   );
 }

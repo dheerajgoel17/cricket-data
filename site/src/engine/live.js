@@ -156,7 +156,7 @@ export function pageState(html) {
 function scoreOf(score, overs) {
   const raw = String(score || "").trim().replace(/^(\d+)-(\d+)$/, "$1/$2");
   if (!raw) return parseScore("");
-  const ov = String(overs || "").trim();
+  const ov = String(overs || "").replace(/[^\d.]/g, "");
   const parsed = parseScore(ov ? `${raw} (${ov} ov)` : raw);
   if ((parsed.runs || 0) === 0 && (parsed.wkts || 0) === 0 && !(parsed.overs > 0)) return parseScore("");
   return parsed;
@@ -166,6 +166,13 @@ function rowScore(row, n) {
   const s = row[`s${n}`] || row[n === 1 ? "team1Score1" : "team2Score1"] || (n === 1 ? row.score1 : row.score2) || "";
   const o = row[`o${n}`] || row[n === 1 ? "team1Over1" : "team2Over1"] || (n === 1 ? row.over1 : row.over2) || "";
   return scoreOf(s, o);
+}
+
+/** A side's score on a schedule row: its first innings, and in a multi-day match the second one too ("152 & 112/10 (35.5 ov)"). */
+function sideScore(row, n) {
+  const first = rowScore(row, n), second = scoreOf(row[`s${n + 2}`], row[`o${n + 2}`]);
+  if (!first.display || !second.display) return second.display ? second : first;
+  return { ...second, display: `${first.display.replace(/\s*\(.*$/, "").replace(/\/10$/, "")} & ${second.display}` }; // an all-out innings is just its runs
 }
 
 function nInt(x) {
@@ -202,9 +209,10 @@ export function parseSchedule(html, base = "") {
   return rows.flatMap((row) => {
     const a = row.team1 || row.t1SName, b = row.team2 || row.t2SName;
     if (!a || !b) return [];
-    const t1 = rowScore(row, 1), t2 = rowScore(row, 2);
+    const t1 = sideScore(row, 1), t2 = sideScore(row, 2);
     const scored = !!t1.display || !!t2.display;
-    const done = Number(row.winningTeam) >= 0 || Number(row.w) >= 0;
+    // a finished match: status 2, a result line, or a winner (the winner is a team key such as "O", -1 while it is on)
+    const done = row.status === 2 || !!row.result || [row.winningTeam, row.w].some((x) => x != null && x !== "" && x !== -1 && x !== "-1");
     // `bf` is the side that batted first; once both have a score the other one is in.
     const first = String(row.bf || "") === String(row.t1f || row.team1fkey || "") ? 0 : 1;
     const bat = t1.display && t2.display ? 1 - first : t1.display ? 0 : t2.display ? 1 : -1;
@@ -214,7 +222,7 @@ export function parseSchedule(html, base = "") {
       status: done ? "final" : scored ? "live" : "upcoming",
       fmt: formatOf(row.fo || row.formats),
       start: row.t ? new Date(row.t).toISOString() : "",
-      summary: row.statusText || row.comment1 || "",
+      summary: row.result || row.statusText || row.comment1 || "",
       note: "",
       url: link.startsWith("/") ? `${base}${link}` : link,
       teams: [
@@ -236,7 +244,7 @@ export function parseMatchPage(html) {
   const t1 = scoreOf(sv.score1, sv.over1), t2 = scoreOf(sv.score2, sv.over2);
   // team1 / score1 / the two batters are the side batting. `rt` looks like it says so but is empty or the bowling side in some matches.
   const bat = aName, batIsA = true, bowl = bName;
-  const strike = Number(sv.st);
+  const strike = Number(sv.os1) === 1 ? 1 : Number(sv.os2) === 1 ? 2 : 0; // os1 / os2: on strike. (`st` is a series-type code, not a batter index)
   const players = [];
   const addBat = (name, runs, balls, fours, sixes, out, onStrike, sr, photo) => {
     if (!name) return;
@@ -400,7 +408,7 @@ function flagLive(players, flags) {
     const bat = f.runs != null;
     const hit = out.find((p) => (bat ? p.runs != null && !p.out : p.wickets != null) && namesMatch(p.name, f.name));
     if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens });
-    else out.push(f);
+    else if (!(bat && out.some((p) => p.runs != null && p.out && namesMatch(p.name, f.name)))) out.push(f); // the card has him out: trust it
   }
   return out;
 }
@@ -419,11 +427,20 @@ export function buildMatch(row, live, card) {
   const innings = [...(card?.innings || [])];
   for (const i of live?.innings || []) if (!innings.some((x) => teamKey(x.team) === teamKey(i.team))) innings.push(i); // a scorecard page cached a beat behind
   const cardPlayers = card?.players || [];
+  // Pages give a side one innings; a side that has batted twice, or batted with no score shown, gets its line from the card ("152 & 112/10 (35.5 ov)")
+  const ovText = (o) => (o == null ? "" : ` (${Number.isInteger(o) ? o.toFixed(1) : o} ov)`);
+  const lined = teams.map((t) => {
+    const mine = (card?.innings || []).filter((i) => teamKey(i.team) === teamKey(t.name) && i.runs != null);
+    if (!mine.length || (mine.length === 1 && (t.display || !mine[0].runs))) return t;
+    const last = mine[mine.length - 1];
+    const display = [...mine.slice(0, -1).map((i) => (i.wkts != null && i.wkts < 10 ? `${i.runs}/${i.wkts}` : `${i.runs}`)), `${last.runs}${last.wkts != null ? `/${last.wkts}` : ""}${ovText(last.overs)}`].join(" & ");
+    return { ...t, display, runs: last.runs, wkts: last.wkts, overs: last.overs };
+  });
   return {
     ...row,
-    status: row.status === "final" ? "final" : teams.some((t) => t.display) ? "live" : "upcoming",
+    status: row.status === "final" ? "final" : lined.some((t) => t.display) ? "live" : "upcoming",
     summary: live?.summary || row.summary,
-    teams,
+    teams: lined,
     innings,
     players: cardPlayers.length ? flagLive(cardPlayers, live?.players || []) : (live?.players || []),
     card: card?.card || [],
