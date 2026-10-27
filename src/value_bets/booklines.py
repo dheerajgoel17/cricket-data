@@ -9,11 +9,28 @@ from __future__ import annotations
 from collections import defaultdict
 
 STAT = {"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
+PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
 FMT = {"T20": "T20", "ODI": "ODI", "MULTI": "Test"}  # the pipeline calls a multi-day match MULTI; the site calls it Test
 
 
+def prop_events(rows: list[dict]) -> list[dict]:
+    """Every pre-match event on which any book prices a player prop (over/unders, top batter/bowler, milestones), not only the
+    two-sided lines ``book_lines`` keeps. The site uses it to show which fixtures have props right now. Sorted by start time."""
+    evs: dict[str, dict] = {}
+    for r in rows:
+        if r.get("market_type") not in PROP_MARKETS or r.get("in_play") or not r.get("back") or not r.get("event_key"):
+            continue
+        e = evs.setdefault(r["event_key"], {"match": r.get("match"), "competition": r.get("competition"), "start_utc": r.get("start_utc"),
+                                            "markets": set(), "sources": set(), "n": 0})
+        e["markets"].add(r["market_type"])
+        e["sources"].add(r.get("source"))
+        e["n"] += 1
+    out = [{**e, "markets": sorted(e["markets"]), "sources": sorted(x for x in e["sources"] if x)} for e in evs.values()]
+    return sorted(out, key=lambda e: (e["start_utc"] or "", e["match"] or ""))
+
+
 def book_lines(rows: list[dict], generated_at: str) -> dict:
-    """rows: pipeline rows after player resolution. Returns {"generated_at_utc", "lines": [...]} sorted by start time, player, stat, line."""
+    """rows: pipeline rows after player resolution. Returns {"generated_at_utc", "lines": [...], "events": [...]}; lines are sorted by start time, player, stat, line."""
     groups: dict[tuple, dict] = {}
     for r in rows:
         stat = STAT.get(r.get("market_type"))
@@ -36,4 +53,4 @@ def book_lines(rows: list[dict], generated_at: str) -> dict:
         if books:
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x["line"]))
-    return {"generated_at_utc": generated_at, "lines": lines}
+    return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows)}
