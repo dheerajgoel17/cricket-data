@@ -40,7 +40,8 @@ async function snapshot() {
     const [booksDoc, schedule] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`)]);
     const rows = pricedLive(parseSchedule(schedule, base()), bookFixtures(booksDoc));
     const pages = new Map();
-    await Promise.allSettled(rows.filter((m) => m.url && wantsCard(m)).slice(0, MAX_CARDS).map(async (m) => {
+    const rank = { live: 0, upcoming: 1, final: 2 }; // the cap goes to matches in play first, finished ones last
+    await Promise.allSettled(rows.filter((m) => m.url && wantsCard(m)).sort((a, b) => rank[a.status] - rank[b.status]).slice(0, MAX_CARDS).map(async (m) => {
       const [live, card] = await Promise.all([getHtml(m.url).catch(() => ""), getHtml(cardPageUrl(m.url)).catch(() => "")]);
       pages.set(m, { live: parseMatchPage(live), card: parseCardPage(card) });
     }));

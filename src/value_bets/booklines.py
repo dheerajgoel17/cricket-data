@@ -69,7 +69,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
     return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}
 
 
-LIVE_KEEP = dt.timedelta(hours=14)  # a limited-overs match is over well inside this
+LIVE_KEEP = dt.timedelta(hours=40)  # a limited-overs match is over well inside this; the site shows a finished match and its props for a day and a half
 TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
 
 
