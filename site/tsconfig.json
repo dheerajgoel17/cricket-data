@@ -3,7 +3,7 @@
     "target": "ES2022", "lib": ["ES2023", "DOM", "DOM.Iterable"], "module": "ESNext", "moduleResolution": "bundler", "jsx": "react-jsx",
     "strict": true, "noEmit": true, "skipLibCheck": true, "allowJs": true, "checkJs": false, "isolatedModules": true, "resolveJsonModule": true,
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "cn": ["./src/lib/utils.ts"] }
   },
   "include": ["src", "vite.config.ts"]
 }

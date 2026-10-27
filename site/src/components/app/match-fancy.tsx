@@ -65,56 +65,56 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   const bookHere = book.find((b: any) => b.line === line);
 
   return (
-    <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-5">
+    <div className="mt-group grid grid-cols-[minmax(0,1fr)] gap-stack">
       <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
-        items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-1.5"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
+        items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
       <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-snug">
         <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
-        <span className="min-w-0 truncate text-xs text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
+        <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
       </div>
 
       {!ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
         <>
-          <section className="rounded-2xl bg-card p-5 ring-1 ring-white/5">
-            <div className="flex items-baseline justify-between gap-2"><h2 className="text-lg font-semibold">{label}</h2><span className="text-xs text-muted-foreground">last {rep.n} matches</span></div>
-            <div className="mt-4 flex items-end gap-7">
-              <div><div className="text-xs text-muted-foreground">Median</div><div className="text-[40px] font-bold leading-none tracking-tight tabular-nums">{num(rep.summary.median)}</div></div>
-              <div><div className="text-xs text-muted-foreground">Mean</div><div className="text-xl font-semibold tabular-nums">{num(rep.summary.mean)}</div></div>
-              <div><div className="text-xs text-muted-foreground">Range</div><div className="text-xl font-semibold tabular-nums">{num(rep.summary.min)}–{num(rep.summary.max)}</div></div>
+          <section className="rounded-2xl bg-card p-inset ring-1 ring-white/5">
+            <div className="flex items-baseline justify-between gap-tight"><h2 className="text-body font-semibold">{label}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
+            <div className="mt-stack flex items-end gap-group">
+              <div><div className="text-footnote text-muted-foreground">Median</div><div className="text-stat font-bold leading-none tracking-tight tabular-nums">{num(rep.summary.median)}</div></div>
+              <div><div className="text-footnote text-muted-foreground">Mean</div><div className="text-title font-semibold tabular-nums">{num(rep.summary.mean)}</div></div>
+              <div><div className="text-footnote text-muted-foreground">Range</div><div className="text-title font-semibold tabular-nums">{num(rep.summary.min)}–{num(rep.summary.max)}</div></div>
             </div>
-            <div className="mt-5"><ValueBars values={rep.values} line={line} /></div>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
+            <div className="mt-stack"><ValueBars values={rep.values} line={line} /></div>
+            <div className="mt-stack flex flex-wrap items-center gap-snug">
               <div className="flex h-11 items-center rounded-full bg-background">
                 <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
-                <span className="min-w-[5rem] text-center text-[15px] font-semibold tabular-nums">O/U {line}</span>
+                <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
                 <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
               </div>
               {book.filter((b: any) => b.line !== line).map((b: any) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-stack grid grid-cols-2 gap-snug">
               {(["over", "under"] as const).map((side) => {
                 const p = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
                 return (
                   <div key={side} className="rounded-xl bg-background p-3 ring-1 ring-white/5">
-                    <div className="text-xs font-medium capitalize text-muted-foreground">{side} {line}</div>
-                    <div className={cn("text-2xl font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")}>{pc(p)}</div>
-                    <div className="text-xs text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                    {bookHere && <div className="mt-1.5 border-t border-white/10 pt-1.5 text-xs">bet365 <b className="tabular-nums">{odds(bookHere[side])}</b></div>}
+                    <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
+                    <div className={cn("text-metric font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")}>{pc(p)}</div>
+                    <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
+                    {bookHere && <div className="mt-tight border-t border-white/10 pt-tight text-footnote">bet365 <b className="tabular-nums">{odds(bookHere[side])}</b></div>}
                   </div>);
               })}
             </div>
-            {!book.length && <p className="mt-3 text-xs text-muted-foreground">The books have no line for this market yet. Prices above are fair prices from the matches shown.</p>}
-            {rep.n < 10 && <p className="mt-2 text-xs text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
+            {!book.length && <p className="mt-snug text-footnote text-muted-foreground">The books have no line for this market yet. Prices above are fair prices from the matches shown.</p>}
+            {rep.n < 10 && <p className="mt-tight text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
           </section>
 
           <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5" aria-label="Line ladder">
-            <div className="grid grid-cols-[1fr_1fr_1fr] px-4 py-2.5 text-xs font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+            <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
             {ladder.map((l: any) => (
-              <button key={l.line} type="button" onClick={() => set({ ml: l.line })} className={cn("grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-4 py-3 text-left text-[15px] transition-colors active:bg-accent", l.line === line && "bg-accent/60")}>
-                <span className="flex items-center gap-2 font-semibold tabular-nums">{l.line}{book.some((b: any) => b.line === l.line) && <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">bet365</span>}</span>
-                <span className="text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-xs text-muted-foreground">{odds(l.fairOver)}</span></span>
-                <span className="text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-xs text-muted-foreground">{odds(l.fairUnder)}</span></span>
+              <button key={l.line} type="button" onClick={() => set({ ml: l.line })} className={cn("grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-inset py-snug text-left text-callout transition-colors active:bg-accent", l.line === line && "bg-accent/60")}>
+                <span className="flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b: any) => b.line === l.line) && <span className="rounded-full bg-primary/15 px-1.5 py-hair text-caption font-semibold text-primary">bet365</span>}</span>
+                <span className="text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
+                <span className="text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
               </button>))}
           </section>
         </>)}
@@ -127,16 +127,16 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
   const t = useMemo(() => (scope < 0 ? topList(store, ms, { scope: "match" }) : topList(store, ms, { team: scope, scope: "team" })), [store, ms, scope]);
   return (
     <section className="rounded-2xl bg-card ring-1 ring-white/5">
-      <div className="px-4 py-3"><h2 className="text-lg font-semibold">Top batter</h2><span className="text-xs text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
+      <div className="px-inset py-snug"><h2 className="text-body font-semibold">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
       {t.rows.map((r: any) => (
-        <Item key={r.player} asChild size="sm" className="rounded-none border-0 border-t border-white/5 px-4 py-3 transition-colors active:bg-accent">
+        <Item key={r.player} asChild size="sm" className="rounded-none border-0 border-t border-white/5 px-inset py-snug transition-colors active:bg-accent">
           <Link to={`/player/${r.player}`}>
             <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
-            <ItemContent className="min-w-0 gap-0.5"><ItemTitle className="max-w-full"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-[13px]">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
-            <ItemActions className="grid justify-items-end text-right"><b className="text-base font-semibold tabular-nums text-primary">{pc(r.pSole)}</b><span className="text-[11px] text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
+            <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-footnote">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
+            <ItemActions className="grid justify-items-end text-right"><b className="text-body font-semibold tabular-nums text-primary">{pc(r.pSole)}</b><span className="text-caption text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
           </Link>
         </Item>))}
-      {!t.rows.length && <p className="px-4 pb-4 text-sm text-muted-foreground">Not enough matches.</p>}
+      {!t.rows.length && <p className="px-inset pb-stack text-callout text-muted-foreground">Not enough matches.</p>}
     </section>
   );
 }

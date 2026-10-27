@@ -20,7 +20,7 @@ function AppSidebar() {
           <SidebarMenu>
             {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
               <SidebarMenuItem key={to}>
-                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-11 rounded-xl text-[17px] font-medium data-[active=true]:bg-white/10 data-[active=true]:text-foreground [&[data-active=true]>svg]:text-primary [&>svg]:size-[22px]">
+                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-11 rounded-xl text-body font-medium data-[active=true]:bg-white/10 data-[active=true]:text-foreground [&[data-active=true]>svg]:text-primary [&>svg]:size-[22px]">
                   <NavLink to={to}><Icon /><span>{label}</span></NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -28,7 +28,7 @@ function AppSidebar() {
             <Collapsible asChild defaultOpen={moreActive} className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="More" className="h-11 rounded-xl text-[17px] font-medium [&>svg]:size-[22px]"><MoreHorizontal /><span>More</span><ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
+                  <SidebarMenuButton tooltip="More" className="h-11 rounded-xl text-body font-medium [&>svg]:size-[22px]"><MoreHorizontal /><span>More</span><ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
@@ -59,9 +59,9 @@ function TabBar() {
       {TAB_NAV.map(({ to, label, match }) => {
         const on = match(pathname), Ico = TAB_ICON[to] ?? CalendarBlank;
         return (
-          <NavLink key={to} to={to} aria-current={on ? "page" : undefined} className={cn("relative flex h-full flex-1 flex-col items-center justify-center gap-0.5 rounded-[26px] text-[10px] font-medium tracking-[.01em] transition-colors", on ? "text-primary" : "text-white/60")}>
+          <NavLink key={to} to={to} aria-current={on ? "page" : undefined} className={cn("relative flex h-full flex-1 flex-col items-center justify-center gap-hair rounded-[26px] text-caption font-medium tracking-[.01em] whitespace-nowrap transition-colors", on ? "text-primary" : "text-white/60")}>
             {on && <motion.span layoutId="tab-glass" aria-hidden className="absolute inset-0 rounded-[26px] bg-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,.22)]" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }} />}
-            <motion.span whileTap={{ scale: 0.88 }} transition={{ type: "spring", stiffness: 600, damping: 30 }} className="relative grid justify-items-center gap-0.5">
+            <motion.span whileTap={{ scale: 0.88 }} transition={{ type: "spring", stiffness: 600, damping: 30 }} className="relative grid justify-items-center gap-hair">
               <Ico className="size-6" weight={on ? "fill" : "regular"} />{label}
             </motion.span>
           </NavLink>
@@ -82,7 +82,7 @@ export function Shell() {
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-4 pb-10 md:px-6">
+            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-4 pb-section md:px-gutter">
               <Outlet />
             </motion.main>
           </AnimatePresence>

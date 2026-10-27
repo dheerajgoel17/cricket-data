@@ -49,27 +49,27 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const when = fixtureStart(f), timed = f.start.length > 10;
   const clock = useMatchClock(when, timed);
   const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="md" className="size-11" eager /><span className="min-w-0 text-[22px] font-bold leading-tight tracking-tight">{name}</span></>;
-    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-3.5 active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-3.5">{body}</div>;
+    const body = <><TeamBadge name={name} size="md" className="size-11" eager /><span className="min-w-0 text-title font-bold leading-tight tracking-tight">{name}</span></>;
+    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-snug">{body}</div>;
   };
   return (
-    <section className="pt-1">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-2 text-[17px] text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
-      <div className="mt-3 flex items-center gap-3">
-        <span className={cn("text-[13px] font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
+    <section className="pt-hair">
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
+      <div className="mt-snug flex items-center gap-snug">
+        <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
           {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
         </span>
-        <span className="text-[13px] font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
+        <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
       </div>
-      <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
-        <div className="grid min-w-0 gap-4">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
-        <div className="grid justify-items-end gap-1 text-right">
-          <span className="text-[15px] font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
-          <b className={cn("text-[26px] font-bold leading-none tracking-tight tabular-nums", clock.tone === "live" && "text-miss")}>{clock.value}</b>
+      <div className="mt-stack grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
+        <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
+        <div className="grid justify-items-end gap-hair text-right">
+          <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
+          <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", clock.tone === "live" && "text-miss")}>{clock.value}</b>
         </div>
       </div>
-      <p className="mt-6 border-b border-white/10 pb-5 text-[15px] leading-snug text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
+      <p className="mt-group border-b border-white/10 pb-stack text-callout leading-snug text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
     </section>
   );
 }
@@ -78,12 +78,12 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
 function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: number; games: number; hit?: string; setQ: (p: Record<string, unknown>) => void }) {
   const step = (d: number) => setQ({ line: Math.max(0, Math.round((line + d) * 2) / 2) });
   return (
-    <div className="mt-5 grid gap-4">
+    <div className="mt-stack grid gap-stack">
       <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-tight">
         <div className="flex h-11 shrink-0 items-center rounded-full bg-card">
           <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
-          <span className="min-w-[4.5rem] text-center text-[15px] font-semibold tabular-nums">O {line}</span>
+          <span className="min-w-[4.5rem] text-center text-callout font-semibold tabular-nums">O {line}</span>
           <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => step(0.5)}><Plus /></Button>
         </div>
         <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0" />
@@ -117,31 +117,31 @@ export function FixturePage() {
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle("Match preview, player grid and trends");
   if (isLoading) return <div><MatchHeaderSkeleton /><RowsSkeleton /></div>;
-  if (!fx) return <div className="pt-3"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="mt-3 rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
+  if (!fx) return <div className="pt-snug"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="mt-snug rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   return (
     <div>
       <MatchHeader f={fx} live={live} />
       <RecentForm teams={known} fmt={fmt} />
-      {!ready ? <div className="mt-5 grid gap-4"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
-      <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-7" />
+      {!ready ? <div className="mt-stack grid gap-stack"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
+      <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-group" />
       {tab === "props" && <div className="-mt-2"><HotProps teams={[fx.a, fx.b]} /></div>}
       {tab === "grid" && (
         <>
           <FilterBar {...{ stat, line, games, setQ }} />
           {known.length > 1 && (
-            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-4"
-              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-2"><TeamBadge name={name} size="xs" />{name}</span>])} />
+            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-stack"
+              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{name}</span>])} />
           )}
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
-            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
-            <span className="flex items-center gap-1.5"><span className="rounded border border-dashed border-amber/60 px-1 text-[10px] text-amber">VOID</span>in the XI, did not bat or bowl</span>
+          <div className="mt-stack flex flex-wrap items-center gap-x-stack gap-y-tight text-footnote text-muted-foreground">
+            <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
+            <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
+            <span className="flex items-center gap-tight"><span className="rounded border border-dashed border-amber/60 px-1 text-caption text-amber">VOID</span>in the XI, did not bat or bowl</span>
           </div>
-          <div className="mt-4">
+          <div className="mt-stack">
             {grids.isLoading || !shown ? <GridSkeleton /> : (
               <section>
-                <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                <h2 className="mb-tight flex items-center gap-tight text-body font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                 <GridTable g={shown.g} teamIdx={shown.team} line={line} />
               </section>)}
           </div>
@@ -149,7 +149,7 @@ export function FixturePage() {
       {tab === "trends" && (
         <>
           <FilterBar {...{ stat, line, games, hit, setQ }} />
-          <div className="mt-4">{grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}</div>
+          <div className="mt-stack">{grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}</div>
         </>)}
       {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} />}
       </>}
@@ -173,7 +173,7 @@ export function TrendsPage() {
     <div>
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Player trends"]]} />
       <PageTitle sub="Strongest recent hit-rate streaks for the players in an upcoming match.">Player trends</PageTitle>
-      <LiveForm onValues={(v) => setQ(v)} className="mb-3" key={sel?.id}>
+      <LiveForm onValues={(v) => setQ(v)} className="mb-snug" key={sel?.id}>
         <Field label="Fixture"><NativeSelect name="f" defaultValue={sel?.id} options={fxs.map((f) => [f.id, `${fixtureWhen(f, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}  ${f.a} v ${f.b} (${f.fmt || "T20"})`])} className="max-w-72" /></Field>
         <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmt} /></Field>
         <Field label="Stat"><NativeSelect name="stat" options={STAT_OPTIONS} defaultValue={stat} /></Field>
@@ -182,9 +182,9 @@ export function TrendsPage() {
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
       {!sel ? <EmptyNote>No upcoming fixtures with known teams right now.</EmptyNote> : (
-        <div><h2 className="mb-2 text-xl font-medium">{sel.a} v {sel.b}</h2>
+        <div><h2 className="mb-tight text-title font-medium">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <Muted>Loading…</Muted>}
-          <Muted className="mt-3">Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
+          <Muted className="mt-snug">Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
     </div>
   );
 }

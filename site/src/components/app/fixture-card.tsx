@@ -37,26 +37,26 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-[22px] outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <Card className="h-full gap-0 rounded-[22px] border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
-        <CardHeader className="flex items-center gap-2 px-5 pb-0 pt-5">
-          {live ? <Badge variant="destructive" className="gap-1.5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">Upcoming</Badge>}
-          <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
-          {city(f.venue) && <span className="ml-auto min-w-0 truncate text-xs font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
+        <CardHeader className="flex items-center gap-tight px-inset pb-0 pt-stack">
+          {live ? <Badge variant="destructive" className="gap-tight px-2.5 py-hair text-caption font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-hair text-caption font-semibold uppercase tracking-wider">Upcoming</Badge>}
+          <Badge variant="outline" className="px-2.5 py-hair text-caption font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
+          {city(f.venue) && <span className="ml-auto min-w-0 truncate text-footnote font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
         </CardHeader>
-        <CardContent className="px-5 pt-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="grid min-w-0 gap-3.5">
-              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-2" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-[19px] font-semibold capitalize">{abbr(t)}</span></div>)}
+        <CardContent className="px-inset pt-stack">
+          <div className="flex items-center justify-between gap-snug">
+            <div className="grid min-w-0 gap-snug">
+              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-tight" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold capitalize">{abbr(t)}</span></div>)}
             </div>
             <div className="shrink-0 text-right">
-              <div className="text-[15px] font-medium text-muted-foreground">{dayLabel(dayKey(f))}</div>
-              {timed && <div className="text-2xl font-bold leading-7 tabular-nums">{localTime(when)}</div>}
+              <div className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}</div>
+              {timed && <div className="text-metric font-bold leading-7 tabular-nums">{localTime(when)}</div>}
             </div>
           </div>
-          <p className="mt-5 truncate text-[15px] font-medium text-muted-foreground">{status}</p>
+          <p className="mt-stack truncate text-callout font-medium text-muted-foreground">{status}</p>
         </CardContent>
-        <CardFooter className="mt-5 justify-between border-t border-white/10 px-5 py-3.5 text-[15px] font-medium [.border-t]:pt-3.5">
+        <CardFooter className="mt-stack justify-between border-t border-white/10 px-inset py-snug text-callout font-medium [.border-t]:pt-snug">
           <span className="min-w-0 truncate text-muted-foreground">{seriesName(f)}</span>
-          <Badge className="ml-3 px-3.5 py-1 text-[13px] font-semibold">Props</Badge>
+          <Badge className="ml-3 px-3.5 py-hair text-footnote font-semibold">Props</Badge>
         </CardFooter>
       </Card>
     </Link>
@@ -88,10 +88,10 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
   return (
-    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-4" aria-label="Upcoming matches">
+    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-stack" aria-label="Upcoming matches">
       <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
-        items={[["all", <>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-xs text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
-      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-5">
+        items={[["all", <>All <span className="ml-1.5 text-footnote text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-footnote text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
+      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-stack">
         <CarouselContent className="-ml-3">
           {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[88%] pl-3 sm:basis-[340px]"><FixtureCard f={f} i={i} /></CarouselItem>)}
         </CarouselContent>
