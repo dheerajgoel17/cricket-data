@@ -2,8 +2,10 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ballsToOvers, liveBoard, liveCard, namesMatch } from "@/engine/live.js";
+import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@/engine/live.js";
 import { FormHeadline, RecentForm, recentForms } from "@/components/app/recent-form";
+import { PillGroup } from "@/components/app/pill-group";
+import { abbr } from "@/lib/format";
 import { playerPhotos } from "@/lib/assets";
 import { useData } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -155,22 +157,36 @@ function cardInns(match: any) {
   return liveCard(match).filter((inn: any) => (inn.batters || []).length || (inn.bowlers || []).length || inn.runs != null);
 }
 
-/** CREX / Cricinfo batting + bowling tables. So-far only. Type matches Recent form rows. */
+const ORD = ["1st", "2nd", "3rd", "4th"];
+const innId = (i: any) => `${i.n}-${i.team}`;
+
+/** "NZ" for a one-innings-a-side match, "NZ 2nd" once a side has batted twice (Tests). */
+export function innLabel(card: any[], k: number) {
+  const team = card[k].team, nth = card.slice(0, k + 1).filter((i) => i.team === team).length;
+  return card.some((i, j) => j !== k && i.team === team) ? `${abbr(team)} ${ORD[nth - 1] ?? `${nth}th`}` : abbr(team);
+}
+
+/** Batting + bowling tables, one innings at a time: a selector over the innings (two in a T20 or ODI, up to four in a Test) that follows the latest one until a tab is picked. So-far only. */
 function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
+  const [pick, setPick] = useState<string>();
   const card = cardInns(match);
   if (!card.length) return null;
+  const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
+  const balls = inn.overs != null ? oversToBalls(inn.overs) : null, rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
   const onStrike = (name: string) => (match?.players || []).some((p: any) => p.strike && namesMatch(p.name, name));
   const yet = (inn: any) => (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
   return (
     <div className="flex flex-col gap-stack">
-      {card.map((inn: any) => (
-        <div key={`${inn.n}-${inn.team}`} className="flex flex-col">
-          {card.length > 1 && (
-            <div className="flex items-center gap-snug py-snug">
-              <span className="min-w-0 flex-1 truncate text-callout font-medium">{inn.team || `Innings ${inn.n}`}</span>
-              <span className="shrink-0 text-footnote font-medium tabular-nums">{innScore(inn) || "—"}</span>
-            </div>
-          )}
+      {card.length > 1 && (
+        <PillGroup layoutId="innings-chip" label="Innings" value={innId(inn)} onChange={setPick}
+          items={card.map((i: any, j: number) => [innId(i), <span key={innId(i)}>{innLabel(card, j)} <span className="ml-1 text-footnote opacity-70">{innScore(i) || "—"}</span></span>] as [string, ReactNode])} />
+      )}
+      {[inn].map((inn: any) => (
+        <div key={innId(inn)} className="flex flex-col">
+          <div className="flex items-center gap-snug py-snug">
+            <span className="min-w-0 flex-1 truncate text-callout font-medium">{inn.team || `Innings ${inn.n}`}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</span>
+            <span className="shrink-0 text-footnote font-medium tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
+          </div>
           {!!inn.batters?.length && (
             <div className="overflow-x-auto">
               <table className="w-full text-footnote">
@@ -275,7 +291,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <span className="flex min-w-0 flex-1 items-center gap-snug">
               <span className="truncate text-body font-semibold">Scorecard</span>
-              <span className="ml-auto truncate text-callout font-medium tabular-nums text-muted-foreground">{card[0].team} {innScore(card[0])}</span>
+              <span className="ml-auto truncate text-callout font-medium tabular-nums text-muted-foreground">{card[card.length - 1].team} {innScore(card[card.length - 1])}</span>
             </span>
           </AccordionTrigger>
           <AccordionContent className="pb-tight">

@@ -30,7 +30,7 @@ import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
 import { LiveFeed } from "@/components/app/live-feed";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
-import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
+import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
 
@@ -230,7 +230,7 @@ export function TrendsPage() {
       </LiveForm>
       {!sel ? <EmptyNote>No upcoming fixtures with known teams right now.</EmptyNote> : (
         <div className="flex flex-col gap-snug"><h2 className="text-title font-medium">{sel.a} v {sel.b}</h2>
-          {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <Muted>Loading…</Muted>}
+          {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <ListSkeleton rows={4} />}
           <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
     </div>
   );

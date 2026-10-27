@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
+import { AppSkeleton } from "@/components/app/skeletons";
 import { HomePage } from "@/pages/Home";
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
@@ -26,7 +27,7 @@ export function App() {
   return (
     <>
       <LegacyHash />
-      <Suspense fallback={<div className="p-8 text-muted-foreground" role="status">Loading…</div>}>
+      <Suspense fallback={<AppSkeleton />}>
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<HomePage />} />

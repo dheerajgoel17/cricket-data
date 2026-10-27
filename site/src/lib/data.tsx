@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { createStore } from "@/engine/store.js";
 import { Resolver } from "@/engine/resolve.js";
 import { loadPhotos, type Photos } from "@/lib/assets";
+import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Data { store: any; rz: any; photos: Photos }
@@ -23,7 +24,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return () => { live = false; };
   }, []);
   if (error) return <div className="m-8 rounded-lg border border-destructive p-6"><h2 className="text-xl font-medium">Data not found</h2><p className="mt-2 text-muted-foreground">Could not load the data files ({error}). Run the site build first: see docs/SITE.md.</p></div>;
-  if (!data) return <div className="p-8 text-muted-foreground" role="status">Loading data…</div>;
+  if (!data) return <AppSkeleton />;
   return <Ctx.Provider value={data}>{children}</Ctx.Provider>;
 }
 

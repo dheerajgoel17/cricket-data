@@ -27,7 +27,7 @@ export async function askApi(question: string): Promise<any | null> {
   try { const r = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question }) }); return r.ok ? await r.json() : null; } catch { return null; }
 }
 
-/** Live scores + player so-far from /api/live (ESPN + CREX match page, ~15 s). Null if the route is down. */
+/** Live scores + player so-far from /api/live (CREX schedule, match and scorecard pages, ~15 s). Null if the route is down. */
 export async function loadLive(): Promise<any | null> {
   try {
     const r = await fetch("/api/live", { headers: { accept: "application/json" } });

@@ -7,7 +7,7 @@ A free player-props and fancy-markets stats site built on this repo's data. Stat
 | Page | What you get |
 |---|---|
 | Home / **Ask** | Type a question in your own words (typos fine). A free Gemini model turns it into a *query plan*; the site runs that plan on the real data and shows the answer, the filters used, the sample size and the data freshness. |
-| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). Live scores (team totals, current batters/bowler, and player so-far vs booked lines) refresh about every 15 seconds from ESPN JSON plus the CREX match page, **only for matches we have player-prop or fancy odds for**; they are never used to settle a prop. Props and Match Fancy tabs (and unpriced fancy markets) stay hidden when that match has no bookmaker line. |
+| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). Live scores (team totals, current batters/bowler, and player so-far vs booked lines) refresh about every 15 seconds from the CREX schedule, match and scorecard pages, **only for matches we have player-prop or fancy odds for**; they are never used to settle a prop. Props and Match Fancy tabs (and unpriced fancy markets) stay hidden when that match has no bookmaker line. |
 | **Players** | Runs, balls, 4s, 6s, wickets, runs conceded. Hit rate over/under any line, a ladder of lines, median/mean, last-N form, fair decimal odds, split by opposition, venue, home/away/neutral, batting first/chasing, batting position, year and competition. One format at a time, never mixed. |
 | **Teams & venues** | Match totals and fancy markets: match 4s/6s, 30s, 50s, 100s, double-digit and single-digit scores, ducks, highest over, most runs conceded by a bowler, top score, team markets (team batting first only), and who tops the batting card. |
 | **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |
@@ -21,7 +21,7 @@ Cricsheet all_json.zip ─┐
 data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/src/engine)
 data/fixtures, value_bets ┘                                                              ▲
                                                 question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
-                                                ESPN JSON + CREX match page ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
+                                                CREX schedule + match + scorecard ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
 ```
 * **Builder** (`src/cricket_site`, stdlib only): parses the ball-by-ball JSON into per-innings batting rows (position, innings order,
   runs/balls/4s/6s, dismissal), bowling spells, partnerships (who was out, runs, balls, opening flag) and match-market aggregates.
@@ -35,16 +35,16 @@ data/fixtures, value_bets ┘                                                   
 * **The model never supplies a number.** `/api/ask` (`site/api/ask.js`) sends only the question text to Gemini with a fixed instruction and gets
   back JSON, which `sanitizePlan` reduces to whitelisted fields. The plan is then resolved against the real player/team/venue tables and executed
   in the browser. If the key is missing, rate-limited or the reply is unusable, the built-in rule parser (`engine/nl.js`) answers instead.
-* **Live scores.** `/api/live` (`site/api/live.js`) pulls ESPN's public cricket JSON (no key), caches ~15 seconds, and returns compact team
+* **Live scores.** `/api/live` (`site/api/live.js`) reads CREX's schedule, match and scorecard pages (no key; ESPN is not used, its cards lagged its own header), caches ~15 seconds, and returns compact team
   scores plus batting/bowling so-far **only for matches in the book feed** (player props, event markets, or fancy). The fixture header shows a
   live board (current pair: avatars on the edges, name with runs/balls under it, partnership in the middle, last wicket, bowler, this-over deliveries with a divider at the over break, CRR/RRR)
   plus a Scorecard and Recent form accordion (both closed so props stay first). The closed Recent form row shows last 3 W/L chips per side so it fits on a phone; the open body is still last 5 in this format. Scorecard has batting (how-out, R, B, 4s, 6s, SR), extras, fall of wickets, yet to bat, and bowling (O, M, R, W, Econ) — the
   same columns CREX and Cricinfo show. Games with no odds stay off
-  the rail and off the live snapshot. When ESPN flags a match live but leaves the score blank (common on Associate ODIs), the same route fills
-  scores from the CREX **match** page and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `crex.com/api`). The schedule page is only used for URLs
-  (it is cached ~5 min). The browser polls that route. ESPN HTML scraping stays blocked (`robots.txt`).
+  the rail and off the live snapshot. The schedule page (cached ~5 min) lists the games and their URLs; scores, the current pair and rates come from the **match** page
+  and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `crex.com/api`), so a chase shows the chasing side's pair the moment it starts.
+  The browser polls that route.
   Unofficial and can change. **Never used for settlement** — VOID/DNP rules still apply after the innings qualifies.
-  Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`); ESPN's ground-local "Starts at … local time" lines are dropped.
+  Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`).
 
 ## Settlement rules and definitions
 * T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100.
@@ -65,7 +65,7 @@ The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app b
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
-* Live scores lag up to about 20 seconds and come from unofficial ESPN JSON plus the CREX match page. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
+* Live scores lag up to about 20 seconds and come from the unofficial CREX pages. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
 ## Run it locally
