@@ -489,6 +489,7 @@ test("without a linked id a name alone never says 'not in': a shared surname cou
   assert.equal(notInXI(m, "BKG Mendis", "Sri Lanka"), false, "he is left unmarked");
   assert.equal(notInXI(m, "PHKD Mendis", "Sri Lanka"), false);
   assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true, "nobody of that surname in the eleven: marked");
+});
 
 test("an over line is cleared the moment the count passes it; a miss is only known once the count can't move", () => {
   assert.equal(lineVerdict(1, 0.5), "cleared"); // already hit his six
