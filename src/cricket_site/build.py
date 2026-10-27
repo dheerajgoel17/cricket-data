@@ -610,10 +610,10 @@ def build_lines(vb_dir: Path | None) -> dict:
     if f and f.exists():
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
-            return {"generated_at_utc": d.get("generated_at_utc", ""), "lines": d.get("lines", [])}
+            return {"generated_at_utc": d.get("generated_at_utc", ""), "lines": d.get("lines", []), "events": d.get("events", []), "fancy": d.get("fancy", [])}
         except ValueError:
             pass  # a half-written file must not fail the site build
-    return {"generated_at_utc": "", "lines": []}
+    return {"generated_at_utc": "", "lines": [], "events": [], "fancy": []}
 
 
 # ------------------------------------------------------------------ main

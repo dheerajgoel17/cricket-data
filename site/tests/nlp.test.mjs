@@ -49,7 +49,7 @@ test("end to end through the rule parser: numbers come from the data", async () 
   const plan = parseQuestion("Harry Brook T20 sixes over 0.5 away from Alpha", rz, store);
   const r = await runPlan(store, rz, plan);
   assert.ok(r.ok, r.error);
-  assert.match(r.headline, /fair decimal odds/);
+  assert.match(r.headline, /fair decimal price/);
   assert.equal(r.summary.over + r.summary.under + r.summary.push, r.summary.n);
   assert.ok(r.filters.some(([k, v]) => k === "Venue type" && /away/.test(v)));
 });

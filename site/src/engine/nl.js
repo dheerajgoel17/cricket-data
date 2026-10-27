@@ -5,7 +5,7 @@ import { lev, norm } from "./util.js";
 
 const FILLER = new Set(("a an the of in on at for to is are was were will would what whats what's how many much does do did has have had " +
   "get gets got hit hits score scores scored scoring who when which player batter batsman bowler hitting more than less than at least most " +
-  "over under line odds fair chance probability prob prop props bet match matches innings game games please tell me show give stats stat " +
+  "over under line odds price fair chance probability prob prop props bet match matches innings game games please tell me show give stats stat " +
   "record rate percentage times often usually ever career form recent number no its it their his her with and or vs versus against v " +
   "from by as be been being can could should if then also just only into out up down about home away neutral first second bat batting " +
   "bowl bowling chase chasing opening open opener openers together partnership partnerships stand stands gets goes go out wicket " +

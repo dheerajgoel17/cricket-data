@@ -11,6 +11,8 @@ export const MATCH_MARKETS = {
   match_wickets: { label: "Match wickets", get: (s, m) => sum(s.M.inn[m], IW) },
   match_fours: { label: "Match fours", get: (s, m) => sum(s.M.inn[m], IF4) },
   match_sixes: { label: "Match sixes", get: (s, m) => sum(s.M.inn[m], IF6) },
+  match_boundaries: { label: "Match boundaries (4s + 6s)", get: (s, m) => sum(s.M.inn[m], IF4) + sum(s.M.inn[m], IF6) },
+  first_innings_runs: { label: "1st innings score", get: (s, m) => s.M.inn[m][0]?.[IR] ?? 0 },
   match_30s: { label: "Match 30s (30-49)", get: (s, m) => sum(s.M.inn[m], I30) },
   match_50s: { label: "Match 50s (50-99)", get: (s, m) => sum(s.M.inn[m], I50) },
   match_100s: { label: "Match 100s", get: (s, m) => sum(s.M.inn[m], I100) },
@@ -36,6 +38,16 @@ export const TEAM_MARKETS = {
   team_ducks: { label: "Team ducks (batting first)", get: first(IDK) },
   team_top_score: { label: "Team top batter's score (batting first)", get: first(ITS) },
   team_highest_over: { label: "Team highest over (batting first)", get: first(IHO) },
+};
+
+// A team's own innings in the match, whichever side batted first: the basis of the books' "Team total" markets (the TEAM_MARKETS above are
+// batting-first only). Test and multi-innings matches add the team's innings together.
+export const TEAM_TOTAL_MARKETS = {
+  team_total_runs: { label: "Team total runs", keys: [IR] },
+  team_total_wickets: { label: "Team wickets lost", keys: [IW] },
+  team_total_fours: { label: "Team fours", keys: [IF4] },
+  team_total_sixes: { label: "Team sixes", keys: [IF6] },
+  team_total_boundaries: { label: "Team boundaries (4s + 6s)", keys: [IF4, IF6] },
 };
 
 export const ALL_MARKETS = { ...MATCH_MARKETS, ...TEAM_MARKETS };
@@ -75,6 +87,20 @@ export function marketReport(store, ms, key, line = null) {
   const sum_ = summarize(values, line);
   const lines = key === "match_runs" || key === "team_runs" ? ladderAround(sum_.median, 10) : suggestLines(values, 1, 5);
   return { key, label: def.label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };
+}
+
+/** Per-match values of a team-total market for `team` over the matches `ms`. */
+export function teamTotalValues(store, ms, team, key) {
+  const { keys } = TEAM_TOTAL_MARKETS[key];
+  return ms.map((m) => store.M.inn[m].filter((i) => i[IT] === team).reduce((t, i) => t + keys.reduce((a, k) => a + i[k], 0), 0));
+}
+
+/** Same shape as marketReport, for a team-total market. */
+export function teamTotalReport(store, ms, team, key, line = null) {
+  const values = teamTotalValues(store, ms, team, key);
+  const sum_ = summarize(values, line);
+  const lines = key === "team_total_runs" ? ladderAround(sum_.median, 10) : suggestLines(values, 1, 5);
+  return { key, label: TEAM_TOTAL_MARKETS[key].label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };
 }
 
 function ladderAround(med, step) {

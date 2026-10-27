@@ -167,7 +167,7 @@ function Loaded({ idx, name, team, res, q, book, bookDefault, fmts, fmtVal, navi
         <Stat k="Prop" v={res.statLabel} />
         <Stat k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
         <Stat k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
-        <Stat k="Fair odds" v={cur.p ? odds(1 / cur.p) : "–"} />
+        <Stat k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
       </div>
       <Gauge p={cur.p} caption={`${cur.label} hit`} />
     </>
@@ -208,8 +208,8 @@ function Loaded({ idx, name, team, res, q, book, bookDefault, fmts, fmtVal, navi
 
           {book && cur && (
             <Panel title="Bookmaker lines">
-              <Muted>{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal odds, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</Muted>
-              <DataTable columns={["Line", "Odds", "Market", `Hit ${cur.label}`]} rows={book.lines.map((l: any) => {
+              <Muted>{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal prices, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</Muted>
+              <DataTable columns={["Line", "Price", "Market", `Hit ${cur.label}`]} rows={book.lines.map((l: any) => {
                 const hist = windowRate(entries, cur.n, l.line, "over");
                 return [<button key={l.line} type="button" onClick={() => { setLine(l.line); keep({ line: l.line, side }); }} className={cn("inline-flex min-w-14 cursor-pointer flex-col items-center rounded-xl border px-2.5 py-1.5 font-bold leading-tight", line === l.line ? "border-transparent bg-primary text-primary-foreground" : "bg-pill")}>{l.line}{l === book.main ? <small className="text-[10px] font-semibold uppercase opacity-70">main</small> : null}</button>,
                   <span key="o" className="grid gap-0.5">{l.books.map((b: any) => <span key={b.source}><em className="mr-1.5 text-[11px] not-italic text-muted-foreground">{bookName(b.source)}</em>{odds(b.over)} / {odds(b.under)}</span>)}</span>,

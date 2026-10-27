@@ -155,14 +155,14 @@ async function runPlayerProp(store, rz, plan, hints) {
   const fair = side === "over" ? s.fairOver : s.fairUnder;
   let headline;
   if (plan.line != null && s.n) {
-    headline = `${rep.name} ${rep.fmtName} ${rep.statLabel.toLowerCase()} ${side} ${plan.line}: ${k} of ${s.n} ${rep.scope === "match" ? "matches" : "innings"} (${P(p)})${s.push ? `, ${s.push} push` : ""} → fair decimal odds ${d2(fair)}`;
+    headline = `${rep.name} ${rep.fmtName} ${rep.statLabel.toLowerCase()} ${side} ${plan.line}: ${k} of ${s.n} ${rep.scope === "match" ? "matches" : "innings"} (${P(p)})${s.push ? `, ${s.push} push` : ""} → fair decimal price ${d2(fair)}`;
   } else {
     headline = `${rep.name} ${rep.fmtName} ${rep.statLabel.toLowerCase()}: median ${s.median ?? "n/a"}, mean ${s.mean ?? "n/a"} over ${s.n} ${rep.scope === "match" ? "matches" : "innings"}`;
   }
   const alt = who.ambiguous.map((a) => a.name);
   const allNotes = [...notes, ...rep.notes];
   if (s.n && s.n < 20) allNotes.push(`Small sample (n=${s.n}): treat the hit rate with caution.`);
-  if (s.n && s.pOverLo != null) allNotes.push(`90% interval for the hit rate: ${P(s.pOverLo)} to ${P(s.pOverHi)} (fair odds ${d2(s.fairOverWorst)} to ${d2(s.fairOverBest)} on the over).`);
+  if (s.n && s.pOverLo != null) allNotes.push(`90% interval for the hit rate: ${P(s.pOverLo)} to ${P(s.pOverHi)} (fair price ${d2(s.fairOverWorst)} to ${d2(s.fairOverBest)} on the over).`);
   return {
     ok: true, kind: "player_prop", headline, title: `${rep.name}: ${rep.fmtName} ${rep.statLabel}`, player: { idx: who.idx, name: rep.name, alternatives: alt },
     sample: { n: s.n, unit: rep.scope === "match" ? "matches" : "innings" }, summary: s, ladder: rep.ladder, splits: rep.splits, last: rep.last, corr: rep.corr, chart: rep.chart ? { ...rep.chart, entries: rep.chart.entries.map((e) => ({ ...e, opp: store.teamName(e.opp, true), venueName: store.venueName(e.venue) })) } : null,
@@ -213,7 +213,7 @@ async function runPartnership(store, rz, plan, hints) {
   const verb = plan.opening ? "open together" : "bat together";
   let headline;
   if (!sum.n) headline = `No recorded ${FORMATS[fmt]} partnerships for ${labelOf(a.idx)} and ${labelOf(b.idx)} with these filters.`;
-  else headline = `${na} & ${nb} ${verb} (${FORMATS[fmt]}): ${sum.n} stands. First out: ${na} ${sum.aOut}× (${P(sum.pFirstOutA)} of stands ended by a dismissal, fair odds ${d2(sum.fairFirstOutA)}), ${nb} ${sum.bOut}× (${P(sum.pFirstOutB)}, fair odds ${d2(sum.fairFirstOutB)})${sum.notBroken ? `; ${sum.notBroken} stand(s) ended without either being dismissed` : ""}. Median stand ${sum.medianRuns} runs.`;
+  else headline = `${na} & ${nb} ${verb} (${FORMATS[fmt]}): ${sum.n} stands. First out: ${na} ${sum.aOut}× (${P(sum.pFirstOutA)} of stands ended by a dismissal, fair price ${d2(sum.fairFirstOutA)}), ${nb} ${sum.bOut}× (${P(sum.pFirstOutB)}, fair price ${d2(sum.fairFirstOutB)})${sum.notBroken ? `; ${sum.notBroken} stand(s) ended without either being dismissed` : ""}. Median stand ${sum.medianRuns} runs.`;
   if (sum.n && sum.n < 15) notes.push(`Small sample (n=${sum.n}).`);
   let together = [];
   if (!sum.n) {
@@ -274,7 +274,7 @@ function runMarket(store, rz, plan, hints = {}) {
     const side = plan.side || "over";
     const p = side === "over" ? one.summary.pOver : one.summary.pUnder;
     const k = side === "over" ? one.summary.over : one.summary.under;
-    headline = `${label} ${FORMATS[fmt]} ${one.label.toLowerCase()} ${side} ${plan.line}: ${k} of ${one.n} (${P(p)}) → fair decimal odds ${d2(side === "over" ? one.summary.fairOver : one.summary.fairUnder)}`;
+    headline = `${label} ${FORMATS[fmt]} ${one.label.toLowerCase()} ${side} ${plan.line}: ${k} of ${one.n} (${P(p)}) → fair decimal price ${d2(side === "over" ? one.summary.fairOver : one.summary.fairUnder)}`;
   }
   if (ms.length < 20) notes.push(`Small sample (n=${ms.length}).`);
   notes.push("Summary markets follow exchange void rules: both innings need 80% of overs (Tests: a result or 300/200 overs). Team markets use the innings of the team batting first.");
@@ -291,7 +291,7 @@ function runTopBatter(store, rz, plan, hints = {}) {
   const label = team ? store.teamName(team.idx) : f.venue != null ? store.venueName(f.venue) : plan.competition;
   notes.push(team ? "Team top batter counts the innings of the team batting first only." : "Match top batter counts the highest score in the match; ties are shown separately.");
   const top = t.rows[0];
-  return { ok: true, kind: "top_batter", headline: top ? `${label} ${FORMATS[fmt]} top batter: ${top.name} ${top.sole} sole + ${top.tied} tied of ${t.n} matches (fair odds ${d2(top.fairSole)})` : `No data for ${label}.`,
+  return { ok: true, kind: "top_batter", headline: top ? `${label} ${FORMATS[fmt]} top batter: ${top.name} ${top.sole} sole + ${top.tied} tied of ${t.n} matches (fair price ${d2(top.fairSole)})` : `No data for ${label}.`,
     title: `${label}: top batter`, sample: { n: t.n, unit: "matches" }, rows: t.rows,
     filters: chips(store, { ...plan, filters: { ...plan.filters, format: FORMATS[fmt] } }, [["Subject", label]]), notes, freshness: freshness(store), plan };
 }

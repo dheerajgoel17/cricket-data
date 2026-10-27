@@ -38,13 +38,13 @@ export function PropsPage() {
       <div className="flex items-center justify-between gap-2"><span className="text-sm text-muted-foreground" title="your local time">{localWhen(b.start_utc || fromIst(b.start_ist) || fromIst(b.alerted_at_ist)) || b.start_ist || b.alerted_at_ist || ""}</span>{b.edge_pct != null ? <Badge className="bg-primary/15 text-primary">{`+${b.edge_pct}%`}</Badge> : null}</div>
       <div className="font-semibold">{link(b)}<small className="block font-normal text-muted-foreground">{b.match}</small></div>
       <div className="text-xl font-medium text-primary">{b.market}</div>
-      <div className="flex gap-6"><Fig v={odds(b.best_odds)} l={b.best_source || "Best odds"} /><Fig v={odds(b.fair_odds)} l="Fair odds" /><Fig v={b.kelly_quarter_stake_pct != null ? `${b.kelly_quarter_stake_pct}%` : "–"} l="¼-Kelly" /></div>
+      <div className="flex gap-6"><Fig v={odds(b.best_odds)} l={b.best_source || "Best price"} /><Fig v={odds(b.fair_odds)} l="Fair price" /><Fig v={b.kelly_quarter_stake_pct != null ? `${b.kelly_quarter_stake_pct}%` : "–"} l="¼-Kelly" /></div>
       {b.why ? <Muted>{b.why}</Muted> : null}
     </Card>);
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Prop Hunter"]]} />
-      <PageTitle sub="Player-prop value bets for upcoming matches, produced hourly by the repo's value-bets pipeline (free odds sources vs the model). Decimal odds. Not betting advice: most edges are information the model lacks (XIs, batting order, pitch, injuries).">Prop Hunter</PageTitle>
+      <PageTitle sub="Player-prop value bets for upcoming matches, produced hourly by the repo's value-bets pipeline (free price sources vs the model). Decimal prices. Not betting advice: most edges are information the model lacks (XIs, batting order, pitch, injuries).">Prop Hunter</PageTitle>
       <p className="mb-3 text-sm"><Badge variant={data?.live ? "default" : "secondary"}>{data?.live ? "live from GitHub" : "bundled snapshot"}</Badge> generated {snap.generated_at_ist || "?"}</p>
       {bets.length ? <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">{bets.map((b: any, i: number) => <BetCard key={i} b={b} />)}</div>
         : <Card className="gap-1 px-4 py-4 shadow-none"><p>No value bets passed the filters in the latest run.</p><Muted>Markets priced: {snap.stats?.markets_in_window ?? "?"} across {snap.stats?.events_in_window ?? "?"} matches in the next 24 h; sources: {Object.entries(snap.sources || {}).map(([k, v]: any) => `${k} ${v.status}`).join(", ") || "n/a"}.</Muted></Card>}

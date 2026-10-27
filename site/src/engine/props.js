@@ -1,4 +1,4 @@
-// Player prop analysis: hit rates over/under any line, median, form, fair decimal odds, and splits.
+// Player prop analysis: hit rates over/under any line, median, form, fair decimal price, and splits.
 import { applyFilters, aggregateByMatch, assertSingleFormat } from "./filters.js";
 import { STATS } from "./rules.js";
 import { fairOdds, summarize, suggestLines } from "./stats.js";

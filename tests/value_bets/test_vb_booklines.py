@@ -1,4 +1,4 @@
-from value_bets.booklines import book_lines
+from value_bets.booklines import book_lines, prop_events
 
 
 def row(**kw):
@@ -49,3 +49,19 @@ def test_output_is_sorted_by_start_then_player():
             row(player_hist_name="B Player", start_utc="2026-10-28T07:00:00Z", event_key="e2", player_id="b1", side="under"),
             row(), row(side="under", back=1.95)]
     assert [x["player"] for x in book_lines(rows, "t")["lines"]] == ["Abhishek Sharma", "B Player"]
+
+
+def test_prop_events_lists_every_prerelease_event_with_any_player_prop_even_without_a_two_sided_line():
+    rows = [row(), row(event_key="e2", match="Namibia vs Ireland", market_type="batter_milestone", line=None, side=None, start_utc="2026-10-27T09:00:00Z"),
+            row(event_key="e2", match="Namibia vs Ireland", market_type="top_batter_team", line=None, side=None, start_utc="2026-10-27T09:00:00Z", source="smarkets"),
+            row(event_key="e3", market_type="match_winner"),  # outright only: not a prop
+            row(event_key="e4", in_play=True)]  # live: not a pre-match prop
+    ev = prop_events(rows)
+    assert [e["match"] for e in ev] == ["India vs NZ", "Namibia vs Ireland"]
+    assert ev[1]["markets"] == ["batter_milestone", "top_batter_team"] and ev[1]["sources"] == ["moviodds_bet365", "smarkets"] and ev[1]["n"] == 2
+    assert book_lines(rows, "t")["events"] == ev
+
+
+def test_book_lines_carries_the_fancy_lines_it_is_given():
+    assert book_lines([], "t")["fancy"] == []
+    assert book_lines([], "t", [{"key": "match_runs"}])["fancy"] == [{"key": "match_runs"}]

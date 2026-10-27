@@ -121,7 +121,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue"}
         meta={[`${fmtName} markets`, isTeam ? "team markets use the side batting first" : "match markets"]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
-      {nextFx ? <NextMatch f={nextFx} /> : null}
+      {nextFx ? <div className="my-3"><NextMatch f={nextFx} /></div> : null}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
         {isTeam && <TabsContent value="grid">
@@ -131,7 +131,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <Muted>Loading…</Muted>}</TabsContent>
         <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <Muted>Loading…</Muted>}</TabsContent>
       </PillTabs>
-      {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair odds are 1 ÷ hit rate and carry no margin.</Muted></Card>}
+      {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.</Muted></Card>}
       <Link to="/teams" className="sr-only">Teams</Link>
     </div>
   );

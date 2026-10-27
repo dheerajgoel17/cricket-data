@@ -96,3 +96,44 @@ The Site workflow runs it hourly (resumable, at most `SYNC_LIMIT` new images per
 the browser then tries our copy first and CREX second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
 (dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and CREX is used directly.
 Schema: see the `cricket_assets_schema` migration (tables above plus the `avatars` bucket: public, 200 KB limit, png/webp/jpeg only).
+
+## UI libraries and the iOS / Android apps
+The apps are planned natively (Expo / React Native), like props.cash, whose website is a plain React SPA with separate store apps. So the website and the apps share
+**data and logic, not components**:
+* `site/src/engine/*` (plain ESM, no DOM) and the JSON data files are the shared core. Keep every number and rule there; never import React or the DOM into the engine.
+* Web UI uses free MIT components from the shadcn CLI and its registries (`@magicui`, `@kibo-ui`, `@originui`, `@animate-ui` are registered in `site/components.json`; add with `npx shadcn@latest add @kibo-ui/<name>`),
+  not hand-built widgets. Check the install diff: the CLI can overwrite `ui/*` files and the `.dark` tokens in `index.css`.
+* Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), targets of at least 44 px on phones, and `env(safe-area-inset-*)`
+  for fixed bars (`viewport-fit=cover` is set in `site/index.html`, which iOS needs for the insets to be non-zero).
+* The look is iOS-inspired: true black with system grays, translucent materials (blur), large titles, a segmented control, 17 px list rows with inset separators at every width (no data tables), a floating glass tab bar on phones and a translucent source-list sidebar on wide screens.
+
+## Type and spacing scales (no hard-coded sizes)
+Sizes are named by role and defined once, in `site/src/index.css` (`@theme`). Pages and shared components use the names, never `text-[13px]`, `text-sm`, `mt-5` or `gap-3`.
+`site/src/lib/design-tokens.test.ts` fails the build if a governed file does; add a file to its `GOVERNED` list when its page is migrated (the old pages are not yet).
+
+| Type | Size | Used for |
+| --- | --- | --- |
+| `text-display` | 32 to 36 px, fluid | page title (large title) |
+| `text-title` | 22 px | section titles, sheet titles, key values |
+| `text-body` | 17 px | names, row titles, primary text |
+| `text-callout` | 15 px | secondary lines, chips and control labels |
+| `text-footnote` | 13 px | meta and captions |
+| `text-caption` | 11 px | micro labels (EDGE), small badges, tab labels |
+| `text-metric` / `text-stat` | 26 / 40 px | timers and big numbers / hero statistic |
+
+| Spacing | Size | Used for |
+| --- | --- | --- |
+| `hair` | 4 px | icon and text micro gaps |
+| `tight` | 8 px | inside a component, chip rows |
+| `snug` | 12 px | between controls in a row, list-row padding |
+| `stack` | 20 px | between stacked blocks |
+| `group` | 28 px | between groups inside a section |
+| `section` | 44 px | between page sections |
+| `inset` | 20 px | padding inside cards and panels |
+| `gutter` | 16 px, 24 px from md | page side padding; list rows use it so photos line up with the page edge |
+
+Type is in rem, so it follows the browser's font-size setting. One `cn()` (`site/src/lib/utils.ts`) merges classes for the whole app, including shadcn's `ui/*` (they import it as `cn`; see the alias in `vite.config.ts` and `tsconfig.json`); it knows these scales, so `text-body` replaces a component's own `text-sm` instead of fighting it.
+
+**Vertical rhythm.** A page is a `flex flex-col gap-section` of sections; a section is a `flex flex-col gap-stack` of blocks; related controls sit in a `gap-snug` group. Blocks never set their own vertical margins (the token test forbids `mt-*`/`mb-*`/`my-*` in governed files, except `mt-auto`), so every gap on a page comes from its parent.
+**Switching tabs smoothly.** Content that changes height (a tab body, a filtered list) goes in `AnimatedHeight`, so the page eases between heights instead of snapping and the browser never clamps your scroll. The fixture page pins its tab bar under the pinned header (`sticky`) and, when you switch tabs while scrolled past the body, eases the new body to the top (then re-aligns once the height animation ends).
+

@@ -49,7 +49,7 @@ ${PLAN_SCHEMA}
 Rules:
 - Never answer the question and never invent statistics. You only describe what to look up.
 - Fix spelling mistakes in names and keywords. Keep the player's name as the user wrote it (surname matters most).
-- Odds are decimal only. Ignore match-winner questions: use kind "unknown".
+- Prices are decimal only. Ignore match-winner questions: use kind "unknown".
 - "this year" = since ${today.slice(0, 4)}-01-01. "last year" = the previous calendar year.
 - If the question is not about cricket statistics, return {"kind":"unknown"}.
 
