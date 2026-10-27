@@ -150,7 +150,7 @@ export function HotProps() {
   return (
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
-        <div><h1 className="font-condensed text-3xl font-bold tracking-wide md:text-4xl">Hot Player Props</h1>
+        <div><h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hot Player Props</h1>
           <p className="mt-1 text-sm text-muted-foreground">{day === "0" ? "Today's" : "Tomorrow's"} bookmaker lines, ranked by hit rate · {new Date(Date.now() + Number(day) * 864e5).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
       </div>
       <div className="mt-3 flex items-center gap-2">
@@ -186,7 +186,7 @@ export function HotProps() {
             {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} />)}
           </ul>
           <TableProvider columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
-            <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 font-condensed text-[15px] font-medium tracking-wide" />}</TableHeaderGroup>}</TableHeader>
+            <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 text-[13px] font-medium text-muted-foreground" />}</TableHeaderGroup>}</TableHeader>
             <TableBody>{({ row }) => <TableRow key={row.id} row={row} className="h-[62px]">{({ cell }) => <TableCell key={cell.id} cell={cell} />}</TableRow>}</TableBody>
           </TableProvider>
           </>
