@@ -45,6 +45,15 @@ def test_team_resolver():
     assert t.resolve("Afghanistan", "male") is None
 
 
+def test_team_resolver_nz_domestic():
+    """The schedule says "Auckland" / "Northern Brave", the books "Auckland Aces" / "Northern Districts": one side each, so a priced match finds its fixture."""
+    t = TeamResolver({"male": {"Auckland": 40, "Auckland Aces": 60, "Wellington": 40, "Wellington Firebirds": 60, "Otago": 30, "Otago Volts": 60,
+                               "Northern Districts": 80, "Canterbury": 90, "Central Stags": 70}})
+    for sched, book in [("Auckland", "Auckland Aces"), ("Wellington", "Wellington Firebirds"), ("Otago", "Otago Volts"),
+                        ("Northern Brave", "Northern Districts"), ("Canterbury", "Canterbury Kings"), ("Central Stags", "Central Stags")]:
+        assert t.resolve(sched, "male") == t.resolve(book, "male") is not None, (sched, book)
+
+
 def test_player_resolver():
     ros = {"India": [("Ishan Kishan", "a1", "2026-10-11", 30), ("Kuldeep Yadav", "a2", "2026-10-11", 40),
                      ("MP Yadav", "a3", "2026-10-11", 10), ("Prince Yadav", "a4", "2026-10-11", 5)],

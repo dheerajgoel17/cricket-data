@@ -38,9 +38,13 @@ def fixture_id(start: str, a: str, b: str) -> str:
     return f"{start[:10]}-{_slug(a)}-v-{_slug(b)}"
 
 
+SAME_SIDE = {"aucklandaces": "auckland", "canterburykings": "canterbury", "wellingtonfirebirds": "wellington", "otagovolts": "otago", "northerndistricts": "northernbrave"}
+
+
 def team_key(n: str) -> str:
-    """The site's ``teamKey``: case, "(W)" / "Women" and punctuation ignored."""
-    return re.sub(r"[^a-z0-9]", "", re.sub(r"\(w\)|women'?s?", "", str(n or "").lower()))
+    """The site's ``teamKey``: case, "(W)" / "Women" and punctuation ignored, and a side the books and the schedule name differently is one key (``SAME_SIDE`` in site/src/engine/util.js)."""
+    k = re.sub(r"[^a-z0-9]", "", re.sub(r"\(w\)|women'?s?", "", str(n or "").lower()))
+    return SAME_SIDE.get(k, k)
 
 
 def _sides(x: dict) -> tuple[str, str]:

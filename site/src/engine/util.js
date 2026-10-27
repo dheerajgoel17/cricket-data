@@ -2,6 +2,9 @@
 export const FORMATS = ["T20", "ODI", "Test", "Hundred"];
 export const fmtIndex = (name) => FORMATS.findIndex((f) => f.toLowerCase() === String(name).toLowerCase());
 
+/** A side the books and the schedule name differently ("Auckland Aces" / "Auckland"), reduced to one team key. Kept equal to `SAME_SIDE` in src/value_bets/archive.py. */
+export const SAME_SIDE = { aucklandaces: "auckland", canterburykings: "canterbury", wellingtonfirebirds: "wellington", otagovolts: "otago", northerndistricts: "northernbrave" };
+
 export function norm(s) {
   return String(s ?? "")
     .normalize("NFKD")

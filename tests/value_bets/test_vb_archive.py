@@ -1,5 +1,7 @@
 import datetime as dt
 import json
+import re
+from pathlib import Path
 
 import pytest
 
@@ -105,6 +107,13 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
     (f,) = build_fixtures(tmp_path, None, {})
     assert f["id"] == fixture_id("2026-10-27T07:00Z", "Côte d'Ivoire", "India A")
     assert team_key("India (W)") == team_key("India Women") == "india"
+    assert team_key("Auckland Aces") == team_key("Auckland") and team_key("Northern Districts") == team_key("Northern Brave")
+
+
+def test_same_side_is_the_sites():
+    src = (Path(__file__).resolve().parents[2] / "site" / "src" / "engine" / "util.js").read_text()
+    js = dict(re.findall(r'(\w+): "(\w+)"', re.search(r"SAME_SIDE = \{(.*?)\}", src).group(1)))
+    assert js == arch.SAME_SIDE
 
 
 def without_name(**kw):

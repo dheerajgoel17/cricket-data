@@ -1,18 +1,19 @@
 // Live score snapshots from Source A: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { NO_IDENTITY } from "./identity.js";
-import { norm } from "./util.js";
+import { SAME_SIDE, norm } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
 const WINDOW_MS = 36 * 3600e3;
 export const BOOK_WINDOW_MS = 14 * 3600e3;
 
 export function teamKey(n) {
-  return String(n || "")
+  const k = String(n || "")
     .toLowerCase()
     .replace(/\(w\)|women'?s?/g, "")
     .replace(/under-?19s?/g, "u19")
     .replace(/[^a-z0-9]/g, "");
+  return SAME_SIDE[k] || k;
 }
 
 /** "HC Brook" / "Harry Brook" / "harry brook" — last name plus first initial. Ambiguous surnames stay unmatched. */
