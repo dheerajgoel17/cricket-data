@@ -25,13 +25,15 @@ function startsIn(ms: number) {
 }
 
 /** Cricinfo-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
-export function FixtureCard({ f }: { f: any }) {
+export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const when = fixtureStart(f), ms = when.getTime() - Date.now(), timed = hasTime(f);
   const live = timed && ms <= 0 && ms > -4 * 3600e3;
   const status = live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed";
   return (
-    <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <Card className="h-full gap-0 rounded-xl py-0 shadow-none transition group-hover:border-primary/50 group-hover:bg-[#161616]">
+    <motion.div className="h-full" initial={{ opacity: 0, y: 16, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      transition={{ delay: Math.min(i, 8) * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
+    <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Card className="h-full gap-0 rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
         <CardHeader className="flex items-center gap-2 px-4 pb-0 pt-4">
           {live ? <Badge variant="destructive" className="gap-1.5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">Upcoming</Badge>}
           <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
@@ -55,6 +57,7 @@ export function FixtureCard({ f }: { f: any }) {
         </CardFooter>
       </Card>
     </Link>
+    </motion.div>
   );
 }
 
@@ -74,7 +77,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
         items={[["all", <>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-xs text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
       <Carousel key={sel} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
         <CarouselContent className="-ml-3">
-          {shown.map((f) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[86%] pl-3 sm:basis-[360px]"><FixtureCard f={f} /></CarouselItem>)}
+          {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[86%] pl-3 sm:basis-[360px]"><FixtureCard f={f} i={i} /></CarouselItem>)}
         </CarouselContent>
         <CarouselPrevious className="left-2 hidden md:inline-flex" />
         <CarouselNext className="right-2 hidden md:inline-flex" />

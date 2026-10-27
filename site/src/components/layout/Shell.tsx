@@ -74,7 +74,7 @@ export function Shell() {
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
-        <SidebarInset className="min-w-0 overflow-x-clip border bg-[#131313] md:peer-data-[variant=inset]:min-h-[calc(100svh-60px-1rem)]">
+        <SidebarInset className="min-w-0 overflow-x-clip border border-white/5 bg-[#0b0b0c] md:peer-data-[variant=inset]:min-h-[calc(100svh-60px-1rem)]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="min-w-0 px-4 pb-8 md:px-8">
               <Outlet />

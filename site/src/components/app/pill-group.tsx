@@ -8,18 +8,19 @@ import { cn } from "@/lib/utils";
  * that slides between items (instant under reduced motion). The active item is scrolled into view when the row overflows.
  * `layoutId` must be unique per group on a page.
  */
-export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName }: {
+export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName, segmented }: {
   items: [string, ReactNode][]; value: string; onChange: (v: string) => void; layoutId: string; label: string; className?: string; itemClassName?: string;
+  /** iOS segmented control: small-radius track and a raised thumb, instead of the full pill. */ segmented?: boolean;
 }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => { ref.current?.querySelector<HTMLElement>('[data-state="on"]')?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" }); }, [value, reduce]);
   return (
     <ToggleGroup ref={ref} type="single" value={value} onValueChange={(v) => v && onChange(v)} variant="outline" spacing={0} aria-label={label}
-      className={cn("h-11 w-full justify-start overflow-x-auto rounded-full border bg-card p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)}>
+      className={cn("w-full justify-start overflow-x-auto bg-card [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", segmented ? "h-9 rounded-[9px] p-0.5" : "h-11 rounded-full border border-white/5 p-1", className)}>
       {items.map(([v, l]) => (
-        <ToggleGroupItem key={v} value={v} className={cn("relative h-9 shrink-0 rounded-full border-0 bg-transparent px-4 text-sm font-medium transition-colors hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground", itemClassName)}>
-          {value === v && <motion.span layoutId={layoutId} aria-hidden className="absolute inset-0 rounded-full bg-accent" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
+        <ToggleGroupItem key={v} value={v} className={cn("relative shrink-0 border-0 bg-transparent font-medium transition-colors", segmented ? "h-8 flex-1 rounded-[7px] px-3 text-[13px]" : "h-9 rounded-full px-4 text-sm", " hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground", itemClassName)}>
+          {value === v && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 bg-accent", segmented ? "rounded-[7px] bg-[#636366] shadow-[0_3px_8px_rgba(0,0,0,.4),0_1px_1px_rgba(0,0,0,.3)]" : "rounded-full")} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
           <span className="relative flex items-center">{l}</span>
         </ToggleGroupItem>
       ))}

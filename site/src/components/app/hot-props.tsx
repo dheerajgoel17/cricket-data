@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { BarChart3, Bookmark, CalendarDays } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
 import { bookLinesFor } from "@/engine/lines.js";
@@ -83,10 +84,11 @@ function Spark({ r }: { r: Row }) {
 }
 
 /** Phone row built from shadcn Item parts (props.cash list style): photo, name and line, then the hit rate over the last-10 bars and the edge. */
-function MobileRow({ r, win, wl, bars }: { r: Row; win: Win; wl: string; bars: boolean }) {
+function MobileRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
   return (
-    <li>
-      <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 active:bg-muted">
+    <motion.li className="relative after:absolute after:bottom-0 after:left-[68px] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 10, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(6px)" }}
+      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 8) * 0.03, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+      <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 transition-colors active:bg-card">
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
           <ItemMedia><PlayerBadge idx={r.idx} size="md" /></ItemMedia>
           <ItemContent className="min-w-0 gap-0.5">
@@ -105,7 +107,7 @@ function MobileRow({ r, win, wl, bars }: { r: Row; win: Win; wl: string; bars: b
           </ItemActions>
         </Link>
       </Item>
-    </li>
+    </motion.li>
   );
 }
 
@@ -149,17 +151,17 @@ export function HotProps() {
   return (
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-8 md:pt-10">
-        <div><h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1>
+        <div><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1>
           </div>
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
-        <PillGroup layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-fit sm:flex-none" itemClassName="flex-1 sm:flex-none" />
+        <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
+        <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-80 sm:flex-none" />
       </div>
       {tabs.length > 1 && (
         <div className="mt-2 flex items-center gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Choose day" className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", day !== "0" && "text-primary")}><CalendarDays className="size-[18px]" /></DropdownMenuTrigger>
+            <DropdownMenuTrigger aria-label="Choose day" className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", day !== "0" && "text-primary")}><CalendarDays className="size-[18px]" /></DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
               <DropdownMenuRadioGroup value={day} onValueChange={setDay}>
                 <DropdownMenuRadioItem value="0">Today</DropdownMenuRadioItem>
@@ -167,7 +169,7 @@ export function HotProps() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent"><Bookmark className="size-[18px]" />
+          <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent"><Bookmark className="size-[18px]" />
             {saved.list.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{saved.list.length}</span>}</Link>
           <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1 sm:w-fit sm:flex-none" />
         </div>
@@ -175,12 +177,14 @@ export function HotProps() {
       <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
         {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for this day yet. They appear a few hours before each match.</p> : (
           <>
-          <ul className="divide-y border-b sm:hidden">
-            {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} />)}
+          <ul className="sm:hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {rows.map((r, i) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} />)}
+            </AnimatePresence>
           </ul>
-          <TableProvider columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
+          <TableProvider key={`${win}-${stat}-${day}`} columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
             <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 text-[13px] font-medium text-muted-foreground" />}</TableHeaderGroup>}</TableHeader>
-            <TableBody>{({ row }) => <TableRow key={row.id} row={row} className="h-[62px]">{({ cell }) => <TableCell key={cell.id} cell={cell} />}</TableRow>}</TableBody>
+            <TableBody className="rows-stagger">{({ row }) => <TableRow key={row.id} row={row} className="h-[62px]">{({ cell }) => <TableCell key={cell.id} cell={cell} />}</TableRow>}</TableBody>
           </TableProvider>
           </>
         )}
