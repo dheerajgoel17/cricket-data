@@ -7,7 +7,7 @@ import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { lineVerdict, liveMarket } from "@/engine/live.js";
-import { fancyFor } from "@/engine/lines.js";
+import { bookName, fancyByLine, fancyFor } from "@/engine/lines.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -33,6 +33,9 @@ const report = marketReport as (store: any, ms: number[], key: string, line?: nu
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const teamReport = teamTotalReport as (store: any, ms: number[], team: number, key: string, line?: number | null) => any;
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null) => { line: number; over: number; under: number; source: string }[];
+type BookLine = { line: number; over: number; under: number; books: { over: number; under: number; source: string }[] };
+const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
+const names = (l?: BookLine) => (l ? l.books.map((b) => bookName(b.source)).join(" / ") : "");
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const edgeOf = (p: number | null, price: number) => (p != null && price > 1 ? p * price - 1 : null);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
@@ -73,7 +76,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const overview = useMemo(() => {
     if (!ms.length || !doc.data) return [];
     const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
-      const b = fancyLines(doc.data, fxInfo, k, team?.[0] ?? null)[0];
+      const b = byLine(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null))[0]; // the first line, at the best price any book offers
       if (!b) return [];
       const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line), s = rep.summary;
       if (!s.n) return [];
@@ -85,7 +88,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const book = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null)), [doc.data, fxInfo, key, team]);
+  const book = useMemo(() => (!key || key === "top_batter" ? [] : byLine(fancyLines(doc.data, fxInfo, key, team?.[0] ?? null))), [doc.data, fxInfo, key, team]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : book[0]?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
   const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, ms, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -97,7 +100,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
-  const bookHere = book.find((b) => b.line === line);
+  const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
   const open = (k: string) => { set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
 
   return (
@@ -164,7 +167,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                           <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
                           <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
                         </div>
-                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
+                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{names(b)} line {b.line}</Button>)}
                       </div>
                       <div className="grid grid-cols-2 gap-snug">
                         {(["over", "under"] as const).map((side) => {
@@ -175,7 +178,14 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                               <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                               <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
                               <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                              {bookHere && <div className="border-t border-white/10 pt-tight text-footnote">bet365 <b className="tabular-nums">{odds(bookHere[side])}</b></div>}
+                              {bookHere && (
+                                <div className="grid gap-hair border-t border-white/10 pt-tight text-footnote">
+                                  {bookHere.books.map((b) => (
+                                    <div key={b.source} className="flex items-baseline justify-between gap-tight">
+                                      <span className="truncate text-muted-foreground">{bookName(b.source)}</span>
+                                      <b className={cn("tabular-nums", bookHere.books.length > 1 && b[side] === bookHere[side] && "text-primary")}>{odds(b[side])}</b>
+                                    </div>))}
+                                </div>)}
                             </div>);
                         })}
                       </div>
@@ -188,7 +198,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
                           className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-inset py-snug text-left text-body transition-colors active:bg-accent">
                           {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b) => b.line === l.line) && <span className="rounded-full bg-primary/15 px-tight py-hair text-caption font-semibold text-primary">bet365</span>}</span>
+                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b) => b.line === l.line) && <span className="truncate rounded-full bg-primary/15 px-tight py-hair text-caption font-semibold text-primary">{names(book.find((b) => b.line === l.line))}</span>}</span>
                           <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
                           <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
                         </motion.button>))}
