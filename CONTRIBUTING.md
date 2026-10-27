@@ -15,7 +15,7 @@ VS Code / GitHub Codespaces: "Reopen in Container" and everything is installed (
 
 ## Adding a data source
 Implement `fetch(since) -> Iterable[MatchRecord]` (see `examples/example_source.py` and
-[docs/PROVISIONAL.md](docs/PROVISIONAL.md)). Provisional data must be verifiable against Cricsheet; it is
+[docs/PROVISIONAL.md](docs/PROVISIONAL.md)). Provisional data must be verifiable against Base; it is
 deleted automatically once the canonical match lands.
 
 ## Pull requests

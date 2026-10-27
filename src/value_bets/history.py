@@ -23,7 +23,7 @@ def repo_commit():
 
 
 def _read(kind, since=None, include_provisional=True):
-    """Monthly canonical CSVs plus provisional (scraped) matches Cricsheet has not published yet."""
+    """Monthly canonical CSVs plus provisional (scraped) matches Base has not published yet."""
     fs = sorted(glob.glob(str(config.DATA_REPO / "data" / kind / "*.csv.gz")))
     if since:
         fs = [f for f in fs if f.rsplit("/", 1)[-1] >= since]

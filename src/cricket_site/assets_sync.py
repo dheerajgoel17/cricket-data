@@ -1,12 +1,12 @@
-"""Keep our own copy of CREX player photos / team logos (Supabase Storage) plus the id maps (Postgres), so the site survives CREX
+"""Keep our own copy of Source A player photos / team logos (Supabase Storage) plus the id maps (Postgres), so the site survives Source A
 changing or removing them.
 
     python -m cricket_site.assets_sync --photos site/public/data/photos.json --index site/public/data/crex_index.json --url "$SUPABASE_URL"
 
 Needs the *service role* key in the environment (SUPABASE_SERVICE_KEY): a GitHub secret, never committed or printed. Runs resumably: only
 images we do not hold yet are downloaded (at most --limit per run, politely), uploaded to the public `avatars` bucket and recorded in
-`assets`. At the end photos.json gets `base` + `s` (which ids we hold) so the browser tries our copy first and CREX second.
-Everything is best effort: a CREX or network error skips that image, a bad key aborts without touching photos.json.
+`assets`. At the end photos.json gets `base` + `s` (which ids we hold) so the browser tries our copy first and Source A second.
+Everything is best effort: a Source A or network error skips that image, a bad key aborts without touching photos.json.
 """
 from __future__ import annotations
 
@@ -20,8 +20,9 @@ import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
-CREX_CDN = "https://cricketvectors.akamaized.net"
-UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"  # for CREX
+from cricket_data.hosts import host
+
+UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"  # for Source A
 API_UA = "cricket-props-hub-sync/0.1 (server)"  # Supabase rejects secret keys sent with a browser-like User-Agent
 MAX_BYTES = 200_000
 
@@ -69,8 +70,8 @@ def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
 
 
 def download(kind: str, cid: str, fetch=None) -> tuple[bytes, str] | None:
-    """One image from the CREX CDN, or None if it is missing / not an image / suspiciously large."""
-    url = f"{CREX_CDN}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"
+    """One image from the Source A CDN, or None if it is missing / not an image / suspiciously large."""
+    url = f"{host('IMG_CDN_BASE')}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA})
         with (fetch or urllib.request.urlopen)(req, timeout=30) as r:
@@ -87,7 +88,7 @@ def upload(base: str, key: str, kind: str, cid: str, body: bytes, ct: str, http=
     path = f"{'players' if kind == 'player' else 'teams'}/{cid}.png"
     http("POST", f"{base}/storage/v1/object/avatars/{path}", key, body, {"Content-Type": ct, "x-upsert": "true", "Cache-Control": "max-age=31536000"})
     return {"kind": kind, "ref": cid, "path": path, "content_type": ct, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(),
-            "source_url": f"{CREX_CDN}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"}
+            "source_url": f"{host('IMG_CDN_BASE')}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"}
 
 
 def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None:
@@ -125,7 +126,7 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
         return item, row
 
     pending_rows: list[dict] = []
-    with ThreadPoolExecutor(max_workers=workers) as ex:  # a few at a time: polite to CREX, ~8x faster than one by one
+    with ThreadPoolExecutor(max_workers=workers) as ex:  # a few at a time: polite to Source A, ~8x faster than one by one
         for (kind, cid), res in ex.map(work, todo):
             if res == "missing":
                 stats["missing_at_crex"] += 1
@@ -170,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
                 detail = f" body={exc.read(300).decode('utf-8', 'replace')!r}"
             except OSError:
                 pass
-        print(f"assets_sync: failed ({exc}){detail}; SUPABASE_SERVICE_KEY is {describe_key(key)}; the site keeps using CREX images", file=sys.stderr)
+        print(f"assets_sync: failed ({exc}){detail}; SUPABASE_SERVICE_KEY is {describe_key(key)}; the site keeps using Source A images", file=sys.stderr)
         return 0
     return 0
 

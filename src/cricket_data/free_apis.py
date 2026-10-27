@@ -6,15 +6,17 @@ No credit card required, just sign up for a free account.
 from __future__ import annotations
 
 import json
+from urllib.parse import urlparse
 from datetime import date, timedelta
 
+from .hosts import host
 from .models import MatchRecord
 from .polite import PoliteFetcher
 from .scrapers import ScraperError
 
 
 class CricketDataOrgScraper:
-    """Scrape using CricketData.org (formerly CricAPI) free tier.
+    """Scrape using Source D (formerly CricAPI) free tier.
     
     Free tier: 100 requests/day, no credit card required.
     Signup: https://cricketdata.org/
@@ -23,7 +25,9 @@ class CricketDataOrgScraper:
     """
     
     name = "cricketdata-org"
-    base_url = "https://api.cricapi.com/v1"
+    @property
+    def base_url(self) -> str:
+        return host("SRC_D_BASE")
     
     def __init__(self, api_key: str, fetcher: PoliteFetcher | None = None):
         self.api_key = api_key
@@ -63,7 +67,7 @@ class CricketDataOrgScraper:
             return [mid for mid in match_ids if mid]
         
         except Exception as exc:
-            raise ScraperError(f"CricketData.org API failed: {exc}") from exc
+            raise ScraperError(f"Source D API failed: {exc}") from exc
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch match details."""
@@ -117,16 +121,18 @@ class CricketDataOrgScraper:
 
 
 class RapidAPICricketScraper:
-    """Scrape using RapidAPI Cricket API (if free tier available).
+    """Scrape using Source E Cricket API (if free tier available).
     
-    Check https://rapidapi.com/hub for cricket APIs with free tiers.
+    Look for cricket APIs with free tiers on the provider's hub.
     Most require signup but no credit card for basic tier.
     
     Set environment variable: RAPIDAPI_CRICKET_KEY
     """
     
     name = "rapidapi-cricket"
-    base_url = "https://cricket-live-data.p.rapidapi.com"
+    @property
+    def base_url(self) -> str:
+        return host("SRC_E_BASE")
     
     def __init__(self, api_key: str, fetcher: PoliteFetcher | None = None):
         self.api_key = api_key
@@ -135,15 +141,15 @@ class RapidAPICricketScraper:
     def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
         """Get recently completed matches."""
         try:
-            # This is a placeholder - actual endpoint depends on which RapidAPI you use
+            # This is a placeholder - actual endpoint depends on which Source E you use
             # Example: cricket-live-data API
             url = f"{self.base_url}/fixtures"
             
-            # RapidAPI requires special headers
+            # Source E requires special headers
             import urllib.request
             req = urllib.request.Request(url)
             req.add_header("X-RapidAPI-Key", self.api_key)
-            req.add_header("X-RapidAPI-Host", "cricket-live-data.p.rapidapi.com")
+            req.add_header("X-RapidAPI-Host", urlparse(self.base_url).netloc)
             
             with urllib.request.urlopen(req, timeout=30) as response:
                 data = response.read().decode('utf-8')
@@ -159,9 +165,9 @@ class RapidAPICricketScraper:
             return [mid for mid in match_ids if mid]
         
         except Exception as exc:
-            raise ScraperError(f"RapidAPI Cricket failed: {exc}") from exc
+            raise ScraperError(f"Source E Cricket failed: {exc}") from exc
     
     def fetch_match(self, match_id: str) -> MatchRecord | None:
         """Fetch match details."""
-        # Placeholder - implement based on actual RapidAPI endpoint
+        # Placeholder - implement based on actual Source E endpoint
         return None

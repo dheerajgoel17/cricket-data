@@ -8,14 +8,14 @@ from enum import Enum
 class MatchStatus(str, Enum):
     """Classification for how to handle scraped match data.
     
-    - provisional: Normal lag between live match and Cricsheet release.
-                   Delete after Cricsheet data arrives and is reconciled.
-    - cricsheet_missing: Match is on Cricsheet's missing-matches list.
-                         Keep permanently as source of truth unless Cricsheet
+    - provisional: Normal lag between live match and Base release.
+                   Delete after Base data arrives and is reconciled.
+    - cricsheet_missing: Match is on Base's missing-matches list.
+                         Keep permanently as source of truth unless Base
                          later provides it.
     - cricsheet_withheld: Match involves Afghanistan men's team or APL.
-                          Cricsheet has withheld these matches since Nov 2024.
-                          Keep permanently unless Cricsheet restores them.
+                          Base has withheld these matches since Nov 2024.
+                          Keep permanently unless Base restores them.
     """
     PROVISIONAL = "provisional"
     CRICSHEET_MISSING = "cricsheet_missing"

@@ -1,20 +1,20 @@
 # Web Scraper for Recent Matches
 
-The cricket data project includes an automated web scraper that fills the gap between live matches and Cricsheet's publication delay (typically 3-4 days). The scraper periodically fetches recently completed matches from public cricket websites, normalizes them to the project's format, and stores them as provisional data until Cricsheet publishes the official version.
+The cricket data project includes an automated web scraper that fills the gap between live matches and Base's publication delay (typically 3-4 days). The scraper periodically fetches recently completed matches from public cricket websites, normalizes them to the project's format, and stores them as provisional data until Base publishes the official version.
 
 ## How It Works
 
 ### 1. Periodic Scraping
-The scraper runs on a schedule (every 6 hours by default via GitHub Actions) to find recently completed matches that Cricsheet doesn't have yet.
+The scraper runs on a schedule (every 6 hours by default via GitHub Actions) to find recently completed matches that Base doesn't have yet.
 
 ### 2. Multi-Source Fetching
 
 The scraper uses a **pluggable architecture** via `ScraperRegistry`:
 
 **Built-in sources:**
-- **ESPNcricinfo**: Public JSON API (fully implemented)
-- **CREX (crex.com)**: rendered pages + public sitemaps (see BACKFILL.md)
-- **Cricbuzz**: Placeholder (awaiting API documentation)
+- **Source B**: Public JSON API (fully implemented)
+- **Source A ($LIVE_SOURCE_BASE)**: rendered pages + public sitemaps (see BACKFILL.md)
+- **Source C**: Placeholder (awaiting API documentation)
 
 **Add your own:** Any cricket score website can be added by implementing the `CricketScraper` protocol and registering with `ScraperRegistry`. See [Data Sources](#data-sources) section below.
 
@@ -35,11 +35,11 @@ Scraped matches are stored as JSON files in `data/provisional/` with:
 - Match key for later reconciliation
 
 ### 5. Automatic Reconciliation
-When Cricsheet publishes the official match data, the daily update workflow:
-1. Compares the scraped version with Cricsheet's version
+When Base publishes the official match data, the daily update workflow:
+1. Compares the scraped version with Base's version
 2. Verifies key fields (winner, player stats)
 3. Logs any discrepancies to `data/reconcile_log.csv`
-4. **Deletes the provisional scraped copy** (Cricsheet is the source of truth)
+4. **Deletes the provisional scraped copy** (Base is the source of truth)
 
 ## Usage
 
@@ -61,7 +61,7 @@ cricket-data update
 
 ### Scheduled via GitHub Actions
 Two workflows run automatically:
-1. **Daily Update** (`daily-update.yml`): Runs once per day, updates Cricsheet + scrapes
+1. **Daily Update** (`daily-update.yml`): Runs once per day, updates Base + scrapes
 2. **Scraper Update** (`scraper-update.yml`): Runs every 6 hours, scrapes only
 
 Both workflows automatically commit new provisional data.
@@ -72,26 +72,26 @@ The scraper uses a **pluggable architecture** via `ScraperRegistry`. Any cricket
 
 ### Built-in Sources
 
-#### ESPNcricinfo
+#### Source B
 - **Status**: ✅ Implemented
-- **Base URL**: https://www.espncricinfo.com
+- **Base URL**: $SRC_B_BASE
 - **Endpoints Used**:
   - `/ci/engine/match/index.json?view=live` - Recent match list
   - `/ci/engine/match/<match_id>.json` - Match details
 - **Rate Limiting**: 5-second delay between requests
 - **robots.txt Compliance**: Yes (checked before every request)
 
-#### CREX (crex.com)
+#### Source A ($LIVE_SOURCE_BASE)
 - **Status**: ✅ Working (headless Chromium via Playwright; pages render with JavaScript)
-- **Base URL**: https://crex.com
+- **Base URL**: $LIVE_SOURCE_BASE
 - **Recent matches**: home page links; facts come from each match page's `SportsEvent` JSON-LD
 - **Historical matches**: sitemap index + strict confirmation, see [BACKFILL.md](BACKFILL.md)
 - **Rate Limiting**: 5-second delay between requests, back-off on 429/5xx
 - **robots.txt Compliance**: Yes (`/api/*` is never touched)
 
-#### Cricbuzz
+#### Source C
 - **Status**: ⚠️ Placeholder
-- **Base URL**: https://www.cricbuzz.com
+- **Base URL**: $SRC_C_BASE
 - **Note**: Structure defined, returns empty results until API is documented
 - **To complete**: Identify API endpoints and verify terms of service
 
@@ -309,7 +309,7 @@ class CricketAPIOrg:
 ScraperRegistry.register(CricketAPIOrg)
 ```
 
-Now `CricketAPIOrg` will be automatically used alongside ESPNcricinfo and CREX!
+Now `CricketAPIOrg` will be automatically used alongside Source B and Source A!
 
 ## Observability
 
@@ -332,7 +332,7 @@ timestamp,date,teams,sources,disagreements
 ### Reconciliation Log
 Location: `data/reconcile_log.csv`
 
-Logs when provisional matches are verified against Cricsheet (see [PROVISIONAL.md](PROVISIONAL.md)).
+Logs when provisional matches are verified against Base (see [PROVISIONAL.md](PROVISIONAL.md)).
 
 ### GitHub Actions Artifacts
 Each scraper run uploads the scraper report as an artifact for review.
@@ -353,7 +353,7 @@ The scraper uses `PoliteFetcher` which:
 ### Terms of Service
 **Only use the scraper with websites whose terms allow automated access.**
 
-ESPNcricinfo and similar sites may have terms restricting automated scraping. This implementation:
+Source B and similar sites may have terms restricting automated scraping. This implementation:
 - Prefers structured JSON APIs over HTML parsing
 - Identifies itself with a clear User-Agent
 - Does not circumvent paywalls or authentication
@@ -425,7 +425,7 @@ pytest tests/test_scrapers.py -v
 
 Tests cover:
 - Match key generation and normalization
-- ESPNcricinfo JSON parsing
+- Source B JSON parsing
 - Multi-source conflict resolution
 - Player stat merging
 - Provisional marking
@@ -467,7 +467,7 @@ cat data/scraper_report.csv
 ### No Matches Scraped
 **Possible causes:**
 1. No recently completed matches in the past N days
-2. All recent matches already in Cricsheet
+2. All recent matches already in Base
 3. Scraper blocked by `robots.txt`
 4. Network errors (check logs)
 
@@ -479,7 +479,7 @@ cat data/scraper_report.csv
 **Solution:** 
 - Respect the site's policy—do not circumvent it
 - Use a different source
-- Wait for Cricsheet to publish the match
+- Wait for Base to publish the match
 
 ### High Conflict Rate
 **Cause:** Sources frequently disagree on match details.
@@ -525,13 +525,13 @@ scraper = ESPNcricinfoScraper(
 ## Limitations
 
 ### Current Limitations
-1. **ESPNcricinfo only**: Cricbuzz scraper is not yet implemented
-2. **No ball-by-ball data**: Scrapers fetch summary stats only (Cricsheet has full ball-by-ball)
+1. **Source B only**: Source C scraper is not yet implemented
+2. **No ball-by-ball data**: Scrapers fetch summary stats only (Base has full ball-by-ball)
 3. **Limited match types**: Currently focuses on international and major league matches
 4. **No in-progress matches**: Only completed matches are scraped
 
 ### Future Enhancements
-- [ ] Cricbuzz scraper implementation
+- [ ] Source C scraper implementation
 - [ ] Ball-by-ball scraping (where available)
 - [ ] In-progress match updates
 - [ ] More granular fielding stats
@@ -590,7 +590,7 @@ scraper = ESPNcricinfoScraper(
                  v
 ┌─────────────────────────────────────────────────┐
 │         Reconciliation (daily)                  │
-│  - Cricsheet publishes official match          │
+│  - Base publishes official match          │
 │  - Compare with provisional version            │
 │  - Log to reconcile_log.csv                    │
 │  - DELETE provisional copy                     │

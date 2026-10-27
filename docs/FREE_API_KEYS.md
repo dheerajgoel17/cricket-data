@@ -4,7 +4,7 @@ This document lists all free cricket APIs that require signup (no credit card ne
 
 ## Required Free API Keys
 
-### 1. CricketData.org (formerly CricAPI)
+### 1. Source D (formerly CricAPI)
 **Tier:** Free - 100 requests/day  
 **Signup:** https://cricketdata.org/  
 **Cost:** Free forever, no credit card required  
@@ -23,22 +23,22 @@ gh secret set CRICKETDATA_API_KEY
 # Paste your key when prompted
 ```
 
-### 2. RapidAPI Cricket (Optional)
+### 2. Source E Cricket (Optional)
 **Tier:** Free tier available (limits vary by provider)  
-**Signup:** https://rapidapi.com/hub  
+**Signup:** the provider's site/hub  
 **Search for:** "cricket" APIs with free tiers  
 **Setup:**
-1. Go to https://rapidapi.com/
+1. Go to the provider's site/
 2. Create free account
 3. Search for "cricket" in API marketplace
 4. Find API with free tier (e.g., "Cricket Live Data")
 5. Subscribe to free plan
-6. Copy your RapidAPI key
+6. Copy your Source E key
 7. Add to GitHub Actions secrets:
    - Secret name: `RAPIDAPI_CRICKET_KEY`
-   - Value: Your RapidAPI key
+   - Value: Your Source E key
 
-**Note:** RapidAPI has many cricket APIs - choose one with a genuine free tier.
+**Note:** Source E has many cricket APIs - choose one with a genuine free tier.
 
 ## Local Development
 
@@ -60,29 +60,29 @@ cricket-data update --enable-scraper
 ## Without API Keys
 
 The scraper will work without keys but with limitations:
-- **CREX**: Works (uses Playwright headless browser)
-- **CricketData.org**: Skipped (requires key)
-- **RapidAPI Cricket**: Skipped (requires key)
-- **ESPNcricinfo HTML**: Blocked (robots.txt)
-- **CREX pages** (`crex.com/schedule`, match page, `/match-scorecard`; used by `/api/live`): no key; unofficial; ~15 s cache on the site. Not a licence to republish commercially. `crex.com` robots Allow; we do not call `/api/*`. ESPN's cricket JSON is not used (its match cards trailed its own header).
-- **Cricbuzz**: Blocked (robots.txt)
+- **Source A**: Works (uses Playwright headless browser)
+- **Source D**: Skipped (requires key)
+- **Source E Cricket**: Skipped (requires key)
+- **Source B HTML**: Blocked (robots.txt)
+- **Source A pages** (the schedule page, match page, `/match-scorecard`; used by `/api/live`): no key; unofficial; ~15 s cache on the site. Not a licence to republish commercially. `$LIVE_SOURCE_BASE` robots Allow; we do not call `/api/*`. Source B's cricket JSON is not used (its match cards trailed its own header).
+- **Source C**: Blocked (robots.txt)
 
-With just CREX (no keys needed), you get some matches.  
-With CricketData.org key (free), you get reliable match data.
+With just Source A (no keys needed), you get some matches.  
+With Source D key (free), you get reliable match data.
 
 ## API Limits & Best Practices
 
-### CricketData.org
+### Source D
 - **Limit:** 100 requests/day
 - **Strategy:** 
   - Check current matches once every 6 hours (4 requests/day)
   - Fetch match details for new matches only
   - Stay well under limit
 
-### RapidAPI Cricket
+### Source E Cricket
 - **Limit:** Varies (typically 100-500/day on free tier)
 - **Strategy:**
-  - Use as backup to CricketData.org
+  - Use as backup to Source D
   - Cache results
   - Check docs for specific limits
 
@@ -91,8 +91,8 @@ With CricketData.org key (free), you get reliable match data.
 Test your keys:
 
 ```bash
-# Test CricketData.org
-curl "https://api.cricapi.com/v1/currentMatches?apikey=YOUR_KEY&offset=0"
+# Test Source D
+curl "$SRC_D_BASE/v1/currentMatches?apikey=YOUR_KEY&offset=0"
 
 # Should return JSON with match data
 ```
@@ -119,22 +119,22 @@ curl "https://api.cricapi.com/v1/currentMatches?apikey=YOUR_KEY&offset=0"
 
 | Source | Cost | Signup | Credit Card | Daily Limit |
 |--------|------|--------|-------------|-------------|
-| CREX | Free | No | No | Unlimited* |
-| CricketData.org | Free | Yes | No | 100 req/day |
-| RapidAPI Cricket | Free | Yes | No | Varies |
-| ESPNcricinfo HTML | N/A | N/A | N/A | Blocked |
-| CREX pages (HTML) | Free | No | No | Unofficial; site live scores |
-| Cricbuzz | N/A | N/A | N/A | Blocked |
+| Source A | Free | No | No | Unlimited* |
+| Source D | Free | Yes | No | 100 req/day |
+| Source E Cricket | Free | Yes | No | Varies |
+| Source B HTML | N/A | N/A | N/A | Blocked |
+| Source A pages (HTML) | Free | No | No | Unofficial; site live scores |
+| Source C | N/A | N/A | N/A | Blocked |
 
 *Subject to rate limiting and polite delay (5 seconds between requests)
 
 ## Recommended Setup
 
 **Minimum** (Free, works today):
-- No keys: CREX only (some matches)
+- No keys: Source A only (some matches)
 
 **Recommended** (Free, 5 minutes setup):
-- CricketData.org key: Reliable match data
+- Source D key: Reliable match data
 
 **Maximum** (Free, 10 minutes setup):
-- CricketData.org + RapidAPI: Multiple sources, conflict resolution
+- Source D + Source E: Multiple sources, conflict resolution

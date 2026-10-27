@@ -43,7 +43,7 @@ def test_match_key_same_for_reversed_teams():
 
 @pytest.fixture
 def espn_match_json():
-    """Fixture: ESPNcricinfo match JSON response."""
+    """Fixture: Source B match JSON response."""
     return {
         "match": {
             "info": {
@@ -127,7 +127,7 @@ def espn_match_json():
 
 @pytest.fixture
 def espn_match_list_json():
-    """Fixture: ESPNcricinfo match list JSON."""
+    """Fixture: Source B match list JSON."""
     return {
         "matches": [
             {

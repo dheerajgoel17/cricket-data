@@ -1,6 +1,6 @@
-"""Canary checks that say *which layer* of the CREX scraper broke, and save what the site returned.
+"""Canary checks that say *which layer* of the Source A scraper broke, and save what the site returned.
 
-CREX changes its pages from time to time. Each check exercises one assumption the scraper makes
+Source A changes its pages from time to time. Each check exercises one assumption the scraper makes
 and, on failure, writes the raw HTML/text it saw to ``diagnostics/`` so a human or repair agent
 can fix the parser against the real page (and turn it into a new test fixture) without guessing.
 
@@ -18,7 +18,7 @@ from datetime import date
 from pathlib import Path
 
 from .crex_lookup import parse_match_page
-from .crex_sitemap import BASE, MATCH_SITEMAP, SERIES_SITEMAP, parse_match_sitemap, parse_series_sitemap
+from .crex_sitemap import base, match_sitemap, parse_match_sitemap, parse_series_sitemap, series_sitemap
 
 # India v Afghanistan, 1st T20I, Mohali, 2024-01-11: a finished match that will never change.
 CANARY_SLUG = "afg-vs-ind-1st-t20-afghanistan-tour-of-india-2024-match-updates-LR3"
@@ -45,8 +45,8 @@ def run_checks(browser, fetcher, out_dir: Path) -> list[CheckResult]:
     res: list[CheckResult] = []
 
     for name, url, parse, minimum in (
-        ("sitemap_matches", MATCH_SITEMAP, parse_match_sitemap, MIN_MATCHES),
-        ("sitemap_series", SERIES_SITEMAP, parse_series_sitemap, MIN_SERIES),
+        ("sitemap_matches", match_sitemap(), parse_match_sitemap, MIN_MATCHES),
+        ("sitemap_series", series_sitemap(), parse_series_sitemap, MIN_SERIES),
     ):
         try:
             xml = fetcher.get(url)
@@ -59,7 +59,7 @@ def run_checks(browser, fetcher, out_dir: Path) -> list[CheckResult]:
             res.append(CheckResult(name, False, f"{type(exc).__name__}: {exc}",
                                    hint="sitemap unreachable or blocked by robots.txt"))
 
-    url = f"{BASE}/cricket-live-score/{CANARY_SLUG}"
+    url = f"{base()}/cricket-live-score/{CANARY_SLUG}"
     try:
         page = browser.render(url, wait_selector="script#sports-event-schema")
         facts = parse_match_page(page.html, page.text, page.title, url) if page.status < 400 else None
@@ -82,7 +82,7 @@ def run_checks(browser, fetcher, out_dir: Path) -> list[CheckResult]:
                                "crex_lookup.py, then save the new page as a tests/fixtures/crex fixture"))
     except Exception as exc:
         res.append(CheckResult("match_page", False, f"{type(exc).__name__}: {exc}",
-                               hint="browser could not render CREX (Chromium install, block, or outage)"))
+                               hint="browser could not render Source A (Chromium install, block, or outage)"))
 
     try:  # the Chromium fallback must keep working even though plain HTTP is tried first
         page = browser.render(url, wait_selector="script#sports-event-schema", force_browser=True)
@@ -96,7 +96,7 @@ def run_checks(browser, fetcher, out_dir: Path) -> list[CheckResult]:
                                hint="Chromium could not start: check the Playwright install step"))
 
     try:
-        page, links = browser.links(BASE, "/cricket-live-score/")
+        page, links = browser.links(base(), "/cricket-live-score/")
         ok = len(links) > 0
         res.append(CheckResult("homepage_links", ok, f"{len(links)} match links",
                                "" if ok else _save(out_dir, "homepage.html", page.html),

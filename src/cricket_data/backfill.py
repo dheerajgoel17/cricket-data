@@ -1,18 +1,18 @@
-"""Incremental backfill of matches Cricsheet will never have, from CREX.
+"""Incremental backfill of matches Base will never have, from Source A.
 
 Two kinds of task live in one persistent queue (``data/state/backfill_queue.json``):
 
-* ``cricsheet_missing``: every match on https://cricsheet.org/missing/;
-* ``cricsheet_withheld``: Afghanistan men's matches, enumerated from CREX's own sitemap.
+* ``cricsheet_missing``: every match on $BASE_DATA_URL/missing/;
+* ``cricsheet_withheld``: Afghanistan men's matches, enumerated from Source A's own sitemap.
 
 Each run takes a small batch, looks every task up with ``crex_lookup.find_match`` (strict date /
 team / format confirmation on the rendered page) and saves what it finds. The outcome of a task is
 always one of:
 
 * ``done``: the match was found, confirmed and **written to disk**;
-* ``not_found``: CREX was checked (candidates rendered and rejected, or none plausible in the
+* ``not_found``: Source A was checked (candidates rendered and rejected, or none plausible in the
   sitemap) and the reason is recorded; it is never retried;
-* ``already_in_cricsheet``: Cricsheet now has the match, nothing to scrape;
+* ``already_in_cricsheet``: Base now has the match, nothing to scrape;
 * ``failed``: network/render trouble; retried up to ``max_retries`` times, then parked.
 """
 from __future__ import annotations
@@ -36,11 +36,12 @@ from .crex_lookup import (
     parse_match_page,
 )
 from .crex_sitemap import CREXSitemapIndex, MatchEntry
+from .hosts import rel
 from .permanent_matches import MissingMatch, fetch_cricsheet_missing_matches
 
 Category = Literal["cricsheet_missing", "cricsheet_withheld"]
 
-# Competition slugs CREX would use for the Afghanistan Premier League (none exist in its sitemap today).
+# Competition slugs Source A would use for the Afghanistan Premier League (none exist in its sitemap today).
 WITHHELD_COMPETITION_PATTERN = re.compile(r"afghanistan-premier-league")
 
 
@@ -56,7 +57,7 @@ class BackfillTask:
     attempts: int = 0
     last_attempt: str | None = None
     last_error: str | None = None
-    crex_url: str | None = None  # known CREX page (Afghanistan tasks come from the sitemap)
+    crex_url: str | None = None  # known Source A page (Afghanistan tasks come from the sitemap)
     rejected_ids: list[str] = field(default_factory=list)  # candidate pages already ruled out
 
     def key(self) -> str:
@@ -124,7 +125,7 @@ class BackfillQueue:
         path.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
     def _drop_unsourced_withheld(self) -> None:
-        """Withheld tasks must come from the CREX sitemap (they carry a crex_url); older hand-typed
+        """Withheld tasks must come from the Source A sitemap (they carry a crex_url); older hand-typed
         ones do not and are discarded so they get re-derived."""
         self.pending = [t for t in self.pending if not (t.category == "cricsheet_withheld" and not t.crex_url)]
         self.in_progress = [t for t in self.in_progress if not (t.category == "cricsheet_withheld" and not t.crex_url)]
@@ -251,7 +252,7 @@ def _nation_name(code: str) -> str | None:
 
 def enumerate_afghanistan_matches(queue: BackfillQueue, index: CREXSitemapIndex,
                                   today: date | None = None) -> dict[str, int]:
-    """Queue every finished Afghanistan men's match listed in CREX's match sitemap.
+    """Queue every finished Afghanistan men's match listed in Source A's match sitemap.
 
     Nothing is hard-coded: opponents, dates and URLs all come from the sitemap, and the page is
     re-confirmed when the task is processed. Matches whose opponent is not a known national side
@@ -277,17 +278,17 @@ def enumerate_afghanistan_matches(queue: BackfillQueue, index: CREXSitemapIndex,
         # blank so the lookup does not guess (and then reject the right page for a guessed format)
         match_type = {"T20": "T20I", "ODI": "ODI", "Test": "Test"}.get(e.format_hint or "", "")
         task = BackfillTask(date=d.isoformat(), team_a="Afghanistan", team_b=opp, match_type=match_type,
-                            gender="male", category="cricsheet_withheld", crex_url=e.url)
+                            gender="male", category="cricsheet_withheld", crex_url=rel(e.url))
         stats["queued"] += int(queue.add_task(task))
     queue.afghanistan_enumerated_at = datetime.now().isoformat(timespec="seconds")
     return stats
 
 
 def initialize_backfill_queue(queue_path: Path, verbose: bool = True) -> BackfillQueue:
-    """Load the queue and top it up from Cricsheet's missing list (adds only new matches)."""
+    """Load the queue and top it up from Base's missing list (adds only new matches)."""
     queue = BackfillQueue.load(queue_path)
     if verbose:
-        print("Fetching Cricsheet missing-matches list for backfill...")
+        print("Fetching Base missing-matches list for backfill...")
     missing = fetch_cricsheet_missing_matches()
     if missing:
         added = queue.initialize_from_missing_list(missing)
@@ -299,12 +300,12 @@ def initialize_backfill_queue(queue_path: Path, verbose: bool = True) -> Backfil
 
 # ---- processing ----------------------------------------------------------------------------------
 def _lookup(task: BackfillTask, index: CREXSitemapIndex, browser) -> LookupResult:
-    """Strictly look the task up on CREX (Afghanistan tasks start from their sitemap URL)."""
+    """Strictly look the task up on Source A (Afghanistan tasks start from their sitemap URL)."""
     if task.crex_url:
         slug = task.crex_url.rsplit("/cricket-live-score/", 1)[-1]
         entry = index.by_slug(slug)
         if entry is None:
-            return LookupResult("not_found", reason=f"{slug} is no longer in the CREX sitemap")
+            return LookupResult("not_found", reason=f"{slug} is no longer in the Source A sitemap")
         try:
             page = browser.render(entry.url, wait_selector="script#sports-event-schema")
         except Exception as exc:
@@ -338,9 +339,9 @@ def process_backfill_batch(
     sleep: Callable[[float], None] = time.sleep,
     max_cheap: int = 400,
 ) -> dict:
-    """Process up to ``queue.batch_size`` tasks that need a CREX page render.
+    """Process up to ``queue.batch_size`` tasks that need a Source A page render.
 
-    Tasks the sitemap alone can rule out (nothing plausible on that date) or that Cricsheet already
+    Tasks the sitemap alone can rule out (nothing plausible on that date) or that Base already
     has cost no page load and do not count towards the batch size (at most ``max_cheap`` per run).
     Returns counts plus ``saved``: one line per match actually written.
     """
@@ -360,7 +361,7 @@ def process_backfill_batch(
             stats["already_in_cricsheet"] += 1
             cheap += 1
             if verbose:
-                print(f"  {label}: already in Cricsheet as {canon}")
+                print(f"  {label}: already in Base as {canon}")
             continue
 
         if not first_render:
@@ -376,12 +377,12 @@ def process_backfill_batch(
         if result.status == "found":
             rec = fetch_record(browser, result.entry, result.facts, task.date, task.match_type, task.category)
             write_provisional(store, rec)
-            queue.mark_done(task, rec.match_id, result.entry.url)
+            queue.mark_done(task, rec.match_id, rel(result.entry.url))
             stats["succeeded"] += 1
             line = f"{task.date} {rec.team_a} v {rec.team_b}: {rec.result_margin or rec.result or 'no result recorded'}"
             stats["saved"].append({"date": task.date, "teams": f"{rec.team_a} v {rec.team_b}",
                                    "result": rec.result_margin or rec.result, "match_id": rec.match_id,
-                                   "category": task.category, "url": result.entry.url})
+                                   "category": task.category, "url": rel(result.entry.url)})
             if verbose:
                 print(f"  {label}: SAVED {line}")
         elif result.status == "not_found":

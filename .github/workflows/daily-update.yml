@@ -3,8 +3,18 @@ name: Daily update
 # Zero cost: public-repo Actions minutes are free, no secrets, no external services.
 on:
   schedule:
-    - cron: "30 5 * * *" # Cricsheet publishes overnight UTC
+    - cron: "30 5 * * *" # Base publishes overnight UTC
   workflow_dispatch:
+
+# Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
+env:
+  LIVE_SOURCE_BASE: ${{ secrets.LIVE_SOURCE_BASE }}
+  LIVE_SITEMAP_DIR: ${{ secrets.LIVE_SITEMAP_DIR }}
+  IMG_CDN_BASE: ${{ secrets.IMG_CDN_BASE }}
+  VITE_IMG_CDN: ${{ secrets.IMG_CDN_BASE }}
+  BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
 
 permissions:
   contents: write
@@ -25,9 +35,9 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: pip install -e .
-      - name: Update (Cricsheet delta + inbox/extra sources + reconcile; scraping runs in scraper-update.yml)
+      - name: Update (Base delta + inbox/extra sources + reconcile; scraping runs in scraper-update.yml)
         run: cricket-data update
-      - name: Freshness check (canonical Cricsheet data <= 3 days old)
+      - name: Freshness check (canonical Base data <= 3 days old)
         id: freshness
         continue-on-error: true
         run: cricket-data freshness --max-age-days 3
@@ -45,7 +55,7 @@ jobs:
             git commit -m "data: daily update $(date -u +%F)"
             git pull --rebase -q && git push
           fi
-      - name: Open an issue if Cricsheet data is stale
+      - name: Open an issue if Base data is stale
         if: steps.freshness.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -54,7 +64,7 @@ jobs:
           echo "::warning::$MSG"
           if [ -z "$(gh issue list --label data-stale --state open --json number -q '.[0].number')" ]; then
             gh label create data-stale --color FBCA04 2>/dev/null || true
-            gh issue create --label data-stale --title "Cricsheet data is stale (>3 days)" \
+            gh issue create --label data-stale --title "Base data is stale (>3 days)" \
               --body "$MSG. Provisional (scraped) matches are still read by query/value-bets. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           fi
       - name: Open an issue if the update failed

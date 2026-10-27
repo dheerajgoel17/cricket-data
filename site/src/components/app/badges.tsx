@@ -34,14 +34,14 @@ const Circle = ({ size, className, children, title }: { size: BadgeSize; classNa
   <span title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-bold text-muted-foreground", SIZES[size], className)}>{children}</span>
 );
 
-/** Round team badge: CREX logo when we know the team, else a flag, else initials. */
+/** Round team badge: Source A logo when we know the team, else a flag, else initials. */
 export function TeamBadge({ name, size = "sm", className, eager }: { name: string; size?: BadgeSize; className?: string; eager?: boolean }) {
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
   return <Circle size={size} className={cn("border-0 bg-transparent", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
 }
 
-/** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the CREX logo, else the initials; the name goes in the tooltip. */
+/** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the Source A logo, else the initials; the name goes in the tooltip. */
 export function TeamFlag({ name, className }: { name: string; className?: string }) {
   const { photos } = useData();
   const flag = flagUrl(name, 80);

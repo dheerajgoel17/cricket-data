@@ -18,8 +18,8 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | Player moved clubs | each team's fixtures only from his first to last appearance there | per-team span |
 | Player active in Tests but not T20 any more | no run of T20 DNPs | "active" is judged on his last innings **in the same format** (120 days) |
 | Player retired / long inactive | later fixtures not blamed on him | same 120-day rule |
-| Two matches between the same sides on consecutive days | both kept | a scraped game one day off a Cricsheet game is a duplicate only if the batter-run totals match |
-| Same fixture in Cricsheet and scraped | Cricsheet wins | deduped on teams + date (+/-1 day) |
+| Two matches between the same sides on consecutive days | both kept | a scraped game one day off a Base game is a duplicate only if the batter-run totals match |
+| Same fixture in Base and scraped | Base wins | deduped on teams + date (+/-1 day) |
 | The Hundred | its own format | never mixed with T20 |
 | First-class (MDM) | not included | not a Test |
 

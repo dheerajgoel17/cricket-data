@@ -11,6 +11,7 @@ from pathlib import Path
 
 from . import __version__
 from .cricsheet import download, iter_zip
+from .hosts import host
 from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .polite import PoliteFetcher
 from .provisional import find_canonical, load_provisional, reconcile, write_provisional
@@ -48,7 +49,7 @@ def _ingest_zip(store: Store, zip_path: Path) -> dict[str, int]:
 
 
 def _run_backfill(a: argparse.Namespace, store: Store, browser) -> None:
-    """One backfill batch: top up the queue, look matches up on CREX, save what is confirmed."""
+    """One backfill batch: top up the queue, look matches up on Source A, save what is confirmed."""
     import json as json_mod
 
     from .backfill import enumerate_afghanistan_matches, initialize_backfill_queue, process_backfill_batch
@@ -59,7 +60,7 @@ def _run_backfill(a: argparse.Namespace, store: Store, browser) -> None:
     index = CREXSitemapIndex(cache_path=Path(".cache") / "crex_index.json")
     index.load()
     afg = enumerate_afghanistan_matches(queue, index)
-    print(f"afghanistan: {afg['seen']} men's matches in CREX sitemap, {afg['queued']} newly queued")
+    print(f"afghanistan: {afg['seen']} men's matches in Source A sitemap, {afg['queued']} newly queued")
     queue.batch_size = a.backfill_batch_size
     if a.backfill_priority:
         n = queue.prioritize(a.backfill_priority.split(","))
@@ -68,7 +69,7 @@ def _run_backfill(a: argparse.Namespace, store: Store, browser) -> None:
     queue.save(queue_path)
     qs = queue.stats()
     print(f"backfill: {stats['succeeded']} saved, {stats['not_found']} not found, {stats['failed']} failed, "
-          f"{stats['already_in_cricsheet']} already in Cricsheet; queue {qs}")
+          f"{stats['already_in_cricsheet']} already in Base; queue {qs}")
     out = store.root / "state" / "last_backfill.json"
     out.write_text(json_mod.dumps({
         "ran_at": datetime.now().isoformat(timespec="seconds"), "batch": {k: v for k, v in stats.items()},
@@ -120,7 +121,7 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
         
         try:
             for rec in src.fetch(since):
-                if find_canonical(store, rec) is None:  # skip anything Cricsheet already has
+                if find_canonical(store, rec) is None:  # skip anything Base already has
                     write_provisional(store, rec)
                     added += 1
             
@@ -172,7 +173,7 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     print(f"reconcile: {rstats}")
     print(f"link-players: {link_players(store)}")
     if rstats["mismatched"]:
-        print("warning: provisional data disagreed with Cricsheet; see reconcile_log.csv", file=sys.stderr)
+        print("warning: provisional data disagreed with Base; see reconcile_log.csv", file=sys.stderr)
     
     # Process a backfill batch (after recent matches, low priority); shares the one browser session
     if a.enable_scraper and a.backfill_batch_size > 0:
@@ -201,17 +202,17 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
 
 
 def cmd_crex_balls(a: argparse.Namespace) -> int:
-    """Ball-by-ball for CREX matches into data/balls/ (only matches that reconcile with the scorecard)."""
+    """Ball-by-ball for Source A matches into data/balls/ (only matches that reconcile with the scorecard)."""
     import json as json_mod
 
     from .crex_balls import collect
     from .crex_browser import CREXBrowser
 
     store = Store(a.data_dir)
-    if a.prune:  # a match's provisional file is deleted once Cricsheet publishes it: its CREX deliveries go with it
+    if a.prune:  # a match's provisional file is deleted once Base publishes it: its Source A deliveries go with it
         live = {json_mod.loads(f.read_text(encoding="utf-8"))["match_id"] for f in (store.root / "provisional").glob("crex-*.json")}
-        print(f"crex-balls: pruned {store.prune_balls(live)} delivery row(s) of matches Cricsheet now has")
-    base = "https://crex.com/cricket-live-score/"
+        print(f"crex-balls: pruned {store.prune_balls(live)} delivery row(s) of matches Base now has")
+    base = f"{host('LIVE_SOURCE_BASE')}/cricket-live-score/"
     targets: list[tuple[str, str, str]] = []
     for u in a.url:
         targets.append((f"crex-{u.rstrip('/').rsplit('/', 1)[-1]}", a.date or "", u))
@@ -289,7 +290,7 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
     else:
         rows = fetch_schedule()
         if not rows:  # a failed or empty fetch must never wipe the schedule we already have
-            print("no fixtures parsed from the CREX schedule page; leaving the existing file alone", file=sys.stderr)
+            print("no fixtures parsed from the Source A schedule page; leaving the existing file alone", file=sys.stderr)
             return 1
         rows = _merge_fixtures(rows, out)
         buf = io.StringIO(newline="")
@@ -376,7 +377,7 @@ def cmd_export_sqlite(a: argparse.Namespace) -> int:
 
 def _add_update_options(p: argparse.ArgumentParser, *, dataset: str, provisional_days: int) -> None:
     """Options read by _cmd_update. Shared by `update` and `backfill` so they cannot drift apart."""
-    p.add_argument("--dataset", default=dataset, help=f"Cricsheet zip to download (default: {dataset})")
+    p.add_argument("--dataset", default=dataset, help=f"Base zip to download (default: {dataset})")
     p.add_argument("--zip", help="use a local zip instead of downloading")
     p.add_argument("--provisional-days", type=int, default=provisional_days)
     p.add_argument("--enable-scraper", action="store_true", help="enable web scraping from public sources")
@@ -392,11 +393,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--data-dir", default=DEFAULT_DATA)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    u = sub.add_parser("update", help="daily update: Cricsheet delta + extra sources + reconcile")
+    u = sub.add_parser("update", help="daily update: Base delta + extra sources + reconcile")
     _add_update_options(u, dataset="recently_added_30_json.zip", provisional_days=14)
     u.set_defaults(fn=cmd_update)
 
-    h = sub.add_parser("health", help="check the CREX scraper's assumptions; save raw pages on failure")
+    h = sub.add_parser("health", help="check the Source A scraper's assumptions; save raw pages on failure")
     h.add_argument("--out", default="diagnostics")
     h.set_defaults(fn=cmd_health)
 
@@ -405,21 +406,21 @@ def main(argv: list[str] | None = None) -> int:
     b.set_defaults(fn=cmd_backfill)
 
     f = sub.add_parser("fixtures", help="refresh upcoming fixtures / schedule (data/fixtures/upcoming.csv)")
-    f.add_argument("--sitemap", action="store_true", help="use the older CREX sitemap crawl instead of the schedule page")
-    f.add_argument("--team", default="", help="with --sitemap: comma-separated CREX team codes, e.g. aus-w,ban-w")
+    f.add_argument("--sitemap", action="store_true", help="use the older Source A sitemap crawl instead of the schedule page")
+    f.add_argument("--team", default="", help="with --sitemap: comma-separated Source A team codes, e.g. aus-w,ban-w")
     f.add_argument("--days", type=int, default=30, help="only fixtures starting within this many days")
     f.add_argument("--max-pages", type=int, default=40, help="cap on match pages fetched per run")
     f.set_defaults(fn=cmd_fixtures)
 
-    cb = sub.add_parser("crex-balls", help="scrape CREX ball-by-ball into data/balls/ (verified against the scorecard)")
-    cb.add_argument("--url", action="append", default=[], help="a CREX match page URL (repeatable); needs --date")
+    cb = sub.add_parser("crex-balls", help="scrape Source A ball-by-ball into data/balls/ (verified against the scorecard)")
+    cb.add_argument("--url", action="append", default=[], help="a Source A match page URL (repeatable); needs --date")
     cb.add_argument("--date", default="", help="match date for --url, YYYY-MM-DD")
     cb.add_argument("--provisional-days", type=int, default=0,
-                    help="also scrape CREX provisional matches from the last N days that have no deliveries yet")
+                    help="also scrape Source A provisional matches from the last N days that have no deliveries yet")
     cb.add_argument("--limit", type=int, default=0, help="cap on matches per run (0 = no cap)")
     cb.add_argument("--min-interval", type=float, default=1.5, help="seconds between page loads / scrolls")
     cb.add_argument("--prune", action="store_true",
-                    help="first delete deliveries of matches whose provisional file is gone (Cricsheet has published them)")
+                    help="first delete deliveries of matches whose provisional file is gone (Base has published them)")
     cb.add_argument("--force", action="store_true", help="re-scrape matches that already have deliveries")
     cb.set_defaults(fn=cmd_crex_balls)
 
@@ -435,7 +436,7 @@ def main(argv: list[str] | None = None) -> int:
     q.add_argument("--canonical-only", action="store_true", help="ignore provisional (scraped) matches")
     q.set_defaults(fn=cmd_query)
 
-    lp = sub.add_parser("link-players", help="fill Cricsheet player_id in provisional files; report unmatched")
+    lp = sub.add_parser("link-players", help="fill Base player_id in provisional files; report unmatched")
     lp.set_defaults(fn=cmd_link_players)
 
     fr = sub.add_parser("freshness", help="exit 1 if the newest canonical match is too old")

@@ -1,4 +1,4 @@
-"""The real CREX feed + scorecard of one finished match (trimmed), shared by the ball-by-ball tests."""
+"""The real Source A feed + scorecard of one finished match (trimmed), shared by the ball-by-ball tests."""
 import json
 from pathlib import Path
 

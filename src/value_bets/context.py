@@ -2,7 +2,7 @@
 
 Matches are processed in date order. For every player-row we first *read* features from the state built from
 strictly earlier matches, then update the state with the whole match. The same state answers live queries.
-cricket-data stores per-player match aggregates only (Cricsheet ball-by-ball is parsed upstream but not stored), so
+cricket-data stores per-player match aggregates only (Base ball-by-ball is parsed upstream but not stored), so
 there is no batting position and no batter-vs-bowler data: balls-faced and overs-bowled shares are the role proxies.
 """
 import math

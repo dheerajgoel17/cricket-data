@@ -132,7 +132,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}</TabsContent>
       </PillTabs>
-      {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.</Muted></Card>}
+      {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.</Muted></Card>}
       <Link to="/teams" className="sr-only">Teams</Link>
     </div>
   );

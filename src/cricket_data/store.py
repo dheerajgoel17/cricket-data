@@ -3,7 +3,7 @@
 Layout (relative to the data dir):
   matches/YYYY-MM.csv.gz   one row per match
   players/YYYY-MM.csv.gz   one row per player per match
-  balls/YYYY-MM.csv.gz     one row per delivery (CREX ball-by-ball, see crex_balls.py)
+  balls/YYYY-MM.csv.gz     one row per delivery (Source A ball-by-ball, see crex_balls.py)
 Files are written deterministically (sorted rows, fixed gzip mtime) so an
 unchanged partition is byte-identical and produces no git diff.
 """
@@ -77,7 +77,7 @@ class Store:
                            key=lambda r: (r["match_id"], int(r["innings"]), int(r["seq"])))
 
     def prune_balls(self, keep: set[str]) -> int:
-        """Drop deliveries of every match not in ``keep`` (matches Cricsheet has since published); returns rows removed."""
+        """Drop deliveries of every match not in ``keep`` (matches Base has since published); returns rows removed."""
         removed = 0
         for month in self.months("balls"):
             rows = self.read("balls", month)

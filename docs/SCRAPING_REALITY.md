@@ -7,17 +7,17 @@
 
 ### Sites Tested
 
-#### ESPNcricinfo
+#### Source B
 - **robots.txt:** `Disallow: /` for all non-Google bots
 - **Verdict:** ❌ Blocks automated access
 - **Alternative:** Requires API key/partnership
 
-#### Cricbuzz  
+#### Source C  
 - **robots.txt:** `Disallow: /` with comment "Despicable and evil robots to keep out :)"
 - **Verdict:** ❌ Explicitly blocks automated scraping
 - **Alternative:** Requires API key/partnership
 
-#### CREX (crex.live)
+#### Source A (crex.live)
 - **robots.txt:** No file (implicit allow)
 - **Investigation:** JavaScript-rendered, no JSON endpoints found
 - **Verdict:** ⚠️ Technically allowed but data not accessible via simple HTTP
@@ -57,9 +57,9 @@ This is **by design**, not a bug in our scraper.
 
 ### Option 1: API Partnerships (Recommended)
 Partner with cricket data providers:
-- **CricAPI** (cricapi.com) - Paid API with recent matches
-- **RapidAPI Cricket** - Multiple cricket APIs available
-- **ESPNcricinfo Developer** - May offer partnership access
+- **CricAPI** (the provider's site) - Paid API with recent matches
+- **Source E Cricket** - Multiple cricket APIs available
+- **Source B Developer** - May offer partnership access
 - **Official board APIs** - BCCI, ECB, CA (if available)
 
 **Implementation:**
@@ -69,7 +69,7 @@ class CricAPIScraper:
     
     def __init__(self, api_key: str, fetcher=None):
         self.api_key = api_key
-        self.base_url = "https://api.cricapi.com/v1"
+        self.base_url = "$SRC_D_BASE/v1"
     
     def fetch_recent_match_ids(self, days=7):
         url = f"{self.base_url}/currentMatches?apikey={self.api_key}"
@@ -121,9 +121,9 @@ This works today and requires no API access.
 
 ### Live Testing Results
 ```
-Sources attempted: 3 (ESPNcricinfo, CREX, Cricbuzz)
+Sources attempted: 3 (Source B, Source A, Source C)
 Sources succeeded: 0 (all blocked or empty)
-Sources failed: 1 (ESPNcricinfo - robots.txt)
+Sources failed: 1 (Source B - robots.txt)
 Matches scraped: 0
 
 System behavior: ✅ CORRECT
@@ -153,13 +153,13 @@ Without API keys:
 
 ### For Personal Use
 1. Use the **inbox system** - manually add matches
-2. Wait for **Cricsheet** - 3-4 day delay acceptable
+2. Wait for **Base** - 3-4 day delay acceptable
 3. Get **free API tier** from cricket data providers (if available)
 
 ### For Production Use
 1. **Budget for API costs** - $10-50/month typical
 2. **Partner with data providers** - may offer free tier for open source
-3. **Contribute to Cricsheet** - help improve their coverage
+3. **Contribute to Base** - help improve their coverage
 4. **Use official board APIs** - if available and free
 
 ## Conclusion

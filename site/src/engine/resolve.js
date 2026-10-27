@@ -1,5 +1,5 @@
 // Entity resolution with typo tolerance: players, teams, venues, competitions.
-// Names in the data are Cricsheet-style ("HC Brook", "BM Duckett"); people type "Harry Brook", "duckett", "brok".
+// Names in the data are Base-style ("HC Brook", "BM Duckett"); people type "Harry Brook", "duckett", "brok".
 import { norm, lev } from "./util.js";
 
 const TEAM_ABBR = {

@@ -1,4 +1,4 @@
-"""Pluggable extra sources for matches Cricsheet has not published yet.
+"""Pluggable extra sources for matches Base has not published yet.
 
 A source is any object with `name` and `fetch(since: date) -> Iterable[MatchRecord]`.
 Built-in: the *inbox*, which reads JSON files you drop into <data>/provisional/inbox/.

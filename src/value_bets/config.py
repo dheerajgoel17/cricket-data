@@ -23,7 +23,7 @@ DEFAULTS = {
     "MAX_ODDS_WINNER": 8.0,
     "MAX_ODDS_PROP": 6.0,          # O/U player props
     "MAX_ODDS_TOP": 15.0,          # top batter/bowler
-    "MIN_EXCHANGE_LIQ_GBP": 20.0,  # money available at the back price (Smarkets/Matchbook)
+    "MIN_EXCHANGE_LIQ_GBP": 20.0,  # money available at the back price (Exchange S/Matchbook)
     "MIN_POLY_LIQ_USD": 1000.0,
     "MAX_SPREAD_RATIO": 1.25,      # exchange lay/back ratio to trust a mid price
     "MIN_PLAYER_NEFF": 8.0,        # effective (recency-weighted) innings needed for prop bets
@@ -48,7 +48,7 @@ DEFAULTS = {
     "ODDSAPI_MIN_INTERVAL_HOURS": 8.0,
     "ODDSAPI_MONTHLY_CREDIT_CAP": 150,
     "PLAYER_HALF_LIFE_DAYS": 540,
-    # Props only (match winner dropped). Polymarket/Matchbook/Odds API/Betfair only price match winner, so they
+    # Props only (match winner dropped). Polymarket/Matchbook/Odds API/Exchange B only price match winner, so they
     # are off by default; add them back e.g. CV_SOURCES=smarkets,moviodds_bet365,betfair
     "SOURCES": "smarkets,moviodds_bet365",
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)

@@ -53,7 +53,7 @@ def split_innings_milestones(rows):
 
 
 def fill_team_scope(rows):
-    """Team top-batter/bowler: a book's market id is already one team's market (MoviOdds/bet365 rows carry no team),
+    """Team top-batter/bowler: a book's market id is already one team's market (Feed P/Book A rows carry no team),
     and the team scope is inferred from the resolved players. Players we fail to match to history used to fall into a
     separate ':?' group, leaving the team group incomplete (implied probs summing < 1), which the de-vig then scaled
     UP (e.g. H Nawaz @ 6.0 -> 'fair' 21.8%). Put them back into the team the rest of that market resolved to."""
@@ -643,7 +643,7 @@ def run():
             if x.get("p_src_from"):
                 notes.append("market fair " + x["p_src_from"])
             if x["source"].startswith("moviodds"):
-                notes.append("price via unofficial bet365 mirror - confirm on bet365 before betting")
+                notes.append("price via unofficial Book A mirror - confirm on Book A before betting")
             conf = "low"
             if pm is not None and pc is not None and n_src >= 2:
                 conf = "medium"

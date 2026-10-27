@@ -4,7 +4,7 @@
 2. Fill in LIST_URL and parse_match_list / parse_scorecard for that site's markup or JSON.
 3. Test the parsers offline against saved sample pages (see tests/test_polite.py for the pattern).
 4. Enable:  CRICKET_DATA_SOURCES="private_source_template:MySource" cricket-data update
-Keep requests few: only matches from the last ~3 days are needed, because Cricsheet takes over after that.
+Keep requests few: only matches from the last ~3 days are needed, because Base takes over after that.
 """
 from __future__ import annotations
 

@@ -58,7 +58,7 @@ def test_update_end_to_end_with_inbox(tmp_path, make_zip, monkeypatch):
     z = make_zip(make_match(date="2020-01-01"))
     assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z)]) == 0
     assert len(load_provisional(Store(tmp_path))) == 1
-    # Cricsheet publishes the match: next update must delete the provisional copy
+    # Base publishes the match: next update must delete the provisional copy
     landed = make_match(date=date.today().isoformat(), teams=("India", "West Indies"), winner="India")
     z2 = make_zip(landed, name="n.zip")
     assert main(["--data-dir", str(tmp_path), "update", "--zip", str(z2)]) == 0
@@ -82,7 +82,7 @@ def test_update_with_scraper_enabled(tmp_path, make_zip, monkeypatch):
         status="provisional",
     )
     
-    # Create a minimal Cricsheet zip
+    # Create a minimal Base zip
     z = make_zip(make_match(date="2020-01-01"))
     
     # Mock ScraperSource.fetch to return our test match

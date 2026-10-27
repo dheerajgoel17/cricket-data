@@ -1,8 +1,8 @@
 name: Ball-by-ball update
 
-# Every 2 hours: scrape CREX ball-by-ball for recent finished matches Cricsheet has not published yet
-# (data/balls/, only matches that reconcile with CREX's own scorecard). Matches Cricsheet has since
-# published are pruned: Cricsheet stays the source for everything older, CREX only bridges the gap.
+# Every 2 hours: scrape Source A ball-by-ball for recent finished matches Base has not published yet
+# (data/balls/, only matches that reconcile with Source A's own scorecard). Matches Base has since
+# published are pruned: Base stays the source for everything older, Source A only bridges the gap.
 on:
   schedule:
     - cron: "47 */2 * * *"
@@ -14,6 +14,16 @@ on:
       days:
         description: "Look back this many days for provisional matches"
         default: "3"
+
+# Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
+env:
+  LIVE_SOURCE_BASE: ${{ secrets.LIVE_SOURCE_BASE }}
+  LIVE_SITEMAP_DIR: ${{ secrets.LIVE_SITEMAP_DIR }}
+  IMG_CDN_BASE: ${{ secrets.IMG_CDN_BASE }}
+  VITE_IMG_CDN: ${{ secrets.IMG_CDN_BASE }}
+  BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
 
 permissions:
   contents: write
@@ -48,7 +58,7 @@ jobs:
           git add data/balls
           if git diff --cached --quiet; then echo "Nothing new."; else
             N=$(git diff --cached --name-only | wc -l)
-            git commit -m "data: CREX ball-by-ball ($N files, $(date -u +%F))"
+            git commit -m "data: Source A ball-by-ball ($N files, $(date -u +%F))"
             # a clash with a concurrent prune is harmless: the next run prunes again, so keep this run's file
             git pull --rebase -X theirs -q && git push
           fi

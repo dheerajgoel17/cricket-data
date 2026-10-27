@@ -2,21 +2,21 @@
 
 ## Overview
 
-Not all cricket matches make it into Cricsheet's canonical dataset. Some are missing due to data availability issues, and others are withheld for policy reasons. For these matches, we scrape from CREX and **keep them permanently** instead of deleting them after reconciliation.
+Not all cricket matches make it into Base's canonical dataset. Some are missing due to data availability issues, and others are withheld for policy reasons. For these matches, we scrape from Source A and **keep them permanently** instead of deleting them after reconciliation.
 
 ## Three Match Statuses
 
 ### 1. `provisional` (Normal Lag)
-**What**: Matches recently completed but not yet in Cricsheet  
-**Duration**: Cricsheet typically publishes within 3-4 days  
-**Action**: Delete after Cricsheet data arrives and is reconciled  
+**What**: Matches recently completed but not yet in Base  
+**Duration**: Base typically publishes within 3-4 days  
+**Action**: Delete after Base data arrives and is reconciled  
 **Example**: India vs West Indies T20I from yesterday
 
 ### 2. `cricsheet_missing` (Permanent Gap)
-**What**: Matches on [Cricsheet's missing-matches list](https://cricsheet.org/missing/)  
-**Why**: Cricsheet cannot obtain data (licensing, availability issues)  
+**What**: Matches on Base's missing-matches list  
+**Why**: Base cannot obtain data (licensing, availability issues)  
 **Action**: Keep permanently as source of truth  
-**Reconciliation**: If Cricsheet later provides the match, reconcile and prefer Cricsheet  
+**Reconciliation**: If Base later provides the match, reconcile and prefer Base  
 **Examples**:
 - England vs India (Women's Test, 2002-01-14)
 - Australia vs South Africa (Men's Test, 2001-12-14)
@@ -24,9 +24,9 @@ Not all cricket matches make it into Cricsheet's canonical dataset. Some are mis
 
 ### 3. `cricsheet_withheld` (Policy Hold)
 **What**: Afghanistan men's team and Afghanistan Premier League matches  
-**Why**: [Cricsheet withheld all Afghanistan matches since November 2024](https://cricsheet.org/article/explanation-for-withholding-of-afghanistani-matches/) (329 matches removed)  
+**Why**: Base withheld all Afghanistan matches since November 2024 (329 matches removed)  
 **Action**: Keep permanently as source of truth  
-**Reconciliation**: If Cricsheet ever restores them, reconcile and prefer Cricsheet  
+**Reconciliation**: If Base ever restores them, reconcile and prefer Base  
 **Examples**:
 - Afghanistan vs Pakistan (any men's international)
 - Kabul Knights vs Kandahar Kings (APL)
@@ -35,7 +35,7 @@ Not all cricket matches make it into Cricsheet's canonical dataset. Some are mis
 ## How It Works
 
 ### 1. Classification
-When matches are scraped from CREX, they are automatically classified:
+When matches are scraped from Source A, they are automatically classified:
 
 ```python
 from cricket_data.permanent_matches import classify_match_status
@@ -46,7 +46,7 @@ status = classify_match_status(match, missing_matches_list)
 
 Priority order:
 1. **Afghanistan check** (fastest; checks team names and event)
-2. **Missing matches check** (fetches from Cricsheet, cached per run)
+2. **Missing matches check** (fetches from Base, cached per run)
 3. **Default**: provisional
 
 ### 2. Storage
@@ -77,14 +77,14 @@ def reconcile(store):
                 # Keep as source of truth
                 stats["permanent_kept"] += 1
             else:
-                # Still waiting for Cricsheet
+                # Still waiting for Base
                 stats["pending"] += 1
         else:
-            # Cricsheet provided it
+            # Base provided it
             compare_and_log(provisional_match, canonical)
             
-            # Always delete when Cricsheet has it
-            # (Cricsheet is preferred, even for permanent matches)
+            # Always delete when Base has it
+            # (Base is preferred, even for permanent matches)
             delete(provisional_match)
             stats["landed"] += 1
 ```
@@ -109,7 +109,7 @@ missing = fetch_cricsheet_missing_matches()
 ```
 
 ### Parsing
-Uses `MissingMatchesParser` (HTMLParser subclass) to extract structured data from https://cricsheet.org/missing/
+Uses `MissingMatchesParser` (HTMLParser subclass) to extract structured data from $BASE_DATA_URL/missing/
 
 **Page structure**:
 ```html
@@ -153,7 +153,7 @@ def is_afghanistan_match(match):
 ```
 
 ### Why Afghanistan?
-From [Cricsheet's announcement](https://cricsheet.org/article/explanation-for-withholding-of-afghanistani-matches/):
+From Base's announcement:
 - **329 matches removed** (all Afghanistan men's internationals and APL)
 - Includes historical matches going back years
 - May be restored in the future
@@ -171,24 +171,24 @@ reconcile: {'landed': 5, 'mismatched': 0, 'pending': 10, 'stale': 0, 'permanent_
 ```
 
 **Stats explanation**:
-- `landed`: Provisional matches that Cricsheet published (deleted)
-- `pending`: Still waiting for Cricsheet
+- `landed`: Provisional matches that Base published (deleted)
+- `pending`: Still waiting for Base
 - `permanent_kept`: Missing/withheld matches kept as source of truth
 - `stale`: Provisional matches older than 45 days (likely won't land)
 
 ## Backfilling
 
 ### Historical Missing Matches
-Periodically backfill Cricsheet's missing list from CREX:
+Periodically backfill Base's missing list from Source A:
 1. Fetch current missing-matches list
-2. For each missing match, search CREX by date + teams
+2. For each missing match, search Source A by date + teams
 3. If found, scrape and store as `cricsheet_missing`
 
 ### Historical Afghanistan Matches
-Scrape as far back as CREX allows:
-1. Search CREX for "Afghanistan" matches (any date)
+Scrape as far back as Source A allows:
+1. Search Source A for "Afghanistan" matches (any date)
 2. Scrape and store as `cricsheet_withheld`
-3. CREX may have years of historical data
+3. Source A may have years of historical data
 
 ## Testing
 
@@ -217,9 +217,9 @@ Includes end-to-end tests with:
 ## Future Enhancements
 
 1. **Automated backfilling**: Run daily job to backfill new entries from missing list
-2. **Change detection**: Monitor Cricsheet's missing list for changes (additions/removals)
+2. **Change detection**: Monitor Base's missing list for changes (additions/removals)
 3. **Historical sweep**: One-time backfill of all historical Afghanistan matches
-4. **Alert on restoration**: Notify when Cricsheet restores Afghanistan matches
+4. **Alert on restoration**: Notify when Base restores Afghanistan matches
 5. **Additional categories**: Handle other permanent gaps (club leagues, historical periods)
 
 ## Files
@@ -240,6 +240,6 @@ Includes end-to-end tests with:
 - `data/scraper_run_report.json` - Run statistics
 
 ## References
-- [Cricsheet missing-matches list](https://cricsheet.org/missing/)
-- [Afghanistan matches withheld announcement](https://cricsheet.org/article/explanation-for-withholding-of-afghanistani-matches/)
-- [Cricsheet robots.txt](https://cricsheet.org/robots.txt) - Allows scraping (only `/data/` disallowed)
+- Base missing-matches list
+- Afghanistan matches withheld announcement
+- Base robots.txt - Allows scraping (only `/data/` disallowed)

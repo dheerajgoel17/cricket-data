@@ -1,7 +1,7 @@
 # Cricket props / fancy model: walk-forward backtest (20 Oct 2026)
 
 ## What was built
-* Data: Cricsheet ball-by-ball (all_json.zip, 17 Oct 2026), 2014 onwards. That gives 18,181 T20/ODI/Test matches, 307,782 batter innings and 221,843 bowler spells. Batting position, innings order (bat first or chase), venue, opposition, gender and intl/league are all derived from the ball-by-ball data.
+* Data: Base ball-by-ball (all_json.zip, 17 Oct 2026), 2014 onwards. That gives 18,181 T20/ODI/Test matches, 307,782 batter innings and 221,843 bowler spells. Batting position, innings order (bat first or chase), venue, opposition, gender and intl/league are all derived from the ball-by-ball data.
 * Features use only data from before each match: recency-weighted form in the **same format only**, the last-10 median, batting position, and venue and opposition environment. Test features are frozen at the start of the match.
 * Walk-forward: models are refit every year on all matches before that year, then predict the next year (2020–2026). Strategies (model, side, margin) were **picked on 2020–23 and reported on 2024–26**, which weren't used for selection.
 * Models compared:
@@ -67,9 +67,9 @@ Code is in src/value_bets/strategy.py, wired into pipeline.py; the policy can be
 
 ## Caveats
 * No historical prop or fancy lines exist for free, so every ROI is against proxy lines. Run the pipeline's odds snapshots for 4–8 weeks and measure CLV and real ROI before trusting any of this. The repo snapshot folder is currently empty because snapshots go to Actions artifacts, which are kept for 30 days.
-* Cricsheet player names aren't registry IDs, so rare homonyms are merged in the backtest.
+* Base player names aren't registry IDs, so rare homonyms are merged in the backtest.
 * No Afghanistan data.
-* Weather, toss and series context (must-win) were not in the backtest. Series context can't be built reliably from Cricsheet.
+* Weather, toss and series context (must-win) were not in the backtest. Series context can't be built reliably from Base.
 * The live GBM is **not** deployed yet. The live pipeline still uses its NB GLM, now with format-pure form and the policy gates. Next step: port gbm_nb into propmodel and refit weekly.
 * Team-specific fancy (only counts if that team bats first) was not backtested separately.
 

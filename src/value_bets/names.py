@@ -1,4 +1,4 @@
-"""Team / player name matching between odds sources and the cricket-data history (Cricsheet names)."""
+"""Team / player name matching between odds sources and the cricket-data history (Base names)."""
 import csv
 import re
 import unicodedata

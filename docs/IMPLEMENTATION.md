@@ -1,7 +1,7 @@
 # Cricket Data Scraper Implementation Summary
 
 ## Overview
-This implementation adds an automated web scraper that fills the gap between live cricket matches and Cricsheet's 3-4 day publication delay. The scraper fetches recent matches from public cricket websites, normalizes them to the project format, and reconciles them with Cricsheet when official data arrives.
+This implementation adds an automated web scraper that fills the gap between live cricket matches and Base's 3-4 day publication delay. The scraper fetches recent matches from public cricket websites, normalizes them to the project format, and reconciles them with Base when official data arrives.
 
 ## Implementation Details
 
@@ -9,12 +9,12 @@ This implementation adds an automated web scraper that fills the gap between liv
 
 #### 1. `src/cricket_data/scrapers.py`
 **New module** containing:
-- `ESPNcricinfoScraper`: Fetches matches from ESPNcricinfo's public JSON API
+- `ESPNcricinfoScraper`: Fetches matches from Source B's public JSON API
   - Uses `/ci/engine/match/index.json` for recent match lists
   - Uses `/ci/engine/match/<id>.json` for detailed match data
   - Parses into `MatchRecord` and `PlayerPerf` objects
   
-- `CricbuzzScraper`: Placeholder for future Cricbuzz implementation
+- `CricbuzzScraper`: Placeholder for future Source C implementation
 
 - `MultiSourceScraper`: Aggregates multiple scrapers with conflict resolution
   - Groups matches by (date, team_a, team_b)
@@ -28,7 +28,7 @@ This implementation adds an automated web scraper that fills the gap between liv
 #### 2. `tests/test_scrapers.py`
 **New test suite** with 15 tests covering:
 - Match key generation and normalization
-- ESPNcricinfo JSON parsing (batting, bowling, fielding)
+- Source B JSON parsing (batting, bowling, fielding)
 - Multi-source conflict resolution (winner, player stats)
 - Player merging across sources
 - Error handling and edge cases
@@ -49,13 +49,13 @@ All tests use fixtures and mocks—no live network calls.
 
 #### 5. Enhanced `.github/workflows/daily-update.yml`
 - Now includes `--enable-scraper` flag in daily run
-- Combines Cricsheet updates with scraper updates
+- Combines Base updates with scraper updates
 
 #### 6. Documentation
 - **`docs/SCRAPER.md`**: Comprehensive scraper documentation
   - How it works (scheduling, fetching, conflict resolution, reconciliation)
   - Usage (CLI, environment variables, GitHub Actions)
-  - Data sources (ESPNcricinfo, adding new sources)
+  - Data sources (Source B, adding new sources)
   - Observability (scraper report, reconciliation log)
   - Ethical considerations (robots.txt, rate limiting, terms of service)
   - Testing and troubleshooting
@@ -65,7 +65,7 @@ All tests use fixtures and mocks—no live network calls.
 
 ## Design Decisions
 
-### Why ESPNcricinfo First?
+### Why Source B First?
 1. **Public JSON API**: Well-structured, no HTML parsing needed
 2. **Comprehensive data**: Covers most international and major league matches
 3. **Reliable**: Established site with consistent API structure
@@ -88,7 +88,7 @@ Follows existing convention:
 - Store as individual JSON files in `data/provisional/`
 - Mark with `status=provisional`
 - Use stable match keys for reconciliation
-- Delete automatically when Cricsheet arrives
+- Delete automatically when Base arrives
 
 This maintains consistency with the existing inbox and custom sources.
 
@@ -101,7 +101,7 @@ This maintains consistency with the existing inbox and custom sources.
 
 ### Scheduling
 **Two workflows**:
-1. **Daily update**: Once per day, full Cricsheet + scraper
+1. **Daily update**: Once per day, full Base + scraper
 2. **Scraper update**: Every 6 hours, scraper only
 
 This balances:
@@ -158,13 +158,13 @@ cat data/scraper_report.csv
 ## Limitations & Future Work
 
 ### Current Limitations
-1. **ESPNcricinfo only**: Cricbuzz not yet implemented
-2. **Summary stats only**: No ball-by-ball data (unlike Cricsheet)
+1. **Source B only**: Source C not yet implemented
+2. **Summary stats only**: No ball-by-ball data (unlike Base)
 3. **Completed matches only**: No in-progress updates
-4. **API structure assumptions**: May break if ESPNcricinfo changes API
+4. **API structure assumptions**: May break if Source B changes API
 
 ### Future Enhancements
-1. **Cricbuzz scraper**: Add second source for better conflict resolution
+1. **Source C scraper**: Add second source for better conflict resolution
 2. **Ball-by-ball scraping**: Where available via public APIs
 3. **In-progress matches**: Real-time updates during games
 4. **More sources**: Official board sites (BCCI, ECB, etc.)
@@ -204,7 +204,7 @@ Documentation clearly states user responsibility.
 ✅ Documentation (user guide, architecture)
 
 ### Before Production
-⚠️ Verify ESPNcricinfo terms allow automated scraping
+⚠️ Verify Source B terms allow automated scraping
 ⚠️ Test with live data over several days
 ⚠️ Monitor GitHub Actions free tier usage
 ⚠️ Set up monitoring/alerts for scraper failures
@@ -239,8 +239,8 @@ Documentation clearly states user responsibility.
 ## References
 
 ### External Resources
-- Cricsheet: https://cricsheet.org
-- ESPNcricinfo: https://www.espncricinfo.com
+- Base: $BASE_DATA_URL
+- Source B: $SRC_B_BASE
 - Robots.txt spec: https://www.robotstxt.org
 
 ### Internal References

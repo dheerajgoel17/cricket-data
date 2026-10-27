@@ -32,7 +32,7 @@ def test_doc_parses_to_the_scorecard_numbers():
     assert (one["team"], one["runs"], one["wkts"], one["balls"]) == ("India Champions", 110, 8, 120)
     assert (two["runs"], two["wkts"]) == (111, 4)
     assert m["q"] == 0  # the chase ended inside 15 overs: below 80% of 20, so summary markets are void
-    # every batter's line equals CREX's scorecard
+    # every batter's line equals Source A's scorecard
     pid = people()
     for k, inn in enumerate(card().innings):
         for b in inn.batters:
@@ -94,7 +94,7 @@ def test_rows_saved_before_the_name_columns_still_build(tmp_path):
 
 
 def test_team_spelled_differently_from_cricsheet_does_not_break_the_build(tmp_path):
-    """CREX and Cricsheet can spell a team differently (same normalised name). teams, first innings and innings rows must agree."""
+    """Source A and Base can spell a team differently (same normalised name). teams, first innings and innings rows must agree."""
     data = tmp_path / "data"
     (data / "provisional").mkdir(parents=True)
     d = {"match_id": "crex-x", "date": "2026-10-13", "match_type": "T20", "team_type": "club", "gender": "male", "event": "WCL",
@@ -108,7 +108,7 @@ def test_team_spelled_differently_from_cricsheet_does_not_break_the_build(tmp_pa
     canon = {"id": "c1", "date": "2020-01-01", "fmt": 0, "gender": 0, "intl": 0, "event": "", "venue": "V", "city": "",
              "teams": ["India  Champions", "West Indies  Champions"], "winner": "", "res": 2, "overs": 20, "bpo": 6, "days": 1, "first": "",
              "q": 1, "mc": 0, "ts": 0, "ho": 0, "pv": 0, "inn": [], "bat": [], "bowl": [], "parts": [], "xi": [], "xq": 0}
-    B.assemble([canon], prov)  # KeyError before the fix: `first` kept CREX's spelling while `teams` took Cricsheet's
+    B.assemble([canon], prov)  # KeyError before the fix: `first` kept Source A's spelling while `teams` took Base's
     m = prov[0]
     assert m["first"] in m["teams"] and all(i[0] in m["teams"] and i[1] in m["teams"] for i in m["inn"])
 

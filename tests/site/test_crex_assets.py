@@ -1,13 +1,13 @@
 from cricket_site import crex_assets as ca
 
 SITEMAP = """<urlset>
-<url><loc>https://crex.com/player/harry-brook-1IG</loc></url>
-<url><loc>https://crex.com/player/harry-brook-1IG/matches</loc></url>
-<url><loc>https://crex.com/player/virat-kohli-4I</loc></url>
-<url><loc>https://crex.com/player/rassie-van-der-dussen-9Z</loc></url>
-<url><loc>https://crex.com/player/dasun-shanaka-7Q</loc></url>
-<url><loc>https://crex.com/player/steve-smith-5A</loc></url>
-<url><loc>https://crex.com/player/jamie-smith-6B</loc></url>
+<url><loc>https://src.test/player/harry-brook-1IG</loc></url>
+<url><loc>https://src.test/player/harry-brook-1IG/matches</loc></url>
+<url><loc>https://src.test/player/virat-kohli-4I</loc></url>
+<url><loc>https://src.test/player/rassie-van-der-dussen-9Z</loc></url>
+<url><loc>https://src.test/player/dasun-shanaka-7Q</loc></url>
+<url><loc>https://src.test/player/steve-smith-5A</loc></url>
+<url><loc>https://src.test/player/jamie-smith-6B</loc></url>
 </urlset>"""
 
 
@@ -27,7 +27,7 @@ def test_match_players_is_conservative():
     assert m[2] == "9Z"                             # particles in the surname
     assert m[3] == "7Q"                             # uncommon surname, initials contain the given name's letter
     assert m[4] == "5A" and m[5] == "6B"            # two Smiths are told apart by their first initial
-    assert 6 not in m                               # no CREX entry for VK Singh
+    assert 6 not in m                               # no Source A entry for VK Singh
 
 
 def test_ambiguous_names_are_skipped_not_guessed():

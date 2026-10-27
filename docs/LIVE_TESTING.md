@@ -14,12 +14,12 @@
 
 ### Individual Scraper Results
 
-#### 1. ESPNcricinfo
+#### 1. Source B
 **Status:** ❌ Blocked by robots.txt  
-**Error:** `RobotsDisallowed: robots.txt disallows https://www.espncricinfo.com/ci/engine/match/index.json?view=live for cricket-data/0.1 (open-source dataset updater)`
+**Error:** `RobotsDisallowed: robots.txt disallows $SRC_B_BASE/ci/engine/match/index.json?view=live for cricket-data/0.1 (open-source dataset updater)`
 
 **Analysis:**
-- ESPNcricinfo's robots.txt disallows automated scraping
+- Source B's robots.txt disallows automated scraping
 - This is expected behavior and demonstrates proper robots.txt compliance
 - The scraper correctly respects site policies
 - Other sources continue to operate (independent failure)
@@ -29,7 +29,7 @@
 - Users with API access can extend with authentication
 - Or use alternative public APIs that allow scraping
 
-#### 2. CREX (crex.live)
+#### 2. Source A (crex.live)
 **Status:** ⚠️ No matches found  
 **Matches returned:** 0
 
@@ -49,7 +49,7 @@
 - Update parser if structure is known
 - Add authentication if required
 
-#### 3. Cricbuzz
+#### 3. Source C
 **Status:** ⚠️ Placeholder  
 **Matches returned:** 0
 
@@ -59,7 +59,7 @@
 - Waiting for API documentation
 
 **Next steps:**
-- Identify Cricbuzz API endpoints
+- Identify Source C API endpoints
 - Implement fetch_recent_match_ids and fetch_match
 - Verify terms of service allow automated access
 
@@ -130,7 +130,7 @@ Conflicts resolved: 0
 - No hardcoded source lists
 
 ### ✅ Independent Failure
-- ESPNcricinfo blocked → CREX and Cricbuzz still attempted
+- Source B blocked → Source A and Source C still attempted
 - One source failure doesn't stop others
 - Partial data collection better than none
 

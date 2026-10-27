@@ -7,7 +7,7 @@ A free player-props and fancy-markets stats site built on this repo's data. Stat
 | Page | What you get |
 |---|---|
 | Home / **Ask** | Type a question in your own words (typos fine). A free Gemini model turns it into a *query plan*; the site runs that plan on the real data and shows the answer, the filters used, the sample size and the data freshness. |
-| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). Live scores (team totals, current batters/bowler, and player so-far vs booked lines) refresh about every 15 seconds from the CREX schedule, match and scorecard pages, **only for matches we have player-prop or fancy odds for**; they are never used to settle a prop. Props and Match Fancy tabs (and unpriced fancy markets) stay hidden when that match has no bookmaker line. |
+| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). Live scores (team totals, current batters/bowler, and player so-far vs booked lines) refresh about every 15 seconds from the Source A schedule, match and scorecard pages, **only for matches we have player-prop or fancy odds for**; they are never used to settle a prop. Props and Match Fancy tabs (and unpriced fancy markets) stay hidden when that match has no bookmaker line. |
 | **Players** | Runs, balls, 4s, 6s, wickets, runs conceded. Hit rate over/under any line, a ladder of lines, median/mean, last-N form, fair decimal odds, split by opposition, venue, home/away/neutral, batting first/chasing, batting position, year and competition. One format at a time, never mixed. |
 | **Teams & venues** | Match totals and fancy markets: match 4s/6s, 30s, 50s, 100s, double-digit and single-digit scores, ducks, highest over, most runs conceded by a bowler, top score, team markets (team batting first only), and who tops the batting card. |
 | **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |
@@ -17,16 +17,16 @@ See [SITE_MAP.md](SITE_MAP.md) for the page-by-page comparison with StatsHub.
 
 ## How the numbers are produced
 ```
-Cricsheet all_json.zip ─┐
+Base all_json.zip ─┐
 data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/src/engine)
 data/fixtures, value_bets ┘                                                              ▲
                                                 question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
-                                                CREX schedule + match + scorecard ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
+                                                Source A schedule + match + scorecard ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
 ```
 * **Builder** (`src/cricket_site`, stdlib only): parses the ball-by-ball JSON into per-innings batting rows (position, innings order,
   runs/balls/4s/6s, dismissal), bowling spells, partnerships (who was out, runs, balls, opening flag) and match-market aggregates.
-  Provisional (scraped) matches are added as player-total rows when Cricsheet does not have the fixture yet (same dedupe as
-  `cricket-data query`: same teams, +/-1 day) and only when `link-players` gave the player a Cricsheet id.
+  Provisional (scraped) matches are added as player-total rows when Base does not have the fixture yet (same dedupe as
+  `cricket-data query`: same teams, +/-1 day) and only when `link-players` gave the player a Base id.
   Output is ~35 MB of JSON (~12 MB compressed): `meta.json`, `index.json`, `matches.json`, 64 player shards `p/NN.json`, `fixtures.json`, `props.json`.
   I checked ~71,000 player rows against `data/players`: every difference was a super-over (the site ignores super overs on purpose).
 * **Engine** (`site/src/engine`, no dependencies, runs in the browser and in node): filters, hit rates, fair odds, markets, partnerships,
@@ -35,13 +35,13 @@ data/fixtures, value_bets ┘                                                   
 * **The model never supplies a number.** `/api/ask` (`site/api/ask.js`) sends only the question text to Gemini with a fixed instruction and gets
   back JSON, which `sanitizePlan` reduces to whitelisted fields. The plan is then resolved against the real player/team/venue tables and executed
   in the browser. If the key is missing, rate-limited or the reply is unusable, the built-in rule parser (`engine/nl.js`) answers instead.
-* **Live scores.** `/api/live` (`site/api/live.js`) reads CREX's schedule, match and scorecard pages (no key; ESPN is not used, its cards lagged its own header), caches ~15 seconds, and returns compact team
+* **Live scores.** `/api/live` (`site/api/live.js`) reads Source A's schedule, match and scorecard pages (no key; Source B is not used, its cards lagged its own header), caches ~15 seconds, and returns compact team
   scores plus batting/bowling so-far **only for matches in the book feed** (player props, event markets, or fancy). The fixture header shows a
   live board (current pair: avatars on the edges, name with runs/balls under it, partnership in the middle, last wicket, bowler, this-over deliveries with a divider at the over break, CRR/RRR)
   plus a Scorecard and Recent form accordion (both closed so props stay first). The closed Recent form row shows last 3 W/L chips per side so it fits on a phone; the open body is still last 5 in this format. Scorecard has batting (how-out, R, B, 4s, 6s, SR), extras, fall of wickets, yet to bat, and bowling (O, M, R, W, Econ) — the
-  same columns CREX and Cricinfo show. Games with no odds stay off
+  same columns Source A and Source B show. Games with no odds stay off
   the rail and off the live snapshot. The schedule page (cached ~5 min) lists the games and their URLs; scores, the current pair and rates come from the **match** page
-  and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `crex.com/api`), so a chase shows the chasing side's pair the moment it starts.
+  and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `$LIVE_SOURCE_BASE/api`), so a chase shows the chasing side's pair the moment it starts.
   The browser polls that route.
   Unofficial and can change. **Never used for settlement** — VOID/DNP rules still apply after the innings qualifies.
   Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`).
@@ -53,25 +53,25 @@ data/fixtures, value_bets ┘                                                   
 * Retired hurt is not a wicket. Penalty runs count. Runs conceded = batter runs + wides + no-balls + penalty (as in `data/players`). Super overs are ignored.
 * Formats: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**. First-class (`MDM`) is not included.
 * Fair decimal odds = 1 / hit rate on the filtered sample (pushes on whole-number lines are void). Decimal odds only.
-* Home/away/neutral is *inferred*, because Cricsheet has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
+* Home/away/neutral is *inferred*, because Base has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
   `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.
 
 ## Player screen (app-style UI)
 The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app bar on phones, a prop rail (stat), a hero (photo, name, round buttons, a 3x2 stat grid and a hit-rate ring), a format switch, one tappable bar chart with Over/Under, a line stepper and look-back pills that show each window's hit rate (`engine/windows.js`, unit-tested by hand-computed numbers), a bottom sheet for filters and for a tapped game, and Lines / Game log / Splits tabs. The chart keeps the line and side in the URL with `replaceState`, so a page can be shared. UI library: shadcn/ui (Radix) with Motion for animation; see PROJECT_GUIDE 5.3.
 
-**Bookmaker lines.** The value-bets pipeline saves every matched two-sided player line (runs, sixes, fours, wickets; decimal over/under per book) to `value_bets/out/book_lines.json` (`src/value_bets/booklines.py`, matched to Cricsheet player ids). The site builder bundles it as `data/lines.json`, and the player page reads the live file from GitHub (falling back to the bundle). For a player with a priced upcoming match, the chart opens on the market's **main line** (the one priced closest to evens, `engine/lines.js`) instead of the median-based default, and a "Bookmaker lines" card shows each book's prices, the no-margin market probability and his own hit rate over each line; tap a line to put it on the chart. Players or stats with no market line keep the median default (floor(median) + 0.5, `suggestLines`).
+**Bookmaker lines.** The value-bets pipeline saves every matched two-sided player line (runs, sixes, fours, wickets; decimal over/under per book) to `value_bets/out/book_lines.json` (`src/value_bets/booklines.py`, matched to Base player ids). The site builder bundles it as `data/lines.json`, and the player page reads the live file from GitHub (falling back to the bundle). For a player with a priced upcoming match, the chart opens on the market's **main line** (the one priced closest to evens, `engine/lines.js`) instead of the median-based default, and a "Bookmaker lines" card shows each book's prices, the no-margin market probability and his own hit rate over each line; tap a line to put it on the chart. Players or stats with no market line keep the median default (floor(median) + 0.5, `suggestLines`).
 
 ## Known limits (be aware before betting)
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
-* Live scores lag up to about 20 seconds and come from the unofficial CREX pages. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
+* Live scores lag up to about 20 seconds and come from the unofficial Source A pages. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
 ## Run it locally
 ```bash
 pip install -e .
-curl -fsSL -o all_json.zip https://cricsheet.org/downloads/all_json.zip
+curl -fsSL -o all_json.zip $BASE_DATA_URL/downloads/all_json.zip
 python -m cricket_site.build --zip all_json.zip --data data --out site/public/data     # ~30 s
 cd site && npm ci && npm test          # engine + resolver + parser + API handler + components (node >= 20)
 npm run dev                            # http://localhost:4173  (set GEMINI_API_KEY to try the AI parse)
@@ -87,7 +87,7 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js` + `api/live.
    `gemini-2.5-flash-lite,gemini-2.5-flash`; change it if Google retires a model), `ASK_PER_MINUTE` (default 12 per IP), `ASK_DAILY_CAP`
    (default 800 calls/day, under the free-tier limits). Without a key the site still answers with the built-in parser.
 3. **Daily refresh:** `.github/workflows/site.yml` runs **every hour** (and after "Daily update", and on demand): the scraper commits new provisional matches every 30 minutes, so each run rebuilds
-   `site/public/data` from the latest repo data and deploys. The Cricsheet zip, people register and player photos are cached once a day, so hourly runs stay light. Add three **GitHub repository secrets**: `VERCEL_TOKEN` (vercel.com/account/tokens),
+   `site/public/data` from the latest repo data and deploys. The Base zip, people register and player photos are cached once a day, so hourly runs stay light. Add three **GitHub repository secrets**: `VERCEL_TOKEN` (vercel.com/account/tokens),
    `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` (both in `site/.vercel/project.json` after `vercel link`). Without them it builds and tests but does not deploy.
    PRs touching the site build and test only.
 4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.
@@ -95,19 +95,19 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js` + `api/live.
 Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI).
 
 ## Player photos and team logos
-Sources, in order: **CREX** (the repo already scrapes it) then **Wikidata/Wikimedia Commons**, then a flag (national sides) or initials/silhouette.
-The builder reads CREX's public sitemaps (`crex.com/crex_sitemap/player.xml`, `team.xml`: ~9.8k players, ~1k teams), matches CREX full names to Cricsheet
+Sources, in order: **Source A** (the repo already scrapes it) then **Wikidata/Wikimedia Commons**, then a flag (national sides) or initials/silhouette.
+The builder reads Source A's public sitemaps (`$LIVE_SOURCE_BASE/crex_sitemap/player.xml`, `team.xml`: ~9.8k players, ~1k teams), matches Source A full names to Base
 names conservatively (surname + first initial, ambiguous names skipped, see `src/cricket_site/crex_assets.py`) and stores only ids in `data/photos.json`.
-The browser loads images from CREX's CDN (`cricketvectors.akamaized.net/players/org/<id>.png`, `/Teams/<id>.png`); nothing is copied into the repo.
-About 54% of recently active players and most national and franchise teams get a CREX image today; the rest fall back. Those images belong to CREX:
+The browser loads images from Source A's CDN (`$IMG_CDN_BASE/players/org/<id>.png`, `/Teams/<id>.png`); nothing is copied into the repo.
+About 54% of recently active players and most national and franchise teams get a Source A image today; the rest fall back. Those images belong to Source A:
 check their terms before using the site commercially, or replace the source later by returning a different URL from `playerPhoto` in `site/src/lib/photos.js`.
 
 ## Our own copy of the images and id maps (Supabase, free plan)
-So the site keeps working if CREX changes or removes its images, `src/cricket_site/assets_sync.py` copies each player photo / team logo once into a
+So the site keeps working if Source A changes or removes its images, `src/cricket_site/assets_sync.py` copies each player photo / team logo once into a
 public Supabase Storage bucket (`avatars`) and records it in Postgres (`assets`, `crex_players`, `crex_teams`; public read, writes only with the service key).
 The Site workflow runs it hourly (resumable, at most `SYNC_LIMIT` new images per run, politely paced) and adds `base` + `s` (ids we hold) to `photos.json`;
-the browser then tries our copy first and CREX second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
-(dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and CREX is used directly.
+the browser then tries our copy first and Source A second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
+(dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and Source A is used directly.
 Schema: see the `cricket_assets_schema` migration (tables above plus the `avatars` bucket: public, 200 KB limit, png/webp/jpeg only).
 
 ## UI libraries and the iOS / Android apps

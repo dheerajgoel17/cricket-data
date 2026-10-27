@@ -80,7 +80,7 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
            "fours": "3", "sixes": "2", "wickets": "0", "balls_bowled": "0", "runs_conceded": "0"},
           {"player": "Unknown Guy", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "5", "balls": "4"}]
     new = _prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)
-    dup = _prov("crex-dup", "2024-01-11", "Alpha", "Beta", pl)  # Cricsheet already has Alpha v Beta on 2024-01-10 (+/-1 day)
+    dup = _prov("crex-dup", "2024-01-11", "Alpha", "Beta", pl)  # Base already has Alpha v Beta on 2024-01-10 (+/-1 day)
     for d in (new, dup):
         (data / "provisional" / f"{d['match_id']}.json").write_text(json.dumps(d))
     meta = B.build(z, data, out, None, workers=1)
@@ -130,7 +130,7 @@ def _prov_game(date, runs, team_a="Alpha", team_b="Beta", extra_players=0):
 
 
 def test_consecutive_day_games_between_the_same_sides_are_not_mistaken_for_duplicates(tmp_path):
-    z, data, out, _ = _out(tmp_path)  # Cricsheet has the short Alpha v Beta game on 2024-06-01 (Brook 10 + Duckett 20 + Kohli 30 + Gill 3 = 63 batter runs)
+    z, data, out, _ = _out(tmp_path)  # Base has the short Alpha v Beta game on 2024-06-01 (Brook 10 + Duckett 20 + Kohli 30 + Gill 3 = 63 batter runs)
     canonical_runs = 10 + 20 + 30 + 3
     next_day = _prov_game("2024-06-02", 99)           # different totals the next day: a genuinely different game
     same_game = _prov_game("2024-05-31", canonical_runs)  # same totals one day earlier (time-zone shift): the same game
@@ -157,8 +157,8 @@ def test_half_scraped_scorecards_are_marked_unreliable(tmp_path):
 def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are_keyed_by_cricsheet_id(tmp_path, monkeypatch):
     from cricket_site import crex_assets as ca
 
-    sitemaps = {"player": "<urlset><url><loc>https://crex.com/player/harry-brook-1IG</loc></url><url><loc>https://crex.com/player/ben-duckett-ZZ</loc></url></urlset>",
-                "team": "<urlset><url><loc>https://crex.com/team/alpha-A1</loc></url></urlset>"}
+    sitemaps = {"player": "<urlset><url><loc>https://src.test/player/harry-brook-1IG</loc></url><url><loc>https://src.test/player/ben-duckett-ZZ</loc></url></urlset>",
+                "team": "<urlset><url><loc>https://src.test/team/alpha-A1</loc></url></urlset>"}
     monkeypatch.setattr(ca, "fetch_sitemap", lambda kind: sitemaps[kind])
     z, data, out, _ = _out(tmp_path)
     pl = [{"player": "Harry Brook", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "40", "balls": "20", "fours": "3", "sixes": "2"},
@@ -174,7 +174,7 @@ def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are
     m = M["id"].index("crex-new")
     assert any(shard["m"][k] == m and shard["r"][k] == 40 for k in range(len(shard["p"])) if IX["players"]["id"][shard["p"][k]] == brook)
     ph = json.loads((out / "photos.json").read_text())
-    assert ph["p"][brook] == "c:1IG" and ph["p"][synth.pid(synth.DUCKETT)] == "c:ZZ"   # keyed by Cricsheet id, so a shifting index cannot mismatch photos
+    assert ph["p"][brook] == "c:1IG" and ph["p"][synth.pid(synth.DUCKETT)] == "c:ZZ"   # keyed by Base id, so a shifting index cannot mismatch photos
     assert (tmp_path / "cache" / "crex_match.json").exists()
 
 

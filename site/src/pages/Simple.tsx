@@ -90,11 +90,11 @@ const GLOSS: [string, string, string, string][] = [
   ["Team-specific markets", "Intermediate", "Rules", "Count only the team batting first."],
   ["Retired hurt", "Basic", "Rules", "Not a wicket. Penalty runs count. Super overs are ignored."],
   ["Batting position", "Intermediate", "Form", "Order in which a batter first appears at the crease (openers are 1 and 2)."],
-  ["Home / away / neutral", "Intermediate", "Form", "Inferred from the series name, the venue's host nation and who plays there most; Cricsheet has no home flag."],
+  ["Home / away / neutral", "Intermediate", "Form", "Inferred from the series name, the venue's host nation and who plays there most; the base data has no home flag."],
   ["Correlated props", "Advanced", "Betting", "How often a player's other props clear when a given prop clears, versus his normal rate."],
   ["Overround", "Advanced", "Betting", "The sum of implied probabilities above 100%: the bookmaker's margin."],
   ["Kelly stake", "Advanced", "Betting", "Stake sized from your edge: (p × price - 1) ÷ (price - 1). Quarter Kelly is the usual cautious fraction."],
-  ["Provisional matches", "Intermediate", "Data", "Scraped scorecards covering the gap until Cricsheet publishes: player totals only, so no partnerships or batting order."],
+  ["Provisional matches", "Intermediate", "Data", "Scraped scorecards covering the gap until the base data is updated: player totals only, so no partnerships or batting order."],
 ];
 export function GlossaryPage() {
   setTitle("Cricket stats explained");
@@ -120,11 +120,11 @@ export function GlossaryPage() {
 // ------------------------------------------------------------------ about (rules & data)
 const DEFS = [
   "Fair decimal price = 1 ÷ hit rate on the filtered sample. Pushes (whole-number lines) are void. A 90% interval shows how far small samples can mislead.",
-  "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: Cricsheet has no home flag.",
+  "Home / away / neutral is inferred from the event ('X tour of Y'), the venue's country and the team that plays most at the ground: the base data has no home flag.",
   "Batting position is the order batters first appear at the crease. Batting first / chasing is the player's team.",
   "Runs conceded include penalty runs, exclude byes and leg byes. Super overs are ignored.",
   "A player named in the XI who never batted or bowled shows as VOID (the bet is void); a player not named shows as DNP; an XI that was not recorded reliably shows N/A. None of the three counts in a hit rate.",
-  "Provisional (scraped) matches fill the gap before Cricsheet publishes: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets.",
+  "Provisional (scraped) matches fill the gap before the base data is updated: they carry player totals only, so they feed player props but not partnerships, batting position, innings order or match markets.",
 ];
 export function AboutPage() {
   setTitle("Rules and data");
@@ -138,8 +138,8 @@ export function AboutPage() {
       <Card className="px-4 shadow-none"><Accordion type="single" collapsible defaultValue="rules">
         <AccordionItem value="rules"><AccordionTrigger><span className="flex items-center gap-2">Settlement rules applied <Badge variant="secondary">{RULES.length}</Badge></span></AccordionTrigger><AccordionContent>{list(RULES)}</AccordionContent></AccordionItem>
         <AccordionItem value="defs"><AccordionTrigger><span className="flex items-center gap-2">Definitions <Badge variant="secondary">{DEFS.length}</Badge></span></AccordionTrigger><AccordionContent>{list(DEFS)}</AccordionContent></AccordionItem>
-        <AccordionItem value="fresh"><AccordionTrigger>Data freshness</AccordionTrigger><AccordionContent><p className="text-muted-foreground">Cricsheet data through <b>{f.newestCricsheet}</b>{f.provisionalIncluded ? <> · includes <b>{f.provisionalMatches}</b> provisional matches up to <b>{f.newestProvisional || "?"}</b></> : " · no provisional matches included"}.</p></AccordionContent></AccordionItem>
-        <AccordionItem value="credits"><AccordionTrigger>Credits and responsible use</AccordionTrigger><AccordionContent><p className="text-muted-foreground">Free cricket stats and player props. Photos: Wikimedia Commons (free licences, where available). Data: Cricsheet ball-by-ball (ODbL) plus provisional scorecards. Decimal prices only; fair price are 1 ÷ historical hit rate with no margin: a guide, not betting advice. 18+, gamble responsibly.</p></AccordionContent></AccordionItem>
+        <AccordionItem value="fresh"><AccordionTrigger>Data freshness</AccordionTrigger><AccordionContent><p className="text-muted-foreground">Ball-by-ball data through <b>{f.newestCricsheet}</b>{f.provisionalIncluded ? <> · includes <b>{f.provisionalMatches}</b> provisional matches up to <b>{f.newestProvisional || "?"}</b></> : " · no provisional matches included"}.</p></AccordionContent></AccordionItem>
+        <AccordionItem value="credits"><AccordionTrigger>Credits and responsible use</AccordionTrigger><AccordionContent><p className="text-muted-foreground">Free cricket stats and player props. Photos: Wikimedia Commons (free licences, where available). Data: open ball-by-ball data plus provisional scorecards. Decimal prices only; fair price are 1 ÷ historical hit rate with no margin: a guide, not betting advice. 18+, gamble responsibly.</p></AccordionContent></AccordionItem>
       </Accordion></Card>
       <Muted className="mt-3">See also: <Link className="text-primary" to="/glossary">Cricket stats explained</Link>.</Muted>
     </div>

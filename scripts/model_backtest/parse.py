@@ -1,7 +1,7 @@
 import zipfile, json, sys, pandas as pd
 from concurrent.futures import ProcessPoolExecutor
 import os
-Z=os.environ.get('CRICSHEET_ZIP','all_json.zip')  # https://cricsheet.org/downloads/all_json.zip
+Z=os.environ.get('CRICSHEET_ZIP','all_json.zip')  # https://base.test/downloads/all_json.zip
 FMT={'T20':'T20','IT20':'T20','ODI':'ODI','ODM':'ODI','Test':'Test'}
 def parse(name):
     try:

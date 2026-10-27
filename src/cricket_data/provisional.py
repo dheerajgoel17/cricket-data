@@ -1,18 +1,18 @@
-"""Provisional (not yet in Cricsheet) matches, and reconciliation when they land.
+"""Provisional (not yet in Base) matches, and reconciliation when they land.
 
 A provisional match is one JSON file under <data>/provisional/. There are three statuses:
 
-1. **provisional**: Normal lag between live match and Cricsheet release.
-   When Cricsheet publishes the match, reconcile compares, logs, and DELETES the file.
+1. **provisional**: Normal lag between live match and Base release.
+   When Base publishes the match, reconcile compares, logs, and DELETES the file.
 
-2. **cricsheet_missing**: Match is on Cricsheet's missing-matches list.
-   Keep permanently as source of truth. If Cricsheet later provides it, reconcile
-   and prefer Cricsheet (then delete the scraped version).
+2. **cricsheet_missing**: Match is on Base's missing-matches list.
+   Keep permanently as source of truth. If Base later provides it, reconcile
+   and prefer Base (then delete the scraped version).
 
-3. **cricsheet_withheld**: Afghanistan men's team or APL matches withheld by Cricsheet.
-   Keep permanently. If Cricsheet ever restores them, reconcile and prefer Cricsheet.
+3. **cricsheet_withheld**: Afghanistan men's team or APL matches withheld by Base.
+   Keep permanently. If Base ever restores them, reconcile and prefer Base.
 
-Permanent matches (statuses 2 and 3) are never deleted unless Cricsheet provides them.
+Permanent matches (statuses 2 and 3) are never deleted unless Base provides them.
 """
 from __future__ import annotations
 
@@ -93,9 +93,9 @@ def reconcile(store: Store, today: date | None = None) -> dict[str, int]:
     """Verify provisional matches against canonical ones and delete those that landed.
     
     Respects match status:
-    - provisional: Delete after Cricsheet arrival
-    - cricsheet_missing: Keep permanently unless Cricsheet provides it
-    - cricsheet_withheld: Keep permanently unless Cricsheet restores it
+    - provisional: Delete after Base arrival
+    - cricsheet_missing: Keep permanently unless Base provides it
+    - cricsheet_withheld: Keep permanently unless Base restores it
     
     Returns stats dict with counts by action taken.
     """
@@ -139,8 +139,8 @@ def reconcile(store: Store, today: date | None = None) -> dict[str, int]:
         
         # Determine action based on status
         if is_permanent:
-            # Permanent match: Cricsheet has now provided it
-            # Prefer Cricsheet and delete scraped version
+            # Permanent match: Base has now provided it
+            # Prefer Base and delete scraped version
             action = "replaced_by_cricsheet"
             should_delete = True
         else:

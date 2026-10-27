@@ -1,18 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, crexFmt, crexMatch, crexScorecardUrl, fixtureInBooks, hasCard, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  namesMatch, oversToBalls, parseCrexLive, parseCrexSchedule, parseCrexScorecard, parseScore, pricedLive, strikeRate, teamKey, teamScore, wantsCard,
+  ballsToOvers, bookFixtures, formatOf, buildMatch, cardPageUrl, fixtureInBooks, hasCard, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  namesMatch, oversToBalls, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, wantsCard,
 } from "../src/engine/live.js";
 
-function crexHtml(payload) {
+function pageHtml(payload) {
   return `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;
 }
 
-const FIXTURE = "https://stats.crickapi.com/fixture/getFixture";
-const LIVE = "https://api.goscorer.com/api/v3/getSV3";
-const CARD = "https://api.goscorer.com/api/v3/getSC4";
-const MAP = "https://oc.crickapi.com/mapping/getHomeMapData";
+const FIXTURE = "https://src.test/fixture/getFixture";
+const LIVE = "https://src.test/v3/getSV3";
+const CARD = "https://src.test/v3/getSC4";
+const MAP = "https://src.test/mapping/getHomeMapData";
 
 /** NZ v India T20I, second innings. The schedule page (cached ~5 min) still shows India at 7/0 (0.2). */
 const nzInd = {
@@ -22,7 +22,7 @@ const nzInd = {
 };
 
 /** Match page a minute later: India 42/0 (1.4), Sooryavanshi on strike, Milne bowling. */
-const nzIndLive = crexHtml({ [LIVE]: {
+const nzIndLive = pageHtml({ [LIVE]: {
   team1_f_n: "India", team2_f_n: "New Zealand", team1short: "IND", team2short: "NZ", rt: "India", inning: 2, status: 1,
   score1: "42-0", over1: "1.4", score2: "198-3", over2: "20.0",
   comment1: "IND need <b style='font-family: $font-DM; color: #cecece;'>157 runs </b> in <b>110 balls </b>",
@@ -34,7 +34,7 @@ const nzIndLive = crexHtml({ [LIVE]: {
 } });
 
 /** Scorecard page: NZ 198/3 (120 balls) and India 42/0 (10 balls). Wickets fell Seifert, Phillips, Allen: the card lists them in batting order. */
-const nzIndCard = crexHtml({
+const nzIndCard = pageHtml({
   [CARD]: [{
     c: "R", d: "198/3(120", e: "4.5.2.0.0",
     b: ["SEI.2.6.0.0.5.6.1.KUM", "ALN.40.25.4.3.104.57.5.ARS", "MIT.89.52.8.4", "PHI.17.14.1.0.64.30.1.ARS", "JAC.39.23.3.3"],
@@ -54,7 +54,7 @@ const nzIndCard = crexHtml({
   },
 });
 
-const chase = () => crexMatch(parseCrexSchedule(crexHtml({ [FIXTURE]: [nzInd] }))[0], parseCrexLive(nzIndLive), parseCrexScorecard(nzIndCard));
+const chase = () => buildMatch(parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }))[0], parseMatchPage(nzIndLive), parseCardPage(nzIndCard));
 
 test("parseScore reads the current innings from a score string", () => {
   assert.deepEqual(parseScore("145/4 (16.2 ov)"), { display: "145/4 (16.2 ov)", runs: 145, wkts: 4, overs: 16.2 });
@@ -86,30 +86,30 @@ test("teamKey folds Under-19 labels", () => {
   assert.equal(teamKey("India Women"), teamKey("India (W)"));
 });
 
-test("liveBlurb shows the CREX status line, not a bare Live", () => {
+test("liveBlurb shows the source's status line, not a bare Live", () => {
   assert.equal(liveBlurb({ summary: "Live", note: "" }), "");
   assert.equal(liveBlurb({ summary: "NZ A need 126 runs in 90 balls" }), "NZ A need 126 runs in 90 balls");
   assert.equal(liveBlurb({ summary: "Live", note: "Match delayed by bad light" }), "Match delayed by bad light");
 });
 
-test("crexFmt maps CREX format labels to the site's formats", () => {
+test("formatOf maps the source's format labels to the site's formats", () => {
   for (const [label, fmt] of [["T20I", "T20"], ["T20", "T20"], ["ODI", "ODI"], ["List A", "ODI"], ["Youth ODI", "ODI"], ["One Day", "ODI"], ["Test", "Test"], ["First Class", "Test"], ["Multi Day", "Test"], ["The Hundred", "Hundred"], ["", ""]]) {
-    assert.equal(crexFmt(label), fmt, label);
+    assert.equal(formatOf(label), fmt, label);
   }
 });
 
-test("parseCrexSchedule reads 119-2 / 17.3 as 119/2 (17.3 ov) (hand-computed)", () => {
-  const html = crexHtml({ [FIXTURE]: [{
+test("parseSchedule reads 119-2 / 17.3 as 119/2 (17.3 ov) (hand-computed)", () => {
+  const html = pageHtml({ [FIXTURE]: [{
     team1: "Netherlands", team2: "Oman", t1SName: "NED", t2SName: "OMA",
     s1: "119-2", o1: "17.3", s2: "", o2: "", t: Date.parse("2026-10-27T05:30:00Z"),
     status: 1, statusText: "OMA opt to Bowl", bf: "12", t1f: "12", t2f: "15", fo: "ODI",
     mf: "14VC", link: "/cricket-live-score/ned-vs-oma-14VC",
   }] });
-  const [m] = parseCrexSchedule(html);
+  const [m] = parseSchedule(html, "https://src.test");
   assert.equal(m.status, "live");
   assert.equal(m.fmt, "ODI");
   assert.equal(m.id, "14VC");
-  assert.equal(m.url, "https://crex.com/cricket-live-score/ned-vs-oma-14VC");
+  assert.equal(m.url, "https://src.test/cricket-live-score/ned-vs-oma-14VC");
   assert.equal(m.summary, "OMA opt to Bowl");
   assert.equal(m.teams[0].display, "119/2 (17.3 ov)");
   assert.equal(m.teams[0].runs, 119);
@@ -120,17 +120,17 @@ test("parseCrexSchedule reads 119-2 / 17.3 as 119/2 (17.3 ov) (hand-computed)", 
   assert.equal(m.teams[1].batting, false);
 });
 
-test("parseCrexSchedule: second innings bats the side that did not bat first; toss-time 0/0 is not a score; a result is final", () => {
-  const [m] = parseCrexSchedule(crexHtml({ [FIXTURE]: [nzInd] }));
+test("parseSchedule: second innings bats the side that did not bat first; toss-time 0/0 is not a score; a result is final", () => {
+  const [m] = parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }));
   assert.equal(m.fmt, "T20");
   assert.equal(m.teams[0].batting, false); // New Zealand batted first (bf) and are done
   assert.equal(m.teams[1].batting, true);
   assert.equal(m.teams[1].display, "7/0 (0.2 ov)");
-  const [toss] = parseCrexSchedule(crexHtml({ [FIXTURE]: [{ team1: "New Zealand", team2: "India", s1: "0/0", o1: "0.0", t: Date.parse("2026-10-27T07:00:00Z"), status: 1 }] }));
+  const [toss] = parseSchedule(pageHtml({ [FIXTURE]: [{ team1: "New Zealand", team2: "India", s1: "0/0", o1: "0.0", t: Date.parse("2026-10-27T07:00:00Z"), status: 1 }] }));
   assert.equal(toss.status, "upcoming");
   assert.equal(toss.teams[0].display, "");
   assert.equal(toss.teams[0].batting, false);
-  const [won] = parseCrexSchedule(crexHtml({ [FIXTURE]: [{ ...nzInd, winningTeam: 1, w: 1, s2: "199-4", o2: "18.2" }] }));
+  const [won] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, winningTeam: 1, w: 1, s2: "199-4", o2: "18.2" }] }));
   assert.equal(won.status, "final");
 });
 
@@ -151,7 +151,7 @@ test("pricedLive keeps only matches the books price (player props or fancy), not
     fancy: [{ match: "Netherlands vs Oman", start_utc: "2026-10-27T09:00:00Z" }],
   });
   assert.equal(books.length, 2);
-  const rows = parseCrexSchedule(crexHtml({ [FIXTURE]: [
+  const rows = parseSchedule(pageHtml({ [FIXTURE]: [
     nzInd,
     { team1: "Netherlands", team2: "Oman", t: Date.parse("2026-10-27T09:00:00Z"), s1: "10-0", o1: "2.0", status: 1 },
     { team1: "Oman U19", team2: "Afghanistan U19", t: Date.parse("2026-10-27T05:30:00Z"), s2: "421-5", o2: "50.0", status: 1 },
@@ -162,8 +162,8 @@ test("pricedLive keeps only matches the books price (player props or fancy), not
   assert.equal(fixtureInBooks(books, { a: "Oman U19", b: "Afghanistan U19", start: "2026-10-27T05:30:00Z" }), false);
 });
 
-test("parseCrexLive current batters and bowler (hand-computed)", () => {
-  const html = crexHtml({ [LIVE]: {
+test("parseMatchPage current batters and bowler (hand-computed)", () => {
+  const html = pageHtml({ [LIVE]: {
     team1_f_n: "Netherlands", team2_f_n: "Oman", team1: "NED", team2: "OMA", team1short: "NED", team2short: "OMA",
     score1: "119-2", over1: "17.3", score2: "", over2: "", rt: "Netherlands", status: 1, inning: 1,
     comment1: "NED <b style='color: #ccc;'>need 12 runs </b> in <b>30 balls </b>",
@@ -175,7 +175,7 @@ test("parseCrexLive current batters and bowler (hand-computed)", () => {
     sr1: "33.33", sr2: "108.82",
     lastovers: [{ over: "Over 17", overinfo: ["1", "0", "4", "W", "0", "1"], total: 6 }, { over: "Over 18", overinfo: ["0", "1", "1"], total: 2 }],
   } });
-  const m = parseCrexLive(html);
+  const m = parseMatchPage(html);
   assert.equal(m.teams[0].runs, 119);
   assert.equal(m.summary, "NED need 12 runs in 30 balls", "markup in the status line is stripped");
   assert.equal(m.innings[0].n, 1);
@@ -201,13 +201,13 @@ test("parseCrexLive current batters and bowler (hand-computed)", () => {
   assert.deepEqual(board.overs, [{ balls: ["1", "0", "4", "W", "0", "1"] }, { balls: ["0", "1", "1"] }], "deliveries stay grouped by over");
 });
 
-test("crexScorecardUrl appends /match-scorecard", () => {
-  assert.equal(crexScorecardUrl("https://crex.com/cricket-live-score/ned-vs-oma-14VC"), "https://crex.com/cricket-live-score/ned-vs-oma-14VC/match-scorecard");
-  assert.equal(crexScorecardUrl("https://crex.com/x/match-scorecard"), "https://crex.com/x/match-scorecard");
+test("cardPageUrl appends /match-scorecard", () => {
+  assert.equal(cardPageUrl("https://src.test/cricket-live-score/ned-vs-oma-14VC"), "https://src.test/cricket-live-score/ned-vs-oma-14VC/match-scorecard");
+  assert.equal(cardPageUrl("https://src.test/x/match-scorecard"), "https://src.test/x/match-scorecard");
 });
 
-test("parseCrexScorecard batting, extras, FOW, yet-to-bat, bowling (hand-computed)", () => {
-  const html = crexHtml({
+test("parseCardPage batting, extras, FOW, yet-to-bat, bowling (hand-computed)", () => {
+  const html = pageHtml({
     [CARD]: [{
       a: ["E5.34.24.0.1"],
       b: ["FL.52.37.6.2.70.107.2.AXL.A9/", "FP5.12.11.2.0.27.38.1.E5/", "TIL"],
@@ -221,7 +221,7 @@ test("parseCrexScorecard batting, extras, FOW, yet-to-bat, bowling (hand-compute
       t: [{ f_key: "V", n: "West Indies" }, { f_key: "O", n: "India" }],
     },
   });
-  const m = parseCrexScorecard(html);
+  const m = parseCardPage(html);
   const inn = liveCard(m)[0];
   assert.equal(inn.team, "West Indies");
   assert.equal(inn.runs, 171);
@@ -294,15 +294,15 @@ test("last wicket is the latest fall, not the last dismissed batter in batting o
 });
 
 test("without the match page the card still keeps the board on the batting side", () => {
-  const row = parseCrexSchedule(crexHtml({ [FIXTURE]: [nzInd] }))[0];
-  const m = crexMatch(row, null, parseCrexScorecard(nzIndCard));
+  const row = parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }))[0];
+  const m = buildMatch(row, null, parseCardPage(nzIndCard));
   assert.equal(teamScore(m, "India").display, "7/0 (0.2 ov)", "schedule score when the match page is down");
   assert.deepEqual(liveBoard(m).batters.map((p) => p.name), ["Vaibhav Sooryavanshi", "Abhishek Sharma"]);
 });
 
 test("without the scorecard the match page alone still gives the pair, rates and the current innings", () => {
-  const row = parseCrexSchedule(crexHtml({ [FIXTURE]: [nzInd] }))[0];
-  const m = crexMatch(row, parseCrexLive(nzIndLive), null);
+  const row = parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }))[0];
+  const m = buildMatch(row, parseMatchPage(nzIndLive), null);
   assert.equal(hasCard(m), false);
   assert.deepEqual(m.innings.map((i) => [i.n, i.team, i.runs]), [[2, "India", 42]]);
   assert.deepEqual(liveBoard(m).batters.map((p) => p.name), ["Vaibhav Sooryavanshi", "Abhishek Sharma"]);
@@ -310,22 +310,22 @@ test("without the scorecard the match page alone still gives the pair, rates and
 });
 
 test("with neither page the schedule row stands as it is", () => {
-  const row = parseCrexSchedule(crexHtml({ [FIXTURE]: [nzInd] }))[0];
-  const m = crexMatch(row, null, null);
+  const row = parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }))[0];
+  const m = buildMatch(row, null, null);
   assert.equal(m.status, "live");
   assert.equal(teamScore(m, "India").display, "7/0 (0.2 ov)");
   assert.equal(liveBoard(m), null);
 });
 
 test("a priced match that has not started stays upcoming even with both pages", () => {
-  const row = parseCrexSchedule(crexHtml({ [FIXTURE]: [{ team1: "Afghanistan", team2: "Zimbabwe", t: Date.parse("2026-10-27T14:30:00Z"), status: 0, mf: "13TM" }] }))[0];
-  const m = crexMatch(row, parseCrexLive(crexHtml({ [LIVE]: { team1_f_n: "Afghanistan", team2_f_n: "Zimbabwe", score1: "0-0", over1: "0.0", rt: "Afghanistan" } })), null);
+  const row = parseSchedule(pageHtml({ [FIXTURE]: [{ team1: "Afghanistan", team2: "Zimbabwe", t: Date.parse("2026-10-27T14:30:00Z"), status: 0, mf: "13TM" }] }))[0];
+  const m = buildMatch(row, parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "Afghanistan", team2_f_n: "Zimbabwe", score1: "0-0", over1: "0.0", rt: "Afghanistan" } })), null);
   assert.equal(m.status, "upcoming");
   assert.equal(teamScore(m, "Afghanistan").display, "");
 });
 
-test("liveForFixture matches CREX team names within the start window", () => {
-  const rows = parseCrexSchedule(crexHtml({ [FIXTURE]: [
+test("liveForFixture matches team names within the start window", () => {
+  const rows = parseSchedule(pageHtml({ [FIXTURE]: [
     { team1: "Netherlands", team2: "Oman", s1: "145-4", o1: "32.2", t: Date.parse("2026-10-27T09:00:00Z"), status: 1, mf: "14VC" },
     { team1: "Afghanistan", team2: "Zimbabwe", t: Date.parse("2026-10-27T14:30:00Z"), status: 0, mf: "13TM" },
   ] }));

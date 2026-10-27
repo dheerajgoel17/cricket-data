@@ -1,4 +1,4 @@
-"""Ball-by-ball (Cricsheet JSON) -> per-innings batting/bowling rows, partnerships and match-market aggregates.
+"""Ball-by-ball (Base JSON) -> per-innings batting/bowling rows, partnerships and match-market aggregates.
 
 Rules baked in here (see docs/SITE.md):
 * balls faced exclude wides; a boundary four excludes `non_boundary` runs; sixes are batter runs == 6

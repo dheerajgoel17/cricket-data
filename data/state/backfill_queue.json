@@ -5,2089 +5,2089 @@
  "delay_between_requests": 5.0,
  "done": [
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO",
+   "crex_url": "/cricket-live-score/afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO",
    "key": "2026-09-28-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-2nd-qtr-final-asian-games-mens-t20-2026-match-updates-13PO",
    "saved_at": "2026-10-10T09:58:15"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
+   "crex_url": "/cricket-live-score/afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
    "key": "2026-09-25-Afghanistan-Nepal",
    "match_id": "crex-afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
    "saved_at": "2026-10-10T09:58:32"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
+   "crex_url": "/cricket-live-score/afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
    "key": "2026-09-24-Afghanistan-Japan",
    "match_id": "crex-afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
    "saved_at": "2026-10-10T09:58:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
+   "crex_url": "/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
    "key": "2026-09-17-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-3rd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IZ",
    "saved_at": "2026-10-10T09:58:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
+   "crex_url": "/cricket-live-score/afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
    "key": "2026-09-15-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
    "saved_at": "2026-10-10T09:59:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
+   "crex_url": "/cricket-live-score/afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
    "key": "2026-09-13-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
    "saved_at": "2026-10-10T09:59:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-5th-odi-afghanistan-tour-of-ireland-2026-match-updates-114Q",
+   "crex_url": "/cricket-live-score/afg-vs-ire-5th-odi-afghanistan-tour-of-ireland-2026-match-updates-114Q",
    "key": "2026-08-15-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-5th-odi-afghanistan-tour-of-ireland-2026-match-updates-114Q",
    "saved_at": "2026-10-10T09:59:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-4th-odi-afghanistan-tour-of-ireland-2026-match-updates-114P",
+   "crex_url": "/cricket-live-score/afg-vs-ire-4th-odi-afghanistan-tour-of-ireland-2026-match-updates-114P",
    "key": "2026-08-12-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-4th-odi-afghanistan-tour-of-ireland-2026-match-updates-114P",
    "saved_at": "2026-10-10T09:59:47"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-tour-of-ireland-2026-match-updates-114O",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-tour-of-ireland-2026-match-updates-114O",
    "key": "2026-08-10-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-tour-of-ireland-2026-match-updates-114O",
    "saved_at": "2026-10-10T10:00:00"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2026-match-updates-114N",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2026-match-updates-114N",
    "key": "2026-08-07-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2026-match-updates-114N",
    "saved_at": "2026-10-10T10:00:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-tour-of-ireland-2026-match-updates-114M",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-tour-of-ireland-2026-match-updates-114M",
    "key": "2026-08-05-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-tour-of-ireland-2026-match-updates-114M",
    "saved_at": "2026-10-10T10:00:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-odi-afghanistan-tour-of-india-2026-match-updates-10ZF",
+   "crex_url": "/cricket-live-score/afg-vs-ind-3rd-odi-afghanistan-tour-of-india-2026-match-updates-10ZF",
    "key": "2026-06-20-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-3rd-odi-afghanistan-tour-of-india-2026-match-updates-10ZF",
    "saved_at": "2026-10-10T10:00:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-2nd-odi-afghanistan-tour-of-india-2026-match-updates-10ZE",
+   "crex_url": "/cricket-live-score/afg-vs-ind-2nd-odi-afghanistan-tour-of-india-2026-match-updates-10ZE",
    "key": "2026-06-17-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-2nd-odi-afghanistan-tour-of-india-2026-match-updates-10ZE",
    "saved_at": "2026-10-10T10:00:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-odi-afghanistan-tour-of-india-2026-match-updates-12NK",
+   "crex_url": "/cricket-live-score/afg-vs-ind-1st-odi-afghanistan-tour-of-india-2026-match-updates-12NK",
    "key": "2026-06-13-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-1st-odi-afghanistan-tour-of-india-2026-match-updates-12NK",
    "saved_at": "2026-10-10T10:01:03"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-only-test-afghanistan-tour-of-india-2026-match-updates-10ZC",
+   "crex_url": "/cricket-live-score/afg-vs-ind-only-test-afghanistan-tour-of-india-2026-match-updates-10ZC",
    "key": "2026-06-06-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-only-test-afghanistan-tour-of-india-2026-match-updates-10ZC",
    "saved_at": "2026-10-10T10:01:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-39th-match-t20-world-cup-2026-match-updates-Y9V",
+   "crex_url": "/cricket-live-score/afg-vs-can-39th-match-t20-world-cup-2026-match-updates-Y9V",
    "key": "2026-02-19-Afghanistan-Canada",
    "match_id": "crex-afg-vs-can-39th-match-t20-world-cup-2026-match-updates-Y9V",
    "saved_at": "2026-10-10T10:01:34"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-28th-match-t20-world-cup-2026-match-updates-Y9K",
+   "crex_url": "/cricket-live-score/afg-vs-uae-28th-match-t20-world-cup-2026-match-updates-Y9K",
    "key": "2026-02-16-Afghanistan-United Arab Emirates",
    "match_id": "crex-afg-vs-uae-28th-match-t20-world-cup-2026-match-updates-Y9K",
    "saved_at": "2026-10-10T10:01:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-13th-match-t20-world-cup-2026-match-updates-Y95",
+   "crex_url": "/cricket-live-score/afg-vs-sa-13th-match-t20-world-cup-2026-match-updates-Y95",
    "key": "2026-02-11-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-13th-match-t20-world-cup-2026-match-updates-Y95",
    "saved_at": "2026-10-10T10:01:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-4th-match-t20-world-cup-2026-match-updates-Y8W",
+   "crex_url": "/cricket-live-score/afg-vs-nz-4th-match-t20-world-cup-2026-match-updates-Y8W",
    "key": "2026-02-08-Afghanistan-New Zealand",
    "match_id": "crex-afg-vs-nz-4th-match-t20-world-cup-2026-match-updates-Y8W",
    "saved_at": "2026-10-10T10:02:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-8th-match-t20-world-cup-warm-up-2026-match-updates-ZMD",
+   "crex_url": "/cricket-live-score/afg-vs-wi-8th-match-t20-world-cup-warm-up-2026-match-updates-ZMD",
    "key": "2026-02-04-Afghanistan-West Indies",
    "match_id": "crex-afg-vs-wi-8th-match-t20-world-cup-warm-up-2026-match-updates-ZMD",
    "saved_at": "2026-10-10T10:02:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-1st-match-t20-world-cup-warm-up-2026-match-updates-ZM6",
+   "crex_url": "/cricket-live-score/afg-vs-sco-1st-match-t20-world-cup-warm-up-2026-match-updates-ZM6",
    "key": "2026-02-02-Afghanistan-Scotland",
    "match_id": "crex-afg-vs-sco-1st-match-t20-world-cup-warm-up-2026-match-updates-ZM6",
    "saved_at": "2026-10-10T10:02:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-3rd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3B",
+   "crex_url": "/cricket-live-score/afg-vs-wi-3rd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3B",
    "key": "2026-01-22-Afghanistan-West Indies",
    "match_id": "crex-afg-vs-wi-3rd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3B",
    "saved_at": "2026-10-10T10:02:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-2nd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3A",
+   "crex_url": "/cricket-live-score/afg-vs-wi-2nd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3A",
    "key": "2026-01-21-Afghanistan-West Indies",
    "match_id": "crex-afg-vs-wi-2nd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3A",
    "saved_at": "2026-10-10T10:03:03"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-1st-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z39",
+   "crex_url": "/cricket-live-score/afg-vs-wi-1st-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z39",
    "key": "2026-01-19-Afghanistan-West Indies",
    "match_id": "crex-afg-vs-wi-1st-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z39",
    "saved_at": "2026-10-10T10:03:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF",
+   "crex_url": "/cricket-live-score/har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF",
    "key": "2025-12-18-Jharkhand-Haryana",
    "match_id": "crex-har-vs-jhkd-final-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKF",
    "saved_at": "2026-10-10T10:03:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mp-vs-pun-121st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKB",
+   "crex_url": "/cricket-live-score/mp-vs-pun-121st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKB",
    "key": "2025-12-16-Madhya Pradesh-Punjab",
    "match_id": "crex-mp-vs-pun-121st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKB",
    "saved_at": "2026-10-11T10:07:32"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-raj-122nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKC",
+   "crex_url": "/cricket-live-score/mum-vs-raj-122nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKC",
    "key": "2025-12-16-Rajasthan-Mumbai",
    "match_id": "crex-mum-vs-raj-122nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKC",
    "saved_at": "2026-10-11T10:07:45"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-jhkd-123rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKD",
+   "crex_url": "/cricket-live-score/andr-vs-jhkd-123rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKD",
    "key": "2025-12-16-Andhra-Jharkhand",
    "match_id": "crex-andr-vs-jhkd-123rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKD",
    "saved_at": "2026-10-11T10:07:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-hyd-124th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKE",
+   "crex_url": "/cricket-live-score/har-vs-hyd-124th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKE",
    "key": "2025-12-16-Haryana-Hyderabad (India)",
    "match_id": "crex-har-vs-hyd-124th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKE",
    "saved_at": "2026-10-11T10:08:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-mum-117th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK7",
+   "crex_url": "/cricket-live-score/har-vs-mum-117th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK7",
    "key": "2025-12-14-Haryana-Mumbai",
    "match_id": "crex-har-vs-mum-117th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK7",
    "saved_at": "2026-10-11T10:08:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-pun-118th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK8",
+   "crex_url": "/cricket-live-score/andr-vs-pun-118th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK8",
    "key": "2025-12-14-Punjab-Andhra",
    "match_id": "crex-andr-vs-pun-118th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK8",
    "saved_at": "2026-10-11T10:08:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-raj-119th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK9",
+   "crex_url": "/cricket-live-score/hyd-vs-raj-119th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK9",
    "key": "2025-12-14-Rajasthan-Hyderabad (India)",
    "match_id": "crex-hyd-vs-raj-119th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK9",
    "saved_at": "2026-10-11T10:08:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-mp-120th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKA",
+   "crex_url": "/cricket-live-score/jhkd-vs-mp-120th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKA",
    "key": "2025-12-14-Jharkhand-Madhya Pradesh",
    "match_id": "crex-jhkd-vs-mp-120th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKA",
    "saved_at": "2026-10-11T10:08:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-mp-113th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK3",
+   "crex_url": "/cricket-live-score/andr-vs-mp-113th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK3",
    "key": "2025-12-12-Andhra-Madhya Pradesh",
    "match_id": "crex-andr-vs-mp-113th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK3",
    "saved_at": "2026-10-11T10:09:12"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-raj-114th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK4",
+   "crex_url": "/cricket-live-score/har-vs-raj-114th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK4",
    "key": "2025-12-12-Rajasthan-Haryana",
    "match_id": "crex-har-vs-raj-114th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK4",
    "saved_at": "2026-10-11T10:09:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-pun-115th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK5",
+   "crex_url": "/cricket-live-score/jhkd-vs-pun-115th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK5",
    "key": "2025-12-12-Punjab-Jharkhand",
    "match_id": "crex-jhkd-vs-pun-115th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK5",
    "saved_at": "2026-10-11T10:09:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mum-116th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK6",
+   "crex_url": "/cricket-live-score/hyd-vs-mum-116th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK6",
    "key": "2025-12-12-Mumbai-Hyderabad (India)",
    "match_id": "crex-hyd-vs-mum-116th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK6",
    "saved_at": "2026-10-11T10:09:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/chg-vs-rlys-108th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLW",
+   "crex_url": "/cricket-live-score/chg-vs-rlys-108th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLW",
    "key": "2025-12-08-Railways-Chhattisgarh",
    "match_id": "crex-chg-vs-rlys-108th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLW",
    "saved_at": "2026-10-11T10:10:06"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-odsa-112th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLX",
+   "crex_url": "/cricket-live-score/mum-vs-odsa-112th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLX",
    "key": "2025-12-08-Odisha-Mumbai",
    "match_id": "crex-mum-vs-odsa-112th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLX",
    "saved_at": "2026-10-11T10:10:19"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-vid-100th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLO",
+   "crex_url": "/cricket-live-score/andr-vs-vid-100th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLO",
    "key": "2025-12-08-Vidarbha-Andhra",
    "match_id": "crex-andr-vs-vid-100th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLO",
    "saved_at": "2026-10-11T10:10:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-ker-104th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLP",
+   "crex_url": "/cricket-live-score/asm-vs-ker-104th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLP",
    "key": "2025-12-08-Kerala-Assam",
    "match_id": "crex-asm-vs-ker-104th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLP",
    "saved_at": "2026-10-11T10:10:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jk-vs-mp-111th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLV",
+   "crex_url": "/cricket-live-score/jk-vs-mp-111th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLV",
    "key": "2025-12-08-Jammu  Kashmir-Madhya Pradesh",
    "match_id": "crex-jk-vs-mp-111th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLV",
    "saved_at": "2026-10-11T10:10:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-hyd-103rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLN",
+   "crex_url": "/cricket-live-score/cg-vs-hyd-103rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLN",
    "key": "2025-12-08-Hyderabad (India)-Chandigarh",
    "match_id": "crex-cg-vs-hyd-103rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLN",
    "saved_at": "2026-10-11T10:11:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/goa-vs-mah-105th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLU",
+   "crex_url": "/cricket-live-score/goa-vs-mah-105th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLU",
    "key": "2025-12-08-Maharashtra-Goa",
    "match_id": "crex-goa-vs-mah-105th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLU",
    "saved_at": "2026-10-11T10:11:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-up-97th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLM",
+   "crex_url": "/cricket-live-score/bihr-vs-up-97th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLM",
    "key": "2025-12-08-Uttar Pradesh-Bihar",
    "match_id": "crex-bihr-vs-up-97th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLM",
    "saved_at": "2026-10-11T10:11:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-pun-107th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLS",
+   "crex_url": "/cricket-live-score/guj-vs-pun-107th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLS",
    "key": "2025-12-08-Punjab-Gujarat",
    "match_id": "crex-guj-vs-pun-107th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLS",
    "saved_at": "2026-10-11T10:11:48"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-har-102nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLL",
+   "crex_url": "/cricket-live-score/ben-vs-har-102nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLL",
    "key": "2025-12-08-Haryana-Bengal",
    "match_id": "crex-ben-vs-har-102nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLL",
    "saved_at": "2026-10-11T10:12:00"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-ser-99th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLK",
+   "crex_url": "/cricket-live-score/brd-vs-ser-99th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLK",
    "key": "2025-12-08-Baroda-Services",
    "match_id": "crex-brd-vs-ser-99th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLK",
    "saved_at": "2026-10-11T10:12:12"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-pdc-110th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLT",
+   "crex_url": "/cricket-live-score/hp-vs-pdc-110th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLT",
    "key": "2025-12-08-Puducherry-Himachal Pradesh",
    "match_id": "crex-hp-vs-pdc-110th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLT",
    "saved_at": "2026-10-11T10:12:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-tri-106th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLQ",
+   "crex_url": "/cricket-live-score/kar-vs-tri-106th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLQ",
    "key": "2025-12-08-Karnataka-Tripura",
    "match_id": "crex-kar-vs-tri-106th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLQ",
    "saved_at": "2026-10-11T10:12:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/saur-vs-tn-109th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLR",
+   "crex_url": "/cricket-live-score/saur-vs-tn-109th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLR",
    "key": "2025-12-08-Saurashtra-Tamil Nadu",
    "match_id": "crex-saur-vs-tn-109th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLR",
    "saved_at": "2026-10-11T10:12:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-utk-98th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLI",
+   "crex_url": "/cricket-live-score/del-vs-utk-98th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLI",
    "key": "2025-12-08-Delhi-Uttarakhand",
    "match_id": "crex-del-vs-utk-98th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLI",
    "saved_at": "2026-10-11T10:13:02"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-raj-101st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLJ",
+   "crex_url": "/cricket-live-score/jhkd-vs-raj-101st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLJ",
    "key": "2025-12-08-Jharkhand-Rajasthan",
    "match_id": "crex-jhkd-vs-raj-101st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLJ",
    "saved_at": "2026-10-11T10:13:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/rlys-vs-vid-96th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLH",
+   "crex_url": "/cricket-live-score/rlys-vs-vid-96th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLH",
    "key": "2025-12-06-Vidarbha-Railways",
    "match_id": "crex-rlys-vs-vid-96th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLH",
    "saved_at": "2026-10-11T10:13:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-odsa-84th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL8",
+   "crex_url": "/cricket-live-score/asm-vs-odsa-84th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL8",
    "key": "2025-12-06-Odisha-Assam",
    "match_id": "crex-asm-vs-odsa-84th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL8",
    "saved_at": "2026-10-11T10:13:39"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-ker-92nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLG",
+   "crex_url": "/cricket-live-score/andr-vs-ker-92nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLG",
    "key": "2025-12-06-Kerala-Andhra",
    "match_id": "crex-andr-vs-ker-92nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLG",
    "saved_at": "2026-10-12T11:01:14"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/chg-vs-mum-88th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL9",
+   "crex_url": "/cricket-live-score/chg-vs-mum-88th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL9",
    "key": "2025-12-06-Chhattisgarh-Mumbai",
    "match_id": "crex-chg-vs-mum-88th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL9",
    "saved_at": "2026-10-12T11:01:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-mp-81st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL6",
+   "crex_url": "/cricket-live-score/cg-vs-mp-81st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL6",
    "key": "2025-12-06-Chandigarh-Madhya Pradesh",
    "match_id": "crex-cg-vs-mp-81st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL6",
    "saved_at": "2026-10-12T11:01:39"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/goa-vs-jk-87th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL7",
+   "crex_url": "/cricket-live-score/goa-vs-jk-87th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL7",
    "key": "2025-12-06-Jammu  Kashmir-Goa",
    "match_id": "crex-goa-vs-jk-87th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL7",
    "saved_at": "2026-10-12T11:01:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mah-vs-up-95th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLF",
+   "crex_url": "/cricket-live-score/mah-vs-up-95th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLF",
    "key": "2025-12-06-Uttar Pradesh-Maharashtra",
    "match_id": "crex-mah-vs-up-95th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLF",
    "saved_at": "2026-10-12T11:02:03"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-hyd-89th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLE",
+   "crex_url": "/cricket-live-score/bihr-vs-hyd-89th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLE",
    "key": "2025-12-06-Bihar-Hyderabad (India)",
    "match_id": "crex-bihr-vs-hyd-89th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLE",
    "saved_at": "2026-10-12T11:02:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/pun-vs-ser-94th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLD",
+   "crex_url": "/cricket-live-score/pun-vs-ser-94th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLD",
    "key": "2025-12-06-Punjab-Services",
    "match_id": "crex-pun-vs-ser-94th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLD",
    "saved_at": "2026-10-12T11:02:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-hp-85th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL5",
+   "crex_url": "/cricket-live-score/guj-vs-hp-85th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL5",
    "key": "2025-12-06-Himachal Pradesh-Gujarat",
    "match_id": "crex-guj-vs-hp-85th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL5",
    "saved_at": "2026-10-12T11:02:40"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-pdc-83rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL4",
+   "crex_url": "/cricket-live-score/ben-vs-pdc-83rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL4",
    "key": "2025-12-06-Puducherry-Bengal",
    "match_id": "crex-ben-vs-pdc-83rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL4",
    "saved_at": "2026-10-12T11:02:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-har-91st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLC",
+   "crex_url": "/cricket-live-score/brd-vs-har-91st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLC",
    "key": "2025-12-06-Haryana-Baroda",
    "match_id": "crex-brd-vs-har-91st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLC",
    "saved_at": "2026-10-12T11:03:05"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tri-vs-utk-93rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLB",
+   "crex_url": "/cricket-live-score/tri-vs-utk-93rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLB",
    "key": "2025-12-06-Tripura-Uttarakhand",
    "match_id": "crex-tri-vs-utk-93rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLB",
    "saved_at": "2026-10-12T11:03:17"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-tn-82nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL2",
+   "crex_url": "/cricket-live-score/jhkd-vs-tn-82nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL2",
    "key": "2025-12-06-Jharkhand-Tamil Nadu",
    "match_id": "crex-jhkd-vs-tn-82nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL2",
    "saved_at": "2026-10-12T11:03:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-raj-90th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLA",
+   "crex_url": "/cricket-live-score/del-vs-raj-90th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLA",
    "key": "2025-12-06-Delhi-Rajasthan",
    "match_id": "crex-del-vs-raj-90th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLA",
    "saved_at": "2026-10-12T11:03:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-saur-86th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL3",
+   "crex_url": "/cricket-live-score/kar-vs-saur-86th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL3",
    "key": "2025-12-06-Saurashtra-Karnataka",
    "match_id": "crex-kar-vs-saur-86th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL3",
    "saved_at": "2026-10-12T11:03:54"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-sikm-final-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ9",
+   "crex_url": "/cricket-live-score/miz-vs-sikm-final-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ9",
    "key": "2025-12-06-Mizoram-Sikkim",
    "match_id": "crex-miz-vs-sikm-final-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ9",
    "saved_at": "2026-10-12T11:04:07"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/odsa-vs-rlys-80th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL1",
+   "crex_url": "/cricket-live-score/odsa-vs-rlys-80th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL1",
    "key": "2025-12-04-Odisha-Railways",
    "match_id": "crex-odsa-vs-rlys-80th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL1",
    "saved_at": "2026-10-12T11:04:19"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-chg-76th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL0",
+   "crex_url": "/cricket-live-score/andr-vs-chg-76th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL0",
    "key": "2025-12-04-Chhattisgarh-Andhra",
    "match_id": "crex-andr-vs-chg-76th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL0",
    "saved_at": "2026-10-12T11:04:32"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-mum-68th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKS",
+   "crex_url": "/cricket-live-score/ker-vs-mum-68th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKS",
    "key": "2025-12-04-Kerala-Mumbai",
    "match_id": "crex-ker-vs-mum-68th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKS",
    "saved_at": "2026-10-12T11:04:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-vid-72nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKT",
+   "crex_url": "/cricket-live-score/asm-vs-vid-72nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKT",
    "key": "2025-12-04-Assam-Vidarbha",
    "match_id": "crex-asm-vs-vid-72nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKT",
    "saved_at": "2026-10-12T11:04:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mah-vs-mp-79th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKZ",
+   "crex_url": "/cricket-live-score/mah-vs-mp-79th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKZ",
    "key": "2025-12-04-Madhya Pradesh-Maharashtra",
    "match_id": "crex-mah-vs-mp-79th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKZ",
    "saved_at": "2026-10-12T11:05:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-up-71st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKR",
+   "crex_url": "/cricket-live-score/cg-vs-up-71st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKR",
    "key": "2025-12-04-Uttar Pradesh-Chandigarh",
    "match_id": "crex-cg-vs-up-71st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKR",
    "saved_at": "2026-10-12T11:05:20"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-jk-65th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKQ",
+   "crex_url": "/cricket-live-score/hyd-vs-jk-65th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKQ",
    "key": "2025-12-04-Jammu  Kashmir-Hyderabad (India)",
    "match_id": "crex-hyd-vs-jk-65th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKQ",
    "saved_at": "2026-10-12T11:05:33"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-goa-73rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKY",
+   "crex_url": "/cricket-live-score/bihr-vs-goa-73rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKY",
    "key": "2025-12-04-Bihar-Goa",
    "match_id": "crex-bihr-vs-goa-73rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKY",
    "saved_at": "2026-10-12T11:05:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/pdc-vs-pun-78th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKX",
+   "crex_url": "/cricket-live-score/pdc-vs-pun-78th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKX",
    "key": "2025-12-04-Punjab-Puducherry",
    "match_id": "crex-pdc-vs-pun-78th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKX",
    "saved_at": "2026-10-12T11:05:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-guj-75th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKW",
+   "crex_url": "/cricket-live-score/brd-vs-guj-75th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKW",
    "key": "2025-12-04-Gujarat-Baroda",
    "match_id": "crex-brd-vs-guj-75th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKW",
    "saved_at": "2026-10-13T10:44:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-ser-70th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKP",
+   "crex_url": "/cricket-live-score/ben-vs-ser-70th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKP",
    "key": "2025-12-04-Services-Bengal",
    "match_id": "crex-ben-vs-ser-70th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKP",
    "saved_at": "2026-10-13T10:44:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-hp-67th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKO",
+   "crex_url": "/cricket-live-score/har-vs-hp-67th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKO",
    "key": "2025-12-04-Himachal Pradesh-Haryana",
    "match_id": "crex-har-vs-hp-67th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKO",
    "saved_at": "2026-10-13T10:44:40"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tn-vs-tri-77th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKV",
+   "crex_url": "/cricket-live-score/tn-vs-tri-77th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKV",
    "key": "2025-12-04-Tamil Nadu-Tripura",
    "match_id": "crex-tn-vs-tri-77th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKV",
    "saved_at": "2026-10-13T10:44:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-kar-74th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKU",
+   "crex_url": "/cricket-live-score/del-vs-kar-74th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKU",
    "key": "2025-12-04-Delhi-Karnataka",
    "match_id": "crex-del-vs-kar-74th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKU",
    "saved_at": "2026-10-13T10:45:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/raj-vs-saur-66th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKM",
+   "crex_url": "/cricket-live-score/raj-vs-saur-66th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKM",
    "key": "2025-12-04-Saurashtra-Rajasthan",
    "match_id": "crex-raj-vs-saur-66th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKM",
    "saved_at": "2026-10-13T10:45:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-utk-69th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKN",
+   "crex_url": "/cricket-live-score/jhkd-vs-utk-69th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKN",
    "key": "2025-12-04-Uttarakhand-Jharkhand",
    "match_id": "crex-jhkd-vs-utk-69th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKN",
    "saved_at": "2026-10-13T10:45:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mnp-vs-nagl-14th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ7",
+   "crex_url": "/cricket-live-score/mnp-vs-nagl-14th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ7",
    "key": "2025-12-04-Nagaland-Manipur",
    "match_id": "crex-mnp-vs-nagl-14th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ7",
    "saved_at": "2026-10-13T10:45:40"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-miz-15th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ8",
+   "crex_url": "/cricket-live-score/mgly-vs-miz-15th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ8",
    "key": "2025-12-04-Meghalaya-Mizoram",
    "match_id": "crex-mgly-vs-miz-15th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ8",
    "saved_at": "2026-10-13T10:45:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-sikm-13th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ6",
+   "crex_url": "/cricket-live-score/ap-vs-sikm-13th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ6",
    "key": "2025-12-04-Arunachal Pradesh-Sikkim",
    "match_id": "crex-ap-vs-sikm-13th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ6",
    "saved_at": "2026-10-13T10:46:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-rlys-56th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKD",
+   "crex_url": "/cricket-live-score/andr-vs-rlys-56th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKD",
    "key": "2025-12-02-Railways-Andhra",
    "match_id": "crex-andr-vs-rlys-56th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKD",
    "saved_at": "2026-10-13T10:46:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/chg-vs-odsa-52nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKC",
+   "crex_url": "/cricket-live-score/chg-vs-odsa-52nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKC",
    "key": "2025-12-02-Odisha-Chhattisgarh",
    "match_id": "crex-chg-vs-odsa-52nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKC",
    "saved_at": "2026-10-13T10:46:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-mum-60th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKK",
+   "crex_url": "/cricket-live-score/asm-vs-mum-60th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKK",
    "key": "2025-12-02-Mumbai-Assam",
    "match_id": "crex-asm-vs-mum-60th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKK",
    "saved_at": "2026-10-13T10:46:40"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-vid-64th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKL",
+   "crex_url": "/cricket-live-score/ker-vs-vid-64th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKL",
    "key": "2025-12-02-Kerala-Vidarbha",
    "match_id": "crex-ker-vs-vid-64th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKL",
    "saved_at": "2026-10-13T10:46:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/goa-vs-mp-49th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKA",
+   "crex_url": "/cricket-live-score/goa-vs-mp-49th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKA",
    "key": "2025-12-02-Madhya Pradesh-Goa",
    "match_id": "crex-goa-vs-mp-49th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKA",
    "saved_at": "2026-10-13T10:47:05"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-jk-57th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKI",
+   "crex_url": "/cricket-live-score/cg-vs-jk-57th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKI",
    "key": "2025-12-02-Jammu  Kashmir-Chandigarh",
    "match_id": "crex-cg-vs-jk-57th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKI",
    "saved_at": "2026-10-13T10:47:17"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-mah-55th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKB",
+   "crex_url": "/cricket-live-score/bihr-vs-mah-55th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKB",
    "key": "2025-12-02-Bihar-Maharashtra",
    "match_id": "crex-bihr-vs-mah-55th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKB",
    "saved_at": "2026-10-13T10:47:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-up-63rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKJ",
+   "crex_url": "/cricket-live-score/hyd-vs-up-63rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKJ",
    "key": "2025-12-02-Uttar Pradesh-Hyderabad (India)",
    "match_id": "crex-hyd-vs-up-63rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKJ",
    "saved_at": "2026-10-13T10:47:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-pun-54th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK9",
+   "crex_url": "/cricket-live-score/brd-vs-pun-54th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK9",
    "key": "2025-12-02-Punjab-Baroda",
    "match_id": "crex-brd-vs-pun-54th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK9",
    "saved_at": "2026-10-13T10:47:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-pdc-51st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK8",
+   "crex_url": "/cricket-live-score/guj-vs-pdc-51st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK8",
    "key": "2025-12-02-Puducherry-Gujarat",
    "match_id": "crex-guj-vs-pdc-51st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK8",
    "saved_at": "2026-10-13T10:48:05"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-hp-59th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKG",
+   "crex_url": "/cricket-live-score/ben-vs-hp-59th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKG",
    "key": "2025-12-02-Himachal Pradesh-Bengal",
    "match_id": "crex-ben-vs-hp-59th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKG",
    "saved_at": "2026-10-13T10:48:17"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-ser-62nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKH",
+   "crex_url": "/cricket-live-score/har-vs-ser-62nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKH",
    "key": "2025-12-02-Services-Haryana",
    "match_id": "crex-har-vs-ser-62nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKH",
    "saved_at": "2026-10-13T10:48:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-tri-53rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK7",
+   "crex_url": "/cricket-live-score/del-vs-tri-53rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK7",
    "key": "2025-12-02-Tripura-Delhi",
    "match_id": "crex-del-vs-tri-53rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK7",
    "saved_at": "2026-10-13T10:48:42"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-tn-50th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK6",
+   "crex_url": "/cricket-live-score/kar-vs-tn-50th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK6",
    "key": "2025-12-02-Karnataka-Tamil Nadu",
    "match_id": "crex-kar-vs-tn-50th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK6",
    "saved_at": "2026-10-13T10:48:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-saur-58th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKE",
+   "crex_url": "/cricket-live-score/jhkd-vs-saur-58th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKE",
    "key": "2025-12-02-Jharkhand-Saurashtra",
    "match_id": "crex-jhkd-vs-saur-58th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKE",
    "saved_at": "2026-10-13T10:49:05"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/raj-vs-utk-61st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKF",
+   "crex_url": "/cricket-live-score/raj-vs-utk-61st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKF",
    "key": "2025-12-02-Rajasthan-Uttarakhand",
    "match_id": "crex-raj-vs-utk-61st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKF",
    "saved_at": "2026-10-13T10:49:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mnp-vs-sikm-12th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ5",
+   "crex_url": "/cricket-live-score/mnp-vs-sikm-12th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ5",
    "key": "2025-12-02-Manipur-Sikkim",
    "match_id": "crex-mnp-vs-sikm-12th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ5",
    "saved_at": "2026-10-13T10:49:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-nagl-10th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ3",
+   "crex_url": "/cricket-live-score/mgly-vs-nagl-10th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ3",
    "key": "2025-12-02-Nagaland-Meghalaya",
    "match_id": "crex-mgly-vs-nagl-10th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ3",
    "saved_at": "2026-10-13T10:49:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-miz-11th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ4",
+   "crex_url": "/cricket-live-score/ap-vs-miz-11th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ4",
    "key": "2025-12-02-Mizoram-Arunachal Pradesh",
    "match_id": "crex-ap-vs-miz-11th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ4",
    "saved_at": "2026-10-13T10:49:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-rlys-36th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJW",
+   "crex_url": "/cricket-live-score/asm-vs-rlys-36th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJW",
    "key": "2025-11-30-Assam-Railways",
    "match_id": "crex-asm-vs-rlys-36th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJW",
    "saved_at": "2026-10-14T08:50:30"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/odsa-vs-vid-44th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK4",
+   "crex_url": "/cricket-live-score/odsa-vs-vid-44th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK4",
    "key": "2025-11-30-Odisha-Vidarbha",
    "match_id": "crex-odsa-vs-vid-44th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK4",
    "saved_at": "2026-10-14T08:50:43"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-mum-48th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK5",
+   "crex_url": "/cricket-live-score/andr-vs-mum-48th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK5",
    "key": "2025-11-30-Andhra-Mumbai",
    "match_id": "crex-andr-vs-mum-48th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK5",
    "saved_at": "2026-10-14T08:50:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/chg-vs-ker-40th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJX",
+   "crex_url": "/cricket-live-score/chg-vs-ker-40th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJX",
    "key": "2025-11-30-Chhattisgarh-Kerala",
    "match_id": "crex-chg-vs-ker-40th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJX",
    "saved_at": "2026-10-14T08:51:08"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mp-vs-up-41st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK2",
+   "crex_url": "/cricket-live-score/mp-vs-up-41st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK2",
    "key": "2025-11-30-Madhya Pradesh-Uttar Pradesh",
    "match_id": "crex-mp-vs-up-41st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK2",
    "saved_at": "2026-10-14T08:51:21"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-mah-33rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJU",
+   "crex_url": "/cricket-live-score/cg-vs-mah-33rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJU",
    "key": "2025-11-30-Maharashtra-Chandigarh",
    "match_id": "crex-cg-vs-mah-33rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJU",
    "saved_at": "2026-10-14T08:51:33"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-jk-47th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK3",
+   "crex_url": "/cricket-live-score/bihr-vs-jk-47th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK3",
    "key": "2025-11-30-Jammu  Kashmir-Bihar",
    "match_id": "crex-bihr-vs-jk-47th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK3",
    "saved_at": "2026-10-14T08:51:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/goa-vs-hyd-39th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJV",
+   "crex_url": "/cricket-live-score/goa-vs-hyd-39th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJV",
    "key": "2025-11-30-Goa-Hyderabad (India)",
    "match_id": "crex-goa-vs-hyd-39th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJV",
    "saved_at": "2026-10-14T08:52:00"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-pun-35th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJS",
+   "crex_url": "/cricket-live-score/ben-vs-pun-35th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJS",
    "key": "2025-11-30-Punjab-Bengal",
    "match_id": "crex-ben-vs-pun-35th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJS",
    "saved_at": "2026-10-14T08:52:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-har-38th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJT",
+   "crex_url": "/cricket-live-score/guj-vs-har-38th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJT",
    "key": "2025-11-30-Haryana-Gujarat",
    "match_id": "crex-guj-vs-har-38th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJT",
    "saved_at": "2026-10-14T08:52:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/pdc-vs-ser-43rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK0",
+   "crex_url": "/cricket-live-score/pdc-vs-ser-43rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK0",
    "key": "2025-11-30-Puducherry-Services",
    "match_id": "crex-pdc-vs-ser-43rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK0",
    "saved_at": "2026-10-14T08:52:36"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-hp-46th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK1",
+   "crex_url": "/cricket-live-score/brd-vs-hp-46th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK1",
    "key": "2025-11-30-Himachal Pradesh-Baroda",
    "match_id": "crex-brd-vs-hp-46th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK1",
    "saved_at": "2026-10-14T08:52:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-tri-34th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJQ",
+   "crex_url": "/cricket-live-score/jhkd-vs-tri-34th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJQ",
    "key": "2025-11-30-Tripura-Jharkhand",
    "match_id": "crex-jhkd-vs-tri-34th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJQ",
    "saved_at": "2026-10-14T08:53:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tn-vs-utk-42nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJY",
+   "crex_url": "/cricket-live-score/tn-vs-utk-42nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJY",
    "key": "2025-11-30-Uttarakhand-Tamil Nadu",
    "match_id": "crex-tn-vs-utk-42nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJY",
    "saved_at": "2026-10-14T08:53:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-saur-45th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJZ",
+   "crex_url": "/cricket-live-score/del-vs-saur-45th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJZ",
    "key": "2025-11-30-Delhi-Saurashtra",
    "match_id": "crex-del-vs-saur-45th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJZ",
    "saved_at": "2026-10-14T08:53:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-raj-37th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJR",
+   "crex_url": "/cricket-live-score/kar-vs-raj-37th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJR",
    "key": "2025-11-30-Rajasthan-Karnataka",
    "match_id": "crex-kar-vs-raj-37th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJR",
    "saved_at": "2026-10-14T08:53:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-mnp-7th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ0",
+   "crex_url": "/cricket-live-score/miz-vs-mnp-7th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ0",
    "key": "2025-11-30-Mizoram-Manipur",
    "match_id": "crex-miz-vs-mnp-7th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ0",
    "saved_at": "2026-10-14T08:53:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-mgly-8th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ1",
+   "crex_url": "/cricket-live-score/ap-vs-mgly-8th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ1",
    "key": "2025-11-30-Arunachal Pradesh-Meghalaya",
    "match_id": "crex-ap-vs-mgly-8th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ1",
    "saved_at": "2026-10-14T08:54:02"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nagl-vs-sikm-9th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ2",
+   "crex_url": "/cricket-live-score/nagl-vs-sikm-9th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ2",
    "key": "2025-11-30-Nagaland-Sikkim",
    "match_id": "crex-nagl-vs-sikm-9th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ2",
    "saved_at": "2026-10-14T08:54:15"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-qualifier-2-csa-t20-challenge-2025-match-updates-XDU",
+   "crex_url": "/cricket-live-score/dol-vs-war-qualifier-2-csa-t20-challenge-2025-match-updates-XDU",
    "key": "2025-11-28-Dolphins-Warriors",
    "match_id": "crex-dol-vs-war-qualifier-2-csa-t20-challenge-2025-match-updates-XDU",
    "saved_at": "2026-10-14T08:54:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-rlys-20th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJG",
+   "crex_url": "/cricket-live-score/ker-vs-rlys-20th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJG",
    "key": "2025-11-28-Railways-Kerala",
    "match_id": "crex-ker-vs-rlys-20th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJG",
    "saved_at": "2026-10-14T08:54:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-odsa-24th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJH",
+   "crex_url": "/cricket-live-score/andr-vs-odsa-24th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJH",
    "key": "2025-11-28-Andhra-Odisha",
    "match_id": "crex-andr-vs-odsa-24th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJH",
    "saved_at": "2026-10-14T08:54:54"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-vid-28th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJO",
+   "crex_url": "/cricket-live-score/mum-vs-vid-28th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJO",
    "key": "2025-11-28-Vidarbha-Mumbai",
    "match_id": "crex-mum-vs-vid-28th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJO",
    "saved_at": "2026-10-14T08:55:06"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-chg-32nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJP",
+   "crex_url": "/cricket-live-score/asm-vs-chg-32nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJP",
    "key": "2025-11-28-Assam-Chhattisgarh",
    "match_id": "crex-asm-vs-chg-32nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJP",
    "saved_at": "2026-10-14T08:55:19"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-mp-23rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJF",
+   "crex_url": "/cricket-live-score/bihr-vs-mp-23rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJF",
    "key": "2025-11-28-Madhya Pradesh-Bihar",
    "match_id": "crex-bihr-vs-mp-23rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJF",
    "saved_at": "2026-10-14T08:55:33"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/cg-vs-goa-31st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJN",
+   "crex_url": "/cricket-live-score/cg-vs-goa-31st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJN",
    "key": "2025-11-28-Goa-Chandigarh",
    "match_id": "crex-cg-vs-goa-31st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJN",
    "saved_at": "2026-10-14T08:55:45"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jk-vs-up-25th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJM",
+   "crex_url": "/cricket-live-score/jk-vs-up-25th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJM",
    "key": "2025-11-28-Uttar Pradesh-Jammu  Kashmir",
    "match_id": "crex-jk-vs-up-25th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJM",
    "saved_at": "2026-10-14T08:55:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mah-17th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJE",
+   "crex_url": "/cricket-live-score/hyd-vs-mah-17th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJE",
    "key": "2025-11-28-Hyderabad (India)-Maharashtra",
    "match_id": "crex-hyd-vs-mah-17th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJE",
    "saved_at": "2026-10-14T08:56:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-pun-19th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJC",
+   "crex_url": "/cricket-live-score/har-vs-pun-19th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJC",
    "key": "2025-11-28-Haryana-Punjab",
    "match_id": "crex-har-vs-pun-19th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJC",
    "saved_at": "2026-10-14T08:56:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
+   "crex_url": "/cricket-live-score/ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
    "key": "2025-11-28-Gujarat-Bengal",
    "match_id": "crex-ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
    "saved_at": "2026-10-15T08:26:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-ser-27th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJK",
+   "crex_url": "/cricket-live-score/hp-vs-ser-27th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJK",
    "key": "2025-11-28-Himachal Pradesh-Services",
    "match_id": "crex-hp-vs-ser-27th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJK",
    "saved_at": "2026-10-15T08:26:30"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
+   "crex_url": "/cricket-live-score/brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
    "key": "2025-11-28-Puducherry-Baroda",
    "match_id": "crex-brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
    "saved_at": "2026-10-15T08:26:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
+   "crex_url": "/cricket-live-score/raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
    "key": "2025-11-28-Tripura-Rajasthan",
    "match_id": "crex-raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
    "saved_at": "2026-10-15T08:26:54"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
+   "crex_url": "/cricket-live-score/del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
    "key": "2025-11-28-Tamil Nadu-Delhi",
    "match_id": "crex-del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
    "saved_at": "2026-10-15T08:27:07"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/saur-vs-utk-26th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJI",
+   "crex_url": "/cricket-live-score/saur-vs-utk-26th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJI",
    "key": "2025-11-28-Saurashtra-Uttarakhand",
    "match_id": "crex-saur-vs-utk-26th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJI",
    "saved_at": "2026-10-15T08:27:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
+   "crex_url": "/cricket-live-score/jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
    "key": "2025-11-28-Karnataka-Jharkhand",
    "match_id": "crex-jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
    "saved_at": "2026-10-15T08:27:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-mnp-4th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIX",
+   "crex_url": "/cricket-live-score/mgly-vs-mnp-4th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIX",
    "key": "2025-11-28-Manipur-Meghalaya",
    "match_id": "crex-mgly-vs-mnp-4th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIX",
    "saved_at": "2026-10-15T08:27:43"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
+   "crex_url": "/cricket-live-score/miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
    "key": "2025-11-28-Mizoram-Sikkim",
    "match_id": "crex-miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
    "saved_at": "2026-10-15T08:27:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
+   "crex_url": "/cricket-live-score/ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
    "key": "2025-11-28-Nagaland-Arunachal Pradesh",
    "match_id": "crex-ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
    "saved_at": "2026-10-15T08:28:07"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-eliminator-1-csa-t20-challenge-2025-match-updates-XDT",
+   "crex_url": "/cricket-live-score/dol-vs-wp-eliminator-1-csa-t20-challenge-2025-match-updates-XDT",
    "key": "2025-11-26-Dolphins-Western Province",
    "match_id": "crex-dol-vs-wp-eliminator-1-csa-t20-challenge-2025-match-updates-XDT",
    "saved_at": "2026-10-15T08:28:20"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-rlys-5th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDR",
+   "crex_url": "/cricket-live-score/mum-vs-rlys-5th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDR",
    "key": "2025-11-26-Railways-Mumbai",
    "match_id": "crex-mum-vs-rlys-5th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDR",
    "saved_at": "2026-10-15T08:28:33"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
+   "crex_url": "/cricket-live-score/ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
    "key": "2025-11-26-Odisha-Kerala",
    "match_id": "crex-ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
    "saved_at": "2026-10-15T08:28:45"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
+   "crex_url": "/cricket-live-score/andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
    "key": "2025-11-26-Andhra-Assam",
    "match_id": "crex-andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
    "saved_at": "2026-10-15T08:28:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
+   "crex_url": "/cricket-live-score/chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
    "key": "2025-11-26-Chhattisgarh-Vidarbha",
    "match_id": "crex-chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
    "saved_at": "2026-10-15T08:29:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
+   "crex_url": "/cricket-live-score/hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
    "key": "2025-11-26-Madhya Pradesh-Hyderabad (India)",
    "match_id": "crex-hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
    "saved_at": "2026-10-15T08:29:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-cg-15th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE4",
+   "crex_url": "/cricket-live-score/bihr-vs-cg-15th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE4",
    "key": "2025-11-26-Bihar-Chandigarh",
    "match_id": "crex-bihr-vs-cg-15th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE4",
    "saved_at": "2026-10-15T08:29:36"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
+   "crex_url": "/cricket-live-score/jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
    "key": "2025-11-26-Maharashtra-Jammu  Kashmir",
    "match_id": "crex-jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
    "saved_at": "2026-10-15T08:29:48"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/goa-vs-up-1st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDW",
+   "crex_url": "/cricket-live-score/goa-vs-up-1st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDW",
    "key": "2025-11-26-Goa-Uttar Pradesh",
    "match_id": "crex-goa-vs-up-1st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDW",
    "saved_at": "2026-10-15T08:30:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
+   "crex_url": "/cricket-live-score/hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
    "key": "2025-11-26-Himachal Pradesh-Punjab",
    "match_id": "crex-hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
    "saved_at": "2026-10-15T08:30:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
+   "crex_url": "/cricket-live-score/guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
    "key": "2025-11-26-Services-Gujarat",
    "match_id": "crex-guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
    "saved_at": "2026-10-15T08:30:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-brd-14th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE2",
+   "crex_url": "/cricket-live-score/ben-vs-brd-14th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE2",
    "key": "2025-11-26-Baroda-Bengal",
    "match_id": "crex-ben-vs-brd-14th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE2",
    "saved_at": "2026-10-15T08:30:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
+   "crex_url": "/cricket-live-score/har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
    "key": "2025-11-26-Puducherry-Haryana",
    "match_id": "crex-har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
    "saved_at": "2026-10-15T08:30:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
+   "crex_url": "/cricket-live-score/saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
    "key": "2025-11-26-Tripura-Saurashtra",
    "match_id": "crex-saur-vs-tri-6th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDT",
    "saved_at": "2026-10-15T08:31:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
+   "crex_url": "/cricket-live-score/raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
    "key": "2025-11-26-Tamil Nadu-Rajasthan",
    "match_id": "crex-raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
    "saved_at": "2026-10-16T08:17:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
+   "crex_url": "/cricket-live-score/del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
    "key": "2025-11-26-Delhi-Jharkhand",
    "match_id": "crex-del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
    "saved_at": "2026-10-16T08:17:47"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
+   "crex_url": "/cricket-live-score/kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
    "key": "2025-11-26-Uttarakhand-Karnataka",
    "match_id": "crex-kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
    "saved_at": "2026-10-16T08:17:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
+   "crex_url": "/cricket-live-score/ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
    "key": "2025-11-26-Manipur-Arunachal Pradesh",
    "match_id": "crex-ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
    "saved_at": "2026-10-16T08:18:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIV",
+   "crex_url": "/cricket-live-score/mgly-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIV",
    "key": "2025-11-26-Meghalaya-Sikkim",
    "match_id": "crex-mgly-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIV",
    "saved_at": "2026-10-16T08:18:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-nagl-1st-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIU",
+   "crex_url": "/cricket-live-score/miz-vs-nagl-1st-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIU",
    "key": "2025-11-26-Mizoram-Nagaland",
    "match_id": "crex-miz-vs-nagl-1st-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIU",
    "saved_at": "2026-10-16T08:18:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
+   "crex_url": "/cricket-live-score/dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
    "key": "2025-11-23-Lions-Dolphins",
    "match_id": "crex-dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
    "saved_at": "2026-10-16T08:18:54"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-25th-match-csa-t20-challenge-2025-match-updates-XDO",
+   "crex_url": "/cricket-live-score/lio-vs-wp-25th-match-csa-t20-challenge-2025-match-updates-XDO",
    "key": "2025-11-21-Lions-Western Province",
    "match_id": "crex-lio-vs-wp-25th-match-csa-t20-challenge-2025-match-updates-XDO",
    "saved_at": "2026-10-16T08:19:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
+   "crex_url": "/cricket-live-score/dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
    "key": "2025-11-21-Titans-Dolphins",
    "match_id": "crex-dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
    "saved_at": "2026-10-16T08:19:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-23rd-match-csa-t20-challenge-2025-match-updates-XDM",
+   "crex_url": "/cricket-live-score/lio-vs-nwd-23rd-match-csa-t20-challenge-2025-match-updates-XDM",
    "key": "2025-11-19-North West-Lions",
    "match_id": "crex-lio-vs-nwd-23rd-match-csa-t20-challenge-2025-match-updates-XDM",
    "saved_at": "2026-10-16T08:19:48"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
+   "crex_url": "/cricket-live-score/dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
    "key": "2025-11-16-Dolphins-Western Province",
    "match_id": "crex-dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
    "saved_at": "2026-10-16T08:20:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
+   "crex_url": "/cricket-live-score/nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
    "key": "2025-11-14-Titans-North West",
    "match_id": "crex-nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
    "saved_at": "2026-10-16T08:20:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
+   "crex_url": "/cricket-live-score/lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
    "key": "2025-11-11-Lions-Warriors",
    "match_id": "crex-lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
    "saved_at": "2026-10-16T08:21:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
+   "crex_url": "/cricket-live-score/afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
    "key": "2025-11-11-Afghanistan-Qatar",
    "match_id": "crex-afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
    "saved_at": "2026-10-16T08:21:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
+   "crex_url": "/cricket-live-score/tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
    "key": "2025-11-09-Western Province-Titans",
    "match_id": "crex-tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
    "saved_at": "2026-10-16T08:21:39"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
+   "crex_url": "/cricket-live-score/dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
    "key": "2025-11-09-Warriors-Dolphins",
    "match_id": "crex-dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
    "saved_at": "2026-10-16T08:21:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
+   "crex_url": "/cricket-live-score/war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
    "key": "2025-11-07-Western Province-Warriors",
    "match_id": "crex-war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
    "saved_at": "2026-10-16T08:22:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
+   "crex_url": "/cricket-live-score/dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
    "key": "2025-11-07-Dolphins-North West",
    "match_id": "crex-dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
    "saved_at": "2026-10-16T08:22:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
+   "crex_url": "/cricket-live-score/nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
    "key": "2025-11-02-North West-Western Province",
    "match_id": "crex-nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
    "saved_at": "2026-10-16T08:23:02"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
    "key": "2025-11-02-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
    "saved_at": "2026-10-16T08:23:21"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
+   "crex_url": "/cricket-live-score/tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
    "key": "2025-11-01-Warriors-Titans",
    "match_id": "crex-tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
    "saved_at": "2026-10-17T07:54:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
    "key": "2025-10-31-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
    "saved_at": "2026-10-17T07:54:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
    "key": "2025-10-29-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
    "saved_at": "2026-10-17T07:54:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
+   "crex_url": "/cricket-live-score/afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
    "key": "2025-10-20-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-only-test-afghanistan-tour-of-zimbabwe-2025-match-updates-X73",
    "saved_at": "2026-10-17T07:55:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
    "key": "2025-10-14-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
    "saved_at": "2026-10-17T07:55:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
+   "crex_url": "/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
    "key": "2025-10-11-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
    "saved_at": "2026-10-17T07:55:34"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
    "key": "2025-10-08-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
    "saved_at": "2026-10-17T07:55:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
    "key": "2025-10-05-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
    "saved_at": "2026-10-17T07:56:00"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
+   "crex_url": "/cricket-live-score/afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
    "key": "2025-10-03-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-2nd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEF",
    "saved_at": "2026-10-17T07:56:12"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
    "key": "2025-10-02-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
    "saved_at": "2026-10-17T07:56:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
+   "crex_url": "/cricket-live-score/afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
    "key": "2025-09-18-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
    "saved_at": "2026-10-17T07:56:36"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
+   "crex_url": "/cricket-live-score/afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
    "key": "2025-09-16-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
    "saved_at": "2026-10-17T07:56:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
+   "crex_url": "/cricket-live-score/afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
    "key": "2025-09-09-Afghanistan-Hong Kong",
    "match_id": "crex-afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
    "saved_at": "2026-10-17T07:57:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
+   "crex_url": "/cricket-live-score/afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
    "key": "2025-09-07-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
    "saved_at": "2026-10-17T07:57:14"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
+   "crex_url": "/cricket-live-score/afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
    "key": "2025-09-05-Afghanistan-United Arab Emirates",
    "match_id": "crex-afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
    "saved_at": "2026-10-17T07:57:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
+   "crex_url": "/cricket-live-score/afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
    "key": "2025-09-02-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-4th-match-uae-t20i-tri-series-2025-match-updates-W3M",
    "saved_at": "2026-10-17T07:57:39"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
+   "crex_url": "/cricket-live-score/afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
    "key": "2025-09-01-Afghanistan-United Arab Emirates",
    "match_id": "crex-afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
    "saved_at": "2026-10-17T07:57:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
+   "crex_url": "/cricket-live-score/afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
    "key": "2025-08-29-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
    "saved_at": "2026-10-17T07:58:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
+   "crex_url": "/cricket-live-score/afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
    "key": "2025-02-28-Afghanistan-Australia",
    "match_id": "crex-afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
    "saved_at": "2026-10-17T07:58:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
+   "crex_url": "/cricket-live-score/afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
    "key": "2025-02-26-Afghanistan-England",
    "match_id": "crex-afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
    "saved_at": "2026-10-17T07:58:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
+   "crex_url": "/cricket-live-score/afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
    "key": "2025-02-21-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
    "saved_at": "2026-10-17T07:58:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
    "key": "2025-01-02-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-2nd-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVC",
    "saved_at": "2026-10-17T07:59:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
    "key": "2024-12-26-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-1st-test-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVB",
    "saved_at": "2026-10-17T07:59:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
    "key": "2024-12-21-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
    "saved_at": "2026-10-17T07:59:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
    "key": "2024-12-19-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
    "saved_at": "2026-10-17T08:00:02"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV8",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV8",
    "key": "2024-12-17-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV8",
    "saved_at": "2026-10-18T08:09:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-miz-121st-match-syed-mushtaq-ali-trophy-2024-match-updates-R4T",
+   "crex_url": "/cricket-live-score/hyd-vs-miz-121st-match-syed-mushtaq-ali-trophy-2024-match-updates-R4T",
    "key": "2024-12-05-Mizoram-Hyderabad (India)",
    "match_id": "crex-hyd-vs-miz-121st-match-syed-mushtaq-ali-trophy-2024-match-updates-R4T",
    "saved_at": "2026-10-18T08:10:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/saur-vs-tri-120th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4R",
+   "crex_url": "/cricket-live-score/saur-vs-tri-120th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4R",
    "key": "2024-12-05-Tripura-Saurashtra",
    "match_id": "crex-saur-vs-tri-120th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4R",
    "saved_at": "2026-10-18T08:10:36"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-del-109th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4H",
+   "crex_url": "/cricket-live-score/ap-vs-del-109th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4H",
    "key": "2024-12-05-Arunachal Pradesh-Delhi",
    "match_id": "crex-ap-vs-del-109th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4H",
    "saved_at": "2026-10-18T08:10:54"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-mnp-119th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4P",
+   "crex_url": "/cricket-live-score/hp-vs-mnp-119th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4P",
    "key": "2024-12-05-Manipur-Himachal Pradesh",
    "match_id": "crex-hp-vs-mnp-119th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4P",
    "saved_at": "2026-10-18T08:11:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jhkd-vs-up-116th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4I",
+   "crex_url": "/cricket-live-score/jhkd-vs-up-116th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4I",
    "key": "2024-12-05-Uttar Pradesh-Jharkhand",
    "match_id": "crex-jhkd-vs-up-116th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4I",
    "saved_at": "2026-10-18T08:11:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-bihr-93rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R43",
+   "crex_url": "/cricket-live-score/ben-vs-bihr-93rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R43",
    "key": "2024-12-03-Bihar-Bengal",
    "match_id": "crex-ben-vs-bihr-93rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R43",
    "saved_at": "2026-10-18T08:12:06"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-miz-108th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4C",
+   "crex_url": "/cricket-live-score/mgly-vs-miz-108th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4C",
    "key": "2024-12-03-Meghalaya-Mizoram",
    "match_id": "crex-mgly-vs-miz-108th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4C",
    "saved_at": "2026-10-18T08:12:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/sikm-vs-tri-107th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4A",
+   "crex_url": "/cricket-live-score/sikm-vs-tri-107th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4A",
    "key": "2024-12-03-Sikkim-Tripura",
    "match_id": "crex-sikm-vs-tri-107th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4A",
    "saved_at": "2026-10-18T08:12:56"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-jhkd-101st-match-syed-mushtaq-ali-trophy-2024-match-updates-R47",
+   "crex_url": "/cricket-live-score/del-vs-jhkd-101st-match-syed-mushtaq-ali-trophy-2024-match-updates-R47",
    "key": "2024-12-03-Delhi-Jharkhand",
    "match_id": "crex-del-vs-jhkd-101st-match-syed-mushtaq-ali-trophy-2024-match-updates-R47",
    "saved_at": "2026-10-18T08:13:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/asm-vs-odsa-97th-t20-syed-mushtaq-ali-trophy-2024-match-updates-R3Y",
+   "crex_url": "/cricket-live-score/asm-vs-odsa-97th-t20-syed-mushtaq-ali-trophy-2024-match-updates-R3Y",
    "key": "2024-12-03-Odisha-Assam",
    "match_id": "crex-asm-vs-odsa-97th-t20-syed-mushtaq-ali-trophy-2024-match-updates-R3Y",
    "saved_at": "2026-10-18T08:13:34"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-mnp-106th-match-syed-mushtaq-ali-trophy-2024-match-updates-R48",
+   "crex_url": "/cricket-live-score/ap-vs-mnp-106th-match-syed-mushtaq-ali-trophy-2024-match-updates-R48",
    "key": "2024-12-03-Manipur-Arunachal Pradesh",
    "match_id": "crex-ap-vs-mnp-106th-match-syed-mushtaq-ali-trophy-2024-match-updates-R48",
    "saved_at": "2026-10-18T08:14:21"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-miz-90th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3U",
+   "crex_url": "/cricket-live-score/bihr-vs-miz-90th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3U",
    "key": "2024-12-01-Bihar-Mizoram",
    "match_id": "crex-bihr-vs-miz-90th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3U",
    "saved_at": "2026-10-18T08:14:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tri-vs-utk-89th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3S",
+   "crex_url": "/cricket-live-score/tri-vs-utk-89th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3S",
    "key": "2024-12-01-Uttarakhand-Tripura",
    "match_id": "crex-tri-vs-utk-89th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3S",
    "saved_at": "2026-10-18T08:15:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-up-80th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3I",
+   "crex_url": "/cricket-live-score/ap-vs-up-80th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3I",
    "key": "2024-12-01-Uttar Pradesh-Arunachal Pradesh",
    "match_id": "crex-ap-vs-up-80th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3I",
    "saved_at": "2026-10-18T08:15:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jk-vs-mnp-88th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3Q",
+   "crex_url": "/cricket-live-score/jk-vs-mnp-88th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3Q",
    "key": "2024-12-01-Manipur-Jammu  Kashmir",
    "match_id": "crex-jk-vs-mnp-88th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3Q",
    "saved_at": "2026-10-18T08:15:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-nagl-76th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3D",
+   "crex_url": "/cricket-live-score/mum-vs-nagl-76th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3D",
    "key": "2024-12-01-Nagaland-Mumbai",
    "match_id": "crex-mum-vs-nagl-76th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3D",
    "saved_at": "2026-10-18T08:16:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-hyd-57th-match-syed-mushtaq-ali-trophy-2024-match-updates-R33",
+   "crex_url": "/cricket-live-score/bihr-vs-hyd-57th-match-syed-mushtaq-ali-trophy-2024-match-updates-R33",
    "key": "2024-11-29-Bihar-Hyderabad (India)",
    "match_id": "crex-bihr-vs-hyd-57th-match-syed-mushtaq-ali-trophy-2024-match-updates-R33",
    "saved_at": "2026-10-20T08:40:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-raj-72nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R3C",
+   "crex_url": "/cricket-live-score/mgly-vs-raj-72nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R3C",
    "key": "2024-11-29-Meghalaya-Rajasthan",
    "match_id": "crex-mgly-vs-raj-72nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R3C",
    "saved_at": "2026-10-20T08:40:14"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-pun-64th-match-syed-mushtaq-ali-trophy-2024-match-updates-R34",
+   "crex_url": "/cricket-live-score/miz-vs-pun-64th-match-syed-mushtaq-ali-trophy-2024-match-updates-R34",
    "key": "2024-11-29-Mizoram-Punjab",
    "match_id": "crex-miz-vs-pun-64th-match-syed-mushtaq-ali-trophy-2024-match-updates-R34",
    "saved_at": "2026-10-20T08:40:28"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-tri-63rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R32",
+   "crex_url": "/cricket-live-score/brd-vs-tri-63rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R32",
    "key": "2024-11-29-Tripura-Baroda",
    "match_id": "crex-brd-vs-tri-63rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R32",
    "saved_at": "2026-10-20T08:40:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-sikm-71st-match-syed-mushtaq-ali-trophy-2024-match-updates-R3A",
+   "crex_url": "/cricket-live-score/kar-vs-sikm-71st-match-syed-mushtaq-ali-trophy-2024-match-updates-R3A",
    "key": "2024-11-29-Sikkim-Karnataka",
    "match_id": "crex-kar-vs-sikm-71st-match-syed-mushtaq-ali-trophy-2024-match-updates-R3A",
    "saved_at": "2026-10-20T08:40:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-jhkd-70th-match-syed-mushtaq-ali-trophy-2024-match-updates-R38",
+   "crex_url": "/cricket-live-score/ap-vs-jhkd-70th-match-syed-mushtaq-ali-trophy-2024-match-updates-R38",
    "key": "2024-11-29-Arunachal Pradesh-Jharkhand",
    "match_id": "crex-ap-vs-jhkd-70th-match-syed-mushtaq-ali-trophy-2024-match-updates-R38",
    "saved_at": "2026-10-20T08:41:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-mnp-62nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R30",
+   "crex_url": "/cricket-live-score/del-vs-mnp-62nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R30",
    "key": "2024-11-29-Manipur-Delhi",
    "match_id": "crex-del-vs-mnp-62nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R30",
    "saved_at": "2026-10-20T08:41:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-up-65th-match-syed-mushtaq-ali-trophy-2024-match-updates-R37",
+   "crex_url": "/cricket-live-score/har-vs-up-65th-match-syed-mushtaq-ali-trophy-2024-match-updates-R37",
    "key": "2024-11-29-Haryana-Uttar Pradesh",
    "match_id": "crex-har-vs-up-65th-match-syed-mushtaq-ali-trophy-2024-match-updates-R37",
    "saved_at": "2026-10-20T08:41:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-jk-55th-match-syed-mushtaq-ali-trophy-2024-match-updates-R2Z",
+   "crex_url": "/cricket-live-score/hp-vs-jk-55th-match-syed-mushtaq-ali-trophy-2024-match-updates-R2Z",
    "key": "2024-11-29-Jammu  Kashmir-Himachal Pradesh",
    "match_id": "crex-hp-vs-jk-55th-match-syed-mushtaq-ali-trophy-2024-match-updates-R2Z",
    "saved_at": "2026-10-20T08:42:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nagl-vs-ser-68th-match-syed-mushtaq-ali-trophy-2024-match-updates-R35",
+   "crex_url": "/cricket-live-score/nagl-vs-ser-68th-match-syed-mushtaq-ali-trophy-2024-match-updates-R35",
    "key": "2024-11-29-Services-Nagaland",
    "match_id": "crex-nagl-vs-ser-68th-match-syed-mushtaq-ali-trophy-2024-match-updates-R35",
    "saved_at": "2026-10-20T08:42:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-miz-39th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX6",
+   "crex_url": "/cricket-live-score/ben-vs-miz-39th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX6",
    "key": "2024-11-27-Mizoram-Bengal",
    "match_id": "crex-ben-vs-miz-39th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX6",
    "saved_at": "2026-10-20T08:43:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-mgly-49th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXE",
+   "crex_url": "/cricket-live-score/bihr-vs-mgly-49th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXE",
    "key": "2024-11-27-Bihar-Meghalaya",
    "match_id": "crex-bihr-vs-mgly-49th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXE",
    "saved_at": "2026-10-20T08:43:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/guj-vs-tri-38th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX4",
+   "crex_url": "/cricket-live-score/guj-vs-tri-38th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX4",
    "key": "2024-11-27-Tripura-Gujarat",
    "match_id": "crex-guj-vs-tri-38th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX4",
    "saved_at": "2026-10-20T08:43:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-jk-47th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXA",
+   "crex_url": "/cricket-live-score/ap-vs-jk-47th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXA",
    "key": "2024-11-27-Arunachal Pradesh-Jammu  Kashmir",
    "match_id": "crex-ap-vs-jk-47th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXA",
    "saved_at": "2026-10-20T08:44:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hp-vs-jhkd-44th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX3",
+   "crex_url": "/cricket-live-score/hp-vs-jhkd-44th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX3",
    "key": "2024-11-27-Jharkhand-Himachal Pradesh",
    "match_id": "crex-hp-vs-jhkd-44th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX3",
    "saved_at": "2026-10-20T08:44:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-nagl-40th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PWY",
+   "crex_url": "/cricket-live-score/ker-vs-nagl-40th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PWY",
    "key": "2024-11-27-Nagaland-Kerala",
    "match_id": "crex-ker-vs-nagl-40th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PWY",
    "saved_at": "2026-10-20T08:44:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-har-52nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PXB",
+   "crex_url": "/cricket-live-score/del-vs-har-52nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PXB",
    "key": "2024-11-27-Haryana-Delhi",
    "match_id": "crex-del-vs-har-52nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PXB",
    "saved_at": "2026-10-20T08:45:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mgly-vs-mp-31st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWW",
+   "crex_url": "/cricket-live-score/mgly-vs-mp-31st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWW",
    "key": "2024-11-25-Madhya Pradesh-Meghalaya",
    "match_id": "crex-mgly-vs-mp-31st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWW",
    "saved_at": "2026-10-20T08:45:57"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-raj-21st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWO",
+   "crex_url": "/cricket-live-score/miz-vs-raj-21st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWO",
    "key": "2024-11-25-Rajasthan-Mizoram",
    "match_id": "crex-miz-vs-raj-21st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWO",
    "saved_at": "2026-10-20T08:46:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/sikm-vs-tn-30th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWU",
+   "crex_url": "/cricket-live-score/sikm-vs-tn-30th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWU",
    "key": "2024-11-25-Tamil Nadu-Sikkim",
    "match_id": "crex-sikm-vs-tn-30th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWU",
    "saved_at": "2026-10-20T08:46:48"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ap-vs-har-29th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWS",
+   "crex_url": "/cricket-live-score/ap-vs-har-29th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWS",
    "key": "2024-11-25-Haryana-Arunachal Pradesh",
    "match_id": "crex-ap-vs-har-29th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWS",
    "saved_at": "2026-10-20T08:47:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
+   "crex_url": "/cricket-live-score/andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
    "key": "2024-11-25-Nagaland-Andhra",
    "match_id": "crex-andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
    "saved_at": "2026-10-21T08:41:56"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
+   "crex_url": "/cricket-live-score/bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
    "key": "2024-11-23-Rajasthan-Bihar",
    "match_id": "crex-bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
    "saved_at": "2026-10-21T08:42:30"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
+   "crex_url": "/cricket-live-score/hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
    "key": "2024-11-23-Hyderabad (India)-Meghalaya",
    "match_id": "crex-hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
    "saved_at": "2026-10-21T08:42:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/miz-vs-mp-4th-match-syed-mushtaq-ali-trophy-2024-match-updates-PVY",
+   "crex_url": "/cricket-live-score/miz-vs-mp-4th-match-syed-mushtaq-ali-trophy-2024-match-updates-PVY",
    "key": "2024-11-23-Madhya Pradesh-Mizoram",
    "match_id": "crex-miz-vs-mp-4th-match-syed-mushtaq-ali-trophy-2024-match-updates-PVY",
    "saved_at": "2026-10-21T08:43:05"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
+   "crex_url": "/cricket-live-score/saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
    "key": "2024-11-23-Saurashtra-Sikkim",
    "match_id": "crex-saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
    "saved_at": "2026-10-21T08:43:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tn-vs-tri-10th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW6",
+   "crex_url": "/cricket-live-score/tn-vs-tri-10th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW6",
    "key": "2024-11-23-Tamil Nadu-Tripura",
    "match_id": "crex-tn-vs-tri-10th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW6",
    "saved_at": "2026-10-21T08:43:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
+   "crex_url": "/cricket-live-score/jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
    "key": "2024-11-23-Jammu  Kashmir-Jharkhand",
    "match_id": "crex-jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
    "saved_at": "2026-10-21T08:44:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
+   "crex_url": "/cricket-live-score/odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
    "key": "2024-11-23-Vidarbha-Odisha",
    "match_id": "crex-odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
    "saved_at": "2026-10-21T08:44:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
+   "crex_url": "/cricket-live-score/ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
    "key": "2024-11-23-Services-Kerala",
    "match_id": "crex-ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
    "saved_at": "2026-10-21T08:45:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
+   "crex_url": "/cricket-live-score/mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
    "key": "2024-11-23-Nagaland-Maharashtra",
    "match_id": "crex-mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
    "saved_at": "2026-10-21T08:45:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
    "key": "2024-11-11-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
    "saved_at": "2026-10-21T08:45:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
+   "crex_url": "/cricket-live-score/afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
    "key": "2024-11-09-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
    "saved_at": "2026-10-21T08:45:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
    "key": "2024-11-06-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
    "saved_at": "2026-10-21T08:46:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
+   "crex_url": "/cricket-live-score/lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
    "key": "2024-10-04-Lions-Warriors",
    "match_id": "crex-lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
    "saved_at": "2026-10-21T08:46:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
+   "crex_url": "/cricket-live-score/afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
    "key": "2024-09-22-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-3rd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM7",
    "saved_at": "2026-10-21T08:46:44"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
+   "crex_url": "/cricket-live-score/afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
    "key": "2024-09-20-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
    "saved_at": "2026-10-21T08:46:56"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
+   "crex_url": "/cricket-live-score/afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
    "key": "2024-09-18-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
    "saved_at": "2026-10-21T08:47:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
+   "crex_url": "/cricket-live-score/afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
    "key": "2024-09-09-Afghanistan-New Zealand",
    "match_id": "crex-afg-vs-nz-only-new-zealand-vs-afghanistan-in-india-2024-match-updates-QKE",
    "saved_at": "2026-10-21T08:47:22"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
+   "crex_url": "/cricket-live-score/afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
    "key": "2024-06-27-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-1st-semi-final-t20-world-cup-2024-match-updates-NUN",
    "saved_at": "2026-10-22T08:46:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
+   "crex_url": "/cricket-live-score/afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
    "key": "2024-06-25-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
    "saved_at": "2026-10-22T08:47:12"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
+   "crex_url": "/cricket-live-score/afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
    "key": "2024-06-23-Afghanistan-Australia",
    "match_id": "crex-afg-vs-aus-super-8-48th-t20-world-cup-2024-match-updates-NUI",
    "saved_at": "2026-10-22T08:47:24"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
+   "crex_url": "/cricket-live-score/afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
    "key": "2024-06-20-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
    "saved_at": "2026-10-22T08:47:36"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
+   "crex_url": "/cricket-live-score/afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
    "key": "2024-05-31-Afghanistan-Scotland",
    "match_id": "crex-afg-vs-sco-14th-match-t20-world-cup-2024-warm-up-match-updates-PJ4",
    "saved_at": "2026-10-22T08:48:09"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
+   "crex_url": "/cricket-live-score/dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
    "key": "2024-04-28-Dolphins-Lions",
    "match_id": "crex-dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
    "saved_at": "2026-10-22T08:48:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-2nd-semi-final-csa-t20-challenge-2024-match-updates-OON",
+   "crex_url": "/cricket-live-score/dol-vs-war-2nd-semi-final-csa-t20-challenge-2024-match-updates-OON",
    "key": "2024-04-25-Warriors-Dolphins",
    "match_id": "crex-dol-vs-war-2nd-semi-final-csa-t20-challenge-2024-match-updates-OON",
    "saved_at": "2026-10-22T08:48:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
+   "crex_url": "/cricket-live-score/lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
    "key": "2024-04-24-Titans-Lions",
    "match_id": "crex-lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
    "saved_at": "2026-10-22T08:48:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
+   "crex_url": "/cricket-live-score/tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
    "key": "2024-04-21-Western Province-Titans",
    "match_id": "crex-tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
    "saved_at": "2026-10-22T08:49:07"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
+   "crex_url": "/cricket-live-score/dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
    "key": "2024-04-21-Warriors-Dolphins",
    "match_id": "crex-dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
    "saved_at": "2026-10-22T08:49:20"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
+   "crex_url": "/cricket-live-score/nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
    "key": "2024-04-19-Warriors-North West",
    "match_id": "crex-nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
    "saved_at": "2026-10-22T08:50:00"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
+   "crex_url": "/cricket-live-score/lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
    "key": "2024-04-17-Lions-Warriors",
    "match_id": "crex-lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
    "saved_at": "2026-10-22T08:50:17"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-wp-43rd-match-csa-t20-challenge-2024-match-updates-OO8",
+   "crex_url": "/cricket-live-score/dol-vs-wp-43rd-match-csa-t20-challenge-2024-match-updates-OO8",
    "key": "2024-04-14-Western Province-Dolphins",
    "match_id": "crex-dol-vs-wp-43rd-match-csa-t20-challenge-2024-match-updates-OO8",
    "saved_at": "2026-10-22T08:50:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
+   "crex_url": "/cricket-live-score/lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
    "key": "2024-04-14-North West-Lions",
    "match_id": "crex-lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
    "saved_at": "2026-10-22T08:50:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-34th-match-csa-t20-challenge-2024-match-updates-ONZ",
+   "crex_url": "/cricket-live-score/tit-vs-war-34th-match-csa-t20-challenge-2024-match-updates-ONZ",
    "key": "2024-04-05-Titans-Warriors",
    "match_id": "crex-tit-vs-war-34th-match-csa-t20-challenge-2024-match-updates-ONZ",
    "saved_at": "2026-10-22T08:51:56"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
+   "crex_url": "/cricket-live-score/lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
    "key": "2024-04-03-Lions-Western Province",
    "match_id": "crex-lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
    "saved_at": "2026-10-22T08:52:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TK",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TK",
    "key": "2026-10-21-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TK",
    "saved_at": "2026-10-23T08:49:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TJ",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TJ",
    "key": "2026-10-19-Afghanistan-Zimbabwe",
    "match_id": "crex-afg-vs-zim-2nd-match-odi-tri-nation-series-in-uae-2026-match-updates-13TJ",
    "saved_at": "2026-10-23T08:49:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
+   "crex_url": "/cricket-live-score/war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
    "key": "2024-03-31-Western Province-Warriors",
    "match_id": "crex-war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
    "saved_at": "2026-10-23T08:49:33"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-war-26th-match-csa-t20-challenge-2024-match-updates-ONR",
+   "crex_url": "/cricket-live-score/lio-vs-war-26th-match-csa-t20-challenge-2024-match-updates-ONR",
    "key": "2024-03-27-Warriors-Lions",
    "match_id": "crex-lio-vs-war-26th-match-csa-t20-challenge-2024-match-updates-ONR",
    "saved_at": "2026-10-23T08:49:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
+   "crex_url": "/cricket-live-score/png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
    "key": "2024-03-24-Papua New Guinea-Zimbabwe",
    "match_id": "crex-png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
    "saved_at": "2026-10-23T08:50:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nwd-vs-war-24th-match-csa-t20-challenge-2024-match-updates-ONP",
+   "crex_url": "/cricket-live-score/nwd-vs-war-24th-match-csa-t20-challenge-2024-match-updates-ONP",
    "key": "2024-03-24-Warriors-North West",
    "match_id": "crex-nwd-vs-war-24th-match-csa-t20-challenge-2024-match-updates-ONP",
    "saved_at": "2026-10-23T08:50:27"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
+   "crex_url": "/cricket-live-score/war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
    "key": "2024-03-21-Western Province-Warriors",
    "match_id": "crex-war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
    "saved_at": "2026-10-23T08:50:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
    "key": "2024-03-18-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
    "saved_at": "2026-10-23T08:51:16"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-wp-17th-match-csa-t20-challenge-2024-match-updates-ONI",
+   "crex_url": "/cricket-live-score/lio-vs-wp-17th-match-csa-t20-challenge-2024-match-updates-ONI",
    "key": "2024-03-17-Western Province-Lions",
    "match_id": "crex-lio-vs-wp-17th-match-csa-t20-challenge-2024-match-updates-ONI",
    "saved_at": "2026-10-23T08:51:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
    "key": "2024-03-17-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
    "saved_at": "2026-10-23T08:51:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
    "key": "2024-03-15-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
    "saved_at": "2026-10-23T08:52:21"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
+   "crex_url": "/cricket-live-score/tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
    "key": "2024-03-13-Warriors-Titans",
    "match_id": "crex-tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
    "saved_at": "2026-10-23T08:52:43"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
    "key": "2024-03-12-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
    "saved_at": "2026-10-23T08:52:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/lio-vs-nwd-8th-match-csa-t20-challenge-2024-match-updates-ON9",
+   "crex_url": "/cricket-live-score/lio-vs-nwd-8th-match-csa-t20-challenge-2024-match-updates-ON9",
    "key": "2024-03-10-North West-Lions",
    "match_id": "crex-lio-vs-nwd-8th-match-csa-t20-challenge-2024-match-updates-ON9",
    "saved_at": "2026-10-23T08:53:37"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
    "key": "2024-03-09-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVD",
    "saved_at": "2026-10-23T08:53:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
    "key": "2024-03-07-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
    "saved_at": "2026-10-23T08:54:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
+   "crex_url": "/cricket-live-score/afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
    "key": "2024-02-28-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-only-test-afghanistan-vs-ireland-in-uae-2024-match-updates-NV7",
    "saved_at": "2026-10-23T08:54:13"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
+   "crex_url": "/cricket-live-score/afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
    "key": "2024-02-21-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
    "saved_at": "2026-10-23T08:54:25"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
+   "crex_url": "/cricket-live-score/afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
    "key": "2024-02-19-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
    "saved_at": "2026-10-23T08:54:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
+   "crex_url": "/cricket-live-score/afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
    "key": "2024-02-17-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
    "saved_at": "2026-10-23T08:54:50"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
+   "crex_url": "/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
    "key": "2024-02-14-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSI",
    "saved_at": "2026-10-23T08:55:02"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
+   "crex_url": "/cricket-live-score/afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
    "key": "2024-02-11-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
    "saved_at": "2026-10-23T08:55:14"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
+   "crex_url": "/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
    "key": "2024-02-09-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
    "saved_at": "2026-10-23T08:55:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
+   "crex_url": "/cricket-live-score/afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
    "key": "2024-02-02-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-only-test-afghanistan-tour-of-sri-lanka-2024-match-updates-NSJ",
    "saved_at": "2026-10-23T08:55:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-tour-of-india-2024-match-updates-LR5",
+   "crex_url": "/cricket-live-score/afg-vs-ind-3rd-t20-afghanistan-tour-of-india-2024-match-updates-LR5",
    "key": "2024-01-17-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-3rd-t20-afghanistan-tour-of-india-2024-match-updates-LR5",
    "saved_at": "2026-10-24T08:15:10"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-2nd-t20-afghanistan-tour-of-uae-2023-24-match-updates-NIJ",
+   "crex_url": "/cricket-live-score/afg-vs-uae-2nd-t20-afghanistan-tour-of-uae-2023-24-match-updates-NIJ",
    "key": "2023-12-31-Afghanistan-United Arab Emirates",
    "match_id": "crex-afg-vs-uae-2nd-t20-afghanistan-tour-of-uae-2023-24-match-updates-NIJ",
    "saved_at": "2026-10-24T08:15:32"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-1st-t20-afghanistan-tour-of-uae-2023-24-match-updates-NII",
+   "crex_url": "/cricket-live-score/afg-vs-uae-1st-t20-afghanistan-tour-of-uae-2023-24-match-updates-NII",
    "key": "2023-12-29-Afghanistan-United Arab Emirates",
    "match_id": "crex-afg-vs-uae-1st-t20-afghanistan-tour-of-uae-2023-24-match-updates-NII",
    "saved_at": "2026-10-24T08:15:45"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-42nd-match-world-cup-2023-match-updates-L57",
+   "crex_url": "/cricket-live-score/afg-vs-sa-42nd-match-world-cup-2023-match-updates-L57",
    "key": "2023-11-10-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-42nd-match-world-cup-2023-match-updates-L57",
    "saved_at": "2026-10-24T08:15:58"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-39th-match-world-cup-2023-match-updates-L54",
+   "crex_url": "/cricket-live-score/afg-vs-aus-39th-match-world-cup-2023-match-updates-L54",
    "key": "2023-11-07-Afghanistan-Australia",
    "match_id": "crex-afg-vs-aus-39th-match-world-cup-2023-match-updates-L54",
    "saved_at": "2026-10-24T08:16:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-34th-match-world-cup-2023-match-updates-L4Z",
+   "crex_url": "/cricket-live-score/afg-vs-ned-34th-match-world-cup-2023-match-updates-L4Z",
    "key": "2023-11-03-Afghanistan-Netherlands",
    "match_id": "crex-afg-vs-ned-34th-match-world-cup-2023-match-updates-L4Z",
    "saved_at": "2026-10-24T08:16:23"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/brd-vs-mum-3rd-qtr-final-syed-mushtaq-ali-trophy-2023-match-updates-MYL",
+   "crex_url": "/cricket-live-score/brd-vs-mum-3rd-qtr-final-syed-mushtaq-ali-trophy-2023-match-updates-MYL",
    "key": "2023-11-02-Mumbai-Baroda",
    "match_id": "crex-brd-vs-mum-3rd-qtr-final-syed-mushtaq-ali-trophy-2023-match-updates-MYL",
    "saved_at": "2026-10-24T08:16:35"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-30th-match-world-cup-2023-match-updates-L4V",
+   "crex_url": "/cricket-live-score/afg-vs-sl-30th-match-world-cup-2023-match-updates-L4V",
    "key": "2023-10-30-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-30th-match-world-cup-2023-match-updates-L4V",
    "saved_at": "2026-10-24T08:16:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mp-vs-up-118th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4A",
+   "crex_url": "/cricket-live-score/mp-vs-up-118th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4A",
    "key": "2023-10-27-Uttar Pradesh-Madhya Pradesh",
    "match_id": "crex-mp-vs-up-118th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4A",
    "saved_at": "2026-10-24T08:17:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/kar-vs-tri-126th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4J",
+   "crex_url": "/cricket-live-score/kar-vs-tri-126th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4J",
    "key": "2023-10-27-Karnataka-Tripura",
    "match_id": "crex-kar-vs-tri-126th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4J",
    "saved_at": "2026-10-24T08:18:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/har-vs-mgly-91st-match-syed-mushtaq-ali-trophy-2023-match-updates-M3M",
+   "crex_url": "/cricket-live-score/har-vs-mgly-91st-match-syed-mushtaq-ali-trophy-2023-match-updates-M3M",
    "key": "2023-10-25-Meghalaya-Haryana",
    "match_id": "crex-har-vs-mgly-91st-match-syed-mushtaq-ali-trophy-2023-match-updates-M3M",
    "saved_at": "2026-10-24T08:19:11"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-saur-93rd-match-syed-mushtaq-ali-trophy-2023-match-updates-M3Q",
+   "crex_url": "/cricket-live-score/andr-vs-saur-93rd-match-syed-mushtaq-ali-trophy-2023-match-updates-M3Q",
    "key": "2023-10-25-Andhra-Saurashtra",
    "match_id": "crex-andr-vs-saur-93rd-match-syed-mushtaq-ali-trophy-2023-match-updates-M3Q",
    "saved_at": "2026-10-24T08:19:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/raj-vs-utk-107th-match-syed-mushtaq-ali-trophy-2023-match-updates-M42",
+   "crex_url": "/cricket-live-score/raj-vs-utk-107th-match-syed-mushtaq-ali-trophy-2023-match-updates-M42",
    "key": "2023-10-25-Uttarakhand-Rajasthan",
    "match_id": "crex-raj-vs-utk-107th-match-syed-mushtaq-ali-trophy-2023-match-updates-M42",
    "saved_at": "2026-10-24T08:20:27"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/del-vs-tri-100th-match-syed-mushtaq-ali-trophy-2023-match-updates-M3S",
+   "crex_url": "/cricket-live-score/del-vs-tri-100th-match-syed-mushtaq-ali-trophy-2023-match-updates-M3S",
    "key": "2023-10-25-Delhi-Tripura",
    "match_id": "crex-del-vs-tri-100th-match-syed-mushtaq-ali-trophy-2023-match-updates-M3S",
    "saved_at": "2026-10-24T08:20:38"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-22nd-match-world-cup-2023-match-updates-L4N",
+   "crex_url": "/cricket-live-score/afg-vs-pak-22nd-match-world-cup-2023-match-updates-L4N",
    "key": "2023-10-23-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-22nd-match-world-cup-2023-match-updates-L4N",
    "saved_at": "2026-10-25T08:33:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mp-vs-tri-64th-match-syed-mushtaq-ali-trophy-2023-match-updates-M2S",
+   "crex_url": "/cricket-live-score/mp-vs-tri-64th-match-syed-mushtaq-ali-trophy-2023-match-updates-M2S",
    "key": "2023-10-21-Madhya Pradesh-Tripura",
    "match_id": "crex-mp-vs-tri-64th-match-syed-mushtaq-ali-trophy-2023-match-updates-M2S",
    "saved_at": "2026-10-25T08:34:19"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-16th-match-world-cup-2023-match-updates-L4H",
+   "crex_url": "/cricket-live-score/afg-vs-nz-16th-match-world-cup-2023-match-updates-L4H",
    "key": "2023-10-18-Afghanistan-New Zealand",
    "match_id": "crex-afg-vs-nz-16th-match-world-cup-2023-match-updates-L4H",
    "saved_at": "2026-10-25T08:35:52"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/hyd-vs-jk-19th-match-syed-mushtaq-ali-trophy-2023-match-updates-M1M",
+   "crex_url": "/cricket-live-score/hyd-vs-jk-19th-match-syed-mushtaq-ali-trophy-2023-match-updates-M1M",
    "key": "2023-10-17-Jammu  Kashmir-Hyderabad (India)",
    "match_id": "crex-hyd-vs-jk-19th-match-syed-mushtaq-ali-trophy-2023-match-updates-M1M",
    "saved_at": "2026-10-25T08:36:04"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-13th-match-world-cup-2023-match-updates-L4D",
+   "crex_url": "/cricket-live-score/afg-vs-eng-13th-match-world-cup-2023-match-updates-L4D",
    "key": "2023-10-15-Afghanistan-England",
    "match_id": "crex-afg-vs-eng-13th-match-world-cup-2023-match-updates-L4D",
    "saved_at": "2026-10-25T08:38:34"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-9th-match-world-cup-2023-match-updates-L49",
+   "crex_url": "/cricket-live-score/afg-vs-ind-9th-match-world-cup-2023-match-updates-L49",
    "key": "2023-10-11-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-9th-match-world-cup-2023-match-updates-L49",
    "saved_at": "2026-10-25T08:38:46"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-final-asian-games-mens-t20-2023-match-updates-MFC",
+   "crex_url": "/cricket-live-score/afg-vs-ind-final-asian-games-mens-t20-2023-match-updates-MFC",
    "key": "2023-10-07-Afghanistan-India",
    "match_id": "crex-afg-vs-ind-final-asian-games-mens-t20-2023-match-updates-MFC",
    "saved_at": "2026-10-25T08:38:59"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-match-world-cup-2023-match-updates-L44",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-match-world-cup-2023-match-updates-L44",
    "key": "2023-10-07-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-match-world-cup-2023-match-updates-L44",
    "saved_at": "2026-10-25T08:39:12"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-qtr-final-asian-games-mens-t20-2023-match-updates-MF7",
+   "crex_url": "/cricket-live-score/afg-vs-sl-3rd-qtr-final-asian-games-mens-t20-2023-match-updates-MF7",
    "key": "2023-10-04-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-3rd-qtr-final-asian-games-mens-t20-2023-match-updates-MF7",
    "saved_at": "2026-10-25T08:39:29"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-8th-match-world-cup-2023-warm-up-match-updates-M8E",
+   "crex_url": "/cricket-live-score/afg-vs-sl-8th-match-world-cup-2023-warm-up-match-updates-M8E",
    "key": "2023-10-03-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-8th-match-world-cup-2023-warm-up-match-updates-M8E",
    "saved_at": "2026-10-25T08:39:51"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sa-2nd-match-world-cup-2023-warm-up-match-updates-M88",
+   "crex_url": "/cricket-live-score/afg-vs-sa-2nd-match-world-cup-2023-warm-up-match-updates-M88",
    "key": "2023-09-29-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-2nd-match-world-cup-2023-warm-up-match-updates-M88",
    "saved_at": "2026-10-25T08:40:03"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
+   "crex_url": "/cricket-live-score/afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
    "key": "2023-09-03-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
    "saved_at": "2026-10-27T09:07:49"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
+   "crex_url": "/cricket-live-score/afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
    "key": "2023-08-26-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
    "saved_at": "2026-10-27T09:08:01"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
+   "crex_url": "/cricket-live-score/afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
    "key": "2023-08-24-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
    "saved_at": "2026-10-27T09:08:14"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
+   "crex_url": "/cricket-live-score/afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
    "key": "2023-08-22-Afghanistan-Pakistan",
    "match_id": "crex-afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
    "saved_at": "2026-10-27T09:08:27"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
    "key": "2023-07-11-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
    "saved_at": "2026-10-27T09:08:41"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
    "key": "2023-07-05-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
    "saved_at": "2026-10-27T09:08:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
+   "crex_url": "/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
    "key": "2023-06-14-Afghanistan-Bangladesh",
    "match_id": "crex-afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
    "saved_at": "2026-10-27T09:09:06"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
+   "crex_url": "/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
    "key": "2023-06-02-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
    "saved_at": "2026-10-27T09:09:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
+   "crex_url": "/cricket-live-score/nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
    "key": "2023-03-29-Namibia-Papua New Guinea",
    "match_id": "crex-nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
    "saved_at": "2026-10-27T09:09:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
+   "crex_url": "/cricket-live-score/nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
    "key": "2023-02-27-Papua New Guinea-Nepal",
    "match_id": "crex-nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
    "saved_at": "2026-10-27T09:09:53"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
+   "crex_url": "/cricket-live-score/nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
    "key": "2023-02-26-Queensland-New South Wales",
    "match_id": "crex-nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
    "saved_at": "2026-10-27T09:10:06"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
+   "crex_url": "/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
    "key": "2022-11-30-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
    "saved_at": "2026-10-27T09:10:19"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
+   "crex_url": "/cricket-live-score/afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
    "key": "2022-11-04-Afghanistan-Australia",
    "match_id": "crex-afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
    "saved_at": "2026-10-27T09:10:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
+   "crex_url": "/cricket-live-score/ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
    "key": "2022-11-01-Bengal-Himachal Pradesh",
    "match_id": "crex-ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
    "saved_at": "2026-10-27T09:10:43"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
+   "crex_url": "/cricket-live-score/afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
    "key": "2022-11-01-Afghanistan-Sri Lanka",
    "match_id": "crex-afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
    "saved_at": "2026-10-27T09:10:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
+   "crex_url": "/cricket-live-score/afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
    "key": "2022-10-28-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
    "saved_at": "2026-10-27T09:11:07"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
+   "crex_url": "/cricket-live-score/afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
    "key": "2022-10-26-Afghanistan-New Zealand",
    "match_id": "crex-afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
    "saved_at": "2026-10-27T09:11:18"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-15th-match-csa-t20-challenge-2022-23-match-updates-GMK",
+   "crex_url": "/cricket-live-score/dol-vs-war-15th-match-csa-t20-challenge-2022-23-match-updates-GMK",
    "key": "2022-10-25-Dolphins-Warriors",
    "match_id": "crex-dol-vs-war-15th-match-csa-t20-challenge-2022-23-match-updates-GMK",
    "saved_at": "2026-10-27T09:11:31"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
+   "crex_url": "/cricket-live-score/andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
    "key": "2022-10-22-Baroda-Andhra",
    "match_id": "crex-andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
    "saved_at": "2026-10-27T09:12:26"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
+   "crex_url": "/cricket-live-score/afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
    "key": "2022-10-22-Afghanistan-England",
    "match_id": "crex-afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
    "saved_at": "2026-10-27T09:12:55"
   },
   {
-   "crex_url": "https://crex.com/cricket-live-score/mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
+   "crex_url": "/cricket-live-score/mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
    "key": "2022-10-16-Mumbai-Vidarbha",
    "match_id": "crex-mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
    "saved_at": "2026-10-27T09:15:59"
@@ -4870,7 +4870,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-11th-match-asia-cup-2022-match-updates-FHA",
+   "crex_url": "/cricket-live-score/afg-vs-ind-11th-match-asia-cup-2022-match-updates-FHA",
    "date": "2022-09-08",
    "gender": "male",
    "last_attempt": null,
@@ -4883,7 +4883,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-match-asia-cup-2022-match-updates-FH0",
+   "crex_url": "/cricket-live-score/afg-vs-sl-1st-match-asia-cup-2022-match-updates-FH0",
    "date": "2022-08-27",
    "gender": "male",
    "last_attempt": null,
@@ -4896,7 +4896,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-tour-of-ireland-2022-match-updates-DZH",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-tour-of-ireland-2022-match-updates-DZH",
    "date": "2022-08-12",
    "gender": "male",
    "last_attempt": null,
@@ -4922,7 +4922,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E6A",
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E6A",
    "date": "2022-06-14",
    "gender": "male",
    "last_attempt": null,
@@ -4935,7 +4935,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E68",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E68",
    "date": "2022-06-11",
    "gender": "male",
    "last_attempt": null,
@@ -4948,7 +4948,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E67",
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E67",
    "date": "2022-06-09",
    "gender": "male",
    "last_attempt": null,
@@ -4961,7 +4961,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E66",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E66",
    "date": "2022-06-06",
    "gender": "male",
    "last_attempt": null,
@@ -4974,7 +4974,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E65",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E65",
    "date": "2022-06-04",
    "gender": "male",
    "last_attempt": null,
@@ -4987,7 +4987,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2022-match-updates-D87",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2022-match-updates-D87",
    "date": "2022-02-28",
    "gender": "male",
    "last_attempt": null,
@@ -5026,7 +5026,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-3rd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFK",
+   "crex_url": "/cricket-live-score/afg-vs-ned-3rd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFK",
    "date": "2022-01-25",
    "gender": "male",
    "last_attempt": null,
@@ -5039,7 +5039,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-2nd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFJ",
+   "crex_url": "/cricket-live-score/afg-vs-ned-2nd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFJ",
    "date": "2022-01-23",
    "gender": "male",
    "last_attempt": null,
@@ -5052,7 +5052,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-1st-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFI",
+   "crex_url": "/cricket-live-score/afg-vs-ned-1st-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFI",
    "date": "2022-01-21",
    "gender": "male",
    "last_attempt": null,
@@ -5429,7 +5429,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
    "date": "2021-03-20",
    "gender": "male",
    "last_attempt": null,
@@ -5442,7 +5442,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Z",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Z",
    "date": "2021-03-10",
    "gender": "male",
    "last_attempt": null,
@@ -5455,7 +5455,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Y",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Y",
    "date": "2021-03-02",
    "gender": "male",
    "last_attempt": null,
@@ -5520,7 +5520,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
    "date": "2021-01-26",
    "gender": "male",
    "last_attempt": null,
@@ -5533,7 +5533,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
    "date": "2021-01-24",
    "gender": "male",
    "last_attempt": null,
@@ -5546,7 +5546,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
    "date": "2021-01-21",
    "gender": "male",
    "last_attempt": null,
@@ -5702,7 +5702,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EP",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EP",
    "date": "2020-03-10",
    "gender": "male",
    "last_attempt": null,
@@ -5715,7 +5715,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EO",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EO",
    "date": "2020-03-08",
    "gender": "male",
    "last_attempt": null,
@@ -5728,7 +5728,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EN",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EN",
    "date": "2020-03-06",
    "gender": "male",
    "last_attempt": null,
@@ -6066,7 +6066,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-only-test-afghanistan-vs-west-indies-in-india-2019-match-updates-9F2",
+   "crex_url": "/cricket-live-score/afg-vs-wi-only-test-afghanistan-vs-west-indies-in-india-2019-match-updates-9F2",
    "date": "2019-11-27",
    "gender": "male",
    "last_attempt": null,
@@ -6274,7 +6274,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
+   "crex_url": "/cricket-live-score/afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
    "date": "2019-11-09",
    "gender": "male",
    "last_attempt": null,
@@ -6300,7 +6300,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
+   "crex_url": "/cricket-live-score/afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
    "date": "2019-11-06",
    "gender": "male",
    "last_attempt": null,
@@ -6365,7 +6365,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
+   "crex_url": "/cricket-live-score/afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
    "date": "2019-09-21",
    "gender": "male",
    "last_attempt": null,
@@ -6391,7 +6391,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-5th-match-bangladesh-tri-series-2019-match-updates-7PU",
+   "crex_url": "/cricket-live-score/afg-vs-zim-5th-match-bangladesh-tri-series-2019-match-updates-7PU",
    "date": "2019-09-20",
    "gender": "male",
    "last_attempt": null,
@@ -6417,7 +6417,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-match-bangladesh-tri-series-2019-match-updates-7PR",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-match-bangladesh-tri-series-2019-match-updates-7PR",
    "date": "2019-09-14",
    "gender": "male",
    "last_attempt": null,
@@ -6456,7 +6456,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-only-test-2019-match-updates-96C",
+   "crex_url": "/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-only-test-2019-match-updates-96C",
    "date": "2019-09-05",
    "gender": "male",
    "last_attempt": null,
@@ -6534,7 +6534,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-36th-match-world-cup-2019-match-updates-L8",
+   "crex_url": "/cricket-live-score/afg-vs-pak-36th-match-world-cup-2019-match-updates-L8",
    "date": "2019-06-29",
    "gender": "male",
    "last_attempt": null,
@@ -6547,7 +6547,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-28th-match-world-cup-2019-match-updates-L0",
+   "crex_url": "/cricket-live-score/afg-vs-ind-28th-match-world-cup-2019-match-updates-L0",
    "date": "2019-06-22",
    "gender": "male",
    "last_attempt": null,
@@ -6742,7 +6742,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-4th-match-world-cup-2019-match-updates-KC",
+   "crex_url": "/cricket-live-score/afg-vs-aus-4th-match-world-cup-2019-match-updates-KC",
    "date": "2019-06-01",
    "gender": "male",
    "last_attempt": null,
@@ -7210,7 +7210,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2019-match-updates-7TP",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2019-match-updates-7TP",
    "date": "2019-05-21",
    "gender": "male",
    "last_attempt": null,
@@ -8276,7 +8276,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-only-test-afghanistan-v-ireland-in-india-2019-match-updates-7T5",
+   "crex_url": "/cricket-live-score/afg-vs-ire-only-test-afghanistan-v-ireland-in-india-2019-match-updates-7T5",
    "date": "2019-03-15",
    "gender": "male",
    "last_attempt": null,
@@ -8380,7 +8380,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2019-match-updates-7SZ",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2019-match-updates-7SZ",
    "date": "2019-02-24",
    "gender": "male",
    "last_attempt": null,
@@ -8406,7 +8406,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2019-match-updates-7SY",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2019-match-updates-7SY",
    "date": "2019-02-23",
    "gender": "male",
    "last_attempt": null,
@@ -9082,7 +9082,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-2nd-match-asia-cup-2018-match-updates-9GR",
+   "crex_url": "/cricket-live-score/afg-vs-pak-2nd-match-asia-cup-2018-match-updates-9GR",
    "date": "2018-09-21",
    "gender": "male",
    "last_attempt": null,
@@ -9277,7 +9277,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ind-1st-test-afghanistan-tour-of-india-2018-match-updates-9HF",
+   "crex_url": "/cricket-live-score/afg-vs-ind-1st-test-afghanistan-tour-of-india-2018-match-updates-9HF",
    "date": "2018-06-14",
    "gender": "male",
    "last_attempt": null,
@@ -9472,7 +9472,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-v-bangladesh-in-india-2018-match-updates-9LW",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-t20-afghanistan-v-bangladesh-in-india-2018-match-updates-9LW",
    "date": "2018-06-03",
    "gender": "male",
    "last_attempt": null,
@@ -10980,7 +10980,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nep-16th-match-world-cup-qualifiers-2018-match-updates-A2S",
+   "crex_url": "/cricket-live-score/afg-vs-nep-16th-match-world-cup-qualifiers-2018-match-updates-A2S",
    "date": "2018-03-10",
    "gender": "male",
    "last_attempt": null,
@@ -10993,7 +10993,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-12th-match-world-cup-qualifiers-2018-match-updates-A2O",
+   "crex_url": "/cricket-live-score/afg-vs-hk-12th-match-world-cup-qualifiers-2018-match-updates-A2O",
    "date": "2018-03-08",
    "gender": "male",
    "last_attempt": null,
@@ -11019,7 +11019,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-7th-match-world-cup-qualifiers-2018-match-updates-A2J",
+   "crex_url": "/cricket-live-score/afg-vs-zim-7th-match-world-cup-qualifiers-2018-match-updates-A2J",
    "date": "2018-03-06",
    "gender": "male",
    "last_attempt": null,
@@ -11084,7 +11084,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-5th-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-60",
+   "crex_url": "/cricket-live-score/afg-vs-zim-5th-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-60",
    "date": "2018-02-19",
    "gender": "male",
    "last_attempt": null,
@@ -11539,7 +11539,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TI",
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TI",
    "date": "2017-12-10",
    "gender": "male",
    "last_attempt": null,
@@ -11578,7 +11578,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TB",
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TB",
    "date": "2017-12-05",
    "gender": "male",
    "last_attempt": null,
@@ -12254,7 +12254,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-wi-1st-t20-afghanistan-tour-of-west-indies-2017-match-updates-55Q",
+   "crex_url": "/cricket-live-score/afg-vs-wi-1st-t20-afghanistan-tour-of-west-indies-2017-match-updates-55Q",
    "date": "2017-06-03",
    "gender": "male",
    "last_attempt": null,
@@ -13541,7 +13541,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2017-match-updates-58U",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2017-match-updates-58U",
    "date": "2017-03-10",
    "gender": "male",
    "last_attempt": null,
@@ -13645,7 +13645,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2017-match-updates-HOW",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2017-match-updates-HOW",
    "date": "2017-02-16",
    "gender": "male",
    "last_attempt": null,
@@ -13801,7 +13801,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-final-desert-t20-2017-match-updates-A5F",
+   "crex_url": "/cricket-live-score/afg-vs-ire-final-desert-t20-2017-match-updates-A5F",
    "date": "2017-01-20",
    "gender": "male",
    "last_attempt": null,
@@ -13814,7 +13814,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-oma-1st-semi-final-desert-t20-2017-match-updates-A5D",
+   "crex_url": "/cricket-live-score/afg-vs-oma-1st-semi-final-desert-t20-2017-match-updates-A5D",
    "date": "2017-01-20",
    "gender": "male",
    "last_attempt": null,
@@ -13827,7 +13827,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nam-11th-match-desert-t20-2017-match-updates-A5B",
+   "crex_url": "/cricket-live-score/afg-vs-nam-11th-match-desert-t20-2017-match-updates-A5B",
    "date": "2017-01-19",
    "gender": "male",
    "last_attempt": null,
@@ -13840,7 +13840,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-6th-match-desert-t20-2017-match-updates-A56",
+   "crex_url": "/cricket-live-score/afg-vs-uae-6th-match-desert-t20-2017-match-updates-A56",
    "date": "2017-01-16",
    "gender": "male",
    "last_attempt": null,
@@ -14308,7 +14308,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-1st-t20-afghanistan-tour-of-united-arab-emirates-2016-match-updates-409",
+   "crex_url": "/cricket-live-score/afg-vs-uae-1st-t20-afghanistan-tour-of-united-arab-emirates-2016-match-updates-409",
    "date": "2016-12-14",
    "gender": "male",
    "last_attempt": null,
@@ -14893,7 +14893,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42U",
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42U",
    "date": "2016-10-01",
    "gender": "male",
    "last_attempt": null,
@@ -14906,7 +14906,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42T",
+   "crex_url": "/cricket-live-score/afg-vs-ban-2nd-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42T",
    "date": "2016-09-28",
    "gender": "male",
    "last_attempt": null,
@@ -14919,7 +14919,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42S",
+   "crex_url": "/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42S",
    "date": "2016-09-25",
    "gender": "male",
    "last_attempt": null,
@@ -15582,7 +15582,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2016-match-updates-46U",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2016-match-updates-46U",
    "date": "2016-07-12",
    "gender": "male",
    "last_attempt": null,
@@ -15621,7 +15621,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2016-match-updates-476",
+   "crex_url": "/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2016-match-updates-476",
    "date": "2016-07-06",
    "gender": "male",
    "last_attempt": null,
@@ -16687,7 +16687,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-24th-match-t20-world-cup-2016-match-updates-4BV",
+   "crex_url": "/cricket-live-score/afg-vs-eng-24th-match-t20-world-cup-2016-match-updates-4BV",
    "date": "2016-03-23",
    "gender": "male",
    "last_attempt": null,
@@ -16739,7 +16739,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-9th-match-t20-world-cup-2016-match-updates-4AV",
+   "crex_url": "/cricket-live-score/afg-vs-zim-9th-match-t20-world-cup-2016-match-updates-4AV",
    "date": "2016-03-12",
    "gender": "male",
    "last_attempt": null,
@@ -17168,7 +17168,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3IA",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-t20-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3IA",
    "date": "2016-01-08",
    "gender": "male",
    "last_attempt": null,
@@ -17220,7 +17220,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-5th-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3I6",
+   "crex_url": "/cricket-live-score/afg-vs-zim-5th-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3I6",
    "date": "2016-01-06",
    "gender": "male",
    "last_attempt": null,
@@ -17298,7 +17298,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3HW",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3HW",
    "date": "2015-12-29",
    "gender": "male",
    "last_attempt": null,
@@ -17350,7 +17350,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3HT",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-odi-zimbabwe-tour-of-united-arab-emirates-2015-16-match-updates-3HT",
    "date": "2015-12-25",
    "gender": "male",
    "last_attempt": null,
@@ -17571,7 +17571,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-oma-6th-match-afghanistan-and-hong-kong-and-oman-in-uae-2015-match-updates-3KI",
+   "crex_url": "/cricket-live-score/afg-vs-oma-6th-match-afghanistan-and-hong-kong-and-oman-in-uae-2015-match-updates-3KI",
    "date": "2015-11-29",
    "gender": "male",
    "last_attempt": null,
@@ -18026,7 +18026,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2015-match-updates-3MV",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2015-match-updates-3MV",
    "date": "2015-10-26",
    "gender": "male",
    "last_attempt": null,
@@ -18052,7 +18052,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-5th-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MR",
+   "crex_url": "/cricket-live-score/afg-vs-zim-5th-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MR",
    "date": "2015-10-24",
    "gender": "male",
    "last_attempt": null,
@@ -18065,7 +18065,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-4th-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MO",
+   "crex_url": "/cricket-live-score/afg-vs-zim-4th-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MO",
    "date": "2015-10-22",
    "gender": "male",
    "last_attempt": null,
@@ -18104,7 +18104,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MJ",
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MJ",
    "date": "2015-10-18",
    "gender": "male",
    "last_attempt": null,
@@ -18130,7 +18130,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MH",
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2015-match-updates-3MH",
    "date": "2015-10-16",
    "gender": "male",
    "last_attempt": null,
@@ -18572,7 +18572,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-oma-5th-place-play-off-world-twenty20-qualifier-2015-match-updates-HMM",
+   "crex_url": "/cricket-live-score/afg-vs-oma-5th-place-play-off-world-twenty20-qualifier-2015-match-updates-HMM",
    "date": "2015-07-25",
    "gender": "male",
    "last_attempt": null,
@@ -18806,7 +18806,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-6th-match-world-twenty20-qualifier-2015-match-updates-AGX",
+   "crex_url": "/cricket-live-score/afg-vs-sco-6th-match-world-twenty20-qualifier-2015-match-updates-AGX",
    "date": "2015-07-12",
    "gender": "male",
    "last_attempt": null,
@@ -19937,7 +19937,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-26th-match-world-cup-2015-match-updates-5SN",
+   "crex_url": "/cricket-live-score/afg-vs-aus-26th-match-world-cup-2015-match-updates-5SN",
    "date": "2015-03-04",
    "gender": "male",
    "last_attempt": null,
@@ -20028,7 +20028,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-5th-match-dubai-triangular-series-2015-match-updates-4JX",
+   "crex_url": "/cricket-live-score/afg-vs-ire-5th-match-dubai-triangular-series-2015-match-updates-4JX",
    "date": "2015-01-17",
    "gender": "male",
    "last_attempt": null,
@@ -20080,7 +20080,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-2nd-match-dubai-triangular-series-2015-match-updates-4JU",
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-match-dubai-triangular-series-2015-match-updates-4JU",
    "date": "2015-01-10",
    "gender": "male",
    "last_attempt": null,
@@ -20119,7 +20119,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-1st-match-dubai-triangular-series-2015-match-updates-4JT",
+   "crex_url": "/cricket-live-score/afg-vs-sco-1st-match-dubai-triangular-series-2015-match-updates-4JT",
    "date": "2015-01-08",
    "gender": "male",
    "last_attempt": null,
@@ -20288,7 +20288,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-4th-odi-afghanistan-tour-of-uae-2014-match-updates-2WM",
+   "crex_url": "/cricket-live-score/afg-vs-uae-4th-odi-afghanistan-tour-of-uae-2014-match-updates-2WM",
    "date": "2014-12-04",
    "gender": "male",
    "last_attempt": null,
@@ -20301,7 +20301,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-uae-3rd-odi-afghanistan-tour-of-uae-2014-match-updates-2WJ",
+   "crex_url": "/cricket-live-score/afg-vs-uae-3rd-odi-afghanistan-tour-of-uae-2014-match-updates-2WJ",
    "date": "2014-12-02",
    "gender": "male",
    "last_attempt": null,
@@ -21211,7 +21211,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-5th-match-t20-world-cup-2014-match-updates-377",
+   "crex_url": "/cricket-live-score/afg-vs-hk-5th-match-t20-world-cup-2014-match-updates-377",
    "date": "2014-03-18",
    "gender": "male",
    "last_attempt": null,
@@ -21250,7 +21250,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
+   "crex_url": "/cricket-live-score/afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
    "date": "2014-03-03",
    "gender": "male",
    "last_attempt": null,
@@ -23616,7 +23616,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-only-odi-australia-in-uae-2012-match-updates-3LS",
+   "crex_url": "/cricket-live-score/afg-vs-aus-only-odi-australia-in-uae-2012-match-updates-3LS",
    "date": "2012-08-25",
    "gender": "male",
    "last_attempt": null,
@@ -23772,7 +23772,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-22nd-match-intercontinental-cup-2011-2013-match-updates-BF2",
+   "crex_url": "/cricket-live-score/afg-vs-ned-22nd-match-intercontinental-cup-2011-2013-match-updates-BF2",
    "date": "2012-03-31",
    "gender": "male",
    "last_attempt": null,
@@ -23811,7 +23811,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-6th-match-world-twenty20-qualifier-2012-match-updates-3YU",
+   "crex_url": "/cricket-live-score/afg-vs-can-6th-match-world-twenty20-qualifier-2012-match-updates-3YU",
    "date": "2012-03-18",
    "gender": "male",
    "last_attempt": null,
@@ -24955,7 +24955,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-4th-match-intercontinental-cup-2011-2013-match-updates-BEM",
+   "crex_url": "/cricket-live-score/afg-vs-can-4th-match-intercontinental-cup-2011-2013-match-updates-BEM",
    "date": "2011-08-09",
    "gender": "male",
    "last_attempt": null,
@@ -24968,7 +24968,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-can-3rd-match-intercontinental-cup-2011-2013-match-updates-BEK",
+   "crex_url": "/cricket-live-score/afg-vs-can-3rd-match-intercontinental-cup-2011-2013-match-updates-BEK",
    "date": "2011-08-07",
    "gender": "male",
    "last_attempt": null,
@@ -25722,7 +25722,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-hk-7th-match-asian-games-mens-t20-competition-2010-match-updates-U9E",
+   "crex_url": "/cricket-live-score/afg-vs-hk-7th-match-asian-games-mens-t20-competition-2010-match-updates-U9E",
    "date": "2010-11-24",
    "gender": "male",
    "last_attempt": null,
@@ -26008,7 +26008,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2010-match-updates-AYF",
+   "crex_url": "/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2010-match-updates-AYF",
    "date": "2010-08-17",
    "gender": "male",
    "last_attempt": null,
@@ -26034,7 +26034,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-1st-odi-afghanistan-tour-of-scotland-2010-match-updates-AYE",
+   "crex_url": "/cricket-live-score/afg-vs-sco-1st-odi-afghanistan-tour-of-scotland-2010-match-updates-AYE",
    "date": "2010-08-16",
    "gender": "male",
    "last_attempt": null,
@@ -26190,7 +26190,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
+   "crex_url": "/cricket-live-score/afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
    "date": "2010-07-10",
    "gender": "male",
    "last_attempt": null,
@@ -26606,7 +26606,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-usa-10th-match-world-twenty20-qualifier-2010-match-updates-11WF",
+   "crex_url": "/cricket-live-score/afg-vs-usa-10th-match-world-twenty20-qualifier-2010-match-updates-11WF",
    "date": "2010-02-11",
    "gender": "male",
    "last_attempt": null,
@@ -26632,7 +26632,7 @@
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sco-5th-match-world-twenty20-qualifier-2010-match-updates-11WA",
+   "crex_url": "/cricket-live-score/afg-vs-sco-5th-match-world-twenty20-qualifier-2010-match-updates-11WA",
    "date": "2010-02-10",
    "gender": "male",
    "last_attempt": null,

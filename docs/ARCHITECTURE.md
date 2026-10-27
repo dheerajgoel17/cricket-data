@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-Cricsheet zip (recently_added_30 daily, all_json weekly)
+Base zip (recently_added_30 daily, all_json weekly)
         |  download -> parse -> delete zip
         v
  data/matches + data/players   (month-partitioned gzip CSV, deterministic)
@@ -10,7 +10,7 @@ Cricsheet zip (recently_added_30 daily, all_json weekly)
  data/provisional/*.json  <---- reconcile: verify, log, DELETE once landed
         ^                ^
         |                |
- inbox/*.json    web scraper (optional, ESPNcricinfo + CREX + pluggable sources)
+ inbox/*.json    web scraper (optional, Source B + Source A + pluggable sources)
         |                |
  CRICKET_DATA_SOURCES plugins (optional, user-supplied)
 ```
@@ -23,6 +23,6 @@ Cricsheet zip (recently_added_30 daily, all_json weekly)
 
 Resilience: the daily run re-reads 30 days, so a missed day heals itself; the weekly run re-reads everything.
 A failing extra source is logged and skipped; a failed run opens a GitHub issue.
-Workflows: `daily-update.yml` (Cricsheet + scraper), `scraper-update.yml` (scraper every 6 hours), `weekly-heal.yml`, `ci.yml`.
+Workflows: `daily-update.yml` (Base + scraper), `scraper-update.yml` (scraper every 6 hours), `weekly-heal.yml`, `ci.yml`.
 
 See [SCRAPER.md](SCRAPER.md) for web scraper details, pluggable architecture, and how to add new sources.

@@ -1,6 +1,6 @@
 # Writing a source for the very latest matches
 
-Cricsheet is normally only **1-2 days** behind, so you rarely need this. If you want same-day results:
+Base is normally only **1-2 days** behind, so you rarely need this. If you want same-day results:
 
 1. Pick a site whose **terms allow automated access**. Many cricket sites forbid it, some block bots outright.
    This project ships no site-specific scraper and will not accept one in a pull request.
@@ -10,5 +10,5 @@ Cricsheet is normally only **1-2 days** behind, so you rarely need this. If you 
 4. Develop the parsers offline against saved pages and add tests.
 5. Enable with `CRICKET_DATA_SOURCES="your_module:YourSource" cricket-data update`.
 
-Whatever you fetch is stored as *provisional*, checked against Cricsheet when the match lands, and then deleted
+Whatever you fetch is stored as *provisional*, checked against Base when the match lands, and then deleted
 ([PROVISIONAL.md](PROVISIONAL.md)). If your source is wrong, the mismatch shows up in `data/reconcile_log.csv`.

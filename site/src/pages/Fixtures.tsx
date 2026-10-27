@@ -50,7 +50,7 @@ function useMatchClock(when: Date, timed: boolean) {
   return { label: "Completed", value: "", tone: "" };
 }
 
-/** Match header, flat like Cricinfo's (no card): status and format, the two sides with their start time and live timer, then series and venue. */
+/** Match header, flat like Source B's (no card): status and format, the two sides with their start time and live timer, then series and venue. */
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;

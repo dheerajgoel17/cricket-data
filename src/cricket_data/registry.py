@@ -1,6 +1,6 @@
-"""Link provisional (scraped) player names to Cricsheet registry IDs, and read canonical + provisional together.
+"""Link provisional (scraped) player names to Base registry IDs, and read canonical + provisional together.
 
-Scrapers such as CREX give full names ("Harry Brook"); Cricsheet uses initials ("HC Brook") and an 8-hex
+Scrapers such as Source A give full names ("Harry Brook"); Base uses initials ("HC Brook") and an 8-hex
 registry id. `link_players` fills `player_id` in provisional files from, in order:
   1. data/mappings/player_aliases.csv (raw_name, team, player_id), team may be blank;
   2. an exact name match within the team's canonical roster;
@@ -135,7 +135,7 @@ def resolve(raw: str, team: str, rosters, aliases, gender: str = "") -> tuple[st
     reason = "surname_initial"
     if not cands:
         # 'Prasidh Krishna' -> 'M Prasidh Krishna', 'Varun Chakaravarthy' -> 'CV Varun': every non-initial
-        # Cricsheet token is in the raw name (fuzzy, for spellings like Nitish/Nithish)
+        # Base token is in the raw name (fuzzy, for spellings like Nitish/Nithish)
         raw_l = [t.lower() for t in rt]
 
         def has(tok):
@@ -227,7 +227,7 @@ def pending_provisional(store: Store) -> list[dict]:
 
 
 def iter_combined(store: Store, kind: str, include_provisional: bool = True) -> Iterator[dict[str, str]]:
-    """Canonical rows, then provisional rows for matches Cricsheet has not published yet."""
+    """Canonical rows, then provisional rows for matches Base has not published yet."""
     yield from store.iter_all(kind)
     if not include_provisional:
         return

@@ -14,7 +14,7 @@ odds are served from their own backend (bookmaker logos, plus a "Sportsbook Odds
 | `/player-trends` | cards of players clearing a line, with per-game strip | `/trends` | pick an upcoming fixture, stat, line, min hit rate |
 | `/prophunter`, `/prop-screener` | find players clearing a line, then check the price | `/props` (Prop Hunter) + `/trends` | price comes from our value-bets output, not a bookmaker feed |
 | `/team-screener`, `/team-stats`, `/player-stats` | landing + screeners | `/teams`, `/players`, `/tools` | |
-| `/referees` | referee card stats | not built | Cricsheet has officials; umpire/referee markets are rare for cricket |
+| `/referees` | referee card stats | not built | Base has officials; umpire/referee markets are rare for cricket |
 | `/odds-converter` | fractional/decimal/American converter | `/odds` | **decimal only** (house rule): implied probability, margin removal, EV, Kelly |
 | `/stats-explained` | glossary with category/difficulty filters | `/glossary` | markets, void rules, DNP, hit rate, fair odds |
 | `/free-tools`, `/features` | tools hub | `/tools` (and `/features`) | |

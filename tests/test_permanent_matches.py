@@ -10,7 +10,7 @@ from cricket_data.permanent_matches import (
 
 
 def test_missing_matches_parser():
-    """Test parsing Cricsheet's missing-matches HTML."""
+    """Test parsing Base's missing-matches HTML."""
     html = """
     <h5>Test Matches</h5>
     <h6>Female matches</h6>
@@ -156,7 +156,7 @@ def test_classify_match_status_afghanistan():
 
 
 def test_classify_match_status_missing():
-    """Matches on Cricsheet's missing list should be classified as missing."""
+    """Matches on Base's missing list should be classified as missing."""
     match = MatchRecord(
         match_id="test-1",
         date="2002-01-14",

@@ -84,21 +84,22 @@ test("without a key the endpoint says so (the site then uses its built-in parser
   process.env.GEMINI_API_KEY = k;
 });
 
+process.env.LIVE_SOURCE_BASE = "https://src.test";
 const { default: liveHandler } = await import("../api/live.js");
-const crexHtml = (payload) => `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;
+const pageHtml = (payload) => `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;
 const nedOma = { team1: "Netherlands", team2: "Oman", t1SName: "NED", t2SName: "OMA", t1f: "N", t2f: "O", bf: "N", s1: "10-0", o1: "2.0", s2: "", o2: "", t: Date.parse("2026-10-27T09:00:00Z"), status: 1, statusText: "Live", fo: "ODI", mf: "14VC", link: "/cricket-live-score/ned-vs-oma-14VC" };
 const u19 = { team1: "Oman U19", team2: "Afghanistan U19", s2: "421-5", o2: "50.0", t: Date.parse("2026-10-27T05:30:00Z"), status: 1, fo: "Youth ODI", mf: "14UU", link: "/cricket-live-score/oma-u19-vs-afg-u19-14UU" };
-const SCHEDULE = crexHtml({ "https://stats.crickapi.com/fixture/getFixture": [nedOma, u19] });
-const MATCH_PAGE = crexHtml({ "https://api.goscorer.com/api/v3/getSV3": {
+const SCHEDULE = pageHtml({ "https://src.test/fixture/getFixture": [nedOma, u19] });
+const MATCH_PAGE = pageHtml({ "https://src.test/v3/getSV3": {
   team1_f_n: "Netherlands", team2_f_n: "Oman", team1short: "NED", team2short: "OMA", rt: "Netherlands", inning: 1, status: 1,
   score1: "19-0", over1: "3.1", score2: "", over2: "", comment1: "OMA opt to <b>Bowl</b>",
   player_full_name1: "Vikramjit Singh", run1: "6", ball1: "(8)", four1: "1", six1: "0", st: "1",
   player_full_name2: "Michael Levitt", run2: "9", ball2: "(11)", four2: "1", six2: "0",
   bowler_full_name: "Bilal Khan", bwr: "0-11", bover: "2.0", partnerruns: 19, partnerballs: 19, crr: "6.00",
 } });
-const SCORECARD = crexHtml({
-  "https://api.goscorer.com/api/v3/getSC4": [{ c: "N", d: "19/0(19", e: "4.0.0.0.0", b: ["VS.6.8.1.0", "ML.9.11.1.0"], a: ["BK.11.12.0.0"] }],
-  "https://oc.crickapi.com/mapping/getHomeMapData": { p: [{ f_key: "VS", n: "Vikramjit Singh" }, { f_key: "ML", n: "Michael Levitt" }, { f_key: "BK", n: "Bilal Khan" }], t: [{ f_key: "N", n: "Netherlands" }, { f_key: "O", n: "Oman" }] },
+const SCORECARD = pageHtml({
+  "https://src.test/v3/getSC4": [{ c: "N", d: "19/0(19", e: "4.0.0.0.0", b: ["VS.6.8.1.0", "ML.9.11.1.0"], a: ["BK.11.12.0.0"] }],
+  "https://src.test/mapping/getHomeMapData": { p: [{ f_key: "VS", n: "Vikramjit Singh" }, { f_key: "ML", n: "Michael Levitt" }, { f_key: "BK", n: "Bilal Khan" }], t: [{ f_key: "N", n: "Netherlands" }, { f_key: "O", n: "Oman" }] },
 });
 const BOOKS = { fancy: [{ match: "Netherlands vs Oman", start_utc: "2026-10-27T09:00:00Z" }] };
 
@@ -109,12 +110,12 @@ function callLive(method = "GET") {
   });
 }
 
-test("GET /api/live builds priced matches from the CREX pages only, then reuses the snapshot", async () => {
+test("GET /api/live builds priced matches from the one source's pages, then reuses the snapshot", async () => {
   globalThis.fetch = async (url) => {
     seen.push({ url: String(url), init: {} });
     const u = String(url), html = (t) => ({ ok: true, status: 200, text: async () => t });
     if (u.includes("book_lines.json")) return { ok: true, status: 200, json: async () => BOOKS };
-    if (u === "https://crex.com/schedule") return html(SCHEDULE);
+    if (u === "https://src.test/schedule") return html(SCHEDULE);
     if (u.endsWith("ned-vs-oma-14VC/match-scorecard")) return html(SCORECARD);
     if (u.endsWith("ned-vs-oma-14VC")) return html(MATCH_PAGE);
     return { ok: false, status: 404, json: async () => ({}), text: async () => "" };
@@ -122,7 +123,7 @@ test("GET /api/live builds priced matches from the CREX pages only, then reuses 
   const r = await callLive();
   assert.equal(r.code, 200);
   assert.equal(r.body.source, "live");
-  assert.ok(!JSON.stringify(r.body).toLowerCase().includes("crex"), "the public body names no source and carries no source URL");
+  assert.ok(!JSON.stringify(r.body).includes("src.test"), "the public body carries no source URL");
   assert.ok(!("url" in r.body.matches[0]));
   assert.equal(r.body.matches.length, 1, "the unpriced under-19 game is dropped");
   const [m] = r.body.matches;
@@ -135,7 +136,8 @@ test("GET /api/live builds priced matches from the CREX pages only, then reuses 
   assert.equal(m.card.length, 1);
   assert.deepEqual(m.partnership, { runs: 19, balls: 19 });
   assert.ok(seen.some((s) => s.url.endsWith("ned-vs-oma-14VC")) && seen.some((s) => s.url.endsWith("/match-scorecard")));
-  assert.ok(!seen.some((s) => s.url.includes("oma-u19") || s.url.includes("espn")), "no ESPN, and no pages for unpriced games");
+  assert.ok(seen.every((s) => s.url.includes("src.test") || s.url.includes("book_lines.json")), "only the one source and our own book file");
+  assert.ok(!seen.some((s) => s.url.includes("oma-u19")), "no pages for unpriced games");
   assert.match(r.headers["Cache-Control"], /s-maxage=15/);
   const n = seen.length;
   await callLive();

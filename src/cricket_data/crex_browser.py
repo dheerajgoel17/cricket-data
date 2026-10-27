@@ -1,13 +1,13 @@
-"""One headless-Chromium session for CREX pages (they render with JavaScript).
+"""One headless-Chromium session for Source A pages (they render with JavaScript).
 
 A single ``CREXBrowser`` is created per process and passed to everything that needs a rendered
 page, so Playwright's sync API is started exactly once and always stopped by ``close()`` (use it as
 a context manager). Starting several ``sync_playwright()`` instances, or tearing one down from
 ``__del__``, is what produced the "Playwright Sync API inside the asyncio loop" crash in Actions.
 
-CREX pages are also server-rendered, so ``render`` first tries a plain HTTP GET (about 2 s, no
+Source A pages are also server-rendered, so ``render`` first tries a plain HTTP GET (about 2 s, no
 browser) and only falls back to Chromium when the expected content is missing from the response.
-That keeps runs fast and still works if CREX stops serving the content to plain requests.
+That keeps runs fast and still works if Source A stops serving the content to plain requests.
 
 Politeness: robots.txt is checked for every URL, requests are spaced by ``min_interval`` seconds and
 429 / 5xx responses are retried with a growing back-off.

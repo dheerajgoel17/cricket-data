@@ -1,4 +1,4 @@
-"""Match-level "fancy" over/under lines from the MoviOdds (bet365 mirror) feed, for the site's Match Fancy tab.
+"""Match-level "fancy" over/under lines from the Feed P (Book A mirror) feed, for the site's Match Fancy tab.
 
 These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score,
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,
@@ -46,7 +46,7 @@ def _line(q):
 
 
 def match_fancy(raw: dict | None) -> list[dict]:
-    """Pre-match over/under lines with both prices, sorted by start time. `raw` is the MoviOdds feed (or None)."""
+    """Pre-match over/under lines with both prices, sorted by start time. `raw` is the Feed P feed (or None)."""
     out = []
     for m in (raw or {}).get("matches", []):
         if m.get("in_play"):

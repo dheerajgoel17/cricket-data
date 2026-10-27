@@ -15,6 +15,16 @@ on:
         description: "Comma-separated task-key prefixes to backfill first, e.g. 2025-12-18-Jharkhand"
         default: ""
 
+# Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
+env:
+  LIVE_SOURCE_BASE: ${{ secrets.LIVE_SOURCE_BASE }}
+  LIVE_SITEMAP_DIR: ${{ secrets.LIVE_SITEMAP_DIR }}
+  IMG_CDN_BASE: ${{ secrets.IMG_CDN_BASE }}
+  VITE_IMG_CDN: ${{ secrets.IMG_CDN_BASE }}
+  BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
+
 permissions:
   contents: write
   issues: write
@@ -37,7 +47,7 @@ jobs:
           pip install -e .
           pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Restore CREX index cache
+      - name: Restore Source A index cache
         uses: actions/cache@v4
         with:
           path: .cache
@@ -106,7 +116,7 @@ jobs:
           else
             echo "has_failures=false" >> $GITHUB_OUTPUT
           fi
-      - name: Refresh upcoming fixtures (CREX's own schedule page, one request)
+      - name: Refresh upcoming fixtures (Source A's own schedule page, one request)
         if: github.event.schedule != '17 3 * * *'
         continue-on-error: true
         run: cricket-data fixtures

@@ -1,4 +1,4 @@
-"""Upcoming-fixture selection and parsing, offline (a real CREX page, trimmed to its event JSON-LD)."""
+"""Upcoming-fixture selection and parsing, offline (a real Source A page, trimmed to its event JSON-LD)."""
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
@@ -13,7 +13,7 @@ NOW = datetime(2026, 10, 13, 12, 0, tzinfo=timezone.utc)
 
 
 def _xml(*rows: tuple[str, str]) -> str:
-    body = "".join(f"<url><loc>https://crex.com/cricket-live-score/{s}</loc><lastmod>{t}</lastmod></url>"
+    body = "".join(f"<url><loc>https://src.test/cricket-live-score/{s}</loc><lastmod>{t}</lastmod></url>"
                    for s, t in rows)
     return f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
 

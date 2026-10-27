@@ -34,9 +34,9 @@ Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-da
 artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `main` small. Caches (`*.pkl`) are rebuilt each run in about 25 s.
 
 ## Sources
-* `smarkets`: public exchange API (top batsman/bowler, venue). `moviodds_bet365`: unofficial bet365 mirror (batter runs, sixes and fours
+* `smarkets`: public exchange API (top batsman/bowler, venue). `moviodds_bet365`: unofficial Book A mirror (batter runs, sixes and fours
   O/U, bowler wickets O/U, 50/100 Yes/No, batter/bowler milestone ladders, top batter/bowler). Both are keyless.
-* Match winner is **not** priced or alerted. Polymarket, Matchbook, The Odds API and Betfair only price match winner, so they are off.
+* Match winner is **not** priced or alerted. Polymarket, Matchbook, The Odds API and Exchange B only price match winner, so they are off.
   To turn them back on, set the repository variable `CV_SOURCES` (e.g. `smarkets,moviodds_bet365,betfair`) and the secrets
   `ODDS_API_KEY`, `BETFAIR_APP_KEY`, `BETFAIR_USERNAME`, `BETFAIR_PASSWORD`. A missing secret means that adapter reports "skipped".
 * Any `CV_<SETTING>` env var overrides `src/value_bets/config.py` (e.g. `CV_MIN_EDGE=0.07`).
@@ -75,7 +75,7 @@ artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `
   NB-GLM terms on top of each selected model, on the same splits (train 2021–22, select on 2023–24, test 2025+). A term is adopted
   only if it gains ≥ 0.0003 validation log-loss **and** does not worsen the held-out test. Result: **no weather term was adopted**
   (best: `wx_rain` for T20 fours passed validation, then got worse on test, 0.4819 → 0.4820). Weather is therefore informational
-  (why line + rain-risk flag) and is not in the probability. Cricsheet has no start times, so day/night and dew-at-night could not be
+  (why line + rain-risk flag) and is not in the probability. Base has no start times, so day/night and dew-at-night could not be
   tested. The weekly refit re-runs this study and tops up the cache (`CV_WEATHER_FETCH=1`); a term that starts to help will be adopted
   automatically.
 * Geocoding uses the venue's city with country hints from the match history (host country of tours/leagues); hits outside those
@@ -85,5 +85,5 @@ artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `
 See `value_bets/out/backtest_props.md` for the current numbers.
 
 ## Book lines for the site
-Every run also writes `value_bets/out/book_lines.json`: each two-sided over/under player line (runs, sixes, fours, wickets) with its decimal prices per source, for players matched to the Cricsheet registry (`src/value_bets/booklines.py`). The site shows them on the player page; they are prices as published, not a model output.
-`book_lines.json` also carries `events` (every pre-match event with any player prop) and `fancy` (match-level over/under lines with both prices, read straight from the MoviOdds feed by `src/value_bets/fancy.py`: total match runs, sixes, fours, boundaries, first-innings score, highest over, top score, and a team's sixes / fours / boundaries). The site's Match Fancy tab shows them next to its own fair prices; they bypass the player-prop pipeline and are never alerted on.
+Every run also writes `value_bets/out/book_lines.json`: each two-sided over/under player line (runs, sixes, fours, wickets) with its decimal prices per source, for players matched to the Base registry (`src/value_bets/booklines.py`). The site shows them on the player page; they are prices as published, not a model output.
+`book_lines.json` also carries `events` (every pre-match event with any player prop) and `fancy` (match-level over/under lines with both prices, read straight from the Feed P feed by `src/value_bets/fancy.py`: total match runs, sixes, fours, boundaries, first-innings score, highest over, top score, and a team's sixes / fours / boundaries). The site's Match Fancy tab shows them next to its own fair prices; they bypass the player-prop pipeline and are never alerted on.
