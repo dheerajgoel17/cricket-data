@@ -97,9 +97,9 @@ jobs:
           meta = json.load(open("site/public/data/meta.json"))
           assert meta["matches"] > 20000, f"suspiciously few matches: {meta['matches']}"
           # the scraper's provisional matches cover the gap until Base publishes, so judge freshness on whichever is newer
-          newest = max(meta["newest_cricsheet"], meta.get("newest_provisional") or "")
+          newest = max(meta["newest_base"], meta.get("newest_provisional") or "")
           age = (date.today() - date.fromisoformat(newest)).days
-          print(f"newest Base match {meta['newest_cricsheet']}, newest provisional {meta.get('newest_provisional')}; provisional {meta['provisional_matches']}")
+          print(f"newest Base match {meta['newest_base']}, newest provisional {meta.get('newest_provisional')}; provisional {meta['provisional_matches']}")
           if age > 3:
               print("::warning::Neither Base nor the scraper has data newer than 3 days")
           PY

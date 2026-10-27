@@ -69,7 +69,7 @@ def test_build_gives_a_provisional_match_innings_and_markets_when_it_has_deliver
     meta = B.build(z, data, out, None, workers=1)
     assert meta["provisional_matches"] == 1
     M = json.loads((out / "matches.json").read_text())
-    m = M["id"].index("crex-x")
+    m = M["id"].index("prov-x")
     assert M["pv"][m] == 1 and len(M["inn"][m]) == 2 and M["inn"][m][0][1:4] == [110, 8, 120]
     assert M["fi"][m] != -1 and M["q"][m] == 0
 
@@ -90,7 +90,7 @@ def test_rows_saved_before_the_name_columns_still_build(tmp_path):
     out = tmp_path / "out"
     assert B.build(z, data, out, None, workers=1)["provisional_matches"] == 1
     M = json.loads((out / "matches.json").read_text())
-    assert M["inn"][M["id"].index("crex-x")] == []
+    assert M["inn"][M["id"].index("prov-x")] == []
 
 
 def test_team_spelled_differently_from_cricsheet_does_not_break_the_build(tmp_path):
