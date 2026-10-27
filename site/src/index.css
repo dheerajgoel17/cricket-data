@@ -96,3 +96,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* Live-feed mark: the two arcs light up in turn, like a broadcast. */
+@keyframes live-arc { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
+.live-arc { animation: live-arc 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .live-arc { animation: none; } }

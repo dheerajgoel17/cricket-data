@@ -20,6 +20,7 @@ import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
+import { LiveFeed } from "@/components/app/live-feed";
 import { RecentForm } from "@/components/app/recent-form";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
@@ -59,7 +60,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
           {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
         </span>
         <span className="text-[13px] font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
-        {live && <Badge className="ml-auto px-3 py-1 text-xs font-semibold">Props live</Badge>}
+        {live && <LiveFeed className="ml-auto" />}
       </div>
       <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
         <div className="grid min-w-0 gap-4">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
