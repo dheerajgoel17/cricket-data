@@ -21,7 +21,7 @@ Base all_json.zip ─┐
 data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/src/engine)
 data/fixtures, value_bets ┘                                                              ▲
                                                 question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
-                                                Source A schedule + match + scorecard ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
+                                                Source A schedule + match + scorecard ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far + each priced line settled (value, final, Cleared / Missed / Push, Not in XI)
 ```
 * **Builder** (`src/cricket_site`, stdlib only): parses the ball-by-ball JSON into per-innings batting rows (position, innings order,
   runs/balls/4s/6s, dismissal), bowling spells, partnerships (who was out, runs, balls, opening flag) and match-market aggregates.
@@ -44,7 +44,7 @@ data/fixtures, value_bets ┘                                                   
   and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `$LIVE_SOURCE_BASE/api`), so a chase shows the chasing side's pair the moment it starts.
   The browser polls that route.
   **Playing XI.** The card lists a side's eleven (batters plus yet to bat) as soon as it is down to bat, so a prop row shows **Not in XI** and is dimmed when that side's eleven are all known and the player is not one of them. The other side stays unmarked until it has batted: the source only gives its XI through an app API we do not call. Pages are fetched from 90 minutes before the start so the batting side's XI is picked up at the toss. A priced match also stays in Hot props, with its last pre-match prices, for as long as the live feed lists it as being played (otherwise 3 hours from the start).
-  Unofficial and can change. **Never used for settlement** — VOID/DNP rules still apply after the innings qualifies.
+  Unofficial and can change. Every priced line of a match is settled here (`lines` on each match: value, state, verdict, Not in XI), by the player's id through the identity table, so the browser does no matching of its own; while the match is on these are "so far", and a final number in a finished match is its result, stored in the archive (`docs/PROJECT_GUIDE.md` 5.4c). VOID/DNP rules still apply: a player with no row has no result.
   Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`).
 
 ## Settlement rules and definitions
@@ -62,13 +62,13 @@ The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app b
 
 **Bookmaker lines.** The value-bets pipeline saves every matched two-sided player line (runs, sixes, fours, wickets; decimal over/under per book) to `value_bets/out/book_lines.json` (`src/value_bets/booklines.py`, matched to Base player ids). The site builder bundles it as `data/lines.json`, and the player page reads the live file from GitHub (falling back to the bundle). For a player with a priced upcoming match, the chart opens on the market's **main line** (the one priced closest to evens, `engine/lines.js`) instead of the median-based default, and a "Bookmaker lines" card shows each book's prices, the no-margin market probability and his own hit rate over each line; tap a line to put it on the chart. Players or stats with no market line keep the median default (floor(median) + 0.5, `suggestLines`).
 
-**Props are never deleted.** A fixture that has arrived and been priced keeps its props: the list on the home page lets a finished match go after a day (`shownFixtures`), but the fixture's own page (`/fixture/<id>`) always works. When the schedule no longer lists the match, or the live book file has let its lines go, the page reads the match's archive file (`value_bets/archive/YYYY-MM/<fixture id>.json`, see `docs/VALUE_BETS.md`) through `useFixtureBooks` (`src/hooks/useEngine.ts`, `loadArchive` in `src/lib/feeds.ts`; the id is checked against the fixture-id pattern before it becomes a URL). `archiveFixture` rebuilds the fixture from the file and `withArchive` adds its lines to the book doc (`src/engine/lines.js`, unit-tested); the props list scores them from the player's history like any others, and shows each result from the data once the match is in it.
+**Props are never deleted.** A fixture that has arrived and been priced keeps its props: the list on the home page lets a finished match go after a day (`shownFixtures`), but the fixture's own page (`/fixture/<id>`) always works. When the schedule no longer lists the match, or the live book file has let its lines go, the page reads the match's archive file (`value_bets/archive/YYYY-MM/<fixture id>.json`, see `docs/VALUE_BETS.md`) through `useFixtureBooks` (`src/hooks/useEngine.ts`, `loadArchive` in `src/lib/feeds.ts`; the id is checked against the fixture-id pattern before it becomes a URL). `archiveFixture` rebuilds the fixture from the file and `withArchive` adds its lines to the book doc (`src/engine/lines.js`, unit-tested); the props list scores them from the player's history like any others, and shows each result from the file's `results` (stored by the server once the match was over, `docs/VALUE_BETS.md`), else from the data once the match is in it.
 
 ## Known limits (be aware before betting)
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
-* Live scores lag up to about 20 seconds and come from the unofficial Source A pages. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
+* Live scores lag up to about 20 seconds and come from the unofficial Source A pages. A player with no row yet is not "0 so far" (they may not have batted). "So far" is not a result until the match is final.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
 ## Run it locally

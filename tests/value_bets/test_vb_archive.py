@@ -1,7 +1,10 @@
 import datetime as dt
 import json
 
-from value_bets.archive import backfill, fixture_id, group, team_key, update
+import pytest
+
+from value_bets import archive as arch
+from value_bets.archive import backfill, fixture_id, group, main, match_results, settle, team_key, update
 
 START = "2026-10-27T07:00:00Z"
 SCHED = [{"start_utc": "2026-10-27T07:00Z", "format": "T20", "gender": "male", "team_a": "New Zealand", "team_b": "India", "venue": "Eden Park", "series": "NZ v IND", "status": "Upcoming"}]
@@ -144,3 +147,105 @@ def test_backfill_takes_names_from_the_current_book_file_too_and_leaves_an_unrea
     bad.write_text('{"id": ')
     assert backfill(tmp_path, book([line(book_name="A Sharma")])) == ["2026-10-27-new-zealand-v-india"]
     assert read(tmp_path)["lines"][0]["book_name"] == "A Sharma" and bad.read_text() == '{"id": '
+
+
+# ---- results: what finished matches decided, stored once the live route reports the match final
+
+def settled(pid, stat, ln, value, state="final", **kw):
+    return {"pid": pid, "stat": stat, "line": ln, "value": value, "state": state, "verdict": None, **kw}
+
+
+def live_match(lines, status="final", start="2026-10-27T07:00:00.000Z", mid="12JE", sides=("New Zealand", "India")):
+    return {"id": mid, "status": status, "start": start, "teams": [{"name": n} for n in sides], "lines": lines}
+
+
+def filed(tmp_path, *lines):
+    update(tmp_path, book(list(lines) or [line(), line(stat="sixes", ln=1.5), line(pid="cd34", player="Tilak Varma", ln=22.5)]), at(20), None, SCHED)
+
+
+NOW = at(18, 27)
+
+
+def test_only_settled_lines_of_a_finished_match_are_results_and_one_value_per_player_and_stat():
+    m = live_match([settled("ab12", "runs", 17.5, 31), settled("ab12", "runs", 24.5, 31), settled("ab12", "sixes", 1.5, 2, state="live"),
+                    settled("cd34", "runs", 22.5, None, notInXI=True), settled("ef56", "wickets", 0.5, 0), settled("gh78", "runs", 9.5, 4), settled("gh78", "runs", 14.5, 5)])
+    assert match_results(m) == {("ab12", "runs"): 31, ("ef56", "wickets"): 0}  # a zero is a result; "so far", not-in-XI and a player whose lines disagree are not
+    assert match_results({**m, "status": "live"}) == {} and match_results({}) == {}
+
+
+def test_results_are_added_to_the_matchs_file_for_priced_lines_only(tmp_path):
+    filed(tmp_path)
+    before = read(tmp_path)
+    m = live_match([settled("ab12", "runs", 17.5, 31), settled("ab12", "sixes", 1.5, 2), settled("cd34", "runs", 22.5, 0), settled("zz99", "runs", 9.5, 7), settled("ab12", "fours", 2.5, 3)])
+    assert settle(tmp_path, [{"matches": [m]}, {"matches": [m]}], NOW) == (["2026-10-27-new-zealand-v-india"], [])
+    d = read(tmp_path)
+    assert d["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}, {"pid": "ab12", "stat": "sixes", "value": 2}, {"pid": "cd34", "stat": "runs", "value": 0}]  # not zz99 or fours: never priced
+    assert d["updated"] == "2026-10-27T18:00:00Z"
+    assert {k: v for k, v in d.items() if k not in ("results", "updated")} == {k: v for k, v in before.items() if k != "updated"}, "nothing else in the file moves"
+
+
+def test_a_result_needs_every_read_to_agree_so_a_card_behind_the_last_ball_is_never_written_down(tmp_path):
+    filed(tmp_path)
+    a = live_match([settled("ab12", "runs", 17.5, 31), settled("cd34", "runs", 22.5, 18)])
+    b = live_match([settled("ab12", "runs", 17.5, 31), settled("cd34", "runs", 22.5, 22)])  # the second read has Tilak four runs further on
+    settle(tmp_path, [{"matches": [a]}, {"matches": [b]}], NOW)
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}]
+    assert settle(tmp_path, [{"matches": [a]}, {"matches": []}], NOW) == ([], []), "a match missing from the second read is not trusted"
+    assert settle(tmp_path, [{"matches": [live_match([settled("cd34", "runs", 22.5, 22)], status="live")]}], NOW) == ([], []), "nothing is stored while the match is on"
+
+
+def test_a_stored_result_is_never_changed_and_a_missing_one_can_still_be_added(tmp_path):
+    filed(tmp_path)
+    settle(tmp_path, [{"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}], NOW)
+    later = live_match([settled("ab12", "runs", 17.5, 99), settled("cd34", "runs", 22.5, 18)])  # a later read disagrees about the first and brings the second
+    assert settle(tmp_path, [{"matches": [later]}], at(19, 27))[0] == ["2026-10-27-new-zealand-v-india"]
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}, {"pid": "cd34", "stat": "runs", "value": 18}]
+    assert settle(tmp_path, [{"matches": [later]}], at(20, 27)) == ([], []), "nothing new, nothing written"
+
+
+def test_results_go_to_the_file_of_that_match_not_the_next_game_of_the_series_and_an_unreadable_file_is_left_alone(tmp_path):
+    update(tmp_path, book([line()]), at(20), None, SCHED)
+    nxt = line(match="New Zealand vs India", start_utc="2026-10-30T07:00:00Z")
+    sched2 = [*SCHED, {**SCHED[0], "start_utc": "2026-10-30T07:00Z"}]
+    update(tmp_path, {**book([nxt]), "events": []}, at(20), None, sched2)
+    assert (tmp_path / "2026-10" / "2026-10-30-new-zealand-v-india.json").exists()
+    m = live_match([settled("ab12", "runs", 17.5, 31)])
+    assert settle(tmp_path, [{"matches": [m]}], NOW)[0] == ["2026-10-27-new-zealand-v-india"]
+    assert "results" not in read(tmp_path, "2026-10-30-new-zealand-v-india")
+    bad = tmp_path / "2026-10" / "2026-10-27-broken.json"
+    bad.write_text('{"id": ')
+    assert settle(tmp_path, [{"matches": [live_match([settled("ab12", "runs", 17.5, 40)])]}], NOW)[1] == ["2026-10-27-broken"] and bad.read_text() == '{"id": '
+
+
+def test_the_hourly_pull_keeps_the_results_and_still_writes_nothing_when_nothing_changed(tmp_path):
+    filed(tmp_path)
+    settle(tmp_path, [{"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}], NOW)
+    p = tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json"
+    before = p.read_text()
+    assert update(tmp_path, book([line()]), at(21, 27), None, SCHED)[0] == [] and p.read_text() == before
+    update(tmp_path, book([line(ln=24.5)]), at(22, 27), None, SCHED)  # a pull that does add a line rewrites the file; the results ride along
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}] and len(read(tmp_path)["lines"]) == 4
+
+
+def test_the_command_reads_the_route_twice_and_a_route_that_is_down_costs_nothing(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(arch.config, "ARCHIVE", tmp_path)
+    filed(tmp_path)
+    body = tmp_path / "live.json"
+    body.write_text(json.dumps({"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}))
+    slept = []
+    assert main(["--results", str(body)], sleep=slept.append) == 0
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}] and json.loads(capsys.readouterr().out)["results_written"] == ["2026-10-27-new-zealand-v-india"]
+    body.write_text(json.dumps({"matches": [live_match([], status="live")]}))
+    slept.clear()
+    assert main(["--results", str(body)], sleep=slept.append) == 0 and json.loads(capsys.readouterr().out)["results_written"] == [] and slept == [], "no finished match: nothing read twice, nothing written"
+    monkeypatch.setattr(arch, "_read_body", lambda src: {"matches": [live_match([settled("cd34", "runs", 22.5, 18)])]})
+    assert main(["--results", "https://site.test/api/live", "--again", "45"], sleep=slept.append) == 0 and slept == [45.0], "a URL is read again after the pause"
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}, {"pid": "cd34", "stat": "runs", "value": 18}]
+    capsys.readouterr()
+    monkeypatch.undo()
+    monkeypatch.setattr(arch.config, "ARCHIVE", tmp_path)
+    assert main(["--results", str(tmp_path / "missing.json")], sleep=slept.append) == 0 and "::warning::" in capsys.readouterr().out
+    body.write_text("not json")
+    assert main(["--results", str(body)], sleep=slept.append) == 0 and "::warning::" in capsys.readouterr().out
+    with pytest.raises(SystemExit):
+        main(["--results"])

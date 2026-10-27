@@ -139,3 +139,11 @@ test("sameFixture tells a series' matches apart: the same two sides, and a start
   assert.equal(sameFixture({ match: "New Zealand vs Pakistan", start_utc: "2026-10-27T07:00:00Z" }, fx), false);
   assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, { a: "New Zealand", b: "India" }), true, "no start known: the names decide");
 });
+
+test("withArchive puts a stored result on the archived line it belongs to, matched by id and stat, and leaves the others without one", () => {
+  const entry = { ...ENTRY, results: [{ pid: "ab12", stat: "runs", value: 31 }, { pid: "ab12", stat: "sixes", value: 2 }, { pid: "zz99", stat: "runs", value: 5 }],
+    lines: [...ENTRY.lines, { ...ENTRY.lines[0], stat: "fours", line: 2.5 }, { ...ENTRY.lines[0], pid: "cd34", line: 22.5 }] };
+  const doc = withArchive({ lines: [] }, entry);
+  assert.deepEqual(doc.lines.map((l) => [l.pid, l.stat, l.line, l.result]), [["ab12", "runs", 17.5, 31], ["ab12", "fours", 2.5, undefined], ["cd34", "runs", 22.5, undefined]]);
+  assert.ok(!("result" in withArchive({ lines: [] }, ENTRY).lines[0]), "a file without results adds none");
+});

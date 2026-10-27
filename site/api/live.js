@@ -3,8 +3,12 @@
 // A finished match drops off that page soon after the end; a priced one that began in the last 40 h is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
 // and the match-scorecard page (getSC4) adds every innings. All three are HTML pages ($LIVE_SOURCE_BASE robots Allow); we never hit $LIVE_SOURCE_BASE/api.
-// "So far" numbers only — the site never settles a prop from this feed.
-import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, unlistedRows, wantsCard } from "../src/engine/live.js";
+// Each match also carries `lines`: where every line the books priced for it stands (value, state, Cleared / Missed / Push, Not in XI), settled here with the identity table
+// so the browser does no matching of its own. While a match is on that is "so far"; a "final" state in a finished match is its result (the archive job stores those).
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows, wantsCard } from "../src/engine/live.js";
+import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
 
 const BOOKS = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 const SCHEDULE_FILE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer lists
@@ -19,10 +23,14 @@ const HTML_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537
 const MAX_CARDS = 12;
 const FINAL_TTL_MS = 10 * 60e3; // a finished match does not change: its pages are read once in ten minutes, not every 15 seconds
 const FETCH_MS = 8000;
+const IDENTITY_FILE = "public/data/identity.json"; // the player-identity table of this deployment, shipped with the function (vercel.json includeFiles)
+const IDENTITY_TTL_MS = 30 * 60e3;
+const IDENTITY_RETRY_MS = 60e3;
 
 let inflight = null;
 const finals = new Map(); // match page URL -> { t, pages }
 let memo = { t: 0, body: null };
+let identity = { t: 0, ttl: 0, idx: NO_IDENTITY };
 
 async function getJson(url) {
   const r = await fetch(url, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(FETCH_MS) });
@@ -42,12 +50,26 @@ async function getHtml(url) {
   return r.text();
 }
 
+/**
+ * The player-identity table (our id <-> the source's id, the names the books use), from the file shipped with this deployment, else from IDENTITY_URL or the site's own
+ * production domain. Without it names decide, as before: a missing table costs matches, never a wrong number.
+ */
+async function loadIdentity() {
+  if (Date.now() - identity.t < identity.ttl) return identity.idx;
+  let doc = await readFile(join(process.cwd(), IDENTITY_FILE), "utf8").then(JSON.parse).catch(() => null);
+  const url = process.env.IDENTITY_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/data/identity.json` : "");
+  if (!doc && url) doc = await getJson(url).catch(() => null);
+  const idx = identityIndex(doc);
+  identity = { t: Date.now(), ttl: idx.size ? IDENTITY_TTL_MS : IDENTITY_RETRY_MS, idx };
+  return idx;
+}
+
 async function snapshot() {
   const now = Date.now();
   if (memo.body && now - memo.t < LIVE_TTL_MS) return memo.body;
   if (inflight) return inflight;
   inflight = (async () => {
-    const [booksDoc, schedule, ours] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`), getText(SCHEDULE_FILE).catch(() => "")]);
+    const [booksDoc, schedule, ours, idn] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`), getText(SCHEDULE_FILE).catch(() => ""), loadIdentity()]);
     const books = bookFixtures(booksDoc), listed = pricedLive(parseSchedule(schedule, base()), books);
     const gaps = unlistedRows(listed, books, parseFixtureCsv(ours), base());
     const rows = [...listed, ...gaps];
@@ -62,8 +84,9 @@ async function snapshot() {
       if (got.live && (got.live.status === "final" || m.status === "final")) finals.set(m.url, { t: Date.now(), pages: got });
     }));
     // the public body names no source: match URLs stay on the server. A match the schedule no longer lists is kept only if its own page was read.
-    const matches = rows.filter((m) => !gaps.includes(m) || pages.get(m)?.live).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return pub; });
-    const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, matches };
+    // and each match carries where its priced lines stand (the books' player lines, settled with the identity table)
+    const matches = rows.filter((m) => !gaps.includes(m) || pages.get(m)?.live).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) }; });
+    const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, linked: idn.size, matches };
     memo = { t: Date.now(), body };
     return body;
   })().finally(() => { inflight = null; });

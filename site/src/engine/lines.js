@@ -102,12 +102,15 @@ export function archiveFixture(entry, teamIx, now = Date.now()) {
 
 /**
  * The book doc with an archived match's lines and fancy lines added, for the sections that match has none of in the doc (the live file lets a match go a day and a half
- * after the start; the archive keeps it for good). Lines come back with the match, competition and start the file holds once. `events` are left out: they decide which
- * fixtures the home page lists, and an old match must not come back there.
+ * after the start; the archive keeps it for good). Lines come back with the match, competition and start the file holds once, and with `result` when the file stored what
+ * the player did (`results`, written by the server once the match was over): an old fixture page then needs no live feed and no name matching. `events` are left out: they
+ * decide which fixtures the home page lists, and an old match must not come back there.
  */
 export function withArchive(doc, entry) {
   const fx = archiveFixture(entry);
   if (!fx) return doc;
   const have = fixtureBooks(doc, fx), shared = { match: entry.match, competition: entry.competition, start_utc: entry.start_utc };
-  return { ...doc, lines: have.props ? doc?.lines : [...(doc?.lines || []), ...(entry.lines || []).map((l) => ({ ...l, ...shared }))], fancy: have.fancy ? doc?.fancy : [...(doc?.fancy || []), ...(entry.fancy || [])] };
+  const done = new Map((entry.results || []).map((r) => [`${r.pid}|${r.stat}`, r.value]));
+  const archived = (l) => (done.has(`${l.pid}|${l.stat}`) ? { ...l, ...shared, result: done.get(`${l.pid}|${l.stat}`) } : { ...l, ...shared });
+  return { ...doc, lines: have.props ? doc?.lines : [...(doc?.lines || []), ...(entry.lines || []).map(archived)], fancy: have.fancy ? doc?.fancy : [...(doc?.fancy || []), ...(entry.fancy || [])] };
 }

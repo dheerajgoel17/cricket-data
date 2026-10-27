@@ -15,7 +15,8 @@
       "maxDuration": 20
     },
     "api/live.js": {
-      "maxDuration": 20
+      "maxDuration": 20,
+      "includeFiles": "public/data/identity.json"
     }
   },
   "headers": [
