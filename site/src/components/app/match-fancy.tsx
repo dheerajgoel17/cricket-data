@@ -37,18 +37,19 @@ const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const edgeOf = (p: number | null, price: number) => (p != null && price > 1 ? p * price - 1 : null);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
-type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void };
+type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any };
 
 /**
  * Match Fancy: whole-match and team-total markets (runs, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
  * in this format. A "Bookmaker lines" list shows every market the books price, one row each in the props-list style; the market chips open any market
  * in a detail panel with the median, a chart of every recent match against the line, over / under shares and fair prices, and a tappable line ladder.
  */
-export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
+export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const { store } = useData();
   const { match: liveMatch } = useLiveMatch(fx);
   const reduce = useReducedMotion();
-  const doc = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
   const panelRef = useRef<HTMLDivElement>(null);
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName).length > 0;

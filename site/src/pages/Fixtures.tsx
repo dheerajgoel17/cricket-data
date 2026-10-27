@@ -17,7 +17,7 @@ import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/fo
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { fixtureBooks } from "@/engine/lines.js";
-import { useFixtures, usePricedFixtures } from "@/hooks/useEngine";
+import { useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
@@ -123,9 +123,8 @@ export function FixturePage() {
   const { store } = useData();
   const { "*": id = "" } = useParams();
   const [q, setQ] = useQ();
-  const { data: all, isLoading } = useFixtures();
-  const { fixtures: pricedFx, priced, ready, doc } = usePricedFixtures();
-  const fx = (all || []).find((f) => f.id === id);
+  const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
+  const { fx, doc, archived, isLoading } = useFixtureBooks(id);
   const live = !!fx && priced && pricedFx.some((p) => p.id === fx.id);
   const { match } = useLiveMatch(fx);
   const books = fixtureBooks(doc, fx);
@@ -169,7 +168,7 @@ export function FixturePage() {
           <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
-          {tab === "props" && <HotProps teams={[fx.a, fx.b]} />}
+          {tab === "props" && <HotProps teams={[fx.a, fx.b]} archive={archived ? doc : undefined} />}
           {tab === "grid" && (
             <>
               <FilterBar {...{ stat, line, games, setQ }} />
@@ -195,7 +194,7 @@ export function FixturePage() {
               <FilterBar {...{ stat, line, games, hit, setQ }} />
               {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}
             </>)}
-          {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} />}
+          {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} />}
               </motion.div>
             </AnimatePresence>
           </AnimatedHeight>

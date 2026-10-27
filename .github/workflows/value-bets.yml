@@ -79,7 +79,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A value_bets/out value_bets/state  # .gitignore keeps caches/snapshots out
+          git add -A value_bets/out value_bets/state value_bets/archive  # .gitignore keeps caches/snapshots out; the archive is never deleted
           git add -A value_bets/mappings/venue_geo.csv value_bets/mappings/venue_weather_daily.csv.gz
           if git diff --cached --quiet; then echo "No changes."; exit 0; fi
           git commit -q -m "value-bets: $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"

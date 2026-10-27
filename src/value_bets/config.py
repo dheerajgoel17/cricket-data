@@ -10,6 +10,7 @@ ROOT = Path(os.environ.get("CV_ROOT") or _DEF_ROOT)
 DATA_REPO = Path(os.environ.get("CV_DATA_REPO") or (_PKG.parent.parent if IN_DATA_REPO else ROOT / "data-repo"))
 OUT = Path(os.environ.get("CV_OUT") or ROOT / "out")
 STATE = Path(os.environ.get("CV_STATE") or ROOT / "state")
+ARCHIVE = Path(os.environ.get("CV_ARCHIVE") or ROOT / "archive")
 SNAPSHOTS = Path(os.environ.get("CV_SNAPSHOTS") or OUT / "snapshots")
 MAPPINGS = Path(os.environ.get("CV_MAPPINGS") or ROOT / "mappings")
 

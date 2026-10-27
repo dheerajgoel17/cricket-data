@@ -2,9 +2,10 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { bookFixtures, fixtureInBooks, liveForFixture } from "@/engine/live.js";
+import { archiveFixture, fixtureBooks, teamKey, withArchive } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { useData } from "@/lib/data";
-import { loadLines } from "@/lib/feeds";
+import { loadArchive, loadLines } from "@/lib/feeds";
 import { useLiveDoc } from "@/hooks/useLive";
 import { fixtureStart } from "@/lib/format";
 
@@ -17,6 +18,26 @@ export function useRunPlan(plan: any, hints: any = {}, enabled = true) {
 export function useFixtures() {
   const { store } = useData();
   return useQuery({ queryKey: ["fixtures"], queryFn: () => store.loadFixtures() as Promise<any[]> });
+}
+
+/**
+ * A fixture page's fixture and the bookmaker lines it reads. The schedule's fixture and the live book file when they have it; for a match the schedule no longer lists, or
+ * whose lines the book file has let go, the permanent archive file for that fixture id (props are never deleted, so the link keeps working). `archived` says the archive was used.
+ */
+export function useFixtureBooks(id: string) {
+  const { store } = useData();
+  const fixtures = useFixtures();
+  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const listed = (fixtures.data || []).find((f) => f.id === id);
+  const books = listed ? fixtureBooks(lines.data, listed) : { props: false, fancy: false };
+  const need = !fixtures.isLoading && !lines.isLoading && (!listed || (!books.props && !books.fancy));
+  const archive = useQuery({ queryKey: ["archive", id], enabled: need, queryFn: () => loadArchive(id), staleTime: Infinity });
+  const entry = need ? archive.data ?? null : null;
+  return useMemo(() => {
+    const teamIx = (name: string, g: string) => (store.teams || []).findIndex((t: any) => teamKey(t.n) === teamKey(name) && (t.g ?? 0) === (g === "female" ? 1 : 0));
+    return { fx: listed ?? (entry ? archiveFixture(entry, teamIx) : null), doc: entry ? withArchive(lines.data, entry) : lines.data, archived: !!entry,
+      isLoading: fixtures.isLoading || (need && archive.isLoading) };
+  }, [listed, entry, lines.data, fixtures.isLoading, need, archive.isLoading, store]);
 }
 
 const startedSince = (f: any, ms: number, now: number) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= new Date(now - ms).toISOString();
