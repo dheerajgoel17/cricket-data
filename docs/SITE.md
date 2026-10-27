@@ -134,3 +134,6 @@ Sizes are named by role and defined once, in `site/src/index.css` (`@theme`). Pa
 
 Type is in rem, so it follows the browser's font-size setting. One `cn()` (`site/src/lib/utils.ts`) merges classes for the whole app, including shadcn's `ui/*` (they import it as `cn`; see the alias in `vite.config.ts` and `tsconfig.json`); it knows these scales, so `text-body` replaces a component's own `text-sm` instead of fighting it.
 
+**Vertical rhythm.** A page is a `flex flex-col gap-section` of sections; a section is a `flex flex-col gap-stack` of blocks; related controls sit in a `gap-snug` group. Blocks never set their own vertical margins (the token test forbids `mt-*`/`mb-*`/`my-*` in governed files, except `mt-auto`), so every gap on a page comes from its parent.
+**Switching tabs smoothly.** Content that changes height (a tab body, a filtered list) goes in `AnimatedHeight`, so the page eases between heights instead of snapping and the browser never clamps your scroll. The fixture page pins its tab bar under the pinned header (`sticky`) and, when you switch tabs while scrolled past the body, eases the new body to the top (then re-aligns once the height animation ends).
+

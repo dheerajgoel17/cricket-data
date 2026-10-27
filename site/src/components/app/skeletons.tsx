@@ -43,12 +43,27 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
 /** Match header while the fixture list loads. */
 export function MatchHeaderSkeleton() {
   return (
-    <div aria-hidden className="pt-snug">
+    <div aria-hidden className="flex flex-col gap-tight pt-snug">
       <Skeleton className="size-11 rounded-full" />
-      <div className="mt-tight grid grid-cols-[1fr_auto_1fr] items-center gap-snug">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-snug">
         <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
         <div className="grid justify-items-center gap-tight"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-28" /><Skeleton className="h-4 w-24" /></div>
         <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
+      </div>
+    </div>
+  );
+}
+
+/** Match Fancy while the bookmaker file loads: an overview list, then the panel. */
+export function FancySkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-stack">
+      <RowsSkeleton rows={3} />
+      <div className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-white/5">
+        <Skeleton className="h-5 w-40" />
+        <div className="flex items-end gap-group"><Skeleton className="h-10 w-20" /><Skeleton className="h-6 w-16" /><Skeleton className="h-6 w-24" /></div>
+        <Skeleton className="h-28 w-full" />
+        <div className="grid grid-cols-2 gap-snug"><Skeleton className="h-24 rounded-xl" /><Skeleton className="h-24 rounded-xl" /></div>
       </div>
     </div>
   );

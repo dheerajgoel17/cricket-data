@@ -6,6 +6,7 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTi
 import { Switch } from "@/components/ui/switch";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
+import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
@@ -123,10 +124,10 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
   return (
-    <section aria-label="Hot player props today">
-      {!teams && <div className="pt-section"><h1 className="text-display font-bold">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
+    <section aria-label="Hot player props today" className="flex flex-col gap-stack">
+      {!teams && <div><h1 className="text-display font-bold">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
       {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
-      <div className="mt-stack flex items-center gap-snug">
+      <div className="flex items-center gap-snug">
         <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
         <Sheet>
           <SheetTrigger asChild>
@@ -142,7 +143,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
               <SheetClose className="text-body font-semibold text-primary active:opacity-50">Done</SheetClose>
             </SheetHeader>
             <SheetDescription className="sr-only">Hit-rate window, {teams ? "team" : "day"} and form charts</SheetDescription>
-            <div className="mt-group grid gap-group">
+            <div className="grid gap-group pt-group">
               <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Hit-rate window</span>
                 <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} /></div>
               {teams ? (
@@ -158,7 +159,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
           </SheetContent>
         </Sheet>
       </div>
-      <div className="mt-stack">
+      <AnimatedHeight>
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
@@ -166,7 +167,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
             </AnimatePresence>
           </ul>
         )}
-      </div>
+      </AnimatedHeight>
     </section>
   );
 }

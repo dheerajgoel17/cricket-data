@@ -15,10 +15,15 @@ const HARD_TEXT = /(?<![\w-])(?:[a-z]+:)*text-(?:\[[^\]]*px\]|xs|sm|base|lg|xl|2
 // mt-5, pt-3.5, py-2, gap-4, gap-x-3 ...: stacks and gaps use tight / snug / stack / group / section (hair for micro gaps)
 const RAW_SPACE = /(?<![\w-])(?:[a-z]+:)*(?:mt|mb|my|pt|pb|py|gap|gap-x|gap-y)-(?!0(?![\w.]))\d[\d.]*(?![\w])/g;
 
+// Blocks do not set their own vertical margins: a parent stacks them with flex/grid gap, so every gap on a page comes from one place.
+// (mt-auto, which pushes a footer to the bottom of a card, is the only margin allowed.)
+const OWN_MARGIN = /(?<![\w-])(?:[a-z]+:)*(?:mt|mb|my)-(?!auto(?![\w-]))[\w.[\]-]+/g;
+
 describe("design tokens", () => {
   it("finds the governed files", () => { for (const f of GOVERNED) expect(src(f), f).not.toBe(""); });
   for (const f of GOVERNED) {
     it(`${f} uses the type scale`, () => { expect(src(f).match(HARD_TEXT) ?? []).toEqual([]); });
     it(`${f} uses the spacing scale`, () => { expect(src(f).match(RAW_SPACE) ?? []).toEqual([]); });
+    it(`${f} stacks blocks with gap, not margins`, () => { expect(src(f).match(OWN_MARGIN) ?? []).toEqual([]); });
   }
 });

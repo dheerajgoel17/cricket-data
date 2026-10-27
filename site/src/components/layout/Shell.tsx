@@ -77,12 +77,12 @@ export function Shell() {
   const playerScreen = pathname.startsWith("/player/");
   return (
     <SidebarProvider className="min-h-screen flex-col pb-[calc(96px+env(safe-area-inset-bottom))] md:pb-0">
-      <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
+      <div className={cn("sticky top-0 z-50", playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-4 pb-section md:px-gutter">
+            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-gutter pb-section pt-stack">
               <Outlet />
             </motion.main>
           </AnimatePresence>

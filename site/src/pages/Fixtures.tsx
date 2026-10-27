@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronLeft, Minus, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +23,7 @@ import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { LiveFeed } from "@/components/app/live-feed";
+import { AnimatedHeight } from "@/components/app/animated-height";
 import { RecentForm } from "@/components/app/recent-form";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
@@ -53,23 +56,23 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-snug">{body}</div>;
   };
   return (
-    <section className="pt-hair">
+    <section className="flex flex-col gap-stack">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
-      <div className="mt-snug flex items-center gap-snug">
+      <div className="flex items-center gap-snug">
         <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
           {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
       </div>
-      <div className="mt-stack grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
         <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
         <div className="grid justify-items-end gap-hair text-right">
           <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
           <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", clock.tone === "live" && "text-miss")}>{clock.value}</b>
         </div>
       </div>
-      <p className="mt-group border-b border-white/10 pb-stack text-callout leading-snug text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
+      <p className="text-callout text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
     </section>
   );
 }
@@ -78,7 +81,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
 function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: number; games: number; hit?: string; setQ: (p: Record<string, unknown>) => void }) {
   const step = (d: number) => setQ({ line: Math.max(0, Math.round((line + d) * 2) / 2) });
   return (
-    <div className="mt-stack grid gap-stack">
+    <div className="flex min-w-0 flex-col gap-snug">
       <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
       <div className="flex items-center gap-tight">
         <div className="flex h-11 shrink-0 items-center rounded-full bg-card">
@@ -113,46 +116,66 @@ export function FixturePage() {
   const known = teams.filter(([, i]) => i >= 0);
   const gridTeam = known.some(([, i]) => String(i) === q.team) ? Number(q.team) : known[0]?.[1];
   const grids = useQuery({ queryKey: ["fx-grids", id, fmt, stat, games], enabled: !!fx && fx.fmt !== "FC", queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, games) }))) });
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  // switching tabs: if the page is scrolled past the top of the tab body, bring the new body into view (smoothly) instead of stranding the reader mid-way
+  const switchTab = (t: string) => {
+    setQ({ tab: t });
+    const align = () => { const el = bodyRef.current; if (el && el.getBoundingClientRect().top < 128) el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" }); };
+    align();
+    setTimeout(align, 420); // the body's height finishes animating after ~300 ms: settle exactly on its top
+  };
   const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle("Match preview, player grid and trends");
   if (isLoading) return <div><MatchHeaderSkeleton /><RowsSkeleton /></div>;
-  if (!fx) return <div className="pt-snug"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="mt-snug rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
+  if (!fx) return <div className="flex flex-col items-start gap-snug pt-snug"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   return (
-    <div>
+    <div className="flex flex-col gap-section">
       <MatchHeader f={fx} live={live} />
       <RecentForm teams={known} fmt={fmt} />
-      {!ready ? <div className="mt-stack grid gap-stack"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
-      <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-group" />
-      {tab === "props" && <div className="-mt-2"><HotProps teams={[fx.a, fx.b]} /></div>}
-      {tab === "grid" && (
-        <>
-          <FilterBar {...{ stat, line, games, setQ }} />
-          {known.length > 1 && (
-            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-stack"
-              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{name}</span>])} />
-          )}
-          <div className="mt-stack flex flex-wrap items-center gap-x-stack gap-y-tight text-footnote text-muted-foreground">
-            <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
-            <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
-            <span className="flex items-center gap-tight"><span className="rounded border border-dashed border-amber/60 px-1 text-caption text-amber">VOID</span>in the XI, did not bat or bowl</span>
+      {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-11 w-72 rounded-full" /><RowsSkeleton /></div> : (
+        <div className="flex min-w-0 flex-col gap-stack">
+          <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
+            <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
-          <div className="mt-stack">
-            {grids.isLoading || !shown ? <GridSkeleton /> : (
-              <section>
-                <h2 className="mb-tight flex items-center gap-tight text-body font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
-                <GridTable g={shown.g} teamIdx={shown.team} line={line} />
-              </section>)}
+          <div ref={bodyRef} className="scroll-mt-32">
+          <AnimatedHeight>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
+          {tab === "props" && <HotProps teams={[fx.a, fx.b]} />}
+          {tab === "grid" && (
+            <>
+              <FilterBar {...{ stat, line, games, setQ }} />
+              <div className="flex min-w-0 flex-col gap-snug">
+                {known.length > 1 && (
+                  <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })}
+                    items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{name}</span>])} />
+                )}
+                <div className="flex flex-wrap items-center gap-x-stack gap-y-tight text-footnote text-muted-foreground">
+                  <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
+                  <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
+                  <span className="flex items-center gap-tight"><span className="rounded border border-dashed border-amber/60 px-hair text-caption text-amber">VOID</span>in the XI, did not bat or bowl</span>
+                </div>
+              </div>
+              {grids.isLoading || !shown ? <GridSkeleton /> : (
+                <section className="flex flex-col gap-snug">
+                  <h2 className="flex items-center gap-tight text-body font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                  <GridTable g={shown.g} teamIdx={shown.team} line={line} />
+                </section>)}
+            </>)}
+          {tab === "trends" && (
+            <>
+              <FilterBar {...{ stat, line, games, hit, setQ }} />
+              {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}
+            </>)}
+          {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} />}
+              </motion.div>
+            </AnimatePresence>
+          </AnimatedHeight>
           </div>
-        </>)}
-      {tab === "trends" && (
-        <>
-          <FilterBar {...{ stat, line, games, hit, setQ }} />
-          <div className="mt-stack">{grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}</div>
-        </>)}
-      {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} />}
-      </>}
+        </div>)}
     </div>
   );
 }
@@ -170,10 +193,10 @@ export function TrendsPage() {
   const n = Number(q.n) || 10;
   const grids = useQuery({ queryKey: ["trend-grids", sel?.id, fmt, stat, n], enabled: !!sel, queryFn: async () => Promise.all([[sel.a, sel.a_ix], [sel.b, sel.b_ix]].map(async ([name, i]: any) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, n) }))) });
   return (
-    <div>
+    <div className="flex flex-col gap-stack">
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Player trends"]]} />
       <PageTitle sub="Strongest recent hit-rate streaks for the players in an upcoming match.">Player trends</PageTitle>
-      <LiveForm onValues={(v) => setQ(v)} className="mb-snug" key={sel?.id}>
+      <LiveForm onValues={(v) => setQ(v)} key={sel?.id}>
         <Field label="Fixture"><NativeSelect name="f" defaultValue={sel?.id} options={fxs.map((f) => [f.id, `${fixtureWhen(f, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}  ${f.a} v ${f.b} (${f.fmt || "T20"})`])} className="max-w-72" /></Field>
         <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmt} /></Field>
         <Field label="Stat"><NativeSelect name="stat" options={STAT_OPTIONS} defaultValue={stat} /></Field>
@@ -182,9 +205,9 @@ export function TrendsPage() {
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
       {!sel ? <EmptyNote>No upcoming fixtures with known teams right now.</EmptyNote> : (
-        <div><h2 className="mb-tight text-title font-medium">{sel.a} v {sel.b}</h2>
+        <div className="flex flex-col gap-snug"><h2 className="text-title font-medium">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <Muted>Loading…</Muted>}
-          <Muted className="mt-snug">Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
+          <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
     </div>
   );
 }

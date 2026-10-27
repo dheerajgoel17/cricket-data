@@ -32,12 +32,12 @@ export function RecentForm({ teams, fmt }: { teams: [string, number][]; fmt: str
   const forms = useMemo(() => teams.filter(([, i]) => i >= 0).map(([name, i]) => ({ name, idx: i, games: teamForm(store, i, fmtIdx, 5) as any[] })), [store, teams, fmtIdx]);
   if (!forms.some((f) => f.games.length)) return null;
   return (
-    <section className="mt-section" aria-label="Recent form">
+    <section className="flex flex-col gap-tight" aria-label="Recent form">
       <h2 className="text-title font-bold tracking-tight">Recent form <span className="text-callout font-medium text-muted-foreground">· {fmt}</span></h2>
-      <Accordion type="multiple" className="mt-tight">
+      <Accordion type="multiple">
         {forms.map(({ name, idx, games }) => (
           <AccordionItem key={idx} value={String(idx)} className="border-white/10">
-            <AccordionTrigger className="items-center py-stack hover:no-underline">
+            <AccordionTrigger className="items-center py-snug hover:no-underline">
               <span className="flex min-w-0 flex-1 items-center gap-snug">
                 <TeamBadge name={name} size="sm" />
                 <span className="truncate text-body font-semibold">{name}</span>

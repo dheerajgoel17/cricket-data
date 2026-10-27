@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 const BAR: Record<string, string> = { hit: "bg-primary", miss: "bg-miss", push: "bg-amber", dnp: "bg-dnp/50", void: "bg-dnp/50", na: "bg-dnp/50" };
@@ -13,18 +14,21 @@ export function MiniBars({ last, line, max }: { last: { v: number | null; s: str
   );
 }
 
-/** One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. Taller than MiniBars, with the line labelled. */
+/** One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. The bars grow up from the baseline in turn when the data changes. */
 export function ValueBars({ values, line }: { values: number[]; line: number }) {
+  const reduce = useReducedMotion();
   const top = Math.max(line * 1.25, ...values, 1);
   return (
-    <div role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
-      <div className="relative flex h-28 items-end gap-[3px]">
-        {values.map((v, i) => <span key={i} title={String(v)} className={cn("flex-1 rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")} style={{ height: `${Math.max((v / top) * 100, 4)}%`, maxWidth: 28 }} />)}
-        <span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" style={{ bottom: `${Math.min(100, (line / top) * 100)}%` }}>
+    <div className="flex flex-col gap-tight" role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
+      <div className="relative flex h-28 items-end gap-hair">
+        {values.map((v, i) => (
+          <motion.span key={`${i}-${v}`} title={String(v)} className={cn("flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
+            style={{ height: `${Math.max((v / top) * 100, 4)}%`, maxWidth: 28 }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.4, ease: [0.22, 1, 0.36, 1] }} />))}
+        <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ type: "spring", stiffness: 380, damping: 34 }}>
           <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-caption font-semibold tabular-nums text-muted-foreground">{line}</span>
-        </span>
+        </motion.span>
       </div>
-      <div className="mt-tight flex justify-between text-caption text-muted-foreground"><span>Oldest</span><span>Latest</span></div>
+      <div className="flex justify-between text-caption text-muted-foreground"><span>Oldest</span><span>Latest</span></div>
     </div>
   );
 }

@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Minus, Plus } from "lucide-react";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { fancyFor } from "@/engine/lines.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
@@ -11,112 +13,181 @@ import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
 import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { AnimatedHeight } from "./animated-height";
+import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
-import { PillGroup } from "./pill-group";
-import { ValueBars } from "./mini-bars";
-import { Link } from "react-router-dom";
+import { MiniBars, ValueBars } from "./mini-bars";
 import { EmptyNote } from "./page";
+import { PillGroup } from "./pill-group";
+import { FancySkeleton } from "./skeletons";
 
 const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"],
   ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"], ["highest_over", "Top over"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
 const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"], ["top_batter", "Top batter"]];
 const WINDOWS = [10, 20, 30];
+const EASE = [0.22, 1, 0.36, 1] as const;
+// the engine is plain JS: give its results the loose shape this view reads
 const report = marketReport as (store: any, ms: number[], key: string, line?: number | null) => any;
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const teamReport = teamTotalReport as (store: any, ms: number[], team: number, key: string, line?: number | null) => any;
-// the engine is plain JS: give its results the loose shape this view reads
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null) => { line: number; over: number; under: number; source: string }[];
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
+const edgeOf = (p: number | null, price: number) => (p != null && price > 1 ? p * price - 1 : null);
+const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void };
 
 /**
  * Match Fancy: whole-match and team-total markets (runs, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
- * in this format, with the bookmaker's line and prices when the books list the market. Scope is Match (both teams' matches together) or one team's own innings.
+ * in this format. A "Bookmaker lines" list shows every market the books price, one row each in the props-list style; the market chips open any market
+ * in a detail panel with the median, a chart of every recent match against the line, over / under shares and fair prices, and a tappable line ladder.
  */
 export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   const { store } = useData();
+  const reduce = useReducedMotion();
   const doc = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const panelRef = useRef<HTMLDivElement>(null);
   const scope = teams.some(([, i]) => String(i) === q.sc) ? Number(q.sc) : -1; // -1 = whole match
   const team = teams.find(([, i]) => i === scope);
   const keys = scope < 0 ? MATCH_KEYS : TEAM_KEYS;
   const key = keys.some(([k]) => k === q.fm) ? q.fm : keys[0][0];
   const win = WINDOWS.includes(Number(q.mw)) ? Number(q.mw) : 20;
   const fmtIdx = FORMATS.indexOf(fmt);
+  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
+  const marketLabel = (k: string) => (k === "top_batter" ? "Top batter" : (scope < 0 ? (MATCH_MARKETS as any)[k] : (TEAM_TOTAL_MARKETS as any)[k]).label as string);
+  const run = (k: string, line?: number | null, ms_ = ms) => (scope < 0 ? report(store, ms_, k, line) : teamReport(store, ms_, scope, k, line));
 
   const ms = useMemo(() => {
     const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: win }) as number[]);
     return [...new Set(sets.flat())].sort((a, b) => a - b);
   }, [store, teams, scope, fmtIdx, win]);
 
-  const book = useMemo(() => (key === "top_batter" ? [] : fancyLines(doc.data, { a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }, key, team?.[0] ?? null)), [doc.data, fx, key, team]);
-  const base: any = useMemo(() => (key === "top_batter" ? null : scope < 0 ? report(store, ms, key) : teamReport(store, ms, scope, key)), [store, ms, key, scope]);
+  // every market the books price, scored on the same matches and ranked by the better side's edge (like the props list ranks by hit rate)
+  const overview = useMemo(() => {
+    if (!ms.length || !doc.data) return [];
+    const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
+      const b = fancyLines(doc.data, fxInfo, k, team?.[0] ?? null)[0];
+      if (!b) return [];
+      const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line), s = rep.summary;
+      if (!s.n) return [];
+      const eo = s.n >= 10 ? edgeOf(s.pOver, b.over) : null, eu = s.n >= 10 ? edgeOf(s.pUnder, b.under) : null;
+      const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
+      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, side, edge: side === "over" ? eo : eu, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+    });
+    return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
+  }, [doc.data, ms, keys, fxInfo, team, scope, store]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const book = useMemo(() => (key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null)), [doc.data, fxInfo, key, team]);
+  const base: any = useMemo(() => (key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : book[0]?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
-  const rep: any = useMemo(() => (key === "top_batter" || !base ? null : scope < 0 ? report(store, ms, key, line) : teamReport(store, ms, scope, key, line)), [base, store, ms, key, scope, line]);
+  const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, ms, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
   // ladder rows: the engine's lines around the median plus the bookmaker's own line(s), computed on the same matches
   const ladder = useMemo(() => {
     if (!rep) return [];
     const have = new Set(rep.ladder.map((l: any) => l.line));
-    const extra = book.filter((b) => !have.has(b.line)).map((b) => (scope < 0 ? report(store, ms, key, b.line) : teamReport(store, ms, scope, key, b.line)).summary);
+    const extra = book.filter((b) => !have.has(b.line)).map((b) => run(key, b.line).summary);
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
-  }, [rep, book, store, ms, key, scope]);
-  const label = key === "top_batter" ? "Top batter" : (scope < 0 ? (MATCH_MARKETS as any)[key] : (TEAM_TOTAL_MARKETS as any)[key]).label;
+  }, [rep, book, store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
-  const bookHere = book.find((b: any) => b.line === line);
+  const bookHere = book.find((b) => b.line === line);
+  const open = (k: string) => { set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
 
   return (
-    <div className="mt-group grid grid-cols-[minmax(0,1fr)] gap-stack">
-      <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
-        items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
-      <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />
-      <div className="flex items-center gap-snug">
-        <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
-        <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
+    <div className="flex min-w-0 flex-col gap-stack">
+      <div className="flex min-w-0 flex-col gap-snug">
+        <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
+          items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
+        <div className="flex items-center gap-snug">
+          <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
+          <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
+        </div>
       </div>
 
-      {!ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
+      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : (
         <>
-          <section className="rounded-2xl bg-card p-inset ring-1 ring-white/5">
-            <div className="flex items-baseline justify-between gap-tight"><h2 className="text-body font-semibold">{label}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
-            <div className="mt-stack flex items-end gap-group">
-              <div><div className="text-footnote text-muted-foreground">Median</div><div className="text-stat font-bold leading-none tracking-tight tabular-nums">{num(rep.summary.median)}</div></div>
-              <div><div className="text-footnote text-muted-foreground">Mean</div><div className="text-title font-semibold tabular-nums">{num(rep.summary.mean)}</div></div>
-              <div><div className="text-footnote text-muted-foreground">Range</div><div className="text-title font-semibold tabular-nums">{num(rep.summary.min)}–{num(rep.summary.max)}</div></div>
-            </div>
-            <div className="mt-stack"><ValueBars values={rep.values} line={line} /></div>
-            <div className="mt-stack flex flex-wrap items-center gap-snug">
-              <div className="flex h-11 items-center rounded-full bg-background">
-                <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
-                <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
-                <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
-              </div>
-              {book.filter((b: any) => b.line !== line).map((b: any) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
-            </div>
-            <div className="mt-stack grid grid-cols-2 gap-snug">
-              {(["over", "under"] as const).map((side) => {
-                const p = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
-                return (
-                  <div key={side} className="rounded-xl bg-background p-3 ring-1 ring-white/5">
-                    <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
-                    <div className={cn("text-metric font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")}>{pc(p)}</div>
-                    <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                    {bookHere && <div className="mt-tight border-t border-white/10 pt-tight text-footnote">bet365 <b className="tabular-nums">{odds(bookHere[side])}</b></div>}
-                  </div>);
-              })}
-            </div>
-            {!book.length && <p className="mt-snug text-footnote text-muted-foreground">The books have no line for this market yet. Prices above are fair prices from the matches shown.</p>}
-            {rep.n < 10 && <p className="mt-tight text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
-          </section>
+          {overview.length > 0 && (
+            <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
+              <h2 className="text-title font-bold">Bookmaker lines</h2>
+              <ul className="-mx-gutter">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {overview.map((r, i) => (
+                    <motion.li key={r.key} layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
+                      className="border-t border-white/5 first:border-t-0">
+                      <button type="button" onClick={() => open(r.key)} aria-label={`Open ${r.label}`}
+                        className={cn("grid min-h-[68px] w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
+                        <span className="grid min-w-0 gap-hair">
+                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
+                          <span className="truncate text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· O {odds(r.over)} · U {odds(r.under)}</span></span>
+                        </span>
+                        <span className="grid justify-items-end text-right">
+                          <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
+                          <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+                        </span>
+                        <MiniBars last={r.last} line={r.line} />
+                        <ChevronRight className="size-4 text-muted-foreground" />
+                      </button>
+                    </motion.li>))}
+                </AnimatePresence>
+              </ul>
+            </section>)}
 
-          <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5" aria-label="Line ladder">
-            <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
-            {ladder.map((l: any) => (
-              <button key={l.line} type="button" onClick={() => set({ ml: l.line })} className={cn("grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-inset py-snug text-left text-callout transition-colors active:bg-accent", l.line === line && "bg-accent/60")}>
-                <span className="flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b: any) => b.line === l.line) && <span className="rounded-full bg-primary/15 px-1.5 py-hair text-caption font-semibold text-primary">bet365</span>}</span>
-                <span className="text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
-                <span className="text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
-              </button>))}
-          </section>
+          <div ref={panelRef} className="flex min-w-0 scroll-mt-24 flex-col gap-snug">
+            <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />
+            <AnimatedHeight>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div key={`${scope}-${key}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
+                {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
+                  <>
+                    <section className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-white/5">
+                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-semibold">{marketLabel(key)}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
+                      <div className="flex items-end gap-group">
+                        <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
+                        <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-semibold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
+                        <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-semibold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
+                      </div>
+                      <ValueBars values={rep.values} line={line} />
+                      <div className="flex flex-wrap items-center gap-snug">
+                        <div className="flex h-11 items-center rounded-full bg-background">
+                          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
+                          <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
+                          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
+                        </div>
+                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
+                      </div>
+                      <div className="grid grid-cols-2 gap-snug">
+                        {(["over", "under"] as const).map((side) => {
+                          const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
+                          return (
+                            <div key={side} className="flex flex-col gap-tight rounded-xl bg-background p-snug ring-1 ring-white/5">
+                              <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
+                              <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                              <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
+                              <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
+                              {bookHere && <div className="border-t border-white/10 pt-tight text-footnote">bet365 <b className="tabular-nums">{odds(bookHere[side])}</b></div>}
+                            </div>);
+                        })}
+                      </div>
+                      {!book.length && <p className="text-footnote text-muted-foreground">The books have no line for this market yet. Prices above are fair prices from the matches shown.</p>}
+                      {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
+                    </section>
+
+                    <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5" aria-label="Line ladder">
+                      <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+                      {ladder.map((l: any, i: number) => (
+                        <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
+                          className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-inset py-snug text-left text-body transition-colors active:bg-accent">
+                          {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
+                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b) => b.line === l.line) && <span className="rounded-full bg-primary/15 px-tight py-hair text-caption font-semibold text-primary">bet365</span>}</span>
+                          <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
+                          <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
+                        </motion.button>))}
+                    </section>
+                  </>)}
+              </motion.div>
+            </AnimatePresence>
+            </AnimatedHeight>
+          </div>
         </>)}
     </div>
   );
@@ -124,19 +195,26 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
 
 function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; teamName?: string }) {
   const { store } = useData();
+  const reduce = useReducedMotion();
   const t = useMemo(() => (scope < 0 ? topList(store, ms, { scope: "match" }) : topList(store, ms, { team: scope, scope: "team" })), [store, ms, scope]);
+  const max = Math.max(...t.rows.map((r: any) => r.pSole), 0.0001);
   return (
-    <section className="rounded-2xl bg-card ring-1 ring-white/5">
-      <div className="px-inset py-snug"><h2 className="text-body font-semibold">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
-      {t.rows.map((r: any) => (
-        <Item key={r.player} asChild size="sm" className="rounded-none border-0 border-t border-white/5 px-inset py-snug transition-colors active:bg-accent">
-          <Link to={`/player/${r.player}`}>
-            <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
-            <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-footnote">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
-            <ItemActions className="grid justify-items-end text-right"><b className="text-body font-semibold tabular-nums text-primary">{pc(r.pSole)}</b><span className="text-caption text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
-          </Link>
-        </Item>))}
-      {!t.rows.length && <p className="px-inset pb-stack text-callout text-muted-foreground">Not enough matches.</p>}
+    <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
+      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-semibold">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
+      <ul>
+        {t.rows.map((r: any, i: number) => (
+          <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-white/5">
+            <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
+            <Item asChild size="sm" className="relative rounded-none border-0 px-inset py-snug transition-colors active:bg-accent">
+              <Link to={`/player/${r.player}`}>
+                <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
+                <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-semibold"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
+                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-semibold tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
+              </Link>
+            </Item>
+          </motion.li>))}
+      </ul>
+      {!t.rows.length && <p className="px-inset pb-snug text-callout text-muted-foreground">Not enough matches.</p>}
     </section>
   );
 }

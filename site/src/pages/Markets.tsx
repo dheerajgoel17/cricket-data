@@ -121,7 +121,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue"}
         meta={[`${fmtName} markets`, isTeam ? "team markets use the side batting first" : "match markets"]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
-      {nextFx ? <NextMatch f={nextFx} /> : null}
+      {nextFx ? <div className="my-3"><NextMatch f={nextFx} /></div> : null}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
         {isTeam && <TabsContent value="grid">

@@ -14,7 +14,7 @@ export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
   const { fixtures: fx } = usePricedFixtures();
   return (
-    <div>
+    <div className="flex flex-col gap-section">
       <FixtureRail fx={fx.slice(0, 14)} />
       <HotProps />
     </div>
@@ -32,11 +32,11 @@ export function Countdown({ when }: { when: Date }) {
 export function NextMatch({ f }: { f: any }) {
   const when = fixtureStart(f);
   return (
-    <Card className="my-snug gap-snug px-4 py-stack shadow-none">
+    <Card className="gap-snug px-4 py-stack shadow-none">
       <div className="flex items-center justify-between"><h3 className="text-body font-medium">Next match</h3><Badge variant="secondary">{`${f.fmt || ""} ${f.gender === "female" ? "women" : "men"}`}</Badge></div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-snug text-center">
         <div className="grid justify-items-center gap-tight"><TeamBadge name={f.a} size="lg" /><b>{f.a}</b></div>
-        <div className="grid justify-items-center gap-hair"><div className="text-metric font-extrabold">{f.start.length > 10 ? localTime(when) : "TBC"}</div><small className="text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</small><div className="mt-tight text-callout text-muted-foreground">Kicks off in</div><Countdown when={when} /></div>
+        <div className="grid justify-items-center gap-hair"><div className="text-metric font-extrabold">{f.start.length > 10 ? localTime(when) : "TBC"}</div><small className="text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</small><div className="pt-tight text-callout text-muted-foreground">Kicks off in</div><Countdown when={when} /></div>
         <div className="grid justify-items-center gap-tight"><TeamBadge name={f.b} size="lg" /><b>{f.b}</b></div>
       </div>
       {f.venue ? <Muted className="text-center">{f.venue}</Muted> : null}
