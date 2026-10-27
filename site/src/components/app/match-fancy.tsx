@@ -65,34 +65,34 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   const bookHere = book.find((b: any) => b.line === line);
 
   return (
-    <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3">
-      <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })} className="sm:w-96"
+    <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-5">
+      <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
         items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-1.5"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
       <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />
       <div className="flex items-center gap-3">
-        <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="w-44 shrink-0" />
+        <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
         <span className="min-w-0 truncate text-xs text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
       </div>
 
       {!ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
         <>
-          <section className="rounded-2xl bg-card p-4 ring-1 ring-white/5">
+          <section className="rounded-2xl bg-card p-5 ring-1 ring-white/5">
             <div className="flex items-baseline justify-between gap-2"><h2 className="text-lg font-semibold">{label}</h2><span className="text-xs text-muted-foreground">last {rep.n} matches</span></div>
-            <div className="mt-3 flex items-end gap-6">
+            <div className="mt-4 flex items-end gap-7">
               <div><div className="text-xs text-muted-foreground">Median</div><div className="text-[40px] font-bold leading-none tracking-tight tabular-nums">{num(rep.summary.median)}</div></div>
               <div><div className="text-xs text-muted-foreground">Mean</div><div className="text-xl font-semibold tabular-nums">{num(rep.summary.mean)}</div></div>
               <div><div className="text-xs text-muted-foreground">Range</div><div className="text-xl font-semibold tabular-nums">{num(rep.summary.min)}–{num(rep.summary.max)}</div></div>
             </div>
-            <div className="mt-4"><ValueBars values={rep.values} line={line} /></div>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <div className="flex h-9 items-center rounded-full bg-background ring-1 ring-white/5">
-                <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-9 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
-                <span className="min-w-[4.5rem] text-center text-sm font-semibold tabular-nums">O/U {line}</span>
-                <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-9 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
+            <div className="mt-5"><ValueBars values={rep.values} line={line} /></div>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="flex h-11 items-center rounded-full bg-background">
+                <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
+                <span className="min-w-[5rem] text-center text-[15px] font-semibold tabular-nums">O/U {line}</span>
+                <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
               </div>
               {book.filter((b: any) => b.line !== line).map((b: any) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="mt-4 grid grid-cols-2 gap-3">
               {(["over", "under"] as const).map((side) => {
                 const p = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
                 return (

@@ -122,15 +122,15 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
   return (
     <section aria-label="Hot player props today">
-      {!teams && <div className="pt-8 md:pt-10"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
-      {teams && <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam} className="mt-3 sm:w-96"
+      {!teams && <div className="pt-12 md:pt-14"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
+      {teams && <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam} className="mt-5"
         items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} />}
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-5 flex items-center gap-3">
         <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
-        <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-80 sm:flex-none" />
+        <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0" />
       </div>
       {tabs.length > 1 && (
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-4 flex items-center gap-3">
           {!teams && <DropdownMenu>
             <DropdownMenuTrigger aria-label="Choose day" className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", day !== "0" && "text-primary")}><CalendarDays className="size-[18px]" /></DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
@@ -145,7 +145,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
           <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1 sm:w-fit sm:flex-none" />
         </div>
       )}
-      <div className="mt-3">
+      <div className="mt-5">
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
           <ul className="-mx-4 md:-mx-6">
             <AnimatePresence mode="popLayout" initial={false}>

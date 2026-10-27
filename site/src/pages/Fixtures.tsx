@@ -61,12 +61,12 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         </div>
         {team(f.b, f.b_ix)}
       </div>
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         {live && <Badge className="px-2.5 py-1 text-[11px] font-semibold">Props live</Badge>}
         <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold">{f.fmt || "T20"}</Badge>
         <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.gender === "female" ? "Women" : "Men"}</Badge>
       </div>
-      <p className="mt-3 text-center text-sm text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ")}</p>
+      <p className="mt-4 text-center text-[15px] text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ")}</p>
     </section>
   );
 }
@@ -75,17 +75,17 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
 function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: number; games: number; hit?: string; setQ: (p: Record<string, unknown>) => void }) {
   const step = (d: number) => setQ({ line: Math.max(0, Math.round((line + d) * 2) / 2) });
   return (
-    <div className="mt-4 grid gap-2">
+    <div className="mt-5 grid gap-4">
       <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
       <div className="flex items-center gap-2">
-        <div className="flex h-9 shrink-0 items-center rounded-full bg-card ring-1 ring-white/5">
-          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-9 rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
-          <span className="min-w-[4.25rem] text-center text-sm font-semibold tabular-nums">O {line}</span>
-          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-9 rounded-full" onClick={() => step(0.5)}><Plus /></Button>
+        <div className="flex h-11 shrink-0 items-center rounded-full bg-card">
+          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
+          <span className="min-w-[4.5rem] text-center text-[15px] font-semibold tabular-nums">O {line}</span>
+          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => step(0.5)}><Plus /></Button>
         </div>
-        <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0 flex-1 sm:w-72 sm:flex-none" />
+        <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0" />
       </div>
-      {hit !== undefined && <PillGroup segmented layoutId="fx-hit" label="Minimum hit rate" value={hit} onChange={(v) => setQ({ hit: v })} items={HITS.map(([v, l]) => [String(v), l])} className="sm:w-72" />}
+      {hit !== undefined && <PillGroup segmented layoutId="fx-hit" label="Minimum hit rate" value={hit} onChange={(v) => setQ({ hit: v })} items={HITS.map(([v, l]) => [String(v), l])} />}
     </div>
   );
 }
@@ -120,21 +120,21 @@ export function FixturePage() {
     <div>
       <MatchHeader f={fx} live={live} />
       {!ready ? <div className="mt-5 grid gap-4"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
-      <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-5 sm:w-96" />
+      <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-7" />
       {tab === "props" && <div className="-mt-2"><HotProps teams={[fx.a, fx.b]} /></div>}
       {tab === "grid" && (
         <>
           <FilterBar {...{ stat, line, games, setQ }} />
           {known.length > 1 && (
-            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-3 sm:w-80"
+            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-4"
               items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-2"><TeamBadge name={name} size="xs" />{name}</span>])} />
           )}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
             <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
             <span className="flex items-center gap-1.5"><span className="rounded border border-dashed border-amber/60 px-1 text-[10px] text-amber">VOID</span>in the XI, did not bat or bowl</span>
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             {grids.isLoading || !shown ? <GridSkeleton /> : (
               <section>
                 <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>

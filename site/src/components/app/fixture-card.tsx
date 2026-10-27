@@ -91,7 +91,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
     <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-4" aria-label="Upcoming matches">
       <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
         items={[["all", <>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-xs text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
-      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
+      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-5">
         <CarouselContent className="-ml-3">
           {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[88%] pl-3 sm:basis-[340px]"><FixtureCard f={f} i={i} /></CarouselItem>)}
         </CarouselContent>
