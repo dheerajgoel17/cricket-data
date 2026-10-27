@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@ionic/core/css/core.css"; /* variables and utility classes only; used by the phone tab bar */
 @import "@fontsource-variable/inter";
 @import "@fontsource/barlow-condensed/400.css";
 @import "@fontsource/barlow-condensed/500.css";
@@ -55,8 +56,8 @@
   --font-sans-stack: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --body-size: 14px;
   --header-h: 3rem;
-  --tabbar-h: 3.5rem;
-  --tabbar-pad: 0.75rem;
+  --tabbar-h: 3.0625rem;   /* 49: the iOS tab bar; the safe area is added by the bar and by the page */
+  --tabbar-pad: 0rem;
   --control: 2.25rem;       /* 36: tappable without iOS-native 44 */
   --chip-radius: 999px;     /* fully rounded pills */
   --row-min: 3.5rem;
@@ -180,3 +181,12 @@
 @keyframes live-arc { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
 .live-arc { animation: live-arc 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .live-arc { animation: none; } }
+
+/* Phone tab bar (Ionic's iOS bar): dark transparent material with the backdrop blur, hairline on top, system gray and the brand tint on the selected tab. */
+ion-tab-bar {
+  --background: rgba(22, 22, 24, 0.5); /* see-through: the page scrolls under it and shows blurred (the bar's own backdrop blur) */
+  --border: 0.55px solid rgba(255, 255, 255, 0.16);
+  --color: #8e8e93;
+  --color-selected: var(--primary);
+  font-family: var(--font-sans);
+}

@@ -119,7 +119,7 @@ The apps are planned natively (Expo / React Native), like props.cash, whose webs
   not hand-built widgets. Check the install diff: the CLI can overwrite `ui/*` files and the `.dark` tokens in `index.css`.
 * Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), `h-control` / `size-control` for tappable chrome, and `env(safe-area-inset-*)`
   for fixed bars (`viewport-fit=cover` is set in `site/index.html`, which iOS needs for the insets to be non-zero).
-* The **look** is iOS-inspired (true black, system grays, blur, fully rounded pills, a segmented control, a floating glass tab bar on phones, a source-list sidebar on wide screens). The **sizes** are a compact web scale so the same site reads well in a desktop browser and in Android/iOS browsers. Do not fork the website by user-agent; one set of values, every device.
+* The **look** is iOS-inspired (true black, system grays, blur, fully rounded pills, a segmented control, the classic iOS tab bar on phones (Ionic's `ion-tab-bar` web component, MIT, forced to iOS mode, translucent with the hairline on top), a source-list sidebar on wide screens). The **sizes** are a compact web scale so the same site reads well in a desktop browser and in Android/iOS browsers. Do not fork the website by user-agent; one set of values, every device.
 
 When the Expo apps exist, reuse the same role names (`text-body`, `gap-stack`, `control`, `chip-radius`, …) from `site/src/index.css` `:root`. Swap only the values: HIG on iOS (17 px body, 44 px controls), Material 3 on Android. Do not copy web pixel values into native, and do not copy native HIG sizes back onto the website.
 
@@ -150,7 +150,7 @@ Web values (16 px rem). Native apps remap the names, not these numbers.
 | `inset` | 14 px | padding inside cards and panels |
 | `gutter` | 14 px, 20 px from md | page side padding; list rows use it so photos line up with the page edge |
 | `control` | 36 px | chip, icon-button and tab height (`h-control`, `size-control`) |
-| `header` / `tabbar` / `row` | 48 / 56 / 56 px | top bar, phone tab bar, list-row min height |
+| `header` / `tabbar` / `row` | 48 / 49 / 56 px | top bar, phone tab bar, list-row min height |
 
 Type is in rem, so it follows the browser's font-size setting. One `cn()` (`site/src/lib/utils.ts`) merges classes for the whole app, including shadcn's `ui/*` (they import it as `cn`; see the alias in `vite.config.ts` and `tsconfig.json`); it knows these scales, so `text-body` replaces a component's own `text-sm` instead of fighting it.
 
