@@ -23,6 +23,7 @@ import { StarButton } from "@/components/app/star";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
+import { ListSkeleton } from "@/components/app/skeletons";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
 const caps = (s: string) => s.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
@@ -126,10 +127,10 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
         {isTeam && <TabsContent value="grid">
           <LiveForm onValues={(v) => setQ({ gstat: v.gstat, gline: v.gline })} className="mb-3"><Field label="Stat"><NativeSelect name="gstat" options={Object.entries(STATS).map(([k, v]: any) => [k, v.label])} defaultValue={gstat} /></Field><Field label="Line"><Input name="gline" type="number" step="0.5" defaultValue={gline} className="w-24" /></Field></LiveForm>
-          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted className="mt-2">{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Muted></> : <Muted>Loading…</Muted>}
+          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted className="mt-2">{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Muted></> : <ListSkeleton rows={4} />}
         </TabsContent>}
-        <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <Muted>Loading…</Muted>}</TabsContent>
-        <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <Muted>Loading…</Muted>}</TabsContent>
+        <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
+        <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}</TabsContent>
       </PillTabs>
       {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from Cricsheet ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.</Muted></Card>}
       <Link to="/teams" className="sr-only">Teams</Link>

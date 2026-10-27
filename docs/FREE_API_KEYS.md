@@ -64,7 +64,7 @@ The scraper will work without keys but with limitations:
 - **CricketData.org**: Skipped (requires key)
 - **RapidAPI Cricket**: Skipped (requires key)
 - **ESPNcricinfo HTML**: Blocked (robots.txt)
-- **ESPN cricket JSON** (`site.api.espn.com`, used by `/api/live`): no key; unofficial; ~15 s cache on the site. Not a licence to republish commercially. The CREX match page fills scores when ESPN's card is empty (`crex.com` robots Allow; we do not call `/api/*`).
+- **CREX pages** (`crex.com/schedule`, match page, `/match-scorecard`; used by `/api/live`): no key; unofficial; ~15 s cache on the site. Not a licence to republish commercially. `crex.com` robots Allow; we do not call `/api/*`. ESPN's cricket JSON is not used (its match cards trailed its own header).
 - **Cricbuzz**: Blocked (robots.txt)
 
 With just CREX (no keys needed), you get some matches.  
@@ -123,7 +123,7 @@ curl "https://api.cricapi.com/v1/currentMatches?apikey=YOUR_KEY&offset=0"
 | CricketData.org | Free | Yes | No | 100 req/day |
 | RapidAPI Cricket | Free | Yes | No | Varies |
 | ESPNcricinfo HTML | N/A | N/A | N/A | Blocked |
-| ESPN cricket JSON | Free | No | No | Unofficial; site live scores |
+| CREX pages (HTML) | Free | No | No | Unofficial; site live scores |
 | Cricbuzz | N/A | N/A | N/A | Blocked |
 
 *Subject to rate limiting and polite delay (5 seconds between requests)

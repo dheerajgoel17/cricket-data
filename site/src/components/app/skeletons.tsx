@@ -68,3 +68,26 @@ export function FancySkeleton() {
     </div>
   );
 }
+
+/** The whole app while the data files and the page code load: header bar, series chips, two fixture cards, a props list. Both waits render this, so a refresh shows one skeleton, not two "Loading" messages. */
+export function AppSkeleton() {
+  return (
+    <div role="status" aria-label="Loading" className="min-h-screen">
+      <div aria-hidden className="flex h-14 items-center gap-snug border-b border-border/60 px-gutter md:h-[60px]">
+        <Skeleton className="size-6 rounded-md" /><Skeleton className="h-5 w-24" />
+        <Skeleton className="mx-auto hidden h-control max-w-[560px] flex-1 rounded-full md:block" />
+        <Skeleton className="ml-auto size-control rounded-full md:ml-0" />
+      </div>
+      <div aria-hidden className="flex">
+        <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug md:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
+        <div className="mx-auto flex w-full min-w-0 max-w-[900px] flex-col gap-section px-gutter pb-section pt-stack">
+          <div className="flex flex-col gap-stack">
+            <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
+            <div className="flex gap-snug overflow-hidden">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] shrink-0 basis-[88%] rounded-[22px] sm:basis-[340px]" />)}</div>
+          </div>
+          <div className="flex flex-col gap-stack"><Skeleton className="h-5 w-40" /><RowsSkeleton rows={6} /></div>
+        </div>
+      </div>
+    </div>
+  );
+}

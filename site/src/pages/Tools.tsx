@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Crumbs, EmptyNote, Muted, OddsText, PageTitle } from "@/components/app/page";
 import { ResultView } from "@/components/app/result";
 import { useRunPlan } from "@/hooks/useEngine";
+import { ListSkeleton } from "@/components/app/skeletons";
 
 // ------------------------------------------------------------------ Prop Hunter
 export function PropsPage() {
@@ -118,7 +119,7 @@ export function PairPage() {
         <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={vt} onChange={(e) => setVt(e.target.value)} /></Field>
         <Button type="submit" className="rounded-full font-semibold">Compare</Button>
       </form>
-      {!ready ? <Muted>Pick two batters to see who gets out first, and how big their stands are.</Muted> : res.data ? <ResultView r={res.data} /> : <Muted>Loading…</Muted>}
+      {!ready ? <Muted>Pick two batters to see who gets out first, and how big their stands are.</Muted> : res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}
     </div>
   );
 }

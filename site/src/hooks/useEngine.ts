@@ -21,7 +21,7 @@ export function useFixtures() {
 /** Fixtures that have not finished yet (4 h grace after the start). */
 export const upcomingOnly = (fx: any[]) => { const cut = new Date(Date.now() - 4 * 3600e3).toISOString(); return fx.filter((f) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= cut); };
 
-/** Upcoming fixtures the books price (player props, event markets, or fancy). Empty ESPN games stay off the rail.
+/** Upcoming fixtures the books price (player props, event markets, or fancy). Unpriced games stay off the rail.
  *  A fixture matches a feed match when both team names agree (ignoring "(W)"/"Women") and the starts are within 14 h.
  *  With no book feed it falls back to every upcoming fixture (`priced: false`) rather than an empty home page. */
 export function usePricedFixtures() {

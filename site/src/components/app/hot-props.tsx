@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
-import { liveForFixture, livePlayer, liveStat } from "@/engine/live.js";
+import { liveForFixture, livePlayer, liveState, liveStat } from "@/engine/live.js";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -81,7 +81,9 @@ function useHotRows() {
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
-function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: number | null }) {
+type SoFar = { v: number; state: "live" | "out" | "final" };
+
+function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null }) {
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
@@ -90,7 +92,7 @@ function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string;
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
-            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar > r.line ? "text-primary" : "text-muted-foreground")}> · {soFar} so far</span>}</ItemDescription>
+            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar.v > r.line ? "text-primary" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
@@ -113,9 +115,10 @@ function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string;
 export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const { data, isLoading } = useHotRows();
   const live = useLiveDoc();
-  const soFarOf = (r: Row) => {
+  const soFarOf = (r: Row): SoFar | null => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return liveStat(livePlayer(liveForFixture(live.data, { a, b, start: r.start }), r.name), r.stat);
+    const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat), v = liveStat(p, r.stat);
+    return v == null ? null : { v, state: liveState(m, p, r.stat) };
   };
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");

@@ -4,7 +4,7 @@ Read [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) first (architecture, data fl
 
 ## One-paragraph summary
 Cricket dataset (Cricsheet + CREX-scraped provisional matches, `src/cricket_data`, `data/`), an hourly value-bets pipeline (`src/value_bets`), and a free StatsHub-style player-props website
-(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and two serverless functions: `site/api/ask.js` (question → validated query plan) and `site/api/live.js` (ESPN scores + player so-far for book-priced matches only, ~15 s cache, never settlement).
+(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and two serverless functions: `site/api/ask.js` (question → validated query plan) and `site/api/live.js` (CREX scores + player so-far for book-priced matches only, ~15 s cache, never settlement).
 
 ## Commands
 ```bash

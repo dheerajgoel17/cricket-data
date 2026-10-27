@@ -1,4 +1,4 @@
-// Live score snapshots from ESPN's public cricket JSON (header + match summary).
+// Live score snapshots from CREX: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { norm } from "./util.js";
 
@@ -40,7 +40,7 @@ export function ballsToOvers(b) {
   return Math.floor(n / 6) + (n % 6) / 10;
 }
 
-/** ESPN competitor.score: "145/4 (16.2 ov)", "113 & 516", "187/9 (65 ov, target 313)". */
+/** Score strings: "145/4 (16.2 ov)", "113 & 516", "187/9 (65 ov, target 313)". */
 export function parseScore(s) {
   const display = String(s || "").trim();
   if (!display) return { display: "", runs: null, wkts: null, overs: null };
@@ -50,78 +50,8 @@ export function parseScore(s) {
   return { display, runs: +m[1], wkts: m[2] != null ? +m[2] : null, overs: m[3] != null ? +m[3] : null };
 }
 
-function fmtOf(ev, cls = {}) {
-  const t = `${ev?.eventType || ""} ${cls.eventType || ""} ${cls.generalClassCard || ""} ${cls.name || ""}`.toLowerCase();
-  if ((/\b100\b/.test(t) && /ball|hundred/.test(t)) || t.includes("hundred")) return "Hundred";
-  if (/\bt20\b/.test(t)) return "T20";
-  if (/\bodi\b/.test(t) || t.includes("list a") || t.includes("one-day") || t.includes("one day")) return "ODI";
-  if (t.includes("first-class") || t.includes("first class") || /\btest\b/.test(t)) return "Test";
-  return "";
-}
-
-function stateOf(ev) {
-  const st = ev?.fullStatus?.type?.state || ev?.status || "";
-  if (st === "in") return "live";
-  if (st === "post") return "final";
-  return "upcoming";
-}
-
-function parseTotal(total, runs) {
-  const t = String(total || "");
-  const wkts = /\((\d+)\s*wkts?/.exec(t);
-  const ovs = /(\d+(?:\.\d+)?)\s*ovs?/.exec(t);
-  const r = runs === "" || runs == null ? null : Number(runs);
-  return { runs: Number.isFinite(r) ? r : null, wkts: wkts ? +wkts[1] : null, overs: ovs ? +ovs[1] : null };
-}
-
-export function parseHeader(doc) {
-  const out = [];
-  for (const sport of doc?.sports || []) {
-    for (const lg of sport.leagues || []) {
-      for (const ev of lg.events || []) {
-        const cls = ev.class || {};
-        const fs = ev.fullStatus || {};
-        const teams = (ev.competitors || []).map((c) => {
-          const sc = parseScore(c.score);
-          return { name: c.displayName || c.name || "", abbr: c.abbreviation || c.name || "", batting: fs.battingTeamId != null && String(fs.battingTeamId) === String(c.id), ...sc };
-        });
-        if (teams.length < 2) continue;
-        out.push({
-          id: String(ev.id || ""),
-          leagueId: String(lg.id || ""),
-          status: stateOf(ev),
-          fmt: fmtOf(ev, cls),
-          start: ev.date || "",
-          summary: fs.summary || ev.summary || "",
-          note: fs.type?.description || ev.summary || "",
-          session: fs.session || "",
-          teams,
-          innings: [],
-          players: [],
-        });
-      }
-    }
-  }
-  return out;
-}
-
-function n(x) { const v = Number(x); return Number.isFinite(v) ? v : 0; }
-
 function blankInn(n, team) {
   return { n, team: team || "", batters: [], bowlers: [], yetToBat: [], fow: [], extras: null, runs: null, wkts: null, overs: null };
-}
-
-function espnOut(dismissal) {
-  const d = String(dismissal || "").trim().toLowerCase();
-  if (!d || d === "not out" || d === "notout") return false;
-  if (/did not bat|dnb/.test(d)) return false;
-  return true;
-}
-
-function espnHow(dismissal) {
-  const d = String(dismissal || "").trim();
-  if (!d || /^not\s*out$/i.test(d)) return "not out";
-  return d;
 }
 
 /** CREX / Cricinfo extras order: b, lb, w, nb, pen. */
@@ -161,78 +91,24 @@ export function liveCard(match) {
   return inn.batters.length || inn.bowlers.length ? [inn] : [];
 }
 
-export function parseSummary(doc) {
-  const cards = doc?.matchcards || [];
-  const players = new Map();
-  const innings = [];
-  const byInn = new Map();
-  const innOf = (innNo, team) => {
-    if (!byInn.has(innNo)) byInn.set(innNo, blankInn(innNo, team));
-    const row = byInn.get(innNo);
-    if (team && !row.team) row.team = team;
-    return row;
-  };
-  const bump = (id, name, team, patch) => {
-    const p = players.get(id) || { id, name, team, runs: null, balls: null, fours: null, sixes: null, wickets: null, conceded: null, ballsBowled: null, out: false };
-    for (const [k, v] of Object.entries(patch)) {
-      if (k === "out") p.out = p.out || !!v;
-      else if (v == null) continue;
-      else p[k] = (p[k] == null ? 0 : p[k]) + v;
-    }
-    players.set(id, p);
-  };
-  for (const card of cards) {
-    const headline = String(card.headline || "");
-    const team = card.teamName || "";
-    const innNo = Number(card.inningsNumber) || innings.length + 1;
-    if (headline === "Batting" || card.typeID === "11" || card.typeID === 11) {
-      const tot = parseTotal(card.total, card.runs);
-      let fours = 0, sixes = 0;
-      const inn = innOf(innNo, team);
-      Object.assign(inn, tot);
-      for (const p of card.playerDetails || []) {
-        fours += n(p.fours); sixes += n(p.sixes);
-        const dismiss = String(p.dismissal || "");
-        const dnb = /did not bat|\bdnb\b/i.test(dismiss) || (p.runs == null && p.ballsFaced == null && !dismiss);
-        const out = espnOut(dismiss);
-        const runs = n(p.runs), balls = n(p.ballsFaced);
-        if (dnb) { inn.yetToBat.push(p.playerName); continue; }
-        inn.batters.push({
-          id: String(p.playerID || p.playerName), name: p.playerName, team, runs, balls,
-          fours: n(p.fours), sixes: n(p.sixes), sr: nFloat(p.strikeRate) ?? strikeRate(runs, balls),
-          out, dismissal: espnHow(dismiss),
-        });
-        bump(String(p.playerID || p.playerName), p.playerName, team, {
-          runs, balls, fours: n(p.fours), sixes: n(p.sixes), out,
-        });
-      }
-      innings.push({ n: innNo, team, headline: "Batting", fours, sixes, ...tot });
-    } else if (headline === "Bowling" || card.typeID === "12" || card.typeID === 12) {
-      const inn = innOf(innNo, "");
-      for (const p of card.playerDetails || []) {
-        const ballsBowled = oversToBalls(p.overs) || 0, conceded = n(p.conceded), wickets = n(p.wickets);
-        inn.bowlers.push({
-          id: String(p.playerID || p.playerName), name: p.playerName, team, wickets, conceded, ballsBowled,
-          maidens: n(p.maidens), overs: nFloat(p.overs) ?? ballsToOvers(ballsBowled),
-          econ: nFloat(p.economyRate || p.economy) ?? (ballsBowled ? Math.round((conceded / (ballsBowled / 6)) * 100) / 100 : null),
-        });
-        bump(String(p.playerID || p.playerName), p.playerName, team, { wickets, conceded, ballsBowled });
-      }
-    }
-  }
-  return { innings, players: [...players.values()], card: [...byInn.values()] };
+/** Rows worth the two page fetches: live ones, plus priced ones about to start (CREX's schedule page is cached ~5 min, so a match can be on but still unscored there). */
+export function wantsCard(match, now = Date.now()) {
+  if (match?.status === "live") return true;
+  const t = match?.start ? Date.parse(match.start) : NaN;
+  return match?.status === "upcoming" && Number.isFinite(t) && t - now < 15 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 
-export function attachSummary(match, summary) {
-  if (!match || !summary) return match;
-  return { ...match, innings: summary.innings, players: summary.players, card: summary.card || [] };
+/** CREX format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
+export function crexFmt(label) {
+  const t = String(label || "").toLowerCase();
+  if (t.includes("hundred")) return "Hundred";
+  if (/\bt20/.test(t)) return "T20";
+  if (/\bodi\b|list a|one[ -]day/.test(t)) return "ODI";
+  if (/\btest\b|first[ -]class|multi[ -]day/.test(t)) return "Test";
+  return "";
 }
 
-export function wantsCard(match) {
-  return match?.status === "live";
-}
-
-/** Matches the books actually price: player lines, event markets, or fancy. Empty ESPN games stay out. */
+/** Matches the books actually price: player lines, event markets, or fancy. Unpriced games stay out. */
 export function bookFixtures(doc) {
   const seen = new Map();
   for (const l of [...(doc?.events || []), ...(doc?.lines || []), ...(doc?.fancy || [])]) {
@@ -286,17 +162,6 @@ function crexInn(row, n) {
   return crexDisplay(s, o);
 }
 
-function sameSides(a, b) {
-  const an = (a?.teams || []).map((t) => teamKey(t.name)), bn = (b?.teams || []).map((t) => teamKey(t.name));
-  return an.length >= 2 && bn.includes(an[0]) && bn.includes(an[1]);
-}
-
-function sameTime(a, b) {
-  const ta = a?.start ? Date.parse(a.start) : NaN, tb = b?.start ? Date.parse(b.start) : NaN;
-  if (!Number.isFinite(ta) || !Number.isFinite(tb)) return true;
-  return Math.abs(ta - tb) < WINDOW_MS;
-}
-
 function nInt(x) {
   const v = parseInt(String(x ?? "").replace(/[^\d-]/g, ""), 10);
   return Number.isFinite(v) ? v : 0;
@@ -324,7 +189,7 @@ function parseOvers(lastovers) {
   return (lastovers || []).map((o) => ({ balls: overBalls(o) })).filter((o) => o.balls.length);
 }
 
-/** CREX schedule page (`crex.com/schedule`, robots Allow). Team scores for every live game in one HTML response. */
+/** CREX schedule page (`crex.com/schedule`, robots Allow). Every live and upcoming game in one HTML response: URL, format, start, team scores (the page is cached ~5 min). */
 export function parseCrexSchedule(html) {
   const rows = crexState(html)?.["https://stats.crickapi.com/fixture/getFixture"];
   if (!Array.isArray(rows)) return [];
@@ -332,18 +197,23 @@ export function parseCrexSchedule(html) {
     const a = row.team1 || row.t1SName, b = row.team2 || row.t2SName;
     if (!a || !b) return [];
     const t1 = crexInn(row, 1), t2 = crexInn(row, 2);
-    const live = !!t1.display || !!t2.display;
+    const scored = !!t1.display || !!t2.display;
+    const done = Number(row.winningTeam) >= 0 || Number(row.w) >= 0;
+    // `bf` is the side that batted first; once both have a score the other one is in.
+    const first = String(row.bf || "") === String(row.t1f || row.team1fkey || "") ? 0 : 1;
+    const bat = t1.display && t2.display ? 1 - first : t1.display ? 0 : t2.display ? 1 : -1;
     const link = row.link || "";
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
-      status: live ? "live" : "upcoming",
+      status: done ? "final" : scored ? "live" : "upcoming",
+      fmt: crexFmt(row.fo || row.formats),
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: row.statusText || row.comment1 || "",
       note: "",
       url: link.startsWith("/") ? `https://crex.com${link}` : link,
       teams: [
-        { name: a, abbr: row.t1SName || a, batting: String(row.bf || "") === String(row.t1f || row.team1fkey || ""), ...t1 },
-        { name: b, abbr: row.t2SName || b, batting: String(row.bf || "") === String(row.t2f || row.team2fkey || ""), ...t2 },
+        { name: a, abbr: row.t1SName || a, batting: bat === 0, ...t1 },
+        { name: b, abbr: row.t2SName || b, batting: bat === 1, ...t2 },
       ],
       innings: [],
       players: [],
@@ -358,7 +228,7 @@ export function parseCrexLive(html) {
   const aName = sv.team1_f_n || sv.rt || sv.team1, bName = sv.team2_f_n || sv.team2;
   if (!aName || !bName) return null;
   const t1 = crexDisplay(sv.score1, sv.over1), t2 = crexDisplay(sv.score2, sv.over2);
-  const bat = sv.rt || aName, bowl = teamKey(bat) === teamKey(aName) ? bName : aName;
+  const bat = sv.rt || aName, batIsA = teamKey(bat) === teamKey(aName), bowl = batIsA ? bName : aName;
   const strike = Number(sv.st);
   const players = [];
   const addBat = (name, runs, balls, fours, sixes, out, onStrike, sr, photo) => {
@@ -385,20 +255,20 @@ export function parseCrexLive(html) {
   }
   const overs = parseOvers(sv.lastovers);
   const thisOver = overs.length ? overs[overs.length - 1].balls : [];
-  const inn = t1.display ? t1 : t2;
+  const inn = batIsA ? t1 : t2;
   const crr = nFloat(sv.crr), rrr = nFloat(sv.rrr);
   return {
     id: String(sv.mf || ""),
-    status: sv.status === 1 || t1.display || t2.display ? "live" : "upcoming",
+    status: t1.display || t2.display ? "live" : "upcoming",
     start: "",
-    summary: sv.comment1 || "",
+    summary: String(sv.comment1 || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim(),
     note: "",
     url: "",
     teams: [
-      { name: aName, abbr: sv.team1short || sv.team1 || "", batting: teamKey(bat) === teamKey(aName), ...t1 },
-      { name: bName, abbr: sv.team2short || sv.team2 || "", batting: teamKey(bat) === teamKey(bName), ...t2 },
+      { name: aName, abbr: sv.team1short || sv.team1 || "", batting: batIsA, ...t1 },
+      { name: bName, abbr: sv.team2short || sv.team2 || "", batting: !batIsA, ...t2 },
     ],
-    innings: inn.runs == null ? [] : [{ n: 1, team: bat, headline: "Batting", fours: nInt(sv.four1) + nInt(sv.four2), sixes: nInt(sv.six1) + nInt(sv.six2), runs: inn.runs, wkts: inn.wkts, overs: inn.overs }],
+    innings: inn.runs == null ? [] : [{ n: Number(sv.inning) || 1, team: bat, headline: "Batting", fours: nInt(sv.four1) + nInt(sv.four2), sixes: nInt(sv.six1) + nInt(sv.six2), runs: inn.runs, wkts: inn.wkts, overs: inn.overs }],
     players,
     partnership: sv.partnerruns == null && sv.partnerballs == null ? null : { runs: nInt(sv.partnerruns), balls: nInt(sv.partnerballs) },
     crr,
@@ -406,16 +276,6 @@ export function parseCrexLive(html) {
     thisOver,
     overs,
   };
-}
-
-/** Copy CREX match-page URLs onto ESPN rows. Schedule scores stay off: that HTML is cached ~5 min. */
-export function attachCrexUrls(matches, crexList) {
-  if (!crexList?.length) return matches || [];
-  return (matches || []).map((m) => {
-    if (m.url) return m;
-    const c = crexList.find((x) => x?.url && sameSides(m, x) && sameTime(m, x));
-    return c ? { ...m, url: c.url } : m;
-  });
 }
 
 /** CREX match-scorecard page (`getSC4` in app-root-state). We fetch the HTML; never `crex.com/api`. */
@@ -502,6 +362,7 @@ export function parseCrexScorecard(html) {
       batters.push(p);
       if (p.out && p.fowRuns != null) fow.push({ name: p.name, runs: p.fowRuns, balls: p.fowBalls, wkts: fow.length + 1 });
     }
+    fow.sort((x, y) => x.runs - y.runs || (x.balls ?? 0) - (y.balls ?? 0)).forEach((w, k) => { w.wkts = k + 1; }); // the card lists batters in order, wickets fell in another
     const extras = extrasOf(String(row.e || "").split("."));
     return {
       n: i + 1, team: batTeam, batters, bowlers: (row.a || []).map((raw) => crexBowler(raw, names, bowlTeam)),
@@ -524,34 +385,47 @@ export function parseCrexScorecard(html) {
   };
 }
 
-/** Fill empty ESPN team scores / so-far from a CREX snapshot. Never overwrites a number ESPN already has. */
-export function overlayCrex(matches, crexList) {
-  if (!crexList?.length) return matches || [];
-  return (matches || []).map((m) => {
-    const c = crexList.find((x) => x && sameSides(m, x) && sameTime(m, x));
-    if (!c) return m;
-    const teams = (m.teams || []).map((t) => {
-      const o = (c.teams || []).find((x) => teamKey(x.name) === teamKey(t.name) || teamKey(x.abbr) === teamKey(t.name) || teamKey(x.name) === teamKey(t.abbr));
-      if (!o || t.display) return t;
-      return { ...t, display: o.display, runs: o.runs, wkts: o.wkts, overs: o.overs, batting: t.batting || o.batting };
-    });
-    const junk = /starts at|\blocal time\b/i;
-    return {
-      ...m,
-      teams,
-      summary: m.summary && !junk.test(m.summary) ? m.summary : (c.summary || m.summary),
-      players: (m.players || []).length ? m.players : (c.players || []),
-      innings: (m.innings || []).length ? m.innings : (c.innings || []),
-      card: hasCard(m) ? m.card : (c.card || m.card || []),
-      partnership: m.partnership || c.partnership || null,
-      crr: m.crr ?? c.crr ?? null,
-      rrr: m.rrr ?? c.rrr ?? null,
-      thisOver: (m.thisOver || []).length ? m.thisOver : (c.thisOver || []),
-      overs: (m.overs || []).length ? m.overs : (c.overs || []),
-      status: m.status === "live" || (c.status === "live" && (c.teams || []).some((t) => t.display)) ? "live" : m.status,
-      url: m.url || c.url,
-    };
+/** Not-out batters and the current bowler from the match page, copied onto the scorecard rows (strike, current bowler, photo, the page's fresher numbers). Rows the card lacks are appended. */
+function flagLive(players, flags) {
+  const out = players.map((p) => ({ ...p }));
+  for (const f of flags) {
+    if (f.out) continue; // dismissed batters are already in the card in full
+    const bat = f.runs != null;
+    const hit = out.find((p) => (bat ? p.runs != null && !p.out : p.wickets != null) && namesMatch(p.name, f.name));
+    if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens });
+    else out.push(f);
+  }
+  return out;
+}
+
+/**
+ * One live row from the three CREX pages. `row` is the schedule entry (id, URL, format, start; scores up to ~5 min old), `live` the match page
+ * (fresh scores, current pair, partnership, run rates), `card` the scorecard (every innings). Either page may be null: the row then keeps what it has.
+ */
+export function crexMatch(row, live, card) {
+  const same = (a, b) => teamKey(a.name) === teamKey(b.name) || (!!a.abbr && teamKey(a.abbr) === teamKey(b.abbr));
+  const teams = (row.teams || []).map((t) => {
+    const o = (live?.teams || []).find((x) => same(x, t));
+    if (!o) return t;
+    return { ...t, ...(o.display ? { display: o.display, runs: o.runs, wkts: o.wkts, overs: o.overs } : {}), batting: o.batting };
   });
+  const innings = [...(card?.innings || [])];
+  for (const i of live?.innings || []) if (!innings.some((x) => teamKey(x.team) === teamKey(i.team))) innings.push(i); // a scorecard page cached a beat behind
+  const cardPlayers = card?.players || [];
+  return {
+    ...row,
+    status: row.status === "final" ? "final" : teams.some((t) => t.display) ? "live" : "upcoming",
+    summary: live?.summary || row.summary,
+    teams,
+    innings,
+    players: cardPlayers.length ? flagLive(cardPlayers, live?.players || []) : (live?.players || []),
+    card: card?.card || [],
+    partnership: live?.partnership ?? null,
+    crr: live?.crr ?? null,
+    rrr: live?.rrr ?? null,
+    thisOver: live?.thisOver || [],
+    overs: live?.overs || [],
+  };
 }
 
 export function liveForFixture(doc, fixture) {
@@ -575,18 +449,22 @@ export function teamScore(match, teamName) {
   return (match?.teams || []).find((t) => teamKey(t.name) === k || teamKey(t.abbr) === k) || null;
 }
 
-/** ESPN kick-off lines are the ground's clock ("Starts at 09:30 local time"). The site only shows the viewer's zone. */
+/** The status line CREX gives: "IND need 179 runs in 115 balls", "OMA opt to Bowl". Bare "Live" says nothing the badge doesn't. */
 export function liveBlurb(match) {
-  for (const s of [match?.summary, match?.note]) {
-    const t = String(s || "").trim();
-    if (!t || /^live$/i.test(t) || /starts at|\blocal time\b/i.test(t)) continue;
-    return t;
+  for (const x of [match?.summary, match?.note]) {
+    const t = String(x || "").trim();
+    if (t && !/^live$/i.test(t)) return t;
   }
   return "";
 }
 
-export function livePlayer(match, name) {
-  const hits = (match?.players || []).filter((p) => namesMatch(p.name, name));
+const BAT_STATS = new Set(["runs", "balls", "fours", "sixes"]);
+const BOWL_STATS = new Set(["wickets", "runs_conceded", "balls_bowled"]);
+
+/** The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat. Ambiguous names stay unmatched. */
+export function livePlayer(match, name, stat) {
+  const role = BAT_STATS.has(stat) ? "runs" : BOWL_STATS.has(stat) ? "wickets" : null;
+  const hits = (match?.players || []).filter((p) => namesMatch(p.name, name) && (!role || p[role] != null));
   return hits.length === 1 ? hits[0] : null;
 }
 
@@ -601,14 +479,19 @@ function withEcon(p) {
   return { ...p, econ: Math.round((p.conceded / (p.ballsBowled / 6)) * 100) / 100 };
 }
 
-/** Compact scoreboard: current not-out batters, last wicket, current bowler. ESPN full cards only mark current when CREX did. */
+/** Compact scoreboard: the batting side's not-out pair, last wicket, current bowler. A finished innings' not-out batters never show as the pair. */
 export function liveBoard(match) {
   const players = match?.players || [];
   if (!players.length) return null;
-  const raw = players.filter((p) => p.runs != null && !p.out).map(withSr);
+  const bat = (match.teams || []).find((t) => t.batting);
+  const onBat = (team) => !bat || teamKey(team) === teamKey(bat.name) || (!!bat.abbr && teamKey(team) === teamKey(bat.abbr));
+  const raw = players.filter((p) => p.runs != null && !p.out && onBat(p.team)).map(withSr);
   const strike = raw.find((p) => p.strike);
   const batters = strike ? [strike, ...raw.filter((p) => p !== strike)] : raw;
-  const outs = players.filter((p) => p.out && p.runs != null).map(withSr);
+  const outs = players.filter((p) => p.out && p.runs != null && onBat(p.team)).map(withSr);
+  const falls = [...(match.card || [])].reverse().find((i) => i.fow?.length && onBat(i.team))?.fow || [];
+  const last = falls.length ? falls[falls.length - 1] : null; // fall of wickets is chronological; the batters list is in batting order
+  const lastWicket = (last && outs.find((p) => namesMatch(p.name, last.name))) || (outs.length ? outs[outs.length - 1] : null);
   const bowling = players.filter((p) => p.wickets != null || p.conceded != null);
   const bowler = withEcon(bowling.find((p) => p.current) || (bowling.length === 1 ? bowling[0] : null));
   if (!batters.length && !outs.length && !bowler) return null;
@@ -618,7 +501,7 @@ export function liveBoard(match) {
     : (Array.isArray(match.thisOver) && match.thisOver.length ? [{ balls: match.thisOver }] : []);
   return {
     batters,
-    lastWicket: outs.length ? outs[outs.length - 1] : null,
+    lastWicket,
     bowler,
     partnership: pr && (pr.runs != null || pr.balls != null) ? pr : null,
     crr: Number.isFinite(match.crr) ? match.crr : null,
@@ -635,6 +518,36 @@ export function liveStat(player, stat) {
   const k = STAT_FIELD[stat];
   if (!k || player[k] == null) return null;
   return player[k];
+}
+
+const MAX_OVERS = { T20: 20, ODI: 50 };
+const SPELL_BALLS = { T20: 24, ODI: 60 };
+
+/** Has this side's innings ended? All out, its overs used, the other side now batting, or the match over. */
+function inningsOver(match, team) {
+  if (match?.status === "final") return true;
+  const inns = match?.innings || [];
+  const mine = [...inns].reverse().find((i) => teamKey(i.team) === teamKey(team));
+  if (!mine) return false;
+  const max = MAX_OVERS[match.fmt];
+  return mine.wkts === 10 || (max != null && mine.overs != null && mine.overs >= max) || inns.some((i) => i.n > mine.n);
+}
+
+/**
+ * Can this so-far number still move? "out": the batter is dismissed; "final": the innings or the spell is over (batter not out when it ended, bowler's quota used
+ * or the batting side finished); "live": it can still change. One innings a side only, so Tests stay "live" until the match ends.
+ */
+export function liveState(match, player, stat) {
+  if (!match || !player) return "live";
+  if (match.status === "final") return "final";
+  if (!["T20", "ODI", "Hundred"].includes(match.fmt)) return "live";
+  if (BAT_STATS.has(stat)) return player.out ? "out" : inningsOver(match, player.team) ? "final" : "live";
+  if (BOWL_STATS.has(stat)) {
+    const quota = SPELL_BALLS[match.fmt];
+    const opp = (match.teams || []).find((t) => teamKey(t.name) !== teamKey(player.team))?.name;
+    return (quota != null && (player.ballsBowled || 0) >= quota) || (opp && inningsOver(match, opp)) ? "final" : "live";
+  }
+  return "live";
 }
 
 export function liveMarket(match, key, team) {
@@ -656,10 +569,4 @@ export function liveMarket(match, key, team) {
   if (key === "match_50s") return (match.players || []).filter((p) => (p.runs || 0) >= 50 && (p.runs || 0) < 100).length;
   if (key === "match_30s") return (match.players || []).filter((p) => (p.runs || 0) >= 30 && (p.runs || 0) < 50).length;
   return null;
-}
-
-/** Snapshot the site stores / serves. `summaries` is {eventId: summaryDoc}. */
-export function buildLive(header, summaries = {}, asOf = new Date().toISOString()) {
-  const matches = parseHeader(header).map((m) => attachSummary(m, summaries[m.id] ? parseSummary(summaries[m.id]) : null));
-  return { asOf, source: "espn", delaySec: LIVE_TTL_MS / 1000, matches };
 }
