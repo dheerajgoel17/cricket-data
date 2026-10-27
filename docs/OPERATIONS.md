@@ -21,7 +21,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
 | `ASK_PER_MINUTE`, `ASK_DAILY_CAP` | Vercel env (optional) | same | rate limits (defaults 12 / 800) |
 | `SYNC_LIMIT` | workflow input / env | `site.yml` | max images copied per run (default 1500) |
-| `LIVE_SOURCE_BASE`, `LIVE_SITEMAP_DIR`, `IMG_CDN_BASE`, `BASE_DATA_URL`, `PRICE_FEED_URL`, `EXCHANGE_API_URL`, `BETFAIR_SSO_URL`, `BETFAIR_API_URL` | GitHub **secrets** (masked in public logs) | repo Settings -> Secrets; values are not written anywhere in the repo, ask the maintainer | every workflow's top-level `env:`; read by `cricket_data.hosts.host()` |
+| `LIVE_SOURCE_BASE`, `LIVE_SITEMAP_DIR`, `IMG_CDN_BASE`, `BASE_DATA_URL`, `PRICE_FEED_URL`, `EXCHANGE_API_URL`, `BETFAIR_SSO_URL`, `BETFAIR_API_URL`, `FEEDK_URL` (the feed root), `FEEDK_BOOKS` (`id=Name,id=Name`: its account ids and the names the prices are published under) | GitHub **secrets** (masked in public logs) | repo Settings -> Secrets; values are not written anywhere in the repo, ask the maintainer | every workflow's top-level `env:`; read by `cricket_data.hosts.host()` |
 | `LIVE_SOURCE_BASE`, `VITE_IMG_CDN` | Vercel env (Production, Preview) | `vercel env add` | `site/api/live.js` (runtime), `site/src/lib/photos.js` (build time) |
 | `IDENTITY_URL` | Vercel env (optional) | `vercel env add` | `site/api/live.js`: where to fetch the identity table when the file shipped with the function is missing (default: the production domain's `/data/identity.json`) |
 | `CV_SOURCES` | GitHub variable | repo Settings -> Variables | value-bets adapter list |

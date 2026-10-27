@@ -32,6 +32,8 @@ env:
   BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
   PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
   EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
+  FEEDK_URL: ${{ secrets.FEEDK_URL }}
+  FEEDK_BOOKS: ${{ secrets.FEEDK_BOOKS }}
 
 permissions:
   contents: write

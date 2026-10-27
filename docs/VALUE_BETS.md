@@ -36,6 +36,11 @@ artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `
 ## Sources
 * `smarkets`: public exchange API (top batsman/bowler, venue). `moviodds_bet365`: unofficial Book A mirror (batter runs, sixes and fours
   O/U, bowler wickets O/U, 50/100 Yes/No, batter/bowler milestone ladders, top batter/bowler). Both are keyless.
+* `feedk` (Feed K, `adapters/feedk.py`): a public, login-free sportsbook feed several operators share. It is on whenever the secrets `FEEDK_URL` and
+  `FEEDK_BOOKS` are set (no need to list it in `CV_SOURCES`) and reports "skipped" otherwise. Each configured book is one source, published under the name
+  given in `FEEDK_BOOKS`, so a line on the site shows every book's over/under next to the others. It reads player runs / sixes / fours / wickets O/U and the
+  "to score a half-century / century / at least N runs" yes/nos; a Test's "Innings 1" runs line is skipped (not the match total). It is polite: one listing and
+  at most `FEEDK_MAX_EVENTS` event pages per book per run, `FEEDK_SPACING_SECS` apart, and a 429 ends that book for the run.
 * Match winner is **not** priced or alerted. Polymarket, Matchbook, The Odds API and Exchange B only price match winner, so they are off.
   To turn them back on, set the repository variable `CV_SOURCES` (e.g. `smarkets,moviodds_bet365,betfair`) and the secrets
   `ODDS_API_KEY`, `BETFAIR_APP_KEY`, `BETFAIR_USERNAME`, `BETFAIR_PASSWORD`. A missing secret means that adapter reports "skipped".

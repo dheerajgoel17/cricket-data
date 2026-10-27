@@ -5,6 +5,7 @@
   IMG_CDN_BASE       its image host
   BASE_DATA_URL      the base ball-by-ball dataset root
   PRICE_FEED_URL     the price feed page      EXCHANGE_API_URL   the exchange API root
+  FEEDK_URL          the root of the shared sportsbook feed behind Feed K      FEEDK_BOOKS   its books, "id=Name,id=Name" (account id, published name)
   SRC_B_BASE, SRC_C_BASE, SRC_D_BASE, SRC_E_BASE   the optional scrapers / key-gated APIs that are not enabled by default
 
 Set them as repository variables for the workflows, as deployment variables for the site, and in a git-ignored env file locally (docs/OPERATIONS.md).

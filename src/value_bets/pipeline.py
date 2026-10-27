@@ -11,19 +11,20 @@ import traceback
 from collections import defaultdict
 
 from . import archive, booklines, config, fancy, history, store, strategy, weather
-from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
+from .adapters import betfair, feedk, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
 from .pricing import devig, edge, effective_odds, exchange_mid, kelly_pct, logit
 from .props_live import PropEngine
 from .util import iso, ist, now_utc, parse_ts
 
-ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair]
+ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk]
 
 
 def adapters():
+    """The sources named in CV_SOURCES, plus any that switch themselves on (``AUTO``: skipped unless their own variables are set)."""
     want = {x.strip() for x in config.get("SOURCES").split(",") if x.strip()}
-    return [m for m in ALL_ADAPTERS if m.NAME in want]
+    return [m for m in ALL_ADAPTERS if m.NAME in want or getattr(m, "AUTO", False)]
 
 
 

@@ -1,0 +1,310 @@
+{
+ "events": [
+  {
+   "id": 1029386847,
+   "name": "Bangladesh - West Indies",
+   "homeName": "Bangladesh",
+   "awayName": "West Indies",
+   "start": "2026-10-28T04:00:00Z",
+   "state": "NOT_STARTED",
+   "path": [
+    {
+     "name": "Cricket",
+     "englishName": "Cricket"
+    },
+    {
+     "name": "International Test Cricket",
+     "englishName": "International Test Cricket"
+    },
+    {
+     "name": "Matches",
+     "englishName": "Matches"
+    }
+   ],
+   "nonLiveBoCount": 39
+  }
+ ],
+ "betOffers": [
+  {
+   "id": 2708731468,
+   "criterion": {
+    "label": "Match Odds",
+    "englishLabel": "Match Odds"
+   },
+   "outcomes": [
+    {
+     "label": "1",
+     "englishLabel": "1",
+     "odds": 1760,
+     "participant": "Bangladesh",
+     "type": "OT_ONE",
+     "status": "OPEN"
+    },
+    {
+     "label": "X",
+     "englishLabel": "X",
+     "odds": 5800,
+     "type": "OT_CROSS",
+     "status": "OPEN"
+    },
+    {
+     "label": "2",
+     "englishLabel": "2",
+     "odds": 2800,
+     "participant": "West Indies",
+     "type": "OT_TWO",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800011,
+   "criterion": {
+    "label": "Top Run Scorer - Bangladesh, Innings 1",
+    "englishLabel": "Top Run Scorer - Bangladesh, Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Ebadot Hossain",
+     "englishLabel": "Ebadot Hossain",
+     "odds": 301000,
+     "participant": "Ebadot Hossain",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Hasan Mahmud",
+     "englishLabel": "Hasan Mahmud",
+     "odds": 51000,
+     "participant": "Hasan Mahmud",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Jaker Ali",
+     "englishLabel": "Jaker Ali",
+     "odds": 9500,
+     "participant": "Jaker Ali",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Litton Das",
+     "englishLabel": "Litton Das",
+     "odds": 5500,
+     "participant": "Litton Das",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Mehidy Hasan Miraz",
+     "englishLabel": "Mehidy Hasan Miraz",
+     "odds": 8000,
+     "participant": "Mehidy Hasan Miraz",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Mominul Haque",
+     "englishLabel": "Mominul Haque",
+     "odds": 5000,
+     "participant": "Mominul Haque",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Mushfiqur Rahim",
+     "englishLabel": "Mushfiqur Rahim",
+     "odds": 5000,
+     "participant": "Mushfiqur Rahim",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Najmul Hossain Shanto",
+     "englishLabel": "Najmul Hossain Shanto",
+     "odds": 5000,
+     "participant": "Najmul Hossain Shanto",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Nayeem Hasan",
+     "englishLabel": "Nayeem Hasan",
+     "odds": 26000,
+     "participant": "Nayeem Hasan",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Shadman Islam",
+     "englishLabel": "Shadman Islam",
+     "odds": 6000,
+     "participant": "Shadman Islam",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Shoriful Islam",
+     "englishLabel": "Shoriful Islam",
+     "odds": 151000,
+     "participant": "Shoriful Islam",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Taijul Islam",
+     "englishLabel": "Taijul Islam",
+     "odds": 51000,
+     "participant": "Taijul Islam",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Tanzid Hasan",
+     "englishLabel": "Tanzid Hasan",
+     "odds": 6000,
+     "participant": "Tanzid Hasan",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Taskin Ahmed",
+     "englishLabel": "Taskin Ahmed",
+     "odds": 81000,
+     "participant": "Taskin Ahmed",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Towhid Hridoy",
+     "englishLabel": "Towhid Hridoy",
+     "odds": 6500,
+     "participant": "Towhid Hridoy",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800016,
+   "criterion": {
+    "label": "Player's Total Runs - Innings 1",
+    "englishLabel": "Player's Total Runs - Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Over 26.5",
+     "englishLabel": "Over 26.5",
+     "odds": 2000,
+     "participant": "Shadman Islam",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Under 26.5",
+     "englishLabel": "Under 26.5",
+     "odds": 1730,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800017,
+   "criterion": {
+    "label": "Player's Total Runs - Innings 1",
+    "englishLabel": "Player's Total Runs - Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Over 26.5",
+     "englishLabel": "Over 26.5",
+     "odds": 2000,
+     "participant": "Tanzid Hasan",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Under 26.5",
+     "englishLabel": "Under 26.5",
+     "odds": 1730,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800022,
+   "criterion": {
+    "label": "To score a Half-Century - Innings 1",
+    "englishLabel": "To score a Half-Century - Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Yes",
+     "englishLabel": "Yes",
+     "odds": 3300,
+     "participant": "Shadman Islam",
+     "type": "OT_YES",
+     "status": "OPEN"
+    },
+    {
+     "label": "No",
+     "englishLabel": "No",
+     "odds": 1300,
+     "type": "OT_NO",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800023,
+   "criterion": {
+    "label": "To score a Half-Century - Innings 1",
+    "englishLabel": "To score a Half-Century - Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Yes",
+     "englishLabel": "Yes",
+     "odds": 3300,
+     "participant": "Tanzid Hasan",
+     "type": "OT_YES",
+     "status": "OPEN"
+    },
+    {
+     "label": "No",
+     "englishLabel": "No",
+     "odds": 1300,
+     "type": "OT_NO",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708800028,
+   "criterion": {
+    "label": "To score a Century - Innings 1",
+    "englishLabel": "To score a Century - Innings 1"
+   },
+   "outcomes": [
+    {
+     "label": "Yes",
+     "englishLabel": "Yes",
+     "odds": 8500,
+     "participant": "Shadman Islam",
+     "type": "OT_YES",
+     "status": "OPEN"
+    },
+    {
+     "label": "No",
+     "englishLabel": "No",
+     "odds": 1050,
+     "type": "OT_NO",
+     "status": "OPEN"
+    }
+   ]
+  }
+ ]
+}
