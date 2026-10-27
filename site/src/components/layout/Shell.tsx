@@ -1,25 +1,48 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { Header } from "./Header";
 import { MAIN_NAV, MORE_NAV, TAB_NAV } from "./nav";
 
-function SideNav() {
+/** shadcn Sidebar under the header: full labels at lg, collapses to an icon rail (Ctrl/Cmd+B or the header trigger). Phones use the tab bar instead. */
+function AppSidebar() {
   const { pathname } = useLocation();
-  const [more, setMore] = useState(false);
+  const moreActive = MORE_NAV.some(([, to]) => pathname.startsWith(to));
   return (
-    <aside className="fixed bottom-0 left-0 top-[60px] z-40 hidden w-[268px] flex-col gap-1 overflow-y-auto border-r bg-background p-3 md:flex" aria-label="Main">
-      {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
-        <NavLink key={to} to={to} className={cn("flex h-11 items-center gap-3 rounded-3xl px-3.5 text-[15.5px] font-semibold transition-colors hover:bg-pill", match(pathname) ? "text-primary" : "text-foreground")}><Icon className="size-5" />{label}</NavLink>
-      ))}
-      <Collapsible open={more} onOpenChange={setMore}>
-        <CollapsibleTrigger className="flex h-11 w-full items-center gap-3 rounded-3xl px-3.5 text-[15.5px] font-semibold hover:bg-pill"><ChevronDown className={cn("size-5 transition-transform", more && "rotate-180")} />More</CollapsibleTrigger>
-        <CollapsibleContent className="grid gap-0.5 pl-8">{MORE_NAV.map(([label, to]) => <NavLink key={to} to={to} className={({ isActive }) => cn("rounded-full px-3 py-2 text-sm hover:bg-pill", isActive ? "text-primary" : "text-muted-foreground")}>{label}</NavLink>)}</CollapsibleContent>
-      </Collapsible>
-    </aside>
+    <Sidebar variant="inset" collapsible="icon" aria-label="Main" className="top-[60px] hidden h-[calc(100svh-60px)] md:block">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
+              <SidebarMenuItem key={to}>
+                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-10 text-[15px] font-medium data-[active=true]:text-primary">
+                  <NavLink to={to}><Icon /><span>{label}</span></NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+            <Collapsible asChild defaultOpen={moreActive} className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="More" className="h-10 text-[15px] font-medium"><MoreHorizontal /><span>More</span><ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {MORE_NAV.map(([label, to]) => (
+                      <SidebarMenuSubItem key={to}><SidebarMenuSubButton asChild isActive={pathname.startsWith(to)}><NavLink to={to}>{label}</NavLink></SidebarMenuSubButton></SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
   );
 }
 
@@ -57,18 +80,20 @@ export function Shell() {
   const { pathname } = useLocation();
   const playerScreen = pathname.startsWith("/player/");
   return (
-    <div className="min-h-screen pb-20 md:pb-0">
+    <SidebarProvider className="min-h-screen flex-col pb-20 md:pb-0">
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
-      <SideNav />
-      <div className="min-w-0 overflow-x-clip md:pl-[268px]">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="min-w-0 px-4 pb-8 md:px-8">
-            <Outlet />
-          </motion.main>
-        </AnimatePresence>
-        <Footer />
+      <div className="flex flex-1">
+        <AppSidebar />
+        <SidebarInset className="min-w-0 overflow-x-clip border bg-[#131313] md:peer-data-[variant=inset]:min-h-[calc(100svh-60px-1rem)]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="min-w-0 px-4 pb-8 md:px-8">
+              <Outlet />
+            </motion.main>
+          </AnimatePresence>
+          <Footer />
+        </SidebarInset>
       </div>
       <TabBar />
-    </div>
+    </SidebarProvider>
   );
 }

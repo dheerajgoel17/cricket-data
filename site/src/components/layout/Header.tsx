@@ -3,6 +3,7 @@ import { Bookmark, BookOpen, Info, MessageSquare, Wrench } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSaved } from "@/lib/saved";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { GlobalSearch } from "./GlobalSearch";
 
 /** Props.Cash wordmark: three rising bars + "Props.Cash". Inline SVG so it stays crisp and needs no asset. */
@@ -49,6 +50,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 h-14 border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-saturate-150 md:h-[60px]">
       <div className="relative mx-auto flex h-full items-center gap-3 px-4 md:px-6">
+        <SidebarTrigger className="-ml-2 hidden md:inline-flex" aria-label="Toggle sidebar" />
         <Brand />
         <GlobalSearch className="ml-auto w-full max-w-[220px] md:absolute md:left-1/2 md:ml-0 md:max-w-[620px] md:-translate-x-1/2" />
         <div className="md:ml-auto"><Profile /></div>
