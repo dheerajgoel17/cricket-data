@@ -487,9 +487,14 @@ const BAT_STATS = new Set(["runs", "balls", "fours", "sixes"]);
 const BOWL_STATS = new Set(["wickets", "runs_conceded", "balls_bowled"]);
 
 /** The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat. Ambiguous names stay unmatched. */
-export function livePlayer(match, name, stat) {
+export function livePlayer(match, name, stat, commonName = "") {
   const role = BAT_STATS.has(stat) ? "runs" : BOWL_STATS.has(stat) ? "wickets" : null;
-  const hits = (match?.players || []).filter((p) => namesMatch(p.name, name) && (!role || p[role] != null));
+  const rows = (match?.players || []).filter((p) => !role || p[role] != null);
+  // The books call a player what the live source calls him ("Kusal Mendis"); the data has initials ("BKG Mendis"), and "K" would match every Mendis with a K.
+  // So the books' own name, when the file has it, is tried first and exactly.
+  const exact = commonName ? rows.filter((p) => norm(p.name) === norm(commonName)) : [];
+  if (exact.length === 1) return exact[0];
+  const hits = rows.filter((p) => namesMatch(p.name, name));
   return hits.length === 1 ? hits[0] : null;
 }
 
@@ -628,10 +633,11 @@ const surname = (n) => norm(n).split(" ").filter(Boolean).pop() || "";
  * and a name is not enough to say "not in": the source gives the common name ("Kusal Mendis") where the data has initials ("BKG Mendis"), so anyone in the XI
  * who shares his surname might be him, and he is left unmarked. (Better a missed mark than a wrong one.)
  */
-export function notInXI(match, name, team, sourceId = "") {
+export function notInXI(match, name, team, sourceId = "", commonName = "") {
   const xi = playingXI(match).get(teamKey(team));
   if (!xi?.complete) return false;
   if (sourceId && xi.ids.size) return !xi.ids.has(sourceId);
+  if (commonName && xi.names.some((n) => norm(n) === norm(commonName))) return false;
   if (xi.names.some((n) => namesMatch(n, name))) return false;
   const sur = surname(name);
   return !xi.names.some((n) => surname(n) === sur);
