@@ -20,6 +20,11 @@ def test_two_sided_line_is_kept_with_both_decimal_prices():
     assert ln["books"] == [{"source": "bet365", "kind": "bookmaker", "over": 1.85, "under": 1.95}]
 
 
+def test_a_line_carries_the_name_the_book_uses_for_the_player():
+    ln = book_lines([row(player="Kusal Mendis", player_hist_name="BKG Mendis"), row(side="under", back=1.95, player="Kusal Mendis", player_hist_name="BKG Mendis")], "t")["lines"][0]
+    assert ln["player"] == "BKG Mendis" and ln["book_name"] == "Kusal Mendis"  # the live source says Kusal Mendis too
+
+
 def test_two_sources_are_listed_separately_and_alt_lines_are_separate_entries():
     rows = [row(), row(side="under", back=1.95), row(source="smarkets", source_type="exchange", back=1.9), row(source="smarkets", source_type="exchange", side="under", back=2.0),
             row(line=22.5, back=2.4), row(line=22.5, side="under", back=1.55)]

@@ -502,3 +502,15 @@ test("an over line is cleared the moment the count passes it; a miss is only kno
   assert.equal(lineVerdict(2, 2, "live"), null);
   assert.equal(lineVerdict(null, 0.5, "out"), null);
 });
+
+test("a player is found by the name the books use: BKG Mendis is Kusal Mendis, and a first initial alone cannot tell the two Mendises apart", () => {
+  const m = { players: [
+    { name: "Kusal Mendis", team: "Sri Lanka", runs: 31, balls: 20, fours: 3, sixes: 2, out: false },
+    { name: "Kamindu Mendis", team: "Sri Lanka", runs: 5, balls: 7, fours: 0, sixes: 0, out: true },
+  ] };
+  assert.equal(livePlayer(m, "BKG Mendis", "sixes"), null, "two K Mendises: the initials rule alone cannot choose");
+  assert.equal(liveStat(livePlayer(m, "BKG Mendis", "sixes", "Kusal Mendis"), "sixes"), 2, "the books' name settles it");
+  assert.equal(liveStat(livePlayer(m, "PHKD Mendis", "runs", "Kamindu Mendis"), "runs"), 5);
+  assert.equal(lineVerdict(liveStat(livePlayer(m, "BKG Mendis", "sixes", "Kusal Mendis"), "sixes"), 0.5), "cleared", "he has hit his six");
+  assert.equal(livePlayer(m, "Dasun Shanaka", "runs", "Dasun Shanaka"), null, "a name nobody has is no match");
+});

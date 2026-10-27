@@ -55,7 +55,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
             continue
         key = (r["event_key"], pid, stat, float(line))
         g = groups.setdefault(key, {
-            "pid": pid, "player": r.get("player_hist_name") or r.get("player"), "team": r.get("player_team"), "fmt": fmt, "stat": stat,
+            "pid": pid, "player": r.get("player_hist_name") or r.get("player"), "book_name": r.get("player"), "team": r.get("player_team"), "fmt": fmt, "stat": stat,
             "line": float(line), "match": r.get("match"), "competition": r.get("competition"), "start_utc": r.get("start_utc"), "_books": defaultdict(dict)})
         g["_books"][(r["source"], r.get("source_type"))][side] = round(float(back), 3)
     lines = []
