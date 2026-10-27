@@ -6,8 +6,8 @@ No credit card required, just sign up for a free account.
 from __future__ import annotations
 
 import json
-from urllib.parse import urlparse
 from datetime import date, timedelta
+from urllib.parse import urlparse
 
 from .hosts import host
 from .models import MatchRecord

@@ -20,8 +20,9 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-from .polite import PoliteFetcher
 from .hosts import host
+from .polite import PoliteFetcher
+
 
 def base() -> str:
     return host("LIVE_SOURCE_BASE")

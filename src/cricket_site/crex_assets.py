@@ -12,6 +12,7 @@ import unicodedata
 import urllib.request
 
 from cricket_data.hosts import host
+
 UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"
 _PLAYER = re.compile(r"/player/(.+)-([0-9A-Z]+)(?:/matches)?$")
 _TEAM = re.compile(r"/team/(.+)-([0-9A-Z]+)(?:/[a-z-]+)?$")

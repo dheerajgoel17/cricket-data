@@ -11,8 +11,8 @@ from collections import defaultdict
 from collections.abc import Iterator
 from pathlib import Path
 
-from .models import MatchRecord, PlayerPerf
 from .hosts import host
+from .models import MatchRecord, PlayerPerf
 
 USER_AGENT = "cricket-data/0.1 (open-source dataset updater)"
 BOWLER_WICKETS = {"bowled", "caught", "caught and bowled", "lbw", "stumped", "hit wicket"}

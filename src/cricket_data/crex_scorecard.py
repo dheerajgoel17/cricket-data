@@ -19,8 +19,8 @@ import json
 import re
 from dataclasses import dataclass, field
 
-from .models import PlayerPerf
 from .hosts import state_at
+from .models import PlayerPerf
 
 SC4 = "/v3/getSC4"  # matched against the end of the state keys
 _STATE = re.compile(r'<script id="[^"]*state[^"]*"[^>]*>(.*?)</script>', re.S)

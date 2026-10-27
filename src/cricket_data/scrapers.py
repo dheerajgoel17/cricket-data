@@ -26,9 +26,9 @@ from typing import Any, Protocol
 from urllib.parse import urljoin
 
 from .crex_browser import BrowserError, CREXBrowser
-from .hosts import host
 from .crex_lookup import fetch_record, parse_match_page
 from .crex_sitemap import MatchEntry
+from .hosts import host
 from .models import MatchRecord, PlayerPerf
 from .permanent_matches import classify_match_status, fetch_cricsheet_missing_matches
 from .polite import PoliteFetcher, RobotsDisallowed
