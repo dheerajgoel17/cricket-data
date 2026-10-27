@@ -139,7 +139,7 @@ export function HotProps() {
             <span className="text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}</span></span></span>
         </Link>) },
       { id: "chart", header: "L10 chart", enableSorting: false, cell: ({ row }) => <Spark r={row.original} /> },
-      { id: "odds", accessorFn: (r) => r.over, header: head("Odds"), cell: ({ row }) => <span className="tabular-nums">{odds(row.original.over)}</span> },
+      { id: "odds", accessorFn: (r) => r.over, header: head("Price"), cell: ({ row }) => <span className="tabular-nums">{odds(row.original.over)}</span> },
       rate("win", wl, (r) => r[win]),
       rate("season", String(new Date().getFullYear()), (r) => r.season),
       rate("h2h", "H2H", (r) => r.h2h, true),
@@ -192,7 +192,7 @@ export function HotProps() {
           </>
         )}
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">Odds are the best decimal price on the over from the books we track. L10, season and H2H are hit rates over the line from the player's own history in that format; Edge is the best over price × the all-time hit rate − 1 (needs 10+ games). A guide, not betting advice.</p>
+      <p className="mt-2 text-xs text-muted-foreground">Price is the best decimal price on the over from the books we track. L10, season and H2H are hit rates over the line from the player's own history in that format; Edge is the best over price × the all-time hit rate − 1 (needs 10+ games). A guide, not betting advice.</p>
     </section>
   );
 }

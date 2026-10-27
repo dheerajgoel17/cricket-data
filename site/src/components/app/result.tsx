@@ -54,7 +54,7 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
           <LadderTable ladder={t.ladder} />
         </Panel>
       ))}
-      {r.kind === "top_batter" && <Panel flat><DataTable columns={["Batter", "Sole top", "Tied top", "Share (sole)", "Fair odds"]} rows={r.rows.map((x: any) => [x.name, x.sole, x.tied, pc(x.pSole), <OddsText>{odds(x.fairSole)}</OddsText>])} /></Panel>}
+      {r.kind === "top_batter" && <Panel flat><DataTable columns={["Batter", "Sole top", "Tied top", "Share (sole)", "Fair price"]} rows={r.rows.map((x: any) => [x.name, x.sole, x.tied, pc(x.pSole), <OddsText>{odds(x.fairSole)}</OddsText>])} /></Panel>}
       {r.notes?.length ? <Panel title="Notes"><ul className="list-disc pl-5 text-sm">{r.notes.map((n: string) => <li key={n}>{n}</li>)}</ul></Panel> : null}
       <Muted>{r.freshness}</Muted>
     </div>
@@ -71,7 +71,7 @@ function PlayerProp({ r }: { r: any }) {
         <StatTile k="Median" v={num(s.median)} s={`mean ${num(s.mean)}`} />
         {s.line != null && s.n ? <>
           <StatTile k={`${side === "over" ? "Over" : "Under"} ${s.line}`} v={pc(side === "over" ? s.pOver : s.pUnder)} s={`${side === "over" ? s.over : s.under} of ${s.n}${s.push ? `, ${s.push} push` : ""}`} />
-          <StatTile k="Fair decimal odds" v={<OddsText>{odds(side === "over" ? s.fairOver : s.fairUnder)}</OddsText>} s={`other side ${odds(side === "over" ? s.fairUnder : s.fairOver)}`} />
+          <StatTile k="Fair decimal price" v={<OddsText>{odds(side === "over" ? s.fairOver : s.fairUnder)}</OddsText>} s={`other side ${odds(side === "over" ? s.fairUnder : s.fairOver)}`} />
         </> : null}
       </StatGridCards>
       {r.player.alternatives?.length ? <Muted>Also matched: {r.player.alternatives.join(", ")} (be more specific to pick another).</Muted> : null}

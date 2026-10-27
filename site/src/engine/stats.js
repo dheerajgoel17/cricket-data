@@ -1,7 +1,7 @@
-// Hit rates, medians and fair decimal odds. Every number shown on the site comes from here.
+// Hit rates, medians and fair decimal price. Every number shown on the site comes from here.
 import { median, mean, round } from "./util.js";
 
-/** Decimal odds that make the bet fair for probability p (no margin). null when p is 0. */
+/** Decimal price that make the bet fair for probability p (no margin). null when p is 0. */
 export function fairOdds(p) {
   return p > 0 ? round(1 / p, 2) : null;
 }
@@ -19,7 +19,7 @@ export function wilson(k, n, z = 1.645) {
 /**
  * Summarise `values` (numbers, oldest first) against an optional line.
  * Over = value > line, Under = value < line, Push = value === line (only possible on whole-number lines;
- * pushes are void, so fair odds use over / (over + under)).
+ * pushes are void, so fair price use over / (over + under)).
  */
 export function summarize(values, line = null) {
   const n = values.length;
