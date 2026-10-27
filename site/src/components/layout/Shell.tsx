@@ -65,22 +65,6 @@ function TabBar() {
   );
 }
 
-function Footer() {
-  const col = (title: string, items: [string, string][]) => (
-    <div><h4 className="mb-2 text-sm font-medium">{title}</h4>{items.map(([l, to]) => (to.startsWith("http") ? <a key={l} href={to} rel="noopener" className="block py-1 text-sm text-muted-foreground hover:text-primary">{l}</a> : <Link key={l} to={to} className="block py-1 text-sm text-muted-foreground hover:text-primary">{l}</Link>))}</div>
-  );
-  return (
-    <footer className="mt-10 border-t px-4 py-8 text-xs text-muted-foreground md:px-8">
-      <div className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
-        {col("Tools & features", [["Free tools", "/tools"], ["Player trends", "/trends"], ["Prop Hunter", "/props"], ["Odds calculator", "/odds"], ["Partnerships", "/pair"], ["Ask anything", "/ask"]])}
-        {col("Popular competitions", [["IPL", "/competitions?q=indian premier"], ["Big Bash", "/competitions?q=big bash"], ["PSL", "/competitions?q=pakistan super"], ["World Cups", "/competitions?q=world cup"], ["All competitions", "/competitions"]])}
-        {col("Resources", [["Cricket stats explained", "/glossary"], ["Rules & data", "/about"], ["Saved", "/saved"], ["Cricsheet", "https://cricsheet.org"]])}
-      </div>
-      <p className="mt-6 border-t pt-4">Free cricket stats and player props. Photos: Wikimedia Commons (free licences, where available). Data: Cricsheet ball-by-ball (ODbL) plus provisional scorecards. Decimal odds only; fair odds are 1 ÷ historical hit rate with no margin: a guide, not betting advice. 18+, gamble responsibly.</p>
-    </footer>
-  );
-}
-
 /** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. The player screen brings its own phone bar. */
 export function Shell() {
   const { pathname } = useLocation();
@@ -96,7 +80,6 @@ export function Shell() {
               <Outlet />
             </motion.main>
           </AnimatePresence>
-          <Footer />
         </SidebarInset>
       </div>
       <TabBar />
