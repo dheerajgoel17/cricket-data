@@ -575,6 +575,17 @@ export function liveState(match, player, stat) {
   return "live";
 }
 
+/**
+ * What a so-far number already says about an over line. Counts only go up, so passing the line is final the moment it happens: "cleared". A miss (or a push on
+ * a whole-number line) is only known once the count can no longer move (`state` "out" or "final"). Otherwise null: still to play for.
+ */
+export function lineVerdict(value, line, state = "live") {
+  if (value == null || line == null) return null;
+  if (value > line) return "cleared";
+  if (state === "live") return null;
+  return value < line ? "missed" : "push";
+}
+
 export function liveMarket(match, key, team) {
   if (!match) return null;
   const inn = match.innings || [];

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   namesMatch, oversToBalls, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, wantsCard,
 } from "../src/engine/live.js";
 
@@ -489,4 +489,16 @@ test("without a linked id a name alone never says 'not in': a shared surname cou
   assert.equal(notInXI(m, "BKG Mendis", "Sri Lanka"), false, "he is left unmarked");
   assert.equal(notInXI(m, "PHKD Mendis", "Sri Lanka"), false);
   assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true, "nobody of that surname in the eleven: marked");
+});
+
+test("an over line is cleared the moment the count passes it; a miss is only known once the count can't move", () => {
+  assert.equal(lineVerdict(1, 0.5), "cleared"); // already hit his six
+  assert.equal(lineVerdict(23, 22.5, "live"), "cleared");
+  assert.equal(lineVerdict(0, 0.5, "live"), null, "still to play for");
+  assert.equal(lineVerdict(17, 22.5, "live"), null);
+  assert.equal(lineVerdict(17, 22.5, "out"), "missed", "dismissed on 17");
+  assert.equal(lineVerdict(0, 0.5, "final"), "missed");
+  assert.equal(lineVerdict(2, 2, "final"), "push", "a whole-number line met exactly");
+  assert.equal(lineVerdict(2, 2, "live"), null);
+  assert.equal(lineVerdict(null, 0.5, "out"), null);
 });
