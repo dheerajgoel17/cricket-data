@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-27T09:33:24Z",
- "generated_at_ist": "2026-10-27 15:03 IST",
- "runtime_secs": 33.1,
+ "generated_at_utc": "2026-10-27T09:54:01Z",
+ "generated_at_ist": "2026-10-27 15:24 IST",
+ "runtime_secs": 22.3,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-27",
-  "commit": "0ca380e1be"
+  "commit": "dd7220d811"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 780,
-   "secs": 0.2
+   "rows": 809,
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 548,
-   "secs": 1.8
+   "rows": 520,
+   "secs": 2.6
   }
  },
- "snapshot": "odds_20261027T093324Z.jsonl.gz",
+ "snapshot": "odds_20261027T095401Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -67,14 +67,14 @@
  },
  "stats": {
   "events_in_window": 11,
-  "rows_in_window": 807,
-  "selections_with_model": 454,
-  "selections_with_market_fair": 421,
-  "markets_in_window": 73,
+  "rows_in_window": 836,
+  "selections_with_model": 477,
+  "selections_with_market_fair": 444,
+  "markets_in_window": 74,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 4,
-   "model_market_gap": 107,
+   "model_market_gap": 114,
    "small_sample": 2,
    "model_only_no_market": 180,
    "policy_max_odds": 2
@@ -102,7 +102,7 @@
     "n_prices": 22,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.419,
     "corr": null
    },
@@ -127,24 +127,32 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.414,
-    "corr": 0.863
+    "mean_abs_logit_diff": 0.415,
+    "corr": 0.862
    },
    "batter_milestone": {
-    "n_prices": 71,
-    "mean_model_p": 0.327,
-    "mean_market_p": 0.387,
-    "mean_logit_diff_model_minus_market": -0.368,
-    "mean_abs_logit_diff": 0.507,
-    "corr": 0.962
+    "n_prices": 83,
+    "mean_model_p": 0.352,
+    "mean_market_p": 0.403,
+    "mean_logit_diff_model_minus_market": -0.312,
+    "mean_abs_logit_diff": 0.504,
+    "corr": 0.958
    },
    "bowler_milestone": {
     "n_prices": 45,
     "mean_model_p": 0.199,
     "mean_market_p": 0.217,
-    "mean_logit_diff_model_minus_market": -0.11,
+    "mean_logit_diff_model_minus_market": -0.109,
     "mean_abs_logit_diff": 0.534,
     "corr": 0.961
+   },
+   "top_bowler_match": {
+    "n_prices": 17,
+    "mean_model_p": 0.065,
+    "mean_market_p": 0.059,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.587,
+    "corr": 0.521
    },
    "top_batter_match": {
     "n_prices": 30,
@@ -329,6 +337,7 @@
   "I Ahmad Ahmadzai",
   "Ibrahim Zadran",
   "Ijaz Ahmad Ahmadzai",
+  "J Bishop",
   "Jacob Michael Gibson",
   "James Neesham",
   "K Chigora",
@@ -486,14 +495,14 @@
   }
  },
  "log": [
-  "[15:03 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[15:03 IST] history: 23653 matches, last 2026-10-27, players 424841",
-  "[15:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 780, 'secs': 0.2}",
-  "[15:03 IST] source smarkets: {'status': 'ok', 'rows': 548, 'secs': 1.8}",
-  "[15:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[15:03 IST] 54 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[15:03 IST] book lines: 42 player lines from 1 source(s)",
-  "[15:03 IST] weather: forecasts for 3 events, 0 failed",
-  "[15:03 IST] prop model: 320 prop selections modelled, 100 milestone ladder prices anchored to O/U"
+  "[15:24 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[15:24 IST] history: 23653 matches, last 2026-10-27, players 424841",
+  "[15:24 IST] source moviodds_bet365: {'status': 'ok', 'rows': 809, 'secs': 0.6}",
+  "[15:24 IST] source smarkets: {'status': 'ok', 'rows': 520, 'secs': 2.6}",
+  "[15:24 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[15:24 IST] 54 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[15:24 IST] book lines: 42 player lines from 1 source(s)",
+  "[15:24 IST] weather: forecasts for 3 events, 0 failed",
+  "[15:24 IST] prop model: 326 prop selections modelled, 100 milestone ladder prices anchored to O/U"
  ]
 }
