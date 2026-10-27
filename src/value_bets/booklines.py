@@ -29,8 +29,8 @@ def prop_events(rows: list[dict]) -> list[dict]:
     return sorted(out, key=lambda e: (e["start_utc"] or "", e["match"] or ""))
 
 
-def book_lines(rows: list[dict], generated_at: str) -> dict:
-    """rows: pipeline rows after player resolution. Returns {"generated_at_utc", "lines": [...], "events": [...]}; lines are sorted by start time, player, stat, line."""
+def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = None) -> dict:
+    """rows: pipeline rows after player resolution. Returns {"generated_at_utc", "lines": [...], "events": [...], "fancy": [...]}; lines are sorted by start time, player, stat, line."""
     groups: dict[tuple, dict] = {}
     for r in rows:
         stat = STAT.get(r.get("market_type"))
@@ -53,4 +53,4 @@ def book_lines(rows: list[dict], generated_at: str) -> dict:
         if books:
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x["line"]))
-    return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows)}
+    return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}

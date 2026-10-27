@@ -12,3 +12,19 @@ export function MiniBars({ last, line, max }: { last: { v: number | null; s: str
     </div>
   );
 }
+
+/** One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. Taller than MiniBars, with the line labelled. */
+export function ValueBars({ values, line }: { values: number[]; line: number }) {
+  const top = Math.max(line * 1.25, ...values, 1);
+  return (
+    <div role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
+      <div className="relative flex h-28 items-end gap-[3px]">
+        {values.map((v, i) => <span key={i} title={String(v)} className={cn("flex-1 rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")} style={{ height: `${Math.max((v / top) * 100, 4)}%`, maxWidth: 28 }} />)}
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" style={{ bottom: `${Math.min(100, (line / top) * 100)}%` }}>
+          <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-[10px] font-semibold tabular-nums text-muted-foreground">{line}</span>
+        </span>
+      </div>
+      <div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground"><span>Oldest</span><span>Latest</span></div>
+    </div>
+  );
+}

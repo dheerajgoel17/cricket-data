@@ -60,3 +60,8 @@ def test_prop_events_lists_every_prerelease_event_with_any_player_prop_even_with
     assert [e["match"] for e in ev] == ["India vs NZ", "Namibia vs Ireland"]
     assert ev[1]["markets"] == ["batter_milestone", "top_batter_team"] and ev[1]["sources"] == ["moviodds_bet365", "smarkets"] and ev[1]["n"] == 2
     assert book_lines(rows, "t")["events"] == ev
+
+
+def test_book_lines_carries_the_fancy_lines_it_is_given():
+    assert book_lines([], "t")["fancy"] == []
+    assert book_lines([], "t", [{"key": "match_runs"}])["fancy"] == [{"key": "match_runs"}]

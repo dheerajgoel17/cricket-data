@@ -35,3 +35,21 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
   const main = (scored.length ? scored : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
   return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, lines: mine, main };
 }
+
+/** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
+export const teamKey = (n) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
+
+/**
+ * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams, start
+ * times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for whole-match markets.
+ * Returns [{ line, over, under, source }] sorted by line.
+ */
+export function fancyFor(doc, fixture, key, team = null) {
+  const a = teamKey(fixture.a), b = teamKey(fixture.b);
+  return (doc?.fancy || []).filter((l) => {
+    if (l.key !== key || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
+    const h = teamKey(l.home), w = teamKey(l.away);
+    if (!((h === a && w === b) || (h === b && w === a))) return false;
+    return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < 14 * 3600e3;
+  }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
+}

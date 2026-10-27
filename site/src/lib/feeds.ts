@@ -11,8 +11,8 @@ async function live(file: string, ms: number): Promise<any | null> {
 export async function loadLines(): Promise<any> {
   let doc = await bundled("lines.json");
   const d = await live("book_lines.json", 3500);
-  if (d && (!doc || (d.generated_at_utc || "") >= (doc.generated_at_utc || ""))) doc = { ...d, events: d.events ?? doc?.events ?? [] }; // a live file from before `events` existed keeps the bundled list
-  return doc || { lines: [], events: [] };
+  if (d && (!doc || (d.generated_at_utc || "") >= (doc.generated_at_utc || ""))) doc = { ...d, events: d.events ?? doc?.events ?? [], fancy: d.fancy ?? doc?.fancy ?? [] }; // a live file from before `events` / `fancy` existed keeps the bundled lists
+  return doc || { lines: [], events: [], fancy: [] };
 }
 
 export async function loadProps(): Promise<{ snap: any | null; live: boolean }> {

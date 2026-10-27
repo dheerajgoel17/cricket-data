@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { loadFixture, sum } from "./helpers.mjs";
 import { runPlan } from "../src/engine/plan.js";
 import { playerReport } from "../src/engine/props.js";
-import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "../src/engine/markets.js";
+import { MATCH_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "../src/engine/markets.js";
 
 const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
 
@@ -67,6 +67,20 @@ test("team markets use only valid matches and the team batting first", async () 
   assert.equal(sum(thirties.values), sum(exp.t20.map((m) => m.n30)));
   assert.deepEqual(marketReport(store, ms, "top_score").values, exp.t20.map((m) => m.top));
   assert.ok(Object.keys(MATCH_MARKETS).includes("highest_over"));
+});
+
+test("match fancy: boundaries, first-innings score and a team's own innings", async () => {
+  const { store, exp } = await loadFixture();
+  const alpha = store.teams.findIndex((t) => t.n === "Alpha");
+  const ms = selectMatches(store, { fmt: 0, team: alpha });
+  const byId = exp.t20;
+  assert.deepEqual(marketReport(store, ms, "match_boundaries").values, byId.map((m) => m.fours + m.sixes));
+  assert.deepEqual(marketReport(store, ms, "first_innings_runs").values, byId.map((m) => (m.alpha_first ? m.alpha_runs : m.beta_runs)));
+  const own = teamTotalReport(store, ms, alpha, "team_total_runs", 30.5);
+  assert.deepEqual(own.values, byId.map((m) => m.alpha_runs), "the team's runs whether it batted first or second");
+  assert.equal(own.summary.over, byId.filter((m) => m.alpha_runs > 30.5).length);
+  const sixes = teamTotalReport(store, ms, alpha, "team_total_sixes").values, all = marketReport(store, ms, "match_sixes").values;
+  assert.ok(sixes.every((v, i) => v <= all[i]), "a team's sixes never exceed the match's");
 });
 
 test("top batter counts sole vs tied", async () => {

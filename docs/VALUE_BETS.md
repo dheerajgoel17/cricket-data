@@ -86,3 +86,4 @@ See `value_bets/out/backtest_props.md` for the current numbers.
 
 ## Book lines for the site
 Every run also writes `value_bets/out/book_lines.json`: each two-sided over/under player line (runs, sixes, fours, wickets) with its decimal prices per source, for players matched to the Cricsheet registry (`src/value_bets/booklines.py`). The site shows them on the player page; they are prices as published, not a model output.
+`book_lines.json` also carries `events` (every pre-match event with any player prop) and `fancy` (match-level over/under lines with both prices, read straight from the MoviOdds feed by `src/value_bets/fancy.py`: total match runs, sixes, fours, boundaries, first-innings score, highest over, top score, and a team's sixes / fours / boundaries). The site's Match Fancy tab shows them next to its own fair prices; they bypass the player-prop pipeline and are never alerted on.

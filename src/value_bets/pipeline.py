@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import booklines, config, history, store, strategy, weather
+from . import booklines, config, fancy, history, store, strategy, weather
 from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
@@ -346,7 +346,7 @@ def run():
     if n_inns_ms:
         log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")
 
-    book = booklines.book_lines(rows, stamp)  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
+    book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
 
     # ---- fair-price signals per source group
