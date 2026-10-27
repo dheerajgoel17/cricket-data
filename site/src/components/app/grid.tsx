@@ -7,7 +7,7 @@ import { useData } from "@/lib/data";
 import type { Grid } from "@/lib/grid";
 import { num, odds, pc, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { PlayerBadge, TeamBadge } from "./badges";
+import { PlayerBadge, TeamFlag } from "./badges";
 import { EmptyNote, Muted, OddsText } from "./page";
 
 /** Players down, the team's last fixtures across; a cell is the stat value (green when it clears the line). */
@@ -15,18 +15,18 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
   const { store } = useData(), M = store.M;
   if (!g.fx.length) return <Muted>No fixtures for this format.</Muted>;
   return (
-    <Card className="overflow-x-auto py-0 shadow-none">
+    <Card className="overflow-x-auto rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5">
       <table className="w-full text-sm">
-        <thead><tr className="border-b text-muted-foreground">
-          <th className="px-3 py-2 text-left font-condensed text-[13px] font-normal uppercase">Player</th><th className="px-2 font-condensed text-[13px] font-normal uppercase">Hit</th>
-          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-2 font-normal"><div className="grid justify-items-center gap-0.5 text-[10.5px]"><TeamBadge name={store.teamName(opp, true)} size="xs" />{shortDate(M.d[m])}</div></th>; })}
+        <thead><tr className="border-b border-white/10 text-muted-foreground">
+          <th className="sticky left-0 z-10 bg-card px-3 py-2.5 text-left text-xs font-medium">Player</th><th className="px-2 text-xs font-medium">Hit</th>
+          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-2 font-normal"><div className="grid justify-items-center gap-1 text-[10.5px]"><TeamFlag name={store.teamName(opp, true)} className="h-3.5 w-5" />{shortDate(M.d[m])}</div></th>; })}
         </tr></thead>
         <tbody>{g.body.map(({ p, map, xi }) => {
           const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key]);
           const k = vals.filter((v: number) => v > line).length;
           return (
-            <tr key={p} className="border-b last:border-b-0">
-              <td className="whitespace-nowrap px-3 py-1.5"><Link to={`/player/${p}`} className="flex items-center gap-2 hover:text-primary"><PlayerBadge idx={p} size="xs" />{store.playerName(p)}</Link></td>
+            <tr key={p} className="border-b border-white/5 last:border-b-0">
+              <td className="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-2"><Link to={`/player/${p}`} className="flex items-center gap-2 hover:text-primary"><PlayerBadge idx={p} size="xs" />{store.playerName(p)}</Link></td>
               <td className="px-2 text-center font-semibold text-primary">{vals.length ? `${k}/${vals.length}` : "–"}</td>
               {g.fx.map((m) => { const x = map.get(m); return (
                 <td key={m} className="px-1 py-1 text-center">{x ? <span className={cn("inline-block min-w-8 rounded-md px-1.5 py-0.5 font-semibold", x[g.def.key] > line ? "bg-primary/20 text-primary" : "bg-destructive/15 text-destructive")}>{x[g.def.key]}</span>
@@ -57,7 +57,7 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
       {list.map((i, n) => (
         <motion.div key={`${i.p}-${i.team}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(n * 0.025, 0.4) }} whileHover={{ y: -2 }}>
           <Link to={`/player/${i.p}`}>
-            <Card className="gap-2 px-4 py-4 shadow-none hover:border-[#3a3a3a]">
+            <Card className="gap-2 rounded-2xl border-0 px-4 py-4 shadow-none ring-1 ring-white/5 transition-colors hover:bg-[#232325]">
               <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-3 font-semibold"><PlayerBadge idx={i.p} size="md" /><div>{store.playerName(i.p)}<small className="block font-normal text-muted-foreground">{store.teamName(i.team)}</small></div></div>
                 <span className="rounded-full bg-secondary px-3.5 py-1.5 text-sm font-semibold">O {line} <OddsText>{odds(i.rate ? 1 / i.rate : null)}</OddsText></span></div>
               <div className="text-xl font-medium text-primary">{(STATS as any)[stat].label} over {line}</div>
