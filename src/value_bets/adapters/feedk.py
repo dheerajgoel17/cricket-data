@@ -19,7 +19,7 @@ from collections import Counter
 
 from .. import config
 from ..util import http_json, parse_ts
-from .base import gender_hint, row
+from .base import Pace, gender_hint, row
 
 NAME = "feedk"
 AUTO = True  # on whenever FEEDK_URL and FEEDK_BOOKS are set; no need to list it in CV_SOURCES
@@ -160,22 +160,6 @@ def parse_event(ev: dict, offers: list[dict], src: str, fetched_at: str) -> tupl
     return rows, skipped
 
 
-class _Pace:
-    """One request at a time, at least ``gap`` seconds apart."""
-
-    def __init__(self, gap: float):
-        self.gap, self.last = gap, 0.0
-
-    def get(self, url: str) -> dict:
-        wait = self.last + self.gap - time.monotonic()
-        if wait > 0:
-            time.sleep(wait)
-        try:
-            return http_json(url, retries=0)[0]
-        finally:
-            self.last = time.monotonic()
-
-
 def fetch(fetched_at: str):
     from cricket_data.hosts import host
     try:
@@ -185,7 +169,7 @@ def fetch(fetched_at: str):
     accounts = books()
     if not accounts:
         raise Skip("FEEDK_BOOKS not set")
-    pace = _Pace(config.get("FEEDK_SPACING_SECS"))
+    pace = Pace(config.get("FEEDK_SPACING_SECS"), lambda u: http_json(u, retries=0)[0])
     deadline = time.monotonic() + config.get("FEEDK_BUDGET_SECS")
     horizon = parse_ts(fetched_at) + dt.timedelta(hours=config.get("FEEDK_HORIZON_HOURS"))
     rows: list[dict] = []

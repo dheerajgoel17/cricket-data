@@ -10,7 +10,7 @@ import datetime as dt
 import json
 from collections import defaultdict
 
-from .adapters import feedk
+from .adapters import feede, feedk
 from .util import parse_ts
 
 STAT ={"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
@@ -19,8 +19,8 @@ PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}  # published under the book's own 
 
 
 def public_names() -> dict[str, str]:
-    """Source key -> published name: the fixed ones, and the books Feed K is configured with (named in the environment, not here)."""
-    return {**PUBLIC_SOURCE, **feedk.published()}
+    """Source key -> published name: the fixed ones, and the books Feed K and Feed E are configured with (named in the environment, not here)."""
+    return {**PUBLIC_SOURCE, **feedk.published(), **feede.published()}
 
 
 def public(doc: dict) -> dict:

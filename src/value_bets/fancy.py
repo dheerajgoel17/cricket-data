@@ -45,6 +45,12 @@ def _line(q):
     return ln
 
 
+def adapter_fancy(raws: dict) -> list[dict]:
+    """The fancy lines other adapters read themselves: a raw feed may carry ``fancy`` in the shape ``match_fancy`` returns (Feed E's match sixes / fours)."""
+    out = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("fancy") or []]
+    return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x["line"], x["source"]))
+
+
 def match_fancy(raw: dict | None) -> list[dict]:
     """Pre-match over/under lines with both prices, sorted by start time. `raw` is the Feed P feed (or None)."""
     out = []

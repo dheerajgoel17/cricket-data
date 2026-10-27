@@ -1,4 +1,5 @@
 import re
+import time
 
 from ..util import decimal_ok, iso, ist, parse_ts
 
@@ -16,6 +17,22 @@ def row(**kw):
     r["back"] = decimal_ok(r["back"])
     r["lay"] = decimal_ok(r["lay"])
     return r
+
+
+class Pace:
+    """One request at a time, at least ``gap`` seconds apart. ``get`` is the adapter's own fetch (one attempt, no retries), looked up at call time."""
+
+    def __init__(self, gap: float, get):
+        self.gap, self.last, self._get = gap, 0.0, get
+
+    def get(self, url: str):
+        wait = self.last + self.gap - time.monotonic()
+        if wait > 0:
+            time.sleep(wait)
+        try:
+            return self._get(url)
+        finally:
+            self.last = time.monotonic()
 
 
 WOMEN_RE = re.compile(r"\s*(\(w\)|\bwomen\b|\bwomens\b|\bwomen's\b)\s*", re.I)

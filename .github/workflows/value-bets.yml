@@ -34,6 +34,7 @@ env:
   EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
   FEEDK_URL: ${{ secrets.FEEDK_URL }}
   FEEDK_BOOKS: ${{ secrets.FEEDK_BOOKS }}
+  FEEDE_BOOKS: ${{ secrets.FEEDE_BOOKS }}
 
 permissions:
   contents: write
