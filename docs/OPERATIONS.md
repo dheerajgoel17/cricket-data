@@ -44,7 +44,7 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 **Vercel deploy limits**: Hobby allows ~100 deploys/day; hourly = 24.
 
 ## Health checks
-* Site: `/data/meta.json` (`built_at`, `newest_cricsheet`, `newest_provisional`), `/sitemap.xml`, a deep link like `/player/<idx>`.
+* Site: `/data/meta.json` (`built_at`, `newest_base`, `newest_provisional`), `/sitemap.xml`, a deep link like `/player/<idx>`.
 * API: `POST /api/ask {"question":"..."}` returns a plan (503 = no key; 429 = rate limit; 502 = provider error: client falls back).
 * Supabase: `select count(*) from assets;` should approach ~5.5k after the backfill.
 * CI: all four checks on PRs (`build`, `site-js`, `test (3.10)`, `test (3.12)`).

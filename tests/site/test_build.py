@@ -24,7 +24,7 @@ def _load(out):
 def test_build_outputs_and_meta(tmp_path):
     z, data, out, exp = _out(tmp_path)
     meta = B.build(z, data, out, None, workers=1)
-    assert meta["matches"] == 15 and meta["newest_cricsheet"] == "2025-04-05"
+    assert meta["matches"] == 15 and meta["newest_base"] == "2025-04-05"
     assert meta["provisional_included"] is False
     M, IX = _load(out)
     assert IX["formats"] == FORMAT_NAMES
@@ -87,7 +87,7 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
     assert meta["provisional_matches"] == 1 and meta["provisional_included"] and meta["newest_provisional"] == "2025-06-01"
     assert meta["provisional_rows_unlinked"] == 1
     M, IX = _load(out)
-    m = M["id"].index("crex-new")
+    m = M["id"].index("prov-new")
     assert M["pv"][m] == 1 and M["q"][m] == -1 and M["inn"][m] == [] and M["fi"][m] == -1
     brook = IX["players"]["id"].index(bro)
     shard = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())["bat"]
@@ -96,7 +96,7 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
     assert rows == [(40, 2, 0, -1)]  # no batting position / dismissal for scraped games
     xi = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())["xi"]
     assert (brook, m) in list(zip(xi["p"], xi["m"], strict=True))  # named in the scraped squad: in the XI
-    assert "crex-dup" not in M["id"]
+    assert "prov-dup" not in M["id"]
 
 
 def test_event_host_parses_tour_events():
@@ -151,7 +151,7 @@ def test_half_scraped_scorecards_are_marked_unreliable(tmp_path):
     B.build(z, data, out, None, workers=1)
     M, _ = _load(out)
     xq = {M["id"][i]: M["xq"][i] for i in range(len(M["id"]))}
-    assert xq["crex-2025-07-01-5"] == 1 and xq["crex-thin"] == 0
+    assert xq["prov-2025-07-01-5"] == 1 and xq["prov-thin"] == 0
 
 
 def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are_keyed_by_cricsheet_id(tmp_path, monkeypatch):
@@ -167,11 +167,11 @@ def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are
     d = _prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)
     (data / "provisional" / "crex-new.json").write_text(json.dumps(d))
     meta = B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")
-    assert meta["provisional_rows_linked_by_crex"] == 1 and meta["provisional_rows_unlinked"] == 21
+    assert meta["provisional_rows_linked"] == 1 and meta["provisional_rows_unlinked"] == 21
     M, IX = _load(out)
     brook = synth.pid(synth.BROOK)
     shard = json.loads((out / "p" / f"{int(brook, 16) % IX['nshard']:02d}.json").read_text())["bat"]
-    m = M["id"].index("crex-new")
+    m = M["id"].index("prov-new")
     assert any(shard["m"][k] == m and shard["r"][k] == 40 for k in range(len(shard["p"])) if IX["players"]["id"][shard["p"][k]] == brook)
     ph = json.loads((out / "photos.json").read_text())
     assert ph["p"][brook] == "c:1IG" and ph["p"][synth.pid(synth.DUCKETT)] == "c:ZZ"   # keyed by Base id, so a shifting index cannot mismatch photos
@@ -191,7 +191,7 @@ def test_bookmaker_feed_is_odds_only_never_a_fixture_or_start_time(tmp_path):
         {"event": "male|dolphins|badgers|2026-10-23", "start_ist": "2026-10-23 21:30 IST", "format": "T20"}]}))
     fx = B.build_fixtures(tmp_path, vb, {})
     assert [(f["a"], f["start"], f["source"]) for f in fx] == [
-        ("Afghanistan U19", "2026-10-23T05:00Z", "crex"), ("Afghanistan", "2026-10-23T11:30Z", "crex")]
+        ("Afghanistan U19", "2026-10-23T05:00Z", "src"), ("Afghanistan", "2026-10-23T11:30Z", "src")]
 
 
 def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_never_fails_the_build(tmp_path):

@@ -54,6 +54,7 @@ test("the nearest upcoming match wins; a match that started long ago is ignored"
 test("book names are readable, unknown sources are shown as-is", () => {
   assert.equal(bookName("moviodds_bet365"), "bet365");
   assert.equal(bookName("smarkets"), "Smarkets");
+  assert.equal(bookName("bet365"), "bet365", "published under the book's own name");
   assert.equal(bookName("newbook"), "newbook");
 });
 

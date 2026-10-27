@@ -75,7 +75,7 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 
 | file | content |
 |---|---|
-| `meta.json` | schema, build time, counts, `newest_cricsheet`, `provisional_matches`, `newest_provisional`, `provisional_included` |
+| `meta.json` | schema, build time, counts, `newest_base`, `provisional_matches`, `newest_provisional`, `provisional_included` |
 | `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred"], `nshard` |
 | `matches.json` | per match: `id d(date) f(format idx) g(0 male/1 female) i(intl) e(event idx) v(venue idx) a b(team idx) w(winner idx/-1) r(result 0 win,1 tie,2 none,3 draw) o(overs) dy(days) h(host: idx into hosts, -1 neutral, -2 unknown) fi(team idx batting first/-1) pv(provisional) q(valid for summary markets 1/0, -1 unknown) ho mc ts` and `inn` = per innings `[team, runs, wkts, balls, f4, f6, n30, n50, n100, n10, nsd, nduck, highest_over, most_conceded, top_score, ...topScorerPlayerIdx]` |
 | `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI); `matches.json` also has `xq` (1 = the named XI is reliable), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
@@ -159,3 +159,5 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 ## 10. Roadmap ideas (not built)
 Umpire/match-referee stats (Base officials) · competition standings (per-tournament points rules) · minutes-style and traits panels on player pages · server-side rendering for SEO ·
 a real odds feed (the only paid piece StatsHub has) · syncing scraped matches into Postgres for ad-hoc queries · more Source A squads/ids from scorecards to raise photo coverage (~54% of active players today) · licensed ball-by-ball websocket if a free source appears.
+
+**Published names.** The site data is source-neutral: provisional match ids are published as `prov-…`, fixtures carry `source: "src"`, and book sources use the book's own name (`bet365`). The scrapers and the pipeline keep their own ids and keys internally; the mapping is `_public_id` / `_public` in `build.py` and `PUBLIC_SOURCE` in `booklines.py`.

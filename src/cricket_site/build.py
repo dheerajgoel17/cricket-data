@@ -346,7 +346,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         fi = team_ix[(m["first"], g)] if m["first"] else -1
         hn = host_of_match.get(m["id"]) or venue_host.get((m["venue"] or "?", m["intl"]))
         hs = -2 if hn is None else -1 if hn == "-" else host_ix[hn]  # -1 neutral ground, -2 host unknown
-        _push(cols, MATCH_KEYS, (m["id"], m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
+        _push(cols, MATCH_KEYS, (_public_id(m["id"]), m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
                                  m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m["xq"]))
         m["_ix"] = mi
         m["_tix"] = (a, b)
@@ -563,7 +563,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
             for r in csv.DictReader(fh):
                 rows.append({"start": r["start_utc"], "fmt": r["format"], "gender": r["gender"], "a": r["team_a"],
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
-                             "source": "crex"})
+                             "source": "src"})
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):
@@ -586,6 +586,16 @@ BET_FIELDS = ["match", "start_utc", "start_ist", "format", "gender", "market", "
               "rain_risk"]
 
 
+def _public_id(match_id: str) -> str:
+    """Provisional matches are published as prov-…, whatever the scraper called them."""
+    return re.sub(r"^crex-", "prov-", match_id)
+
+
+def _public(obj):
+    """Book sources are published under the book's own name (the pipeline's source key names the feed it came through)."""
+    return json.loads(json.dumps(obj).replace("moviodds_bet365", "bet365"))
+
+
 def build_props(vb_dir: Path | None) -> dict:
     """Small snapshot of the value-bets output (the site also reads the live file from GitHub at view time)."""
     out = {"generated_at_utc": "", "generated_at_ist": "", "value_bets": [], "recent_alerts": [], "sources": {}, "stats": {}}
@@ -601,7 +611,7 @@ def build_props(vb_dir: Path | None) -> dict:
     if hist.exists():
         rows = [json.loads(x) for x in hist.read_text(encoding="utf-8").splitlines() if x.strip()]
         out["recent_alerts"] = rows[-60:]
-    return out
+    return _public(out)
 
 
 def build_lines(vb_dir: Path | None) -> dict:
@@ -610,7 +620,7 @@ def build_lines(vb_dir: Path | None) -> dict:
     if f and f.exists():
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
-            return {"generated_at_utc": d.get("generated_at_utc", ""), "lines": d.get("lines", []), "events": d.get("events", []), "fancy": d.get("fancy", [])}
+            return _public({"generated_at_utc": d.get("generated_at_utc", ""), "lines": d.get("lines", []), "events": d.get("events", []), "fancy": d.get("fancy", [])})
         except ValueError:
             pass  # a half-written file must not fail the site build
     return {"generated_at_utc": "", "lines": [], "events": [], "fancy": []}
@@ -628,9 +638,9 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     newest = max((m["date"] for m in canonical), default="")
     newest_prov = max((m["date"] for m in prov), default="")
     meta = write(out, A, names, {
-        "newest_cricsheet": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
+        "newest_base": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
-        "provisional_rows_linked_by_crex": pstat.get("rows_linked_by_crex", 0),
+        "provisional_rows_linked": pstat.get("rows_linked_by_crex", 0),
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")

@@ -83,7 +83,7 @@ function chips(store, plan, extra = []) {
 
 function freshness(store) {
   const fr = store.freshness();
-  return `Newest match in the base data: ${fr.newestCricsheet}. ${fr.provisionalIncluded
+  return `Newest match in the base data: ${fr.newestBase}. ${fr.provisionalIncluded
     ? `Includes ${fr.provisionalMatches} provisional (scraped) matches up to ${fr.newestProvisional}.` : "No provisional matches included."}`;
 }
 

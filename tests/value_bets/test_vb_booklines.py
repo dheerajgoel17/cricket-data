@@ -16,7 +16,7 @@ def test_two_sided_line_is_kept_with_both_decimal_prices():
     assert out["generated_at_utc"] == "2026-10-26T10:00:00Z"
     (ln,) = out["lines"]
     assert (ln["pid"], ln["stat"], ln["line"], ln["fmt"], ln["team"]) == ("ab12", "runs", 17.5, "T20", "India")
-    assert ln["books"] == [{"source": "moviodds_bet365", "kind": "bookmaker", "over": 1.85, "under": 1.95}]
+    assert ln["books"] == [{"source": "bet365", "kind": "bookmaker", "over": 1.85, "under": 1.95}]
 
 
 def test_two_sources_are_listed_separately_and_alt_lines_are_separate_entries():
@@ -24,7 +24,7 @@ def test_two_sources_are_listed_separately_and_alt_lines_are_separate_entries():
             row(line=22.5, back=2.4), row(line=22.5, side="under", back=1.55)]
     out = book_lines(rows, "t")["lines"]
     assert [x["line"] for x in out] == [17.5, 22.5]
-    assert [b["source"] for b in out[0]["books"]] == ["moviodds_bet365", "smarkets"]
+    assert [b["source"] for b in out[0]["books"]] == ["bet365", "smarkets"]  # published under the book's name
     assert out[1]["books"][0]["over"] == 2.4
 
 
@@ -60,7 +60,7 @@ def test_prop_events_lists_every_prerelease_event_with_any_player_prop_even_with
             row(event_key="e4", in_play=True)]  # live: not a pre-match prop
     ev = prop_events(rows)
     assert [e["match"] for e in ev] == ["India vs NZ", "Namibia vs Ireland"]
-    assert ev[1]["markets"] == ["batter_milestone", "top_batter_team"] and ev[1]["sources"] == ["moviodds_bet365", "smarkets"] and ev[1]["n"] == 2
+    assert ev[1]["markets"] == ["batter_milestone", "top_batter_team"] and ev[1]["sources"] == ["bet365", "smarkets"] and ev[1]["n"] == 2
     assert book_lines(rows, "t")["events"] == ev
 
 

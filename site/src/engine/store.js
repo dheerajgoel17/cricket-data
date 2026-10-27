@@ -125,7 +125,7 @@ export class Store {
 
   freshness() {
     const me = this.meta;
-    return { newestCricsheet: me.newest_cricsheet, provisionalIncluded: !!me.provisional_included,
+    return { newestBase: me.newest_base, provisionalIncluded: !!me.provisional_included,
       provisionalMatches: me.provisional_matches || 0, newestProvisional: me.newest_provisional || null,
       builtAt: me.built_at };
   }

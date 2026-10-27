@@ -13,6 +13,7 @@ from .util import parse_ts
 
 STAT = {"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
 PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
+PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}  # published under the book's own name; the key names the feed it came through
 FMT = {"T20": "T20", "ODI": "ODI", "MULTI": "Test"}  # the pipeline calls a multi-day match MULTI; the site calls it Test
 
 
@@ -26,7 +27,7 @@ def prop_events(rows: list[dict]) -> list[dict]:
         e = evs.setdefault(r["event_key"], {"match": r.get("match"), "competition": r.get("competition"), "start_utc": r.get("start_utc"),
                                             "markets": set(), "sources": set(), "n": 0})
         e["markets"].add(r["market_type"])
-        e["sources"].add(r.get("source"))
+        e["sources"].add(PUBLIC_SOURCE.get(r.get("source"), r.get("source")))
         e["n"] += 1
     out = [{**e, "markets": sorted(e["markets"]), "sources": sorted(x for x in e["sources"] if x)} for e in evs.values()]
     return sorted(out, key=lambda e: (e["start_utc"] or "", e["match"] or ""))
@@ -50,7 +51,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
         g["_books"][(r["source"], r.get("source_type"))][side] = round(float(back), 3)
     lines = []
     for g in groups.values():
-        books = [{"source": s, "kind": k, "over": sides["over"], "under": sides["under"]}
+        books = [{"source": PUBLIC_SOURCE.get(s, s), "kind": k, "over": sides["over"], "under": sides["under"]}
                  for (s, k), sides in sorted(g.pop("_books").items(), key=lambda kv: kv[0])
                  if "over" in sides and "under" in sides]  # a one-sided price is not a line the player page can show
         if books:
