@@ -209,3 +209,61 @@ def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_n
     assert json.loads((tmp_path / "out2" / "lines.json").read_text()) == {"generated_at_utc": "", "lines": [], "events": [], "fancy": []}
     B.build(z, data, tmp_path / "out3", None, workers=1)  # no value-bets output at all
     assert json.loads((tmp_path / "out3" / "lines.json").read_text())["lines"] == []
+
+
+def _src_players(monkeypatch, *slugs):
+    from cricket_site import crex_assets as ca
+
+    sitemaps = {"player": "<urlset>" + "".join(f"<url><loc>https://src.test/player/{s}</loc></url>" for s in slugs) + "</urlset>",
+                "team": "<urlset><url><loc>https://src.test/team/alpha-A1</loc></url></urlset>"}
+    monkeypatch.setattr(ca, "fetch_sitemap", lambda kind: sitemaps[kind])
+
+
+def _vb(tmp_path, lines):
+    vb = tmp_path / "vb" / "out"
+    vb.mkdir(parents=True)
+    (vb / "book_lines.json").write_text(json.dumps({"generated_at_utc": "t", "lines": lines, "events": [], "fancy": []}))
+    return vb
+
+
+def _line(pid, player, book_name=None):
+    return {"pid": pid, "player": player, **({"book_name": book_name} if book_name else {}), "stat": "runs", "fmt": "T20", "line": 10.5,
+            "books": [{"source": "bet365", "kind": "bookmaker", "over": 1.9, "under": 1.9}]}
+
+
+def test_the_identity_table_links_the_books_and_hand_checked_links_and_gives_them_to_photos_and_scraped_names(tmp_path, monkeypatch):
+    _src_players(monkeypatch, "harry-brook-1IG", "shubman-gill-SG", "run-machine-RM")
+    z, data, out, _ = _out(tmp_path)
+    brook, gill, kohli = (synth.pid(n) for n in (synth.BROOK, "G Gill", synth.KOHLI))
+    (data / "mappings").mkdir()
+    (data / "mappings" / "player_identity.csv").write_text(f"player_id,source_id,note\n{kohli},RM,checked by hand: V Kohli is Run Machine\n")
+    vb = _vb(tmp_path, [_line(gill, "G Gill", "Shubman Gill"), _line(brook, "HC Brook", "Harry Brook")])
+    pl = [{"player": "Run Machine", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "33", "balls": "20"}] + [
+          {"player": f"F{i}", "player_id": "", "team": "Alpha" if i < 10 else "Beta", "opponent": "Beta" if i < 10 else "Alpha", "runs": "0", "balls": "0"} for i in range(21)]
+    (data / "provisional" / "crex-new.json").write_text(json.dumps(_prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)))
+    meta = B.build(z, data, out, vb, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    ident = json.loads((out / "identity.json").read_text())
+    assert ident["s"] == {brook: "1IG", gill: "SG", kohli: "RM"}, "Brook by the photo matcher, Gill by the name the books use, Kohli by hand"
+    assert ident["b"] == {gill: ["Shubman Gill"], brook: ["Harry Brook"]}
+    assert (meta["identity_linked"], meta["identity_review"]) == (3, 0) and not (out / "identity_review.json").exists()
+    ph = json.loads((out / "photos.json").read_text())["p"]
+    assert (ph[gill], ph[kohli], ph[brook]) == ("c:SG", "c:RM", "c:1IG"), "a linked player gets his source photo"
+    assert [r for r in json.loads((out / "crex_index.json").read_text())["players"] if r[0] == "RM"] == [["RM", "run machine", kohli]]
+    assert meta["provisional_rows_linked"] == 1, "the scraped name 'Run Machine' is Kohli now"
+    M, IX = _load(out)
+    shard = json.loads((out / "p" / f"{int(kohli, 16) % IX['nshard']:02d}.json").read_text())["bat"]
+    m = M["id"].index("prov-new")
+    assert any(shard["m"][k] == m and shard["r"][k] == 33 for k in range(len(shard["p"])) if IX["players"]["id"][shard["p"][k]] == kohli)
+
+
+def test_a_priced_player_who_could_not_be_linked_goes_to_the_review_list_and_a_stale_list_is_removed(tmp_path, monkeypatch):
+    _src_players(monkeypatch, "harry-brook-1IG", "vaibhav-sooryavanshi-DBT")
+    z, data, out, _ = _out(tmp_path)
+    gill = synth.pid("G Gill")
+    vb = _vb(tmp_path, [_line(gill, "V Gill", "Vaibhav Gillanshi")])
+    meta = B.build(z, data, out, vb, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    (r,) = json.loads((out / "identity_review.json").read_text())
+    assert (r["pid"], r["name"], r["books"], r["why"]) == (gill, "G Gill", ["Vaibhav Gillanshi"], "no source player has this name") and meta["identity_review"] == 1
+    assert gill not in json.loads((out / "identity.json").read_text())["s"]
+    B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")  # nothing priced any more
+    assert not (out / "identity_review.json").exists()

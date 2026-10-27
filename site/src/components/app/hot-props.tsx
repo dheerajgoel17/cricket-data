@@ -35,7 +35,7 @@ const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
-interface Row { day: number; idx: number; name: string; bookName: string; settled?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; pid: string; name: string; bookName: string; settled?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
 function useHotRows(archive?: any, teams?: [string, string]) {
@@ -73,7 +73,7 @@ function useHotRows(archive?: any, teams?: [string, string]) {
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: dayOffset(b.start_utc), idx, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
+        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
           edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
       });
       // a few plans at a time, giving the main thread back in between: on a phone the whole batch is seconds of work, and typing in search waited behind it
@@ -132,17 +132,17 @@ export function HotProps({ teams, archive }: { teams?: [string, string]; archive
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
     return ["live", "final"].includes(liveForFixture(live.data, { a, b, start: r.start })?.status ?? ""); // a finished match keeps its props with their results
   }), [all, live.data, onFixture]);
+  const { identity } = useData();
+  const booksCall = (r: Row) => [r.bookName, ...identity.bookNames(r.pid)].filter(Boolean); // the line's own book name (older archived lines have none), then the identity table's
   const soFarOf = (r: Row): SoFar | null => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat, r.bookName), v = liveStat(p, r.stat);
+    const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat, booksCall(r), identity.sourceOf(r.pid), identity.isLinked), v = liveStat(p, r.stat);
     if (v != null) return { v, state: liveState(m, p, r.stat) };
     return r.settled != null ? { v: r.settled, state: "final" } : null; // the live feed no longer has the match: his result as the data records it
   };
-  const { store, photos } = useData();
   const outOf = (r: Row) => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    const v = (photos as any)?.p?.[store.P.id[r.idx]], sourceId = typeof v === "string" && v.startsWith("c:") ? v.slice(2) : ""; // the source's id for him, when the data has linked it
-    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team, sourceId, r.bookName);
+    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team, identity.sourceOf(r.pid), booksCall(r)); // the source's id for him comes from the identity table
   };
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");

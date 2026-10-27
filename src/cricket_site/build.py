@@ -22,6 +22,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+from . import identity
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, KINDS, parse_match, squad_quality
 
@@ -490,6 +491,19 @@ def crex_cached(cache_dir: Path | None, canonical: list[dict], names: dict[str, 
     return res
 
 
+def link_identity(cx: dict, names: dict[str, str], vb_dir: Path | None, data_dir: Path) -> tuple[dict, list[dict]]:
+    """Build the player-identity table (``identity.py``) and hand its links to everything that matched players by name before:
+    the photo map (a linked player gets his source photo), the source-id index (who holds which id) and the scraped-name linker."""
+    sitemap = [(cid, nm) for cid, nm, _ in cx["index"]["players"]]
+    table, review, added = identity.build(cx["p"], sitemap, names, identity.collect_books(vb_dir), identity.load_overrides(data_dir))
+    owner = {sid: pid for pid, sid in table["s"].items()}
+    cx["p"] = {**{p: v for p, v in cx["p"].items() if v.startswith("w:")}, **{p: "c:" + s for p, s in table["s"].items()}}
+    cx["index"]["players"] = [[cid, nm, owner.get(cid)] for cid, nm, _ in cx["index"]["players"]]
+    full = dict(sitemap)
+    cx["names"].update({fold_name(full[s]): p for p, s in added.items() if s in full})
+    return table, review
+
+
 def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo: dict[str, str] | None = None) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     (out / "p").mkdir(exist_ok=True)
@@ -633,6 +647,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     canonical = parse_zip(zpath, workers)
     names = player_names(zpath)
     cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
+    ident, review = link_identity(cx, names, vb_dir, data_dir)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
     newest = max((m["date"] for m in canonical), default="")
@@ -641,7 +656,13 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "newest_base": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
         "provisional_rows_linked": pstat.get("rows_linked_by_crex", 0),
+        "identity_linked": len(ident["s"]), "identity_review": len(review),
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
+    (out / "identity.json").write_text(json.dumps(ident, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    if review:
+        (out / "identity_review.json").write_text(json.dumps(review, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")  # for the job summary; not deployed
+    else:
+        (out / "identity_review.json").unlink(missing_ok=True)
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     build_sitemap(out, A, names, site_url)

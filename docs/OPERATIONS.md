@@ -40,6 +40,7 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 **Base looks stale**: expected for a few days; the scraper's provisional matches cover the gap. A `data-stale` issue opens if canonical data is > 3 days old; the Site workflow warns only if both sources are old.
 **Scraper broke (Source A layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
 **A workflow shows "workflow file issue"**: YAML error. `pip install actionlint-py && actionlint .github/workflows/*.yml`.
+**A priced player shows no live numbers, or a wrong "Not in XI"**: the name could not be linked to the live source. Open the latest Site run's summary ("Player identity: names to review"), pick the right source player from the suggestions (or look the player up on the source) and add `<our id>,<source id>,<note>` to `data/mappings/player_identity.csv`; the next build applies it (and gives the player his source photo).
 **Site shows no photos**: `data/photos.json` missing? (cache restored an old format: bump the cache key prefix in `site.yml`). Source A CDN down: the browser falls back to our Supabase copy / flags / silhouettes.
 **Vercel deploy limits**: Hobby allows ~100 deploys/day; hourly = 24.
 

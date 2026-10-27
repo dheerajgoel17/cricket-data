@@ -107,7 +107,7 @@ def _combine(kind: str, old: dict, new: dict, refresh: bool) -> dict:
         for b in new["books"]:
             if refresh or (b["source"], b["kind"]) not in books:
                 books[(b["source"], b["kind"])] = b
-        return {**(new if refresh else old), "books": [books[k] for k in sorted(books)]}
+        return {**({**old, **new} if refresh else {**new, **old}), "books": [books[k] for k in sorted(books)]}  # a field the old line lacked (``book_name``) is added, never taken away
     if kind == "events":
         return {**(new if refresh else old), "markets": sorted({*old.get("markets", []), *new.get("markets", [])}),
                 "sources": sorted({*old.get("sources", []), *new.get("sources", [])}), "n": max(old.get("n", 0), new.get("n", 0))}
@@ -163,12 +163,56 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
     return written, bad
 
 
+def book_names(root: Path, *books: dict) -> dict[str, str]:
+    """{player id: the name the books use} for every player the archive and the given book files know by exactly one such name (two spellings: left out)."""
+    seen: dict[str, set[str]] = {}
+    docs = [*books]
+    for f in sorted(root.glob("*/*.json")):
+        try:
+            docs.append(_read(f) or {})
+        except (ValueError, OSError):
+            pass
+    for d in docs:
+        for ln in d.get("lines", []):
+            if ln.get("pid") and ln.get("book_name"):
+                seen.setdefault(ln["pid"], set()).add(ln["book_name"])
+    return {p: next(iter(n)) for p, n in seen.items() if len(n) == 1}
+
+
+def backfill(root: Path, *books: dict) -> list[str]:
+    """Add ``book_name`` to archived lines that were filed before the field existed, from the name the books use for that player on other lines.
+    Only ever adds a field: no line, price or file is removed or changed. Returns the ids of the files that gained names."""
+    names = book_names(root, *books)
+    changed = []
+    for f in sorted(root.glob("*/*.json")):
+        try:
+            d = _read(f)
+        except (ValueError, OSError):
+            continue  # an unreadable file is left alone
+        todo = [ln for ln in (d or {}).get("lines", []) if not ln.get("book_name") and ln.get("pid") in names]
+        if not todo:
+            continue
+        for ln in todo:
+            ln["book_name"] = names[ln["pid"]]
+        tmp = f.with_suffix(".tmp")
+        tmp.write_text(json.dumps(public(d), separators=(",", ":")), encoding="utf-8")
+        tmp.replace(f)
+        changed.append(d["id"])
+    return changed
+
+
 def main(argv: list[str] | None = None) -> int:
-    """Archive the matches in a book file as they are (the one-off start of the archive, or a rebuild from an old copy of the file)."""
+    """Archive the matches in a book file as they are (the one-off start of the archive, or a rebuild from an old copy of the file).
+    With --backfill-book-names it only adds the books' names to archived lines that lack them."""
     ap = argparse.ArgumentParser(description=main.__doc__)
     ap.add_argument("--book", default=str(config.OUT / "book_lines.json"))
     ap.add_argument("--schedule", default=str(config.DATA_REPO / "data" / "fixtures" / "upcoming.csv"))
+    ap.add_argument("--backfill-book-names", action="store_true")
     a = ap.parse_args(argv)
+    if a.backfill_book_names:
+        book = json.loads(Path(a.book).read_text(encoding="utf-8")) if Path(a.book).exists() else {}
+        print(json.dumps({"filled": backfill(config.ARCHIVE, book)}))
+        return 0
     sched = []
     if Path(a.schedule).exists():
         with open(a.schedule, encoding="utf-8", newline="") as fh:

@@ -529,13 +529,27 @@ export function liveBlurb(match) {
 const BAT_STATS = new Set(["runs", "balls", "fours", "sixes"]);
 const BOWL_STATS = new Set(["wickets", "runs_conceded", "balls_bowled"]);
 
-/** The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat. Ambiguous names stay unmatched. */
-export function livePlayer(match, name, stat, commonName = "") {
+const nameSet = (x) => [].concat(x || []).map(norm).filter(Boolean);
+
+/**
+ * The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat.
+ * With the source's own id for him (`sourceId`, from the identity table) the row is found by that id and no name is consulted. Otherwise names decide, and a row that
+ * belongs to a different player the table knows (`isLinked(row id)`, only asked once he is linked himself) is never taken for him. Ambiguous names stay unmatched.
+ * @param {string | string[]} [commonName] the name(s) the books use for him
+ * @param {((sourceId: string) => boolean) | null} [isLinked]
+ */
+export function livePlayer(match, name, stat, commonName = "", sourceId = "", isLinked = null) {
   const role = BAT_STATS.has(stat) ? "runs" : BOWL_STATS.has(stat) ? "wickets" : null;
-  const rows = (match?.players || []).filter((p) => !role || p[role] != null);
+  let rows = (match?.players || []).filter((p) => !role || p[role] != null);
+  if (sourceId) {
+    const byId = rows.filter((p) => p.id === sourceId);
+    if (byId.length) return byId.length === 1 ? byId[0] : null; // two rows with his id (a Test, two innings) are as ambiguous as two names
+    if (isLinked) rows = rows.filter((p) => !isLinked(p.id));
+  }
   // The books call a player what the live source calls him ("Kusal Mendis"); the data has initials ("BKG Mendis"), and "K" would match every Mendis with a K.
-  // So the books' own name, when the file has it, is tried first and exactly.
-  const exact = commonName ? rows.filter((p) => norm(p.name) === norm(commonName)) : [];
+  // So the books' own name (the line's, else the identity table's), when there is one, is tried first and exactly.
+  const books = nameSet(commonName);
+  const exact = books.length ? rows.filter((p) => books.includes(norm(p.name))) : [];
   if (exact.length === 1) return exact[0];
   const hits = rows.filter((p) => namesMatch(p.name, name));
   return hits.length === 1 ? hits[0] : null;
@@ -675,12 +689,13 @@ const surname = (n) => norm(n).split(" ").filter(Boolean).pop() || "";
  * True only when the side's XI is fully known and the player is not in it. With the source's own id for the player the answer is exact. Without one it goes by name,
  * and a name is not enough to say "not in": the source gives the common name ("Kusal Mendis") where the data has initials ("BKG Mendis"), so anyone in the XI
  * who shares his surname might be him, and he is left unmarked. (Better a missed mark than a wrong one.)
+ * @param {string | string[]} [commonName] the name(s) the books use for him
  */
 export function notInXI(match, name, team, sourceId = "", commonName = "") {
   const xi = playingXI(match).get(teamKey(team));
   if (!xi?.complete) return false;
   if (sourceId && xi.ids.size) return !xi.ids.has(sourceId);
-  if (commonName && xi.names.some((n) => norm(n) === norm(commonName))) return false;
+  if (nameSet(commonName).some((c) => xi.names.some((n) => norm(n) === c))) return false;
   if (xi.names.some((n) => namesMatch(n, name))) return false;
   const sur = surname(name);
   return !xi.names.some((n) => surname(n) === sur);

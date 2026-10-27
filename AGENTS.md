@@ -34,5 +34,6 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 * Stats/markets/plan logic -> `site/src/engine/*` (no DOM, tested with node:test); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
 * LLM prompt/provider -> `site/src/engine/prompt.js`, `site/api/ask.js`.
 * Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only; so-far, never settlement).
+* Who is who across the data, the live source and the books -> the player-identity table: `src/cricket_site/identity.py` (builder), `data/mappings/player_identity.csv` (links checked by hand), `site/src/engine/identity.js` (lookups). Ids first, names only as the fallback; fix a bad link with a line in the CSV, not with another name rule (PROJECT_GUIDE 5.7).
 * Images/ids -> `src/cricket_site/crex_assets.py`, `assets_sync.py`, `site/src/lib/photos.js`, `site/src/lib/assets.ts`, `supabase/migrations/`.
 * Deploy/schedules -> `.github/workflows/site.yml`.

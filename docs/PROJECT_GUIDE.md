@@ -32,7 +32,7 @@ docs/                 documentation (this file, OPERATIONS, SITE, SITE_MAP, VALU
 scripts/              check_public_safe.py, make_site_fixture.py, model_backtest/ (research)
 src/cricket_data/     dataset package: Base ingest, store, provisional + reconcile, registry/link-players, Source A scraper, CLI
 src/value_bets/       hourly prop-pricing pipeline (model, adapters for Exchange S / Feed P, weather, alerts)
-src/cricket_site/     site builder (stdlib only): parse.py, build.py, crex_assets.py, assets_sync.py
+src/cricket_site/     site builder (stdlib only): parse.py, build.py, crex_assets.py, identity.py, assets_sync.py
 site/                 the website: Vite + React app (src/, index.html), public/ (generated data/ + static files), api/ask.js + api/live.js (serverless), vercel.json, tests/ (node:test for engine + API)
 supabase/migrations/  SQL for the image/id store (applied to the Supabase project)
 tests/                pytest: dataset tests, tests/value_bets, tests/site (synthetic matches + builder + crex_assets + assets_sync)
@@ -70,7 +70,8 @@ snapshot built into the site. Details: [VALUE_BETS.md](VALUE_BETS.md), [MODEL_BA
    aggregates (fours, sixes, 30s, 50s, 100s, 10+, single-digits, ducks, highest over, most conceded, top score, top-scorer ids). Super overs ignored. `qualifies()` implements the void rules.
 2. `build.py` merges provisional matches (deduped against the zip), infers hosts (home/away), assigns integer ids, shards player data into 64 files and writes JSON.
 3. `crex_assets.py` matches Source A sitemap names to Base players (conservative: surname + first initial; ambiguous names skipped) and teams (with a small alias table).
-4. `assets_sync.py` copies images into our own Supabase Storage (see 5.6).
+4. `identity.py` builds the player-identity table from the photo map, the books' names and a hand-checked file (see 5.7); its links also feed the photo map and the scraped-name linker.
+5. `assets_sync.py` copies images into our own Supabase Storage (see 5.6).
 
 Output files in `site/public/data/` (all JSON, columnar = one array per field; **generated, gitignored**):
 
@@ -83,11 +84,12 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 | `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` (refreshed every scraper run from **Source A's own schedule page**, `src/cricket_data/crex_schedule.py`: the next ~20 matches with real times, format, venue; far-future tours are kept until they pass) only (the bookmaker feed is odds-only: never a fixture or start-time source, as books serve different regions), with stable `id` (`date-team-v-team`) and team idx |
 | `props.json` | snapshot of the value-bets output (Prop Hunter fallback) |
 | `photos.json` | `{p: {cricsheetPlayerId: "c:<Source A id>"|"w:<Commons file>"}, t: {foldedTeamName: crexTeamId}, base, s}` (`base`/`s` added by assets_sync). **Keyed by Base id, never by array index** (indices shift between builds) |
+| `identity.json` | the player-identity table, `{v:1, s: {Base id: Source A player id}, b: {Base id: [names the books use]}}` (5.7). `identity_review.json` (priced players that could not be linked) is written next to it for the job summary and is not deployed |
 
 Rebuilding is deterministic apart from timestamps. Size: ~35 MB raw, ~12 MB compressed.
 
 ### 5.2 Engine (`site/src/engine`, dependency-free ES modules; runs in browser and node)
-`store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `props.js` (player report, DNP-aware form chart over team
+`identity.js` (lookups over the identity table: our id <-> the live source's id, the books' names) · `store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `props.js` (player report, DNP-aware form chart over team
 fixtures, correlated props) · `markets.js` (match/team markets, top batter) · `partnership.js` · `resolve.js` (typo-tolerant player/team/venue/competition resolution) · `plan.js` (query plans: sanitize,
 resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `live.js` (Source A snapshot parse, name match, so-far vs line; not settlement) · `rules.js`, `util.js`.
 **Invariant: every number shown comes from the engine; the LLM only emits a validated plan** (`sanitizePlan` whitelists fields; see `site/tests/nlp.test.mjs`).
@@ -104,7 +106,7 @@ Tests: engine, API and photo helpers with `node --test` (`tests/`), components w
 Per-IP rate limit + daily cap, key only in headers, reply passed through `sanitizePlan`. The browser resolves names and runs the plan locally.
 
 ### 5.4b Live scores (`site/api/live.js`)
-`GET /api/live` -> `{asOf, source: "live", matches}`, built from three Source A HTML pages (robots Allow; never the source's API endpoints) and intersected with `book_lines.json` (player props, event markets, or fancy). Matches with no odds are dropped. The **schedule** page (the schedule page, cached ~5 min by Source A) gives the match list, URLs, format, start and a first score. For live matches and priced ones about to start, the **match** page (`getSV3`, `max-age` 10 s) gives the fresh score, the current pair with strike, the bowler, partnership, CRR/RRR and the last deliveries, and `/match-scorecard` (`getSC4`) gives every innings: batting how-out / R / B / 4s / 6s / SR, extras, FOW, yet-to-bat, bowling O / M / R / W / Econ. Source B is not used: its summary cards trailed its own header by an innings. `crexMatch` merges the pages (match-page scores beat the schedule's; a page that failed just leaves its fields empty), and `liveBoard` only ever shows the batting side's not-out pair, so a finished innings can't pose as the current one. The fixture header renders that snapshot as a live board plus the accordion. No key. Cached ~15 s (`s-maxage` + in-memory single-flight). The Vite dev server mounts the same handler. Team names are matched to Source A fixtures; player names to booked lines (`HC Brook` ~ `Harry Brook`). Kick-off and countdowns stay in the viewer's time zone. **So-far only** — never settle from this feed. Unofficial and can change.
+`GET /api/live` -> `{asOf, source: "live", matches}`, built from three Source A HTML pages (robots Allow; never the source's API endpoints) and intersected with `book_lines.json` (player props, event markets, or fancy). Matches with no odds are dropped. The **schedule** page (the schedule page, cached ~5 min by Source A) gives the match list, URLs, format, start and a first score. For live matches and priced ones about to start, the **match** page (`getSV3`, `max-age` 10 s) gives the fresh score, the current pair with strike, the bowler, partnership, CRR/RRR and the last deliveries, and `/match-scorecard` (`getSC4`) gives every innings: batting how-out / R / B / 4s / 6s / SR, extras, FOW, yet-to-bat, bowling O / M / R / W / Econ. Source B is not used: its summary cards trailed its own header by an innings. `crexMatch` merges the pages (match-page scores beat the schedule's; a page that failed just leaves its fields empty), and `liveBoard` only ever shows the batting side's not-out pair, so a finished innings can't pose as the current one. The fixture header renders that snapshot as a live board plus the accordion. No key. Cached ~15 s (`s-maxage` + in-memory single-flight). The Vite dev server mounts the same handler. Team names are matched to Source A fixtures; players are matched to booked lines **by id through the identity table** (5.7), with names (`HC Brook` ~ `Harry Brook`) only as the fallback for a player the table does not know. Kick-off and countdowns stay in the viewer's time zone. **So-far only** — never settle from this feed. Unofficial and can change.
 
 ### 5.5 Photos, flags, logos
 Team logos / player photos come from Source A's public sitemaps + image CDN (`$IMG_CDN_BASE`), fallbacks: Wikimedia Commons (Wikidata P2697->P18), flagcdn flags, initials/silhouette.
@@ -113,6 +115,12 @@ The browser tries **our own copy first** (5.6). Images belong to their owners: c
 ### 5.6 Our own store (Supabase, free plan; project `cricket-props-hub`, ref `fgqcuvtpguuoxgwcgqyw`, region ap-south-1)
 Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write) + public Storage bucket `avatars` (200 KB, png/webp/jpeg). `assets_sync.py` runs in the Site workflow
 (resumable, `SYNC_LIMIT` per run, polite). Schema: `supabase/migrations/`. If Source A disappears, the stored copies and id maps keep the site working.
+
+### 5.7 Player identity table (`src/cricket_site/identity.py`, `site/src/engine/identity.js`)
+The data knows a player by our id and a history name ("V Suryavanshi"), the live source by its own id and full name ("Vaibhav Sooryavanshi"), the books by whatever they print ("Kusal Mendis" for "BKG Mendis"). Matching those by name fails differently in every place, so the site build links them once, by id, into `identity.json` (`s`: our id -> the live source's player id; `b`: our id -> the names the books use when they differ from ours). The browser loads it with the other data files, and the live lookups (`livePlayer`, `notInXI` via `hot-props.tsx`) find a player's row by the source id first; names are the fallback for a player the table does not know, and a row that belongs to a different linked player is never taken for him.
+A source id comes from, in order (an id is never given to two players): 1. `data/mappings/player_identity.csv` (`player_id,source_id,note`: a link somebody checked by hand, overrides everything); 2. the photo map's conservative name match; 3. the books: a *priced* player (the pipeline already resolved a book line to his id) whose history name or book name equals exactly one source full name that nobody else holds. The links also feed the photo map (a linked player gets his source photo), the source-id index for `assets_sync`, and the scraped-name linker.
+**Review list.** Every priced player that could not be linked is written to `identity_review.json` with the reason and the source players he might be (`suggest`: same or near surname, given name starting with one of his initials; never linked automatically). The Site workflow prints it in the run summary; fix a row by adding its line to the CSV. The pipeline (`value_bets/names.py`) does not read the table yet, and the fetchers stay separate (one outage must not stop the others).
+Backfilling: `python -m value_bets.archive --backfill-book-names` adds `book_name` to archived lines filed before the field existed, where the archive knows exactly one spelling for the player (it only ever adds a field).
 
 ## 6. Workflows (`.github/workflows`)
 | workflow | trigger | what it does | secrets / vars |
@@ -123,7 +131,7 @@ Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write)
 | `balls-update.yml` | every 2 h | Source A ball-by-ball for recent matches Base lacks (`data/balls/`), prune the ones it now has | none |
 | `weekly-heal.yml` | Sun 06:15 | full re-sync / healing | none |
 | `value-bets.yml` | hourly 03:30-17:30 UTC, weekly refit | odds -> value bets, commits `value_bets/out` | optional odds keys |
-| `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
+| `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), list unlinked priced players in the run summary, sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
 | `auto-merge-scraper-fixes.yml` | workflow_run | merges `scraper-fix` PRs that only touch scraper files | none |
 
 ## 7. Local development

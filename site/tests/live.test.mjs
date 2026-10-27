@@ -4,6 +4,7 @@ import {
   ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
+import { identityIndex } from "../src/engine/identity.js";
 
 function pageHtml(payload) {
   return `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;
@@ -569,4 +570,46 @@ test("unlistedRows: a priced match that began and is not on the schedule page co
   assert.deepEqual([done.status, done.summary], ["final", 'India won by 5 runs, "DLS"']);
   assert.deepEqual(unlistedRows(listed, null, sched), []);
   assert.deepEqual(unlistedRows(listed, books, null, "", now).length, 0);
+});
+
+// --- the identity table: ids first, names only as the fallback ---
+const NZ_IND = { players: [
+  { id: "DBT", name: "Vaibhav Sooryavanshi", team: "India", runs: 45, balls: 19, fours: 4, sixes: 3, out: false },
+  { id: "YL", name: "Avishka Fernando", team: "Sri Lanka", runs: 16, balls: 17, fours: 2, sixes: 0, out: false },
+  { id: "1JR", name: "Asitha Fernando", team: "Sri Lanka", runs: null, balls: null, wickets: 1, conceded: 30, ballsBowled: 18, out: false },
+] };
+const IDN = identityIndex({ v: 1, s: { "470f446b": "DBT", "9550470d": "YL", "de3d549a": "1JR" }, b: { "5d1e7582": ["Kusal Mendis"] } });
+
+test("the id finds a player whose name the data and the source spell differently (V Suryavanshi is Vaibhav Sooryavanshi, WIA Fernando is Avishka Fernando)", () => {
+  assert.equal(livePlayer(NZ_IND, "V Suryavanshi", "runs"), null, "by name alone: Suryavanshi is not Sooryavanshi");
+  assert.equal(livePlayer(NZ_IND, "WIA Fernando", "runs"), null, "by name alone: W is not A");
+  const v = livePlayer(NZ_IND, "V Suryavanshi", "runs", "", IDN.sourceOf("470f446b"), IDN.isLinked);
+  assert.deepEqual([liveStat(v, "runs"), liveStat(v, "balls"), liveStat(v, "fours"), liveStat(v, "sixes")], [45, 19, 4, 3]);
+  assert.equal(liveStat(livePlayer(NZ_IND, "WIA Fernando", "runs", "", IDN.sourceOf("9550470d"), IDN.isLinked), "runs"), 16);
+});
+
+test("a linked player who has not batted is not mistaken for a namesake the table knows (AM Fernando is not Avishka Fernando)", () => {
+  assert.equal(livePlayer(NZ_IND, "AM Fernando", "runs").name, "Avishka Fernando", "the name rule alone takes the first A Fernando it finds");
+  assert.equal(livePlayer(NZ_IND, "AM Fernando", "runs", "", "1JR", IDN.isLinked), null, "he is 1JR and has no batting row; YL is somebody else");
+  assert.equal(liveStat(livePlayer(NZ_IND, "AM Fernando", "wickets", "", "1JR", IDN.isLinked), "wickets"), 1);
+});
+
+test("two rows with his id (a Test, two innings) are ambiguous, as two rows with his name are", () => {
+  const test = { players: [{ id: "N0", name: "Sahibzada Farhan", team: "Pakistan", runs: 12, out: true }, { id: "N0", name: "Sahibzada Farhan", team: "Pakistan", runs: 40, out: false }] };
+  assert.equal(livePlayer(test, "Sahibzada Farhan", "runs", "", "N0"), null);
+});
+
+test("the books' names from the table settle two Mendises when the line carries no book name of its own", () => {
+  const m = { players: [
+    { name: "Kusal Mendis", team: "Sri Lanka", runs: 31, balls: 20, fours: 3, sixes: 2, out: false },
+    { name: "Kamindu Mendis", team: "Sri Lanka", runs: 5, balls: 7, fours: 0, sixes: 0, out: true },
+  ] };
+  assert.equal(liveStat(livePlayer(m, "BKG Mendis", "sixes", IDN.bookNames("5d1e7582")), "sixes"), 2);
+  assert.equal(livePlayer(m, "BKG Mendis", "sixes", IDN.bookNames("nobody")), null);
+});
+
+test("notInXI by the table's id: linked and absent is out; the same name spelled differently by the source is still in", () => {
+  const m = xiMatch(XI); // ids P0.. in the order of XI; Hasaranga is P6
+  assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "P6", ""), false);
+  assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "N0", ""), true);
 });

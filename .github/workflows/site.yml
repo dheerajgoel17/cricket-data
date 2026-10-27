@@ -104,6 +104,12 @@ jobs:
               print("::warning::Neither Base nor the scraper has data newer than 3 days")
           PY
           du -sh site/public/data
+      - name: List the priced players that could not be linked to the source
+        run: |
+          if [ -f site/public/data/identity_review.json ]; then
+            { echo "### Player identity: names to review"; python -m cricket_site.identity site/public/data/identity_review.json; } >> "$GITHUB_STEP_SUMMARY"
+            rm -f site/public/data/identity_review.json
+          fi
       - name: Keep our own copy of Source A images and id maps (Supabase Storage + Postgres)
         continue-on-error: true
         env:
