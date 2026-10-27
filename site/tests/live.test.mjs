@@ -570,6 +570,7 @@ test("unlistedRows: a priced match that began and is not on the schedule page co
   assert.deepEqual([done.status, done.summary], ["final", 'India won by 5 runs, "DLS"']);
   assert.deepEqual(unlistedRows(listed, null, sched), []);
   assert.deepEqual(unlistedRows(listed, books, null, "", now).length, 0);
+});
 
 // --- the identity table: ids first, names only as the fallback ---
 const NZ_IND = { players: [
