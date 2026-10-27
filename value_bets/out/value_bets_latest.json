@@ -1,25 +1,25 @@
 {
- "generated_at_utc": "2026-10-27T10:58:24Z",
- "generated_at_ist": "2026-10-27 16:28 IST",
- "runtime_secs": 32.7,
+ "generated_at_utc": "2026-10-27T14:18:00Z",
+ "generated_at_ist": "2026-10-27 19:48 IST",
+ "runtime_secs": 33.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-27",
-  "commit": "282a112750"
+  "commit": "37dcf97e26"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 815,
-   "secs": 1.2
+   "rows": 1093,
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 544,
-   "secs": 3.0
+   "rows": 471,
+   "secs": 1.7
   }
  },
- "snapshot": "odds_20261027T105824Z.jsonl.gz",
+ "snapshot": "odds_20261027T141800Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -66,36 +66,36 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 9,
-  "rows_in_window": 830,
-  "selections_with_model": 477,
-  "selections_with_market_fair": 450,
-  "markets_in_window": 74,
+  "events_in_window": 10,
+  "rows_in_window": 817,
+  "selections_with_model": 485,
+  "selections_with_market_fair": 461,
+  "markets_in_window": 73,
   "value_bets": 0,
   "dropped_by_filter": {
-   "odds_range": 4,
-   "model_market_gap": 116,
+   "odds_range": 5,
+   "model_market_gap": 118,
    "small_sample": 2,
-   "model_only_no_market": 180,
+   "model_only_no_market": 179,
    "policy_max_odds": 2
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 56,
-    "mean_model_p": 0.039,
-    "mean_market_p": 0.071,
-    "mean_logit_diff_model_minus_market": -0.053,
-    "mean_abs_logit_diff": 0.921,
-    "corr": 0.823
+    "n_prices": 43,
+    "mean_model_p": 0.035,
+    "mean_market_p": 0.07,
+    "mean_logit_diff_model_minus_market": -0.067,
+    "mean_abs_logit_diff": 1.007,
+    "corr": 0.819
    },
    "top_bowler_team": {
     "n_prices": 18,
     "mean_model_p": 0.121,
     "mean_market_p": 0.111,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.375,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.376,
     "corr": 0.856
    },
    "batter_runs": {
@@ -119,8 +119,8 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.556,
-    "corr": 0.219
+    "mean_abs_logit_diff": 0.547,
+    "corr": -0.088
    },
    "bowler_wickets": {
     "n_prices": 18,
@@ -131,12 +131,12 @@
     "corr": 0.862
    },
    "batter_milestone": {
-    "n_prices": 83,
-    "mean_model_p": 0.352,
-    "mean_market_p": 0.403,
-    "mean_logit_diff_model_minus_market": -0.312,
-    "mean_abs_logit_diff": 0.54,
-    "corr": 0.958
+    "n_prices": 99,
+    "mean_model_p": 0.376,
+    "mean_market_p": 0.419,
+    "mean_logit_diff_model_minus_market": -0.263,
+    "mean_abs_logit_diff": 0.557,
+    "corr": 0.965
    },
    "bowler_milestone": {
     "n_prices": 45,
@@ -280,25 +280,32 @@
     "moviodds_bet365",
     "smarkets"
    ]
+  },
+  {
+   "event": "male|Pokhara Avengers|Sudurpaschim Royals|2026-10-28",
+   "start_ist": "2026-10-28 16:45 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Pokhara Avengers",
+    "Sudurpaschim Royals"
+   ],
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [],
  "suspect_not_alerted": [],
  "unmatched_teams": [
   "BBK Partnership (male)",
-  "Bengal (W) (female)",
   "Champions (W) (female)",
-  "Chandigarh (W) (female)",
-  "Chhattisgarh (W) (female)",
-  "Goa (W) (female)",
   "Hayleys Group A (male)",
   "Incredibles (W) (female)"
  ],
  "unmatched_players_in_window": [
   "A Tarakhail",
   "Abdollah Ahmadzai",
-  "Abdullah Ahmadzai",
-  "Abdullah Tarakhail",
   "Azmatullah Omarzai",
   "B Biza",
   "Beloved Biza",
@@ -306,12 +313,9 @@
   "F Ahmad",
   "F Chipare",
   "F Farooqi",
-  "Fareed Ahmad",
-  "Fazalhaq Farooqi",
   "Francisca Chipare",
   "I Ahmad Ahmadzai",
   "Ibrahim Zadran",
-  "Ijaz Ahmad Ahmadzai",
   "J Bishop",
   "Jacob Michael Gibson",
   "James Neesham",
@@ -325,23 +329,17 @@
   "M ur Rahman",
   "Matthew Buchanan Rowe",
   "Mitchel Mavunga",
-  "Mohammad Akram",
-  "Mujeeb Ur Rahman",
   "N Ahmad",
   "N Gwanzura",
   "N ul Rahman",
   "Nicholas Frederick Kelly",
-  "Noor Ahmad",
-  "Noor ul Rahman",
   "Nyasha Gwanzura",
   "O Chare",
   "Olinda Chare",
   "R Gurbaz",
-  "Rahmanullah Gurbaz",
   "Rashid Khan",
   "S Atal",
   "Sam James Cassidy",
-  "Sediqullah Atal",
   "Shahidullah",
   "T Makusha",
   "T Marumani",
@@ -470,14 +468,14 @@
   }
  },
  "log": [
-  "[16:28 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[16:28 IST] history: 23653 matches, last 2026-10-27, players 424841",
-  "[16:28 IST] source moviodds_bet365: {'status': 'ok', 'rows': 815, 'secs': 1.2}",
-  "[16:28 IST] source smarkets: {'status': 'ok', 'rows': 544, 'secs': 3.0}",
-  "[16:28 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[16:28 IST] 54 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[16:28 IST] book lines: 42 player lines from 1 source(s)",
-  "[16:28 IST] weather: forecasts for 3 events, 0 failed",
-  "[16:28 IST] prop model: 326 prop selections modelled, 100 milestone ladder prices anchored to O/U"
+  "[19:48 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[19:48 IST] history: 23656 matches, last 2026-10-27, players 424907",
+  "[19:48 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1093, 'secs': 0.2}",
+  "[19:48 IST] source smarkets: {'status': 'ok', 'rows': 471, 'secs': 1.7}",
+  "[19:48 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[19:48 IST] 57 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[19:48 IST] book lines: 70 player lines from 1 source(s)",
+  "[19:48 IST] weather: forecasts for 3 events, 0 failed",
+  "[19:48 IST] prop model: 512 prop selections modelled, 170 milestone ladder prices anchored to O/U"
  ]
 }
