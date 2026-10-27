@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { ChevronRight } from "lucide-react";
 import { liveBlurb, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
@@ -36,10 +36,10 @@ export function LiveScore({ s, size = "md", className }: { s: { display?: string
   );
 }
 
-function startsIn(ms: number) {
-  const m = Math.round(ms / 60000), h = Math.floor(m / 60), d = Math.floor(h / 24);
+export function startsIn(ms: number) {
+  const m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60), d = Math.floor(h / 24);
   if (d >= 1) return `Starts in ${d} day${d > 1 ? "s" : ""}`;
-  return h >= 1 ? `Match starts in ${h} hr${h > 1 ? "s" : ""} ${m % 60} mins` : `Match starts in ${m} mins`;
+  return h >= 1 ? `Starts in ${h}h${m % 60 ? ` ${m % 60}m` : ""}` : `Starts in ${m}m`;
 }
 
 /** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
@@ -53,41 +53,39 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const final = match?.status === "final" || (!match && f.status === "Completed");
   const live = !final && (hasScore || clockLive);
   const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
+  const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <Card className="h-full gap-0 rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
-        <div className="flex h-full flex-col gap-stack p-inset">
-          <div className="flex items-center gap-tight">
-            {live ? <Badge variant="destructive" className="gap-tight px-2.5 py-hair text-caption font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-hair text-caption font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</Badge>}
-            <Badge variant="outline" className="px-2.5 py-hair text-caption font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
-            {city(f.venue) && <span className="ml-auto min-w-0 truncate text-footnote font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
+      <Card className="h-full gap-0 rounded-2xl border-0 bg-white/[0.03] py-0 shadow-none ring-1 ring-white/[0.06] transition-colors group-hover:bg-white/[0.06]">
+        <div className="flex h-full flex-col gap-snug p-inset">
+          <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
+            {live ? <span className="inline-flex items-center gap-tight font-semibold uppercase tracking-wider text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</span>}
+            <span aria-hidden>·</span>
+            <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
+            {city(f.venue) && <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
           </div>
-          {hasScore ? (
-            <div className="grid gap-snug">
-              {[f.a, f.b].map((t: string, k: number) => (
-                <div key={t} className="flex min-w-0 items-center gap-snug" title={t}>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
+            {[f.a, f.b].map((t: string, k: number) => (
+              <div key={t} className="contents">
+                <div className="flex min-w-0 items-center gap-snug" title={t}>
                   <TeamBadge name={t} size="md" eager />
-                  <span className="min-w-0 flex-1 truncate text-body font-semibold">{t}</span>
-                  <LiveScore s={scores[k]} />
+                  <span className={cn("truncate text-body font-semibold", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
-              <div className="grid min-w-0 gap-snug">
-                {[f.a, f.b].map((t: string) => <div key={t} className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold">{t}</span></div>)}
+                {hasScore ? <LiveScore s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
+                  <span className="row-span-2 grid justify-items-end text-right">
+                    <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
+                    {timed && <span className="text-callout font-semibold tabular-nums">{localTime(when)}</span>}
+                  </span>
+                ) : null}
               </div>
-              <div className="grid justify-items-end gap-hair text-right">
-                <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}</span>
-                {timed && <span className="text-metric font-bold tabular-nums">{localTime(when)}</span>}
-              </div>
-            </div>
-          )}
-          <div className="mt-auto flex items-center justify-between gap-snug border-t border-white/10 pt-snug">
-            <div className="grid min-w-0 gap-hair"><span className="truncate text-callout font-medium">{status}</span><span className="truncate text-footnote text-muted-foreground">{seriesName(f)}</span></div>
-            <Badge className="shrink-0 px-3.5 py-hair text-footnote font-semibold">Props</Badge>
+            ))}
+          </div>
+          <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
+            <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
+            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
           </div>
         </div>
       </Card>
