@@ -1,7 +1,7 @@
 import datetime as dt
 import json
 
-from value_bets.archive import fixture_id, group, team_key, update
+from value_bets.archive import backfill, fixture_id, group, team_key, update
 
 START = "2026-10-27T07:00:00Z"
 SCHED = [{"start_utc": "2026-10-27T07:00Z", "format": "T20", "gender": "male", "team_a": "New Zealand", "team_b": "India", "venue": "Eden Park", "series": "NZ v IND", "status": "Upcoming"}]
@@ -102,3 +102,45 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
     (f,) = build_fixtures(tmp_path, None, {})
     assert f["id"] == fixture_id("2026-10-27T07:00Z", "Côte d'Ivoire", "India A")
     assert team_key("India (W)") == team_key("India Women") == "india"
+
+
+def without_name(**kw):
+    ln = line(**kw)
+    del ln["book_name"]  # how every line was filed before the field existed
+    return ln
+
+
+def test_a_later_pull_gives_a_line_filed_without_the_books_name_its_name_and_leaves_the_price(tmp_path):
+    update(tmp_path, book([without_name()]), at(20), None, SCHED)
+    update(tmp_path, book([line(books=(("bet365", 1.70, 2.10),), book_name="A Sharma")]), at(21), None, SCHED)  # a day out: the price stays as filed
+    (x,) = read(tmp_path)["lines"]
+    assert x["book_name"] == "A Sharma" and x["books"][0]["over"] == 1.85
+
+
+def test_backfill_adds_the_books_name_where_the_archive_knows_exactly_one_and_changes_nothing_else(tmp_path):
+    ab, cd, ef = ("ab12", "Abhishek Sharma"), ("cd34", "Tilak Varma"), ("ef56", "Rinku Singh")
+    update(tmp_path, book([line(*ab, book_name="A Sharma"), without_name(pid=ab[0], player=ab[1], stat="sixes", ln=1.5),
+                           line(*cd, ln=22.5, book_name="T Varma"), line(*cd, stat="fours", ln=2.5, book_name="Tilak V"), without_name(pid=cd[0], player=cd[1], stat="sixes", ln=0.5),
+                           without_name(pid=ef[0], player=ef[1])]), at(20), None, SCHED)
+    path = tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json"
+    before = json.loads(path.read_text())
+    assert backfill(tmp_path) == ["2026-10-27-new-zealand-v-india"]
+    after = json.loads(path.read_text())
+    got = {(x["pid"], x["stat"]): x.get("book_name") for x in after["lines"]}
+    assert got[("ab12", "sixes")] == "A Sharma", "one name for him across the archive"
+    assert got[("cd34", "sixes")] is None, "two spellings: not guessed"
+    assert got[("ef56", "runs")] is None, "no name anywhere"
+    for x in after["lines"]:
+        x.pop("book_name", None)
+    for x in before["lines"]:
+        x.pop("book_name", None)
+    assert after == before, "lines, prices and the update time are as they were"
+    assert backfill(tmp_path) == [], "nothing left to add"
+
+
+def test_backfill_takes_names_from_the_current_book_file_too_and_leaves_an_unreadable_file_alone(tmp_path):
+    update(tmp_path, book([without_name()]), at(20), None, SCHED)
+    bad = tmp_path / "2026-10" / "2026-10-28-broken.json"
+    bad.write_text('{"id": ')
+    assert backfill(tmp_path, book([line(book_name="A Sharma")])) == ["2026-10-27-new-zealand-v-india"]
+    assert read(tmp_path)["lines"][0]["book_name"] == "A Sharma" and bad.read_text() == '{"id": '

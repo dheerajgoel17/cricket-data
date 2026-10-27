@@ -1,0 +1,5 @@
+# Player links checked by hand: our player id, the live source's player id, a note. These override every automatic link (src/cricket_site/identity.py).
+# The site build lists the priced players it could not link, with the source players they might be; add one line here per fix.
+player_id,source_id,note
+470f446b,DBT,V Suryavanshi is Vaibhav Sooryavanshi (the source spells the surname differently)
+9550470d,YL,WIA Fernando is Avishka Fernando (the source uses the name he is known by)

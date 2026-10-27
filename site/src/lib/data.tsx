@@ -1,14 +1,20 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { createStore } from "@/engine/store.js";
 import { Resolver } from "@/engine/resolve.js";
+import { identityIndex } from "@/engine/identity.js";
 import { loadPhotos, type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Data { store: any; rz: any; photos: Photos }
+export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex> }
 const Ctx = createContext<Data | null>(null);
 
-/** Loads the generated data files once (matches, players index, photos map) and shares the engine objects with every page. */
+/** The player-identity table (our id <-> the live source's id, the books' names); a missing file just means nobody is linked and names decide. */
+async function loadIdentity(base: string) {
+  try { return identityIndex(await (await fetch(`${base}identity.json`)).json()); } catch { return identityIndex(null); }
+}
+
+/** Loads the generated data files once (matches, players index, photos map, identity table) and shares the engine objects with every page. */
 export function DataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -17,8 +23,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const store = await createStore({ base: "/data/" });
-        const [photos] = await Promise.all([loadPhotos("/data/")]);
-        if (live) setData({ store, rz: new Resolver(store), photos });
+        const [photos, identity] = await Promise.all([loadPhotos("/data/"), loadIdentity("/data/")]);
+        if (live) setData({ store, rz: new Resolver(store), photos, identity });
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };
