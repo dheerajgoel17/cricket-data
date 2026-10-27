@@ -38,7 +38,7 @@ const Circle = ({ size, className, children, title }: { size: BadgeSize; classNa
 export function TeamBadge({ name, size = "sm", className, eager }: { name: string; size?: BadgeSize; className?: string; eager?: boolean }) {
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
-  return <Circle size={size} className={className} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
+  return <Circle size={size} className={cn("border-0 bg-transparent", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
 }
 
 /** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the CREX logo, else the initials; the name goes in the tooltip. */
@@ -47,7 +47,7 @@ export function TeamFlag({ name, className }: { name: string; className?: string
   const flag = flagUrl(name, 80);
   const urls = [flag, ...teamLogos(photos, name)].filter(Boolean) as string[];
   return (
-    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-secondary text-[8px] font-bold text-muted-foreground ring-1 ring-inset ring-white/10", className)}>
+    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-transparent text-[8px] font-bold text-muted-foreground", className)}>
       <Img eager urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} />
     </span>
   );
