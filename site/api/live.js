@@ -39,7 +39,9 @@ async function snapshot() {
       const [live, card] = await Promise.all([getHtml(m.url).catch(() => ""), getHtml(crexScorecardUrl(m.url)).catch(() => "")]);
       pages.set(m, { live: parseCrexLive(live), card: parseCrexScorecard(card) });
     }));
-    const body = { asOf: new Date().toISOString(), source: "crex", delaySec: LIVE_TTL_MS / 1000, matches: rows.map((m) => (pages.has(m) ? crexMatch(m, pages.get(m).live, pages.get(m).card) : m)) };
+    // the public body names no source: match URLs stay on the server
+    const matches = rows.map((m) => { const { url, ...pub } = pages.has(m) ? crexMatch(m, pages.get(m).live, pages.get(m).card) : m; return pub; });
+    const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, matches };
     memo = { t: Date.now(), body };
     return body;
   })().finally(() => { inflight = null; });
@@ -54,6 +56,6 @@ export default async function handler(req, res) {
   } catch (e) {
     if (memo.body) return res.status(200).json({ ...memo.body, stale: true });
     const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
-    return res.status(502).json({ error: msg, asOf: new Date().toISOString(), source: "crex", matches: [] });
+    return res.status(502).json({ error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });
   }
 }

@@ -121,7 +121,9 @@ test("GET /api/live builds priced matches from the CREX pages only, then reuses 
   };
   const r = await callLive();
   assert.equal(r.code, 200);
-  assert.equal(r.body.source, "crex");
+  assert.equal(r.body.source, "live");
+  assert.ok(!JSON.stringify(r.body).toLowerCase().includes("crex"), "the public body names no source and carries no source URL");
+  assert.ok(!("url" in r.body.matches[0]));
   assert.equal(r.body.matches.length, 1, "the unpriced under-19 game is dropped");
   const [m] = r.body.matches;
   assert.equal(m.teams[0].name, "Netherlands");
