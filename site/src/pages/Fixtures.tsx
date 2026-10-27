@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ChevronLeft, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Clock, MapPin, Minus, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { PillGroup } from "@/components/app/pill-group";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
-import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
+import { TeamBadge, TeamGlow, usePreloadTeams } from "@/components/app/badges";
 import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
@@ -31,42 +31,50 @@ const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
 
-/** Time to / since the start, ticking every second from the shared clock. */
+/** Time to / since the start in a glass capsule, ticking every second from the shared clock. */
 function MatchTimer({ when, timed }: { when: Date; timed: boolean }) {
   const now = useNow(1000), ms = when.getTime() - now;
-  if (!timed) return <span className="text-sm text-muted-foreground">Start time to be confirmed</span>;
-  const label = "text-[11px] font-medium uppercase tracking-wider text-muted-foreground";
-  if (ms > 0) return <div className="grid justify-items-center gap-0.5"><span className={label}>Starts in</span><b className="text-lg font-semibold tabular-nums">{formatCountdown(ms)}</b></div>;
-  if (ms > -4 * 3600e3) return <div className="grid justify-items-center gap-0.5"><span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-miss"><span className="size-1.5 animate-pulse rounded-full bg-miss" />Live</span><b className="text-lg font-semibold tabular-nums">{formatElapsed(-ms)}</b></div>;
-  return <span className={label}>Completed</span>;
+  const cap = "inline-flex items-center gap-2 rounded-full bg-black/35 px-4 py-2 text-[15px] font-semibold tabular-nums backdrop-blur-md ring-1 ring-white/10";
+  if (!timed) return <span className={cap}><Clock className="size-4 text-muted-foreground" />Start time to be confirmed</span>;
+  if (ms > 0) return <span className={cap}><Clock className="size-4 text-muted-foreground" /><span className="font-medium text-muted-foreground">Starts in</span>{formatCountdown(ms)}</span>;
+  if (ms > -4 * 3600e3) return <span className={cap}><span className="size-2 animate-pulse rounded-full bg-miss" /><span className="font-medium text-miss">Live</span>{formatElapsed(-ms)}</span>;
+  return <span className={cap}>Completed</span>;
 }
 
-/** One match header (replaces the old hero + "Next match" card): flat flags, teams, start time and a live timer, then series, venue and badges. */
+/** One hero card for the match (iOS widget style): ambient glow from both teams' flags, series and format, the two sides around a big start time, the timer, then venue and "Props live". */
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="lg" eager /><b className="max-w-full text-[17px] font-semibold leading-tight">{name}</b></>;
-    return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-2.5">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-2.5">{body}</div>;
+    return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-3 active:opacity-70">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-3">{body}</div>;
   };
   return (
-    <section className="pt-3">
+    <section className="pt-1">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-2 text-[17px] text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
-      <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center">
-        {team(f.a, f.a_ix)}
-        <div className="grid justify-items-center gap-1.5">
-          <span className="text-sm font-medium text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
-          <b className="text-[28px] font-bold leading-none tracking-tight tabular-nums">{timed ? localTime(when) : "TBC"}</b>
-          <div className="mt-1"><MatchTimer when={when} timed={timed} /></div>
+      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-card p-5 ring-1 ring-white/10">
+        <TeamGlow name={f.a} className="-left-20 -top-12" />
+        <TeamGlow name={f.b} className="-right-20 -top-12" />
+        <div className="relative">
+          <div className="flex items-center justify-between gap-3">
+            <span className="min-w-0 truncate text-[13px] font-medium text-muted-foreground">{f.series || "Upcoming match"}</span>
+            <span className="shrink-0 rounded-full bg-black/35 px-3 py-1 text-xs font-semibold backdrop-blur-md ring-1 ring-white/10">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
+          </div>
+          <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-start gap-2 text-center">
+            {team(f.a, f.a_ix)}
+            <div className="grid justify-items-center gap-1 pt-1">
+              <span className="text-[13px] font-medium text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
+              <b className="text-[34px] font-bold leading-none tracking-tight tabular-nums">{timed ? localTime(when) : "TBC"}</b>
+            </div>
+            {team(f.b, f.b_ix)}
+          </div>
+          <div className="mt-6 flex justify-center"><MatchTimer when={when} timed={timed} /></div>
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+            <span className="flex min-w-0 items-center gap-2 text-[15px] text-muted-foreground"><MapPin className="size-4 shrink-0" /><span className="truncate">{f.venue || "Venue to be confirmed"}</span></span>
+            {live && <Badge className="shrink-0 px-3 py-1 text-xs font-semibold">Props live</Badge>}
+          </div>
         </div>
-        {team(f.b, f.b_ix)}
       </div>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-        {live && <Badge className="px-2.5 py-1 text-[11px] font-semibold">Props live</Badge>}
-        <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold">{f.fmt || "T20"}</Badge>
-        <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.gender === "female" ? "Women" : "Men"}</Badge>
-      </div>
-      <p className="mt-4 text-center text-[15px] text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ")}</p>
     </section>
   );
 }

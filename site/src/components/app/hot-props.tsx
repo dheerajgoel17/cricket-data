@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Bookmark, CalendarDays } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SlidersHorizontal } from "lucide-react";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { RowsSkeleton } from "./skeletons";
@@ -13,7 +14,6 @@ import { fmtIndex } from "@/engine/util.js";
 import { barState, windowRate } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
-import { useSaved } from "@/lib/saved";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
@@ -109,7 +109,6 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const { data, isLoading } = useHotRows();
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
-  const saved = useSaved();
   const [day, setDay] = useState("0");
   const [bars, setBars] = useState(true);
   const [team, setTeam] = useState("all");
@@ -117,34 +116,46 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
   }, [data]);
+  const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
   return (
     <section aria-label="Hot player props today">
       {!teams && <div className="pt-12 md:pt-14"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
-      {teams && <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam} className="mt-5"
-        items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} />}
+      {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
       <div className="mt-5 flex items-center gap-3">
-        <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
-        <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0" />
+        <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
+        <Sheet>
+          <SheetTrigger asChild>
+            <button type="button" aria-label="Filters" className="relative flex h-11 shrink-0 items-center gap-2 rounded-full bg-card px-4 text-[15px] font-medium transition-colors active:bg-accent">
+              <SlidersHorizontal className="size-[18px]" />{wl}
+              {dirty && <span aria-hidden className="absolute -right-0.5 -top-0.5 size-3 rounded-full bg-primary ring-2 ring-background" />}
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-[28px] border-0 bg-popover/80 px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
+            <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-white/25" />
+            <SheetHeader className="flex-row items-center justify-between p-0 pt-4">
+              <SheetTitle className="text-[22px] font-bold tracking-tight">Filters</SheetTitle>
+              <SheetClose className="text-[17px] font-semibold text-primary active:opacity-50">Done</SheetClose>
+            </SheetHeader>
+            <SheetDescription className="sr-only">Hit-rate window, {teams ? "team" : "day"} and form charts</SheetDescription>
+            <div className="mt-6 grid gap-6">
+              <div className="grid gap-2.5"><span className="text-[13px] font-medium text-muted-foreground">Hit-rate window</span>
+                <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} /></div>
+              {teams ? (
+                <div className="grid gap-2.5"><span className="text-[13px] font-medium text-muted-foreground">Team</span>
+                  <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam}
+                    items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} /></div>
+              ) : (
+                <div className="grid gap-2.5"><span className="text-[13px] font-medium text-muted-foreground">Day</span>
+                  <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={[["0", "Today"], ["1", "Tomorrow"]]} /></div>
+              )}
+              <label className="flex min-h-11 items-center justify-between gap-4 rounded-2xl bg-white/[0.06] px-4 py-2 text-[17px]">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
-      {tabs.length > 1 && (
-        <div className="mt-4 flex items-center gap-3">
-          {!teams && <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Choose day" className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", day !== "0" && "text-primary")}><CalendarDays className="size-[18px]" /></DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              <DropdownMenuRadioGroup value={day} onValueChange={setDay}>
-                <DropdownMenuRadioItem value="0">Today</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="1">Tomorrow</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>}
-          <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent"><Bookmark className="size-[18px]" />
-            {saved.list.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{saved.list.length}</span>}</Link>
-          <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1 sm:w-fit sm:flex-none" />
-        </div>
-      )}
       <div className="mt-5">
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
           <ul className="-mx-4 md:-mx-6">
