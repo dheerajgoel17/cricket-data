@@ -4,13 +4,16 @@ Scrapers such as Source A give full names ("Harry Brook"); Base uses initials ("
 registry id. `link_players` fills `player_id` in provisional files from, in order:
   1. data/mappings/player_aliases.csv (raw_name, team, player_id), team may be blank;
   2. an exact name match within the team's canonical roster;
-  3. same surname + compatible first name/initials, accepted only when exactly one roster player fits.
+  3. same surname + compatible first name/initials, accepted only when exactly one roster player fits;
+  4. a team Base has no roster for at all (Afghanistan, many associates): the one Base player with exactly this full name on any team, else
+     a minted id (`minted_id`), so the side's matches build a history and its players can be priced like any other.
 Anything else stays blank and is listed in data/provisional_unmatched.csv.
 """
 from __future__ import annotations
 
 import csv
 import difflib
+import hashlib
 import json
 import re
 import unicodedata
@@ -153,10 +156,21 @@ def resolve(raw: str, team: str, rosters, aliases, gender: str = "") -> tuple[st
     return "", "no_candidate", ""
 
 
+def minted_id(name: str, gender: str = "male") -> str:
+    """An id for a player of a team Base publishes nothing for: 8 hex of the full name and gender, so every match of theirs shares it.
+    Deterministic, so a later run (or a reader) recomputes it; a Base id for the player replaces it with a line in player_aliases.csv."""
+    return hashlib.sha1(f"minted|{_gender(gender)}|{_key(name)}".encode()).hexdigest()[:8]
+
+
 def link_players(store: Store, today: date | None = None) -> dict[str, int]:
     """Fill player_id in every provisional JSON file; write data/provisional_unmatched.csv."""
     rosters, aliases = build_rosters(store), load_aliases(store)
-    stats = {"files": 0, "rows": 0, "already": 0, "linked": 0, "unmatched": 0, "files_changed": 0}
+    by_name: dict[tuple[str, str], set[str]] = defaultdict(set)  # (gender, full name) -> Base ids, for a side Base has no roster of
+    for (_, g), ros in rosters.items():
+        for pid, (n, _, _) in ros.items():
+            by_name[(g, _key(n))].add(pid)
+    base_ids = {p for ids in by_name.values() for p in ids}
+    stats = {"files": 0, "rows": 0, "already": 0, "linked": 0, "minted": 0, "unmatched": 0, "files_changed": 0}
     unmatched = []
     for path in sorted((store.root / "provisional").glob("*.json")):
         doc = json.loads(path.read_text(encoding="utf-8"))
@@ -169,6 +183,16 @@ def link_players(store: Store, today: date | None = None) -> dict[str, int]:
                 continue
             pid, reason, cands = resolve(pl.get("player", ""), pl.get("team", ""), rosters, aliases,
                                          doc.get("gender", ""))
+            if not pid and reason == "team_not_in_cricsheet" and _key(pl.get("player", "")):
+                g = _gender(doc.get("gender", ""), pl.get("team", ""))
+                same = by_name.get((g, _key(pl["player"])), set())
+                if len(same) == 1:
+                    pid = next(iter(same))
+                elif (m := minted_id(pl["player"], g)) not in base_ids:
+                    pid = m
+                    stats["minted"] += 1
+                else:
+                    reason = "id_clash"
             if pid:
                 pl["player_id"], changed = pid, True
                 stats["linked"] += 1
