@@ -49,10 +49,10 @@ function AppSidebar() {
 function TabBar() {
   const { pathname } = useLocation();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-60 flex border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden" aria-label="Sections">
+    <nav className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-60 flex rounded-full border bg-background/85 px-2 shadow-[0_8px_30px_rgba(0,0,0,.55)] backdrop-blur-xl md:hidden" aria-label="Sections">
       {TAB_NAV.map(({ to, label, icon: Icon, match }) => (
-        <NavLink key={to} to={to} className={cn("grid flex-1 justify-items-center gap-0.5 pb-2.5 pt-2 text-xs font-semibold", match(pathname) ? "text-foreground" : "text-muted-foreground")}>
-          <Icon className="size-6" strokeWidth={1.7} />{label}
+        <NavLink key={to} to={to} className={cn("grid flex-1 justify-items-center gap-0.5 py-2 text-[11px] font-semibold", match(pathname) ? "text-foreground" : "text-muted-foreground")}>
+          <Icon className="size-5" strokeWidth={1.8} />{label}
         </NavLink>
       ))}
     </nav>
@@ -80,7 +80,7 @@ export function Shell() {
   const { pathname } = useLocation();
   const playerScreen = pathname.startsWith("/player/");
   return (
-    <SidebarProvider className="min-h-screen flex-col pb-20 md:pb-0">
+    <SidebarProvider className="min-h-screen flex-col pb-24 md:pb-0">
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />

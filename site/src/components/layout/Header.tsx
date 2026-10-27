@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Bookmark, BookOpen, Info, MessageSquare, Wrench } from "lucide-react";
+import { Bookmark, BookOpen, Info, MessageSquare, Search, Wrench, X } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSaved } from "@/lib/saved";
@@ -15,7 +16,7 @@ export function Brand() {
         <rect x="10.5" y="8" width="7" height="18" rx="1.5" fill="var(--primary)" opacity=".8" />
         <rect x="21" y="0" width="7" height="26" rx="1.5" fill="var(--primary)" />
       </svg>
-      <span className="hidden text-[22px] font-extrabold leading-none tracking-tight sm:inline">Props<span className="text-primary">.</span>Cash</span>
+      <span className="text-xl font-extrabold leading-none tracking-tight md:text-[22px]">Props<span className="text-primary">.</span>Cash</span>
     </Link>
   );
 }
@@ -47,13 +48,19 @@ function Profile() {
 
 /** Top bar: logo left, search centred on the page, profile right. Glass blur with a faint green glow line underneath. */
 export function Header() {
+  const [searching, setSearching] = useState(false);
   return (
     <header className="sticky top-0 z-50 h-14 border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-saturate-150 md:h-[60px]">
       <div className="relative mx-auto flex h-full items-center gap-3 px-4 md:px-6">
         <SidebarTrigger className="-ml-2 hidden md:inline-flex" aria-label="Toggle sidebar" />
-        <Brand />
-        <GlobalSearch className="ml-auto w-full max-w-[220px] md:absolute md:left-1/2 md:ml-0 md:max-w-[620px] md:-translate-x-1/2" />
-        <div className="md:ml-auto"><Profile /></div>
+        {/* phones: centred logo with search and menu icons (props.cash style); search opens as a full-width bar */}
+        <div className={searching ? "hidden" : "absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"}><Brand /></div>
+        <GlobalSearch className={searching ? "w-full md:absolute md:left-1/2 md:max-w-[620px] md:-translate-x-1/2" : "hidden md:block md:absolute md:left-1/2 md:w-full md:max-w-[620px] md:-translate-x-1/2"} />
+        {searching && <button type="button" aria-label="Close search" onClick={() => setSearching(false)} className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary md:hidden"><X className="size-4" /></button>}
+        {!searching && <div className="ml-auto flex items-center gap-2">
+          <button type="button" aria-label="Search" onClick={() => setSearching(true)} className="grid size-9 place-items-center rounded-full bg-secondary md:hidden"><Search className="size-[18px]" /></button>
+          <Profile />
+        </div>}
       </div>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     </header>
