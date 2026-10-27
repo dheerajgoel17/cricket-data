@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Link } from "react-router-dom";
 import { BarChart3, Bookmark, CalendarDays } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -17,9 +16,9 @@ import { loadLines } from "@/lib/feeds";
 import { useSaved } from "@/lib/saved";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { PlayerBadge, TeamFlag } from "./badges";
+import { PillGroup } from "./pill-group";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
@@ -155,9 +154,7 @@ export function HotProps() {
       </div>
       <div className="mt-3 flex items-center gap-2">
         <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
-        <ToggleGroup type="single" value={win} onValueChange={(v) => v && setWin(v as Win)} variant="outline" spacing={0} className="h-11 min-w-0 flex-1 rounded-full border bg-card p-1 sm:w-fit sm:flex-none" aria-label="Hit-rate window">
-          {WINS.map(([k, l]) => <ToggleGroupItem key={k} value={k} className="h-9 flex-1 rounded-full border-0 px-4 text-sm data-[state=on]:bg-accent sm:flex-none">{l}</ToggleGroupItem>)}
-        </ToggleGroup>
+        <PillGroup layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-fit sm:flex-none" itemClassName="flex-1 sm:flex-none" />
       </div>
       {tabs.length > 1 && (
         <div className="mt-2 flex items-center gap-2">
@@ -172,11 +169,7 @@ export function HotProps() {
           </DropdownMenu>
           <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent"><Bookmark className="size-[18px]" />
             {saved.list.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{saved.list.length}</span>}</Link>
-          <Tabs value={stat} onValueChange={setStat} className="min-w-0 flex-1 sm:flex-none">
-            <TabsList className="h-11 w-full justify-start gap-0 overflow-x-auto rounded-full border bg-card p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-fit">
-              {tabs.map(([k, l]) => <TabsTrigger key={k} value={k} className="h-9 flex-none rounded-full px-4 text-sm data-[state=active]:bg-accent">{l}</TabsTrigger>)}
-            </TabsList>
-          </Tabs>
+          <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1 sm:w-fit sm:flex-none" />
         </div>
       )}
       <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">

@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { TeamFlag } from "./badges";
+import { PillGroup } from "./pill-group";
 
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
 /** Short chip label: drops the year, "in <place>" and "tour of <host>" tails so names aren't cut mid-word. */
@@ -68,13 +68,10 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   }, [fx]);
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
-  const chip = "h-9 shrink-0 rounded-full border-0 px-4 text-sm font-medium data-[state=on]:bg-accent";
   return (
     <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-4" aria-label="Upcoming matches">
-      <ToggleGroup type="single" value={sel} onValueChange={(v) => v && setSel(v)} variant="outline" spacing={0} className="h-11 w-full justify-start overflow-x-auto rounded-full border bg-card p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Filter by series">
-        <ToggleGroupItem value="all" className={chip}>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></ToggleGroupItem>
-        {chips.map(([n, k]) => <ToggleGroupItem key={n} value={n} title={n} className={chip}>{shortSeries(n)} <span className="ml-1.5 text-xs text-muted-foreground">{k}</span></ToggleGroupItem>)}
-      </ToggleGroup>
+      <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
+        items={[["all", <>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-xs text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
       <Carousel key={sel} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
         <CarouselContent className="-ml-3">
           {shown.map((f) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[86%] pl-3 sm:basis-[360px]"><FixtureCard f={f} /></CarouselItem>)}
