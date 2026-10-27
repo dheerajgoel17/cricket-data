@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { TeamFlag } from "./badges";
@@ -64,6 +65,18 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
 /** Series chips (shadcn ToggleGroup) over a shadcn Carousel (embla: swipe, drag, snap; arrows from md) of FixtureCards. */
 export function FixtureRail({ fx }: { fx: any[] }) {
   const [sel, setSel] = useState("all");
+  const [api, setApi] = useState<CarouselApi>();
+  const [edge, setEdge] = useState({ l: false, r: true });
+  const [moving, setMoving] = useState(false); // edge blur shows only while the row is being dragged or is still gliding
+  useEffect(() => {
+    if (!api) return;
+    const upd = () => setEdge({ l: api.canScrollPrev(), r: api.canScrollNext() });
+    upd();
+    let idle: ReturnType<typeof setTimeout>;
+    const move = () => { upd(); setMoving(true); clearTimeout(idle); idle = setTimeout(() => setMoving(false), 160); }; // off ~160 ms after the last movement
+    api.on("select", upd).on("reInit", upd).on("scroll", move).on("pointerDown", move);
+    return () => { clearTimeout(idle); api.off("select", upd).off("reInit", upd).off("scroll", move).off("pointerDown", move); };
+  }, [api]);
   const chips = useMemo(() => {
     const c = new Map<string, number>();
     fx.forEach((f) => c.set(seriesName(f), (c.get(seriesName(f)) || 0) + 1));
@@ -75,10 +88,16 @@ export function FixtureRail({ fx }: { fx: any[] }) {
     <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-4" aria-label="Upcoming matches">
       <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
         items={[["all", <>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-xs text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
-      <Carousel key={sel} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
+      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
         <CarouselContent className="-ml-3">
           {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[86%] pl-3 sm:basis-[360px]"><FixtureCard f={f} i={i} /></CarouselItem>)}
         </CarouselContent>
+        {/* edge fades: blurred, masked strips that appear only on the side that still has cards to scroll to */}
+        {(["l", "r"] as const).map((side) => (
+          <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 z-10 w-14 bg-black/40 backdrop-blur-md transition-opacity duration-300 ease-out",
+            side === "l" ? "left-0 [mask-image:linear-gradient(to_right,#000,transparent)] [-webkit-mask-image:linear-gradient(to_right,#000,transparent)]" : "right-0 [mask-image:linear-gradient(to_left,#000,transparent)] [-webkit-mask-image:linear-gradient(to_left,#000,transparent)]",
+            moving && edge[side] ? "opacity-100" : "opacity-0")} />
+        ))}
         <CarouselPrevious className="left-2 hidden md:inline-flex" />
         <CarouselNext className="right-2 hidden md:inline-flex" />
       </Carousel>

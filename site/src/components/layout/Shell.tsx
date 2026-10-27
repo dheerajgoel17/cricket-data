@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { CalendarBlank, ChatCircleText, Crosshair, Flag, User, type Icon } from "@phosphor-icons/react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
@@ -46,17 +47,22 @@ function AppSidebar() {
   );
 }
 
-/** Phones: iOS-style tab bar. Full width, translucent blur over a hairline top border, 49pt tall plus the home-indicator inset, 10pt labels, tint on the active tab, a press-in on tap. */
+/** SF-Symbols-style tab icons (Phosphor): outline when idle, filled when selected, like iOS. */
+const TAB_ICON: Record<string, Icon> = { "/": CalendarBlank, "/props": Crosshair, "/players": User, "/teams": Flag, "/ask": ChatCircleText };
+
+/** Phones: iOS 26 style floating glass tab bar. A translucent capsule (heavy blur and saturation, inner top highlight), the selected tab marked by a glass pill that slides between tabs, filled icon and tint on the active tab, spring press. */
 function TabBar() {
   const { pathname } = useLocation();
+  const reduce = useReducedMotion();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-60 flex border-t border-white/10 bg-background/70 pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-[1.8] md:hidden" aria-label="Sections">
-      {TAB_NAV.map(({ to, label, icon: Icon, match }) => {
-        const on = match(pathname);
+    <nav className="fixed inset-x-4 bottom-[max(14px,env(safe-area-inset-bottom))] z-60 flex h-16 items-center rounded-[32px] border border-white/[0.14] bg-white/[0.07] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,.18),0_12px_40px_rgba(0,0,0,.6)] backdrop-blur-2xl backdrop-saturate-[1.8] md:hidden" aria-label="Sections">
+      {TAB_NAV.map(({ to, label, match }) => {
+        const on = match(pathname), Ico = TAB_ICON[to] ?? CalendarBlank;
         return (
-          <NavLink key={to} to={to} aria-current={on ? "page" : undefined} className={cn("flex h-[49px] flex-1 flex-col items-center justify-center gap-[3px] pt-1 text-[10px] font-medium tracking-[.01em] transition-colors", on ? "text-primary" : "text-muted-foreground")}>
-            <motion.span whileTap={{ scale: 0.86 }} transition={{ type: "spring", stiffness: 600, damping: 30 }} className="grid justify-items-center gap-[3px]">
-              <Icon className="size-[25px]" strokeWidth={on ? 2.2 : 1.7} />{label}
+          <NavLink key={to} to={to} aria-current={on ? "page" : undefined} className={cn("relative flex h-full flex-1 flex-col items-center justify-center gap-0.5 rounded-[26px] text-[10px] font-medium tracking-[.01em] transition-colors", on ? "text-primary" : "text-white/60")}>
+            {on && <motion.span layoutId="tab-glass" aria-hidden className="absolute inset-0 rounded-[26px] bg-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,.22)]" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }} />}
+            <motion.span whileTap={{ scale: 0.88 }} transition={{ type: "spring", stiffness: 600, damping: 30 }} className="relative grid justify-items-center gap-0.5">
+              <Ico className="size-6" weight={on ? "fill" : "regular"} />{label}
             </motion.span>
           </NavLink>
         );
@@ -70,7 +76,7 @@ export function Shell() {
   const { pathname } = useLocation();
   const playerScreen = pathname.startsWith("/player/");
   return (
-    <SidebarProvider className="min-h-screen flex-col pb-[calc(49px+env(safe-area-inset-bottom))] md:pb-0">
+    <SidebarProvider className="min-h-screen flex-col pb-[calc(96px+env(safe-area-inset-bottom))] md:pb-0">
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
