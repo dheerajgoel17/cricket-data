@@ -3,6 +3,7 @@ name: Value bets
 # Hourly 03:30-17:30 UTC (09:00-23:00 IST): pull free odds (Exchange S, Book A via Feed P), price player props
 # against the cricket-data history and commit ONLY the small outputs under value_bets/out + dedupe state.
 # Independent of the data workflows (own concurrency group, touches no files under data/).
+# Each run also adds the results of finished matches to value_bets/archive (read from the site's live route; see docs/PROJECT_GUIDE.md 5.4c).
 # Weekly (Sun 07:00 UTC) or on demand with refit=true: re-run the prop backtest (incl. the weather study, topping up
 # the Open-Meteo cache in value_bets/mappings) and refit state/prop_model.json.
 on:
@@ -74,6 +75,13 @@ jobs:
             cat value_bets/out/value_bets_latest.md
           } >> "$GITHUB_STEP_SUMMARY"
           test ! -f value_bets/out/last_error.txt || { echo "::warning::pipeline error, see value_bets_run.log"; }
+      - name: Store the results of finished matches in the archive
+        # the site's live route settles every priced line of a finished match (ids through the identity table); this only writes those results into the match's archive file (added, never changed)
+        if: github.event.schedule != '0 7 * * 0' && vars.SITE_URL != ''
+        continue-on-error: true
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: python -m value_bets.archive --results "${SITE_URL%/}/api/live"
       - name: Commit outputs
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)
         run: |

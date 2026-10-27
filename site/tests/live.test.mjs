@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, unlistedRows, wantsCard,
+  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, settleLines, strikeRate, teamKey, teamScore, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
 import { identityIndex } from "../src/engine/identity.js";
 
@@ -612,4 +612,118 @@ test("notInXI by the table's id: linked and absent is out; the same name spelled
   const m = xiMatch(XI); // ids P0.. in the order of XI; Hasaranga is P6
   assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "P6", ""), false);
   assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "N0", ""), true);
+});
+
+// --- lines settled on the server: where every priced line stands, found by id through the identity table ---
+const PRICED = (pid, player, team, stat, line, extra = {}) => ({ pid, player, team, fmt: "T20", stat, line, match: "New Zealand vs India", start_utc: "2026-10-27T07:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 1.9, under: 1.9 }], ...extra });
+const CHASE_IDN = identityIndex({ v: 1, s: { s1: "SOO" } });
+
+test("settleLines: every priced line of a live match gets its value, state and verdict (hand-computed from the card)", () => {
+  const m = chase(), at = (lines, idn) => settleLines(m, lines, idn);
+  const lines = [
+    PRICED("a1", "Finn Allen", "New Zealand", "runs", 30.5), // 40 off 25, lbw: dismissed on 40, over 30.5 already cleared
+    PRICED("a1", "Finn Allen", "New Zealand", "sixes", 3.5), // 3 sixes and out: the count cannot reach 4
+    PRICED("m1", "Daryl Mitchell", "New Zealand", "runs", 89), // 89 not out when New Zealand's 20 overs ended: exactly the line
+    PRICED("m1", "Daryl Mitchell", "New Zealand", "runs", 89.5), // one short
+    PRICED("s1", "V Suryavanshi", "India", "runs", 25.5), // 13 off 5, India are batting: still to play for
+    PRICED("s1", "V Suryavanshi", "India", "sixes", 0.5), // his one six clears 0.5 at once, whatever else happens
+    PRICED("ar", "Arshdeep Singh", "India", "wickets", 1.5), // 2 wickets in a full 4-over spell
+    PRICED("mi", "Adam Milne", "New Zealand", "wickets", 0.5), // 0 wickets after 0.4 overs of 4.0
+  ];
+  assert.deepEqual(at(lines, CHASE_IDN).map(({ pid, stat, line, value, state, verdict }) => [pid, stat, line, value, state, verdict]), [
+    ["a1", "runs", 30.5, 40, "out", "cleared"],
+    ["a1", "sixes", 3.5, 3, "out", "missed"],
+    ["m1", "runs", 89, 89, "final", "push"],
+    ["m1", "runs", 89.5, 89, "final", "missed"],
+    ["s1", "runs", 25.5, 13, "live", null],
+    ["s1", "sixes", 0.5, 1, "live", "cleared"],
+    ["ar", "wickets", 1.5, 2, "final", "cleared"],
+    ["mi", "wickets", 0.5, 0, "live", null],
+  ]);
+});
+
+test("settleLines: the identity table finds the player the name rules cannot (V Suryavanshi is Vaibhav Sooryavanshi on the card)", () => {
+  const m = chase(), lines = [PRICED("s1", "V Suryavanshi", "India", "runs", 25.5), PRICED("a1", "Finn Allen", "New Zealand", "runs", 30.5)];
+  assert.deepEqual(settleLines(m, lines).map((x) => x.pid), ["a1"], "no table: only the player whose name agrees is placed");
+  assert.deepEqual(settleLines(m, lines, CHASE_IDN).map((x) => [x.pid, x.value]), [["s1", 13], ["a1", 40]]);
+  assert.deepEqual(settleLines(m, lines, identityIndex({ v: 1, s: { s1: "NOBODY" } })).map((x) => x.pid), ["a1"], "an id the card does not have is not guessed from the name");
+});
+
+test("settleLines: only this match's lines, not the series' next game or another pair of sides; a player with no row has no entry", () => {
+  const m = chase();
+  const lines = [
+    PRICED("a1", "Finn Allen", "New Zealand", "runs", 12.5, { start_utc: "2026-10-30T07:00:00Z" }), // the next game between the same sides
+    PRICED("a1", "Finn Allen", "New Zealand", "runs", 13.5, { match: "Pakistan vs Sri Lanka" }),
+    PRICED("a1", "Finn Allen", "New Zealand", "runs", 14.5, { match: "India vs New Zealand", start_utc: "2026-10-27T10:30:00Z" }), // sides either way round, books 3.5 h off
+    PRICED("sa", "Mitchell Santner", "New Zealand", "runs", 10.5), // not on the card yet
+  ];
+  assert.deepEqual(settleLines(m, lines).map((x) => [x.line, x.value]), [[14.5, 40]]);
+  assert.deepEqual(settleLines(m, [], CHASE_IDN), []);
+  assert.deepEqual(settleLines(m, undefined), []);
+  assert.deepEqual(settleLines(null, lines), []);
+});
+
+test("settleLines: a player the named XI rules out has no value and is marked, and the books' name or the table's id keeps a namesake from being called out", () => {
+  const m = xiMatch(XI);
+  const lines = [
+    PRICED("sh", "Dasun Shanaka", "Sri Lanka", "runs", 10.5, { match: "Pakistan vs Sri Lanka", start_utc: "" }),
+    PRICED("bm", "BKG Mendis", "Sri Lanka", "runs", 20.5, { match: "Pakistan vs Sri Lanka", start_utc: "", book_name: "Kusal Mendis" }), // in the eleven under the books' name
+    PRICED("hd", "PWH de Silva", "Sri Lanka", "runs", 15.5, { match: "Pakistan vs Sri Lanka", start_utc: "" }), // Hasaranga: P6
+    PRICED("zz", "X Linked", "Sri Lanka", "runs", 5.5, { match: "Pakistan vs Sri Lanka", start_utc: "" }), // linked, and his id is not among the eleven
+  ];
+  const idn = identityIndex({ v: 1, s: { hd: "P6", zz: "ZZZ" } });
+  assert.deepEqual(settleLines(m, lines, idn).map(({ pid, value, state, verdict, notInXI }) => [pid, value, state, verdict, notInXI]), [
+    ["sh", null, "live", null, true],
+    ["zz", null, "live", null, true],
+  ]);
+});
+
+test("settleLines: in a finished match every number is final, found by the books' name, and a line met exactly is a push", () => {
+  const row = { id: "x", status: "live", fmt: "ODI", start: "2026-10-27T08:00:00.000Z", teams: [{ name: "Pakistan", abbr: "PAK" }, { name: "Sri Lanka", abbr: "SL" }], innings: [], players: [] };
+  const m = buildMatch(row, parseMatchPage(pkSl), null); // Kusal Mendis 62 (60), 6 fours, 2 sixes; the match page says status 2
+  const line = (stat, ln, extra) => PRICED("bm", "BKG Mendis", "Sri Lanka", stat, ln, { fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-10-27T08:00:00Z", book_name: "Kusal Mendis", ...extra });
+  const got = settleLines(m, [line("runs", 49.5), line("runs", 62), line("runs", 62.5), line("sixes", 2), line("fours", 5.5), line("wickets", 0.5)]);
+  assert.deepEqual(got.map(({ stat, line: ln, value, state, verdict }) => [stat, ln, value, state, verdict]), [
+    ["runs", 49.5, 62, "final", "cleared"],
+    ["runs", 62, 62, "final", "push"],
+    ["runs", 62.5, 62, "final", "missed"],
+    ["sixes", 2, 2, "final", "push"],
+    ["fours", 5.5, 6, "final", "cleared"],
+  ]);
+});
+
+test("lineStanding: the server's settled entry first, then the archive's stored result, then the browser's own reading, then the data's game", () => {
+  const m = chase(), line = { pid: "s1", player: "V Suryavanshi", book_name: "", team: "India", stat: "runs", line: 25.5 };
+  const served = { ...m, lines: [{ pid: "s1", stat: "runs", line: 25.5, value: 31, state: "out", verdict: "cleared" }] };
+  assert.deepEqual(lineStanding(served, line, CHASE_IDN, { stored: 99, settled: 98 }), { v: 31, state: "out", verdict: "cleared" }, "the server's word beats everything else");
+  assert.deepEqual(lineStanding(served, { ...line, line: 30.5 }, CHASE_IDN, { stored: 44 }), { v: 44, state: "final", verdict: "cleared" }, "no entry for this line: the stored result");
+  assert.deepEqual(lineStanding(null, line, CHASE_IDN, { stored: 20 }), { v: 20, state: "final", verdict: "missed" }, "an old match: no live feed, no matching, the archive file's result");
+  assert.deepEqual(lineStanding(null, { ...line, line: 20 }, CHASE_IDN, { stored: 20 }), { v: 20, state: "final", verdict: "push" });
+  assert.deepEqual(lineStanding(m, line, CHASE_IDN), { v: 13, state: "live", verdict: null }, "a body with no settled lines: his row on the card, found by his id");
+  assert.equal(lineStanding(m, line), null, "and by name alone he is not found");
+  assert.deepEqual(lineStanding(null, line, CHASE_IDN, { settled: 7 }), { v: 7, state: "final", verdict: "missed" }, "the data's game is the last resort");
+  assert.equal(lineStanding(null, line, CHASE_IDN), null);
+  const noValue = { ...m, lines: [{ pid: "s1", stat: "runs", line: 25.5, value: null, state: "live", verdict: null, notInXI: true }] };
+  assert.equal(lineStanding(noValue, line, CHASE_IDN, { stored: 12 }).v, 12, "a ruled-out entry has no value to show");
+});
+
+test("lineNotIn: the server's word when it settled the player, the browser's reading of the card otherwise", () => {
+  const m = xiMatch(XI), line = { pid: "sh", player: "Dasun Shanaka", team: "Sri Lanka", stat: "runs", line: 10.5 };
+  assert.equal(lineNotIn(m, line), true, "no entry: read off the card, nobody of that surname among the eleven");
+  assert.equal(lineNotIn({ ...m, lines: [{ pid: "sh", stat: "runs", line: 10.5, value: null, state: "live", verdict: null, notInXI: true }] }, line), true);
+  assert.equal(lineNotIn({ ...m, lines: [{ pid: "sh", stat: "runs", line: 10.5, value: 4, state: "live", verdict: null }] }, line), false, "the server found a row for him");
+  assert.equal(lineNotIn(null, line), false);
+});
+
+test("unlistedRows: a match our file calls Completed without a result is not final until its own page says so (a Test still being played)", () => {
+  const csv = ["start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result",
+    '2026-10-27T08:30Z,aus-vs-sa-3rd-test,Australia tour of South Africa 2026,Test,male,South Africa,Australia,"Newlands, Cape Town",Completed,/cricket-live-score/aus-vs-sa-3rd-test,',
+    '2026-10-27T07:00Z,ind-vs-nz-3rd-t20i,India tour of New Zealand 2026,T20,male,New Zealand,India,"Hnry Stadium, Wellington",Completed,/cricket-live-score/ind-vs-nz-3rd-t20i,India won by 5 runs'].join("\n");
+  const books = bookFixtures({ events: [{ match: "South Africa vs Australia", start_utc: "2026-10-27T08:30:00Z" }, { match: "India vs New Zealand", start_utc: "2026-10-27T07:00:00Z" }] });
+  const rows = unlistedRows([], books, parseFixtureCsv(csv), "", Date.parse("2026-10-27T14:00:00Z"));
+  assert.deepEqual(rows.map((r) => [r.id, r.status]), [["aus-vs-sa-3rd-test", "live"], ["ind-vs-nz-3rd-t20i", "final"]]);
+  const day1 = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "South Africa", team2_f_n: "Australia", status: 1, inning: 1, score1: "308-6", over1: "(76.0)" } }));
+  assert.equal(buildMatch(rows[0], day1, null).status, "live", "the match page says it is on");
+  const over = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "South Africa", team2_f_n: "Australia", status: 2, inning: 4, score1: "308-6", over1: "(76.0)", B: "South Africa won by 5 wickets" } }));
+  assert.equal(buildMatch(rows[0], over, null).status, "final", "and once it says it is over, it is");
 });

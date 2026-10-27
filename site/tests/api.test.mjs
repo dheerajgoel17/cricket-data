@@ -1,5 +1,8 @@
 import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const FAKE = ["not", "a", "real", "key"].join("-");
 process.env.GEMINI_API_KEY = FAKE;
@@ -173,4 +176,42 @@ test("GET /api/live reads a finished match from its own page when the schedule p
   assert.deepEqual([m.status, m.summary, m.teams[0].name, m.teams[1].display], ["final", "Sri Lanka won by 8 wickets", "Pakistan", "114/2 (18.1 ov)"]);
   assert.ok(!JSON.stringify(r.body).includes("src.test"), "no source URL in the public body");
   assert.ok(hits.some((u) => u.endsWith("pak-vs-sl-5th-odi/match-scorecard")), "the scorecard page is read too");
+});
+
+test("GET /api/live settles each match's priced lines with the identity table, and a finished match's numbers are final", async () => {
+  const { default: fresh } = await import("../api/live.js?settled"); // its own cache and identity
+  const dir = await mkdtemp(join(tmpdir(), "live-identity-")), here = process.cwd();
+  await mkdir(join(dir, "public", "data"), { recursive: true });
+  await writeFile(join(dir, "public", "data", "identity.json"), JSON.stringify({ v: 1, s: { aa11: "SOO", bb22: "ZED" }, b: {} }));
+  process.chdir(dir); // the table is read from public/data/identity.json, where the deployment ships it
+  const start = new Date(Date.now() - 6 * 3600e3), iso = start.toISOString().slice(0, 16) + "Z";
+  const priced = (pid, player, team, stat, line) => ({ pid, player, team, fmt: "ODI", stat, line, match: "Pakistan vs Sri Lanka", start_utc: start.toISOString(), books: [{ source: "bet365", kind: "bookmaker", over: 1.9, under: 1.9 }] });
+  const books = { lines: [priced("aa11", "V Suryavanshi", "Sri Lanka", "runs", 49.5), priced("aa11", "V Suryavanshi", "Sri Lanka", "sixes", 2), priced("cc33", "Not Playing", "Pakistan", "runs", 9.5)] };
+  const csv = ["start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result", `${iso},pak-vs-sl-5th-odi,Tri Series,ODI,male,Pakistan,Sri Lanka,Lahore,Completed,/cricket-live-score/pak-vs-sl-5th-odi,`].join("\n");
+  // the source calls him Vaibhav Sooryavanshi (id SOO); our data and the books call him V Suryavanshi, which no name rule joins
+  const live = pageHtml({ "https://src.test/v3/getSV3": { team1_f_n: "Sri Lanka", team2_f_n: "Pakistan", inning: 2, status: 2, score1: "114-2", over1: "(18.1)", score2: "110-10", over2: "(25.3)", B: "Sri Lanka won by 8 wickets",
+    player_full_name1: "Vaibhav Sooryavanshi", run1: "62", ball1: "(60)", four1: "6", six1: "2", os1: 1 } });
+  const card = pageHtml({ "https://src.test/v3/getSC4": [{ c: "SL", d: "114/2(109", e: "0.0.0.0.0", b: ["SOO.62.60.6.2"], a: [] }],
+    "https://src.test/mapping/getHomeMapData": { p: [{ f_key: "SOO", n: "Vaibhav Sooryavanshi" }], t: [{ f_key: "SL", n: "Sri Lanka" }, { f_key: "PK", n: "Pakistan" }] } });
+  globalThis.fetch = async (url) => {
+    const u = String(url), html = (t) => ({ ok: true, status: 200, text: async () => t });
+    if (u.includes("book_lines.json")) return { ok: true, status: 200, json: async () => books };
+    if (u.includes("upcoming.csv")) return html(csv);
+    if (u === "https://src.test/schedule") return html(pageHtml({ "https://src.test/fixture/getFixture": [] }));
+    if (u.endsWith("pak-vs-sl-5th-odi/match-scorecard")) return html(card);
+    if (u.endsWith("pak-vs-sl-5th-odi")) return html(live);
+    return { ok: false, status: 404, json: async () => ({}), text: async () => "" };
+  };
+  try {
+    const r = await new Promise((resolve) => { const res = { setHeader() {}, status(c) { this.code = c; return this; }, json(o) { resolve({ code: this.code, body: o }); } }; fresh({ method: "GET" }, res); });
+    assert.equal(r.code, 200);
+    assert.equal(r.body.linked, 2, "the table was read");
+    const [m] = r.body.matches;
+    assert.equal(m.status, "final");
+    assert.deepEqual(m.lines.map(({ pid, stat, line, value, state, verdict }) => [pid, stat, line, value, state, verdict]), [
+      ["aa11", "runs", 49.5, 62, "final", "cleared"], // 62 off 60 against a line of 49.5
+      ["aa11", "sixes", 2, 2, "final", "push"], // 2 sixes against a line of exactly 2
+    ], "found by id; the player with no row on the card has no entry");
+    assert.ok(!JSON.stringify(r.body).includes("src.test"));
+  } finally { process.chdir(here); await rm(dir, { recursive: true, force: true }); }
 });

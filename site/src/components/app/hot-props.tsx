@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
-import { liveForFixture, lineVerdict, livePlayer, liveState, liveStat, notInXI } from "@/engine/live.js";
+import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
 import { bookLinesFor, sameFixture } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -35,7 +35,7 @@ const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
-interface Row { day: number; idx: number; pid: string; name: string; bookName: string; settled?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; pid: string; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
 function useHotRows(archive?: any, teams?: [string, string]) {
@@ -75,7 +75,7 @@ function useHotRows(archive?: any, teams?: [string, string]) {
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
         out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
-          edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
+          edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       });
       // a few plans at a time, giving the main thread back in between: on a phone the whole batch is seconds of work, and typing in search waited behind it
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
@@ -90,7 +90,7 @@ function useHotRows(archive?: any, teams?: [string, string]) {
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
-type SoFar = { v: number; state: "live" | "out" | "final" };
+type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const; // the words the player page's chart uses
 
 function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
@@ -102,7 +102,7 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && (() => { const verdict = lineVerdict(soFar.v, r.line, soFar.state); return <span className={cn("tabular-nums", verdict === "cleared" ? "text-primary" : verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{verdict && <b className="font-semibold"> · {VERDICT[verdict as keyof typeof VERDICT]}</b>}</span>; })()}</ItemDescription>
+            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
@@ -135,17 +135,12 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
     return ["live", "final"].includes(liveForFixture(live.data, { a, b, start: r.start })?.status ?? ""); // a finished match keeps its props with their results
   }), [all, live.data, onFixture]);
   const { identity } = useData();
-  const booksCall = (r: Row) => [r.bookName, ...identity.bookNames(r.pid)].filter(Boolean); // the line's own book name (older archived lines have none), then the identity table's
-  const soFarOf = (r: Row): SoFar | null => {
-    const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat, booksCall(r), identity.sourceOf(r.pid), identity.isLinked), v = liveStat(p, r.stat);
-    if (v != null) return { v, state: liveState(m, p, r.stat) };
-    return r.settled != null ? { v: r.settled, state: "final" } : null; // the live feed no longer has the match: his result as the data records it
-  };
-  const outOf = (r: Row) => {
-    const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team, identity.sourceOf(r.pid), booksCall(r)); // the source's id for him comes from the identity table
-  };
+  // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`
+  // shows those first and reads the card itself only as the fallback.
+  const matchOf = (r: Row) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start }); };
+  const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line });
+  const soFarOf = (r: Row): SoFar | null => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
+  const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
   const [day, setDay] = useState("0");

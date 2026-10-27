@@ -4,6 +4,9 @@
 the fixture keeps showing them, and the files are the start of a historical record. A file only grows: a later pull adds the lines it did not have, and
 changes the price of a line already there only inside the last ``CLOSE`` before the start (the closing prices), so an hourly run does not rewrite every
 file. The file name is the fixture id the site uses (``start date`` + team slugs, from the schedule when it lists the match).
+
+Once a match is over its file also gets ``results``: ``[{pid, stat, value}]``, what each priced player actually did, as the site's live route settled it
+(``settle``). They are only ever added, never changed, so an old fixture page needs neither the live feed nor any name matching to show how its lines went.
 """
 from __future__ import annotations
 
@@ -12,6 +15,8 @@ import csv
 import datetime as dt
 import json
 import re
+import time
+import urllib.request
 from pathlib import Path
 
 from . import config
@@ -151,7 +156,8 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
         new = {"id": fid, "match": (old or g)["match"], "competition": (old or {}).get("competition") or g["competition"], "start_utc": (old or g)["start_utc"],
                "fixture": _fixture_record(f, fid) if f else (old or {}).get("fixture"),
                "first_seen": (old or {}).get("first_seen") or now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-               **{k: _merge(k, (old or {}).get(k, []), [_slim(x) if k == "lines" else x for x in g[k]], refresh) for k in KINDS}}
+               **{k: _merge(k, (old or {}).get(k, []), [_slim(x) if k == "lines" else x for x in g[k]], refresh) for k in KINDS},
+               **({"results": old["results"]} if (old or {}).get("results") else {})}  # stored by ``settle``, never touched here
         if old is not None and {k: v for k, v in new.items() if k != "updated"} == {k: v for k, v in old.items() if k != "updated"}:
             continue
         new["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -201,14 +207,102 @@ def backfill(root: Path, *books: dict) -> list[str]:
     return changed
 
 
-def main(argv: list[str] | None = None) -> int:
+def match_results(m: dict) -> dict[tuple[str, str], int | float]:
+    """{(pid, stat): value} for the lines of a finished live match that are settled for good: the site's live route marks each priced line with its value and state, and a
+    ``final`` state in a ``final`` match is a result. A player ruled out of the XI has no value; one whose lines disagree on it (never expected) is left out."""
+    if m.get("status") != "final":
+        return {}
+    seen: dict[tuple[str, str], set] = {}
+    for x in m.get("lines") or []:
+        if x.get("state") == "final" and x.get("value") is not None and not x.get("notInXI") and x.get("pid") and x.get("stat"):
+            seen.setdefault((x["pid"], x["stat"]), set()).add(x["value"])
+    return {k: next(iter(v)) for k, v in seen.items() if len(v) == 1}
+
+
+def _same_match(d: dict, keys: frozenset, start: dt.datetime) -> bool:
+    """Is this archive file the match between these two sides (``team_key``s) that started at ``start``?"""
+    st = parse_ts(d.get("start_utc"))
+    if not st or abs((st - start).total_seconds()) >= SAME:
+        return False
+    f = d.get("fixture") or {}
+    return keys in (frozenset(team_key(x) for x in _sides({"match": d.get("match")})), frozenset((team_key(f.get("a")), team_key(f.get("b")))))
+
+
+def settle(root: Path, bodies: list[dict], now: dt.datetime) -> tuple[list[str], list[str]]:
+    """Store what finished matches decided: add ``results`` to the archive file of every match the live route (``/api/live``) reports as final.
+    Takes the route's body read more than once, some time apart, and keeps only the values every read agrees on, so a card a few seconds behind the final ball is
+    never written down. A file only gains results: a (player, stat) already there is never changed, one that was missing is added later. Results are kept for lines the
+    archive priced only. Returns (ids written, ids left alone because unreadable)."""
+    written, bad = [], []
+    if not bodies:
+        return written, bad
+    for m in bodies[0].get("matches") or []:
+        got = match_results(m)
+        for body in bodies[1:]:
+            twin = next((x for x in body.get("matches") or [] if x.get("id") == m.get("id")), {})
+            theirs = match_results(twin)
+            got = {k: v for k, v in got.items() if k in theirs and theirs[k] == v}
+        keys = frozenset(team_key(t.get("name")) for t in m.get("teams") or [])
+        start = parse_ts(m.get("start"))
+        if not got or len(keys) != 2 or not start:
+            continue
+        months = {(start + dt.timedelta(days=d)).strftime("%Y-%m") for d in (-1, 0, 1)}
+        for path in sorted(p for mo in months for p in (root / mo).glob("*.json")):
+            try:
+                d = _read(path)
+            except (ValueError, OSError):
+                bad.append(path.stem)
+                continue
+            if not d or not _same_match(d, keys, start):
+                continue
+            priced = {(x["pid"], x["stat"]) for x in d.get("lines", [])}
+            have = {(r["pid"], r["stat"]) for r in d.get("results", [])}
+            add = [{"pid": p, "stat": s, "value": v} for (p, s), v in sorted(got.items()) if (p, s) in priced and (p, s) not in have]
+            if not add:
+                continue
+            d["results"] = sorted([*d.get("results", []), *add], key=lambda r: (r["pid"], r["stat"]))
+            d["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(json.dumps(public(d), separators=(",", ":")), encoding="utf-8")
+            tmp.replace(path)
+            written.append(d["id"])
+    return written, bad
+
+
+def _read_body(src: str) -> dict:
+    """The live route's body from a URL or a file."""
+    if re.match(r"https?://", src):
+        req = urllib.request.Request(src, headers={"user-agent": "cricket-props-hub-archive/1", "accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.load(r)
+    return json.loads(Path(src).read_text(encoding="utf-8"))
+
+
+def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
     """Archive the matches in a book file as they are (the one-off start of the archive, or a rebuild from an old copy of the file).
-    With --backfill-book-names it only adds the books' names to archived lines that lack them."""
+    With --backfill-book-names it only adds the books' names to archived lines that lack them. With --results URL_OR_FILE it adds the results of finished matches
+    (read from the site's live route, twice, --again seconds apart) to their files."""
     ap = argparse.ArgumentParser(description=main.__doc__)
     ap.add_argument("--book", default=str(config.OUT / "book_lines.json"))
     ap.add_argument("--schedule", default=str(config.DATA_REPO / "data" / "fixtures" / "upcoming.csv"))
     ap.add_argument("--backfill-book-names", action="store_true")
+    ap.add_argument("--results", metavar="URL_OR_FILE")
+    ap.add_argument("--again", type=float, default=60.0, help="seconds between the two reads of the live route (--results)")
     a = ap.parse_args(argv)
+    if a.results:
+        try:
+            first = _read_body(a.results)
+            if any(m.get("status") == "final" and m.get("lines") for m in first.get("matches") or []):
+                sleep(a.again if a.results.startswith("http") else 0)
+                bodies = [first, _read_body(a.results)]
+            else:
+                bodies = []
+        except (OSError, ValueError) as e:  # the route being down must not fail the hourly run: the next one tries again
+            print(f"::warning::live route not read ({type(e).__name__}); no results stored")
+            return 0
+        wrote, bad = settle(config.ARCHIVE, bodies, dt.datetime.now(dt.timezone.utc))
+        print(json.dumps({"results_written": wrote, "unreadable": bad}))
+        return 0
     if a.backfill_book_names:
         book = json.loads(Path(a.book).read_text(encoding="utf-8")) if Path(a.book).exists() else {}
         print(json.dumps({"filled": backfill(config.ARCHIVE, book)}))

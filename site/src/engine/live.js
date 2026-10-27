@@ -1,5 +1,6 @@
 // Live score snapshots from Source A: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
+import { NO_IDENTITY } from "./identity.js";
 import { norm } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
@@ -161,7 +162,8 @@ export function unlistedRows(listed, books, schedule, base = "", now = Date.now(
     const f = (schedule || []).find((r) => r.url && r.start_utc && Math.abs(Date.parse(r.start_utc) - b.t) < BOOK_WINDOW_MS
       && ((teamKey(r.team_a) === b.a && teamKey(r.team_b) === b.b) || (teamKey(r.team_a) === b.b && teamKey(r.team_b) === b.a)));
     if (!f || out.some((m) => m.id === f.match_id)) continue;
-    out.push({ id: f.match_id, status: f.status === "Completed" ? "final" : "live", fmt: f.format, start: new Date(f.start_utc).toISOString(), summary: f.result || "", note: "",
+    // "Completed" in our file is a guess when it has no result line (a Test that has dropped off the source's page is still being played): only the match page then calls it over
+    out.push({ id: f.match_id, status: f.status === "Completed" && f.result ? "final" : "live", fmt: f.format, start: new Date(f.start_utc).toISOString(), summary: f.result || "", note: "",
       url: `${base}${f.url}`, teams: [{ name: f.team_a, abbr: f.team_a }, { name: f.team_b, abbr: f.team_b }], innings: [], players: [] });
   }
   return out;
@@ -646,6 +648,63 @@ export function lineVerdict(value, line, state = "live") {
   if (value > line) return "cleared";
   if (state === "live") return null;
   return value < line ? "missed" : "push";
+}
+
+/** One priced line read off the match's card, by the player's id through the identity table (names only for a player it does not know): `{value, state, verdict}`; a player the named XI rules out is `{value: null, notInXI: true}`; null when he has no row (he may not have batted yet). `l`: {pid, player, book_name, team, stat, line}. */
+function readLine(match, l, idn) {
+  const sid = idn.sourceOf(l.pid), books = [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean);
+  const p = livePlayer(match, l.player, l.stat, books, sid, idn.isLinked), value = liveStat(p, l.stat);
+  if (value != null) { const state = liveState(match, p, l.stat); return { value, state, verdict: lineVerdict(value, l.line, state) }; }
+  return notInXI(match, l.player, l.team, sid, books) ? { value: null, state: "live", verdict: null, notInXI: true } : null;
+}
+
+/**
+ * Where every line the books priced for this match stands, settled on the server so the browser does no name matching of its own: one entry per priced line,
+ * `{pid, stat, line, value, state, verdict}` with `state` and `verdict` as `liveState` and `lineVerdict` give them. A player the match's XI rules out is
+ * `{notInXI: true, value: null}`: the bet is void, nothing was counted. A line whose player has no row yet has no entry. `lines` are the book file's player lines;
+ * the match is the one with the same two sides and a start within 14 hours. Still "so far" while the match is on: only `state: "final"` in a `status: "final"`
+ * match is a result.
+ */
+export function settleLines(match, lines, idn = NO_IDENTITY) {
+  const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
+  const t = match?.start ? Date.parse(match.start) : NaN;
+  const out = [];
+  if (sides.size !== 2) return out;
+  for (const l of lines || []) {
+    const [a, b] = String(l.match).split(/\s+vs\s+/i);
+    if (!b || !l.pid || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) continue;
+    if (Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= BOOK_WINDOW_MS) continue;
+    const got = readLine(match, l, idn);
+    if (got) out.push({ pid: l.pid, stat: l.stat, line: l.line, ...got });
+  }
+  return out;
+}
+
+const settledEntry = (match, l) => (match?.lines || []).find((x) => x.pid === l.pid && x.stat === l.stat && x.line === l.line);
+
+/**
+ * What the page shows for a priced line, `{v, state, verdict}` or null. In order: the server's settled entry on the live match (`match.lines`); the result stored in the
+ * match's archive file (`stored`); the browser's own reading of the card, kept for a live body from before the server settled lines and for a player it could not place;
+ * and the player's game as the data records it (`settled`).
+ * @param {{pid: string, player: string, book_name?: string, team?: string, stat: string, line: number}} l
+ * @param {{stored?: number | null, settled?: number | null}} [known] `stored`: the archive file's result for him; `settled`: his game as the data records it
+ */
+export function lineStanding(match, l, idn = NO_IDENTITY, known = {}) {
+  const { stored = null, settled = null } = known;
+  const s = settledEntry(match, l);
+  if (s?.value != null) return { v: s.value, state: s.state, verdict: s.verdict ?? null };
+  const done = (v) => ({ v, state: "final", verdict: lineVerdict(v, l.line, "final") });
+  if (stored != null) return done(stored);
+  const own = readLine(match, l, idn);
+  if (own?.value != null) return { v: own.value, state: own.state, verdict: own.verdict };
+  return settled != null ? done(settled) : null;
+}
+
+/** Is the line's player ruled out of the XI? The server's word when it settled him; otherwise the browser's own reading of the card. */
+export function lineNotIn(match, l, idn = NO_IDENTITY) {
+  const s = settledEntry(match, l);
+  if (s) return !!s.notInXI;
+  return notInXI(match, l.player, l.team, idn.sourceOf(l.pid), [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean));
 }
 
 export function liveMarket(match, key, team) {

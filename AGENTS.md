@@ -4,7 +4,7 @@ Read [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) first (architecture, data fl
 
 ## One-paragraph summary
 Cricket dataset (Base + Source A-scraped provisional matches, `src/cricket_data`, `data/`), an hourly value-bets pipeline (`src/value_bets`), and a free StatsHub-style player-props website
-(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and two serverless functions: `site/api/ask.js` (question → validated query plan) and `site/api/live.js` (Source A scores + player so-far for book-priced matches only, ~15 s cache, never settlement).
+(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and two serverless functions: `site/api/ask.js` (question → validated query plan) and `site/api/live.js` (Source A scores + player so-far for book-priced matches only, ~15 s cache; each match also carries `lines`, every priced line settled on the server).
 
 ## Commands
 ```bash
@@ -34,7 +34,8 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 * Stats/markets/plan logic -> `site/src/engine/*` (no DOM, tested with node:test); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
 * Home rail order and its settings -> `site/src/lib/priority.ts`, `config/home_rail.json` (read at view time from the repo, no deploy; docs/SITE.md).
 * LLM prompt/provider -> `site/src/engine/prompt.js`, `site/api/ask.js`.
-* Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only; so-far, never settlement).
+* Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only).
+* Where a priced line stands (so far / final / Cleared / Missed / Push / Not in XI) -> settled on the server: `settleLines` in `live.js` (matching and verdicts, one place), shown by `lineStanding` / `lineNotIn`; a finished match's results are stored in its archive file by `settle` in `src/value_bets/archive.py` (PROJECT_GUIDE 5.4c). Fix a matching or settlement bug there, not in a component.
 * Who is who across the data, the live source and the books -> the player-identity table: `src/cricket_site/identity.py` (builder), `data/mappings/player_identity.csv` (links checked by hand), `site/src/engine/identity.js` (lookups). Ids first, names only as the fallback; fix a bad link with a line in the CSV, not with another name rule (PROJECT_GUIDE 5.7).
 * Images/ids -> `src/cricket_site/crex_assets.py`, `assets_sync.py`, `site/src/lib/photos.js`, `site/src/lib/assets.ts`, `supabase/migrations/`.
 * Deploy/schedules -> `.github/workflows/site.yml`.

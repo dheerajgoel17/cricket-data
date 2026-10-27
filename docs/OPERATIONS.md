@@ -16,13 +16,14 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
 | `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
-| `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt |
+| `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; and the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset) |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
 | `ASK_PER_MINUTE`, `ASK_DAILY_CAP` | Vercel env (optional) | same | rate limits (defaults 12 / 800) |
 | `SYNC_LIMIT` | workflow input / env | `site.yml` | max images copied per run (default 1500) |
 | `LIVE_SOURCE_BASE`, `LIVE_SITEMAP_DIR`, `IMG_CDN_BASE`, `BASE_DATA_URL`, `PRICE_FEED_URL`, `EXCHANGE_API_URL`, `BETFAIR_SSO_URL`, `BETFAIR_API_URL` | GitHub **secrets** (masked in public logs) | repo Settings -> Secrets; values are not written anywhere in the repo, ask the maintainer | every workflow's top-level `env:`; read by `cricket_data.hosts.host()` |
 | `LIVE_SOURCE_BASE`, `VITE_IMG_CDN` | Vercel env (Production, Preview) | `vercel env add` | `site/api/live.js` (runtime), `site/src/lib/photos.js` (build time) |
+| `IDENTITY_URL` | Vercel env (optional) | `vercel env add` | `site/api/live.js`: where to fetch the identity table when the file shipped with the function is missing (default: the production domain's `/data/identity.json`) |
 | `CV_SOURCES` | GitHub variable | repo Settings -> Variables | value-bets adapter list |
 | `ODDS_API_KEY`, `BETFAIR_*`, `CRICKETDATA_API_KEY`, `RAPIDAPI_CRICKET_KEY` | GitHub secrets (all optional) | | value-bets / scraper extras |
 
@@ -41,6 +42,7 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 **Scraper broke (Source A layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
 **A workflow shows "workflow file issue"**: YAML error. `pip install actionlint-py && actionlint .github/workflows/*.yml`.
 **A priced player shows no live numbers, or a wrong "Not in XI"**: the name could not be linked to the live source. Open the latest Site run's summary ("Player identity: names to review"), pick the right source player from the suggestions (or look the player up on the source) and add `<our id>,<source id>,<note>` to `data/mappings/player_identity.csv`; the next build applies it (and gives the player his source photo).
+**A finished match's lines show no result, or a wrong one**: open the deployment's `/api/live` and look at `matches[].lines` of that match (`linked` in the body is how many ids the identity table holds; 0 means the table did not load and names decide). A wrong or missing value is a matching fix (identity CSV, above) or a `settleLines` fix: one server change, no browser change. Results already stored in `value_bets/archive/**/<fixture id>.json` (`results`) are never rewritten by a job: correct the value in that file by hand in a PR.
 **Site shows no photos**: `data/photos.json` missing? (cache restored an old format: bump the cache key prefix in `site.yml`). Source A CDN down: the browser falls back to our Supabase copy / flags / silhouettes.
 **Vercel deploy limits**: Hobby allows ~100 deploys/day; hourly = 24.
 
