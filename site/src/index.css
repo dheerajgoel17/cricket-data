@@ -182,9 +182,9 @@
 .live-arc { animation: live-arc 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .live-arc { animation: none; } }
 
-/* Phone tab bar (Ionic's iOS bar): dark translucent material, hairline on top, system gray and the brand tint on the selected tab. */
+/* Phone tab bar (Ionic's iOS bar): dark transparent material with the backdrop blur, hairline on top, system gray and the brand tint on the selected tab. */
 ion-tab-bar {
-  --background: rgba(28, 28, 30, 0.82);
+  --background: rgba(22, 22, 24, 0.5); /* see-through: the page scrolls under it and shows blurred (the bar's own backdrop blur) */
   --border: 0.55px solid rgba(255, 255, 255, 0.16);
   --color: #8e8e93;
   --color-selected: var(--primary);
