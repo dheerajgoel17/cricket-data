@@ -475,3 +475,18 @@ test("a Test gives each side its innings together: a schedule row's s1 / s3, and
   assert.equal(teamScore(built, "India").display, "564/8 (127.0 ov)");
   assert.equal(teamScore(built, "Afghanistan").runs, 112);
 });
+
+test("the XI keeps the source's own ids, and a player with a linked id is matched by it exactly", () => {
+  const m = xiMatch(XI);
+  assert.deepEqual(playingXI(m).get("srilanka").ids, new Set(XI.map((_, i) => `P${i}`)));
+  assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "P6"), false, "Hasaranga is in the XI under his common name; the data knows him as PWH de Silva");
+  assert.equal(notInXI(m, "PWH de Silva", "Sri Lanka", "ZZZ"), true, "linked, and his id is not among the eleven");
+});
+
+test("without a linked id a name alone never says 'not in': a shared surname could be him (BKG Mendis is Kusal Mendis)", () => {
+  const m = xiMatch(XI); // two Mendises among the eleven: Kusal and Kamindu
+  assert.equal(playingXI(m).get("srilanka").complete, true);
+  assert.equal(notInXI(m, "BKG Mendis", "Sri Lanka"), false, "he is left unmarked");
+  assert.equal(notInXI(m, "PHKD Mendis", "Sri Lanka"), false);
+  assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true, "nobody of that surname in the eleven: marked");
+});
