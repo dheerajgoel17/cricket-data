@@ -150,8 +150,8 @@ export function HotProps() {
   return (
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
-        <div><h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hot Player Props</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{day === "0" ? "Today's" : "Tomorrow's"} bookmaker lines, ranked by hit rate · {new Date(Date.now() + Number(day) * 864e5).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
+        <div><h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1>
+          </div>
       </div>
       <div className="mt-3 flex items-center gap-2">
         <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
