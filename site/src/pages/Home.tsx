@@ -8,6 +8,7 @@ import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
 import { liveForFixture } from "@/engine/live.js";
 import { homeTeam, rankFixtures } from "@/lib/priority";
+import { useRail } from "@/hooks/useRail";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
 import { HotProps } from "@/components/app/hot-props";
@@ -17,8 +18,9 @@ export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
   const { fixtures: fx } = usePricedFixtures();
   const live = useLiveDoc();
-  // the viewer's own team first, then the biggest matches, matches in play lifted and finished ones last (src/lib/priority.ts)
-  const ranked = useMemo(() => rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status)), [fx, live.data]);
+  const rail = useRail();
+  // matches in play first, then the ones to come, finished ones last; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
+  const ranked = useMemo(() => rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status), rail), [fx, live.data, rail]);
   return (
     <div className="flex flex-col gap-section">
       <FixtureRail fx={ranked.slice(0, 14)} />

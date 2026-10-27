@@ -32,6 +32,7 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 ## Where to look
 * Rules for parsing matches -> `src/cricket_site/parse.py`; output format -> `build.py` (+ the table in PROJECT_GUIDE 5.1).
 * Stats/markets/plan logic -> `site/src/engine/*` (no DOM, tested with node:test); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
+* Home rail order and its settings -> `site/src/lib/priority.ts`, `config/home_rail.json` (read at view time from the repo, no deploy; docs/SITE.md).
 * LLM prompt/provider -> `site/src/engine/prompt.js`, `site/api/ask.js`.
 * Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only; so-far, never settlement).
 * Who is who across the data, the live source and the books -> the player-identity table: `src/cricket_site/identity.py` (builder), `data/mappings/player_identity.csv` (links checked by hand), `site/src/engine/identity.js` (lookups). Ids first, names only as the fallback; fix a bad link with a line in the CSV, not with another name rule (PROJECT_GUIDE 5.7).
