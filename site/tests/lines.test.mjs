@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bookLinesFor, bookName, fancyFor, lineProb, overProb } from "../src/engine/lines.js";
+import { bookLinesFor, bookName, fancyFor, fixtureBooks, lineProb, overProb } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -67,4 +67,14 @@ test("fancyFor matches the fixture by team names and time, whole-match or team-t
   assert.deepEqual(fancyFor(doc, fx, "team_total_sixes", "New Zealand").map((x) => x.line), [9.5]);
   assert.deepEqual(fancyFor(doc, fx, "team_total_sixes", "India"), []);
   assert.deepEqual(fancyFor({}, fx, "match_runs"), []);
+});
+
+test("fixtureBooks hides player-prop vs fancy sections when that match has no line", () => {
+  const fx = { a: "Netherlands", b: "Oman", start: "2026-10-27T09:00:00Z" };
+  const fancyOnly = { lines: [L(17.5, 1.85, 1.95)], fancy: [{ match: "Netherlands vs Oman", home: "Netherlands", away: "Oman", start_utc: "2026-10-27T09:00:00Z", key: "top_score", scope: "match", line: 83.5, over: 1.83, under: 1.83 }] };
+  assert.deepEqual(fixtureBooks(fancyOnly, fx), { props: false, fancy: true });
+  const both = { lines: [{ ...L(22.5, 1.8, 2.0), match: "Netherlands vs Oman", start_utc: "2026-10-27T09:00:00Z", fmt: "ODI" }], fancy: fancyOnly.fancy };
+  assert.deepEqual(fixtureBooks(both, fx), { props: true, fancy: true });
+  assert.deepEqual(fixtureBooks({ lines: [L(17.5, 1.85, 1.95)], fancy: [] }, fx), { props: false, fancy: false });
+  assert.deepEqual(fixtureBooks(null, fx), { props: false, fancy: false });
 });

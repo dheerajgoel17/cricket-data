@@ -13,6 +13,9 @@
   "functions": {
     "api/ask.js": {
       "maxDuration": 20
+    },
+    "api/live.js": {
+      "maxDuration": 20
     }
   },
   "headers": [

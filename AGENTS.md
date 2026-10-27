@@ -4,7 +4,7 @@ Read [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) first (architecture, data fl
 
 ## One-paragraph summary
 Cricket dataset (Cricsheet + CREX-scraped provisional matches, `src/cricket_data`, `data/`), an hourly value-bets pipeline (`src/value_bets`), and a free StatsHub-style player-props website
-(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and one serverless function (`site/api/ask.js`) that only turns questions into a validated query plan.
+(`site/`, builder in `src/cricket_site`). The site is a Vite + React + TypeScript app (shadcn/ui, Tailwind, Motion) over static JSON, with the stats engine (plain ESM, `site/src/engine`) running in the browser and two serverless functions: `site/api/ask.js` (question → validated query plan) and `site/api/live.js` (ESPN scores + player so-far for book-priced matches only, ~15 s cache, never settlement).
 
 ## Commands
 ```bash
@@ -32,5 +32,6 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 * Rules for parsing matches -> `src/cricket_site/parse.py`; output format -> `build.py` (+ the table in PROJECT_GUIDE 5.1).
 * Stats/markets/plan logic -> `site/src/engine/*` (no DOM, tested with node:test); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
 * LLM prompt/provider -> `site/src/engine/prompt.js`, `site/api/ask.js`.
+* Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only; so-far, never settlement).
 * Images/ids -> `src/cricket_site/crex_assets.py`, `assets_sync.py`, `site/src/lib/photos.js`, `site/src/lib/assets.ts`, `supabase/migrations/`.
 * Deploy/schedules -> `.github/workflows/site.yml`.
