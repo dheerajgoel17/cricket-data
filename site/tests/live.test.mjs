@@ -366,3 +366,19 @@ test("an all-rounder's batting and bowling rows are told apart by the stat", () 
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "wickets"), "wickets"), 1);
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "balls_bowled"), "balls_bowled"), 24);
 });
+
+test("the batting side is the page's first team, whatever the other fields say (a first innings, 9 down, the other side named in rt)", () => {
+  const html = pageHtml({ [LIVE]: {
+    team1_f_n: "Pakistan", team2_f_n: "Sri Lanka", team1short: "PAK", team2short: "SL", rt: "Sri Lanka", inning: 1, status: 1,
+    score1: "93-9", over1: "23.4", score2: "", over2: "", comment1: "SL opt to Bowl",
+    player_full_name1: "Shaheen Afridi", run1: "0", ball1: "(4)", four1: "0", six1: "0", st: "1",
+    player_full_name2: "Naseem Shah", run2: "1", ball2: "(3)", four2: "0", six2: "0",
+    bowler_full_name: "Dilshan Madushanka", bwr: "3-20", bover: "5.0", partnerruns: 1, partnerballs: 3,
+  } });
+  const m = parseMatchPage(html);
+  assert.deepEqual(m.teams.map((t) => [t.name, t.batting]), [["Pakistan", true], ["Sri Lanka", false]]);
+  assert.deepEqual(m.innings.map((i) => [i.team, i.runs, i.wkts]), [["Pakistan", 93, 9]]);
+  assert.equal(livePlayer(m, "Shaheen Afridi").team, "Pakistan");
+  assert.equal(livePlayer(m, "Dilshan Madushanka").team, "Sri Lanka");
+  assert.deepEqual(liveBoard(m).batters.map((p) => p.name), ["Shaheen Afridi", "Naseem Shah"]);
+});
