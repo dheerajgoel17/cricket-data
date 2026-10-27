@@ -125,29 +125,29 @@ export function HotProps() {
         {WINS.map(([k, l]) => <ToggleGroupItem key={k} value={k} className="h-9 flex-1 rounded-full border-0 px-4 text-sm data-[state=on]:bg-accent sm:flex-none">{l}</ToggleGroupItem>)}
       </ToggleGroup>
       {tabs.length > 1 && <PillTabs scrollable layoutId="hot-stat" tabs={tabs} value={stat} onChange={setStat} className="mt-2" />}
-      <div className="mt-2 overflow-hidden rounded-xl border bg-card">
+      <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
         {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for today yet. They appear a few hours before each match.</p> : (
           <>
-          <ul className="divide-y sm:hidden">
+          <ul className="divide-y border-b sm:hidden">
             {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} />)}
           </ul>
           <Table className="hidden sm:table">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="h-11 pl-4 font-condensed text-[13px] uppercase tracking-wider">Lines</TableHead>
+                <TableHead className="h-11 pl-1 font-condensed text-[13px] uppercase tracking-wider">Lines</TableHead>
                 <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider sm:table-cell">L10 chart</TableHead>
                 <TableHead className="font-condensed text-[13px] uppercase tracking-wider">Odds</TableHead>
                 <TableHead className="font-condensed text-[13px] uppercase tracking-wider">{wl}</TableHead>
                 <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider md:table-cell">{new Date().getFullYear()}</TableHead>
                 <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider md:table-cell">H2H</TableHead>
                 <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider lg:table-cell">Matchup</TableHead>
-                <TableHead className="pr-4 text-right font-condensed text-[13px] uppercase tracking-wider">Edge</TableHead>
+                <TableHead className="pr-1 text-right font-condensed text-[13px] uppercase tracking-wider">Edge</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((r) => (
                 <TableRow key={`${r.idx}${r.stat}${r.fmt}`} className="group h-[62px] cursor-pointer">
-                  <TableCell className="py-2 pl-4">
+                  <TableCell className="py-2 pl-1">
                     <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 outline-none after:absolute after:inset-0 focus-visible:underline">
                       <PlayerBadge idx={r.idx} size="md" />
                       <span className="min-w-0"><b className="block truncate text-[15px] font-medium">{r.name}<span className="ml-1.5 font-condensed text-xs font-normal uppercase tracking-wide text-muted-foreground">{abbr(r.team)}</span></b>
@@ -160,7 +160,7 @@ export function HotProps() {
                   <TableCell className={cn("hidden tabular-nums md:table-cell", pctClass(r.season.p))}>{pct(r.season.p)}</TableCell>
                   <TableCell className={cn("hidden tabular-nums md:table-cell", pctClass(r.h2h.p))} title={r.h2h.played ? `${r.h2h.hits} of ${r.h2h.played} vs ${r.opp}` : "No games against this opponent"}>{pct(r.h2h.p)}</TableCell>
                   <TableCell className="hidden lg:table-cell"><span className="flex items-center gap-2 text-sm" title={r.match}><TeamBadge name={r.opp} size="xs" />{abbr(r.opp)}</span></TableCell>
-                  <TableCell className={cn("pr-4 text-right font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</TableCell>
+                  <TableCell className={cn("pr-1 text-right font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
