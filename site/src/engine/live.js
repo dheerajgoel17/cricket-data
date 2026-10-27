@@ -234,7 +234,8 @@ export function parseMatchPage(html) {
   const aName = sv.team1_f_n || sv.rt || sv.team1, bName = sv.team2_f_n || sv.team2;
   if (!aName || !bName) return null;
   const t1 = scoreOf(sv.score1, sv.over1), t2 = scoreOf(sv.score2, sv.over2);
-  const bat = sv.rt || aName, batIsA = teamKey(bat) === teamKey(aName), bowl = batIsA ? bName : aName;
+  // team1 / score1 / the two batters are the side batting. `rt` looks like it says so but is empty or the bowling side in some matches.
+  const bat = aName, batIsA = true, bowl = bName;
   const strike = Number(sv.st);
   const players = [];
   const addBat = (name, runs, balls, fours, sixes, out, onStrike, sr, photo) => {
