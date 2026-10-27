@@ -32,26 +32,26 @@ export function FixtureCard({ f }: { f: any }) {
   return (
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <Card className="h-full gap-0 rounded-xl py-0 shadow-none transition group-hover:border-primary/50 group-hover:bg-[#161616]">
-        <CardHeader className="flex items-center gap-1.5 px-3 pb-0 pt-3">
-          {live ? <Badge variant="destructive" className="gap-1.5 text-[10px] font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="text-[10px] font-semibold uppercase tracking-wider">Upcoming</Badge>}
-          <Badge variant="outline" className="text-[10px] font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
-          {city(f.venue) && <span className="ml-auto min-w-0 truncate text-[11px] font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
+        <CardHeader className="flex items-center gap-2 px-4 pb-0 pt-4">
+          {live ? <Badge variant="destructive" className="gap-1.5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider">Upcoming</Badge>}
+          <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
+          {city(f.venue) && <span className="ml-auto min-w-0 truncate text-xs font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
         </CardHeader>
-        <CardContent className="px-3 pt-2.5">
+        <CardContent className="px-4 pt-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="grid min-w-0 gap-2">
-              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-2" title={t}><TeamFlag name={t} className="h-[18px] w-[26px]" /><span className="truncate text-sm font-medium capitalize">{abbr(t)}</span></div>)}
+            <div className="grid min-w-0 gap-3">
+              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-2" title={t}><TeamFlag name={t} className="h-6 w-9 rounded-[4px]" /><span className="truncate text-base font-semibold capitalize">{abbr(t)}</span></div>)}
             </div>
             <div className="shrink-0 text-right">
-              <div className="text-xs font-medium text-muted-foreground">{dayLabel(dayKey(f))}</div>
-              {timed && <div className="text-base font-semibold leading-5 tabular-nums">{localTime(when)}</div>}
+              <div className="text-sm font-medium text-muted-foreground">{dayLabel(dayKey(f))}</div>
+              {timed && <div className="text-xl font-bold leading-6 tabular-nums">{localTime(when)}</div>}
             </div>
           </div>
-          <p className="mt-3 truncate text-xs font-medium text-muted-foreground">{status}</p>
+          <p className="mt-4 truncate text-[13px] font-medium text-muted-foreground">{status}</p>
         </CardContent>
-        <CardFooter className="mt-2.5 justify-between border-t px-3 py-2 text-xs font-medium [.border-t]:pt-2">
+        <CardFooter className="mt-4 justify-between border-t px-4 py-3 text-[13px] font-medium [.border-t]:pt-3">
           <span className="min-w-0 truncate text-muted-foreground">{seriesName(f)}</span>
-          <Badge className="ml-3 text-[11px] font-semibold">Props</Badge>
+          <Badge className="ml-3 px-3 py-1 text-xs font-semibold">Props</Badge>
         </CardFooter>
       </Card>
     </Link>
@@ -77,7 +77,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
       </ToggleGroup>
       <Carousel key={sel} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
         <CarouselContent className="-ml-3">
-          {shown.map((f) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[288px] pl-3"><FixtureCard f={f} /></CarouselItem>)}
+          {shown.map((f) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[86%] pl-3 sm:basis-[360px]"><FixtureCard f={f} /></CarouselItem>)}
         </CarouselContent>
         <CarouselPrevious className="left-2 hidden md:inline-flex" />
         <CarouselNext className="right-2 hidden md:inline-flex" />

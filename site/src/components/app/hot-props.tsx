@@ -149,7 +149,7 @@ export function HotProps() {
   }, [win, wl]);
   return (
     <section aria-label="Hot player props today">
-      <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
+      <div className="flex flex-wrap items-end justify-between gap-2 pt-8 md:pt-10">
         <div><h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1>
           </div>
       </div>
