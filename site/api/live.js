@@ -7,7 +7,11 @@ import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseMatchPage, par
 
 const BOOKS = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 // Where the pages live is configuration, not code: LIVE_SOURCE_BASE (no trailing slash) comes from the deployment's environment variables.
-const base = () => String(process.env.LIVE_SOURCE_BASE || "").replace(/\/+$/, "");
+const base = () => {
+  const b = String(process.env.LIVE_SOURCE_BASE || "").replace(/\/+$/, "");
+  if (!b) throw new Error("LIVE_SOURCE_BASE is not set");
+  return b;
+};
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
 const HTML_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const MAX_CARDS = 8;
