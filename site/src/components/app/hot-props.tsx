@@ -5,7 +5,7 @@ import { BarChart3, Bookmark, CalendarDays } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { RowsSkeleton } from "./skeletons";
 import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { PlayerBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
+import { MiniBars } from "./mini-bars";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
@@ -30,7 +31,6 @@ const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?
 const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.setHours(0, 0, 0, 0); t.setHours(0, 0, 0, 0); const n = Math.round((d.getTime() - t.getTime()) / 864e5); return n === 0 || n === 1 ? n : -1; };
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
-const BAR = { hit: "bg-primary", miss: "bg-miss", push: "bg-amber", dnp: "bg-dnp/50", void: "bg-dnp/50", na: "bg-dnp/50" } as Record<string, string>;
 
 interface Row { day: number; idx: number; name: string; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
@@ -74,21 +74,13 @@ function useHotRows() {
   });
 }
 
-function Spark({ r }: { r: Row }) {
-  const linePct = Math.min(100, (r.line / r.max) * 100);
-  return (
-    <div className="relative flex h-9 w-[84px] shrink-0 items-end gap-[2px] sm:w-[104px] sm:gap-[3px]" role="img" aria-label={`Last ${r.last.length}: ${r.last.map((x) => x.v ?? "DNP").join(", ")} against a line of ${r.line}`}>
-      {r.last.map((x, i) => <span key={i} className={cn("w-2 rounded-[2px] sm:w-2.5", BAR[x.s] || "bg-dnp/50")} style={{ height: `${Math.max(x.v == null ? 8 : (x.v / r.max) * 100, 8)}%` }} />)}
-      <span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/40" style={{ bottom: `${linePct}%` }} />
-    </div>
-  );
-}
+const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** Phone row built from shadcn Item parts (props.cash list style): photo, name and line, then the hit rate over the last-10 bars and the edge. */
 function MobileRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
   return (
-    <motion.li className="relative after:absolute after:bottom-0 after:left-[68px] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 10, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(6px)" }}
-      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 8) * 0.03, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+    <motion.li className="relative after:absolute after:bottom-0 after:left-[68px] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
       <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 transition-colors active:bg-card">
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
           <ItemMedia><PlayerBadge idx={r.idx} size="md" /></ItemMedia>
@@ -112,7 +104,6 @@ function MobileRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars
   );
 }
 
-const Skel = () => <div className="grid gap-px">{Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-[62px] rounded-none" />)}</div>;
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
 export function HotProps({ teams }: { teams?: [string, string] } = {}) {
@@ -122,13 +113,14 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const saved = useSaved();
   const [day, setDay] = useState("0");
   const [bars, setBars] = useState(true);
+  const [team, setTeam] = useState("all");
   const tabs = useMemo(() => {
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
   }, [data]);
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
-  const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams]);
+  const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
   const columns = useMemo<ColumnDef<Row>[]>(() => {
     const head = (title: string) => ({ column }: { column: any }) => <TableColumnHeader column={column} title={title} />;
     const rate = (id: string, title: string, get: (r: Row) => any, tip?: boolean): ColumnDef<Row> => ({ id, accessorFn: (r) => get(r).p ?? -1, header: head(title), sortUndefined: "last",
@@ -152,6 +144,8 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   return (
     <section aria-label="Hot player props today">
       {!teams && <div className="pt-8 md:pt-10"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
+      {teams && <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam} className="mt-3 sm:w-96"
+        items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamFlag name={t} className="h-3.5 w-5" />{t}</span>] as [string, React.ReactNode])]} />}
       <div className="mt-3 flex items-center gap-2">
         <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
         <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-80 sm:flex-none" />
@@ -173,7 +167,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
         </div>
       )}
       <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
-        {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for this day yet. They appear a few hours before each match.</p> : (
+        {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
           <>
           <ul className="sm:hidden">
             <AnimatePresence mode="popLayout" initial={false}>

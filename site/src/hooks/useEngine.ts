@@ -44,6 +44,6 @@ export function usePricedFixtures() {
     const priced = all.filter((f) => { const a = teamKey(f.a), b = teamKey(f.b), t = fixtureStart(f).getTime(); return feed.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && Math.abs(m.t - t) < WINDOW); });
     const ok = priced.length > 0;
     const last = ok ? Math.max(...priced.map((f) => fixtureStart(f).getTime())) : 0;
-    return { loading: fx.isLoading, all, fixtures: ok ? priced : all, priced: ok, through: ok ? new Date(last) : null, feedMatches: feed.length };
-  }, [fx.data, fx.isLoading, lines.data]);
+    return { loading: fx.isLoading, ready: !fx.isLoading && !lines.isLoading, all, fixtures: ok ? priced : all, priced: ok, through: ok ? new Date(last) : null, feedMatches: feed.length };
+  }, [fx.data, fx.isLoading, lines.isLoading, lines.data]);
 }

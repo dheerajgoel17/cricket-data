@@ -2,13 +2,15 @@
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { STATS } from "@/engine/rules.js";
 import { useData } from "@/lib/data";
 import type { Grid } from "@/lib/grid";
-import { num, odds, pc, shortDate } from "@/lib/format";
+import { odds, pc, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { PlayerBadge, TeamFlag } from "./badges";
-import { EmptyNote, Muted, OddsText } from "./page";
+import { EmptyNote, Muted } from "./page";
+import { MiniBars } from "./mini-bars";
 
 /** Players down, the team's last fixtures across; a cell is the stat value (green when it clears the line). */
 export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line: number }) {
@@ -38,7 +40,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
   );
 }
 
-/** Players whose recent games clear the line most often (StatsHub "player trends" cards). */
+/** Players whose recent games clear the line most often, as light list rows (photo, line and record, hit rate, last-10 bars). */
 export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; team: number }[]; line: number; minHit: number; stat: string }) {
   const { store } = useData();
   const items: any[] = [];
@@ -52,21 +54,26 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
   items.sort((a, b) => b.rate - a.rate || b.vals.length - a.vals.length);
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
   if (!list.length) return <EmptyNote>No player clears that hit rate in the last games. Lower the hit-rate filter or line.</EmptyNote>;
+  const label = (STATS as any)[stat].label;
   return (
-    <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
+    <ul className="-mx-4 sm:mx-0">
       {list.map((i, n) => (
-        <motion.div key={`${i.p}-${i.team}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(n * 0.025, 0.4) }} whileHover={{ y: -2 }}>
-          <Link to={`/player/${i.p}`}>
-            <Card className="gap-2 rounded-2xl border-0 px-4 py-4 shadow-none ring-1 ring-white/5 transition-colors hover:bg-[#232325]">
-              <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-3 font-semibold"><PlayerBadge idx={i.p} size="md" /><div>{store.playerName(i.p)}<small className="block font-normal text-muted-foreground">{store.teamName(i.team)}</small></div></div>
-                <span className="rounded-full bg-secondary px-3.5 py-1.5 text-sm font-semibold">O {line} <OddsText>{odds(i.rate ? 1 / i.rate : null)}</OddsText></span></div>
-              <div className="text-xl font-medium text-primary">{(STATS as any)[stat].label} over {line}</div>
-              <div className="flex gap-6"><Stat v={`${i.k}/${i.vals.length}`} l="Record" /><Stat v={pc(i.rate)} l="Hit rate" /><Stat v={num(i.vals.reduce((a: number, b: number) => a + b, 0) / i.vals.length)} l="Avg" /></div>
-              <div className="flex gap-1.5 overflow-x-auto pt-1">{i.vals.slice(-10).map((v: number, j: number) => <span key={j} className={cn("min-w-9 rounded-lg px-2 py-2 text-center text-[15px] font-extrabold", v > line ? "bg-primary/20 text-primary" : "bg-destructive/15 text-destructive")}>{v}</span>)}</div>
-            </Card>
-          </Link>
-        </motion.div>))}
-    </div>
+        <motion.li key={`${i.p}-${i.team}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(n, 6) * 0.025, duration: 0.3 }}
+          className="relative after:absolute after:bottom-0 after:left-[68px] after:right-0 after:h-px after:bg-white/10 last:after:hidden">
+          <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 transition-colors active:bg-card">
+            <Link to={`/player/${i.p}`}>
+              <ItemMedia><PlayerBadge idx={i.p} size="md" /></ItemMedia>
+              <ItemContent className="min-w-0 gap-0.5">
+                <ItemTitle className="max-w-full"><span className="truncate">{store.playerName(i.p)}</span><TeamFlag name={store.teamName(i.team)} /></ItemTitle>
+                <ItemDescription className="truncate text-[13px]"><span className="text-primary">O {line} {label}</span> <span className="text-muted-foreground">· {i.k}/{i.vals.length}</span></ItemDescription>
+              </ItemContent>
+              <ItemActions className="gap-3">
+                <span className="grid justify-items-end text-right"><b className="text-base font-semibold tabular-nums text-primary">{pc(i.rate)}</b><span className="text-[11px] text-muted-foreground">fair {odds(i.rate ? 1 / i.rate : null)}</span></span>
+                <MiniBars last={i.vals.slice(-10).map((v: number) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" }))} line={line} />
+              </ItemActions>
+            </Link>
+          </Item>
+        </motion.li>))}
+    </ul>
   );
 }
-const Stat = ({ v, l }: { v: string; l: string }) => <div><b className="block text-xl font-extrabold tabular-nums text-primary">{v}</b><span className="text-xs text-muted-foreground">{l}</span></div>;

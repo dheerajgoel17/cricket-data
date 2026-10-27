@@ -7,7 +7,8 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
-import { TeamFlag } from "./badges";
+import { useNow } from "@/lib/clock";
+import { TeamFlag, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
 
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
@@ -27,12 +28,13 @@ function startsIn(ms: number) {
 
 /** Cricinfo-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
-  const when = fixtureStart(f), ms = when.getTime() - Date.now(), timed = hasTime(f);
+  const now = useNow(30000);
+  const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const live = timed && ms <= 0 && ms > -4 * 3600e3;
   const status = live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed";
   return (
-    <motion.div className="h-full" initial={{ opacity: 0, y: 16, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{ delay: Math.min(i, 8) * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
+    <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <Card className="h-full gap-0 rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
         <CardHeader className="flex items-center gap-2 px-4 pb-0 pt-4">
@@ -64,6 +66,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
 
 /** Series chips (shadcn ToggleGroup) over a shadcn Carousel (embla: swipe, drag, snap; arrows from md) of FixtureCards. */
 export function FixtureRail({ fx }: { fx: any[] }) {
+  usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
   const [sel, setSel] = useState("all");
   const [api, setApi] = useState<CarouselApi>();
   const [edge, setEdge] = useState({ l: false, r: true });

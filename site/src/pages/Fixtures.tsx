@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { motion } from "motion/react";
-import { ChevronLeft, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,32 +12,53 @@ import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
 import { fixtureStart, fixtureWhen, localTime, num } from "@/lib/format";
+import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
 import { HotProps } from "@/components/app/hot-props";
 import { GridTable, TrendCards } from "@/components/app/grid";
-import { TeamFlag } from "@/components/app/badges";
+import { TeamFlag, usePreloadTeams } from "@/components/app/badges";
+import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
-import { Countdown } from "./Home";
 
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
 const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`]);
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
-function MarketCard({ name, idx, fmt }: { name: string; idx: number; fmt: string }) {
+/** One team's match markets as a grouped list: market on the left, median and mean over its last N matches on the right. */
+function MarketCard({ name, idx, fmt, last }: { name: string; idx: number; fmt: string; last: number }) {
   const { store } = useData();
-  const ms = selectMatches(store, { fmt: FORMATS.indexOf(fmt), team: idx, lastN: 30 });
-  const rows = ["match_runs", "match_sixes", "match_fours", "match_50s", "highest_over"].map((k) => { const r = marketReport(store, ms, k); return [(MATCH_MARKETS as any)[k].label, num(r.summary.median), num(r.summary.mean)]; });
-  return <Panel title={`${name}: last ${ms.length} ${fmt} matches`}><DataTable columns={["Market", "Median", "Mean"]} rows={rows} /><p className="mt-2"><Link className="text-primary" to={`/team/${idx}?fmt=${fmt}`}>Full team page →</Link></p></Panel>;
+  const ms = selectMatches(store, { fmt: FORMATS.indexOf(fmt), team: idx, lastN: last });
+  const rows = ["match_runs", "match_sixes", "match_fours", "match_50s", "highest_over"].map((k) => { const r = marketReport(store, ms, k); return [(MATCH_MARKETS as any)[k].label as string, num(r.summary.median), num(r.summary.mean)]; });
+  return (
+    <section>
+      <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamFlag name={name} className="h-5 w-7" />{name}<span className="text-sm font-normal text-muted-foreground">last {ms.length} {fmt}</span></h2>
+      <div className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
+        <div className="flex px-4 py-2.5 text-xs font-medium text-muted-foreground"><span>Market</span><span className="ml-auto w-16 text-right">Median</span><span className="w-16 text-right">Mean</span></div>
+        {rows.map(([label, med, mean]) => <div key={label} className="flex items-center border-t border-white/5 px-4 py-3.5 text-[15px]"><span>{label}</span><b className="ml-auto w-16 text-right font-semibold tabular-nums">{med}</b><span className="w-16 text-right tabular-nums text-muted-foreground">{mean}</span></div>)}
+        <Link to={`/team/${idx}?fmt=${fmt}`} className="flex items-center justify-between border-t border-white/5 px-4 py-3.5 text-[15px] font-medium text-primary active:bg-accent">Full team page <ChevronRight className="size-4" /></Link>
+      </div>
+    </section>
+  );
 }
 
 const TABS: [string, string][] = [["props", "Props"], ["grid", "Grid"], ["trends", "Trends"], ["markets", "Markets"]];
 
-/** One match header (replaces the old hero + "Next match" card): flat flags, teams, start time and countdown, then series, venue and badges. */
+/** Time to / since the start, ticking every second from the shared clock. */
+function MatchTimer({ when, timed }: { when: Date; timed: boolean }) {
+  const now = useNow(1000), ms = when.getTime() - now;
+  if (!timed) return <span className="text-sm text-muted-foreground">Start time to be confirmed</span>;
+  const label = "text-[11px] font-medium uppercase tracking-wider text-muted-foreground";
+  if (ms > 0) return <div className="grid justify-items-center gap-0.5"><span className={label}>Starts in</span><b className="text-lg font-semibold tabular-nums">{formatCountdown(ms)}</b></div>;
+  if (ms > -4 * 3600e3) return <div className="grid justify-items-center gap-0.5"><span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-miss"><span className="size-1.5 animate-pulse rounded-full bg-miss" />Live</span><b className="text-lg font-semibold tabular-nums">{formatElapsed(-ms)}</b></div>;
+  return <span className={label}>Completed</span>;
+}
+
+/** One match header (replaces the old hero + "Next match" card): flat flags, teams, start time and a live timer, then series, venue and badges. */
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
@@ -47,14 +67,14 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
     return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-2.5">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-2.5">{body}</div>;
   };
   return (
-    <motion.section initial={{ opacity: 0, y: 14, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="pt-3">
+    <section className="pt-3">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-1 grid size-11 place-items-center rounded-full bg-card active:bg-accent"><ChevronLeft className="size-5" /></button>
       <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center">
         {team(f.a, f.a_ix)}
-        <div className="grid justify-items-center gap-1">
+        <div className="grid justify-items-center gap-1.5">
           <span className="text-sm font-medium text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
           <b className="text-[28px] font-bold leading-none tracking-tight tabular-nums">{timed ? localTime(when) : "TBC"}</b>
-          {timed && when.getTime() > Date.now() && <div className="mt-2 origin-top scale-90"><Countdown when={when} /></div>}
+          <div className="mt-1"><MatchTimer when={when} timed={timed} /></div>
         </div>
         {team(f.b, f.b_ix)}
       </div>
@@ -64,7 +84,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         <Badge variant="outline" className="px-2.5 py-1 text-[11px] font-semibold">{f.gender === "female" ? "Women" : "Men"}</Badge>
       </div>
       <p className="mt-3 text-center text-sm text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ")}</p>
-    </motion.section>
+    </section>
   );
 }
 
@@ -92,7 +112,7 @@ export function FixturePage() {
   const { "*": id = "" } = useParams();
   const [q, setQ] = useQ();
   const { data: all, isLoading } = useFixtures();
-  const { fixtures: pricedFx, priced } = usePricedFixtures();
+  const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
   const fx = (all || []).find((f) => f.id === id);
   const live = !!fx && priced && pricedFx.some((p) => p.id === fx.id);
   const fmt = FORMATS.includes(q.fmt) ? q.fmt : fx ? fmtOf(fx) : "T20";
@@ -104,33 +124,52 @@ export function FixturePage() {
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";
   const teams: [string, number][] = fx ? [[fx.a, fx.a_ix], [fx.b, fx.b_ix]] : [];
   const known = teams.filter(([, i]) => i >= 0);
+  const gridTeam = known.some(([, i]) => String(i) === q.team) ? Number(q.team) : known[0]?.[1];
+  const mlast = [10, 20, 30].includes(Number(q.mw)) ? Number(q.mw) : 20;
   const grids = useQuery({ queryKey: ["fx-grids", id, fmt, stat, games], enabled: !!fx && fx.fmt !== "FC", queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, games) }))) });
+  const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
+  usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle("Match preview, player grid and trends");
-  if (isLoading) return <div className="grid gap-3 pt-4"><Skeleton className="h-10 w-10 rounded-full" /><Skeleton className="h-36 rounded-2xl" /></div>;
+  if (isLoading) return <div><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return <div className="pt-3"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="mt-3 rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
-  const stepper = (txt: string) => <Muted className="mt-3">{txt}</Muted>;
   return (
     <div>
       <MatchHeader f={fx} live={live} />
+      {!ready ? <div className="mt-5 grid gap-4"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
       <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-5 sm:w-96" />
       {tab === "props" && <div className="-mt-2"><HotProps teams={[fx.a, fx.b]} /></div>}
       {tab === "grid" && (
         <>
           <FilterBar {...{ stat, line, games, setQ }} />
-          {grids.isLoading ? <div className="mt-4 grid gap-3"><Skeleton className="h-64 rounded-2xl" /></div> : grids.data?.map(({ name, team, g }) => (
-            <section key={name} className="mt-5">
-              <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamFlag name={name} className="h-5 w-7" />{name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
-              <GridTable g={g} teamIdx={team} line={line} />
-            </section>))}
-          {stepper("Each cell is the player's stat in that game (green clears the line). VOID: in the XI but did not bat or bowl, so the prop is void.")}
+          {known.length > 1 && (
+            <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-3 sm:w-80"
+              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-2"><TeamFlag name={name} className="h-3.5 w-5" />{name}</span>])} />
+          )}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
+            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
+            <span className="flex items-center gap-1.5"><span className="rounded border border-dashed border-amber/60 px-1 text-[10px] text-amber">VOID</span>in the XI, did not bat or bowl</span>
+          </div>
+          <div className="mt-3">
+            {grids.isLoading || !shown ? <GridSkeleton /> : (
+              <section>
+                <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamFlag name={shown.name} className="h-5 w-7" />{shown.name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                <GridTable g={shown.g} teamIdx={shown.team} line={line} />
+              </section>)}
+          </div>
         </>)}
       {tab === "trends" && (
         <>
           <FilterBar {...{ stat, line, games, hit, setQ }} />
-          <div className="mt-4">{grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <Skeleton className="h-40 rounded-2xl" />}</div>
+          <div className="mt-4">{grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}</div>
         </>)}
-      {tab === "markets" && <div className="mt-4">{known.length ? <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">{known.map(([name, i]) => <MarketCard key={i} name={name} idx={i} fmt={fmt} />)}</div> : <EmptyNote>No team data.</EmptyNote>}</div>}
+      {tab === "markets" && (
+        <div className="mt-4 grid gap-5">
+          <PillGroup segmented layoutId="fx-mw" label="Matches" value={String(mlast)} onChange={(v) => setQ({ mw: v })} items={[10, 20, 30].map((n) => [String(n), `L${n}`])} className="sm:w-64" />
+          {known.length ? <div className="grid gap-5 md:grid-cols-2">{known.map(([name, i]) => <MarketCard key={i} name={name} idx={i} fmt={fmt} last={mlast} />)}</div> : <EmptyNote>No team data.</EmptyNote>}
+        </div>)}
+      </>}
     </div>
   );
 }
