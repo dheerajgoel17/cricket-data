@@ -6,7 +6,10 @@ and use the market line as the default. Prices are decimal back prices only; no 
 """
 from __future__ import annotations
 
+import datetime as dt
 from collections import defaultdict
+
+from .util import parse_ts
 
 STAT = {"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
 PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
@@ -54,3 +57,35 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x["line"]))
     return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}
+
+
+LIVE_KEEP = dt.timedelta(hours=14)  # a limited-overs match is over well inside this
+TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
+
+
+def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
+    """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
+    the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
+    and has no rows of a kind in this pull keeps the previous pull's rows of that kind: the last pre-match prices. Upcoming matches are never
+    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one)."""
+    if not prev:
+        return book
+    test_matches = {(x.get("match"), x.get("start_utc")) for x in prev.get("lines", []) if x.get("fmt") == "Test"}
+
+    def alive(row: dict) -> bool:
+        st = parse_ts(row.get("start_utc"))
+        keep = TEST_KEEP if (row.get("match"), row.get("start_utc")) in test_matches else LIVE_KEEP
+        return bool(st) and st <= now < st + keep
+
+    def order(x: dict):
+        line = x.get("line")
+        return (x.get("start_utc") or "", x.get("match") or "", x.get("player") or "", x.get("stat") or x.get("key") or "", x.get("team") or "",
+                line if isinstance(line, (int, float)) else 0.0)
+
+    out = dict(book)
+    for kind in ("events", "lines", "fancy"):
+        have = {(x.get("match"), x.get("start_utc")) for x in book.get(kind, [])}
+        old = [x for x in prev.get(kind, []) if (x.get("match"), x.get("start_utc")) not in have and alive(x)]
+        if old:
+            out[kind] = sorted([*book.get(kind, []), *old], key=order)
+    return out

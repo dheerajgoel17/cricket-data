@@ -732,6 +732,11 @@ def run():
         "model_backtest": _prop_backtest_summary(), "log": LOG,
     }
     (config.OUT / "value_bets_latest.json").write_text(json.dumps(result, indent=1, default=str))
+    try:
+        prev_book = json.loads((config.OUT / "book_lines.json").read_text())
+    except (OSError, ValueError):
+        prev_book = None
+    book = booklines.carry_started(book, prev_book, now)  # a match stays in the file while it is being played
     (config.OUT / "book_lines.json").write_text(json.dumps(book, separators=(",", ":")))
     (config.OUT / "new_alerts.json").write_text(json.dumps({"generated_at_ist": ist(now), "alerts": alerts},
                                                           indent=1, default=str))

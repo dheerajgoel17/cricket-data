@@ -1,4 +1,6 @@
-from value_bets.booklines import book_lines, prop_events
+import datetime as dt
+
+from value_bets.booklines import book_lines, carry_started, prop_events
 
 
 def row(**kw):
@@ -65,3 +67,44 @@ def test_prop_events_lists_every_prerelease_event_with_any_player_prop_even_with
 def test_book_lines_carries_the_fancy_lines_it_is_given():
     assert book_lines([], "t")["fancy"] == []
     assert book_lines([], "t", [{"key": "match_runs"}])["fancy"] == [{"key": "match_runs"}]
+
+
+NOW = dt.datetime(2026, 10, 27, 9, 33, tzinfo=dt.timezone.utc)
+
+
+def doc(*matches):
+    """matches: (match, start_utc, fmt); one event, one line and one fancy row each."""
+    return {"generated_at_utc": "x",
+            "events": [{"match": m, "start_utc": st, "markets": ["batter_runs"], "sources": [], "n": 1} for m, st, _ in matches],
+            "lines": [{"match": m, "start_utc": st, "fmt": f, "player": "P", "stat": "runs", "line": 17.5, "books": []} for m, st, f in matches],
+            "fancy": [{"match": m, "start_utc": st, "key": "match_runs", "team": None, "line": 300.5} for m, st, _ in matches]}
+
+
+def test_a_started_match_stays_in_the_file_after_the_books_stop_pricing_it():
+    prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "T20"), ("Afghanistan vs Zimbabwe", "2026-10-27T14:30:00Z", "T20"))
+    new = doc(("Afghanistan vs Zimbabwe", "2026-10-27T14:30:00Z", "T20"))
+    out = carry_started(new, prev, NOW)
+    for kind in ("events", "lines", "fancy"):
+        assert [x["match"] for x in out[kind]] == ["India vs NZ", "Afghanistan vs Zimbabwe"], kind  # start order, 2 h 33 min in
+
+
+def test_upcoming_matches_are_never_revived_and_finished_ones_are_let_go():
+    prev = doc(("Later vs Match", "2026-10-27T14:30:00Z", "T20"), ("Old vs Game", "2026-10-26T07:00:00Z", "ODI"))  # 26 h ago
+    out = carry_started(doc(), prev, NOW)
+    assert out["events"] == out["lines"] == out["fancy"] == []
+
+
+def test_a_kind_the_new_pull_still_has_for_the_match_is_not_doubled():
+    prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "T20"))
+    new = {"generated_at_utc": "y", "events": [{"match": "India vs NZ", "start_utc": "2026-10-27T07:00:00Z", "markets": [], "sources": [], "n": 2}], "lines": [], "fancy": []}
+    out = carry_started(new, prev, NOW)
+    assert [e["n"] for e in out["events"]] == [2]  # this pull's row, not the old one
+    assert len(out["lines"]) == 1 and len(out["fancy"]) == 1  # kinds the pull lacks are kept
+    assert out["generated_at_utc"] == "y"
+
+
+def test_a_multi_day_match_is_kept_across_days():
+    prev = doc(("SA vs Aus", "2026-10-25T08:30:00Z", "Test"))  # two days in
+    assert len(carry_started(doc(), prev, NOW)["lines"]) == 1
+    assert carry_started(doc(), prev, NOW + dt.timedelta(days=5))["lines"] == []
+    assert carry_started(doc(), None, NOW) == doc()
