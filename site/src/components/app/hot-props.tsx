@@ -71,7 +71,9 @@ function useHotRows() {
         out.push({ day: dayOffset(b.start_utc), idx, name: store.playerName(idx), team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
           edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
       });
-      for (let i = 0; i < work.length; i += 8) await Promise.all(work.slice(i, i + 8).map((w) => w()));
+      // a few plans at a time, giving the main thread back in between: on a phone the whole batch is seconds of work, and typing in search waited behind it
+      const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
+      for (let i = 0; i < work.length; i += 4) { await Promise.all(work.slice(i, i + 4).map((w) => w())); await yieldToMain(); }
       return out;
     },
   });

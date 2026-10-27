@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { fixtureStart, localTime } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { usePricedFixtures } from "@/hooks/useEngine";
+import { useLiveDoc } from "@/hooks/useLive";
+import { liveForFixture } from "@/engine/live.js";
+import { homeTeam, rankFixtures } from "@/lib/priority";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
 import { HotProps } from "@/components/app/hot-props";
@@ -13,9 +16,12 @@ import { Muted } from "@/components/app/page";
 export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
   const { fixtures: fx } = usePricedFixtures();
+  const live = useLiveDoc();
+  // the viewer's own team first, then the biggest matches, matches in play lifted and finished ones last (src/lib/priority.ts)
+  const ranked = useMemo(() => rankFixtures(fx, homeTeam(), (f) => liveForFixture(live.data, f)?.status ?? "upcoming"), [fx, live.data]);
   return (
     <div className="flex flex-col gap-section">
-      <FixtureRail fx={fx.slice(0, 14)} />
+      <FixtureRail fx={ranked.slice(0, 14)} />
       <HotProps />
     </div>
   );
