@@ -150,7 +150,7 @@ export function HotProps() {
   return (
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
-        <div><h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Hot Player Props</h1>
+        <div><h1 className="font-condensed text-3xl font-bold uppercase tracking-wide md:text-4xl">Hot Player Props</h1>
           <p className="mt-1 text-sm text-muted-foreground">{day === "0" ? "Today's" : "Tomorrow's"} bookmaker lines, ranked by hit rate · {new Date(Date.now() + Number(day) * 864e5).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
       </div>
       <div className="mt-3 flex items-center gap-2">

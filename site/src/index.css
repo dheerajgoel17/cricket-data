@@ -1,8 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/plus-jakarta-sans";
 @import "@fontsource/barlow-condensed/400.css";
 @import "@fontsource/barlow-condensed/500.css";
+@import "@fontsource/barlow-condensed/600.css";
+@import "@fontsource/barlow-condensed/700.css";
 @import "@fontsource/bebas-neue";
 
 @custom-variant dark (&:is(.dark *));
@@ -46,7 +48,7 @@
 .dark { color-scheme: dark; }
 
 @theme inline {
-  --font-sans: "Instrument Sans Variable", "Diatype", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-condensed: "Barlow Condensed", "Diatype Condensed", "Arial Narrow", sans-serif;
   --font-brand: "Bebas Neue", Impact, sans-serif;
   --color-background: var(--background);
