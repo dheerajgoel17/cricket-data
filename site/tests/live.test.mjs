@@ -143,7 +143,8 @@ test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not 
   assert.equal(wantsCard(row("upcoming", "2026-10-27T06:30:00Z"), now), true);
   assert.equal(wantsCard(row("upcoming", "2026-10-27T09:00:00Z"), now), false);
   assert.equal(wantsCard(row("upcoming", "2026-10-26T07:00:00Z"), now), false); // long gone, never scored
-  assert.equal(wantsCard(row("final", "2026-10-27T05:00:00Z"), now), false);
+  assert.equal(wantsCard(row("final", "2026-10-27T05:00:00Z"), now), true, "a finished match keeps its scorecard for a day and a half");
+  assert.equal(wantsCard(row("final", "2026-10-25T05:00:00Z"), now), false);
 });
 
 test("pricedLive keeps only matches the books price (player props or fancy), not unpriced games", () => {
@@ -425,7 +426,7 @@ test("a finished match is final: status 2, the winner as a team key, and the res
   assert.equal(m.status, "final");
   assert.equal(liveBlurb(m), "IND Won by 6 wickets");
   assert.equal(teamScore(m, "India").display, "199/4 (13.2 ov)");
-  assert.equal(wantsCard(m, Date.parse("2026-10-27T10:30:00Z")), false);
+  assert.equal(wantsCard(m, Date.parse("2026-10-27T10:30:00Z")), true, "its scorecard is still read, for the props on it");
   const [live] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, status: 1, w: -1, winningTeam: -1 }] }));
   assert.equal(live.status, "live", "-1 means nobody has won yet");
   const [innBreak] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...nzInd, statusText: "Innings Break" }] }));

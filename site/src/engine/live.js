@@ -95,6 +95,7 @@ export function liveCard(match) {
 export function wantsCard(match, now = Date.now()) {
   if (match?.status === "live") return true;
   const t = match?.start ? Date.parse(match.start) : NaN;
+  if (match?.status === "final") return Number.isFinite(t) && now - t < 36 * 3600e3; // a finished match keeps its scorecard: the props on it are decided by those numbers
   return match?.status === "upcoming" && Number.isFinite(t) && t - now < 90 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 

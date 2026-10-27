@@ -95,7 +95,7 @@ def test_a_started_match_stays_in_the_file_after_the_books_stop_pricing_it():
 
 
 def test_upcoming_matches_are_never_revived_and_finished_ones_are_let_go():
-    prev = doc(("Later vs Match", "2026-10-27T14:30:00Z", "T20"), ("Old vs Game", "2026-10-26T07:00:00Z", "ODI"))  # 26 h ago
+    prev = doc(("Later vs Match", "2026-10-27T14:30:00Z", "T20"), ("Old vs Game", "2026-10-25T07:00:00Z", "ODI"))  # 50 h ago: past the 40 h a finished match is kept
     out = carry_started(doc(), prev, NOW)
     assert out["events"] == out["lines"] == out["fancy"] == []
 

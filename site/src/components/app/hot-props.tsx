@@ -35,7 +35,7 @@ const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
-interface Row { day: number; idx: number; name: string; bookName: string; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; name: string; bookName: string; settled?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
 function useHotRows() {
@@ -48,14 +48,14 @@ function useHotRows() {
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
-      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= 0 && Date.parse(l.start_utc) > now - 14 * 3600e3 && l.books?.length) };
+      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= -1 && Date.parse(l.start_utc) > now - 40 * 3600e3 && l.books?.length) };
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}`, l);
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const work = [...keys.values()].map((l) => async () => {
         const idx = store.P.id.indexOf(l.pid);
-        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, 14 * 3600e3);
+        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, 40 * 3600e3);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt }, split_by: [] }, { playerIdx: idx });
@@ -68,8 +68,11 @@ function useHotRows() {
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
         const p = r.summary?.pOver, n = r.summary?.n || 0;
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
+        // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
+        const lastE = entries[entries.length - 1];
+        const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
         out.push({ day: dayOffset(b.start_utc), idx, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
-          edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
+          edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
       });
       // a few plans at a time, giving the main thread back in between: on a phone the whole batch is seconds of work, and typing in search waited behind it
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
@@ -120,15 +123,18 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const { data: all, isLoading } = useHotRows();
   const live = useLiveDoc();
   // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
+  const onFixture = !!teams;
   const data = useMemo(() => (all || []).filter((r) => {
-    if (Date.parse(r.start) > Date.now() - 3 * 3600e3) return true;
+    if (onFixture) return true; // a fixture's own page shows every line it has, whatever the match's age: props are never taken away
+    if (Date.parse(r.start) > Date.now() - 3 * 3600e3 || r.settled != null) return true;
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return liveForFixture(live.data, { a, b, start: r.start })?.status === "live";
-  }), [all, live.data]);
+    return ["live", "final"].includes(liveForFixture(live.data, { a, b, start: r.start })?.status ?? ""); // a finished match keeps its props with their results
+  }), [all, live.data, onFixture]);
   const soFarOf = (r: Row): SoFar | null => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
     const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat, r.bookName), v = liveStat(p, r.stat);
-    return v == null ? null : { v, state: liveState(m, p, r.stat) };
+    if (v != null) return { v, state: liveState(m, p, r.stat) };
+    return r.settled != null ? { v: r.settled, state: "final" } : null; // the live feed no longer has the match: his result as the data records it
   };
   const { store, photos } = useData();
   const outOf = (r: Row) => {
