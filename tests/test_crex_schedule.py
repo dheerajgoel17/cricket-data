@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from cricket_data import crex_schedule as cs
 
@@ -57,6 +58,31 @@ def test_merge_keeps_far_future_rows_but_lets_the_schedule_replace_the_near_term
         w.writeheader()
         w.writerows(old)
     fresh = [row("2026-10-24T07:00Z", "New Zealand", "India"), row("2026-10-26T03:00Z", "A", "B")]
-    merged = _merge_fixtures(fresh, path)
+    merged = _merge_fixtures(fresh, path, datetime(2026, 10, 24, 12, 0))
     assert [r["team_a"] for r in merged] == ["New Zealand", "A", "Australia Women"]   # the old near-term game (25 Oct) is gone, the 2027 tour stays
     assert _merge_fixtures([], path) == []
+
+
+def test_a_match_that_has_dropped_off_the_page_is_kept_for_three_days_as_completed(tmp_path):
+    import csv
+
+    from cricket_data.cli import _merge_fixtures
+    from cricket_data.fixtures import FIELDS
+
+    def row(start, a, b, status="Upcoming"):
+        return {**{k: "" for k in FIELDS}, "start_utc": start, "match_id": f"{a}-{b}", "team_a": a, "team_b": b, "status": status}
+
+    path = tmp_path / "upcoming.csv"
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDS, lineterminator="\n")
+        w.writeheader()
+        w.writerows([row("2026-10-27T07:00Z", "New Zealand", "India", "Live"), row("2026-10-22T07:00Z", "Long", "Ago"), row("2026-10-27T05:00Z", "Still", "Listed")])
+    fresh = [row("2026-10-27T05:00Z", "Still", "Listed", "Live"), row("2026-10-28T08:30Z", "India Women", "Zimbabwe Women")]
+    merged = _merge_fixtures(fresh, path, datetime(2026, 10, 27, 12, 0))
+    assert [(r["team_a"], r["status"]) for r in merged] == [("Still", "Live"), ("New Zealand", "Completed"), ("India Women", "Upcoming")]  # 5 days ago is gone
+
+
+def test_a_finished_match_is_completed_with_its_result_line():
+    r = cs.parse_schedule(page([item(status=2, result="IND Won by 6 wickets")]))[0]
+    assert r["status"] == "Completed" and r["result"] == "IND Won by 6 wickets"
+    assert cs.parse_schedule(page([item(status=1)]))[0]["result"] == ""

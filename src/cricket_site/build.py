@@ -563,7 +563,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
             for r in csv.DictReader(fh):
                 rows.append({"start": r["start_utc"], "fmt": r["format"], "gender": r["gender"], "a": r["team_a"],
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
-                             "source": "src"})
+                             "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):

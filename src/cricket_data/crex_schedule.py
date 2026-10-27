@@ -56,7 +56,8 @@ def parse_schedule(html: str) -> list[dict]:
             "format": format_of(x.get("formats") or x.get("fo")),
             "gender": "male" if x.get("g") == 1 else "female",  # Source A: g=1 men, g=0 women (India Women have g=0)
             "team_a": x["team1"], "team_b": x["team2"], "venue": x.get("venue", ""),
-            "status": "Live" if x.get("status") == 1 else "Upcoming",
+            "status": "Live" if x.get("status") == 1 else "Completed" if x.get("status") == 2 or x.get("result") else "Upcoming",
+            "result": x.get("result") or "",
             "url": rel(link),  # host-relative: committed data names no host
         })
     return sorted(rows, key=lambda r: (r["start_utc"], r["match_id"]))
