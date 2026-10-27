@@ -1,0 +1,14 @@
+{
+  "tiers": ["live", "upcoming", "final"],
+  "bonus": { "home": 100, "homeWomen": 50, "region": 30, "event": 30 },
+  "bigEvent": ["world cup", "champions trophy", "asia cup", "ashes", "border gavaskar", "ipl", "indian premier", "big bash", "bbl", "psl", "pakistan super", "sa20", "cpl", "caribbean premier", "the hundred", "ilt20", "lpl", "bpl", "t20 blast"],
+  "standing": {
+    "india": 100, "australia": 95, "england": 95, "pakistan": 85, "southafrica": 85, "newzealand": 80, "westindies": 70, "srilanka": 70, "bangladesh": 65, "afghanistan": 60,
+    "zimbabwe": 40, "ireland": 40, "netherlands": 30, "namibia": 25, "scotland": 25, "uae": 20, "nepal": 20, "oman": 20, "usa": 20, "canada": 15
+  },
+  "region": {
+    "india": "asia", "pakistan": "asia", "bangladesh": "asia", "srilanka": "asia", "afghanistan": "asia", "nepal": "asia", "australia": "oceania", "newzealand": "oceania",
+    "southafrica": "africa", "zimbabwe": "africa", "namibia": "africa", "england": "europe", "ireland": "europe", "scotland": "europe", "netherlands": "europe",
+    "westindies": "caribbean", "uae": "gulf", "oman": "gulf", "qatar": "gulf"
+  }
+}

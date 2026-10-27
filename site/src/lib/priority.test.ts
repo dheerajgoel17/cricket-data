@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { fixtureScore, homeTeam, rankFixtures } from "./priority";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { DEFAULT_RAIL, fixtureScore, homeTeam, rankFixtures, sanitizeRail } from "./priority";
 
 const fx = (a: string, b: string, extra: Record<string, unknown> = {}) => ({ a, b, fmt: "ODI", gender: "male", series: "", ...extra });
 // today's list, in the order the schedule gives it
@@ -29,14 +31,58 @@ describe("fixture order", () => {
     expect(order("australia")[0]).toBe("South Africa v Australia");
     expect(order(null).slice(0, 2)).toEqual(["South Africa v Australia", "New Zealand v India"]); // nobody's team: by standing alone
   });
-  it("lifts a match in play, sinks a finished one, keeps the start order on a tie", () => {
+  it("puts every match in play first, then the ones to come, then finished ones, and keeps the start order on a tie", () => {
     expect(order("india", (f: any) => (f.a === "New Zealand" ? "final" : "upcoming")).at(-1)).toBe("New Zealand v India");
-    expect(fixtureScore(fx("India", "Australia"), null, "live")).toBeGreaterThan(fixtureScore(fx("India", "Australia"), null));
+    // a small match in play still leads the biggest one to come
+    const o = order("india", (f: any) => (f.a === "Namibia" ? "live" : f.a === "New Zealand" ? "final" : "upcoming"));
+    expect(o[0]).toBe("Namibia v Ireland");
+    expect(o.at(-1)).toBe("New Zealand v India");
+    expect(o[1]).toBe("Pakistan v Sri Lanka");
+    // inside the group in play the viewer's team still leads
+    expect(order("india", (f: any) => (["Namibia", "New Zealand"].includes(f.a) ? "live" : "upcoming")).slice(0, 2)).toEqual(["New Zealand v India", "Namibia v Ireland"]);
     expect(rankFixtures([fx("Spain", "Italy"), fx("France", "Germany")], null).map((f) => f.a)).toEqual(["Spain", "France"]);
   });
   it("counts women's, youth and A sides for less, and big tournaments for more", () => {
     expect(fixtureScore(fx("India", "Australia", { gender: "female" }), null)).toBeLessThan(fixtureScore(fx("India", "Australia"), null));
     expect(fixtureScore(fx("India U19", "Australia U19"), null)).toBeLessThan(fixtureScore(fx("Ireland", "Scotland"), null));
     expect(fixtureScore(fx("Ireland", "Scotland", { series: "T20 World Cup 2026" }), null)).toBeGreaterThan(fixtureScore(fx("Ireland", "Scotland"), null));
+  });
+});
+
+describe("the published settings", () => {
+  const live = (f: any) => (f.a === "Namibia" ? "live" : "upcoming");
+  it("the file in the repo says what the built-in settings say", () => {
+    const file = JSON.parse(readFileSync(resolve(process.cwd(), "../config/home_rail.json"), "utf8"));
+    expect(sanitizeRail(file)).toEqual(DEFAULT_RAIL);
+    expect(file.standing).toEqual(DEFAULT_RAIL.standing);
+    expect(file.region).toEqual(DEFAULT_RAIL.region);
+  });
+  it("changes the order without a code change: group order, a standing, a bonus, a tournament", () => {
+    const upcomingFirst = sanitizeRail({ tiers: ["upcoming", "live", "final"] });
+    expect(rankFixtures(today, "india", live, upcomingFirst)[0].a).toBe("New Zealand");
+    const boosted = sanitizeRail({ standing: { namibia: 500 } });
+    expect(rankFixtures(today, null, undefined, boosted)[0].a).toBe("Namibia");
+    expect(fixtureScore(fx("India", "Australia"), "india", sanitizeRail({ bonus: { home: 0 } }))).toBe(195);
+    expect(fixtureScore(fx("Ireland", "Scotland", { series: "Tri-Series Cup" }), null, sanitizeRail({ bigEvent: ["tri series"] }))).toBe(95);
+  });
+  it("keeps the built-in value for anything missing, mistyped or out of range, and reads nothing else", () => {
+    expect(sanitizeRail(null)).toBe(DEFAULT_RAIL);
+    expect(sanitizeRail("nope")).toBe(DEFAULT_RAIL);
+    const odd = sanitizeRail({ tiers: ["final", "bogus", "final"], standing: { india: "high", Pakistan: 5, nepal: 1e9, oman: -1, usa: 33 }, region: { india: 7, oman: "asia" }, bonus: { home: NaN, region: "30", event: 5 }, bigEvent: [3, "", "x".repeat(61), "ipl"], extra: { evil: true } });
+    expect(odd.tiers).toEqual(["final", "live", "upcoming"]); // an unknown group is dropped and the missing ones follow in the built-in order
+    expect(odd.standing.india).toBe(100);
+    expect(odd.standing.pakistan).toBe(85);
+    expect(odd.standing.nepal).toBe(20);
+    expect(odd.standing.oman).toBe(20);
+    expect(odd.standing.usa).toBe(33);
+    expect(odd.region.india).toBe("asia");
+    expect(odd.region.oman).toBe("asia");
+    expect(odd.bonus).toEqual({ home: 100, homeWomen: 50, region: 30, event: 5 });
+    expect(odd.bigEvent).toEqual(["ipl"]);
+    expect("extra" in odd).toBe(false);
+  });
+  it("matches a tournament by whole words, so 'ipl' is not found inside 'triple'", () => {
+    expect(fixtureScore(fx("Ireland", "Scotland", { series: "Triple Crown Cup" }), null)).toBe(fixtureScore(fx("Ireland", "Scotland"), null));
+    expect(fixtureScore(fx("Ireland", "Scotland", { series: "Indian Premier League 2026" }), null)).toBe(fixtureScore(fx("Ireland", "Scotland"), null) + 30);
   });
 });

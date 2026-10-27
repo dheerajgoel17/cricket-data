@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { teamKey } from "@/engine/live.js";
 
-// Which fixtures lead the home rail: matches of the viewer's own team first, then by how big the match is (the two sides' standing), with a lift for the
-// viewer's own part of the world, for the big tournaments and leagues, and for matches in play. Finished matches sink. No account: the region is read from
-// the time zone, then the language tag.
+// Which fixtures lead the home rail: matches in play first, then the ones still to come, then finished ones; inside each group the viewer's own team first, then
+// by how big the match is (the two sides' standing), with a lift for the viewer's own part of the world and for the big tournaments and leagues. No account: the
+// region is read from the time zone, then the language tag. The tunables (group order, standings, bonuses, tournaments) are published as config/home_rail.json
+// and read at view time, so changing them needs no deploy; the built-in values below are the fallback (and a test keeps the file equal to them).
 
 const ZONE: Record<string, string> = {
   "Asia/Kolkata": "india", "Asia/Calcutta": "india", "Asia/Karachi": "pakistan", "Asia/Dhaka": "bangladesh", "Asia/Colombo": "srilanka", "Asia/Kabul": "afghanistan",
@@ -34,29 +35,50 @@ const REGION: Record<string, string> = {
   southafrica: "africa", zimbabwe: "africa", namibia: "africa", england: "europe", ireland: "europe", scotland: "europe", netherlands: "europe",
   westindies: "caribbean", uae: "gulf", oman: "gulf", qatar: "gulf",
 };
-const BIG_EVENT = /world cup|champions trophy|asia cup|ashes|border.?gavaskar|ipl|indian premier|big bash|bbl|psl|pakistan super|sa20|cpl|caribbean premier|the hundred|ilt20|lpl|bpl|t20 blast/i;
+const BIG_EVENT = ["world cup", "champions trophy", "asia cup", "ashes", "border gavaskar", "ipl", "indian premier", "big bash", "bbl", "psl", "pakistan super", "sa20", "cpl", "caribbean premier", "the hundred", "ilt20", "lpl", "bpl", "t20 blast"]; // whole words in the series name
 
-function standing(name: string): number {
+export type RailState = "live" | "final" | "upcoming";
+export interface RailConfig { tiers: RailState[]; standing: Record<string, number>; region: Record<string, string>; bigEvent: string[]; bonus: { home: number; homeWomen: number; region: number; event: number } }
+
+export const DEFAULT_RAIL: RailConfig = { tiers: ["live", "upcoming", "final"], standing: STANDING, region: REGION, bigEvent: BIG_EVENT, bonus: { home: 100, homeWomen: 50, region: 30, event: 30 } };
+
+const words = (x: unknown) => ` ${String(x || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+
+/** The published config laid over the built-in one: anything missing or malformed keeps its built-in value, and nothing but these keys is read. */
+export function sanitizeRail(raw: any): RailConfig {
+  const d = DEFAULT_RAIL;
+  if (!raw || typeof raw !== "object") return d;
+  const num = (x: unknown, lo: number, hi: number) => (typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? x : null);
+  const named = (o: unknown) => Object.entries(o && typeof o === "object" ? (o as object) : {}).slice(0, 300).filter(([k]) => /^[a-z0-9]{1,40}$/.test(k));
+  const tiers = Array.isArray(raw.tiers) ? ([...new Set(raw.tiers)].filter((t) => (d.tiers as unknown[]).includes(t)) as RailState[]) : [];
+  const standing = { ...d.standing }, region = { ...d.region }, bonus = { ...d.bonus };
+  for (const [k, v] of named(raw.standing)) { const n = num(v, 0, 1000); if (n != null) standing[k] = n; }
+  for (const [k, v] of named(raw.region)) if (typeof v === "string" && /^[a-z]{1,20}$/.test(v)) region[k] = v;
+  for (const k of Object.keys(bonus) as (keyof typeof bonus)[]) { const n = num(raw.bonus?.[k], -1000, 1000); if (n != null) bonus[k] = n; }
+  const events = Array.isArray(raw.bigEvent) ? raw.bigEvent.filter((x: unknown): x is string => typeof x === "string" && x.trim().length > 0 && x.length <= 60).slice(0, 100) : null;
+  return { tiers: [...tiers, ...d.tiers.filter((t) => !tiers.includes(t))], standing, region, bigEvent: events ?? d.bigEvent, bonus };
+}
+
+function standing(name: string, table: Record<string, number>): number {
   const key = teamKey(name);
-  if (STANDING[key] != null) return STANDING[key];
-  if (key.endsWith("u19") && STANDING[key.slice(0, -3)] != null) return STANDING[key.slice(0, -3)] * 0.25; // youth side
-  if (key.length > 4 && key.endsWith("a") && STANDING[key.slice(0, -1)] != null) return STANDING[key.slice(0, -1)] * 0.4; // "A" side
+  if (table[key] != null) return table[key];
+  if (key.endsWith("u19") && table[key.slice(0, -3)] != null) return table[key.slice(0, -3)] * 0.25; // youth side
+  if (key.length > 4 && key.endsWith("a") && table[key.slice(0, -1)] != null) return table[key.slice(0, -1)] * 0.4; // "A" side
   return 10;
 }
 
-/** Higher is shown first. `state` comes from the live feed: "live" lifts a match, "final" sinks it. */
-export function fixtureScore(f: any, home: string | null, state: "live" | "final" | "upcoming" = "upcoming"): number {
+/** How big the match is, higher first: the two sides' standing, with a lift for the viewer's own team or part of the world and for a big tournament. */
+export function fixtureScore(f: any, home: string | null, cfg: RailConfig = DEFAULT_RAIL): number {
   const a = teamKey(f.a), b = teamKey(f.b);
-  let s = (standing(f.a) + standing(f.b)) * (f.gender === "female" ? 0.8 : 1);
-  if (home && (a === home || b === home)) s += f.gender === "female" ? 50 : 100; // the women's side of the viewer's team counts, for less
-  else if (home && REGION[home] && (REGION[a] === REGION[home] || REGION[b] === REGION[home])) s += 30;
-  if (BIG_EVENT.test(String(f.series || ""))) s += 30;
-  if (state === "live") s += 15;
-  if (state === "final") s -= 400; // always behind everything still to come
+  let s = (standing(f.a, cfg.standing) + standing(f.b, cfg.standing)) * (f.gender === "female" ? 0.8 : 1);
+  if (home && (a === home || b === home)) s += f.gender === "female" ? cfg.bonus.homeWomen : cfg.bonus.home; // the women's side of the viewer's team counts, for less
+  else if (home && cfg.region[home] && (cfg.region[a] === cfg.region[home] || cfg.region[b] === cfg.region[home])) s += cfg.bonus.region;
+  const series = words(f.series);
+  if (cfg.bigEvent.some((e) => series.includes(words(e)))) s += cfg.bonus.event;
   return s;
 }
 
-/** The fixtures best first; equal scores keep the start order. */
-export function rankFixtures(fx: any[], home: string | null, stateOf: (f: any) => "live" | "final" | "upcoming" = () => "upcoming"): any[] {
-  return fx.map((f, i) => ({ f, i, s: fixtureScore(f, home, stateOf(f)) })).sort((x, y) => y.s - x.s || x.i - y.i).map((x) => x.f);
+/** The fixtures in order: by group first (`cfg.tiers`: matches in play, then to come, then finished; `stateOf` is the live feed's word for a match), then best first; equal scores keep the start order. */
+export function rankFixtures(fx: any[], home: string | null, stateOf: (f: any) => RailState = () => "upcoming", cfg: RailConfig = DEFAULT_RAIL): any[] {
+  return fx.map((f, i) => ({ f, i, t: cfg.tiers.indexOf(stateOf(f)), s: fixtureScore(f, home, cfg) })).sort((x, y) => x.t - y.t || y.s - x.s || x.i - y.i).map((x) => x.f);
 }

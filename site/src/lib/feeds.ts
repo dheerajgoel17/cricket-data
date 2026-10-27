@@ -3,6 +3,7 @@
 import { isFixtureId } from "@/engine/lines.js";
 
 const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out";
+const CONFIG = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/config";
 const ARCHIVE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/archive";
 
 async function bundled(file: string): Promise<any | null> { try { return await (await fetch(`/data/${file}`)).json(); } catch { return null; } }
@@ -16,6 +17,12 @@ export async function loadLines(): Promise<any> {
   const d = await live("book_lines.json", 3500);
   if (d && (!doc || (d.generated_at_utc || "") >= (doc.generated_at_utc || ""))) doc = { ...d, events: d.events ?? doc?.events ?? [], fancy: d.fancy ?? doc?.fancy ?? [] }; // a live file from before `events` / `fancy` existed keeps the bundled lists
   return doc || { lines: [], events: [], fancy: [] };
+}
+
+/** The home rail's published settings (config/home_rail.json, read at view time so a change needs no deploy); null when it cannot be read, and the built-in ones apply. */
+export async function loadRail(): Promise<any | null> {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 3500);
+  try { const r = await fetch(`${CONFIG}/home_rail.json`, { cache: "no-cache", signal: ctl.signal }); return r.ok ? await r.json() : null; } catch { return null; } finally { clearTimeout(t); }
 }
 
 /** One match's permanent archive file (every line the books priced for it, never deleted), by fixture id; null if there is none. */
