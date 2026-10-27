@@ -19,7 +19,7 @@ import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
 import { HotProps } from "@/components/app/hot-props";
 import { GridTable, TrendCards } from "@/components/app/grid";
-import { TeamFlag, usePreloadTeams } from "@/components/app/badges";
+import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ function MarketCard({ name, idx, fmt, last }: { name: string; idx: number; fmt: 
   const rows = ["match_runs", "match_sixes", "match_fours", "match_50s", "highest_over"].map((k) => { const r = marketReport(store, ms, k); return [(MATCH_MARKETS as any)[k].label as string, num(r.summary.median), num(r.summary.mean)]; });
   return (
     <section>
-      <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamFlag name={name} className="h-5 w-7" />{name}<span className="text-sm font-normal text-muted-foreground">last {ms.length} {fmt}</span></h2>
+      <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamBadge name={name} size="xs" />{name}<span className="text-sm font-normal text-muted-foreground">last {ms.length} {fmt}</span></h2>
       <div className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
         <div className="flex px-4 py-2.5 text-xs font-medium text-muted-foreground"><span>Market</span><span className="ml-auto w-16 text-right">Median</span><span className="w-16 text-right">Mean</span></div>
         {rows.map(([label, med, mean]) => <div key={label} className="flex items-center border-t border-white/5 px-4 py-3.5 text-[15px]"><span>{label}</span><b className="ml-auto w-16 text-right font-semibold tabular-nums">{med}</b><span className="w-16 text-right tabular-nums text-muted-foreground">{mean}</span></div>)}
@@ -63,7 +63,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const team = (name: string, ix: number) => {
-    const body = <><TeamFlag name={name} className="h-12 w-[72px] rounded-md" /><b className="max-w-full text-base font-semibold leading-tight">{name}</b></>;
+    const body = <><TeamBadge name={name} size="lg" eager /><b className="max-w-full text-base font-semibold leading-tight">{name}</b></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-2.5">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-2.5">{body}</div>;
   };
   return (
@@ -144,7 +144,7 @@ export function FixturePage() {
           <FilterBar {...{ stat, line, games, setQ }} />
           {known.length > 1 && (
             <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })} className="mt-3 sm:w-80"
-              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-2"><TeamFlag name={name} className="h-3.5 w-5" />{name}</span>])} />
+              items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-2"><TeamBadge name={name} size="xs" />{name}</span>])} />
           )}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
@@ -154,7 +154,7 @@ export function FixturePage() {
           <div className="mt-3">
             {grids.isLoading || !shown ? <GridSkeleton /> : (
               <section>
-                <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamFlag name={shown.name} className="h-5 w-7" />{shown.name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                <h2 className="mb-2 flex items-center gap-2 text-lg font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-sm font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                 <GridTable g={shown.g} teamIdx={shown.team} line={line} />
               </section>)}
           </div>

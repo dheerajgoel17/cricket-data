@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
-import { TeamFlag, usePreloadTeams } from "./badges";
+import { TeamBadge, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
 
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
@@ -45,7 +45,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
         <CardContent className="px-4 pt-4">
           <div className="flex items-center justify-between gap-3">
             <div className="grid min-w-0 gap-3">
-              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-2" title={t}><TeamFlag name={t} className="h-6 w-9 rounded-[4px]" /><span className="truncate text-base font-semibold capitalize">{abbr(t)}</span></div>)}
+              {[f.a, f.b].map((t: string) => <div key={t} className="flex items-center gap-2" title={t}><TeamBadge name={t} size="sm" eager /><span className="truncate text-base font-semibold capitalize">{abbr(t)}</span></div>)}
             </div>
             <div className="shrink-0 text-right">
               <div className="text-sm font-medium text-muted-foreground">{dayLabel(dayKey(f))}</div>

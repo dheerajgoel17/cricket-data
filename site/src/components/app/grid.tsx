@@ -8,7 +8,7 @@ import { useData } from "@/lib/data";
 import type { Grid } from "@/lib/grid";
 import { odds, pc, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { PlayerBadge, TeamFlag } from "./badges";
+import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { EmptyNote, Muted } from "./page";
 import { MiniBars } from "./mini-bars";
 
@@ -21,7 +21,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
       <table className="w-full text-sm">
         <thead><tr className="border-b border-white/10 text-muted-foreground">
           <th className="sticky left-0 z-10 bg-card px-3 py-2.5 text-left text-xs font-medium">Player</th><th className="px-2 text-xs font-medium">Hit</th>
-          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-2 font-normal"><div className="grid justify-items-center gap-1 text-[10.5px]"><TeamFlag name={store.teamName(opp, true)} className="h-3.5 w-5" />{shortDate(M.d[m])}</div></th>; })}
+          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-2 font-normal"><div className="grid justify-items-center gap-1 text-[10.5px]"><TeamBadge name={store.teamName(opp, true)} size="xs" />{shortDate(M.d[m])}</div></th>; })}
         </tr></thead>
         <tbody>{g.body.map(({ p, map, xi }) => {
           const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key]);

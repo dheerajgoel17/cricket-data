@@ -18,7 +18,7 @@ import { useSaved } from "@/lib/saved";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
-import { PlayerBadge, TeamFlag } from "./badges";
+import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
 
@@ -145,7 +145,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
     <section aria-label="Hot player props today">
       {!teams && <div className="pt-8 md:pt-10"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
       {teams && <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam} className="mt-3 sm:w-96"
-        items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamFlag name={t} className="h-3.5 w-5" />{t}</span>] as [string, React.ReactNode])]} />}
+        items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-2"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} />}
       <div className="mt-3 flex items-center gap-2">
         <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full bg-card transition-colors active:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
         <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} className="min-w-0 flex-1 sm:w-80 sm:flex-none" />

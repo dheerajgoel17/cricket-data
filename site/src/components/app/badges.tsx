@@ -35,10 +35,10 @@ const Circle = ({ size, className, children, title }: { size: BadgeSize; classNa
 );
 
 /** Round team badge: CREX logo when we know the team, else a flag, else initials. */
-export function TeamBadge({ name, size = "sm", className }: { name: string; size?: BadgeSize; className?: string }) {
+export function TeamBadge({ name, size = "sm", className, eager }: { name: string; size?: BadgeSize; className?: string; eager?: boolean }) {
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
-  return <Circle size={size} className={className}><Img urls={urls} alt="" className="size-full object-cover" fallback={initials(name)} /></Circle>;
+  return <Circle size={size} className={className} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
 }
 
 /** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the CREX logo, else the initials; the name goes in the tooltip. */
@@ -73,5 +73,5 @@ export function PlayerPhoto({ idx, className }: { idx: number; className?: strin
 export function usePreloadTeams(names: string[]) {
   const { photos } = useData();
   const key = names.join("|");
-  useEffect(() => { preloadImages(names.map((n) => flagUrl(n, 80) ?? teamLogos(photos, n)[0])); }, [key, photos]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { preloadImages(names.flatMap((n) => { const logo = teamLogos(photos, n)[0]; return logo ? [logo] : [flagUrl(n, 40), flagUrl(n, 160), flagUrl(n, 80)]; })); }, [key, photos]); // eslint-disable-line react-hooks/exhaustive-deps
 }
