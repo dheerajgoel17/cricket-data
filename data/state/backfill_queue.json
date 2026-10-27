@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-10-25T08:31:57",
+ "afghanistan_enumerated_at": "2026-10-27T09:07:41",
  "already_in_cricsheet": [],
  "batch_size": 30,
  "delay_between_requests": 5.0,
@@ -1965,6 +1965,132 @@
    "key": "2023-09-29-Afghanistan-South Africa",
    "match_id": "crex-afg-vs-sa-2nd-match-world-cup-2023-warm-up-match-updates-M88",
    "saved_at": "2026-10-25T08:40:03"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
+   "key": "2023-09-03-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
+   "saved_at": "2026-10-27T09:07:49"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
+   "key": "2023-08-26-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
+   "saved_at": "2026-10-27T09:08:01"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
+   "key": "2023-08-24-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
+   "saved_at": "2026-10-27T09:08:14"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
+   "key": "2023-08-22-Afghanistan-Pakistan",
+   "match_id": "crex-afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
+   "saved_at": "2026-10-27T09:08:27"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
+   "key": "2023-07-11-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
+   "saved_at": "2026-10-27T09:08:41"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
+   "key": "2023-07-05-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
+   "saved_at": "2026-10-27T09:08:53"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
+   "key": "2023-06-14-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
+   "saved_at": "2026-10-27T09:09:06"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
+   "key": "2023-06-02-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
+   "saved_at": "2026-10-27T09:09:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
+   "key": "2023-03-29-Namibia-Papua New Guinea",
+   "match_id": "crex-nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
+   "saved_at": "2026-10-27T09:09:31"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
+   "key": "2023-02-27-Papua New Guinea-Nepal",
+   "match_id": "crex-nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
+   "saved_at": "2026-10-27T09:09:53"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
+   "key": "2023-02-26-Queensland-New South Wales",
+   "match_id": "crex-nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
+   "saved_at": "2026-10-27T09:10:06"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
+   "key": "2022-11-30-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
+   "saved_at": "2026-10-27T09:10:19"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
+   "key": "2022-11-04-Afghanistan-Australia",
+   "match_id": "crex-afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
+   "saved_at": "2026-10-27T09:10:31"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
+   "key": "2022-11-01-Bengal-Himachal Pradesh",
+   "match_id": "crex-ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
+   "saved_at": "2026-10-27T09:10:43"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
+   "key": "2022-11-01-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
+   "saved_at": "2026-10-27T09:10:55"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
+   "key": "2022-10-28-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
+   "saved_at": "2026-10-27T09:11:07"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
+   "key": "2022-10-26-Afghanistan-New Zealand",
+   "match_id": "crex-afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
+   "saved_at": "2026-10-27T09:11:18"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/dol-vs-war-15th-match-csa-t20-challenge-2022-23-match-updates-GMK",
+   "key": "2022-10-25-Dolphins-Warriors",
+   "match_id": "crex-dol-vs-war-15th-match-csa-t20-challenge-2022-23-match-updates-GMK",
+   "saved_at": "2026-10-27T09:11:31"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
+   "key": "2022-10-22-Baroda-Andhra",
+   "match_id": "crex-andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
+   "saved_at": "2026-10-27T09:12:26"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
+   "key": "2022-10-22-Afghanistan-England",
+   "match_id": "crex-afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
+   "saved_at": "2026-10-27T09:12:55"
+  },
+  {
+   "crex_url": "https://crex.com/cricket-live-score/mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
+   "key": "2022-10-16-Mumbai-Vidarbha",
+   "match_id": "crex-mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
+   "saved_at": "2026-10-27T09:15:59"
   }
  ],
  "failed": [],
@@ -3859,919 +3985,316 @@
    "checked_at": "2026-10-25T08:40:15",
    "key": "2023-09-26-Western Australia-South Australia",
    "reason": "rendered 2 candidate page(s) for 2023-09-26; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:09:36",
+   "key": "2023-03-27-Canada-Jersey",
+   "reason": "no CREX match within a day of 2023-03-27 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:09:41",
+   "key": "2023-03-24-Afghanistan-Pakistan",
+   "reason": "afg-vs-pak-1st-match-afghanistan-vs-pakistan-in-uae-2023-match-updates-IY2 is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:11:36",
+   "key": "2022-10-22-Manipur-Hyderabad (India)",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:11:41",
+   "key": "2022-10-22-Tripura-Delhi",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:11:46",
+   "key": "2022-10-22-Rajasthan-Mizoram",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:11:51",
+   "key": "2022-10-22-Mumbai-Uttarakhand",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "CW1"
+   ],
+   "checked_at": "2026-10-27T09:11:58",
+   "key": "2022-10-22-Maharashtra-Arunachal Pradesh",
+   "reason": "rendered 1 candidate page(s) for 2022-10-22; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:03",
+   "key": "2022-10-22-Haryana-Karnataka",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:08",
+   "key": "2022-10-22-Meghalaya-Kerala",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:14",
+   "key": "2022-10-22-Jammu  Kashmir-Services",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:31",
+   "key": "2022-10-22-Bengal-Chandigarh",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:36",
+   "key": "2022-10-22-Sikkim-Jharkhand",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:12:41",
+   "key": "2022-10-22-Chhattisgarh-Odisha",
+   "reason": "no CREX match within a day of 2022-10-22 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "CVY"
+   ],
+   "checked_at": "2026-10-27T09:13:02",
+   "key": "2022-10-20-Hyderabad (India)-Uttar Pradesh",
+   "reason": "rendered 1 candidate page(s) for 2022-10-20; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:07",
+   "key": "2022-10-20-Puducherry-Punjab",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:12",
+   "key": "2022-10-20-Rajasthan-Assam",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:17",
+   "key": "2022-10-20-Vidarbha-Madhya Pradesh",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:22",
+   "key": "2022-10-20-Maharashtra-Haryana",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:27",
+   "key": "2022-10-20-Services-Karnataka",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:32",
+   "key": "2022-10-20-Kerala-Jammu  Kashmir",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:37",
+   "key": "2022-10-20-Meghalaya-Arunachal Pradesh",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "GLC",
+    "GLD"
+   ],
+   "checked_at": "2026-10-27T09:13:50",
+   "key": "2022-10-20-Bihar-Saurashtra",
+   "reason": "rendered 2 candidate page(s) for 2022-10-20; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:13:55",
+   "key": "2022-10-20-Bengal-Chhattisgarh",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:00",
+   "key": "2022-10-20-Tamil Nadu-Chandigarh",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:05",
+   "key": "2022-10-20-Jharkhand-Odisha",
+   "reason": "no CREX match within a day of 2022-10-20 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:10",
+   "key": "2022-10-19-Afghanistan-Pakistan",
+   "reason": "afg-vs-pak-13th-match-t20-world-cup-2022-warm-up-match-updates-G6D is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:15",
+   "key": "2022-10-18-Delhi-Hyderabad (India)",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "CVT"
+   ],
+   "checked_at": "2026-10-27T09:14:24",
+   "key": "2022-10-18-Goa-Uttar Pradesh",
+   "reason": "rendered 1 candidate page(s) for 2022-10-18; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:29",
+   "key": "2022-10-18-Mumbai-Rajasthan",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:34",
+   "key": "2022-10-18-Assam-Railways",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:39",
+   "key": "2022-10-18-Maharashtra-Kerala",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:44",
+   "key": "2022-10-18-Arunachal Pradesh-Karnataka",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:49",
+   "key": "2022-10-18-Jammu  Kashmir-Haryana",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:54",
+   "key": "2022-10-18-Meghalaya-Services",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:14:59",
+   "key": "2022-10-18-Nagaland-Gujarat",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:04",
+   "key": "2022-10-18-Bengal-Sikkim",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:09",
+   "key": "2022-10-18-Tamil Nadu-Jharkhand",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:14",
+   "key": "2022-10-18-Chandigarh-Chhattisgarh",
+   "reason": "no CREX match within a day of 2022-10-18 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:19",
+   "key": "2022-10-17-Afghanistan-Bangladesh",
+   "reason": "afg-vs-ban-12th-match-t20-world-cup-2022-warm-up-match-updates-G6C is no longer in the CREX sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:24",
+   "key": "2022-10-16-Tripura-Hyderabad (India)",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:29",
+   "key": "2022-10-16-Goa-Punjab",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:34",
+   "key": "2022-10-16-Puducherry-Delhi",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "CVP"
+   ],
+   "checked_at": "2026-10-27T09:15:42",
+   "key": "2022-10-16-Manipur-Uttar Pradesh",
+   "reason": "rendered 1 candidate page(s) for 2022-10-16; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:15:47",
+   "key": "2022-10-16-Madhya Pradesh-Railways",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:16:04",
+   "key": "2022-10-16-Maharashtra-Meghalaya",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:16:09",
+   "key": "2022-10-16-Karnataka-Jammu  Kashmir",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:16:14",
+   "key": "2022-10-16-Services-Kerala",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-27T09:16:19",
+   "key": "2022-10-16-Haryana-Arunachal Pradesh",
+   "reason": "no CREX match within a day of 2022-10-16 with plausible teams (sitemap covers 1980-01-26..2026-10-23)"
+  },
+  {
+   "checked": [
+    "GL8"
+   ],
+   "checked_at": "2026-10-27T09:16:26",
+   "key": "2022-10-16-Baroda-Bihar",
+   "reason": "rendered 1 candidate page(s) for 2022-10-16; none confirmed"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
-   "date": "2023-09-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
-   "date": "2023-08-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
-   "date": "2023-08-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
-   "date": "2023-08-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
-   "date": "2023-07-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
-   "date": "2023-07-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-2023-match-updates-K5I",
-   "date": "2023-06-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
-   "date": "2023-06-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2023-03-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Namibia",
-   "team_b": "Papua New Guinea"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2023-03-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Jersey"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-1st-match-afghanistan-vs-pakistan-in-uae-2023-match-updates-IY2",
-   "date": "2023-03-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2023-02-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Papua New Guinea",
-   "team_b": "Nepal"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2023-02-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Queensland",
-   "team_b": "New South Wales"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
-   "date": "2022-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
-   "date": "2022-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bengal",
-   "team_b": "Himachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
-   "date": "2022-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ire-25th-match-t20-world-cup-2022-match-updates-CWE",
-   "date": "2022-10-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-nz-21st-match-t20-world-cup-2022-match-updates-CWA",
-   "date": "2022-10-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Manipur",
-   "team_b": "Hyderabad (India)"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tripura",
-   "team_b": "Delhi"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Rajasthan",
-   "team_b": "Mizoram"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mumbai",
-   "team_b": "Uttarakhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Arunachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Haryana",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Meghalaya",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jammu  Kashmir",
-   "team_b": "Services"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Baroda",
-   "team_b": "Andhra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bengal",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Sikkim",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chhattisgarh",
-   "team_b": "Odisha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
-   "date": "2022-10-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Hyderabad (India)",
-   "team_b": "Uttar Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Punjab"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Rajasthan",
-   "team_b": "Assam"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Vidarbha",
-   "team_b": "Madhya Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Haryana"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Kerala",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Meghalaya",
-   "team_b": "Arunachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bihar",
-   "team_b": "Saurashtra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bengal",
-   "team_b": "Chhattisgarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tamil Nadu",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jharkhand",
-   "team_b": "Odisha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-pak-13th-match-t20-world-cup-2022-warm-up-match-updates-G6D",
-   "date": "2022-10-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Delhi",
-   "team_b": "Hyderabad (India)"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Goa",
-   "team_b": "Uttar Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mumbai",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Assam",
-   "team_b": "Railways"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Arunachal Pradesh",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jammu  Kashmir",
-   "team_b": "Haryana"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Meghalaya",
-   "team_b": "Services"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Nagaland",
-   "team_b": "Gujarat"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bengal",
-   "team_b": "Sikkim"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tamil Nadu",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chandigarh",
-   "team_b": "Chhattisgarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "https://crex.com/cricket-live-score/afg-vs-ban-12th-match-t20-world-cup-2022-warm-up-match-updates-G6C",
-   "date": "2022-10-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Tripura",
-   "team_b": "Hyderabad (India)"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Goa",
-   "team_b": "Punjab"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Delhi"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Manipur",
-   "team_b": "Uttar Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Madhya Pradesh",
-   "team_b": "Railways"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mumbai",
-   "team_b": "Vidarbha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Meghalaya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Karnataka",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Haryana",
-   "team_b": "Arunachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2022-10-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Baroda",
-   "team_b": "Bihar"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
