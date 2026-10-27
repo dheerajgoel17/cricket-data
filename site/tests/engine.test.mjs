@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { loadFixture, sum } from "./helpers.mjs";
 import { runPlan } from "../src/engine/plan.js";
 import { playerReport } from "../src/engine/props.js";
+import { teamForm } from "../src/engine/form.js";
 import { MATCH_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "../src/engine/markets.js";
 
 const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
@@ -81,6 +82,19 @@ test("match fancy: boundaries, first-innings score and a team's own innings", as
   assert.equal(own.summary.over, byId.filter((m) => m.alpha_runs > 30.5).length);
   const sixes = teamTotalReport(store, ms, alpha, "team_total_sixes").values, all = marketReport(store, ms, "match_sixes").values;
   assert.ok(sixes.every((v, i) => v <= all[i]), "a team's sixes never exceed the match's");
+});
+
+test("team form: last results in one format, oldest first", async () => {
+  const { store } = await loadFixture();
+  const alpha = store.teams.findIndex((t) => t.n === "Alpha"), beta = store.teams.findIndex((t) => t.n === "Beta");
+  const a = teamForm(store, alpha, 0, 5), b = teamForm(store, beta, 0, 5);
+  assert.equal(a.length, 5);
+  assert.deepEqual(a.map((x) => x.result), ["W", "W", "W", "W", "W"], "the fixture's Alpha wins every game");
+  assert.deepEqual(b.map((x) => x.result), ["L", "L", "L", "L", "L"]);
+  assert.deepEqual(a.map((x) => x.date), [...a.map((x) => x.date)].sort(), "oldest to newest");
+  assert.ok(a.every((x) => x.opp === beta) && b.every((x) => x.opp === alpha));
+  assert.ok(a.every((x) => /^\d+\/\d+/.test(x.own) && /^\d+\/\d+/.test(x.theirs)), "scores come from the innings");
+  assert.deepEqual(teamForm(store, alpha, 3, 5), [], "no Hundred matches, and formats are never mixed");
 });
 
 test("top batter counts sole vs tied", async () => {

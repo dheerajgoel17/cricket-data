@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ChevronLeft, Clock, MapPin, Minus, Plus } from "lucide-react";
+import { ChevronLeft, Minus, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { fixtureStart, fixtureWhen, localTime } from "@/lib/format";
+import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { useFixtures, usePricedFixtures } from "@/hooks/useEngine";
@@ -19,7 +19,9 @@ import { PillGroup } from "@/components/app/pill-group";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
-import { TeamBadge, TeamGlow, usePreloadTeams } from "@/components/app/badges";
+import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
+import { RecentForm } from "@/components/app/recent-form";
+import { cn } from "@/lib/utils";
 import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
@@ -31,50 +33,42 @@ const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
 
-/** Time to / since the start in a glass capsule, ticking every second from the shared clock. */
-function MatchTimer({ when, timed }: { when: Date; timed: boolean }) {
+/** Where the match is in time: label (Upcoming / Live / Completed) and the ticking value, from the shared 1 s clock. */
+function useMatchClock(when: Date, timed: boolean) {
   const now = useNow(1000), ms = when.getTime() - now;
-  const cap = "inline-flex items-center gap-2 rounded-full bg-black/35 px-4 py-2 text-[15px] font-semibold tabular-nums backdrop-blur-md ring-1 ring-white/10";
-  if (!timed) return <span className={cap}><Clock className="size-4 text-muted-foreground" />Start time to be confirmed</span>;
-  if (ms > 0) return <span className={cap}><Clock className="size-4 text-muted-foreground" /><span className="font-medium text-muted-foreground">Starts in</span>{formatCountdown(ms)}</span>;
-  if (ms > -4 * 3600e3) return <span className={cap}><span className="size-2 animate-pulse rounded-full bg-miss" /><span className="font-medium text-miss">Live</span>{formatElapsed(-ms)}</span>;
-  return <span className={cap}>Completed</span>;
+  if (!timed) return { label: "Upcoming", value: "Time TBC", tone: "" };
+  if (ms > 0) return { label: "Upcoming", value: formatCountdown(ms), tone: "" };
+  if (ms > -4 * 3600e3) return { label: "Live", value: formatElapsed(-ms), tone: "live" };
+  return { label: "Completed", value: "", tone: "" };
 }
 
-/** One hero card for the match (iOS widget style): ambient glow from both teams' flags, series and format, the two sides around a big start time, the timer, then venue and "Props live". */
+/** Match header, flat like Cricinfo's (no card): status and format, the two sides with their start time and live timer, then series and venue. */
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
+  const clock = useMatchClock(when, timed);
   const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="lg" eager /><b className="max-w-full text-[17px] font-semibold leading-tight">{name}</b></>;
-    return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-3 active:opacity-70">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-3">{body}</div>;
+    const body = <><TeamBadge name={name} size="md" className="size-11" eager /><span className="min-w-0 text-[22px] font-bold leading-tight tracking-tight">{name}</span></>;
+    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-3.5 active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-3.5">{body}</div>;
   };
   return (
     <section className="pt-1">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-2 text-[17px] text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
-      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-card p-5 ring-1 ring-white/10">
-        <TeamGlow name={f.a} className="-left-20 -top-12" />
-        <TeamGlow name={f.b} className="-right-20 -top-12" />
-        <div className="relative">
-          <div className="flex items-center justify-between gap-3">
-            <span className="min-w-0 truncate text-[13px] font-medium text-muted-foreground">{f.series || "Upcoming match"}</span>
-            <span className="shrink-0 rounded-full bg-black/35 px-3 py-1 text-xs font-semibold backdrop-blur-md ring-1 ring-white/10">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
-          </div>
-          <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-start gap-2 text-center">
-            {team(f.a, f.a_ix)}
-            <div className="grid justify-items-center gap-1 pt-1">
-              <span className="text-[13px] font-medium text-muted-foreground">{when.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</span>
-              <b className="text-[34px] font-bold leading-none tracking-tight tabular-nums">{timed ? localTime(when) : "TBC"}</b>
-            </div>
-            {team(f.b, f.b_ix)}
-          </div>
-          <div className="mt-6 flex justify-center"><MatchTimer when={when} timed={timed} /></div>
-          <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
-            <span className="flex min-w-0 items-center gap-2 text-[15px] text-muted-foreground"><MapPin className="size-4 shrink-0" /><span className="truncate">{f.venue || "Venue to be confirmed"}</span></span>
-            {live && <Badge className="shrink-0 px-3 py-1 text-xs font-semibold">Props live</Badge>}
-          </div>
+      <div className="mt-3 flex items-center gap-3">
+        <span className={cn("text-[13px] font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
+          {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
+        </span>
+        <span className="text-[13px] font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
+        {live && <Badge className="ml-auto px-3 py-1 text-xs font-semibold">Props live</Badge>}
+      </div>
+      <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
+        <div className="grid min-w-0 gap-4">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
+        <div className="grid justify-items-end gap-1 text-right">
+          <span className="text-[15px] font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
+          <b className={cn("text-[26px] font-bold leading-none tracking-tight tabular-nums", clock.tone === "live" && "text-miss")}>{clock.value}</b>
         </div>
       </div>
+      <p className="mt-6 border-b border-white/10 pb-5 text-[15px] leading-snug text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
     </section>
   );
 }
@@ -127,6 +121,7 @@ export function FixturePage() {
   return (
     <div>
       <MatchHeader f={fx} live={live} />
+      <RecentForm teams={known} fmt={fmt} />
       {!ready ? <div className="mt-5 grid gap-4"><Skeleton className="h-9 rounded-[9px] sm:w-96" /><RowsSkeleton /></div> : <>
       <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={(t) => setQ({ tab: t })} items={tabs} className="mt-7" />
       {tab === "props" && <div className="-mt-2"><HotProps teams={[fx.a, fx.b]} /></div>}

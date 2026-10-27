@@ -75,11 +75,3 @@ export function usePreloadTeams(names: string[]) {
   const key = names.join("|");
   useEffect(() => { preloadImages(names.flatMap((n) => { const logo = teamLogos(photos, n)[0]; return logo ? [logo] : [flagUrl(n, 40), flagUrl(n, 160), flagUrl(n, 80)]; })); }, [key, photos]); // eslint-disable-line react-hooks/exhaustive-deps
 }
-
-/** A soft blurred blob of a team's flag/logo colours, for ambient backgrounds behind a match header. Decorative: parent must be `relative overflow-hidden`. */
-export function TeamGlow({ name, className }: { name: string; className?: string }) {
-  const { photos } = useData();
-  const url = flagUrl(name, 160) ?? teamLogos(photos, name)[0];
-  if (!url) return null;
-  return <div aria-hidden className={cn("pointer-events-none absolute size-56 rounded-full bg-cover bg-center opacity-40 blur-3xl", className)} style={{ backgroundImage: `url(${url})` }} />;
-}
