@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, withArchive } from "../src/engine/lines.js";
+import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -129,4 +129,13 @@ test("withArchive leaves the live doc as it is when it still has the match's lin
   assert.deepEqual(doc.fancy, live.fancy);
   assert.equal(withArchive(live, null), live);
   assert.equal(withArchive(undefined, ENTRY).lines.length, 1);
+});
+
+test("sameFixture tells a series' matches apart: the same two sides, and a start within 14 hours", () => {
+  const fx = { a: "New Zealand", b: "India", start: "2026-10-27T07:00Z" };
+  assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-27T07:00:00Z" }, fx), true);
+  assert.equal(sameFixture({ match: "India vs New Zealand", start_utc: "2026-10-27T10:30:00Z" }, fx), true, "sides either way round, books a few hours off the schedule");
+  assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, fx), false, "the next game of the series");
+  assert.equal(sameFixture({ match: "New Zealand vs Pakistan", start_utc: "2026-10-27T07:00:00Z" }, fx), false);
+  assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, { a: "New Zealand", b: "India" }), true, "no start known: the names decide");
 });

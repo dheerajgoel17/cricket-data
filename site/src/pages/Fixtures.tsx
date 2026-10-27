@@ -168,7 +168,7 @@ export function FixturePage() {
           <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
-          {tab === "props" && <HotProps teams={[fx.a, fx.b]} archive={archived ? doc : undefined} />}
+          {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} archive={archived ? doc : undefined} />}
           {tab === "grid" && (
             <>
               <FilterBar {...{ stat, line, games, setQ }} />
