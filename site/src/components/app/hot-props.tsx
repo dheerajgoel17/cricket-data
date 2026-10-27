@@ -2,7 +2,8 @@
 import { useMemo, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Link } from "react-router-dom";
-import { Bookmark } from "lucide-react";
+import { BarChart3, Bookmark, CalendarDays } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
@@ -24,12 +25,13 @@ const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
 const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
 const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
-const sameDay = (iso: string) => new Date(iso).toDateString() === new Date().toDateString();
+/** 0 = today, 1 = tomorrow (viewer's local days), else -1. */
+const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.setHours(0, 0, 0, 0); t.setHours(0, 0, 0, 0); const n = Math.round((d.getTime() - t.getTime()) / 864e5); return n === 0 || n === 1 ? n : -1; };
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 const BAR = { hit: "bg-primary", miss: "bg-miss", push: "bg-amber", dnp: "bg-dnp/50", void: "bg-dnp/50", na: "bg-dnp/50" } as Record<string, string>;
 
-interface Row { idx: number; name: string; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; name: string; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
 function useHotRows() {
@@ -42,7 +44,7 @@ function useHotRows() {
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
-      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && sameDay(l.start_utc) && Date.parse(l.start_utc) > now - 3 * 3600e3 && l.books?.length) };
+      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= 0 && Date.parse(l.start_utc) > now - 3 * 3600e3 && l.books?.length) };
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}`, l);
       const year = String(new Date().getFullYear());
@@ -62,7 +64,7 @@ function useHotRows() {
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
         const p = r.summary?.pOver, n = r.summary?.n || 0;
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
-        out.push({ idx, name: store.playerName(idx), team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
+        out.push({ day: dayOffset(b.start_utc), idx, name: store.playerName(idx), team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
           edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) });
       });
       for (let i = 0; i < work.length; i += 8) await Promise.all(work.slice(i, i + 8).map((w) => w()));
@@ -82,7 +84,7 @@ function Spark({ r }: { r: Row }) {
 }
 
 /** Phone row built from shadcn Item parts (props.cash list style): photo, name and line, then the hit rate over the last-10 bars and the edge. */
-function MobileRow({ r, win, wl }: { r: Row; win: Win; wl: string }) {
+function MobileRow({ r, win, wl, bars }: { r: Row; win: Win; wl: string; bars: boolean }) {
   return (
     <li>
       <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 active:bg-muted">
@@ -99,7 +101,7 @@ function MobileRow({ r, win, wl }: { r: Row; win: Win; wl: string }) {
             </span>
             <span className="grid justify-items-end gap-0.5">
               <span className={cn("text-[11px] font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
-              <Spark r={r} />
+              {bars && <Spark r={r} />}
             </span>
           </ItemActions>
         </Link>
@@ -116,13 +118,15 @@ export function HotProps() {
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
   const saved = useSaved();
+  const [day, setDay] = useState("0");
+  const [bars, setBars] = useState(true);
   const tabs = useMemo(() => {
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
   }, [data]);
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
-  const rows = useMemo(() => (data || []).filter((r) => (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need]);
+  const rows = useMemo(() => (data || []).filter((r) => r.day === Number(day) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day]);
   const columns = useMemo<ColumnDef<Row>[]>(() => {
     const head = (title: string) => ({ column }: { column: any }) => <TableColumnHeader column={column} title={title} />;
     const rate = (id: string, title: string, get: (r: Row) => any, tip?: boolean): ColumnDef<Row> => ({ id, accessorFn: (r) => get(r).p ?? -1, header: head(title), sortUndefined: "last",
@@ -147,13 +151,25 @@ export function HotProps() {
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
         <div><h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Hot Player Props</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Today's bookmaker lines, ranked by hit rate · {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
+          <p className="mt-1 text-sm text-muted-foreground">{day === "0" ? "Today's" : "Tomorrow's"} bookmaker lines, ranked by hit rate · {new Date(Date.now() + Number(day) * 864e5).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
       </div>
-      <ToggleGroup type="single" value={win} onValueChange={(v) => v && setWin(v as Win)} variant="outline" spacing={0} className="mt-3 h-11 w-full rounded-full border bg-card p-1 sm:w-fit" aria-label="Hit-rate window">
-        {WINS.map(([k, l]) => <ToggleGroupItem key={k} value={k} className="h-9 flex-1 rounded-full border-0 px-4 text-sm data-[state=on]:bg-accent sm:flex-none">{l}</ToggleGroupItem>)}
-      </ToggleGroup>
+      <div className="mt-3 flex items-center gap-2">
+        <button type="button" aria-label={bars ? "Hide form charts" : "Show form charts"} aria-pressed={bars} onClick={() => setBars((v) => !v)} className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", bars && "text-primary")}><BarChart3 className="size-[18px]" /></button>
+        <ToggleGroup type="single" value={win} onValueChange={(v) => v && setWin(v as Win)} variant="outline" spacing={0} className="h-11 min-w-0 flex-1 rounded-full border bg-card p-1 sm:w-fit sm:flex-none" aria-label="Hit-rate window">
+          {WINS.map(([k, l]) => <ToggleGroupItem key={k} value={k} className="h-9 flex-1 rounded-full border-0 px-4 text-sm data-[state=on]:bg-accent sm:flex-none">{l}</ToggleGroupItem>)}
+        </ToggleGroup>
+      </div>
       {tabs.length > 1 && (
         <div className="mt-2 flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger aria-label="Choose day" className={cn("relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent", day !== "0" && "text-primary")}><CalendarDays className="size-[18px]" /></DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-40">
+              <DropdownMenuRadioGroup value={day} onValueChange={setDay}>
+                <DropdownMenuRadioItem value="0">Today</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="1">Tomorrow</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent"><Bookmark className="size-[18px]" />
             {saved.list.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{saved.list.length}</span>}</Link>
           <Tabs value={stat} onValueChange={setStat} className="min-w-0 flex-1 sm:flex-none">
@@ -164,10 +180,10 @@ export function HotProps() {
         </div>
       )}
       <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
-        {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for today yet. They appear a few hours before each match.</p> : (
+        {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for this day yet. They appear a few hours before each match.</p> : (
           <>
           <ul className="divide-y border-b sm:hidden">
-            {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} />)}
+            {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} />)}
           </ul>
           <TableProvider columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
             <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 font-condensed text-[13px] uppercase tracking-wider" />}</TableHeaderGroup>}</TableHeader>
