@@ -1,6 +1,7 @@
 import datetime as dt
+import json
 
-from value_bets.booklines import book_lines, carry_started, prop_events
+from value_bets.booklines import book_lines, carry_started, prop_events, public
 
 
 def row(**kw):
@@ -108,3 +109,13 @@ def test_a_multi_day_match_is_kept_across_days():
     assert len(carry_started(doc(), prev, NOW)["lines"]) == 1
     assert carry_started(doc(), prev, NOW + dt.timedelta(days=5))["lines"] == []
     assert carry_started(doc(), None, NOW) == doc()
+
+
+def test_rows_carried_over_from_an_older_pull_are_published_under_the_book_name_too():
+    prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "T20"))
+    prev["lines"][0]["books"] = [{"source": "moviodds_bet365", "kind": "bookmaker", "over": 1.8, "under": 1.9}]
+    prev["events"][0]["sources"] = ["moviodds_bet365", "smarkets"]
+    out = carry_started(doc(), prev, NOW)
+    assert out["lines"][0]["books"][0]["source"] == "bet365"
+    assert out["events"][0]["sources"] == ["bet365", "smarkets"]
+    assert "moviodds" not in json.dumps(public(prev))
