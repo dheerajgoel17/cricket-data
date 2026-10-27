@@ -126,7 +126,7 @@ function Hero({ idx, name, team, fmts, share, stats }: { idx: number; name: stri
       <div className="self-start pb-3.5 [grid-area:id] md:self-center md:pb-0">
         <h1 className="text-2xl font-medium leading-tight md:text-3xl xl:text-[40px]">{name}</h1>
         <div className="text-sm text-muted-foreground md:text-base">{team}</div><div className="text-sm text-muted-foreground md:text-base">{fmts.map(([, f]) => f).join(" · ")}</div>
-        <div className="mt-3.5 flex gap-3"><span className="grid size-11 place-items-center overflow-hidden rounded-full bg-secondary"><TeamBadge name={team} size="md" className="border-0" /></span><StarButton kind="player" idx={idx} /><motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-11 cursor-pointer place-items-center rounded-full bg-secondary"><Share2 className="size-5" /></motion.button></div>
+        <div className="mt-3.5 flex gap-3"><span className="grid size-control place-items-center overflow-hidden rounded-full bg-secondary"><TeamBadge name={team} size="md" className="border-0" /></span><StarButton kind="player" idx={idx} /><motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><Share2 className="size-5" /></motion.button></div>
       </div>
       <div className="-mx-4 mt-0 flex items-center justify-between gap-3 border-t px-4 py-3.5 [grid-area:stats] md:mx-0 md:gap-10 md:border-t-0 md:p-0">{stats}</div>
     </section>

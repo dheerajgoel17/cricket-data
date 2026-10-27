@@ -35,8 +35,8 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
-    <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-[22px] outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <Card className="h-full gap-0 rounded-[22px] border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
+    <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <Card className="h-full gap-0 rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
         <div className="flex h-full flex-col gap-stack p-inset">
           <div className="flex items-center gap-tight">
             {live ? <Badge variant="destructive" className="gap-tight px-2.5 py-hair text-caption font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-hair text-caption font-semibold uppercase tracking-wider">Upcoming</Badge>}
@@ -92,7 +92,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
         items={[["all", <>All <span className="ml-1.5 text-footnote text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-footnote text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
       <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}>
         <CarouselContent className="-ml-3">
-          {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[88%] pl-3 sm:basis-[340px]"><FixtureCard f={f} i={i} /></CarouselItem>)}
+          {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[82%] pl-3 sm:basis-(--fixture-card)"><FixtureCard f={f} i={i} /></CarouselItem>)}
         </CarouselContent>
         {/* edge fades: blurred, masked strips that appear only on the side that still has cards to scroll to */}
         {(["l", "r"] as const).map((side) => (

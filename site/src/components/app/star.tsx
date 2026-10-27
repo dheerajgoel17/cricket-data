@@ -12,7 +12,7 @@ export function StarButton({ kind, idx, className }: { kind: "player" | "team"; 
   return (
     <motion.button type="button" aria-label={on ? "Remove from Saved" : "Save"} aria-pressed={on} whileTap={{ scale: 0.88 }} whileHover={{ scale: 1.06 }}
       onClick={() => toast(toggle(key) ? "Saved. Find it under Saved." : "Removed from Saved")}
-      className={cn("grid size-11 shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-secondary text-foreground", className)}>
+      className={cn("grid size-control shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-secondary text-foreground", className)}>
       <Star className={cn("size-5", on && "fill-amber stroke-amber")} />
     </motion.button>
   );

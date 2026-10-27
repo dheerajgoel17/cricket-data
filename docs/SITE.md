@@ -99,38 +99,44 @@ Schema: see the `cricket_assets_schema` migration (tables above plus the `avatar
 
 ## UI libraries and the iOS / Android apps
 The apps are planned natively (Expo / React Native), like props.cash, whose website is a plain React SPA with separate store apps. So the website and the apps share
-**data and logic, not components**:
+**data, logic and token names, not components**:
 * `site/src/engine/*` (plain ESM, no DOM) and the JSON data files are the shared core. Keep every number and rule there; never import React or the DOM into the engine.
 * Web UI uses free MIT components from the shadcn CLI and its registries (`@magicui`, `@kibo-ui`, `@originui`, `@animate-ui` are registered in `site/components.json`; add with `npx shadcn@latest add @kibo-ui/<name>`),
   not hand-built widgets. Check the install diff: the CLI can overwrite `ui/*` files and the `.dark` tokens in `index.css`.
-* Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), targets of at least 44 px on phones, and `env(safe-area-inset-*)`
+* Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), `h-control` / `size-control` for tappable chrome, and `env(safe-area-inset-*)`
   for fixed bars (`viewport-fit=cover` is set in `site/index.html`, which iOS needs for the insets to be non-zero).
-* The look is iOS-inspired: true black with system grays, translucent materials (blur), large titles, a segmented control, 17 px list rows with inset separators at every width (no data tables), a floating glass tab bar on phones and a translucent source-list sidebar on wide screens.
+* The **look** is iOS-inspired (true black, system grays, blur, fully rounded pills, a segmented control, a floating glass tab bar on phones, a source-list sidebar on wide screens). The **sizes** are a compact web scale so the same site reads well in a desktop browser and in Android/iOS browsers. Do not fork the website by user-agent; one set of values, every device.
+
+When the Expo apps exist, reuse the same role names (`text-body`, `gap-stack`, `control`, `chip-radius`, …) from `site/src/index.css` `:root`. Swap only the values: HIG on iOS (17 px body, 44 px controls), Material 3 on Android. Do not copy web pixel values into native, and do not copy native HIG sizes back onto the website.
 
 ## Type and spacing scales (no hard-coded sizes)
-Sizes are named by role and defined once, in `site/src/index.css` (`@theme`). Pages and shared components use the names, never `text-[13px]`, `text-sm`, `mt-5` or `gap-3`.
+Sizes are named by role and defined once, in `site/src/index.css` (`:root` plus `@theme`). Pages and shared components use the names, never `text-[13px]`, `text-sm`, `mt-5` or `gap-3`.
 `site/src/lib/design-tokens.test.ts` fails the build if a governed file does; add a file to its `GOVERNED` list when its page is migrated (the old pages are not yet).
 
-| Type | Size | Used for |
-| --- | --- | --- |
-| `text-display` | 32 to 36 px, fluid | page title (large title) |
-| `text-title` | 22 px | section titles, sheet titles, key values |
-| `text-body` | 17 px | names, row titles, primary text |
-| `text-callout` | 15 px | secondary lines, chips and control labels |
-| `text-footnote` | 13 px | meta and captions |
-| `text-caption` | 11 px | micro labels (EDGE), small badges, tab labels |
-| `text-metric` / `text-stat` | 26 / 40 px | timers and big numbers / hero statistic |
+Web values (16 px rem). Native apps remap the names, not these numbers.
 
-| Spacing | Size | Used for |
+| Type | Web | Used for |
+| --- | --- | --- |
+| `text-display` | 24–28 px, fluid | page title |
+| `text-title` | 18 px | section titles, sheet titles, key values |
+| `text-body` | 15 px | names, row titles, primary text |
+| `text-callout` | 13 px | secondary lines, chips and control labels |
+| `text-footnote` | 12 px | meta and captions |
+| `text-caption` | 10 px | micro labels (EDGE), small badges, tab labels |
+| `text-metric` / `text-stat` | 20 / 30 px | timers and big numbers / hero statistic |
+
+| Spacing | Web | Used for |
 | --- | --- | --- |
 | `hair` | 4 px | icon and text micro gaps |
-| `tight` | 8 px | inside a component, chip rows |
-| `snug` | 12 px | between controls in a row, list-row padding |
-| `stack` | 20 px | between stacked blocks |
-| `group` | 28 px | between groups inside a section |
-| `section` | 44 px | between page sections |
-| `inset` | 20 px | padding inside cards and panels |
-| `gutter` | 16 px, 24 px from md | page side padding; list rows use it so photos line up with the page edge |
+| `tight` | 6 px | inside a component, chip rows |
+| `snug` | 10 px | between controls in a row, list-row padding |
+| `stack` | 16 px | between stacked blocks |
+| `group` | 20 px | between groups inside a section |
+| `section` | 32 px | between page sections |
+| `inset` | 14 px | padding inside cards and panels |
+| `gutter` | 14 px, 20 px from md | page side padding; list rows use it so photos line up with the page edge |
+| `control` | 36 px | chip, icon-button and tab height (`h-control`, `size-control`) |
+| `header` / `tabbar` / `row` | 48 / 56 / 56 px | top bar, phone tab bar, list-row min height |
 
 Type is in rem, so it follows the browser's font-size setting. One `cn()` (`site/src/lib/utils.ts`) merges classes for the whole app, including shadcn's `ui/*` (they import it as `cn`; see the alias in `vite.config.ts` and `tsconfig.json`); it knows these scales, so `text-body` replaces a component's own `text-sm` instead of fighting it.
 

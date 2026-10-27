@@ -81,11 +81,11 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
 function PropRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
   return (
-    <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+3.5rem)] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Item asChild size="sm" className="min-h-[68px] rounded-none border-0 px-gutter py-snug transition-colors active:bg-card">
+      <Item asChild size="sm" className="min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-card">
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
-          <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-11" /></ItemMedia>
+          <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
             <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></ItemDescription>
@@ -131,12 +131,12 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
         <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
         <Sheet>
           <SheetTrigger asChild>
-            <button type="button" aria-label="Filters" className="relative flex h-11 shrink-0 items-center gap-tight rounded-full bg-card px-4 text-callout font-medium transition-colors active:bg-accent">
-              <SlidersHorizontal className="size-[18px]" />{wl}
+            <button type="button" aria-label="Filters" className="relative flex h-control shrink-0 items-center gap-tight rounded-[var(--chip-radius)] bg-card px-3 text-callout font-medium transition-colors active:bg-accent">
+              <SlidersHorizontal className="size-4" />{wl}
               {dirty && <span aria-hidden className="absolute -right-0.5 -top-0.5 size-3 rounded-full bg-primary ring-2 ring-background" />}
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-[28px] border-0 bg-popover/80 px-inset pb-[max(2rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
+          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
             <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-white/25" />
             <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
               <SheetTitle className="text-title font-bold tracking-tight">Filters</SheetTitle>
@@ -154,7 +154,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
                 <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Day</span>
                   <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={[["0", "Today"], ["1", "Tomorrow"]]} /></div>
               )}
-              <label className="flex min-h-11 items-center justify-between gap-stack rounded-2xl bg-white/[0.06] px-4 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
+              <label className="flex min-h-control items-center justify-between gap-stack rounded-xl bg-white/[0.06] px-3 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
             </div>
           </SheetContent>
         </Sheet>

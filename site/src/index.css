@@ -11,7 +11,7 @@
 
 /* Design tokens: the props.cash palette (read from the live app) mapped onto shadcn's CSS variables. Change colours here only. */
 :root {
-  --radius: 0.875rem;
+  --radius: 0.75rem;
   --background: #000000;
   --foreground: #ffffff;
   --card: #1c1c1e;
@@ -46,46 +46,88 @@
   --pill: #2c2c2e;
 }
 /*
- * Type and spacing scales: the only sizes pages and shared components may use (src/lib/design-tokens.test.ts enforces it).
- * Type is iOS-style by role and in rem, so it follows the browser's font-size setting; display grows fluidly with the viewport.
- * Spacing is named by role: components use tight/snug inside a block, stack between blocks, group between groups, section between page sections.
+ * Type and spacing scales: named roles only (src/lib/design-tokens.test.ts).
+ * The look is iOS-inspired (true black, pills, glass); the sizes are a compact web scale so the
+ * same CSS works on desktop and in Android/iOS browsers. Future Expo apps should reuse these
+ * role names (text-body, gap-stack, control, …) and only swap the values for HIG / Material.
  */
-:root { --gutter: 1rem; }
-@media (min-width: 768px) { :root { --gutter: 1.5rem; } }
-@theme {
-  --text-display: clamp(2rem, 1.7rem + 1vw, 2.25rem);       /* large title */
-  --text-display--line-height: 1.12;
-  --text-display--letter-spacing: -0.022em;
-  --text-title: 1.375rem;                                        /* section title, sheet title */
-  --text-title--line-height: 1.2;
-  --text-title--letter-spacing: -0.01em;
-  --text-body: 1.0625rem;                                        /* names, row titles, primary text */
-  --text-body--line-height: 1.3;
-  --text-callout: 0.9375rem;                                     /* secondary lines, chips and control labels */
-  --text-callout--line-height: 1.35;
-  --text-footnote: 0.8125rem;                                    /* meta, captions under content */
-  --text-footnote--line-height: 1.3;
-  --text-caption: 0.6875rem;                                     /* micro labels (EDGE), small badges */
-  --text-caption--line-height: 1.2;
-  --text-metric: 1.625rem;                                       /* timers, headline numbers */
-  --text-metric--line-height: 1.1;
-  --text-stat: 2.5rem;                                           /* hero statistic */
-  --text-stat--line-height: 1;
+:root {
+  --font-sans-stack: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --body-size: 14px;
+  --header-h: 3rem;
+  --tabbar-h: 3.5rem;
+  --tabbar-pad: 0.75rem;
+  --control: 2.25rem;       /* 36: tappable without iOS-native 44 */
+  --chip-radius: 999px;     /* fully rounded pills */
+  --row-min: 3.5rem;
+  --fixture-card: 17.5rem;
+  --gutter: 0.875rem;
+  --fs-display: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);
+  --fs-display-lh: 1.15;
+  --fs-display-ls: -0.02em;
+  --fs-title: 1.125rem;
+  --fs-title-lh: 1.25;
+  --fs-title-ls: -0.015em;
+  --fs-body: 0.9375rem;
+  --fs-body-lh: 1.3;
+  --fs-callout: 0.8125rem;
+  --fs-callout-lh: 1.35;
+  --fs-footnote: 0.75rem;
+  --fs-footnote-lh: 1.3;
+  --fs-caption: 0.625rem;
+  --fs-caption-lh: 1.2;
+  --fs-metric: 1.25rem;
+  --fs-metric-lh: 1.1;
+  --fs-stat: 1.875rem;
+  --fs-stat-lh: 1;
+  --space-hair: 0.25rem;
+  --space-tight: 0.375rem;
+  --space-snug: 0.625rem;
+  --space-stack: 1rem;
+  --space-group: 1.25rem;
+  --space-section: 2rem;
+  --space-inset: 0.875rem;
+}
+@media (min-width: 768px) { :root { --gutter: 1.25rem; } }
 
-  --spacing-hair: 0.25rem;      /* 4  icon and text micro gaps */
-  --spacing-tight: 0.5rem;      /* 8  inside a component, chips, icon rows */
-  --spacing-snug: 0.75rem;      /* 12 between controls in a row, list row padding */
-  --spacing-stack: 1.25rem;     /* 20 between stacked blocks */
-  --spacing-group: 1.75rem;     /* 28 between groups inside a section */
-  --spacing-section: 2.75rem;   /* 44 between page sections */
-  --spacing-inset: 1.25rem;     /* 20 padding inside cards and panels */
+@theme {
+  --text-display: var(--fs-display);
+  --text-display--line-height: var(--fs-display-lh);
+  --text-display--letter-spacing: var(--fs-display-ls);
+  --text-title: var(--fs-title);
+  --text-title--line-height: var(--fs-title-lh);
+  --text-title--letter-spacing: var(--fs-title-ls);
+  --text-body: var(--fs-body);
+  --text-body--line-height: var(--fs-body-lh);
+  --text-callout: var(--fs-callout);
+  --text-callout--line-height: var(--fs-callout-lh);
+  --text-footnote: var(--fs-footnote);
+  --text-footnote--line-height: var(--fs-footnote-lh);
+  --text-caption: var(--fs-caption);
+  --text-caption--line-height: var(--fs-caption-lh);
+  --text-metric: var(--fs-metric);
+  --text-metric--line-height: var(--fs-metric-lh);
+  --text-stat: var(--fs-stat);
+  --text-stat--line-height: var(--fs-stat-lh);
+
+  --spacing-hair: var(--space-hair);
+  --spacing-tight: var(--space-tight);
+  --spacing-snug: var(--space-snug);
+  --spacing-stack: var(--space-stack);
+  --spacing-group: var(--space-group);
+  --spacing-section: var(--space-section);
+  --spacing-inset: var(--space-inset);
   --spacing-gutter: var(--gutter);
+  --spacing-control: var(--control);
+  --spacing-header: var(--header-h);
+  --spacing-tabbar: var(--tabbar-h);
+  --spacing-row: var(--row-min);
 }
 
 .dark { color-scheme: dark; }
 
 @theme inline {
-  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-sans: var(--font-sans-stack);
   --font-condensed: "Barlow Condensed", "Diatype Condensed", "Arial Narrow", sans-serif;
   --font-brand: "Bebas Neue", Impact, sans-serif;
   --color-background: var(--background);
@@ -128,7 +170,7 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body { @apply bg-background text-foreground font-sans antialiased; font-size: 15px; }
+  body { @apply bg-background text-foreground font-sans antialiased; font-size: var(--body-size); }
   a { color: inherit; }
 }
 

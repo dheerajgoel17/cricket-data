@@ -27,7 +27,7 @@ function Img({ urls, alt, fallback, className, eager }: { urls: string[]; alt: s
   );
 }
 
-const SIZES = { xs: "size-5 text-[8px]", sm: "size-7 text-[10px]", md: "size-10 text-xs", lg: "size-16 text-lg", xl: "size-24 text-2xl" } as const;
+const SIZES = { xs: "size-5 text-[8px]", sm: "size-6 text-[9px]", md: "size-9 text-[10px]", lg: "size-12 text-callout", xl: "size-16 text-title" } as const;
 export type BadgeSize = keyof typeof SIZES;
 
 const Circle = ({ size, className, children, title }: { size: BadgeSize; className?: string; children: React.ReactNode; title?: string }) => (

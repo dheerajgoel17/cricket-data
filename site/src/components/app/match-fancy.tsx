@@ -115,7 +115,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
                       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
                       className="border-t border-white/5 first:border-t-0">
                       <button type="button" onClick={() => open(r.key)} aria-label={`Open ${r.label}`}
-                        className={cn("grid min-h-[68px] w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
+                        className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
                         <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
                           <span className="truncate text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· O {odds(r.over)} · U {odds(r.under)}</span></span>
@@ -148,10 +148,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
                       </div>
                       <ValueBars values={rep.values} line={line} />
                       <div className="flex flex-wrap items-center gap-snug">
-                        <div className="flex h-11 items-center rounded-full bg-background">
-                          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
+                        <div className="flex h-control items-center rounded-[var(--chip-radius)] bg-background">
+                          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>
                           <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
-                          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
+                          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
                         </div>
                         {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>bet365 line {b.line}</Button>)}
                       </div>

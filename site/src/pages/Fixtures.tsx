@@ -52,12 +52,12 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const when = fixtureStart(f), timed = f.start.length > 10;
   const clock = useMatchClock(when, timed);
   const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="md" className="size-11" eager /><span className="min-w-0 text-title font-bold leading-tight tracking-tight">{name}</span></>;
+    const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 text-title font-bold leading-tight tracking-tight">{name}</span></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-snug">{body}</div>;
   };
   return (
     <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
       <div className="flex items-center gap-snug">
         <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
           {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
@@ -84,10 +84,10 @@ function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: numbe
     <div className="flex min-w-0 flex-col gap-snug">
       <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
       <div className="flex items-center gap-tight">
-        <div className="flex h-11 shrink-0 items-center rounded-full bg-card">
-          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-11 rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
+        <div className="flex h-control shrink-0 items-center rounded-[var(--chip-radius)] bg-card">
+          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
           <span className="min-w-[4.5rem] text-center text-callout font-semibold tabular-nums">O {line}</span>
-          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-11 rounded-full" onClick={() => step(0.5)}><Plus /></Button>
+          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => step(0.5)}><Plus /></Button>
         </div>
         <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0" />
       </div>
@@ -135,7 +135,7 @@ export function FixturePage() {
     <div className="flex flex-col gap-section">
       <MatchHeader f={fx} live={live} />
       <RecentForm teams={known} fmt={fmt} />
-      {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-11 w-72 rounded-full" /><RowsSkeleton /></div> : (
+      {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
           <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
             <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
