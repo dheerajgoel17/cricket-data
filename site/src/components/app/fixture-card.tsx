@@ -68,12 +68,12 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   }, [fx]);
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
-  const chip = "h-9 shrink-0 rounded-full px-3.5 text-[13px] font-medium data-[state=on]:border-primary data-[state=on]:bg-primary/15 data-[state=on]:text-primary";
+  const chip = "h-9 shrink-0 rounded-full border-0 px-4 text-sm font-medium data-[state=on]:bg-accent";
   return (
     <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="pt-4" aria-label="Upcoming matches">
-      <ToggleGroup type="single" value={sel} onValueChange={(v) => v && setSel(v)} variant="outline" spacing={2} className="w-full gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Filter by series">
-        <ToggleGroupItem value="all" className={chip}>All <span className="ml-1 text-muted-foreground">{fx.length}</span></ToggleGroupItem>
-        {chips.map(([n, k]) => <ToggleGroupItem key={n} value={n} title={n} className={chip}>{shortSeries(n)} <span className="ml-1 text-muted-foreground">{k}</span></ToggleGroupItem>)}
+      <ToggleGroup type="single" value={sel} onValueChange={(v) => v && setSel(v)} variant="outline" spacing={0} className="h-11 w-full justify-start overflow-x-auto rounded-full border bg-card p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Filter by series">
+        <ToggleGroupItem value="all" className={chip}>All <span className="ml-1.5 text-xs text-muted-foreground">{fx.length}</span></ToggleGroupItem>
+        {chips.map(([n, k]) => <ToggleGroupItem key={n} value={n} title={n} className={chip}>{shortSeries(n)} <span className="ml-1.5 text-xs text-muted-foreground">{k}</span></ToggleGroupItem>)}
       </ToggleGroup>
       <Carousel key={sel} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }} className="mt-3">
         <CarouselContent className="-ml-3">
