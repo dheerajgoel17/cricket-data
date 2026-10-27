@@ -1,12 +1,12 @@
 """Detect and classify matches that should be kept permanently.
 
 Two categories of permanent matches:
-1. Cricsheet missing-matches list: Matches Cricsheet cannot obtain
+1. Base missing-matches list: Matches Base cannot obtain
 2. Withheld Afghanistan matches: Afghanistan men's team and APL (since Nov 2024)
 
-These matches are scraped from CREX and kept as permanent source of truth,
-not deleted after reconciliation. If Cricsheet later provides data, we reconcile
-and prefer Cricsheet.
+These matches are scraped from Source A and kept as permanent source of truth,
+not deleted after reconciliation. If Base later provides data, we reconcile
+and prefer Base.
 """
 from __future__ import annotations
 
@@ -14,12 +14,13 @@ import re
 from html.parser import HTMLParser
 from typing import NamedTuple
 
+from .hosts import host
 from .models import MatchRecord, MatchStatus
 from .polite import PoliteFetcher
 
 
 class MissingMatch(NamedTuple):
-    """A match from Cricsheet's missing-matches list."""
+    """A match from Base's missing-matches list."""
     date: str  # ISO format YYYY-MM-DD
     team_a: str
     team_b: str
@@ -28,7 +29,7 @@ class MissingMatch(NamedTuple):
 
 
 class MissingMatchesParser(HTMLParser):
-    """Parse Cricsheet's missing-matches HTML page into structured data.
+    """Parse Base's missing-matches HTML page into structured data.
     
     Handles two main sections:
     1. "By match type" - Internationals (Test, ODI, T20I)  
@@ -154,7 +155,7 @@ class MissingMatchesParser(HTMLParser):
 
 
 def fetch_cricsheet_missing_matches(fetcher: PoliteFetcher | None = None) -> list[MissingMatch]:
-    """Fetch and parse Cricsheet's missing-matches list.
+    """Fetch and parse Base's missing-matches list.
     
     Returns:
         List of missing matches with date, teams, match type, and gender
@@ -162,7 +163,7 @@ def fetch_cricsheet_missing_matches(fetcher: PoliteFetcher | None = None) -> lis
     if fetcher is None:
         fetcher = PoliteFetcher(min_interval=5.0)
     
-    url = "https://cricsheet.org/missing/"
+    url = f"{host('BASE_DATA_URL')}/missing/"
     
     # Check robots.txt
     if not fetcher.allowed(url):
@@ -174,14 +175,14 @@ def fetch_cricsheet_missing_matches(fetcher: PoliteFetcher | None = None) -> lis
         parser.feed(html)
         return parser.matches
     except Exception as exc:
-        print(f"Failed to fetch Cricsheet missing matches: {exc}")
+        print(f"Failed to fetch Base missing matches: {exc}")
         return []
 
 
 def is_afghanistan_match(match: MatchRecord) -> bool:
     """Check if match involves Afghanistan men's team or APL.
     
-    Cricsheet withheld all Afghanistan men's matches and Afghanistan Premier League
+    Base withheld all Afghanistan men's matches and Afghanistan Premier League
     matches since November 2024 (329 matches removed). These should be scraped
     and kept permanently.
     
@@ -225,7 +226,7 @@ def classify_match_status(
     if is_afghanistan_match(match):
         return MatchStatus.CRICSHEET_WITHHELD
     
-    # Check if on Cricsheet's missing list
+    # Check if on Base's missing list
     if missing_matches is None:
         missing_matches = fetch_cricsheet_missing_matches()
     

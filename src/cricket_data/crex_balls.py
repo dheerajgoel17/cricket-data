@@ -1,9 +1,9 @@
-"""Ball-by-ball from CREX's commentary feed -> one row per delivery, checked against the scorecard.
+"""Ball-by-ball from Source A's commentary feed -> one row per delivery, checked against the scorecard.
 
 The match page (summary tab) loads its commentary through ``getBallFeeds``, newest first, a page at a
 time as the reader scrolls (the next page is requested with ``lastDocId`` = the oldest event id seen).
 ``CREXBrowser.capture`` scrolls the real page and collects those responses, so we only ever visit URLs
-that crex.com's robots.txt allows, at the browser's own pace.
+that $LIVE_SOURCE_BASE's robots.txt allows, at the browser's own pace.
 
 Event kinds (``type``): ``b`` a delivery, ``w`` a wicket card, ``o`` an over summary, ``t`` plain text and
 ``tm``/``ac``/``pl``/... milestones that we ignore. ``inning`` is 0-based (-1 = pre-match chatter).
@@ -48,7 +48,7 @@ class Ball:
     wicket: int = 0
     dismissed: str = ""
     dismissal: str = ""
-    score: str = ""  # innings score after the ball as CREX stamped it, "111/4"
+    score: str = ""  # innings score after the ball as Source A stamped it, "111/4"
     text: str = ""  # start of the commentary
     team_name: str = ""  # names come from the scorecard, so they are what the player table and the site use
     striker_name: str = ""
@@ -209,7 +209,7 @@ def totals(balls: list[Ball]) -> dict[int, dict]:
 def reconcile(balls: list[Ball], scorecard) -> list[str]:
     """Differences between the deliveries and a ``crex_scorecard.Scorecard`` (empty = proven).
 
-    Messages start with ``innings:`` / ``bat:`` (the parse is wrong or incomplete) or ``bowl:`` (CREX's own
+    Messages start with ``innings:`` / ``bat:`` (the parse is wrong or incomplete) or ``bowl:`` (Source A's own
     feed and card sometimes disagree by a ball or a run: a warning, see ``is_hard``).
     """
     issues: list[str] = []
@@ -270,7 +270,7 @@ def _solve_moves(to_b: dict, to_a: dict, want: tuple, limit: int) -> tuple[int, 
 
 
 def heal(balls: list[Ball], scorecard, limit: int = 4) -> int:
-    """Repair the one error CREX's feed makes: a ball credited to the wrong one of the two batters at the crease.
+    """Repair the one error Source A's feed makes: a ball credited to the wrong one of the two batters at the crease.
 
     When exactly two partners' lines are off by equal and opposite amounts against the scorecard, the fewest
     balls (at most ``limit``) are moved between them until both lines match. The pair, the innings total, the
@@ -337,12 +337,12 @@ def feed_events(html: str, bodies: list) -> list[dict]:
 
 
 def match_key(url: str) -> str:
-    """CREX's short match key: the id at the end of the slug (``...-match-updates-13W5`` -> ``13W5``)."""
+    """Source A's short match key: the id at the end of the slug (``...-match-updates-13W5`` -> ``13W5``)."""
     return url.rstrip("/").rsplit("-", 1)[-1]
 
 
 def fetch_events(browser, url: str) -> list[dict]:
-    """Scroll a match's summary page and return every feed event it loads (empty if CREX has none)."""
+    """Scroll a match's summary page and return every feed event it loads (empty if Source A has none)."""
     page, bodies = browser.capture(url, FEED_PART)
     return feed_events(page.html, bodies)
 
@@ -361,7 +361,7 @@ def collect(browser, store, targets: list[tuple[str, str, str]], min_balls: int 
             events = fetch_events(browser, url)
             if sum(1 for e in events if e.get("type") == "b") < min_balls:
                 out["no_feed"] += 1
-                out["problems"].append(f"{match_id}: CREX has no ball-by-ball feed for this match")
+                out["problems"].append(f"{match_id}: Source A has no ball-by-ball feed for this match")
                 continue
             page = browser.render(url + "/match-scorecard", marker="getSC4")
             sc = parse_scorecard(page.html) if page.status < 400 else None

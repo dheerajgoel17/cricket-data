@@ -1,7 +1,7 @@
-# CREX backfill
+# Source A backfill
 
-Fills in matches Cricsheet will never publish, from [CREX](https://crex.com), a few per run.
-Everything here respects CREX's `robots.txt` (`Allow: /`, `/api/*` disallowed): we read its public
+Fills in matches Base will never publish, from Source A, a few per run.
+Everything here respects Source A's `robots.txt` (`Allow: /`, `/api/*` disallowed): we read its public
 sitemaps and render ordinary match pages in headless Chromium, with delays and back-off.
 
 ## What gets queued
@@ -11,12 +11,12 @@ sitemaps and render ordinary match pages in headless Chromium, with delays and b
 
 | class | source of tasks | notes |
 |---|---|---|
-| `cricsheet_missing` | <https://cricsheet.org/missing/> (topped up every run) | domestic T20 / List A / FC matches keep their own type, never relabelled T20I/ODI |
-| `cricsheet_withheld` | CREX's match sitemap: every finished men's `afg` match | opponents/dates/URLs all come from the sitemap, nothing hard-coded |
+| `cricsheet_missing` | the source (topped up every run) | domestic T20 / List A / FC matches keep their own type, never relabelled T20I/ODI |
+| `cricsheet_withheld` | Source A's match sitemap: every finished men's `afg` match | opponents/dates/URLs all come from the sitemap, nothing hard-coded |
 
-The Afghanistan Premier League has no entry in CREX's sitemaps (CREX lists the *Shpageeza Cricket
+The Afghanistan Premier League has no entry in Source A's sitemaps (Source A lists the *Shpageeza Cricket
 League* and *Kabul Premier League*, which are different tournaments), so nothing is queued for it.
-`WITHHELD_COMPETITION_PATTERN` in `backfill.py` picks it up automatically if CREX ever adds it.
+`WITHHELD_COMPETITION_PATTERN` in `backfill.py` picks it up automatically if Source A ever adds it.
 
 ## How a match is found
 
@@ -32,9 +32,9 @@ League* and *Kabul Premier League*, which are different tournaments), so nothing
 4. Outcomes: `done` only after the match JSON is written to `data/provisional/`;
    `not_found` (with a recorded reason and the candidate ids rendered) only when nothing plausible
    exists in the sitemap or every candidate was rendered and rejected; `failed`/retry when the
-   network or page rendering misbehaved; `already_in_cricsheet` if Cricsheet now has it.
+   network or page rendering misbehaved; `already_in_cricsheet` if Base now has it.
 
-Matches CREX does not cover (most pre-2023 and lower-tier domestic matches) end up in
+Matches Source A does not cover (most pre-2023 and lower-tier domestic matches) end up in
 `not_found` with their reason; they cost no page loads and do not count towards the batch size.
 
 ## Running it
@@ -63,7 +63,7 @@ git-ignored so they never create commits; they appear in the job summary instead
 
 ## Known limits
 
-* CREX stamps start times in IST; a venue-local date can differ by a day, so `date` is the CREX
-  date for withheld matches and the Cricsheet date for missing-list matches.
+* Source A stamps start times in IST; a venue-local date can differ by a day, so `date` is the Source A
+  date for withheld matches and the Base date for missing-list matches.
 * Scraped records carry match-level data only (teams, venue, date, winner, result); player
-  performances come from Cricsheet when it has the match.
+  performances come from Base when it has the match.

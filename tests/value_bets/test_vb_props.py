@@ -108,7 +108,7 @@ def test_guard_value_direction_and_suspect():
     assert guard_value(0.151, 0.209, 9.0, "moviodds_bet365") == (False, "suspect_edge")
     # ladder case: model 15% below 1/4.33 = 23% -> edge only from the market blend -> never alert
     assert guard_value(0.151, 0.21, 4.33, "moviodds_bet365") == (False, "model_disagrees")
-    # commission counts: 0.5 model at 2.02 on Smarkets (eff 2.0) is not above implied
+    # commission counts: 0.5 model at 2.02 on Exchange S (eff 2.0) is not above implied
     assert guard_value(0.499, 0.53, 2.02, "smarkets")[1] == "model_disagrees"
     assert guard_value(0.30, 0.29, 4.0, "moviodds_bet365") == (True, None)
     assert guard_value(None, 0.29, 4.0, "moviodds_bet365") == (True, None)

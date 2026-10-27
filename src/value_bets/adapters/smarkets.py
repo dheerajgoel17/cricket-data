@@ -1,12 +1,13 @@
-"""Smarkets public (unauthenticated) read API. Note: Smarkets' T&Cs say automated access needs their
+"""Exchange S public (unauthenticated) read API. Note: Exchange S' T&Cs say automated access needs their
 approval; this is read-only, low-frequency. Prices are probability in basis points: decimal = 10000/price."""
 import re
+
+from cricket_data.hosts import host
 
 from ..util import http_json
 from .base import gender_hint, row, split_teams
 
 NAME = "smarkets"
-B = "https://api.smarkets.com/v3"
 
 
 def _chunks(lst, n):
@@ -36,19 +37,19 @@ def _comp(e):
 
 
 def fetch(fetched_at):
-    ev = http_json(B + "/events/?type_domain=cricket&type_scope=single_event&state=upcoming&state=live"
+    ev = http_json(host("EXCHANGE_API_URL") + "/events/?type_domain=cricket&type_scope=single_event&state=upcoming&state=live"
                    "&sort=start_datetime,id&limit=200")[0]["events"]
     raw = {"events": ev}
     E = {e["id"]: e for e in ev}
     mk = []
     for c in _chunks(list(E), 20):
-        mk += http_json(B + f"/events/{','.join(c)}/markets/")[0]["markets"]
+        mk += http_json(host("EXCHANGE_API_URL") + f"/events/{','.join(c)}/markets/")[0]["markets"]
     keep = [m for m in mk if classify(m["name"])[0]]
     M = {m["id"]: m for m in keep}
     ct, qt = [], {}
     for c in _chunks(list(M), 40):
-        ct += http_json(B + f"/markets/{','.join(c)}/contracts/")[0]["contracts"]
-        qt.update(http_json(B + f"/markets/{','.join(c)}/quotes/")[0])
+        ct += http_json(host("EXCHANGE_API_URL") + f"/markets/{','.join(c)}/contracts/")[0]["contracts"]
+        qt.update(http_json(host("EXCHANGE_API_URL") + f"/markets/{','.join(c)}/quotes/")[0])
     raw.update(markets=keep, contracts=ct, quotes=qt)
     rows = []
     for c in ct:

@@ -1,6 +1,6 @@
 name: Value bets
 
-# Hourly 03:30-17:30 UTC (09:00-23:00 IST): pull free odds (Smarkets, bet365 via MoviOdds), price player props
+# Hourly 03:30-17:30 UTC (09:00-23:00 IST): pull free odds (Exchange S, Book A via Feed P), price player props
 # against the cricket-data history and commit ONLY the small outputs under value_bets/out + dedupe state.
 # Independent of the data workflows (own concurrency group, touches no files under data/).
 # Weekly (Sun 07:00 UTC) or on demand with refit=true: re-run the prop backtest (incl. the weather study, topping up
@@ -22,6 +22,16 @@ on:
         type: boolean
         default: true
 
+# Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
+env:
+  LIVE_SOURCE_BASE: ${{ secrets.LIVE_SOURCE_BASE }}
+  LIVE_SITEMAP_DIR: ${{ secrets.LIVE_SITEMAP_DIR }}
+  IMG_CDN_BASE: ${{ secrets.IMG_CDN_BASE }}
+  VITE_IMG_CDN: ${{ secrets.IMG_CDN_BASE }}
+  BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
+
 permissions:
   contents: write
 
@@ -34,11 +44,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      CV_SOURCES: ${{ vars.CV_SOURCES || 'smarkets,moviodds_bet365' }}
+      CV_SOURCES: ${{ vars.CV_SOURCES }}
       ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
       BETFAIR_APP_KEY: ${{ secrets.BETFAIR_APP_KEY }}
       BETFAIR_USERNAME: ${{ secrets.BETFAIR_USERNAME }}
       BETFAIR_PASSWORD: ${{ secrets.BETFAIR_PASSWORD }}
+      BETFAIR_SSO_URL: ${{ secrets.BETFAIR_SSO_URL }}
+      BETFAIR_API_URL: ${{ secrets.BETFAIR_API_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

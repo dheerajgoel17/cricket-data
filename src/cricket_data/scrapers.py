@@ -5,9 +5,9 @@ from any public website. Scrapers implement the CricketScraper protocol and
 register themselves with the ScraperRegistry for automatic discovery.
 
 Built-in sources:
-- ESPNcricinfo: Public JSON API
-- Cricbuzz: Mobile API (placeholder)
-- CREX: Live scores JSON API
+- Source B: Public JSON API
+- Source C: Mobile API (placeholder)
+- Source A: Live scores JSON API
 
 To add a new source:
 1. Implement the CricketScraper protocol (name, fetch_recent_match_ids, fetch_match)
@@ -28,6 +28,7 @@ from urllib.parse import urljoin
 from .crex_browser import BrowserError, CREXBrowser
 from .crex_lookup import fetch_record, parse_match_page
 from .crex_sitemap import MatchEntry
+from .hosts import host
 from .models import MatchRecord, PlayerPerf
 from .permanent_matches import classify_match_status, fetch_cricsheet_missing_matches
 from .polite import PoliteFetcher, RobotsDisallowed
@@ -159,16 +160,18 @@ class ScraperRegistry:
 
 
 class ESPNcricinfoScraper:
-    """Scrape ESPNcricinfo match data from their public JSON feed.
+    """Scrape Source B match data from their public JSON feed.
     
-    ESPNcricinfo exposes a public JSON API for completed matches.
+    Source B exposes a public JSON API for completed matches.
     Endpoints:
     - /ci/engine/match/index.json?view=live - Recent match list
     - /ci/engine/match/<match_id>.json - Match details
     """
     
     name = "espncricinfo"
-    base_url = "https://www.espncricinfo.com"
+    @property
+    def base_url(self) -> str:
+        return host("SRC_B_BASE")
     
     def __init__(self, fetcher: PoliteFetcher | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
@@ -210,7 +213,7 @@ class ESPNcricinfoScraper:
             raise ScraperError(f"Failed to fetch match {match_id}: {exc}") from exc
     
     def _parse_match(self, match_id: str, doc: dict[str, Any]) -> MatchRecord:
-        """Parse ESPNcricinfo JSON into MatchRecord."""
+        """Parse Source B JSON into MatchRecord."""
         match = doc.get("match", {})
         info = match.get("info", {})
         teams_info = match.get("teams", [])
@@ -353,19 +356,21 @@ class ESPNcricinfoScraper:
 
 
 class CricbuzzScraper:
-    """Scrape Cricbuzz match data.
+    """Scrape Source C match data.
     
-    Cricbuzz has a mobile API that may be accessible. This implementation
+    Source C has a mobile API that may be accessible. This implementation
     provides the interface structure for future development.
     
     To implement:
-    1. Identify Cricbuzz's API endpoints (check developer tools in browser)
+    1. Identify Source C's API endpoints (check developer tools in browser)
     2. Verify their terms of service allow automated access
     3. Parse their JSON/HTML response format
     """
     
     name = "cricbuzz"
-    base_url = "https://www.cricbuzz.com"
+    @property
+    def base_url(self) -> str:
+        return host("SRC_C_BASE")
     
     def __init__(self, fetcher: PoliteFetcher | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
@@ -373,7 +378,7 @@ class CricbuzzScraper:
     def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
         """Get match IDs for recently completed matches.
         
-        Placeholder - needs implementation once Cricbuzz API structure is known.
+        Placeholder - needs implementation once Source C API structure is known.
         """
         # TODO: Implement once API structure is documented/discovered
         return []
@@ -383,21 +388,23 @@ class CricbuzzScraper:
         
         Placeholder - needs implementation.
         """
-        # TODO: Implement Cricbuzz match fetching
+        # TODO: Implement Source C match fetching
         return None
 
 
 class CREXScraper:
-    """Scrape CREX (crex.com) with the shared headless-Chromium session.
+    """Scrape Source A ($LIVE_SOURCE_BASE) with the shared headless-Chromium session.
 
-    CREX pages render with JavaScript, so ``CREXBrowser`` (Playwright, sync API) loads them. The
+    Source A pages render with JavaScript, so ``CREXBrowser`` (Playwright, sync API) loads them. The
     browser is shared with the backfill (``use_browser``) so Playwright is started once per
     process. Match facts come from the page's own schema.org ``SportsEvent`` block (start date,
     both team names, venue) and its headline (result), never from guessing at CSS classes.
     """
 
     name = "crex"
-    base_url = "https://crex.com"
+    @property
+    def base_url(self) -> str:
+        return host("LIVE_SOURCE_BASE")
 
     def __init__(self, fetcher: PoliteFetcher | None = None, browser: CREXBrowser | None = None):
         self.fetcher = fetcher or PoliteFetcher(min_interval=5.0)
@@ -422,11 +429,11 @@ class CREXScraper:
             self.browser = None
 
     def fetch_recent_match_ids(self, days: int = 7) -> list[str]:
-        """Completed matches listed on the CREX home page (slugs under /cricket-live-score/)."""
+        """Completed matches listed on the Source A home page (slugs under /cricket-live-score/)."""
         try:
             _, links = self._get_browser().links(self.base_url, "/cricket-live-score/")
         except (BrowserError, RobotsDisallowed) as exc:
-            raise ScraperError(f"CREX home page unavailable: {exc}") from exc
+            raise ScraperError(f"Source A home page unavailable: {exc}") from exc
         ids: list[str] = []
         for link in links:
             href = link["href"]
@@ -444,7 +451,7 @@ class CREXScraper:
         try:
             page = self._get_browser().render(url, wait_selector="script#sports-event-schema")
         except (BrowserError, RobotsDisallowed) as exc:
-            print(f"CREX fetch_match failed for {match_id}: {exc}")
+            print(f"Source A fetch_match failed for {match_id}: {exc}")
             return None
         facts = parse_match_page(page.html, page.text, page.title, url) if page.status < 400 else None
         if facts is None or facts.start_date is None or not facts.finished:
@@ -666,8 +673,8 @@ class ScraperSource:
     """Source implementation that uses MultiSourceScraper for the pluggable system.
     
     Classifies matches based on their permanence:
-    - provisional: Normal lag (delete after Cricsheet arrives)
-    - cricsheet_missing: On Cricsheet's missing list (keep permanently)
+    - provisional: Normal lag (delete after Base arrives)
+    - cricsheet_missing: On Base's missing list (keep permanently)
     - cricsheet_withheld: Afghanistan men's team or APL (keep permanently)
     """
     
@@ -699,7 +706,7 @@ class ScraperSource:
         
         # Classify and mark each match
         for match in matches:
-            # Classify based on Cricsheet missing list or Afghanistan status
+            # Classify based on Base missing list or Afghanistan status
             status = classify_match_status(match, self._missing_matches_cache)
             match.status = status.value
             
@@ -712,7 +719,7 @@ class ScraperSource:
 
 # Register all built-in scrapers
 # These are automatically available to MultiSourceScraper
-# ESPNcricinfo and Cricbuzz disallow bots in robots.txt, so their adapters are not registered:
+# Source B and Source C disallow bots in robots.txt, so their adapters are not registered:
 # registering them would only produce a failure on every run.
 ScraperRegistry.register(CREXScraper)
 
@@ -722,7 +729,7 @@ def register_free_api_scrapers():
     """Register free API scrapers if keys are available."""
     import os
     
-    # CricketData.org (CricAPI) - Free tier: 100 requests/day
+    # Source D (CricAPI) - Free tier: 100 requests/day
     if os.getenv("CRICKETDATA_API_KEY"):
         try:
             from .free_apis import CricketDataOrgScraper
@@ -730,7 +737,7 @@ def register_free_api_scrapers():
         except ImportError:
             pass
     
-    # RapidAPI Cricket (if free tier exists)
+    # Source E Cricket (if free tier exists)
     if os.getenv("RAPIDAPI_CRICKET_KEY"):
         try:
             from .free_apis import RapidAPICricketScraper

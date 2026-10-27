@@ -21,7 +21,12 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
 | `ASK_PER_MINUTE`, `ASK_DAILY_CAP` | Vercel env (optional) | same | rate limits (defaults 12 / 800) |
 | `SYNC_LIMIT` | workflow input / env | `site.yml` | max images copied per run (default 1500) |
+| `LIVE_SOURCE_BASE`, `LIVE_SITEMAP_DIR`, `IMG_CDN_BASE`, `BASE_DATA_URL`, `PRICE_FEED_URL`, `EXCHANGE_API_URL`, `BETFAIR_SSO_URL`, `BETFAIR_API_URL` | GitHub **secrets** (masked in public logs) | repo Settings -> Secrets; values are not written anywhere in the repo, ask the maintainer | every workflow's top-level `env:`; read by `cricket_data.hosts.host()` |
+| `LIVE_SOURCE_BASE`, `VITE_IMG_CDN` | Vercel env (Production, Preview) | `vercel env add` | `site/api/live.js` (runtime), `site/src/lib/photos.js` (build time) |
+| `CV_SOURCES` | GitHub variable | repo Settings -> Variables | value-bets adapter list |
 | `ODDS_API_KEY`, `BETFAIR_*`, `CRICKETDATA_API_KEY`, `RAPIDAPI_CRICKET_KEY` | GitHub secrets (all optional) | | value-bets / scraper extras |
+
+**Source hosts live in the environment, never in the tree.** No tracked file names a data source's host (`scripts/check_public_safe.py` fails on it, comparing hashes so the script lists none), and committed data stores host-relative links. Locally put the same names in a git-ignored `site/.env.local` (the dev server loads it into the API handlers) or export them before running Python. Tests use placeholder hosts (`tests/conftest.py`, `site/tests/*`).
 
 Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link` must be deleted (it holds an OIDC token).
 
@@ -32,10 +37,10 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 **Force a site refresh now**: Actions -> Site -> Run workflow (optionally `sync_limit`).
 **First image backfill**: run Site with `sync_limit=6000` once; afterwards hourly runs only add new ids.
 **Add a column/table in Supabase**: add a migration file in `supabase/migrations/` and apply it (Supabase MCP `apply_migration` or SQL editor); keep RLS on and reads public, writes service-only.
-**Cricsheet looks stale**: expected for a few days; the scraper's provisional matches cover the gap. A `data-stale` issue opens if canonical data is > 3 days old; the Site workflow warns only if both sources are old.
-**Scraper broke (CREX layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
+**Base looks stale**: expected for a few days; the scraper's provisional matches cover the gap. A `data-stale` issue opens if canonical data is > 3 days old; the Site workflow warns only if both sources are old.
+**Scraper broke (Source A layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
 **A workflow shows "workflow file issue"**: YAML error. `pip install actionlint-py && actionlint .github/workflows/*.yml`.
-**Site shows no photos**: `data/photos.json` missing? (cache restored an old format: bump the cache key prefix in `site.yml`). CREX CDN down: the browser falls back to our Supabase copy / flags / silhouettes.
+**Site shows no photos**: `data/photos.json` missing? (cache restored an old format: bump the cache key prefix in `site.yml`). Source A CDN down: the browser falls back to our Supabase copy / flags / silhouettes.
 **Vercel deploy limits**: Hobby allows ~100 deploys/day; hourly = 24.
 
 ## Health checks

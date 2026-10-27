@@ -1,11 +1,11 @@
-# Provisional data (matches Cricsheet has not published yet)
+# Provisional data (matches Base has not published yet)
 
-Cricsheet usually publishes a match some days after it is played. To cover the gap you can supply
-*provisional* matches. They are tagged `status=provisional`, **verified** against Cricsheet when it
+Base usually publishes a match some days after it is played. To cover the gap you can supply
+*provisional* matches. They are tagged `status=provisional`, **verified** against Base when it
 publishes the same match, logged in `data/reconcile_log.csv`, and then **deleted** to save space.
 
 ## How a match is recognised as "landed"
-Same two teams, and a Cricsheet match dated within one day of the provisional date.
+Same two teams, and a Base match dated within one day of the provisional date.
 
 ## Option 1: the inbox (no code)
 Put a JSON file in `data/provisional/inbox/`:
@@ -39,5 +39,5 @@ No scraper ships with this project. Many sites forbid scraping in their terms.
 
 ## What reconciliation checks
 Winner agreement, and for each provisional player with runs/wickets/catches: runs and wickets must equal
-Cricsheet's. Disagreements are flagged in `reconcile_log.csv` (`winner_ok`, `player_mismatches`), and the run prints a
+Base's. Disagreements are flagged in `reconcile_log.csv` (`winner_ok`, `player_mismatches`), and the run prints a
 warning. Provisional matches older than 45 days with no canonical match are reported as stale.

@@ -60,7 +60,7 @@ def test_combined_dedupes_when_cricsheet_lands(tmp_path):
     _prov(store)
     assert any(r["match_id"] == "crex-eng-vs-pak" for r in iter_combined(store, "matches"))
     assert not any(r["match_id"] == "crex-eng-vs-pak" for r in iter_combined(store, "matches", False))
-    _canon(store, date="2026-10-20", mid="c2")  # Cricsheet publishes the same fixture
+    _canon(store, date="2026-10-20", mid="c2")  # Base publishes the same fixture
     ids = [r["match_id"] for r in iter_combined(store, "players")]
     assert "crex-eng-vs-pak" not in ids and "c2" in ids
 

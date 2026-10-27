@@ -42,7 +42,7 @@ function startsIn(ms: number) {
   return h >= 1 ? `Match starts in ${h} hr${h > 1 ? "s" : ""} ${m % 60} mins` : `Match starts in ${m} mins`;
 }
 
-/** Cricinfo-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
+/** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const now = useNow(30000);
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);

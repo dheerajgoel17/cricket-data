@@ -49,7 +49,7 @@ def test_fixture_match_reconciles_with_the_scorecard():
     assert (t[2]["runs"], t[2]["wkts"]) == (111, 4)
     issues = reconcile(balls, card())
     assert [i for i in issues if crex_balls.is_hard(i)] == []
-    assert all(i.startswith("bowl:") for i in issues)  # CREX's own card is a ball out on one over
+    assert all(i.startswith("bowl:") for i in issues)  # Source A's own card is a ball out on one over
 
 
 def test_extras_and_wickets_are_decoded():
@@ -135,7 +135,7 @@ class FakeBrowser:
 def run_collect(tmp_path, monkeypatch, events, sc):
     monkeypatch.setattr(crex_scorecard, "parse_scorecard", lambda html: sc)
     store = Store(tmp_path)
-    url = "https://crex.com/cricket-live-score/x-vs-y-match-updates-13W5"
+    url = "https://src.test/cricket-live-score/x-vs-y-match-updates-13W5"
     return collect(FakeBrowser(events), store, [("crex-x", "2026-10-13", url)], verbose=False), store
 
 
@@ -160,8 +160,8 @@ def test_collect_reports_a_match_without_a_feed(tmp_path, monkeypatch):
 
 
 def test_match_key_and_feed_events_cover_every_endpoint_version():
-    assert crex_balls.match_key("https://crex.com/cricket-live-score/a-vs-b-match-updates-13W5/") == "13W5"
-    html = ('<script id="app-root-state" type="application/json">{&q;https://content.crickapi.com/commentary/v2/'
+    assert crex_balls.match_key("https://src.test/cricket-live-score/a-vs-b-match-updates-13W5/") == "13W5"
+    html = ('<script id="app-root-state" type="application/json">{&q;https://content.src.test/commentary/v2/'
             'getBallFeeds&q;:[{&q;id&q;:1,&q;type&q;:&q;t&q;}]}</script>')
     assert crex_balls.feed_events(html, [[{"id": 2}], {"not": "a list"}]) == [{"id": 1, "type": "t"}, {"id": 2}]
 
@@ -195,7 +195,7 @@ def test_prune_balls_keeps_only_live_matches_and_removes_empty_files(tmp_path):
 
 
 def swapped(balls, pick):
-    """Credit one ball to the other batter at the crease, as CREX's feed sometimes does."""
+    """Credit one ball to the other batter at the crease, as Source A's feed sometimes does."""
     b = pick(balls)
     b.striker, b.non_striker = b.non_striker, b.striker
     b.striker_name, b.non_striker_name = b.non_striker_name, b.striker_name
@@ -231,7 +231,7 @@ def test_heal_never_moves_a_wicket_ball():
 def test_collect_heals_before_it_rejects(tmp_path, monkeypatch):
     victim = next(e for e in FIXTURE["events"] if e["type"] == "b" and e["inning"] == 1 and e["b"] == "4")
     a, b = victim["pf"], next(e["pf"] for e in FIXTURE["events"] if e["type"] == "b" and e["inning"] == 1 and e["pf"] != victim["pf"])
-    events = [dict(e, pf=b) if e is victim else e for e in FIXTURE["events"]]  # CREX credits the four to somebody else
+    events = [dict(e, pf=b) if e is victim else e for e in FIXTURE["events"]]  # Source A credits the four to somebody else
     assert a != b
     res, store = run_collect(tmp_path, monkeypatch, events, card())
     # the only wrong ball is credited to a batter who may not be the partner: either healed or rejected, never stored wrong

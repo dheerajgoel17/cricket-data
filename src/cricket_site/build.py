@@ -1,4 +1,4 @@
-"""Build the static site data (site/public/data) from Cricsheet ball-by-ball + the repo's provisional matches.
+"""Build the static site data (site/public/data) from Base ball-by-ball + the repo's provisional matches.
 
     python -m cricket_site.build --zip all_json.zip --data data --out site/public/data
 
@@ -100,7 +100,7 @@ def _int_getter(row: dict):
 
 
 def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, str] | None = None) -> tuple[list[dict], dict]:
-    """Provisional (scraped) matches that Cricsheet has not published yet, as compact match dicts."""
+    """Provisional (scraped) matches that Base has not published yet, as compact match dicts."""
     from cricket_data.registry import pending_provisional  # local import: keeps the parser usable standalone
     from cricket_data.store import Store
 
@@ -113,7 +113,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
             d = (date.fromisoformat(m["date"]) + timedelta(days=dd)).isoformat()
             seen.setdefault((d, frozenset(_norm_team(t) for t in m["teams"]), m["gender"]), []).append(runs if dd else -1)
     out, stat = [], {"files": 0, "matches": 0, "rows": 0, "rows_unlinked": 0, "unlinked_names": [], "with_deliveries": 0}
-    deliveries: dict[str, list[dict]] = {}  # CREX ball-by-ball (data/balls), keyed by match id
+    deliveries: dict[str, list[dict]] = {}  # Source A ball-by-ball (data/balls), keyed by match id
     for month in store.months("balls"):
         for r in store.read("balls", month):
             deliveries.setdefault(r["match_id"], []).append(r)
@@ -125,7 +125,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
             continue
         if key in seen:
             # same fixture +/-1 day, but consecutive-day games between the same two sides are real: an adjacent-date "duplicate" only
-            # counts when the batter-run totals agree (CREX and Cricsheet can differ by a day across time zones)
+            # counts when the batter-run totals agree (Source A and Base can differ by a day across time zones)
             prov_runs = sum(int(p.get("runs") or 0) for p in d.get("players", []))
             if any(r == -1 or r is None or not prov_runs or r == prov_runs for r in seen[key]):
                 continue
@@ -144,7 +144,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
         for p in d.get("players", []):
             stat["rows"] += 1
             pid = p.get("player_id", "")
-            if not pid and name_pid:  # not linked by `link-players` (e.g. Afghanistan, withheld by Cricsheet): use CREX's full-name match
+            if not pid and name_pid:  # not linked by `link-players` (e.g. Afghanistan, withheld by Base): use Source A's full-name match
                 pid = name_pid.get(fold_name(p.get("player", "")), "")
                 stat["rows_linked_by_crex"] = stat.get("rows_linked_by_crex", 0) + bool(pid)
             if pid:
@@ -174,9 +174,9 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
 
 
 def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dict[str, str], stat: dict) -> None:
-    """Replace a provisional match's totals-only rows with the full parse of its CREX deliveries.
+    """Replace a provisional match's totals-only rows with the full parse of its Source A deliveries.
 
-    Gives it innings, batting order, partnerships, extras-style aggregates and a valid ``q`` like a Cricsheet
+    Gives it innings, batting order, partnerships, extras-style aggregates and a valid ``q`` like a Base
     match. Skipped (the match stays totals-only) if the deliveries do not form two innings of this fixture.
     """
     info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20"}[fmt],
@@ -238,7 +238,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
 
     Order of evidence: the event's own host ("X tour of Y"), the venue's host as voted by its tour matches, the venue's
     country (value_bets/mappings/venue_geo.csv), then the team that plays >= half of the venue's internationals.
-    Cricsheet has no home flag, so this is an inference and the UI says so.
+    Base has no home flag, so this is an inference and the UI says so.
     """
     national = {t for m in matches if m["intl"] for t in m["teams"]}
     votes: dict[str, Counter] = defaultdict(Counter)
@@ -307,7 +307,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             if m["winner"]:
                 m["winner"] = canon_name.get((_norm_team(m["winner"]), m["gender"]), _strip_women(m["winner"]))
             fix = _team_fixer(canon_name, m["gender"])
-            if m["first"]:  # deliveries carry CREX's spelling of the teams: use Cricsheet's, as for `teams` and `winner`
+            if m["first"]:  # deliveries carry Source A's spelling of the teams: use Base's, as for `teams` and `winner`
                 m["first"] = fix(m["first"])
             m["inn"] = [[fix(i[0]), fix(i[1]), *i[2:]] for i in m["inn"]]
             m["bat"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m["bat"]]
@@ -396,7 +396,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
 
 
 def player_names(zpath: Path | None) -> dict[str, str]:
-    """Latest Cricsheet name per id, from the registry blocks (cheap second pass over the zip)."""
+    """Latest Base name per id, from the registry blocks (cheap second pass over the zip)."""
     names: dict[str, tuple[str, str]] = {}
     if zpath is None:
         return {}
@@ -414,7 +414,7 @@ def player_names(zpath: Path | None) -> dict[str, str]:
 
 
 def load_cricinfo(path: Path | None) -> dict[str, str]:
-    """Cricsheet register people.csv -> {player id: ESPNcricinfo id}; the site maps it to Wikidata photos."""
+    """Base register people.csv -> {player id: Source B id}; the site maps it to Wikidata photos."""
     out: dict[str, str] = {}
     if path and path.exists():
         with path.open(encoding="utf-8", newline="") as fh:
@@ -425,12 +425,12 @@ def load_cricinfo(path: Path | None) -> dict[str, str]:
 
 
 def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str], wikidata: bool = True, chunk: int = 400) -> dict:
-    """Match CREX's players and teams to ours, keyed by Cricsheet player id (never by array index: indices shift between builds).
+    """Match Source A's players and teams to ours, keyed by Base player id (never by array index: indices shift between builds).
 
-    {"p": {pid: "c:<CREX id>" | "w:<Commons file>"}, "t": {folded team name: CREX id}, "names": {folded CREX full name: pid},
+    {"p": {pid: "c:<Source A id>" | "w:<Commons file>"}, "t": {folded team name: Source A id}, "names": {folded Source A full name: pid},
      "index": {"players": [[crex id, name, pid|None]], "teams": [[crex id, name, folded]]}}.
-    CREX first (public sitemaps), Wikidata (P2697 Cricinfo id -> P18, free licences) as the photo fallback. Best effort: a network failure
-    yields less, never an error. Teams are matched on the Cricsheet team names seen in `canonical`.
+    Source A first (public sitemaps), Wikidata (P2697 Source B id -> P18, free licences) as the photo fallback. Best effort: a network failure
+    yields less, never an error. Teams are matched on the Base team names seen in `canonical`.
     """
     import urllib.parse
     import urllib.request
@@ -552,7 +552,7 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> i
 
 
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
-    """Fixtures and start times come from CREX's schedule only (data/fixtures/upcoming.csv).
+    """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
     The bookmaker feed (vb_dir) is for odds: books serve different regions, so its start times and team labels
     are not trustworthy as a schedule. vb_dir is accepted for call compatibility and deliberately unused."""
@@ -646,15 +646,15 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--zip", required=True, help="Cricsheet all_json.zip")
+    ap.add_argument("--zip", required=True, help="Base all_json.zip")
     ap.add_argument("--data", default="data")
     ap.add_argument("--out", default="site/public/data")
     ap.add_argument("--value-bets", default="value_bets/out")
     ap.add_argument("--geo", default="value_bets/mappings/venue_geo.csv", help="venue -> country (optional)")
-    ap.add_argument("--people", default="", help="Cricsheet register people.csv (optional: enables player photos)")
+    ap.add_argument("--people", default="", help="Base register people.csv (optional: enables player photos)")
     ap.add_argument("--photos", action="store_true", help="look up player photos on Wikidata (needs --people)")
     ap.add_argument("--site-url", default="", help="public base URL: enables sitemap.xml and robots.txt")
-    ap.add_argument("--crex-cache", default="", help="directory caching the CREX/Wikidata matching for the day")
+    ap.add_argument("--crex-cache", default="", help="directory caching the Source A/Wikidata matching for the day")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args(argv)
     meta = build(Path(a.zip), Path(a.data), Path(a.out), Path(a.value_bets), a.workers, Path(a.geo), Path(a.people) if a.people else None, a.photos and bool(a.people), a.site_url, Path(a.crex_cache) if a.crex_cache else None)

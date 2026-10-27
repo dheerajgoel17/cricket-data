@@ -1,4 +1,4 @@
-// Free image sources, loaded lazily in the browser: CREX's public image CDN (ids matched at build time, see photos.ts),
+// Free image sources, loaded lazily in the browser: Source A's public image CDN (ids matched at build time, see photos.ts),
 // flagcdn.com flags for national sides, Wikimedia Commons photos via Wikidata, then initials / a silhouette.
 export { playerPhotos, teamLogos } from "@/lib/photos.js";
 

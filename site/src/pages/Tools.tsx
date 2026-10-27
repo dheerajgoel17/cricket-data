@@ -106,7 +106,7 @@ export function PairPage() {
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Partnerships"]]} />
-      <PageTitle sub="For any pair: who is dismissed first, stand sizes, split by format, opposition and venue. Needs ball-by-ball data, so only Cricsheet-published matches count.">Partnerships</PageTitle>
+      <PageTitle sub="For any pair: who is dismissed first, stand sizes, split by format, opposition and venue. Needs ball-by-ball data, so only matches in the base data count.">Partnerships</PageTitle>
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <datalist id="dl-venues">{store.venues.map((n: string) => <option key={n} value={n} />)}</datalist>
       <form className="mb-4 flex flex-wrap items-end gap-3 rounded-lg border p-4" onSubmit={(e) => { e.preventDefault(); go("pair", { a, b, fmt, open: open ? "1" : "", opp, venue: ven, vt }); }}>

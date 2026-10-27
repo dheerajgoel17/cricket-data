@@ -1,12 +1,13 @@
-"""MoviOdds: free unofficial mirror of bet365 prices (no key). Bookmaker prices, back only.
+"""Feed P: free unofficial mirror of Book A prices (no key). Bookmaker prices, back only.
 Its robots.txt disallows /odds for crawlers; we make one request per run."""
 import re
+
+from cricket_data.hosts import host
 
 from ..util import http_json
 from .base import gender_hint, row
 
 NAME = "moviodds_bet365"
-URL = "https://moviodds.com/odds?sport=cricket"
 
 MAP = {
     "To Win the Match": "match_winner",
@@ -33,7 +34,7 @@ LADDER_RE = re.compile(r"^\s*(\d+)\+")
 
 
 def fetch(fetched_at):
-    d = http_json(URL, timeout=45)[0]
+    d = http_json(host("PRICE_FEED_URL"), timeout=45)[0]
     rows = []
     for m in d.get("matches", []):
         name = f"{m['home']} vs {m['away']}"

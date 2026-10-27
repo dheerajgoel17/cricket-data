@@ -6,6 +6,7 @@ __pycache__/
 *.zip
 *.db
 .env
+.env.*
 .cache/
 diagnostics/
 data/scraper_run_report.json

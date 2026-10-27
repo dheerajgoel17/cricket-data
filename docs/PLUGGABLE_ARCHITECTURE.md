@@ -4,7 +4,7 @@
 The cricket data scraper now uses a fully pluggable architecture that allows any cricket score website to be added as a source without modifying existing code. This document explains the design decisions and architecture.
 
 ## Problem Statement
-The original implementation hardcoded ESPNcricinfo and had a placeholder for Cricbuzz. Adding new sources required:
+The original implementation hardcoded Source B and had a placeholder for Source C. Adding new sources required:
 1. Modifying `MultiSourceScraper.__init__` 
 2. Changing the scraper list in multiple places
 3. No clear interface for what a scraper must implement
@@ -135,10 +135,10 @@ This ensures maximum data availability even with partial failures.
 - Treats unreachable robots.txt as "disallow all"
 - No way to bypass (enforced by PoliteFetcher)
 
-## CREX Implementation
+## Source A Implementation
 
-### Why CREX?
-User requested a third source alongside ESPNcricinfo and Cricbuzz. CREX (crex.live) is a cricket live scores site.
+### Why Source A?
+User requested a third source alongside Source B and Source C. Source A (crex.live) is a cricket live scores site.
 
 ### Implementation Strategy
 **Best-effort auto-discovery:**
@@ -149,7 +149,7 @@ User requested a third source alongside ESPNcricinfo and Cricbuzz. CREX (crex.li
 **Why not require documented API?**
 - Many cricket sites don't document their APIs
 - Best-effort scraping is better than no scraping
-- Users can still benefit if CREX works
+- Users can still benefit if Source A works
 
 **Ethical considerations:**
 - Still respects robots.txt
@@ -157,7 +157,7 @@ User requested a third source alongside ESPNcricinfo and Cricbuzz. CREX (crex.li
 - Fails gracefully if blocked
 - Documentation warns about terms of service
 
-### CREX Parsing
+### Source A Parsing
 Uses flexible parsing that handles multiple JSON structures:
 - Field name variations: `date` vs `start_date`, `teams` vs `team_a`/`team_b`
 - Different nesting: `match.data` vs flat `match`

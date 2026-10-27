@@ -1,6 +1,6 @@
-"""CREX sitemap index: every published match and series, with dates, from public sitemaps.
+"""Source A sitemap index: every published match and series, with dates, from public sitemaps.
 
-CREX's robots.txt allows crawlers to read its sitemaps:
+Source A's robots.txt allows crawlers to read its sitemaps:
 
 * ``/crex_sitemap/cricket-live-score.xml`` lists ~18.5k match pages. Each ``<lastmod>`` is the
   match's start time (IST), which lets us find candidate matches for a date without rendering
@@ -20,15 +20,30 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from .hosts import host
 from .polite import PoliteFetcher
 
-BASE = "https://crex.com"
-MATCH_SITEMAP = f"{BASE}/crex_sitemap/cricket-live-score.xml"
-SERIES_SITEMAP = f"{BASE}/crex_sitemap/series.xml"
+
+def base() -> str:
+    return host("LIVE_SOURCE_BASE")
+
+
+def _sitemap(name: str) -> str:
+    return f"{base()}/{host('LIVE_SITEMAP_DIR')}/{name}.xml"
+
+
+def match_sitemap() -> str:
+    return _sitemap("cricket-live-score")
+
+
+def series_sitemap() -> str:
+    return _sitemap("series")
+
+
 CACHE_MAX_AGE = 24 * 3600  # refresh the sitemaps at most once a day
 _NS = {"ns": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
-# "<a>-vs-<rest>-match-updates-<ID>"; the id is CREX's short base-36-ish match key.
+# "<a>-vs-<rest>-match-updates-<ID>"; the id is Source A's short base-36-ish match key.
 _MATCH_RE = re.compile(r"^(?P<a>.+?)-vs-(?P<rest>.+?)(?:-match-updates)?-(?P<id>[0-9A-Z]{2,5})$")
 _SERIES_RE = re.compile(r"^(?P<name>.+)-(?P<id>[0-9A-Za-z]{2,4})$")
 # The match label (what follows team B) is an ordinal match, a knockout stage, or a numbered one.
@@ -45,7 +60,7 @@ _YEARS_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})(?:-(\d{2}))?(?!\d)")
 
 
 def ist_date(lastmod: str | None) -> date | None:
-    """The calendar date in a sitemap ``<lastmod>`` timestamp (kept in CREX's own +05:30 clock)."""
+    """The calendar date in a sitemap ``<lastmod>`` timestamp (kept in Source A's own +05:30 clock)."""
     if not lastmod:
         return None
     try:
@@ -146,7 +161,7 @@ class SeriesEntry:
         return season_years(self.name)
 
     def matches_url(self) -> str:
-        return f"{BASE}/series/{self.slug}/matches"
+        return f"{base()}/series/{self.slug}/matches"
 
     def involves_afghanistan(self) -> bool:
         return "afghanistan" in self.slug.lower() or bool(re.search(r"(?:^|-)afg(?:-|$)", self.slug.lower()))
@@ -212,14 +227,14 @@ class CREXSitemapIndex:
             self._finish()
             return
         try:
-            self.series = parse_series_sitemap(self.fetcher.get(SERIES_SITEMAP))
-            self.matches = parse_match_sitemap(self.fetcher.get(MATCH_SITEMAP))
+            self.series = parse_series_sitemap(self.fetcher.get(series_sitemap()))
+            self.matches = parse_match_sitemap(self.fetcher.get(match_sitemap()))
             if not self.matches or not self.series:
-                raise RuntimeError("CREX sitemaps parsed to zero entries")
+                raise RuntimeError("Source A sitemaps parsed to zero entries")
         except Exception as exc:
             # approach switch: a day-old (or older) index is still far better than no backfill
             if self._load_cache(max_age=None):
-                print(f"warning: CREX sitemaps unavailable ({exc}); using the cached index")
+                print(f"warning: Source A sitemaps unavailable ({exc}); using the cached index")
                 self._finish()
                 return
             raise
@@ -252,9 +267,9 @@ class CREXSitemapIndex:
             return False
         try:
             doc = json.loads(p.read_text(encoding="utf-8"))
-            self.matches = [MatchEntry(url=f"{BASE}/cricket-live-score/{mid}", match_id=mid, lastmod=lm or None)
+            self.matches = [MatchEntry(url=f"{base()}/cricket-live-score/{mid}", match_id=mid, lastmod=lm or None)
                             for mid, lm in doc["matches"]]
-            self.series = [SeriesEntry(url=f"{BASE}/series/{s}", slug=s) for s in doc["series"]]
+            self.series = [SeriesEntry(url=f"{base()}/series/{s}", slug=s) for s in doc["series"]]
             return bool(self.matches and self.series)
         except (OSError, ValueError, KeyError, TypeError):
             return False

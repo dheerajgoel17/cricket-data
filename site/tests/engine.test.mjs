@@ -139,7 +139,7 @@ test("partnership picks the pair's busiest format and explains when there is not
 test("freshness is reported on every answer", async () => {
   const { store, rz } = await loadFixture();
   const res = await runPlan(store, rz, { kind: "player_prop", player: "Brook", stat: "sixes", line: 0.5, side: "over", filters: { format: "T20" } });
-  assert.match(res.freshness, /Newest Cricsheet match: 2025-04-05/);
+  assert.match(res.freshness, /Newest match in the base data: 2025-04-05/);
   assert.match(res.freshness, /No provisional matches included/);
   assert.equal(res.sample.n, res.summary.n);
   assert.ok(res.filters.some(([k]) => k === "Format"));

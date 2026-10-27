@@ -1,4 +1,4 @@
-// Live score snapshots from CREX: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
+// Live score snapshots from Source A: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { norm } from "./util.js";
 
@@ -54,7 +54,7 @@ function blankInn(n, team) {
   return { n, team: team || "", batters: [], bowlers: [], yetToBat: [], fow: [], extras: null, runs: null, wkts: null, overs: null };
 }
 
-/** CREX / Cricinfo extras order: b, lb, w, nb, pen. */
+/** Source A / Source B extras order: b, lb, w, nb, pen. */
 function extrasOf(parts) {
   const [byes, legByes, wides, noBalls, penalty] = parts.map((x) => nInt(x));
   const total = byes + legByes + wides + noBalls + penalty;
@@ -91,15 +91,15 @@ export function liveCard(match) {
   return inn.batters.length || inn.bowlers.length ? [inn] : [];
 }
 
-/** Rows worth the two page fetches: live ones, plus priced ones about to start (CREX's schedule page is cached ~5 min, so a match can be on but still unscored there). */
+/** Rows worth the two page fetches: live ones, plus priced ones about to start (Source A's schedule page is cached ~5 min, so a match can be on but still unscored there). */
 export function wantsCard(match, now = Date.now()) {
   if (match?.status === "live") return true;
   const t = match?.start ? Date.parse(match.start) : NaN;
   return match?.status === "upcoming" && Number.isFinite(t) && t - now < 15 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 
-/** CREX format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
-export function crexFmt(label) {
+/** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
+export function formatOf(label) {
   const t = String(label || "").toLowerCase();
   if (t.includes("hundred")) return "Hundred";
   if (/\bt20/.test(t)) return "T20";
@@ -136,18 +136,24 @@ export function pricedLive(matches, books) {
   });
 }
 
-function unescapeCrex(s) {
+function unescapeState(s) {
   return String(s || "").replace(/&q;/g, '"').replace(/&a;/g, "&").replace(/&s;/g, "'").replace(/&l;/g, "<").replace(/&g;/g, ">");
 }
 
-export function crexState(html) {
-  const m = String(html || "").match(/<script id="app-root-state"[^>]*>([\s\S]*?)<\/script>/);
-  if (!m) return null;
-  try { return JSON.parse(unescapeCrex(m[1])); } catch { return null; }
+/** The page's embedded state is keyed by endpoint URL; the host part is not ours to know, so keys are matched by their trailing path. */
+export function stateAt(state, suffix) {
+  const k = Object.keys(state || {}).find((x) => x.endsWith(suffix));
+  return k ? state[k] : undefined;
 }
 
-/** CREX writes "119-2"; the site displays "119/2 (17.3 ov)". Toss-time 0/0 (0.0 ov) is not a score. */
-function crexDisplay(score, overs) {
+export function pageState(html) {
+  const m = String(html || "").match(/<script id="app-root-state"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) return null;
+  try { return JSON.parse(unescapeState(m[1])); } catch { return null; }
+}
+
+/** Source A writes "119-2"; the site displays "119/2 (17.3 ov)". Toss-time 0/0 (0.0 ov) is not a score. */
+function scoreOf(score, overs) {
   const raw = String(score || "").trim().replace(/^(\d+)-(\d+)$/, "$1/$2");
   if (!raw) return parseScore("");
   const ov = String(overs || "").trim();
@@ -156,10 +162,10 @@ function crexDisplay(score, overs) {
   return parsed;
 }
 
-function crexInn(row, n) {
+function rowScore(row, n) {
   const s = row[`s${n}`] || row[n === 1 ? "team1Score1" : "team2Score1"] || (n === 1 ? row.score1 : row.score2) || "";
   const o = row[`o${n}`] || row[n === 1 ? "team1Over1" : "team2Over1"] || (n === 1 ? row.over1 : row.over2) || "";
-  return crexDisplay(s, o);
+  return scoreOf(s, o);
 }
 
 function nInt(x) {
@@ -184,19 +190,19 @@ function overBalls(over) {
   return (over?.overinfo || []).map((x) => String(x || "").trim()).filter(Boolean);
 }
 
-/** CREX lastovers as over groups. Delivery-wise; do not flatten across the over break. */
+/** Source A lastovers as over groups. Delivery-wise; do not flatten across the over break. */
 function parseOvers(lastovers) {
   return (lastovers || []).map((o) => ({ balls: overBalls(o) })).filter((o) => o.balls.length);
 }
 
-/** CREX schedule page (`crex.com/schedule`, robots Allow). Every live and upcoming game in one HTML response: URL, format, start, team scores (the page is cached ~5 min). */
-export function parseCrexSchedule(html) {
-  const rows = crexState(html)?.["https://stats.crickapi.com/fixture/getFixture"];
+/** Source A schedule page (the schedule page, robots Allow). Every live and upcoming game in one HTML response: URL, format, start, team scores (the page is cached ~5 min). */
+export function parseSchedule(html, base = "") {
+  const rows = stateAt(pageState(html), "/fixture/getFixture");
   if (!Array.isArray(rows)) return [];
   return rows.flatMap((row) => {
     const a = row.team1 || row.t1SName, b = row.team2 || row.t2SName;
     if (!a || !b) return [];
-    const t1 = crexInn(row, 1), t2 = crexInn(row, 2);
+    const t1 = rowScore(row, 1), t2 = rowScore(row, 2);
     const scored = !!t1.display || !!t2.display;
     const done = Number(row.winningTeam) >= 0 || Number(row.w) >= 0;
     // `bf` is the side that batted first; once both have a score the other one is in.
@@ -206,11 +212,11 @@ export function parseCrexSchedule(html) {
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
       status: done ? "final" : scored ? "live" : "upcoming",
-      fmt: crexFmt(row.fo || row.formats),
+      fmt: formatOf(row.fo || row.formats),
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: row.statusText || row.comment1 || "",
       note: "",
-      url: link.startsWith("/") ? `https://crex.com${link}` : link,
+      url: link.startsWith("/") ? `${base}${link}` : link,
       teams: [
         { name: a, abbr: row.t1SName || a, batting: bat === 0, ...t1 },
         { name: b, abbr: row.t2SName || b, batting: bat === 1, ...t2 },
@@ -221,13 +227,13 @@ export function parseCrexSchedule(html) {
   });
 }
 
-/** CREX match summary page (`getSV3` in the same app-root-state). Current batters + bowler, not a full card. */
-export function parseCrexLive(html) {
-  const sv = crexState(html)?.["https://api.goscorer.com/api/v3/getSV3"];
+/** Source A match summary page (`getSV3` in the same app-root-state). Current batters + bowler, not a full card. */
+export function parseMatchPage(html) {
+  const sv = stateAt(pageState(html), "/v3/getSV3");
   if (!sv || typeof sv !== "object") return null;
   const aName = sv.team1_f_n || sv.rt || sv.team1, bName = sv.team2_f_n || sv.team2;
   if (!aName || !bName) return null;
-  const t1 = crexDisplay(sv.score1, sv.over1), t2 = crexDisplay(sv.score2, sv.over2);
+  const t1 = scoreOf(sv.score1, sv.over1), t2 = scoreOf(sv.score2, sv.over2);
   const bat = sv.rt || aName, batIsA = teamKey(bat) === teamKey(aName), bowl = batIsA ? bName : aName;
   const strike = Number(sv.st);
   const players = [];
@@ -278,16 +284,16 @@ export function parseCrexLive(html) {
   };
 }
 
-/** CREX match-scorecard page (`getSC4` in app-root-state). We fetch the HTML; never `crex.com/api`. */
-export function crexScorecardUrl(url) {
+/** Source A match-scorecard page (`getSC4` in app-root-state). We fetch the HTML; never `$LIVE_SOURCE_BASE/api`. */
+export function cardPageUrl(url) {
   const u = String(url || "").replace(/\/+$/, "");
   if (!u) return "";
   return /match-scorecard/i.test(u) ? u : `${u}/match-scorecard`;
 }
 
-const CREX_OUT = { 1: "bowled", 2: "caught", 3: "caught and bowled", 4: "run out", 5: "lbw", 8: "stumped" };
+const OUT_HOW = { 1: "bowled", 2: "caught", 3: "caught and bowled", 4: "run out", 5: "lbw", 8: "stumped" };
 
-function crexHow(code, bowler, fielders) {
+function howOut(code, bowler, fielders) {
   const b = bowler || "", f = (fielders || []).filter(Boolean).join("/");
   if (!code) return "not out";
   if (code === 1) return b ? `b ${b}` : "bowled";
@@ -296,10 +302,10 @@ function crexHow(code, bowler, fielders) {
   if (code === 4) return f ? `run out (${f})` : "run out";
   if (code === 5) return b ? `lbw b ${b}` : "lbw";
   if (code === 8) return b && f ? `st ${f} b ${b}` : (b ? `st b ${b}` : "stumped");
-  return CREX_OUT[code] || "out";
+  return OUT_HOW[code] || "out";
 }
 
-function crexMaps(state) {
+function idMaps(state) {
   const names = {}, teams = {};
   for (const v of Object.values(state || {})) {
     if (!v || typeof v !== "object") continue;
@@ -313,7 +319,7 @@ function crexMaps(state) {
   return { names, teams };
 }
 
-function crexBatter(row, names, team) {
+function cardBatter(row, names, team) {
   const f = String(row || "").split("/")[0].split(".");
   const id = f[0], name = names[id] || id;
   if (f.length < 5) return { id, name, team, dnb: true };
@@ -327,12 +333,12 @@ function crexBatter(row, names, team) {
   const bowlerName = names[bowler] || bowler, fielderNames = fielders.map((x) => names[x] || x);
   return {
     id, name, team, runs, balls, fours, sixes, sr: strikeRate(runs, balls), out: !!code,
-    dismissal: crexHow(code, bowlerName, fielderNames),
+    dismissal: howOut(code, bowlerName, fielderNames),
     fowRuns: f.length > 5 ? nInt(f[5]) : null, fowBalls: f.length > 6 ? nInt(f[6]) : null,
   };
 }
 
-function crexBowler(row, names, team) {
+function cardBowler(row, names, team) {
   const f = String(row || "").split("/")[0].split(".");
   const id = f[0], conceded = nInt(f[1]), ballsBowled = nInt(f[2]), maidens = nInt(f[3]), wickets = nInt(f[4]);
   return {
@@ -341,12 +347,12 @@ function crexBowler(row, names, team) {
   };
 }
 
-/** Full CREX scorecard: batting (how-out, R, B, 4s, 6s, SR), extras, FOW, yet-to-bat, bowling (O, M, R, W, Econ). */
-export function parseCrexScorecard(html) {
-  const state = crexState(html);
-  const rows = state?.["https://api.goscorer.com/api/v3/getSC4"];
+/** Full Source A scorecard: batting (how-out, R, B, 4s, 6s, SR), extras, FOW, yet-to-bat, bowling (O, M, R, W, Econ). */
+export function parseCardPage(html) {
+  const state = pageState(html);
+  const rows = stateAt(state, "/v3/getSC4");
   if (!Array.isArray(rows) || !rows.length) return null;
-  const { names, teams } = crexMaps(state);
+  const { names, teams } = idMaps(state);
   const teamName = (id) => teams[id] || id || "";
   const ids = rows.map((r) => r.c).filter(Boolean);
   const otherId = (id) => ids.find((x) => x !== id) || Object.keys(teams).find((x) => x !== id) || "";
@@ -357,7 +363,7 @@ export function parseCrexScorecard(html) {
     const balls = tot ? +tot[3] : null;
     const batters = [], yetToBat = [], fow = [];
     for (const raw of row.b || []) {
-      const p = crexBatter(raw, names, batTeam);
+      const p = cardBatter(raw, names, batTeam);
       if (p.dnb) { if (names[p.id]) yetToBat.push(p.name); continue; }
       batters.push(p);
       if (p.out && p.fowRuns != null) fow.push({ name: p.name, runs: p.fowRuns, balls: p.fowBalls, wkts: fow.length + 1 });
@@ -365,7 +371,7 @@ export function parseCrexScorecard(html) {
     fow.sort((x, y) => x.runs - y.runs || (x.balls ?? 0) - (y.balls ?? 0)).forEach((w, k) => { w.wkts = k + 1; }); // the card lists batters in order, wickets fell in another
     const extras = extrasOf(String(row.e || "").split("."));
     return {
-      n: i + 1, team: batTeam, batters, bowlers: (row.a || []).map((raw) => crexBowler(raw, names, bowlTeam)),
+      n: i + 1, team: batTeam, batters, bowlers: (row.a || []).map((raw) => cardBowler(raw, names, bowlTeam)),
       yetToBat, fow, extras, runs: tot ? +tot[1] : null, wkts: tot ? +tot[2] : null, overs: balls != null ? ballsToOvers(balls) : null,
     };
   });
@@ -399,10 +405,10 @@ function flagLive(players, flags) {
 }
 
 /**
- * One live row from the three CREX pages. `row` is the schedule entry (id, URL, format, start; scores up to ~5 min old), `live` the match page
+ * One live row from the three Source A pages. `row` is the schedule entry (id, URL, format, start; scores up to ~5 min old), `live` the match page
  * (fresh scores, current pair, partnership, run rates), `card` the scorecard (every innings). Either page may be null: the row then keeps what it has.
  */
-export function crexMatch(row, live, card) {
+export function buildMatch(row, live, card) {
   const same = (a, b) => teamKey(a.name) === teamKey(b.name) || (!!a.abbr && teamKey(a.abbr) === teamKey(b.abbr));
   const teams = (row.teams || []).map((t) => {
     const o = (live?.teams || []).find((x) => same(x, t));
@@ -449,7 +455,7 @@ export function teamScore(match, teamName) {
   return (match?.teams || []).find((t) => teamKey(t.name) === k || teamKey(t.abbr) === k) || null;
 }
 
-/** The status line CREX gives: "IND need 179 runs in 115 balls", "OMA opt to Bowl". Bare "Live" says nothing the badge doesn't. */
+/** The status line Source A gives: "IND need 179 runs in 115 balls", "OMA opt to Bowl". Bare "Live" says nothing the badge doesn't. */
 export function liveBlurb(match) {
   for (const x of [match?.summary, match?.note]) {
     const t = String(x || "").trim();

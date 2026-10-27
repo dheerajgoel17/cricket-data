@@ -1,8 +1,8 @@
-"""Player photos and team logos from CREX's public sitemaps (the repo already scrapes CREX), with Wikidata as the fallback.
+"""Player photos and team logos from Source A's public sitemaps (the repo already scrapes Source A), with Wikidata as the fallback.
 
-CREX lists every player (`/player/<name-slug>-<ID>`) and team (`/team/<name-slug>-<ID>`) in its sitemaps, and serves images at
-`cricketvectors.akamaized.net/players/org/<ID>.png` and `.../Teams/<ID>.png`. We only store the ids; the browser loads the images.
-Matching a CREX full name ("harry-brook") to a Cricsheet name ("HC Brook") is deliberately conservative: surname must match,
+Source A lists every player (`/player/<name-slug>-<ID>`) and team (`/team/<name-slug>-<ID>`) in its sitemaps, and serves images at
+`$IMG_CDN_BASE/players/org/<ID>.png` and `.../Teams/<ID>.png`. We only store the ids; the browser loads the images.
+Matching a Source A full name ("harry-brook") to a Base name ("HC Brook") is deliberately conservative: surname must match,
 the first initial must agree, and an ambiguous name is skipped rather than guessed (a wrong face is worse than a silhouette).
 """
 from __future__ import annotations
@@ -11,7 +11,8 @@ import re
 import unicodedata
 import urllib.request
 
-SITEMAP = "https://crex.com/crex_sitemap/{}.xml"
+from cricket_data.hosts import host
+
 UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"
 _PLAYER = re.compile(r"/player/(.+)-([0-9A-Z]+)(?:/matches)?$")
 _TEAM = re.compile(r"/team/(.+)-([0-9A-Z]+)(?:/[a-z-]+)?$")
@@ -36,7 +37,7 @@ def parse_sitemap(xml: str, kind: str) -> list[tuple[str, str]]:
 
 
 def fetch_sitemap(kind: str) -> str:
-    req = urllib.request.Request(SITEMAP.format(kind), headers={"User-Agent": UA})
+    req = urllib.request.Request(f"{host('LIVE_SOURCE_BASE')}/{host('LIVE_SITEMAP_DIR')}/{kind}.xml", headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read().decode("utf-8", "replace")
 
@@ -55,9 +56,9 @@ def _split_cricsheet(name: str) -> tuple[str, str, str]:
 
 
 def match_players(players: list[dict], crex: list[tuple[str, str]], named: dict[str, int] | None = None) -> dict[int, str]:
-    """players: [{'idx', 'name', 'n', 'last'}] -> {player idx: CREX id}. Unique or clearly dominant matches only.
+    """players: [{'idx', 'name', 'n', 'last'}] -> {player idx: Source A id}. Unique or clearly dominant matches only.
 
-    If `named` is given it is filled with {folded CREX full name: player idx} for every accepted match (used to link scraped names).
+    If `named` is given it is filled with {folded Source A full name: player idx} for every accepted match (used to link scraped names).
     """
     by_sur: dict[str, list[tuple[dict, str, str]]] = {}
     for p in players:
@@ -90,7 +91,7 @@ def match_players(players: list[dict], crex: list[tuple[str, str]], named: dict[
                 if ok:
                     cands[p["idx"]] = p
         if not cands and crex_sur.get(toks[-1]) == 1 and len(by_sur.get(toks[-1], [])) == 1:
-            # second pass for an uncommon surname: the only Cricsheet player and the only CREX player with it, and his
+            # second pass for an uncommon surname: the only Base player and the only Source A player with it, and his
             # initials contain the given name's first letter ("MD Shanaka" = "Dasun Shanaka")
             p, ini, g = by_sur[toks[-1]][0]
             if (ini and toks[0][0] in ini) or (not ini and g[:1] == toks[0][:1]):
@@ -108,12 +109,12 @@ def match_players(players: list[dict], crex: list[tuple[str, str]], named: dict[
         for _, _, nm in best.values():
             counts[nm] = counts.get(nm, 0) + 1
         for i, (_, _, nm) in best.items():
-            if counts[nm] == 1:  # two Cricsheet players behind one CREX name would be a guess: leave it out
+            if counts[nm] == 1:  # two Base players behind one Source A name would be a guess: leave it out
                 named[nm] = i
     return {i: cid for i, (_, cid, _) in best.items()}
 
 
-# Cricsheet names for franchises that were renamed or spelled differently on CREX (folded names)
+# Base names for franchises that were renamed or spelled differently on Source A (folded names)
 TEAM_ALIASES = {
     "royal challengers bangalore": "royal challengers bengaluru", "kings xi punjab": "punjab kings", "delhi daredevils": "delhi capitals",
     "rising pune supergiants": "rising pune supergiant", "st kitts and nevis patriots": "st kitts nevis patriots", "jammu kashmir": "jammu and kashmir",
@@ -122,7 +123,7 @@ TEAM_ALIASES = {
 
 
 def match_teams(teams: list[dict], crex: list[tuple[str, str]]) -> dict[str, str]:
-    """teams: [{'name', 'g'}] (Cricsheet) -> {folded Cricsheet team name: CREX id}. Men's / unisex ids win; women-only slugs are ignored."""
+    """teams: [{'name', 'g'}] (Base) -> {folded Base team name: Source A id}. Men's / unisex ids win; women-only slugs are ignored."""
     avail: dict[str, str] = {}
     for name, cid in crex:
         f = fold(name)

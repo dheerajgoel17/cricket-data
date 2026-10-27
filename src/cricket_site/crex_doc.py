@@ -1,4 +1,4 @@
-"""CREX deliveries (``data/balls``) -> a Cricsheet-shaped match document, so ``parse.parse_match`` reads them unchanged.
+"""Source A deliveries (``data/balls``) -> a Base-shaped match document, so ``parse.parse_match`` reads them unchanged.
 
 Only the fields the parser uses are produced: per-delivery batter / non-striker / bowler names, runs, extras
 (wides, noballs, legbyes, byes, penalty) and wickets. Names are the scorecard's, so ``registry`` (name -> player
@@ -10,7 +10,7 @@ EXTRA_KEY = {"wd": "wides", "nb": "noballs", "lb": "legbyes", "b": "byes", "pen"
 
 
 def balls_doc(rows: list[dict], info: dict) -> dict:
-    """``rows``: stored delivery rows of one match (string values). ``info``: the Cricsheet-style ``info`` block."""
+    """``rows``: stored delivery rows of one match (string values). ``info``: the Base-style ``info`` block."""
     by_inn: dict[int, list[dict]] = {}
     for r in rows:
         by_inn.setdefault(int(r["innings"]), []).append(r)
@@ -20,7 +20,7 @@ def balls_doc(rows: list[dict], info: dict) -> dict:
         overs: dict[int, list[dict]] = {}
         for r in deliveries:
             bat, extra, total = int(r["bat_runs"]), int(r["extra_runs"]), int(r["total"])
-            g = r.get  # rows saved before the *_name columns existed still convert (by CREX id, so no site players)
+            g = r.get  # rows saved before the *_name columns existed still convert (by Source A id, so no site players)
             striker = g("striker_name") or r["striker"]
             dl = {"batter": striker, "bowler": g("bowler_name") or r["bowler"],
                   "non_striker": g("non_striker_name") or r["non_striker"] or striker,

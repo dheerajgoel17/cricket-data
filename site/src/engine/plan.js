@@ -83,7 +83,7 @@ function chips(store, plan, extra = []) {
 
 function freshness(store) {
   const fr = store.freshness();
-  return `Newest Cricsheet match: ${fr.newestCricsheet}. ${fr.provisionalIncluded
+  return `Newest match in the base data: ${fr.newestCricsheet}. ${fr.provisionalIncluded
     ? `Includes ${fr.provisionalMatches} provisional (scraped) matches up to ${fr.newestProvisional}.` : "No provisional matches included."}`;
 }
 
@@ -225,7 +225,7 @@ async function runPartnership(store, rz, plan, hints) {
     const prov = together.filter((t) => t.pv);
     if (!together.length) notes.push("These two have never batted for the same team in the data, so there is nothing to measure.");
     else {
-      notes.push(`They batted in the same team in ${together.length} recorded match(es) but never appear as a ball-by-ball partnership${prov.length ? `; ${prov.length} of those are provisional (scraped) matches with totals only, no batting order or fall of wickets, so who was out first cannot be derived until Cricsheet publishes them` : ""}.`);
+      notes.push(`They batted in the same team in ${together.length} recorded match(es) but never appear as a ball-by-ball partnership${prov.length ? `; ${prov.length} of those are provisional (scraped) matches with totals only, no batting order or fall of wickets, so who was out first cannot be derived until the base data has them` : ""}.`);
     }
   }
   if (rows0.some((r) => r.pv)) notes.push("Partnerships need ball-by-ball data, so provisional (scraped) matches are not included.");

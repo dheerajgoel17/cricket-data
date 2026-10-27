@@ -1,7 +1,7 @@
 """Free weather from Open-Meteo (no key): geocoding, ERA5 archive (backtests) and forecast (live).
 
 Venues are geocoded once (`mappings/venue_geo.csv`, editable). Daily match-day weather for historical venues is cached in
-`mappings/venue_weather_daily.csv.gz` so weekly refits don't re-download history. Cricsheet has no start times, so
+`mappings/venue_weather_daily.csv.gz` so weekly refits don't re-download history. Base has no start times, so
 history uses daily aggregates; live uses the same daily aggregates for the model and hourly rain probability around the
 scheduled start for the rain-risk flag.
 """

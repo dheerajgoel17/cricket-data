@@ -1,9 +1,9 @@
-"""Full scorecard -> per-player rows in the same columns as the Cricsheet player table.
+"""Full scorecard -> per-player rows in the same columns as the Base player table.
 
-CREX renders ``<match>/match-scorecard`` on the server and embeds the scorecard as page data
+Source A renders ``<match>/match-scorecard`` on the server and embeds the scorecard as page data
 (``getSC4``), so the whole card (both innings) is available without clicking through tabs.
 
-Row layout, verified against Cricsheet records (stumpings, catches, run-outs):
+Row layout, verified against Base records (stumpings, catches, run-outs):
 
 * batting row  ``id.runs.balls.fours.sixes.fowScore.fowBalls.code.<bowler>.<fielder>`` (a batter who
   did not bat is just ``id``; a not-out batter stops after the sixes);
@@ -11,7 +11,7 @@ Row layout, verified against Cricsheet records (stumpings, catches, run-outs):
 * dismissal ``code``: 1 bowled, 2 caught, 3 caught and bowled, 4 run out, 5 lbw, 8 stumped
   (other codes, e.g. retired or hit wicket, give nobody a fielding credit).
 
-Player ids are CREX's own, so ``player_id`` stays blank until Cricsheet publishes the match.
+Player ids are Source A's own, so ``player_id`` stays blank until Base publishes the match.
 """
 from __future__ import annotations
 
@@ -19,9 +19,10 @@ import json
 import re
 from dataclasses import dataclass, field
 
+from .hosts import state_at
 from .models import PlayerPerf
 
-SC4 = "https://api.goscorer.com/api/v3/getSC4"
+SC4 = "/v3/getSC4"  # matched against the end of the state keys
 _STATE = re.compile(r'<script id="[^"]*state[^"]*"[^>]*>(.*?)</script>', re.S)
 _MM = re.compile(r"&q;mm&q;:&q;([A-Za-z0-9]+)\^")
 _YEAR_TAIL = re.compile(r"\s*(?:19|20)\d{2}(?:[-/]\d{2,4})?\s*$")
@@ -30,7 +31,7 @@ BOWLED, CAUGHT, CAUGHT_BOWLED, RUN_OUT, LBW, STUMPED = 1, 2, 3, 4, 5, 8
 
 
 def unescape_state(s: str) -> str:
-    """CREX escapes its embedded JSON (``&q;`` for a quote, ...)."""
+    """Source A escapes its embedded JSON (``&q;`` for a quote, ...)."""
     return s.replace("&q;", '"').replace("&a;", "&").replace("&s;", "'").replace("&l;", "<").replace("&g;", ">")
 
 
@@ -128,11 +129,12 @@ def _maps(state: dict) -> tuple[dict[str, str], dict[str, str], str]:
 
 def parse_scorecard(html: str) -> Scorecard | None:
     state = parse_state(html)
-    if not state or not isinstance(state.get(SC4), list) or not state[SC4]:
+    rows = state_at(state, SC4)
+    if not isinstance(rows, list) or not rows:
         return None
     names, teams, series = _maps(state)
     innings = [Innings(batting_team=i.get("c", ""), batters=[_batter(r) for r in i.get("b", [])],
-                       bowlers=[_bowler(r) for r in i.get("a", [])]) for i in state[SC4]]
+                       bowlers=[_bowler(r) for r in i.get("a", [])]) for i in rows]
     return Scorecard(teams=teams, names=names, innings=innings, series_name=series)
 
 
@@ -143,7 +145,7 @@ def player_of_match(html: str, names: dict[str, str]) -> str:
 
 
 def event_name(series_name: str) -> str:
-    """'West Indies tour of India 2026' -> 'West Indies tour of India' (Cricsheet omits the year)."""
+    """'West Indies tour of India 2026' -> 'West Indies tour of India' (Base omits the year)."""
     return _YEAR_TAIL.sub("", series_name or "").strip()
 
 
@@ -183,7 +185,7 @@ def player_rows(sc: Scorecard, match_id: str, date: str) -> list[PlayerPerf]:
                 return rows[pid]
             if pid not in sc.names:
                 return None  # unknown substitute: no name to record
-            rows[pid] = PlayerPerf(match_id=match_id, date=date, player=sc.names[pid])  # substitute: no team, as in Cricsheet
+            rows[pid] = PlayerPerf(match_id=match_id, date=date, player=sc.names[pid])  # substitute: no team, as in Base
             return rows[pid]
 
         for b in inn.batters:

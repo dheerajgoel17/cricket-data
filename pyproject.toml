@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cricket-data"
 version = "0.1.0"
-description = "Free, self-updating open cricket dataset: daily Cricsheet ingest, per-player performance, provisional-data reconciliation."
+description = "Free, self-updating open cricket dataset: daily Base ingest, per-player performance, provisional-data reconciliation."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

@@ -1,4 +1,4 @@
-"""Cricsheet (https://cricsheet.org) downloader and ball-by-ball JSON parser."""
+"""Base ($BASE_DATA_URL) downloader and ball-by-ball JSON parser."""
 from __future__ import annotations
 
 import json
@@ -11,16 +11,16 @@ from collections import defaultdict
 from collections.abc import Iterator
 from pathlib import Path
 
+from .hosts import host
 from .models import MatchRecord, PlayerPerf
 
-BASE_URL = "https://cricsheet.org/downloads/"
 USER_AGENT = "cricket-data/0.1 (open-source dataset updater)"
 BOWLER_WICKETS = {"bowled", "caught", "caught and bowled", "lbw", "stumped", "hit wicket"}
 
 
 def download(dataset: str, retries: int = 3, backoff: float = 30.0) -> Path:
-    """Download a Cricsheet zip to a temp file and return its path (caller deletes it)."""
-    url = dataset if dataset.startswith("http") else BASE_URL + dataset
+    """Download a Base zip to a temp file and return its path (caller deletes it)."""
+    url = dataset if dataset.startswith("http") else f"{host('BASE_DATA_URL')}/downloads/{dataset}"
     last: Exception | None = None
     for attempt in range(1, retries + 1):
         fd, tmp = tempfile.mkstemp(suffix=".zip", prefix="cricsheet-")
@@ -46,7 +46,7 @@ def download(dataset: str, retries: int = 3, backoff: float = 30.0) -> Path:
             Path(tmp).unlink(missing_ok=True)
             if attempt < retries:
                 time.sleep(backoff * attempt)
-    raise RuntimeError(f"Cricsheet download failed for {url}: {last}")
+    raise RuntimeError(f"Base download failed for {url}: {last}")
 
 
 def parse_match(match_id: str, doc: dict) -> MatchRecord:

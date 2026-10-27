@@ -25,7 +25,7 @@ def test_parse_schedule_maps_time_format_gender_and_status():
     live, women, nz = rows
     assert live["status"] == "Live" and live["gender"] == "male" and live["format"] == "ODI"
     assert women["gender"] == "female" and women["format"] == "ODI" and women["team_a"] == "India Women"
-    assert nz["format"] == "T20" and nz["url"] == "https://crex.com/cricket-live-score/nz-vs-ind-1st-t20i-x-14Z"
+    assert nz["format"] == "T20" and nz["url"] == "https://src.test/cricket-live-score/nz-vs-ind-1st-t20i-x-14Z"
     assert women["match_id"] == "ind-w-vs-zim-w-1st-odi-x-1221"
 
 

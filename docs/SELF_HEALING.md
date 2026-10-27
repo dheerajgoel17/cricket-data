@@ -1,4 +1,4 @@
-# When CREX changes and the scraper breaks
+# When Source A changes and the scraper breaks
 
 The scraper is built to say *where* it broke and to degrade rather than stop.
 
@@ -7,7 +7,7 @@ The scraper is built to say *where* it broke and to degrade rather than stop.
 * **Health check** (`cricket-data health`, first step of every scraper run) tests each assumption
   separately: sitemap XML shape/size, a never-changing finished match page (date, teams, winner),
   and the home-page match links. A failure names the layer, gives a fix hint, and saves the raw
-  page CREX returned to `diagnostics/` (uploaded as the `scraper-report-<run>` artifact).
+  page Source A returned to `diagnostics/` (uploaded as the `scraper-report-<run>` artifact).
 * **Sources fail independently**: one broken source never hides the others' results.
 * **Stale index fallback**: if the sitemaps are unreachable, the last cached index is used.
 * **Nothing is guessed**: a changed page makes the strict confirmation fail, so tasks are retried

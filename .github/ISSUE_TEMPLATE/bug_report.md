@@ -5,6 +5,6 @@ labels: bug
 ---
 **What happened?**
 
-**Match / player / date involved** (Cricsheet match id if known):
+**Match / player / date involved** (Base match id if known):
 
 **Command you ran and the output:**

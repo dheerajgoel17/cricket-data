@@ -1,9 +1,9 @@
-"""Find one historical match on CREX and *strictly* confirm it is the right one.
+"""Find one historical match on Source A and *strictly* confirm it is the right one.
 
 The sitemap index (``crex_sitemap``) proposes candidates by date; this module renders each
 candidate page and only accepts it when all of these agree with the task:
 
-* **date**: the page's own ``startDate`` is within one day of the task date (CREX stamps IST, a
+* **date**: the page's own ``startDate`` is within one day of the task date (Source A stamps IST, a
   venue-local date can differ by a day) *and* agrees with the sitemap's ``lastmod``;
 * **teams**: both teams named on the page match the task's two teams (names, not slug codes);
 * **format**: T20 / 50-over / multi-day, from the slug, the competition name, or overs played;
@@ -24,7 +24,7 @@ from .crex_sitemap import CREXSitemapIndex, MatchEntry
 from .models import MatchRecord
 
 # ---- team names / codes --------------------------------------------------------------------------
-NATIONS: dict[str, str] = {  # CREX slug code -> team name
+NATIONS: dict[str, str] = {  # Source A slug code -> team name
     "afg": "Afghanistan", "aus": "Australia", "ban": "Bangladesh", "eng": "England", "ind": "India",
     "ire": "Ireland", "nz": "New Zealand", "pak": "Pakistan", "sa": "South Africa", "sl": "Sri Lanka",
     "wi": "West Indies", "zim": "Zimbabwe", "uae": "United Arab Emirates", "nep": "Nepal",
@@ -36,7 +36,7 @@ NATIONS: dict[str, str] = {  # CREX slug code -> team name
 }
 _QUALIFIERS = {"w", "a", "u19", "u23", "s", "wu19", "emerging"}
 _STOP = {"cricket", "club", "cc", "sc", "the", "xi", "men", "mens", "women", "womens", "and", "of", "association"}
-_ALIASES = {  # extra spellings seen on Cricsheet / CREX
+_ALIASES = {  # extra spellings seen on Base / Source A
     "usa": {"united states of america", "united states", "usa"},
     "uae": {"united arab emirates", "uae"},
     "uga": {"uganda"}, "ugn": {"uganda"},
@@ -176,7 +176,7 @@ class PageFacts:
     scores: str = ""
     toss_winner: str = ""
     toss_decision: str = ""  # bat | field
-    potm_id: str = ""  # CREX player id of the player of the match
+    potm_id: str = ""  # Source A player id of the player of the match
 
     @property
     def start_date(self) -> date | None:
@@ -196,7 +196,7 @@ def _cricsheet_margin(text: str) -> str:
 
 
 def parse_result(headline: str) -> tuple[str, str, str]:
-    """(winner, margin, result) as Cricsheet records them: ('India', '6 wickets', 'win').
+    """(winner, margin, result) as Base records them: ('India', '6 wickets', 'win').
 
     Ties (including ones settled by a super over), draws and no-results have no winner or margin.
     """
@@ -220,7 +220,7 @@ def _potm_id(html: str) -> str:
 
 
 def parse_match_page(html: str, text: str = "", title: str = "", url: str = "") -> PageFacts | None:
-    """Pull the verifiable facts out of a rendered CREX match page. None if it does not look like one."""
+    """Pull the verifiable facts out of a rendered Source A match page. None if it does not look like one."""
     m = _LD_EVENT.search(html or "")
     if not m:
         return None
@@ -348,11 +348,11 @@ def candidates_for(task, index: CREXSitemapIndex, skip_ids: set[str] | None = No
 
 def find_match(task, index: CREXSitemapIndex, browser, max_pages: int = 6,
                skip_ids: set[str] | None = None) -> LookupResult:
-    """Look ``task`` up on CREX. See module docstring for what 'found' and 'not_found' guarantee."""
+    """Look ``task`` up on Source A. See module docstring for what 'found' and 'not_found' guarantee."""
     cands = candidates_for(task, index, skip_ids)
     if not cands:
         lo, hi = index.coverage()
-        return LookupResult("not_found", reason=f"no CREX match within a day of {task.date} with plausible "
+        return LookupResult("not_found", reason=f"no Source A match within a day of {task.date} with plausible "
                                                 f"teams (sitemap covers {lo}..{hi})")
     confirmed: list[tuple[MatchEntry, PageFacts]] = []
     checked: list[str] = []
@@ -391,7 +391,7 @@ _CRICSHEET_TYPE = {"t20": "T20", "t20i": "T20", "it20": "T20", "odi": "ODI", "od
 
 
 def cricsheet_match_type(match_type: str, fam: str, international: bool) -> str:
-    """Use Cricsheet's own match_type vocabulary: T20, ODI, ODM (domestic one-day), Test, MDM (domestic multi-day)."""
+    """Use Base's own match_type vocabulary: T20, ODI, ODM (domestic one-day), Test, MDM (domestic multi-day)."""
     key = (match_type or "").lower().replace(" ", "").replace("-", "")
     mt = _CRICSHEET_TYPE.get(key) or {"t20": "T20", "50": "ODI", "multi": "Test"}[fam]
     if mt == "ODI" and not international:
@@ -430,10 +430,10 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
 
 def fetch_record(browser, entry: MatchEntry, facts: PageFacts, match_date: str, match_type: str = "",
                  status: str = "provisional") -> MatchRecord:
-    """The full Cricsheet-shaped record: match fields plus every player's row from the scorecard page.
+    """The full Base-shaped record: match fields plus every player's row from the scorecard page.
 
     If the scorecard page cannot be read the match is still returned (without players), and the
-    next run of Cricsheet's own data replaces it anyway.
+    next run of Base's own data replaces it anyway.
     """
     from .crex_scorecard import parse_scorecard
 

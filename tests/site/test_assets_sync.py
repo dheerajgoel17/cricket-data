@@ -1,5 +1,6 @@
 import io
 import json
+import os
 
 from cricket_site import assets_sync as s
 
@@ -56,7 +57,8 @@ def test_sync_copies_only_missing_images_and_annotates_photos_json(tmp_path):
     photos = write_photos(tmp_path)
     db = FakeDB(have=[("player", "AAA")])  # AAA already stored
     img = b"x" * 500
-    fetch = fake_fetch({f"{s.CREX_CDN}/players/org/BBB.png": img, f"{s.CREX_CDN}/Teams/O.png": img})
+    cdn = os.environ["IMG_CDN_BASE"]
+    fetch = fake_fetch({f"{cdn}/players/org/BBB.png": img, f"{cdn}/Teams/O.png": img})
     stats = s.sync(photos, None, BASE, "service-key", limit=10, pause=0, http=db, fetch=fetch)
     assert stats["downloaded"] == 2 and stats["already"] == 1 and stats["missing_at_crex"] == 0
     assert set(db.objects) == {"players/BBB.png", "teams/O.png"}

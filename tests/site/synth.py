@@ -1,4 +1,4 @@
-"""Synthetic Cricsheet-shaped matches with hand-known numbers (used by the pytest suite and the JS fixture)."""
+"""Synthetic Base-shaped matches with hand-known numbers (used by the pytest suite and the JS fixture)."""
 from __future__ import annotations
 
 import hashlib

@@ -1,4 +1,4 @@
-"""Upcoming fixtures / schedule from CREX's public sitemap plus each match page's own metadata.
+"""Upcoming fixtures / schedule from Source A's public sitemap plus each match page's own metadata.
 
 The sitemap lists pages for matches that have not been played yet, but only some of them carry a
 real start time in ``<lastmod>`` (unscheduled ones get the time the sitemap was generated). So the
@@ -19,6 +19,7 @@ from pathlib import Path
 
 from .crex_lookup import PageFacts, parse_match_page
 from .crex_sitemap import MatchEntry
+from .hosts import rel
 from .polite import PoliteFetcher
 
 FIELDS = ["start_utc", "match_id", "series", "format", "gender", "team_a", "team_b",
@@ -27,7 +28,7 @@ PLAYED = {"finished", "completed", "abandoned", "cancelled"}
 
 
 def _has_team(entry: MatchEntry, team: str) -> bool:
-    """``team`` is a CREX slug code such as ``aus-w`` or ``ind``."""
+    """``team`` is a Source A slug code such as ``aus-w`` or ``ind``."""
     mid = entry.match_id
     return mid.startswith(f"{team}-vs-") or f"-vs-{team}-" in mid
 
@@ -69,7 +70,7 @@ class Fixture:
             "match_id": e.match_id, "series": e.series_name, "format": _format(e),
             "gender": "female" if e.is_women else "male",
             "team_a": self.facts.team_a, "team_b": self.facts.team_b,
-            "venue": self.facts.venue.replace("''", "'"), "status": self.facts.status, "url": e.url,
+            "venue": self.facts.venue.replace("''", "'"), "status": self.facts.status, "url": rel(e.url),
         }
 
 

@@ -1,7 +1,7 @@
 """Bookmaker / exchange player lines for the site: every two-sided over/under price on a runs, sixes, fours or wickets line.
 
 The pipeline already holds these rows (to price value bets) and used to discard them. ``book_lines`` keeps the ones whose
-player was matched to the Cricsheet registry, so the site can show the market's line and decimal odds on that player's page
+player was matched to the Base registry, so the site can show the market's line and decimal odds on that player's page
 and use the market line as the default. Prices are decimal back prices only; no stake advice is made here.
 """
 from __future__ import annotations

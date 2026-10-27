@@ -1,6 +1,6 @@
-"""Betfair Exchange API with the free *delayed* app key. Optional: env BETFAIR_APP_KEY, BETFAIR_USERNAME,
+"""Exchange B Exchange API with the free *delayed* app key. Optional: env BETFAIR_APP_KEY, BETFAIR_USERNAME,
 BETFAIR_PASSWORD (and optional BETFAIR_SSO_URL / BETFAIR_API_URL for regional endpoints).
-Betfair blocks restricted jurisdictions (the box egresses from the US), so failures are reported, not fatal."""
+Exchange B blocks restricted jurisdictions (the box egresses from the US), so failures are reported, not fatal."""
 import datetime as dt
 import os
 
@@ -20,8 +20,9 @@ def fetch(fetched_at):
     pw = os.environ.get("BETFAIR_PASSWORD")
     if not (app and user and pw):
         raise Skip("BETFAIR_APP_KEY/USERNAME/PASSWORD not set")
-    sso = os.environ.get("BETFAIR_SSO_URL", "https://identitysso.betfair.com/api/login")
-    api = os.environ.get("BETFAIR_API_URL", "https://api.betfair.com/exchange/betting/rest/v1.0")
+    sso, api = os.environ.get("BETFAIR_SSO_URL"), os.environ.get("BETFAIR_API_URL")
+    if not (sso and api):
+        raise Skip("BETFAIR_SSO_URL/API_URL not set")
     hdr = {"X-Application": app, "Content-Type": "application/x-www-form-urlencoded"}
     login, _ = http_json(sso, method="POST", headers=hdr, data={"username": user, "password": pw}, retries=0)
     if login.get("status") != "SUCCESS":

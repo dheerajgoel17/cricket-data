@@ -4,7 +4,7 @@ import { loadFixture } from "./helpers.mjs";
 import { parseQuestion } from "../src/engine/nl.js";
 import { runPlan, sanitizePlan } from "../src/engine/plan.js";
 
-test("names resolve despite typos and Cricsheet-style initials", async () => {
+test("names resolve despite typos and ball-by-ball-style initials", async () => {
   const { rz, store } = await loadFixture();
   const nm = (t) => rz.player(t)?.name;
   assert.equal(nm("Harry Brook"), "HC Brook");

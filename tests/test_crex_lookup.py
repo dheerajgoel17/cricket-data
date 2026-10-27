@@ -114,7 +114,7 @@ def test_parse_match_page_reads_schema_facts():
     assert f.start_date == date(2024, 1, 11)
     assert f.venue.startswith("Punjab Cricket Association")
     assert f.finished
-    assert (f.winner, f.result, f.margin) == ("India", "win", "6 wickets")  # Cricsheet wording
+    assert (f.winner, f.result, f.margin) == ("India", "win", "6 wickets")  # Base wording
     assert f.max_overs == 20.0
 
 
@@ -129,7 +129,7 @@ def test_parse_result_variants():
     assert parse_result("Australia won by an innings and 9 runs 🏆") == ("Australia", "innings 9 runs", "win")
     assert parse_result("India won by 5 wickets (DLS method)") == ("India", "5 wickets", "win")
     assert parse_result("India won by 69 runs") == ("India", "69 runs", "win")
-    # a super-over finish is a tie with no winner or margin, as in Cricsheet
+    # a super-over finish is a tie with no winner or margin, as in Base
     assert parse_result("India won in Super Over 🏆") == ("", "", "tie")
 
 
@@ -218,7 +218,7 @@ def test_find_match_found_renders_only_candidates(index):
 def test_find_match_not_found_without_candidates_renders_nothing(index):
     b = FakeBrowser()
     r = find_match(T("2015-03-01", "Foo", "Bar", "ODI"), index, b)
-    assert r.status == "not_found" and "no CREX match" in r.reason
+    assert r.status == "not_found" and "no Source A match" in r.reason
     assert b.rendered == []
 
 
@@ -394,7 +394,7 @@ def test_health_checks_flag_a_changed_match_page(tmp_path):
 def test_parse_match_page_reads_toss_and_overs_from_embedded_data():
     p = _page("ind_wi_1st_t20_2026")
     f = parse_match_page(p.html, p.text, p.title)
-    assert (f.toss_winner, f.toss_decision) == ("India", "field")  # same as the Cricsheet record
+    assert (f.toss_winner, f.toss_decision) == ("India", "field")  # same as the Base record
     assert f.max_overs == 19.1  # 171/10 in 19.1: a T20, and the all-out innings is not mistaken for 50-over
     assert f.winner == "India" and f.venue.endswith("Lucknow")
 
@@ -422,7 +422,7 @@ def test_render_uses_plain_http_and_falls_back_to_the_browser(monkeypatch):
         b.render("u", wait_selector="script#sports-event-schema")  # tried to start Chromium
 
 
-# ---- Cricsheet-shaped records: match fields + every player -----------------------------------------
+# ---- Base-shaped records: match fields + every player -----------------------------------------
 def _scorecard():
     from cricket_data.crex_scorecard import parse_scorecard
     return parse_scorecard((FIX / "ind_wi_1st_t20_2026_scorecard.html").read_text())
@@ -464,10 +464,10 @@ def test_full_record_has_toss_potm_event_and_players(index):
             assert url.endswith("/match-scorecard")
             return RenderedPage(url, 200, (FIX / "ind_wi_1st_t20_2026_scorecard.html").read_text(), "", "")
 
-    rec = fetch_record(B(), MatchEntry(url="https://crex.com/cricket-live-score/" + slug, match_id=slug,
+    rec = fetch_record(B(), MatchEntry(url="https://src.test/cricket-live-score/" + slug, match_id=slug,
                                        lastmod="2026-10-06T19:00:00+05:30"), facts, "2026-10-06")
-    assert (rec.match_type, rec.team_type, rec.gender) == ("T20", "international", "male")  # Cricsheet vocabulary
-    assert rec.event == "West Indies tour of India"  # no year, as Cricsheet writes it
+    assert (rec.match_type, rec.team_type, rec.gender) == ("T20", "international", "male")  # Base vocabulary
+    assert rec.event == "West Indies tour of India"  # no year, as Base writes it
     assert (rec.toss_winner, rec.toss_decision) == ("India", "field")
     assert (rec.winner, rec.result, rec.result_margin) == ("India", "win", "8 wickets")
     assert rec.player_of_match == "Shreyas Iyer"

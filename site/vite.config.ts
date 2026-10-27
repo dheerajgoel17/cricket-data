@@ -1,12 +1,14 @@
 import path from "node:path";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { loadEnv } from "vite";
 import { defineConfig, type Plugin } from "vitest/config";
 
 /** Dev only: serves /api/* with the same handlers Vercel runs (ask, live). */
 function devApi(): Plugin {
   return {
     name: "dev-api",
+    configResolved(config) { for (const [k, v] of Object.entries(loadEnv(config.mode, config.root, ""))) process.env[k] ??= v; }, // site/.env.local feeds the handlers' process.env
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const name = /^\/api\/([a-z]+)$/.exec((req.url || "").split("?")[0] || "")?.[1];

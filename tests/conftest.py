@@ -1,16 +1,23 @@
 import json
+import os
 import sys
 import zipfile
 from pathlib import Path
 
 import pytest
 
+# Source hosts are deployment configuration, never code: tests point them at placeholder hosts (and ship fixtures that use the same).
+for _k, _v in {"LIVE_SOURCE_BASE": "https://src.test", "LIVE_SITEMAP_DIR": "sitemaps", "IMG_CDN_BASE": "https://img.test", "BASE_DATA_URL": "https://base.test",
+               "PRICE_FEED_URL": "https://price.test/odds?sport=cricket", "EXCHANGE_API_URL": "https://exch.test/v3",
+               "SRC_B_BASE": "https://b.test", "SRC_C_BASE": "https://c.test", "SRC_D_BASE": "https://d.test/v1", "SRC_E_BASE": "https://e.test"}.items():
+    os.environ.setdefault(_k, _v)
+
 sys.path.insert(0, str(Path(__file__).parent))  # shared fixture helpers
 sys.path.insert(0, str(Path(__file__).parent / "site"))  # synthetic-match helpers for the site tests
 
 
 def make_match(date="2026-09-30", teams=("Australia", "South Africa"), runs=30, winner="Australia"):
-    """Minimal Cricsheet-shaped match: one innings, 3 deliveries."""
+    """Minimal Base-shaped match: one innings, 3 deliveries."""
     return {
         "info": {
             "dates": [date], "match_type": "ODI", "team_type": "international", "gender": "male",
