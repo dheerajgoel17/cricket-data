@@ -13,7 +13,7 @@ import urllib.request
 from datetime import datetime, timezone
 
 from .crex_scorecard import unescape_state
-from .hosts import host, state_at
+from .hosts import host, rel, state_at
 
 KEY = "/fixture/getFixture"  # matched against the end of the state keys
 UA = "Mozilla/5.0 (compatible; cricket-data/0.1; +https://github.com/dheerajgoel17/cricket-data)"
@@ -57,7 +57,7 @@ def parse_schedule(html: str) -> list[dict]:
             "gender": "male" if x.get("g") == 1 else "female",  # Source A: g=1 men, g=0 women (India Women have g=0)
             "team_a": x["team1"], "team_b": x["team2"], "venue": x.get("venue", ""),
             "status": "Live" if x.get("status") == 1 else "Upcoming",
-            "url": f"{host('LIVE_SOURCE_BASE')}{link}" if link.startswith("/") else link,
+            "url": rel(link),  # host-relative: committed data names no host
         })
     return sorted(rows, key=lambda r: (r["start_utc"], r["match_id"]))
 
