@@ -105,4 +105,4 @@ The apps are planned natively (Expo / React Native), like props.cash, whose webs
   not hand-built widgets. Check the install diff: the CLI can overwrite `ui/*` files and the `.dark` tokens in `index.css`.
 * Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), targets of at least 44 px on phones, and `env(safe-area-inset-*)`
   for fixed bars (`viewport-fit=cover` is set in `site/index.html`, which iOS needs for the insets to be non-zero).
-* Pinned, because Kibo's table is written for TanStack Table v8: `@tanstack/react-table@8`.
+* The look is iOS-inspired: true black with system grays, translucent materials (blur), large titles, a segmented control, 17 px list rows with inset separators at every width (no data tables), a floating glass tab bar on phones and a translucent source-list sidebar on wide screens.

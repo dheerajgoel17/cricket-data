@@ -14,13 +14,13 @@ function AppSidebar() {
   const { pathname } = useLocation();
   const moreActive = MORE_NAV.some(([, to]) => pathname.startsWith(to));
   return (
-    <Sidebar variant="inset" collapsible="icon" aria-label="Main" className="top-[60px] hidden h-[calc(100svh-60px)] md:block">
+    <Sidebar collapsible="icon" aria-label="Main" className="top-[60px] hidden h-[calc(100svh-60px)] border-0 md:block [&_[data-sidebar=sidebar]]:bg-white/[0.035] [&_[data-sidebar=sidebar]]:backdrop-blur-2xl [&_[data-sidebar=sidebar]]:backdrop-saturate-150">
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
             {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
               <SidebarMenuItem key={to}>
-                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-10 text-[15px] font-medium data-[active=true]:text-primary">
+                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-11 rounded-xl text-[17px] font-medium data-[active=true]:bg-white/10 data-[active=true]:text-foreground [&[data-active=true]>svg]:text-primary [&>svg]:size-[22px]">
                   <NavLink to={to}><Icon /><span>{label}</span></NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -28,7 +28,7 @@ function AppSidebar() {
             <Collapsible asChild defaultOpen={moreActive} className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="More" className="h-10 text-[15px] font-medium"><MoreHorizontal /><span>More</span><ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
+                  <SidebarMenuButton tooltip="More" className="h-11 rounded-xl text-[17px] font-medium [&>svg]:size-[22px]"><MoreHorizontal /><span>More</span><ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
@@ -80,9 +80,9 @@ export function Shell() {
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
-        <SidebarInset className="min-w-0 overflow-x-clip border border-white/5 bg-[#0b0b0c] md:peer-data-[variant=inset]:min-h-[calc(100svh-60px-1rem)]">
+        <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="min-w-0 px-4 pb-8 md:px-8">
+            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-4 pb-10 md:px-6">
               <Outlet />
             </motion.main>
           </AnimatePresence>

@@ -46,12 +46,12 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="lg" eager /><b className="max-w-full text-base font-semibold leading-tight">{name}</b></>;
+    const body = <><TeamBadge name={name} size="lg" eager /><b className="max-w-full text-[17px] font-semibold leading-tight">{name}</b></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="grid min-w-0 justify-items-center gap-2.5">{body}</Link> : <div className="grid min-w-0 justify-items-center gap-2.5">{body}</div>;
   };
   return (
     <section className="pt-3">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-1 grid size-11 place-items-center rounded-full bg-card active:bg-accent"><ChevronLeft className="size-5" /></button>
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-2 text-[17px] text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-7" strokeWidth={2.4} />Back</button>
       <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-center">
         {team(f.a, f.a_ix)}
         <div className="grid justify-items-center gap-1.5">

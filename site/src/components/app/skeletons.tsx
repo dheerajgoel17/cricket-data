@@ -5,12 +5,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 /** Props / trends list rows: photo, two text lines, edge, bars. */
 export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div aria-hidden className="-mx-4 sm:mx-0">
+    <div aria-hidden className="-mx-4 md:-mx-6">
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="flex items-center gap-3 px-3 py-3 sm:h-[62px] sm:px-1" style={{ opacity: 1 - i * 0.1 }}>
-          <Skeleton className="size-10 shrink-0 rounded-full" />
+        <div key={i} className="flex min-h-[68px] items-center gap-3 px-4 py-3" style={{ opacity: 1 - i * 0.1 }}>
+          <Skeleton className="size-11 shrink-0 rounded-full" />
           <div className="grid flex-1 gap-2"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-24" /></div>
-          <Skeleton className="hidden h-3.5 w-10 sm:block" /><Skeleton className="h-9 w-[84px] rounded-md sm:w-[104px]" />
+          <Skeleton className="h-9 w-[84px] rounded-md sm:w-[104px]" />
         </div>
       ))}
     </div>

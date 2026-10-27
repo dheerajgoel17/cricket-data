@@ -54,8 +54,8 @@ export function Header() {
         <SidebarTrigger className="-ml-2 hidden md:inline-flex" aria-label="Toggle sidebar" />
         {/* phones: centred logo with search and profile icons (props.cash style); md+: logo left, search field centred */}
         <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"><Brand /></div>
-        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:flex md:absolute md:left-1/2 md:w-full md:max-w-[620px] md:-translate-x-1/2" />
-        <div className="ml-auto flex items-center gap-2">
+        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[560px] md:flex-1" />
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-11 place-items-center rounded-full bg-secondary md:hidden"><Search className="size-[18px]" /></button>
           <Profile />
         </div>

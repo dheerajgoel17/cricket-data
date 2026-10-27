@@ -23,9 +23,9 @@ export function useSearchDialog() {
 /** The header field: a read-only shadcn InputGroup that opens the dialog. */
 export function SearchField({ onOpen, className = "" }: { onOpen: () => void; className?: string }) {
   return (
-    <InputGroup className={`h-10 cursor-pointer rounded-full bg-input/90 ${className}`} onClick={onOpen}>
+    <InputGroup className={`h-9 cursor-pointer rounded-[10px] border-0 bg-white/10 ${className}`} onClick={onOpen}>
       <InputGroupAddon><Search /></InputGroupAddon>
-      <InputGroupInput readOnly placeholder="Search players, teams" aria-label="Search" className="cursor-pointer" onFocus={onOpen} />
+      <InputGroupInput readOnly placeholder="Search" aria-label="Search" className="cursor-pointer text-[17px]" onFocus={onOpen} />
       <InputGroupAddon align="inline-end"><Kbd>⌘K</Kbd></InputGroupAddon>
     </InputGroup>
   );

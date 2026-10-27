@@ -6,7 +6,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenu
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { RowsSkeleton } from "./skeletons";
-import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -76,25 +75,25 @@ function useHotRows() {
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
-/** Phone row built from shadcn Item parts (props.cash list style): photo, name and line, then the hit rate over the last-10 bars and the edge. */
-function MobileRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
+/** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
+function PropRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
   return (
-    <motion.li className="relative after:absolute after:bottom-0 after:left-[68px] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    <motion.li className="relative after:absolute after:bottom-0 after:left-[72px] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 transition-colors active:bg-card">
+      <Item asChild size="sm" className="min-h-[68px] rounded-none border-0 px-4 py-3 transition-colors active:bg-card">
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
-          <ItemMedia><PlayerBadge idx={r.idx} size="md" /></ItemMedia>
+          <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-11" /></ItemMedia>
           <ItemContent className="min-w-0 gap-0.5">
-            <ItemTitle className="max-w-full"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
-            <ItemDescription className="truncate text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></ItemDescription>
+            <ItemTitle className="max-w-full text-[17px] font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
+            <ItemDescription className="truncate text-[15px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></ItemDescription>
           </ItemContent>
-          <ItemActions className="gap-3">
+          <ItemActions className="gap-2.5">
             <span className="grid justify-items-end text-right">
-              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground">EDGE</span>
-              <span className={cn("text-sm font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+              <span className="text-[11px] font-semibold tracking-wider text-muted-foreground">EDGE</span>
+              <span className={cn("text-base font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
             <span className="grid justify-items-end gap-0.5">
-              <span className={cn("text-[11px] font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
+              <span className={cn("text-xs font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
               {bars && <Spark r={r} />}
             </span>
           </ItemActions>
@@ -121,26 +120,6 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
-  const columns = useMemo<ColumnDef<Row>[]>(() => {
-    const head = (title: string) => ({ column }: { column: any }) => <TableColumnHeader column={column} title={title} />;
-    const rate = (id: string, title: string, get: (r: Row) => any, tip?: boolean): ColumnDef<Row> => ({ id, accessorFn: (r) => get(r).p ?? -1, header: head(title), sortUndefined: "last",
-      cell: ({ row }) => { const w = get(row.original); return <span className={cn("font-medium tabular-nums", pctClass(w.p))} title={tip && w.played ? `${w.hits} of ${w.played} vs ${row.original.opp}` : undefined}>{pct(w.p)}</span>; } });
-    return [
-      { id: "player", accessorFn: (r) => r.name, header: head("Lines"), cell: ({ row: { original: r } }) => (
-        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 outline-none focus-visible:underline">
-          <PlayerBadge idx={r.idx} size="md" />
-          <span className="min-w-0"><b className="flex items-center gap-1.5 text-[15px] font-medium"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></b>
-            <span className="text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}</span></span></span>
-        </Link>) },
-      { id: "chart", header: "L10 chart", enableSorting: false, cell: ({ row }) => <Spark r={row.original} /> },
-      { id: "odds", accessorFn: (r) => r.over, header: head("Price"), cell: ({ row }) => <span className="tabular-nums">{odds(row.original.over)}</span> },
-      rate("win", wl, (r) => r[win]),
-      rate("season", String(new Date().getFullYear()), (r) => r.season),
-      rate("h2h", "H2H", (r) => r.h2h, true),
-      { id: "matchup", header: "Matchup", enableSorting: false, cell: ({ row: { original: r } }) => <span title={r.match}><TeamFlag name={r.opp} className="h-5 w-7" /></span> },
-      { id: "edge", accessorFn: (r) => r.edge ?? -9, header: head("Edge"), cell: ({ row: { original: r } }) => <span className={cn("font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span> },
-    ];
-  }, [win, wl]);
   return (
     <section aria-label="Hot player props today">
       {!teams && <div className="pt-8 md:pt-10"><h1 className="text-[32px] font-bold leading-tight tracking-[-0.022em] md:text-[34px]">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
@@ -166,19 +145,13 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
           <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1 sm:w-fit sm:flex-none" />
         </div>
       )}
-      <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
+      <div className="mt-3">
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
-          <>
-          <ul className="sm:hidden">
+          <ul className="-mx-4 md:-mx-6">
             <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} />)}
+              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} />)}
             </AnimatePresence>
           </ul>
-          <TableProvider key={`${win}-${stat}-${day}`} columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
-            <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 text-[13px] font-medium text-muted-foreground" />}</TableHeaderGroup>}</TableHeader>
-            <TableBody className="rows-stagger">{({ row }) => <TableRow key={row.id} row={row} className="h-[62px]">{({ cell }) => <TableCell key={cell.id} cell={cell} />}</TableRow>}</TableBody>
-          </TableProvider>
-          </>
         )}
       </div>
     </section>
