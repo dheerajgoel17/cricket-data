@@ -50,7 +50,8 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const clockLive = timed && ms <= 0 && ms > -4 * 3600e3;
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const live = hasScore || clockLive;
+  const final = match?.status === "final";
+  const live = !final && (hasScore || clockLive);
   const status = liveBlurb(match) || (live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -59,7 +60,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 py-0 shadow-none ring-1 ring-white/5 transition group-hover:bg-[#232325]">
         <div className="flex h-full flex-col gap-stack p-inset">
           <div className="flex items-center gap-tight">
-            {live ? <Badge variant="destructive" className="gap-tight px-2.5 py-hair text-caption font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-hair text-caption font-semibold uppercase tracking-wider">Upcoming</Badge>}
+            {live ? <Badge variant="destructive" className="gap-tight px-2.5 py-hair text-caption font-semibold uppercase tracking-wider"><span className="size-1.5 animate-pulse rounded-full bg-white" />Live</Badge> : <Badge variant="secondary" className="px-2.5 py-hair text-caption font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</Badge>}
             <Badge variant="outline" className="px-2.5 py-hair text-caption font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
             {city(f.venue) && <span className="ml-auto min-w-0 truncate text-footnote font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
           </div>
