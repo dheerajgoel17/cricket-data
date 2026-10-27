@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Link } from "react-router-dom";
+import { Bookmark } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
@@ -12,10 +13,12 @@ import { fmtIndex } from "@/engine/util.js";
 import { barState, windowRate } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
-import { abbr, odds } from "@/lib/format";
+import { useSaved } from "@/lib/saved";
+import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { PillTabs } from "./pill-tabs";
-import { PlayerBadge, TeamBadge } from "./badges";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { PlayerBadge, TeamFlag } from "./badges";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
@@ -78,25 +81,29 @@ function Spark({ r }: { r: Row }) {
   );
 }
 
-/** Phone row, props.cash style: photo, name and line on the left, edge and the last-10 bars on the right. */
+/** Phone row built from shadcn Item parts (props.cash list style): photo, name and line, then the hit rate over the last-10 bars and the edge. */
 function MobileRow({ r, win, wl }: { r: Row; win: Win; wl: string }) {
   return (
-    <li className="relative">
-      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 px-3 py-3 active:bg-muted">
-        <PlayerBadge idx={r.idx} size="md" />
-        <span className="min-w-0 flex-1">
-          <b className="block truncate text-[15px] font-semibold">{r.name} <span className="font-condensed text-xs font-normal uppercase tracking-wide text-muted-foreground">{abbr(r.team)}</span></b>
-          <span className="block truncate text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></span>
-        </span>
-        <span className="grid shrink-0 justify-items-end text-right">
-          <span className="text-[10px] font-semibold tracking-wider text-muted-foreground">EDGE</span>
-          <span className={cn("text-sm font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-        </span>
-        <span className="grid shrink-0 justify-items-end gap-0.5">
-          <span className={cn("text-[11px] font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
-          <Spark r={r} />
-        </span>
-      </Link>
+    <li>
+      <Item asChild size="sm" className="rounded-none border-0 px-3 py-3 active:bg-muted">
+        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
+          <ItemMedia><PlayerBadge idx={r.idx} size="md" /></ItemMedia>
+          <ItemContent className="min-w-0 gap-0.5">
+            <ItemTitle className="max-w-full"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
+            <ItemDescription className="truncate text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></ItemDescription>
+          </ItemContent>
+          <ItemActions className="gap-3">
+            <span className="grid justify-items-end text-right">
+              <span className="text-[10px] font-semibold tracking-wider text-muted-foreground">EDGE</span>
+              <span className={cn("text-sm font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+            </span>
+            <span className="grid justify-items-end gap-0.5">
+              <span className={cn("text-[11px] font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
+              <Spark r={r} />
+            </span>
+          </ItemActions>
+        </Link>
+      </Item>
     </li>
   );
 }
@@ -108,6 +115,7 @@ export function HotProps() {
   const { data, isLoading } = useHotRows();
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
+  const saved = useSaved();
   const tabs = useMemo(() => {
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
@@ -123,7 +131,7 @@ export function HotProps() {
       { id: "player", accessorFn: (r) => r.name, header: head("Lines"), cell: ({ row: { original: r } }) => (
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 outline-none focus-visible:underline">
           <PlayerBadge idx={r.idx} size="md" />
-          <span className="min-w-0"><b className="block truncate text-[15px] font-medium">{r.name}<span className="ml-1.5 font-condensed text-xs font-normal uppercase tracking-wide text-muted-foreground">{abbr(r.team)}</span></b>
+          <span className="min-w-0"><b className="flex items-center gap-1.5 text-[15px] font-medium"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></b>
             <span className="text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}</span></span></span>
         </Link>) },
       { id: "chart", header: "L10 chart", enableSorting: false, cell: ({ row }) => <Spark r={row.original} /> },
@@ -131,7 +139,7 @@ export function HotProps() {
       rate("win", wl, (r) => r[win]),
       rate("season", String(new Date().getFullYear()), (r) => r.season),
       rate("h2h", "H2H", (r) => r.h2h, true),
-      { id: "matchup", header: "Matchup", enableSorting: false, cell: ({ row: { original: r } }) => <span className="flex items-center gap-2 text-sm" title={r.match}><TeamBadge name={r.opp} size="xs" />{abbr(r.opp)}</span> },
+      { id: "matchup", header: "Matchup", enableSorting: false, cell: ({ row: { original: r } }) => <span title={r.match}><TeamFlag name={r.opp} className="h-5 w-7" /></span> },
       { id: "edge", accessorFn: (r) => r.edge ?? -9, header: head("Edge"), cell: ({ row: { original: r } }) => <span className={cn("font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span> },
     ];
   }, [win, wl]);
@@ -141,10 +149,20 @@ export function HotProps() {
         <div><h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Hot Player Props</h1>
           <p className="mt-1 text-sm text-muted-foreground">Today's bookmaker lines, ranked by hit rate · {new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</p></div>
       </div>
-      <ToggleGroup type="single" value={win} onValueChange={(v) => v && setWin(v as Win)} variant="outline" spacing={0} className="mt-3 w-full rounded-full border bg-card p-1 sm:w-fit" aria-label="Hit-rate window">
+      <ToggleGroup type="single" value={win} onValueChange={(v) => v && setWin(v as Win)} variant="outline" spacing={0} className="mt-3 h-11 w-full rounded-full border bg-card p-1 sm:w-fit" aria-label="Hit-rate window">
         {WINS.map(([k, l]) => <ToggleGroupItem key={k} value={k} className="h-9 flex-1 rounded-full border-0 px-4 text-sm data-[state=on]:bg-accent sm:flex-none">{l}</ToggleGroupItem>)}
       </ToggleGroup>
-      {tabs.length > 1 && <PillTabs scrollable layoutId="hot-stat" tabs={tabs} value={stat} onChange={setStat} className="mt-2" />}
+      {tabs.length > 1 && (
+        <div className="mt-2 flex items-center gap-2">
+          <Link to="/saved" aria-label={`Saved (${saved.list.length})`} className="relative grid size-11 shrink-0 place-items-center rounded-full border bg-card transition-colors hover:bg-accent"><Bookmark className="size-[18px]" />
+            {saved.list.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{saved.list.length}</span>}</Link>
+          <Tabs value={stat} onValueChange={setStat} className="min-w-0 flex-1 sm:flex-none">
+            <TabsList className="h-11 w-full justify-start gap-0 overflow-x-auto rounded-full border bg-card p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-fit">
+              {tabs.map(([k, l]) => <TabsTrigger key={k} value={k} className="h-9 flex-none rounded-full px-4 text-sm data-[state=active]:bg-accent">{l}</TabsTrigger>)}
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
       <div className="-mx-4 mt-2 border-t sm:mx-0 sm:border-t-0">
         {isLoading ? <Skel /> : !rows.length ? <p className="p-6 text-sm text-muted-foreground">No bookmaker player lines for today yet. They appear a few hours before each match.</p> : (
           <>

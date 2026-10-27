@@ -25,6 +25,18 @@ export function TeamBadge({ name, size = "sm", className }: { name: string; size
   return <Circle size={size} className={className}><Img urls={urls} alt="" className="size-full object-cover" fallback={initials(name)} /></Circle>;
 }
 
+/** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the CREX logo, else the initials; the name goes in the tooltip. */
+export function TeamFlag({ name, className }: { name: string; className?: string }) {
+  const { photos } = useData();
+  const flag = flagUrl(name, 80);
+  const urls = [flag, ...teamLogos(photos, name)].filter(Boolean) as string[];
+  return (
+    <span title={name} className={cn("inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-secondary text-[8px] font-bold text-muted-foreground ring-1 ring-inset ring-white/10", className)}>
+      <Img urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} />
+    </span>
+  );
+}
+
 const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="mt-[14%] size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */

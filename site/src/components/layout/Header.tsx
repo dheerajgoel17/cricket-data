@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Bookmark, BookOpen, Info, MessageSquare, Search, Wrench, X } from "lucide-react";
+import { Bookmark, BookOpen, Info, MessageSquare, Search, Wrench } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSaved } from "@/lib/saved";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { GlobalSearch } from "./GlobalSearch";
+import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 
 /** Props.Cash wordmark: three rising bars + "Props.Cash". Inline SVG so it stays crisp and needs no asset. */
 export function Brand() {
@@ -48,20 +47,20 @@ function Profile() {
 
 /** Top bar: logo left, search centred on the page, profile right. Glass blur with a faint green glow line underneath. */
 export function Header() {
-  const [searching, setSearching] = useState(false);
+  const search = useSearchDialog();
   return (
     <header className="sticky top-0 z-50 h-14 border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-saturate-150 md:h-[60px]">
       <div className="relative mx-auto flex h-full items-center gap-3 px-4 md:px-6">
         <SidebarTrigger className="-ml-2 hidden md:inline-flex" aria-label="Toggle sidebar" />
-        {/* phones: centred logo with search and menu icons (props.cash style); search opens as a full-width bar */}
-        <div className={searching ? "hidden" : "absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"}><Brand /></div>
-        <GlobalSearch className={searching ? "w-full md:absolute md:left-1/2 md:max-w-[620px] md:-translate-x-1/2" : "hidden md:block md:absolute md:left-1/2 md:w-full md:max-w-[620px] md:-translate-x-1/2"} />
-        {searching && <button type="button" aria-label="Close search" onClick={() => setSearching(false)} className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary md:hidden"><X className="size-4" /></button>}
-        {!searching && <div className="ml-auto flex items-center gap-2">
-          <button type="button" aria-label="Search" onClick={() => setSearching(true)} className="grid size-9 place-items-center rounded-full bg-secondary md:hidden"><Search className="size-[18px]" /></button>
+        {/* phones: centred logo with search and profile icons (props.cash style); md+: logo left, search field centred */}
+        <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"><Brand /></div>
+        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:flex md:absolute md:left-1/2 md:w-full md:max-w-[620px] md:-translate-x-1/2" />
+        <div className="ml-auto flex items-center gap-2">
+          <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-11 place-items-center rounded-full bg-secondary md:hidden"><Search className="size-[18px]" /></button>
           <Profile />
-        </div>}
+        </div>
       </div>
+      <SearchDialog open={search.open} onOpenChange={search.setOpen} />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     </header>
   );
