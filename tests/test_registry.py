@@ -2,7 +2,7 @@ import json
 
 from cricket_data.cli import main
 from cricket_data.models import MatchRecord, PlayerPerf
-from cricket_data.registry import build_rosters, freshness, iter_combined, link_players, resolve
+from cricket_data.registry import build_rosters, freshness, iter_combined, link_players, minted_id, resolve
 from cricket_data.store import Store
 
 
@@ -52,6 +52,34 @@ def test_link_players_fills_ids_and_reports(tmp_path):
     rep = (tmp_path / "provisional_unmatched.csv").read_text()
     assert "Nobody Known" in rep and "Harry Brook" not in rep
     assert ("england", "male") in build_rosters(store)
+
+
+def _prov_side(store, mid, team, names, gender="male"):
+    p = _prov(store, mid=mid, names=names)
+    d = json.loads(p.read_text())
+    d["gender"], d["team_a"] = gender, team
+    for pl in d["players"]:
+        pl["team"] = team
+    p.write_text(json.dumps(d))
+    return p
+
+
+def test_link_players_mints_ids_for_a_side_base_has_no_roster_of(tmp_path):
+    """Afghanistan has no Base roster: its players get one stable id each (the Base id when the exact full name is a Base player), not a blank."""
+    store = Store(tmp_path)
+    _canon(store)
+    a = _prov_side(store, "crex-afg-1", "Afghanistan", ("Rahmanullah Gurbaz", "JE Root"))
+    b = _prov_side(store, "crex-afg-2", "Afghanistan", ("Rahmanullah Gurbaz",))
+    w = _prov_side(store, "crex-afgw-1", "Afghanistan Women", ("Rahmanullah Gurbaz",), gender="female")
+    st = link_players(store)
+    ids = lambda p: [x["player_id"] for x in json.loads(p.read_text())["players"]]  # noqa: E731
+    gurbaz, root = ids(a)
+    assert gurbaz == ids(b)[0] == minted_id("Rahmanullah Gurbaz") and len(gurbaz) == 8
+    assert root == "a343262c", "a Base player with this exact name keeps his Base id"
+    assert ids(w)[0] != gurbaz, "the women's side is its own pool"
+    assert st["unmatched"] == 0 and st["minted"] == 3
+    assert "Gurbaz" not in (tmp_path / "provisional_unmatched.csv").read_text()
+    assert link_players(store)["already"] == 4, "a second run leaves every id as it is"
 
 
 def test_combined_dedupes_when_cricsheet_lands(tmp_path):

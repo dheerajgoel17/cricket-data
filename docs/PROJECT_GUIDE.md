@@ -47,7 +47,8 @@ AGENTS.md CLAUDE.md   instructions for AI coding agents (any IDE)
   publishes the same fixture (same teams, +/-1 day) and is logged in `data/reconcile_log.csv`. Permanent classes (`cricsheet_missing`, `cricsheet_withheld`) are kept. See
   [PROVISIONAL.md](PROVISIONAL.md), [PERMANENT_MATCHES.md](PERMANENT_MATCHES.md).
 * **Player ids**: `cricket-data link-players` fills Base registry ids ("Harry Brook" -> `4ae1755b`) into provisional files using `data/mappings/player_aliases.csv`; unmatched names land in
-  `data/provisional_unmatched.csv`.
+  `data/provisional_unmatched.csv`. A side Base has no roster for at all (Afghanistan, many associates) gets the Base id of the one player with exactly that full name on any team, else a minted id
+  (`registry.minted_id`: 8 hex of the full name and gender, stable across runs), so its matches build a history and the books' lines for its players can be matched; a Base id found later goes in `player_aliases.csv`.
 * **Fixtures**: `cricket-data fixtures` reads Source A's `/schedule` page (server-rendered state with the next ~20 matches) every scraper run; it never overwrites the file with an empty result. The older sitemap crawl (`--sitemap`) surfaced stale placeholder pages and is no longer the default.
 * **Linking scraped players**: besides `link-players`, the site builder links still-unlinked scraped names through Source A's full-name list (e.g. Afghanistan, whose matches Base withholds): ~1.7k extra rows.
 * **Source A scraper**: `crex_*.py`, `scrapers.py` (Playwright for pages, plain HTTP for the Source A sitemaps; see [SCRAPER.md](SCRAPER.md), [SCRAPING_REALITY.md](SCRAPING_REALITY.md), [SELF_HEALING.md](SELF_HEALING.md)).
