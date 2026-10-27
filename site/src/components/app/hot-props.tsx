@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineVerdict, livePlayer, liveState, liveStat, notInXI } from "@/engine/live.js";
-import { bookLinesFor } from "@/engine/lines.js";
+import { bookLinesFor, sameFixture } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
 import { fmtIndex } from "@/engine/util.js";
@@ -51,13 +51,14 @@ function useHotRows(archive?: any, teams?: [string, string]) {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
       const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && l.books?.length && (archive ? sameMatch(l.match, teams!) : dayOffset(l.start_utc) >= -1 && Date.parse(l.start_utc) > now - 40 * 3600e3)) };
+      // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
       const keys = new Map<string, any>();
-      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}`, l);
+      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${l.start_utc}`, l);
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const work = [...keys.values()].map((l) => async () => {
         const idx = store.P.id.indexOf(l.pid);
-        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3);
+        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt }, split_by: [] }, { playerIdx: idx });
@@ -121,8 +122,9 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
 
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, archive }: { teams?: [string, string]; archive?: any } = {}) {
+export function HotProps({ teams, start, archive }: { teams?: [string, string]; start?: string; archive?: any } = {}) {
   const { data: all, isLoading } = useHotRows(archive, teams);
+  const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start }, { a: teams![0], b: teams![1], start }); // this match: the same two sides and the same start, not the series' next game
   const live = useLiveDoc();
   // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
   const onFixture = !!teams;
@@ -155,9 +157,9 @@ export function HotProps({ teams, archive }: { teams?: [string, string]; archive
   }, [data]);
   const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
-  const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
-  const priced = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) : true)), [data, teams]);
+  const rows = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start]);
+  const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
   if (!isLoading && !priced.length) return null;
   return (
     <section aria-label="Hot player props today" className="flex flex-col gap-stack">
@@ -199,7 +201,7 @@ export function HotProps({ teams, archive }: { teams?: [string, string]; archive
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
             </AnimatePresence>
           </ul>
         )}

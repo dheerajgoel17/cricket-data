@@ -47,7 +47,7 @@ function startMs(fixture) {
 }
 
 /** Same two sides, starts within 14 h. Player lines use `match`; fancy uses home/away. */
-function sameFixture(line, fixture) {
+export function sameFixture(line, fixture) {
   const a = teamKey(fixture?.a), b = teamKey(fixture?.b);
   if (!a || !b) return false;
   let x = "", y = "";
