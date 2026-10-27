@@ -8,11 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
+import { liveForFixture, livePlayer, liveStat } from "@/engine/live.js";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
 import { fmtIndex } from "@/engine/util.js";
 import { barState, windowRate } from "@/engine/windows.js";
+import { useLiveDoc } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
 import { odds } from "@/lib/format";
@@ -79,7 +81,7 @@ function useHotRows() {
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
-function PropRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: boolean; i: number }) {
+function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: number | null }) {
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
@@ -88,7 +90,7 @@ function PropRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: 
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
-            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span></ItemDescription>
+            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar > r.line ? "text-primary" : "text-muted-foreground")}> · {soFar} so far</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
@@ -110,6 +112,11 @@ function PropRow({ r, win, wl, bars, i }: { r: Row; win: Win; wl: string; bars: 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
 export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const { data, isLoading } = useHotRows();
+  const live = useLiveDoc();
+  const soFarOf = (r: Row) => {
+    const [a, b] = String(r.match).split(/\s+vs\s+/i);
+    return liveStat(livePlayer(liveForFixture(live.data, { a, b, start: r.start }), r.name), r.stat);
+  };
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
   const [day, setDay] = useState("0");
@@ -123,6 +130,8 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
+  const priced = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) : true)), [data, teams]);
+  if (!isLoading && !priced.length) return null;
   return (
     <section aria-label="Hot player props today" className="flex flex-col gap-stack">
       {!teams && <div><h1 className="text-display font-bold">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
@@ -160,10 +169,10 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
         </Sheet>
       </div>
       <AnimatedHeight>
-        {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">{teams ? "The books have not priced player props for this match yet. Lines usually appear a few hours before the start." : "No bookmaker player lines for this day yet. They appear a few hours before each match."}</p> : (
+        {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} />)}
+              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} />)}
             </AnimatePresence>
           </ul>
         )}

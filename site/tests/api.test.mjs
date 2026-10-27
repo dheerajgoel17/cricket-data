@@ -83,3 +83,58 @@ test("without a key the endpoint says so (the site then uses its built-in parser
   assert.equal((await call({ question: "q" }, { ip: "9.9.9.7" })).code, 503);
   process.env.GEMINI_API_KEY = k;
 });
+
+const { default: liveHandler } = await import("../api/live.js");
+const HEADER = {
+  sports: [{ leagues: [{ id: "19439", events: [{
+    id: "1", date: "2026-10-27T09:00:00Z", eventType: "ODI", class: { eventType: "ODI", generalClassCard: "ODI" },
+    status: "in", fullStatus: { summary: "NED 10/0", battingTeamId: 7, type: { state: "in" } },
+    competitors: [
+      { id: 7, displayName: "Netherlands", abbreviation: "NED", score: "10/0 (2.0 ov)" },
+      { id: 8, displayName: "Oman", abbreviation: "OMA", score: "" },
+    ],
+  }, {
+    id: "2", date: "2026-10-27T05:30:00Z", eventType: "ODI", class: { eventType: "ODI", generalClassCard: "ODI" },
+    status: "in", fullStatus: { summary: "Starts at 09:30 local time", type: { state: "in" } },
+    competitors: [
+      { id: 9, displayName: "Oman Under-19s", abbreviation: "Omn19", score: "" },
+      { id: 10, displayName: "Afghanistan Under-19s", abbreviation: "AFG19", score: "" },
+    ],
+  }] }] }],
+};
+const BOOKS = { fancy: [{ match: "Netherlands vs Oman", start_utc: "2026-10-27T09:00:00Z" }] };
+const SUMMARY = { matchcards: [{ headline: "Batting", typeID: "11", inningsNumber: 1, teamName: "Netherlands", runs: "10", total: "(0 wkts; 2 ovs)",
+  playerDetails: [{ playerID: "1", playerName: "Vikramjit Singh", dismissal: "not out", runs: "6", ballsFaced: "8", fours: "1", sixes: "0" }] }] };
+
+function callLive(method = "GET") {
+  return new Promise((resolve) => {
+    const res = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, json(o) { resolve({ code: this.code, headers: this.headers, body: o }); } };
+    liveHandler({ method, headers: {}, socket: {} }, res);
+  });
+}
+
+test("GET /api/live returns compact scores and player so-far, then reuses the snapshot", async () => {
+  globalThis.fetch = async (url) => {
+    seen.push({ url: String(url), init: {} });
+    const u = String(url);
+    if (u.includes("scoreboard/header")) return { ok: true, status: 200, json: async () => HEADER };
+    if (u.includes("book_lines.json")) return { ok: true, status: 200, json: async () => BOOKS };
+    if (u.includes("/summary?")) return { ok: true, status: 200, json: async () => SUMMARY };
+    return { ok: false, status: 404, json: async () => ({}) };
+  };
+  const r = await callLive();
+  assert.equal(r.code, 200);
+  assert.equal(r.body.source, "espn");
+  assert.equal(r.body.matches.length, 1);
+  assert.equal(r.body.matches[0].teams[0].name, "Netherlands");
+  assert.equal(r.body.matches[0].teams[0].runs, 10);
+  assert.equal(r.body.matches[0].players[0].runs, 6);
+  assert.ok(seen.some((s) => s.url.includes("event=1")));
+  assert.ok(!seen.some((s) => s.url.includes("event=2")));
+  assert.match(r.headers["Cache-Control"], /s-maxage=15/);
+  assert.ok(seen.some((s) => s.url.includes("scoreboard/header")));
+  const n = seen.length;
+  await callLive();
+  assert.equal(seen.length, n);
+  assert.equal((await callLive("POST")).code, 405);
+});

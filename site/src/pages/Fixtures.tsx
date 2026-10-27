@@ -12,19 +12,23 @@ import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
+import { liveBlurb, teamScore } from "@/engine/live.js";
 import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
+import { fixtureBooks } from "@/engine/lines.js";
 import { useFixtures, usePricedFixtures } from "@/hooks/useEngine";
+import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
+import { LiveScore } from "@/components/app/fixture-card";
+import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
 import { LiveFeed } from "@/components/app/live-feed";
 import { AnimatedHeight } from "@/components/app/animated-height";
-import { RecentForm } from "@/components/app/recent-form";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
@@ -51,28 +55,46 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const clock = useMatchClock(when, timed);
+  const { match } = useLiveMatch(f);
+  const scores = [teamScore(match, f.a), teamScore(match, f.b)];
+  const hasScore = scores.some((s) => s?.display);
+  const on = hasScore || clock.tone === "live";
+  const blurb = liveBlurb(match);
   const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 text-title font-bold leading-tight tracking-tight">{name}</span></>;
-    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 items-center gap-snug">{body}</div>;
+    const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
+    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
   };
+  const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   return (
     <section className="flex flex-col gap-stack">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
       <div className="flex items-center gap-snug">
-        <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", clock.tone === "live" ? "text-miss" : "text-muted-foreground")}>
-          {clock.tone === "live" && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{clock.label}
+        <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", on ? "text-miss" : "text-muted-foreground")}>
+          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
       </div>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
-        <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
-        <div className="grid justify-items-end gap-hair text-right">
-          <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
-          <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", clock.tone === "live" && "text-miss")}>{clock.value}</b>
+      {hasScore ? (
+        <div className="grid gap-stack">
+          {sides.map(([name, ix], i) => (
+            <div key={name} className="flex min-w-0 items-center gap-snug">
+              {team(name, ix)}
+              <LiveScore s={scores[i]} size="lg" />
+            </div>
+          ))}
         </div>
-      </div>
-      <p className="text-callout text-muted-foreground">{[f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
+      ) : (
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
+          <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
+          <div className="grid justify-items-end gap-hair text-right">
+            <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
+            <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{clock.value}</b>
+          </div>
+        </div>
+      )}
+      <p className="text-callout text-muted-foreground">{[blurb, f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
+      {hasScore && <LiveBoard match={match} teams={sides} />}
     </section>
   );
 }
@@ -101,14 +123,16 @@ export function FixturePage() {
   const { "*": id = "" } = useParams();
   const [q, setQ] = useQ();
   const { data: all, isLoading } = useFixtures();
-  const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
+  const { fixtures: pricedFx, priced, ready, doc } = usePricedFixtures();
   const fx = (all || []).find((f) => f.id === id);
   const live = !!fx && priced && pricedFx.some((p) => p.id === fx.id);
+  const { match } = useLiveMatch(fx);
+  const books = fixtureBooks(doc, fx);
   const fmt = FORMATS.includes(q.fmt) ? q.fmt : fx ? fmtOf(fx) : "T20";
   const stat = (STATS as any)[q.stat] ? q.stat : "sixes";
   const line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
   const games = [5, 10, 15, 20, 30].includes(Number(q.n)) ? Number(q.n) : 10;
-  const tabs = TABS.filter(([k]) => k !== "props" || live);
+  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : true));
   const wanted = q.tab === "markets" ? "fancy" : q.tab; // old links used ?tab=markets
   const tab = tabs.some(([k]) => k === wanted) ? wanted : tabs[0][0];
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";
@@ -134,7 +158,7 @@ export function FixturePage() {
   return (
     <div className="flex flex-col gap-section">
       <MatchHeader f={fx} live={live} />
-      <RecentForm teams={known} fmt={fmt} />
+      <MatchAccordions match={match} teams={known} fmt={fmt} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
           <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">

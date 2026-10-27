@@ -94,6 +94,7 @@ test("team form: last results in one format, oldest first", async () => {
   assert.deepEqual(a.map((x) => x.date), [...a.map((x) => x.date)].sort(), "oldest to newest");
   assert.ok(a.every((x) => x.opp === beta) && b.every((x) => x.opp === alpha));
   assert.ok(a.every((x) => /^\d+\/\d+/.test(x.own) && /^\d+\/\d+/.test(x.theirs)), "scores come from the innings");
+  assert.equal(teamForm(store, alpha, 0, 3).length, 3, "closed headline is last 3");
   assert.deepEqual(teamForm(store, alpha, 3, 5), [], "no Hundred matches, and formats are never mixed");
 });
 

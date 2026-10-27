@@ -1,13 +1,13 @@
 # Cricket Props Hub: the free stats site (`site/`)
 
-A free player-props and fancy-markets stats site built on this repo's data. Static pages plus one small serverless function,
-hosted on **Vercel Hobby**. Nothing paid, no database, no model hosting.
+A free player-props and fancy-markets stats site built on this repo's data. Static pages plus two small serverless functions
+(`/api/ask`, `/api/live`), hosted on **Vercel Hobby**. Nothing paid, no database, no model hosting.
 
 ## What it does
 | Page | What you get |
 |---|---|
 | Home / **Ask** | Type a question in your own words (typos fine). A free Gemini model turns it into a *query plan*; the site runs that plan on the real data and shows the answer, the filters used, the sample size and the data freshness. |
-| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). |
+| **Fixtures** | Upcoming internationals/leagues from `data/fixtures/upcoming.csv` only. The bookmaker feed is for odds, never for fixtures or start times (books serve different regions). Live scores (team totals, current batters/bowler, and player so-far vs booked lines) refresh about every 15 seconds from ESPN JSON plus the CREX match page, **only for matches we have player-prop or fancy odds for**; they are never used to settle a prop. Props and Match Fancy tabs (and unpriced fancy markets) stay hidden when that match has no bookmaker line. |
 | **Players** | Runs, balls, 4s, 6s, wickets, runs conceded. Hit rate over/under any line, a ladder of lines, median/mean, last-N form, fair decimal odds, split by opposition, venue, home/away/neutral, batting first/chasing, batting position, year and competition. One format at a time, never mixed. |
 | **Teams & venues** | Match totals and fancy markets: match 4s/6s, 30s, 50s, 100s, double-digit and single-digit scores, ducks, highest over, most runs conceded by a bowler, top score, team markets (team batting first only), and who tops the batting card. |
 | **Partnerships** | For any two batters: who is dismissed first, stand sizes, split by format, opposition and venue; opening pair only if you like. |
@@ -21,6 +21,7 @@ Cricsheet all_json.zip ─┐
 data/provisional/*.json ─┼─► python -m cricket_site.build ─► site/public/data/*.json ─► browser engine (site/src/engine)
 data/fixtures, value_bets ┘                                                              ▲
                                                 question ─► /api/ask (Gemini) ─► plan ───┘  (validated, then run on the rows)
+                                                ESPN JSON + CREX match page ─► /api/live (15 s cache) ─► fixture scores + live board + player so-far (not settlement)
 ```
 * **Builder** (`src/cricket_site`, stdlib only): parses the ball-by-ball JSON into per-innings batting rows (position, innings order,
   runs/balls/4s/6s, dismissal), bowling spells, partnerships (who was out, runs, balls, opening flag) and match-market aggregates.
@@ -29,10 +30,21 @@ data/fixtures, value_bets ┘                                                   
   Output is ~35 MB of JSON (~12 MB compressed): `meta.json`, `index.json`, `matches.json`, 64 player shards `p/NN.json`, `fixtures.json`, `props.json`.
   I checked ~71,000 player rows against `data/players`: every difference was a super-over (the site ignores super overs on purpose).
 * **Engine** (`site/src/engine`, no dependencies, runs in the browser and in node): filters, hit rates, fair odds, markets, partnerships,
-  name resolution with typo tolerance, and the plan runner. **Every number on a page is computed here from the rows.**
+  name resolution with typo tolerance, the plan runner, and live-score parsing (`live.js`). **Every number on a page is computed here from the rows
+  or from the live snapshot** — never from the LLM.
 * **The model never supplies a number.** `/api/ask` (`site/api/ask.js`) sends only the question text to Gemini with a fixed instruction and gets
   back JSON, which `sanitizePlan` reduces to whitelisted fields. The plan is then resolved against the real player/team/venue tables and executed
   in the browser. If the key is missing, rate-limited or the reply is unusable, the built-in rule parser (`engine/nl.js`) answers instead.
+* **Live scores.** `/api/live` (`site/api/live.js`) pulls ESPN's public cricket JSON (no key), caches ~15 seconds, and returns compact team
+  scores plus batting/bowling so-far **only for matches in the book feed** (player props, event markets, or fancy). The fixture header shows a
+  live board (current pair: avatars on the edges, name with runs/balls under it, partnership in the middle, last wicket, bowler, this-over deliveries with a divider at the over break, CRR/RRR)
+  plus a Scorecard and Recent form accordion (both closed so props stay first). The closed Recent form row shows last 3 W/L chips per side so it fits on a phone; the open body is still last 5 in this format. Scorecard has batting (how-out, R, B, 4s, 6s, SR), extras, fall of wickets, yet to bat, and bowling (O, M, R, W, Econ) — the
+  same columns CREX and Cricinfo show. Games with no odds stay off
+  the rail and off the live snapshot. When ESPN flags a match live but leaves the score blank (common on Associate ODIs), the same route fills
+  scores from the CREX **match** page and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `crex.com/api`). The schedule page is only used for URLs
+  (it is cached ~5 min). The browser polls that route. ESPN HTML scraping stays blocked (`robots.txt`).
+  Unofficial and can change. **Never used for settlement** — VOID/DNP rules still apply after the innings qualifies.
+  Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`); ESPN's ground-local "Starts at … local time" lines are dropped.
 
 ## Settlement rules and definitions
 * T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100.
@@ -53,6 +65,7 @@ The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app b
 * Provisional matches carry player totals only (no batting order, dismissals or fall of wickets), so they feed player props but **not**
   partnerships, batting position, innings order or match markets. The site says how many provisional rows a view includes.
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
+* Live scores lag up to about 20 seconds and come from unofficial ESPN JSON plus the CREX match page. A player with no row yet is not "0 so far" (they may not have batted). Do not treat "so far" as a settled result.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
 ## Run it locally
@@ -67,7 +80,7 @@ Python tests: `pytest -q tests/site`. The JS tests run on a tiny synthetic datas
 (`tests/site/synth.py`, regenerated by `python scripts/make_site_fixture.py`; a pytest fails if the committed fixture is stale).
 
 ## Deploy (Vercel Hobby, free)
-The Vercel project root is `site/` (static `public/` + `api/ask.js`; `site/vercel.json` already sets this).
+The Vercel project root is `site/` (static `public/` + `api/ask.js` + `api/live.js`; `site/vercel.json` already sets this).
 1. **Once:** `cd site && npx vercel link --project cricket-props-hub` then, after building the data, `npx vercel deploy --prod`.
 2. **AI key for the chat box.** Either **xAI Grok**: create a key at console.x.ai (API Keys), add it as the Vercel env var `XAI_API_KEY`, and set `XAI_MODEL` to a model name from the console's Models page (Grok API usage is billed per token, a few hundred tokens per question; check your credits). Or **Gemini (free tier):** create a key in Google AI Studio, then add it as the *Vercel* environment variable `GEMINI_API_KEY`
    (Project → Settings → Environment Variables, Production) and redeploy. Optional: `GEMINI_MODELS` (comma list, default

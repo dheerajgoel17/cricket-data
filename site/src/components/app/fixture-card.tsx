@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { liveBlurb, teamScore } from "@/engine/live.js";
+import { useLiveMatch } from "@/hooks/useLive";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamBadge, usePreloadTeams } from "./badges";
@@ -20,6 +22,20 @@ const shortSeries = (n: string) => {
 const hasTime = (f: any) => f.start.length > 10;
 const city = (v: string) => (v || "").split(",")[0].replace(/\(.*\)/, "").trim();
 
+/** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
+export function LiveScore({ s, size = "md", className }: { s: { display?: string; runs?: number | null; wkts?: number | null; overs?: number | null } | null | undefined; size?: "md" | "lg"; className?: string }) {
+  if (!s?.display) {
+    return <span className={cn("shrink-0 text-muted-foreground", size === "lg" ? "text-callout" : "text-footnote", className)}>Yet to bat</span>;
+  }
+  const total = s.runs != null && s.wkts != null ? `${s.runs}/${s.wkts}` : String(s.runs ?? String(s.display).replace(/\s*\(.*$/, ""));
+  return (
+    <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
+      <span className={cn("font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body font-semibold")}>{total}</span>
+      {s.overs != null && <span className="text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
+    </span>
+  );
+}
+
 function startsIn(ms: number) {
   const m = Math.round(ms / 60000), h = Math.floor(m / 60), d = Math.floor(h / 24);
   if (d >= 1) return `Starts in ${d} day${d > 1 ? "s" : ""}`;
@@ -30,8 +46,12 @@ function startsIn(ms: number) {
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const now = useNow(30000);
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
-  const live = timed && ms <= 0 && ms > -4 * 3600e3;
-  const status = live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed";
+  const { match } = useLiveMatch(f);
+  const clockLive = timed && ms <= 0 && ms > -4 * 3600e3;
+  const scores = [teamScore(match, f.a), teamScore(match, f.b)];
+  const hasScore = scores.some((s) => s?.display);
+  const live = hasScore || clockLive;
+  const status = liveBlurb(match) || (live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
@@ -43,15 +63,27 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
             <Badge variant="outline" className="px-2.5 py-hair text-caption font-semibold">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Badge>
             {city(f.venue) && <span className="ml-auto min-w-0 truncate text-footnote font-medium text-muted-foreground" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
           </div>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
-            <div className="grid min-w-0 gap-snug">
-              {[f.a, f.b].map((t: string) => <div key={t} className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold">{t}</span></div>)}
+          {hasScore ? (
+            <div className="grid gap-snug">
+              {[f.a, f.b].map((t: string, k: number) => (
+                <div key={t} className="flex min-w-0 items-center gap-snug" title={t}>
+                  <TeamBadge name={t} size="md" eager />
+                  <span className="min-w-0 flex-1 truncate text-body font-semibold">{t}</span>
+                  <LiveScore s={scores[k]} />
+                </div>
+              ))}
             </div>
-            <div className="grid justify-items-end gap-hair text-right">
-              <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}</span>
-              {timed && <span className="text-metric font-bold tabular-nums">{localTime(when)}</span>}
+          ) : (
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
+              <div className="grid min-w-0 gap-snug">
+                {[f.a, f.b].map((t: string) => <div key={t} className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold">{t}</span></div>)}
+              </div>
+              <div className="grid justify-items-end gap-hair text-right">
+                <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}</span>
+                {timed && <span className="text-metric font-bold tabular-nums">{localTime(when)}</span>}
+              </div>
             </div>
-          </div>
+          )}
           <div className="mt-auto flex items-center justify-between gap-snug border-t border-white/10 pt-snug">
             <div className="grid min-w-0 gap-hair"><span className="truncate text-callout font-medium">{status}</span><span className="truncate text-footnote text-muted-foreground">{seriesName(f)}</span></div>
             <Badge className="shrink-0 px-3.5 py-hair text-footnote font-semibold">Props</Badge>

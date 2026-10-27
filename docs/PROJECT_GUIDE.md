@@ -10,8 +10,8 @@ Two products in one repo, both **100% free to run**:
    gzipped CSVs, plus **provisional** matches scraped from CREX to cover the days before Cricsheet publishes. A `cricket-data` CLI queries and maintains it.
    An hourly **value-bets** pipeline (`src/value_bets`) prices player props against free odds sources.
 2. **The site** ("Cricket Props Hub", `site/`, `src/cricket_site`): a StatsHub-style player-props and stats website on Vercel Hobby. Hit rates over any line, DNP-aware form
-   charts, fair decimal odds, partnerships, team/venue/competition markets, player trends, a Prop Hunter (value bets), and an ask-anything box (an LLM turns the question into a
-   structured query; **all numbers come from the data**).
+   charts, fair decimal odds, partnerships, team/venue/competition markets, player trends, a Prop Hunter (value bets), live scores with player so-far vs booked lines
+   (~15 s, not settlement), and an ask-anything box (an LLM turns the question into a structured query; **all numbers come from the data**).
 
 ### Non-negotiable rules
 * **Free only**: no paid services as hard dependencies. Optional keys (xAI Grok / Gemini for the chat parser) degrade gracefully to a built-in parser.
@@ -32,7 +32,7 @@ scripts/              check_public_safe.py, make_site_fixture.py, model_backtest
 src/cricket_data/     dataset package: Cricsheet ingest, store, provisional + reconcile, registry/link-players, CREX scraper, CLI
 src/value_bets/       hourly prop-pricing pipeline (model, adapters for Smarkets / MoviOdds, weather, alerts)
 src/cricket_site/     site builder (stdlib only): parse.py, build.py, crex_assets.py, assets_sync.py
-site/                 the website: Vite + React app (src/, index.html), public/ (generated data/ + static files), api/ask.js (serverless), vercel.json, tests/ (node:test for engine + API)
+site/                 the website: Vite + React app (src/, index.html), public/ (generated data/ + static files), api/ask.js + api/live.js (serverless), vercel.json, tests/ (node:test for engine + API)
 supabase/migrations/  SQL for the image/id store (applied to the Supabase project)
 tests/                pytest: dataset tests, tests/value_bets, tests/site (synthetic matches + builder + crex_assets + assets_sync)
 value_bets/           committed outputs of the value-bets pipeline (out/, state/, mappings/)
@@ -88,7 +88,7 @@ Rebuilding is deterministic apart from timestamps. Size: ~35 MB raw, ~12 MB comp
 ### 5.2 Engine (`site/src/engine`, dependency-free ES modules; runs in browser and node)
 `store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `props.js` (player report, DNP-aware form chart over team
 fixtures, correlated props) · `markets.js` (match/team markets, top batter) · `partnership.js` · `resolve.js` (typo-tolerant player/team/venue/competition resolution) · `plan.js` (query plans: sanitize,
-resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `rules.js`, `util.js`.
+resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `live.js` (ESPN snapshot parse, name match, so-far vs line; not settlement) · `rules.js`, `util.js`.
 **Invariant: every number shown comes from the engine; the LLM only emits a validated plan** (`sanitizePlan` whitelists fields; see `site/tests/nlp.test.mjs`).
 
 ### 5.3 UI (`site/src`: Vite + React + TypeScript)
@@ -101,6 +101,9 @@ Tests: engine, API and photo helpers with `node --test` (`tests/`), components w
 ### 5.4 Ask-anything API (`site/api/ask.js`)
 `POST /api/ask {question}` -> `{plan, model}`. Provider: **xAI Grok** if `XAI_API_KEY` (model `XAI_MODEL`, e.g. `grok-4.20-0309-non-reasoning`), else **Gemini** if `GEMINI_API_KEY`; none -> 503 and the client uses `nl.js`.
 Per-IP rate limit + daily cap, key only in headers, reply passed through `sanitizePlan`. The browser resolves names and runs the plan locally.
+
+### 5.4b Live scores (`site/api/live.js`)
+`GET /api/live` -> `{asOf, source, matches}` from ESPN's public cricket JSON, intersected with `book_lines.json` (player props, event markets, or fancy). Matches with no odds are dropped. ESPN's summary `matchcards` become the scorecard accordion (batting how-out / R / B / 4s / 6s / SR, bowling O / M / R / W / Econ). When ESPN has no scorecard yet, the CREX match page fills team scores and the current pair, and `/match-scorecard` (`getSC4`) fills extras, FOW and yet-to-bat (robots Allow, `max-age` 10 s; never `crex.com/api`). The schedule page is only used for match URLs. The fixture header renders that snapshot as a live board plus the accordion. No key. Cached ~15 s (`s-maxage` + in-memory single-flight). The Vite dev server mounts the same handler. Team names are matched to CREX fixtures; player names to booked lines (`HC Brook` ~ `Harry Brook`). Kick-off and countdowns stay in the viewer's time zone; ESPN ground-local "Starts at … local time" lines are dropped. **So-far only** — never settle from this feed. ESPN's HTML site remains robots-blocked; this uses `site.api.espn.com` / `site.web.api.espn.com`. Unofficial.
 
 ### 5.5 Photos, flags, logos
 Team logos / player photos come from CREX's public sitemaps + image CDN (`cricketvectors.akamaized.net`), fallbacks: Wikimedia Commons (Wikidata P2697->P18), flagcdn flags, initials/silhouette.
@@ -151,8 +154,8 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * Cache key `site-dl4-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
-* The Vite dev server has the SPA fallback built in, and serves `/api/ask` with the same handler Vercel runs (`vite.config.ts`).
+* The Vite dev server has the SPA fallback built in, and serves `/api/ask` and `/api/live` with the same handlers Vercel runs (`vite.config.ts`).
 
 ## 10. Roadmap ideas (not built)
 Umpire/match-referee stats (Cricsheet officials) · competition standings (per-tournament points rules) · minutes-style and traits panels on player pages · server-side rendering for SEO ·
-a real odds feed (the only paid piece StatsHub has) · syncing scraped matches into Postgres for ad-hoc queries · more CREX squads/ids from scorecards to raise photo coverage (~54% of active players today).
+a real odds feed (the only paid piece StatsHub has) · syncing scraped matches into Postgres for ad-hoc queries · more CREX squads/ids from scorecards to raise photo coverage (~54% of active players today) · licensed ball-by-ball websocket if a free source appears.

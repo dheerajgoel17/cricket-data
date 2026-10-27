@@ -6,9 +6,11 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { liveMarket } from "@/engine/live.js";
 import { fancyFor } from "@/engine/lines.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
+import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
 import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
@@ -44,16 +46,20 @@ type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string
  */
 export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   const { store } = useData();
+  const { match: liveMatch } = useLiveMatch(fx);
   const reduce = useReducedMotion();
   const doc = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
   const panelRef = useRef<HTMLDivElement>(null);
-  const scope = teams.some(([, i]) => String(i) === q.sc) ? Number(q.sc) : -1; // -1 = whole match
+  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
+  const booked = (k: string, teamName: string | null) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName).length > 0;
+  const scopes = [["-1", "Match", MATCH_KEYS.some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, TEAM_KEYS.some(([k]) => booked(k, name))] as const)].filter(([, , on]) => on);
+  const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
+  const scope = scopes.some(([v]) => v === wantSc) ? Number(wantSc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
-  const keys = scope < 0 ? MATCH_KEYS : TEAM_KEYS;
-  const key = keys.some(([k]) => k === q.fm) ? q.fm : keys[0][0];
+  const keys = (scope < 0 ? MATCH_KEYS : TEAM_KEYS).filter(([k]) => booked(k, team?.[0] ?? null));
+  const key = keys.some(([k]) => k === q.fm) ? q.fm : keys[0]?.[0] || "";
   const win = WINDOWS.includes(Number(q.mw)) ? Number(q.mw) : 20;
   const fmtIdx = FORMATS.indexOf(fmt);
-  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
   const marketLabel = (k: string) => (k === "top_batter" ? "Top batter" : (scope < 0 ? (MATCH_MARKETS as any)[k] : (TEAM_TOTAL_MARKETS as any)[k]).label as string);
   const run = (k: string, line?: number | null, ms_ = ms) => (scope < 0 ? report(store, ms_, k, line) : teamReport(store, ms_, scope, k, line));
 
@@ -72,13 +78,14 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
       if (!s.n) return [];
       const eo = s.n >= 10 ? edgeOf(s.pOver, b.over) : null, eu = s.n >= 10 ? edgeOf(s.pUnder, b.under) : null;
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
-      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, side, edge: side === "over" ? eo : eu, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+      const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
+      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
     });
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
-  }, [doc.data, ms, keys, fxInfo, team, scope, store]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const book = useMemo(() => (key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null)), [doc.data, fxInfo, key, team]);
-  const base: any = useMemo(() => (key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
+  const book = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null)), [doc.data, fxInfo, key, team]);
+  const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : book[0]?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
   const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, ms, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
   // ladder rows: the engine's lines around the median plus the bookmaker's own line(s), computed on the same matches
@@ -95,8 +102,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   return (
     <div className="flex min-w-0 flex-col gap-stack">
       <div className="flex min-w-0 flex-col gap-snug">
-        <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
-          items={[["-1", "Match"], ...teams.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>] as [string, React.ReactNode])]} />
+        {scopes.length > 1 && (
+          <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
+            items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
+        )}
         <div className="flex items-center gap-snug">
           <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
           <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
@@ -108,6 +117,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
           {overview.length > 0 && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <h2 className="text-title font-bold">Bookmaker lines</h2>
+              {liveMatch?.status === "live" && <p className="text-footnote text-muted-foreground">So far this match, delayed up to about 20 seconds. Not used for settlement.</p>}
               <ul className="-mx-gutter">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {overview.map((r, i) => (
@@ -118,7 +128,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
                         className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
                         <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
-                          <span className="truncate text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· O {odds(r.over)} · U {odds(r.under)}</span></span>
+                          <span className="truncate text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· O {odds(r.over)} · U {odds(r.under)}</span>{r.soFar != null && <span className="text-muted-foreground"> · {r.soFar} so far</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
                           <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
@@ -133,7 +143,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
             </section>)}
 
           <div ref={panelRef} className="flex min-w-0 scroll-mt-24 flex-col gap-snug">
-            <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />
+            {keys.length > 1 && <PillGroup layoutId="fancy-market" label="Market" value={key} onChange={(v) => set({ fm: v })} items={keys} />}
             <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={`${scope}-${key}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
@@ -168,7 +178,6 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
                             </div>);
                         })}
                       </div>
-                      {!book.length && <p className="text-footnote text-muted-foreground">The books have no line for this market yet. Prices above are fair prices from the matches shown.</p>}
                       {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                     </section>
 

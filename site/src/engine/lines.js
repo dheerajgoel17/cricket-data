@@ -39,6 +39,37 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
 /** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
 export const teamKey = (n) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
 
+const BOOK_WINDOW_MS = 14 * 3600e3;
+
+function startMs(fixture) {
+  if (Number.isFinite(fixture?.startMs)) return fixture.startMs;
+  return fixture?.start ? Date.parse(fixture.start) : NaN;
+}
+
+/** Same two sides, starts within 14 h. Player lines use `match`; fancy uses home/away. */
+function sameFixture(line, fixture) {
+  const a = teamKey(fixture?.a), b = teamKey(fixture?.b);
+  if (!a || !b) return false;
+  let x = "", y = "";
+  if (line?.home && line?.away) { x = teamKey(line.home); y = teamKey(line.away); }
+  else {
+    const [p, q] = String(line?.match || "").split(/\s+vs\s+/i);
+    if (!q) return false;
+    x = teamKey(p); y = teamKey(q);
+  }
+  if (!((x === a && y === b) || (x === b && y === a))) return false;
+  const t = startMs(fixture), u = line?.start_utc ? Date.parse(line.start_utc) : NaN;
+  if (!Number.isFinite(t) || !Number.isFinite(u)) return true;
+  return Math.abs(t - u) < BOOK_WINDOW_MS;
+}
+
+/** Which bookmaker sections this fixture can show. `props` = two-sided player lines; `fancy` = match/team totals. */
+export function fixtureBooks(doc, fixture) {
+  const props = (doc?.lines || []).some((l) => l.books?.length && sameFixture(l, fixture));
+  const fancy = (doc?.fancy || []).some((l) => sameFixture(l, fixture));
+  return { props, fancy };
+}
+
 /**
  * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams, start
  * times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for whole-match markets.
