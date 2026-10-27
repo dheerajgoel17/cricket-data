@@ -17,33 +17,8 @@ import { useFixtures, upcomingOnly } from "@/hooks/useEngine";
 import { useQ } from "@/components/app/forms";
 import { PillTabs } from "@/components/app/pill-tabs";
 import { TeamBadge } from "@/components/app/badges";
+import { FixtureRail } from "@/components/app/fixture-card";
 import { Muted, OddsText } from "@/components/app/page";
-
-const WORDS = ["T20", "ODI", "TEST", "IPL", "BBL", "PSL", "T20I", "WOMEN'S", "THE HUNDRED", "SA20", "CPL", "LIST A"];
-const FEATS: [string, string][] = [
-  ["BALL-BY-BALL DEPTH", "Batting position, innings order, partnerships and 20+ years of Cricsheet data behind every number."],
-  ["FIND THE EDGE", "Hit rates over any line, fair decimal odds and the exchange void rules built in."],
-  ["ADVANCED FILTERS", "Format, opposition, venue, home/away, batting first or chasing, position and dates."],
-  ["CORRELATED PROPS", "When a line clears, see how often the player's other props clear too."],
-];
-
-function Landing() {
-  return (
-    <section className="relative -mx-4 mb-2 overflow-hidden border-b bg-[radial-gradient(90%_120%_at_15%_0%,#12261d_0%,transparent_60%)] px-5 pb-2 pt-9 md:-mx-8 md:px-8 md:pt-14 lg:grid lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-12 lg:pt-16">
-      <div>
-        <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="font-brand text-[clamp(72px,22vw,168px)] font-normal uppercase leading-[.86] tracking-[.01em] md:text-[clamp(96px,13vw,150px)] lg:text-[clamp(110px,10vw,168px)]">FIND THE<br /><span className="text-primary">EDGE</span></motion.h1>
-        <p className="mb-4 mt-5 max-w-[560px] text-[17px] text-muted-foreground">Free cricket player props: scan hit rates over any line, DNP-aware form charts, partnerships and fancy markets, then compare with the market in Prop Hunter.</p>
-        <div className="flex flex-wrap gap-2 pb-2"><Button asChild className="rounded-full font-semibold"><Link to="/ask">Ask a question <ArrowRight /></Link></Button><Button asChild variant="secondary" className="rounded-full"><Link to="/props">Open Prop Hunter</Link></Button></div>
-      </div>
-      <div className="grid gap-4 py-5 lg:py-0">{FEATS.map(([t, d]) => <div key={t} className="border-l-[3px] border-primary pl-3.5"><h3 className="font-brand text-2xl font-normal leading-none tracking-wide">{t}</h3><Muted className="mt-1">{d}</Muted></div>)}</div>
-      <div aria-hidden className="-mx-5 mt-4 overflow-hidden border-y bg-black/25 md:-mx-8 lg:col-span-2">
-        <motion.div className="flex w-max gap-11 py-3 font-brand text-2xl tracking-[.08em] text-muted-foreground" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 32, ease: "linear", repeat: Infinity }}>
-          {[...WORDS, ...WORDS].map((w, i) => <span key={i} className={i % 3 === 0 ? "text-primary" : ""}>{w}</span>)}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 function Sidebar() {
   const { data } = useQuery({ queryKey: ["props-bundled"], queryFn: async () => { try { return await (await fetch("/data/props.json")).json(); } catch { return null; } } });
@@ -107,7 +82,7 @@ export function HomePage() {
   const list = fx.filter((x) => dayKey(x) === sel && (f === "all" || x.fmt === f || x.gender === f));
   return (
     <div>
-      <Landing />
+      <FixtureRail fx={fx.slice(0, 14)} />
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div>
           <h1 className="text-2xl font-medium md:text-3xl">Today's cricket fixtures, player stats &amp; team stats</h1>

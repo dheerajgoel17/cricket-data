@@ -4,22 +4,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { useData } from "@/lib/data";
-import { localWhen, tzName } from "@/lib/format";
-import { GlobalSearch } from "./GlobalSearch";
+import { Header } from "./Header";
 import { MAIN_NAV, MORE_NAV, TAB_NAV } from "./nav";
-
-const Brand = () => <Link to="/" className="font-brand text-[28px] leading-none tracking-wider text-primary md:text-[26px]">CRICKET<b className="font-normal text-foreground">PROPS</b>HUB</Link>;
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-50 flex h-14 items-center gap-3 border-b bg-background/90 px-4 backdrop-blur md:h-[60px]">
-      <Brand />
-      <GlobalSearch className="ml-auto w-full max-w-[200px] md:absolute md:left-1/2 md:ml-0 md:max-w-[620px] md:-translate-x-1/2" />
-      <Link to="/ask" className="grid h-[34px] place-items-center rounded-full bg-primary px-4 text-[13px] font-semibold text-primary-foreground md:ml-auto">Ask</Link>
-    </header>
-  );
-}
 
 function SideNav() {
   const { pathname } = useLocation();
@@ -50,18 +36,6 @@ function TabBar() {
   );
 }
 
-function Freshness() {
-  const { store } = useData();
-  const f = store.freshness();
-  return (
-    <div role="status" className="border-b px-4 py-1.5 text-[12.5px] text-muted-foreground md:px-8">
-      Cricsheet data through <b className="text-foreground">{f.newestCricsheet}</b>
-      {f.provisionalIncluded ? <> · includes <b className="text-foreground">{f.provisionalMatches}</b> provisional matches up to <b className="text-foreground">{f.newestProvisional || "?"}</b></> : " · no provisional matches included"}
-      {f.builtAt ? ` · built ${localWhen(f.builtAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} (${tzName()})` : ""}
-    </div>
-  );
-}
-
 function Footer() {
   const col = (title: string, items: [string, string][]) => (
     <div><h4 className="mb-2 text-sm font-medium">{title}</h4>{items.map(([l, to]) => (to.startsWith("http") ? <a key={l} href={to} rel="noopener" className="block py-1 text-sm text-muted-foreground hover:text-primary">{l}</a> : <Link key={l} to={to} className="block py-1 text-sm text-muted-foreground hover:text-primary">{l}</Link>))}</div>
@@ -87,7 +61,6 @@ export function Shell() {
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <SideNav />
       <div className="min-w-0 overflow-x-clip md:pl-[268px]">
-        <div className={cn(playerScreen && "max-md:hidden")}><Freshness /></div>
         <AnimatePresence mode="wait" initial={false}>
           <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="min-w-0 px-4 pb-8 md:px-8">
             <Outlet />
