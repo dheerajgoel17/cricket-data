@@ -50,9 +50,9 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const clockLive = timed && ms <= 0 && ms > -4 * 3600e3;
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final";
+  const final = match?.status === "final" || (!match && f.status === "Completed");
   const live = !final && (hasScore || clockLive);
-  const status = liveBlurb(match) || (live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>

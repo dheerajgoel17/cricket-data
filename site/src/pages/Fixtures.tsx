@@ -58,9 +58,9 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const { match } = useLiveMatch(f);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final";
+  const final = match?.status === "final" || (!match && f.status === "Completed");
   const on = !final && (hasScore || clock.tone === "live");
-  const blurb = liveBlurb(match);
+  const blurb = liveBlurb(match) || (final ? f.result || "" : "");
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;

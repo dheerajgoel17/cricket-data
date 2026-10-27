@@ -23,7 +23,7 @@ from .hosts import rel
 from .polite import PoliteFetcher
 
 FIELDS = ["start_utc", "match_id", "series", "format", "gender", "team_a", "team_b",
-          "venue", "status", "url"]
+          "venue", "status", "url", "result"]
 PLAYED = {"finished", "completed", "abandoned", "cancelled"}
 
 

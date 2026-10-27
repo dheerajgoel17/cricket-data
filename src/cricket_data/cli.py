@@ -258,18 +258,25 @@ def cmd_backfill(a: argparse.Namespace) -> int:
     return cmd_update(a)
 
 
-def _merge_fixtures(fresh: list[dict], path: Path) -> list[dict]:
+def _merge_fixtures(fresh: list[dict], path: Path, now_dt: datetime | None = None) -> list[dict]:
     """The schedule page only reaches ~1-2 days ahead. Rows we already hold that start after its horizon (e.g. tours announced weeks
     ahead) are kept until they pass; anything inside the horizon is replaced by the page, so cancelled or moved games drop out."""
     if not path.exists() or not fresh:
         return fresh
     horizon = max(r["start_utc"] for r in fresh)
-    now = datetime.now().strftime("%Y-%m-%dT%H:%MZ")
+    now_dt = now_dt or datetime.now()
+    now = now_dt.strftime("%Y-%m-%dT%H:%MZ")
     with path.open(encoding="utf-8", newline="") as fh:
-        old = [r for r in csv.DictReader(fh) if r["start_utc"] > max(horizon, now)]
+        held = list(csv.DictReader(fh))
+    old = [r for r in held if r["start_utc"] > max(horizon, now)]
     seen = {(r["start_utc"][:10], frozenset((r["team_a"], r["team_b"]))) for r in fresh}
-    keep = [r for r in old if (r["start_utc"][:10], frozenset((r["team_a"], r["team_b"]))) not in seen]
-    return sorted(fresh + keep, key=lambda r: (r["start_utc"], r["match_id"]))
+    key = lambda r: (r["start_utc"][:10], frozenset((r["team_a"], r["team_b"])))  # noqa: E731
+    keep = [r for r in old if key(r) not in seen]
+    # A match that has started and is no longer on the page has finished: keep it for 3 days as Completed, so the site can show the result
+    # (the page drops a match soon after the end; the site keeps it for a day at least).
+    since = (now_dt - timedelta(days=3)).strftime("%Y-%m-%dT%H:%MZ")
+    done = [{**r, "status": "Completed"} for r in held if since < r["start_utc"] <= now and key(r) not in seen]
+    return sorted(fresh + keep + done, key=lambda r: (r["start_utc"], r["match_id"]))
 
 
 def cmd_fixtures(a: argparse.Namespace) -> int:
