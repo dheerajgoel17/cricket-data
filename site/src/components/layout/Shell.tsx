@@ -70,13 +70,12 @@ function TabBar() {
   );
 }
 
-/** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. The player screen brings its own phone bar. */
+/** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. */
 export function Shell() {
   const { pathname } = useLocation();
-  const playerScreen = pathname.startsWith("/player/");
   return (
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] md:pb-0">
-      <div className={cn("sticky top-0 z-50", playerScreen && "max-md:hidden")}><Header /></div>
+      <div className="sticky top-0 z-50"><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">

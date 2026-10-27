@@ -1,16 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import { ArrowLeft, Minus, Plus, Share2, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Minus, Plus, Share2, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { TabsContent } from "@/components/ui/tabs";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { bookLinesFor, bookName } from "@/engine/lines.js";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
@@ -25,37 +23,43 @@ import { useRunPlan } from "@/hooks/useEngine";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
-import { PillTabs } from "@/components/app/pill-tabs";
+import { AnimatedHeight } from "@/components/app/animated-height";
+import { PillGroup } from "@/components/app/pill-group";
 import { StarButton } from "@/components/app/star";
-import { Chips, DataTable, EmptyNote, Muted, Panel } from "@/components/app/page";
+import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
+import { PlayerSkeleton } from "@/components/app/skeletons";
 
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side"]); // those are on screen already
 const band = (p: number | null) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo");
-const bandText = { hi: "text-primary", mid: "text-amber", lo: "text-destructive", "": "" } as const;
-const STAT_TABS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
+const bandText = { hi: "text-primary", mid: "text-amber", lo: "text-miss", "": "" } as const;
+const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
+const CARD = "rounded-2xl bg-card ring-1 ring-white/5";
 
 /** The URL's query string as it is right now (the chart keeps line / side in the URL with replaceState, so the router's copy can be stale). */
 const liveQ = () => Object.fromEntries(new URLSearchParams(location.search));
 
-function Stat({ k, v, tone }: { k: string; v: React.ReactNode; tone?: "up" | "down" }) {
+function Metric({ k, v, tone }: { k: string; v: ReactNode; tone?: "up" | "down" }) {
   return (
-    <div className="grid">
-      <span className="font-condensed text-[13px] uppercase leading-snug text-muted-foreground md:text-base">{k}</span>
-      <b className="text-[15px] font-medium leading-snug md:text-base">{tone ? <span className={cn("mr-1.5 align-[2px] text-[9px]", tone === "up" ? "text-primary" : "text-destructive")}>{tone === "up" ? "▲" : "▼"}</span> : null}{v}</b>
+    <div className="grid min-w-0 gap-hair">
+      <span className="text-footnote leading-tight text-muted-foreground">{k}</span>
+      <b className={cn("truncate text-metric font-bold tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
     </div>
   );
 }
 
+/** Hit-rate ring: green from 60%, amber from 40%, red below. */
 function Gauge({ p, caption }: { p: number | null; caption: string }) {
   const arc = p == null ? 0 : Math.max(0, Math.min(1, p));
-  const tone = arc >= 0.6 ? "var(--primary)" : arc >= 0.4 ? "var(--amber)" : "var(--destructive)";
+  const tone = arc >= 0.6 ? "var(--primary)" : arc >= 0.4 ? "var(--amber)" : "var(--miss)";
   const ring = (stroke: string, dash: string) => <circle cx="24" cy="24" r="19" fill="none" stroke={stroke} strokeWidth="4" strokeDasharray={dash} strokeLinecap="round" transform="rotate(135 24 24)" />;
   return (
-    <div className="grid h-24 w-28 shrink-0 content-center justify-items-center gap-0.5 rounded-lg border bg-popover text-sm">
-      <svg viewBox="0 0 48 48" width="52" height="52">{ring("var(--border)", "89.6 29.9")}<motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{ring(tone, `${(89.6 * arc).toFixed(1)} 200`)}</motion.g>
-        <text x="24" y="28" textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor">{p == null ? "–" : `${Math.round(arc * 100)}%`}</text></svg>
-      <span>{caption}</span>
+    <div className="grid shrink-0 justify-items-center gap-hair">
+      <svg viewBox="0 0 48 48" className="size-20" role="img" aria-label={`${caption} ${p == null ? "none" : `${Math.round(arc * 100)}%`}`}>
+        {ring("var(--border)", "89.6 29.9")}<motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{ring(tone, `${(89.6 * arc).toFixed(1)} 200`)}</motion.g>
+        <text x="24" y="28" textAnchor="middle" fontSize="11" fontWeight="700" fill="currentColor">{p == null ? "–" : `${Math.round(arc * 100)}%`}</text>
+      </svg>
+      <span className="text-caption text-muted-foreground">{caption}</span>
     </div>
   );
 }
@@ -66,6 +70,30 @@ export function PlayerPage() {
   const idx = Number(id);
   if (!(idx >= 0 && idx < store.P.id.length)) return <EmptyNote>Unknown player.</EmptyNote>;
   return <PlayerScreen key={idx} idx={idx} />;
+}
+
+/** Back row, then the player flat on the page (no card): photo, name, team and formats, save and share. */
+function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: string; team: string; fmts: [number, string][]; share: () => void }) {
+  const { store } = useData();
+  const nav = useNavigate();
+  const teamIx = store.P.tm[idx];
+  return (
+    <section className="flex flex-col gap-stack">
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
+      <div className="flex items-center gap-snug">
+        <PlayerPhoto idx={idx} className="size-20 shrink-0 rounded-full bg-secondary" />
+        <div className="grid min-w-0 flex-1 gap-tight">
+          <h1 className="truncate text-display font-bold leading-tight tracking-tight">{name}</h1>
+          <Link to={`/team/${teamIx}`} className="flex min-w-0 items-center gap-tight text-callout text-muted-foreground active:opacity-70"><TeamBadge name={team} size="sm" /><span className="truncate">{team}</span></Link>
+          <div className="flex flex-wrap items-center gap-tight">{fmts.map(([i, f]) => <Badge key={i} variant="outline" className="px-snug py-hair text-caption font-semibold">{f}</Badge>)}</div>
+        </div>
+        <div className="flex shrink-0 flex-col items-center gap-tight">
+          <StarButton kind="player" idx={idx} />
+          <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><Share2 className="size-5" /></motion.button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function PlayerScreen({ idx }: { idx: number }) {
@@ -97,47 +125,27 @@ function PlayerScreen({ idx }: { idx: number }) {
     venue: q.venue || null,
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
-  const back = () => (history.length > 1 ? nav(-1) : nav("/players"));
   const share = () => { const u = location.href; (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
+  const loading = lines.isLoading || res.isLoading || !res.data;
 
   return (
-    <div className="-mx-4 md:mx-0">
-      <div className="sticky top-0 z-[45] flex h-[52px] items-center gap-1.5 border-b bg-background px-2.5 md:hidden">
-        <button type="button" aria-label="Back" onClick={back} className="grid size-10 place-items-center rounded-full"><ArrowLeft className="size-5" /></button>
-        <div className="flex-1 truncate font-bold">{name}</div><StarButton kind="player" idx={idx} className="size-10" />
+    <div className="flex flex-col gap-stack">
+      <PlayerHeader {...{ idx, name, team, fmts, share }} />
+      <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
+        <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={STAT_OPTIONS} />
       </div>
-      <div className="sticky top-[52px] z-40 border-b bg-background px-4 py-2 md:top-[60px] md:px-0">
-        <PillTabs scrollable layoutId="stat-rail" tabs={STAT_TABS} value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} />
-      </div>
-      <div className="px-4 md:px-0">
-        {res.data && res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, team, res: res.data, q, book, bookDefault, fmts, fmtVal, navigateWith, share }} />
-          : <Hero {...{ idx, name, team, fmts, share }} stats={null} />}
-        {res.data && !res.data.ok ? <EmptyNote>{res.data.error}</EmptyNote> : null}
-        {res.isLoading ? <Muted className="py-6">Loading…</Muted> : null}
-      </div>
+      {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
+      {loading ? <PlayerSkeleton />
+        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, res: res.data, q, book, bookDefault, navigateWith }} />
+        : <EmptyNote>{res.data.error}</EmptyNote>}
     </div>
   );
 }
 
-function Hero({ idx, name, team, fmts, share, stats }: { idx: number; name: string; team: string; fmts: [number, string][]; share: () => void; stats: React.ReactNode }) {
-  return (
-    <section className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-3 border-b pt-4 [grid-template-areas:'id_photo''stats_stats'] md:grid-cols-[190px_minmax(0,1fr)_auto] md:items-center md:gap-x-6 md:pt-5 md:[grid-template-areas:'photo_id_stats']">
-      <div className="h-[138px] w-[150px] [grid-area:photo] md:h-[168px] md:w-[190px] md:self-end"><PlayerPhoto idx={idx} className="size-full" /></div>
-      <div className="self-start pb-3.5 [grid-area:id] md:self-center md:pb-0">
-        <h1 className="text-2xl font-medium leading-tight md:text-3xl xl:text-[40px]">{name}</h1>
-        <div className="text-sm text-muted-foreground md:text-base">{team}</div><div className="text-sm text-muted-foreground md:text-base">{fmts.map(([, f]) => f).join(" · ")}</div>
-        <div className="mt-3.5 flex gap-3"><span className="grid size-control place-items-center overflow-hidden rounded-full bg-secondary"><TeamBadge name={team} size="md" className="border-0" /></span><StarButton kind="player" idx={idx} /><motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><Share2 className="size-5" /></motion.button></div>
-      </div>
-      <div className="-mx-4 mt-0 flex items-center justify-between gap-3 border-t px-4 py-3.5 [grid-area:stats] md:mx-0 md:gap-10 md:border-t-0 md:p-0">{stats}</div>
-    </section>
-  );
-}
-
-function Loaded({ idx, name, team, res, q, book, bookDefault, fmts, fmtVal, navigateWith, share }: any) {
+function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
   const { store } = useData();
   const c = res.chart;
   const entries: any[] = c ? c.entries : [];
-  const nav = useNavigate();
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<string>(c ? c.side : "over");
   const [win, setWin] = useState<number>(entries.length >= 20 ? 20 : 0);
@@ -158,110 +166,140 @@ function Loaded({ idx, name, team, res, q, book, bookDefault, fmts, fmtVal, navi
   const active = (res.filters || []).filter(([k]: [string]) => !FILTER_SKIP.has(k));
   const logs = [...entries].reverse();
   const stepLine = (d: number) => { const v = Math.max(0.5, Math.round((line + d) * 100) / 100); setLine(v); keep({ line: v, side }); };
-
-  const stats = cur ? (
-    <>
-      <div className="grid grid-cols-3 gap-x-5 gap-y-3.5 md:grid-cols-[repeat(3,96px)] md:gap-x-2">
-        <Stat k={`${cur.label} avg`} v={num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)} tone={cur.p != null && (cur.mean ?? 0) > line ? "up" : undefined} />
-        <Stat k="Line" v={`${side === "over" ? "O" : "U"} ${line}`} />
-        <Stat k="Prop" v={res.statLabel} />
-        <Stat k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
-        <Stat k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
-        <Stat k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
-      </div>
-      <Gauge p={cur.p} caption={`${cur.label} hit`} />
-    </>
-  ) : null;
+  const pickLine = (v: number) => { setLine(v); keep({ line: v, side }); };
 
   return (
-    <>
-      <Hero {...{ idx, name, team, fmts, share }} stats={stats} />
-      {fmts.length > 1 && (
-        <ToggleGroup type="single" value={String(fmtVal)} onValueChange={(v) => v && navigateWith({ fmt: v, line: "" })} className="my-3 w-full rounded-full border p-1">
-          {fmts.map(([i, f]: [number, string]) => <ToggleGroupItem key={i} value={String(i)} className="h-9 flex-1 rounded-full data-[state=on]:bg-accent">{f}</ToggleGroupItem>)}
-        </ToggleGroup>)}
-      <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
-        <div className="grid min-w-0 gap-3">
-          <section className="grid gap-3">
-            {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
-              <>
-                <div className="flex items-center justify-between gap-3">
-                  <ToggleGroup type="single" value={side} onValueChange={(v) => { if (v) { setSide(v); keep({ line, side: v }); } }} className="rounded-full border p-1">
-                    {["over", "under"].map((s) => <ToggleGroupItem key={s} value={s} className="h-9 rounded-full px-5 capitalize data-[state=on]:bg-accent">{s}</ToggleGroupItem>)}
-                  </ToggleGroup>
-                  <div className="flex items-center gap-1 rounded-full bg-secondary p-1">
-                    <Button size="icon" variant="ghost" aria-label="Lower line" className="size-9 rounded-full bg-[#3a3a3a]" onClick={() => stepLine(-0.5)}><Minus /></Button>
-                    <b className="min-w-12 text-center text-base tabular-nums">{line}</b>
-                    <Button size="icon" variant="ghost" aria-label="Raise line" className="size-9 rounded-full bg-[#3a3a3a]" onClick={() => stepLine(0.5)}><Plus /></Button>
-                  </div>
-                </div>
-                <ChartBars entries={shown} line={line} side={side} height={340} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
-                <ToggleGroup type="single" value={String(cur.n)} onValueChange={(v) => v !== "" && setWin(Number(v))} className="w-full rounded-full border p-1">
-                  {ws.map((w: any) => (
-                    <ToggleGroupItem key={w.n} value={String(w.n)} className="relative h-[52px] flex-1 rounded-full data-[state=on]:bg-accent">
-                      <span className="grid gap-px text-sm leading-tight"><span>{w.label}</span><b className={cn("font-medium", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>
-                    </ToggleGroupItem>))}
-                </ToggleGroup>
-                <p className="text-center text-sm text-muted-foreground">{res.statLabel} {side} {line} · green = cleared, red = missed · DNP/VOID fixtures are not counted</p>
-              </>)}
-          </section>
-
-          {book && cur && (
-            <Panel title="Bookmaker lines">
-              <Muted>{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal prices, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</Muted>
-              <DataTable columns={["Line", "Price", "Market", `Hit ${cur.label}`]} rows={book.lines.map((l: any) => {
-                const hist = windowRate(entries, cur.n, l.line, "over");
-                return [<button key={l.line} type="button" onClick={() => { setLine(l.line); keep({ line: l.line, side }); }} className={cn("inline-flex min-w-14 cursor-pointer flex-col items-center rounded-xl border px-2.5 py-1.5 font-bold leading-tight", line === l.line ? "border-transparent bg-primary text-primary-foreground" : "bg-pill")}>{l.line}{l === book.main ? <small className="text-[10px] font-semibold uppercase opacity-70">main</small> : null}</button>,
-                  <span key="o" className="grid gap-0.5">{l.books.map((b: any) => <span key={b.source}><em className="mr-1.5 text-[11px] not-italic text-muted-foreground">{bookName(b.source)}</em>{odds(b.over)} / {odds(b.under)}</span>)}</span>,
-                  l.prob == null ? "–" : pc(l.prob), hist.p == null ? "–" : pc(hist.p)];
-              })} />
-              <Muted className="mt-2">Market = the chance of the over once each book's margin is removed. Hit rate = how often he has gone over that line in the games shown on the chart.{bestPrice && cur.p ? ` At ${line}: best price ${odds(bestPrice)}, ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% vs his hit rate.` : ""}</Muted>
-            </Panel>)}
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" className="rounded-full" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters{active.length ? ` · ${active.length}` : ""}</Button>
-            {active.length ? <Chips list={active} /> : <span className="text-sm text-muted-foreground">All matches</span>}
-            {active.length ? <Button variant="link" className="text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
+    <div className="flex flex-col gap-section">
+      {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
+        <section className="flex flex-col gap-stack">
+          <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
+            <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack">
+              <Metric k={`${cur.label} avg`} v={num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)} tone={cur.p != null && (cur.mean ?? 0) > line ? "up" : undefined} />
+              <Metric k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
+              <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
+              <Metric k="Line" v={`${side === "over" ? "O" : "U"} ${line}`} />
+              <Metric k="Prop" v={res.statLabel} />
+              <Metric k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
+            </div>
+            <Gauge p={cur.p} caption={`${cur.label} hit`} />
           </div>
 
-          <PillTabs layoutId="pl-tab" tabs={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} value={tab} onChange={(t) => { setTab(t); keep({ tab: t }); }}>
-            <TabsContent value="lines" className="grid gap-3">
-              <Panel title="Hit rate at every line" flat><LadderTable ladder={res.ladder} /></Panel>
-              {res.corr ? <Panel title={`When ${res.statLabel.toLowerCase()} ${res.plan.side || "over"} ${c?.line ?? res.line} hits`}><Muted>{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</Muted>
-                <DataTable columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} /></Panel> : null}
-            </TabsContent>
-            <TabsContent value="logs">
-              <Panel flat>{logs.slice(0, logCount).map((e, i) => { const s = barState(e, line, side) as string; return (
-                <button key={i} type="button" onClick={() => setGame({ e, s })} className="flex w-full cursor-pointer items-center justify-between gap-3 border-b px-3 py-2.5 text-left last:border-b-0 hover:bg-[#151515]">
-                  <span className="flex min-w-0 items-center gap-2.5"><TeamBadge name={e.opp} /><span className="grid min-w-0"><b className="truncate font-medium">{e.opp}</b><small className="truncate text-xs text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</small></span></span>
-                  <span className={cn("min-w-14 rounded-lg px-2 py-1.5 text-center font-bold", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-destructive/20 text-destructive" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
-                </button>); })}
-                {logs.length > logCount ? <div className="p-3 text-center"><Button variant="secondary" className="rounded-full" onClick={() => setLogCount(logCount + 30)}>Show more ({logs.length - logCount} left)</Button></div> : null}
-              </Panel>
-            </TabsContent>
-            <TabsContent value="splits" className="grid gap-3"><SplitTables splits={res.splits} /></TabsContent>
-          </PillTabs>
+          <div className="flex flex-wrap items-center justify-between gap-snug">
+            <PillGroup segmented layoutId="pl-side" label="Side" value={side} onChange={(v) => { setSide(v); keep({ line, side: v }); }} items={[["over", "Over"], ["under", "Under"]]} />
+            <div className="flex h-control items-center rounded-[var(--chip-radius)] bg-card">
+              <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => stepLine(-0.5)}><Minus /></Button>
+              <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
+              <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => stepLine(0.5)}><Plus /></Button>
+            </div>
+          </div>
+
+          <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
+            <ChartBars entries={shown} line={line} side={side} height={300} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
+            <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
+              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
+            <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
+          </div>
+        </section>
+      )}
+
+      {book && cur && (
+        <section className="flex flex-col gap-snug">
+          <div className="grid gap-hair">
+            <h2 className="text-title font-bold tracking-tight">Bookmaker lines</h2>
+            <p className="text-footnote text-muted-foreground">{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal prices, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</p>
+          </div>
+          <ul className={cn("overflow-hidden", CARD)}>
+            {book.lines.map((l: any) => {
+              const hist = windowRate(entries, cur.n, l.line, "over");
+              return (
+                <li key={l.line} className="border-t border-white/5 first:border-t-0">
+                  <button type="button" onClick={() => pickLine(l.line)} aria-label={`Use line ${l.line}`}
+                    className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
+                    <span className="grid min-w-0 gap-hair">
+                      <span className="text-body font-semibold">O/U {l.line}{l === book.main && <span className="ml-tight text-caption font-semibold uppercase tracking-wider text-primary">main</span>}</span>
+                      {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><span className="text-footnote">{bookName(b.source)}</span> {odds(b.over)} / {odds(b.under)}</span>)}
+                    </span>
+                    <span className="grid justify-items-end gap-hair text-right">
+                      <span className="text-footnote text-muted-foreground">Market <b className="font-semibold tabular-nums text-foreground">{l.prob == null ? "–" : pc(l.prob)}</b></span>
+                      <span className="text-footnote text-muted-foreground">Hit {cur.label} <b className="font-semibold tabular-nums text-foreground">{hist.p == null ? "–" : pc(hist.p)}</b></span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the games on the chart.{bestPrice && cur.p ? ` At ${line}: best price ${odds(bestPrice)}, ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% vs his hit rate.` : ""}</p>
+        </section>
+      )}
+
+      <section className="flex flex-col gap-stack">
+        <div className="flex flex-wrap items-center gap-snug">
+          <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters{active.length ? ` · ${active.length}` : ""}</Button>
+          {active.length ? active.map(([k, v]: [string, unknown], i: number) => <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-footnote font-normal">{k ? <b className="mr-tight font-semibold">{k}</b> : null}{String(v)}</Badge>)
+            : <span className="text-callout text-muted-foreground">All matches</span>}
+          {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
         </div>
-        <aside className="hidden gap-3 xl:grid xl:sticky xl:top-[130px]">
-          <Panel title="At a glance"><p>{res.headline}</p><Muted className="mt-2">{res.freshness}</Muted></Panel>
-        </aside>
-      </div>
+
+        <div className={cn("flex flex-col gap-hair p-inset", CARD)}>
+          <h2 className="text-body font-semibold">At a glance</h2>
+          <p className="text-callout">{res.headline}</p>
+          <p className="text-footnote text-muted-foreground">{res.freshness}</p>
+        </div>
+
+        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={(t) => { setTab(t); keep({ tab: t }); }} items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} />
+        <AnimatedHeight>
+          <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
+            {tab === "lines" && (
+              <>
+                <div className={cn("overflow-hidden", CARD)}><LadderTable ladder={res.ladder} /></div>
+                {res.corr ? (
+                  <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
+                    <h3 className="text-body font-semibold">When {res.statLabel.toLowerCase()} {res.plan.side || "over"} {c?.line ?? res.line} hits</h3>
+                    <p className="text-footnote text-muted-foreground">{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</p>
+                    <DataTable columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
+                  </div>
+                ) : null}
+              </>
+            )}
+            {tab === "logs" && (
+              <>
+                <ul className={cn("overflow-hidden", CARD)}>
+                  {logs.slice(0, logCount).map((e, i) => {
+                    const s = barState(e, line, side) as string;
+                    return (
+                      <li key={i} className="border-t border-white/5 first:border-t-0">
+                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent">
+                          <TeamBadge name={e.opp} size="sm" />
+                          <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-semibold">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
+                          <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-bold tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {logs.length > logCount ? <Button variant="secondary" className="h-control self-center rounded-full" onClick={() => setLogCount(logCount + 30)}>Show more ({logs.length - logCount} left)</Button> : null}
+              </>
+            )}
+            {tab === "splits" && <SplitTables splits={res.splits} />}
+          </motion.div>
+        </AnimatedHeight>
+      </section>
 
       <Sheet open={!!game} onOpenChange={(o) => !o && setGame(null)}>
-        <SheetContent side="bottom" className="mx-auto max-w-xl rounded-t-2xl">
+        <SheetContent side="bottom" className="z-[70] mx-auto max-w-xl rounded-t-2xl">
           {game && <><SheetHeader><SheetTitle>{name} · {shortDate(game.e.date)}</SheetTitle><SheetDescription className="sr-only">Game details</SheetDescription></SheetHeader>
-            <div className="px-4 pb-6">{[["Date", game.e.date], ["Opponent", game.e.opp], game.e.venueName ? ["Venue", game.e.venueName] : null,
+            <div className="px-gutter pb-section">{[["Date", game.e.date], ["Opponent", game.e.opp], game.e.venueName ? ["Venue", game.e.venueName] : null,
               [res.statLabel, game.e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[game.s] : String(game.e.value)],
-              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between border-b py-3 last:border-b-0"><span className="text-muted-foreground">{k}</span><b>{v}</b></div>)}</div></>}
+              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between gap-snug border-b border-white/10 py-snug text-body last:border-b-0"><span className="text-muted-foreground">{k}</span><b className="text-right font-semibold">{v}</b></div>)}</div></>}
         </SheetContent>
       </Sheet>
 
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-        <SheetContent side="bottom" className="mx-auto max-h-[90vh] max-w-xl overflow-y-auto rounded-t-2xl">
+        <SheetContent side="bottom" className="z-[70] mx-auto max-h-[90vh] max-w-xl overflow-y-auto rounded-t-2xl">
           <SheetHeader><SheetTitle>Filters</SheetTitle><SheetDescription>Filters apply as you change them.</SheetDescription></SheetHeader>
           <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
           <datalist id="dl-venues">{store.venues.map((n: string) => <option key={n} value={n} />)}</datalist>
-          <LiveForm onValues={(v) => { navigateWith({ ...v, line: "", side: "" }); }} className="grid grid-cols-2 border-0 bg-transparent px-4 pb-6">
+          <LiveForm onValues={(v) => { navigateWith({ ...v, line: "", side: "" }); }} className="grid grid-cols-2 border-0 bg-transparent px-gutter pb-section">
             <Field label="Opposition"><Input name="opp" list="dl-teams" defaultValue={q.opp} /></Field>
             <Field label="Venue"><Input name="venue" list="dl-venues" defaultValue={q.venue} /></Field>
             <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={q.vt} className="w-full" /></Field>
@@ -275,8 +313,6 @@ function Loaded({ idx, name, team, res, q, book, bookDefault, fmts, fmtVal, navi
           </LiveForm>
         </SheetContent>
       </Sheet>
-      <Link to="/players" className="sr-only" onClick={(e) => { e.preventDefault(); nav("/players"); }}>All players</Link>
-      <Badge className="hidden">{String(tab)}</Badge>
-    </>
+    </div>
   );
 }
