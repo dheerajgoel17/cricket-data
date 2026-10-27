@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
-import { liveForFixture, livePlayer, liveState, liveStat } from "@/engine/live.js";
+import { liveForFixture, livePlayer, liveState, liveStat, notInXI } from "@/engine/live.js";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -20,6 +20,7 @@ import { loadLines } from "@/lib/feeds";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { Badge } from "@/components/ui/badge";
 import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
@@ -47,14 +48,14 @@ function useHotRows() {
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
-      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= 0 && Date.parse(l.start_utc) > now - 3 * 3600e3 && l.books?.length) };
+      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= 0 && Date.parse(l.start_utc) > now - 14 * 3600e3 && l.books?.length) };
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}`, l);
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const work = [...keys.values()].map((l) => async () => {
         const idx = store.P.id.indexOf(l.pid);
-        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now);
+        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, 14 * 3600e3);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt }, split_by: [] }, { playerIdx: idx });
@@ -83,15 +84,15 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
 type SoFar = { v: number; state: "live" | "out" | "final" };
 
-function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null }) {
+function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Item asChild size="sm" className="min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-card">
+      <Item asChild size="sm" className={cn("min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-card", out && "opacity-60")}>
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
-            <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} /></ItemTitle>
+            <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
             <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar.v > r.line ? "text-primary" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
@@ -113,12 +114,22 @@ function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string;
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
 export function HotProps({ teams }: { teams?: [string, string] } = {}) {
-  const { data, isLoading } = useHotRows();
+  const { data: all, isLoading } = useHotRows();
   const live = useLiveDoc();
+  // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
+  const data = useMemo(() => (all || []).filter((r) => {
+    if (Date.parse(r.start) > Date.now() - 3 * 3600e3) return true;
+    const [a, b] = String(r.match).split(/\s+vs\s+/i);
+    return liveForFixture(live.data, { a, b, start: r.start })?.status === "live";
+  }), [all, live.data]);
   const soFarOf = (r: Row): SoFar | null => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
     const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat), v = liveStat(p, r.stat);
     return v == null ? null : { v, state: liveState(m, p, r.stat) };
+  };
+  const outOf = (r: Row) => {
+    const [a, b] = String(r.match).split(/\s+vs\s+/i);
+    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team);
   };
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
@@ -175,7 +186,7 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
         {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} />)}
+              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
             </AnimatePresence>
           </ul>
         )}

@@ -43,6 +43,7 @@ data/fixtures, value_bets ┘                                                   
   the rail and off the live snapshot. The schedule page (cached ~5 min) lists the games and their URLs; scores, the current pair and rates come from the **match** page
   and the full card from **match-scorecard** (`getSC4`; `max-age` 10 s, robots-allowed; we do not call `$LIVE_SOURCE_BASE/api`), so a chase shows the chasing side's pair the moment it starts.
   The browser polls that route.
+  **Playing XI.** The card lists a side's eleven (batters plus yet to bat) as soon as it is down to bat, so a prop row shows **Not in XI** and is dimmed when that side's eleven are all known and the player is not one of them. The other side stays unmarked until it has batted: the source only gives its XI through an app API we do not call. Pages are fetched from 90 minutes before the start so the batting side's XI is picked up at the toss. A priced match also stays in Hot props, with its last pre-match prices, for as long as the live feed lists it as being played (otherwise 3 hours from the start).
   Unofficial and can change. **Never used for settlement** — VOID/DNP rules still apply after the innings qualifies.
   Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`).
 

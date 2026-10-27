@@ -91,3 +91,20 @@ export function AppSkeleton() {
     </div>
   );
 }
+
+/** Player page body while the run is going: summary card, side and line controls, chart card, bookmaker list. */
+export function PlayerSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-section">
+      <div className="flex flex-col gap-stack">
+        <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-white/5">
+          <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
+          <Skeleton className="size-20 rounded-full" />
+        </div>
+        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-control w-40 rounded-full" /><Skeleton className="h-control w-36 rounded-full" /></div>
+        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-white/5"><Skeleton className="h-[300px] w-full" /><Skeleton className="h-control w-full rounded-full" /></div>
+      </div>
+      <div className="flex flex-col gap-snug"><Skeleton className="h-6 w-44" /><ListSkeleton rows={3} /></div>
+    </div>
+  );
+}

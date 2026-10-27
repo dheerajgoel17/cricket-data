@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, formatOf, buildMatch, cardPageUrl, fixtureInBooks, hasCard, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   namesMatch, oversToBalls, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, wantsCard,
 } from "../src/engine/live.js";
 
@@ -139,6 +139,7 @@ test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not 
   const row = (status, start) => ({ status, start });
   assert.equal(wantsCard(row("live", "2026-10-27T05:00:00Z"), now), true);
   assert.equal(wantsCard(row("upcoming", "2026-10-27T07:10:00Z"), now), true); // schedule page is ~5 min behind
+  assert.equal(wantsCard(row("upcoming", "2026-10-27T08:20:00Z"), now), true); // 80 min out: the XIs are up by the toss
   assert.equal(wantsCard(row("upcoming", "2026-10-27T06:30:00Z"), now), true);
   assert.equal(wantsCard(row("upcoming", "2026-10-27T09:00:00Z"), now), false);
   assert.equal(wantsCard(row("upcoming", "2026-10-26T07:00:00Z"), now), false); // long gone, never scored
@@ -381,4 +382,40 @@ test("the batting side is the page's first team, whatever the other fields say (
   assert.equal(livePlayer(m, "Shaheen Afridi").team, "Pakistan");
   assert.equal(livePlayer(m, "Dilshan Madushanka").team, "Sri Lanka");
   assert.deepEqual(liveBoard(m).batters.map((p) => p.name), ["Shaheen Afridi", "Naseem Shah"]);
+});
+
+const XI = ["Kusal Mendis", "Pathum Nissanka", "Kamindu Mendis", "Charith Asalanka", "Janith Liyanage", "Dunith Wellalage", "Wanindu Hasaranga", "Dushmantha Chameera", "Maheesh Theekshana", "Eshan Malinga", "Asitha Fernando"];
+const xiCard = (names) => parseCardPage(pageHtml({
+  [CARD]: [{ c: "T", d: "", e: "0.0.0.0.0", b: names.map((_, i) => `P${i}`), a: [] }],
+  [MAP]: { p: names.map((n, i) => ({ f_key: `P${i}`, n })), t: [{ f_key: "T", n: "Sri Lanka" }, { f_key: "U", n: "Pakistan" }] },
+}));
+const xiMatch = (names) => buildMatch({ id: "x", status: "upcoming", start: "", teams: [{ name: "Pakistan", abbr: "PAK" }, { name: "Sri Lanka", abbr: "SL" }] }, null, xiCard(names));
+
+test("before the first ball the card is the batting XI, all yet to bat, and the match keeps it", () => {
+  const card = xiCard(XI);
+  assert.deepEqual(card.card.map((i) => [i.team, i.batters.length, i.yetToBat.length]), [["Sri Lanka", 0, 11]]);
+  assert.equal(hasCard(xiMatch(XI)), false, "no batting or bowling yet, so no scorecard to show");
+});
+
+test("a player is called out of the XI only when his side's eleven are all listed and he is not one of them", () => {
+  const m = xiMatch(XI);
+  assert.equal(playingXI(m).get("srilanka").complete, true);
+  assert.equal(notInXI(m, "Kusal Mendis", "Sri Lanka"), false);
+  assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true);
+  assert.equal(notInXI(m, "WPUJC Vandersay", "Sri Lanka"), true);
+  assert.equal(notInXI(m, "PBB Nissanka", "Sri Lanka"), false, "initials match the full name");
+  assert.equal(notInXI(m, "Babar Azam", "Pakistan"), false, "the side that has not batted is not known yet");
+  assert.equal(notInXI(xiMatch(XI.slice(0, 10)), "Dasun Shanaka", "Sri Lanka"), false, "ten names is not a full XI");
+  assert.equal(notInXI(null, "Dasun Shanaka", "Sri Lanka"), false);
+});
+
+test("once a side has batted its XI is the batters and the yet to bat together", () => {
+  const card = parseCardPage(pageHtml({
+    [CARD]: [{ c: "T", d: "20/1(10", e: "0.0.0.0.0", b: ["P0.12.8.2.0.20.8.1.Q0", "P1.5.2.0.0", ...XI.slice(2).map((_, i) => `P${i + 2}`)], a: [] }],
+    [MAP]: { p: [...XI.map((n, i) => ({ f_key: `P${i}`, n })), { f_key: "Q0", n: "Shaheen Afridi" }], t: [{ f_key: "T", n: "Sri Lanka" }, { f_key: "U", n: "Pakistan" }] },
+  }));
+  const m = buildMatch({ id: "x", status: "live", start: "", teams: [{ name: "Pakistan", abbr: "PAK" }, { name: "Sri Lanka", abbr: "SL" }] }, null, card);
+  assert.equal(playingXI(m).get("srilanka").names.length, 11);
+  assert.equal(notInXI(m, "Kusal Mendis", "Sri Lanka"), false);
+  assert.equal(notInXI(m, "Dasun Shanaka", "Sri Lanka"), true);
 });

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@/engine/live.js";
@@ -25,9 +25,7 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
   const teamIdx = sides?.find(([n]) => n === team)?.[1];
   return useMemo(() => {
     const hits = rz.players(name, teamIdx != null && teamIdx >= 0 ? { team: teamIdx } : {}, 2) as { idx: number; score: number }[];
-    if (!hits.length) return null;
-    if (hits.length === 1 || hits[0].score >= (hits[1]?.score ?? 0) + 3) return hits[0].idx;
-    return hits[0].idx;
+    return hits.length && hits[0].score >= 8 ? hits[0].idx : null; // the resolver's own bar for "this is the player"; a debutant or unknown name stays plain text
   }, [rz, name, teamIdx]);
 }
 
@@ -55,7 +53,7 @@ function Who({ name, team, sides, strike, short, className }: { name: string; te
   const text = short ? shortName(name) : name;
   const label = <>{text}{strike ? <span className="text-primary">*</span> : null}</>;
   const cls = cn("truncate font-semibold", strike && "text-primary", className);
-  return idx != null ? <Link to={`/player/${idx}`} className={cn(cls, "hover:underline")}>{label}</Link> : <span className={cls}>{label}</span>;
+  return idx != null ? <Link to={`/player/${idx}`} className={cn(cls, "underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-primary active:opacity-70")}>{label}</Link> : <span className={cls}>{label}</span>;
 }
 
 function Score({ p }: { p: any }) {
@@ -236,11 +234,11 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
           {!!inn.fow?.length && (
             <p className="py-snug text-footnote text-muted-foreground">
               <span className="font-medium text-foreground">FOW</span>{" "}
-              {inn.fow.map((w: any) => `${w.wkts}–${w.runs} (${w.name}${w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})`).join(" · ")}
+              {inn.fow.map((w: any, k: number) => <Fragment key={`${w.wkts}-${w.name}`}>{k > 0 && " · "}{w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-normal" />{w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})</Fragment>)}
             </p>
           )}
           {!!yet(inn).length && (
-            <p className="py-snug text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet(inn).join(", ")}</p>
+            <p className="py-snug text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-normal" /></Fragment>)}</p>
           )}
           {!!inn.bowlers?.length && (
             <div className="overflow-x-auto">

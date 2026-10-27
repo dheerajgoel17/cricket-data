@@ -91,11 +91,11 @@ export function liveCard(match) {
   return inn.batters.length || inn.bowlers.length ? [inn] : [];
 }
 
-/** Rows worth the two page fetches: live ones, plus priced ones about to start (Source A's schedule page is cached ~5 min, so a match can be on but still unscored there). */
+/** Rows worth the two page fetches: live ones, plus priced ones within 90 minutes of the start (XIs are out by the toss; Source A's schedule page is cached ~5 min, so a match can be on but still unscored there). */
 export function wantsCard(match, now = Date.now()) {
   if (match?.status === "live") return true;
   const t = match?.start ? Date.parse(match.start) : NaN;
-  return match?.status === "upcoming" && Number.isFinite(t) && t - now < 15 * 60e3 && now - t < BOOK_WINDOW_MS;
+  return match?.status === "upcoming" && Number.isFinite(t) && t - now < 90 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 
 /** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
@@ -376,7 +376,7 @@ export function parseCardPage(html) {
       yetToBat, fow, extras, runs: tot ? +tot[1] : null, wkts: tot ? +tot[2] : null, overs: balls != null ? ballsToOvers(balls) : null,
     };
   });
-  const shown = card.filter((i) => i.batters.length || i.bowlers.length || i.runs != null);
+  const shown = card.filter((i) => i.batters.length || i.bowlers.length || i.runs != null || i.yetToBat.length); // before the first ball a card is the batting XI, all yet to bat
   const players = [];
   for (const inn of shown) {
     for (const p of inn.batters) players.push({ id: p.id, name: p.name, team: p.team, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes, sr: p.sr, wickets: null, conceded: null, ballsBowled: null, out: p.out, dismissal: p.dismissal });
@@ -576,4 +576,24 @@ export function liveMarket(match, key, team) {
   if (key === "match_50s") return (match.players || []).filter((p) => (p.runs || 0) >= 50 && (p.runs || 0) < 100).length;
   if (key === "match_30s") return (match.players || []).filter((p) => (p.runs || 0) >= 30 && (p.runs || 0) < 50).length;
   return null;
+}
+
+/**
+ * Each side's XI as far as the card shows it: the batters and yet-to-bat of an innings the side has batted in (the card lists all eleven, even before the first
+ * ball). `complete` once eleven names are there. A side that has not batted yet is not known, so nobody on it is called out of the XI.
+ */
+export function playingXI(match) {
+  const out = new Map();
+  for (const inn of match?.card || []) {
+    const names = [...(inn.batters || []).map((p) => p.name), ...(inn.yetToBat || [])];
+    const k = teamKey(inn.team);
+    if (names.length && (!out.has(k) || names.length > out.get(k).names.length)) out.set(k, { names, complete: names.length >= 11 });
+  }
+  return out;
+}
+
+/** True only when the side's XI is fully known and the player is not in it. */
+export function notInXI(match, name, team) {
+  const xi = playingXI(match).get(teamKey(team));
+  return !!xi?.complete && !xi.names.some((n) => namesMatch(n, name));
 }

@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { CalendarBlank, ChatCircleText, Crosshair, Flag, User, type Icon } from "@phosphor-icons/react";
+import { CalendarBlank, ChatCircleText, Crosshair, User, type Icon } from "@phosphor-icons/react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
@@ -47,7 +47,7 @@ function AppSidebar() {
 }
 
 /** SF-Symbols-style tab icons (Phosphor): outline when idle, filled when selected, like iOS. */
-const TAB_ICON: Record<string, Icon> = { "/": CalendarBlank, "/props": Crosshair, "/players": User, "/teams": Flag, "/ask": ChatCircleText };
+const TAB_ICON: Record<string, Icon> = { "/": CalendarBlank, "/props": Crosshair, "/players": User, "/ask": ChatCircleText };
 
 /** Phones: iOS 26 style floating glass tab bar. A translucent capsule (heavy blur and saturation, inner top highlight), the selected tab marked by a glass pill that slides between tabs, filled icon and tint on the active tab, spring press. */
 function TabBar() {
@@ -70,13 +70,12 @@ function TabBar() {
   );
 }
 
-/** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. The player screen brings its own phone bar. */
+/** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. */
 export function Shell() {
   const { pathname } = useLocation();
-  const playerScreen = pathname.startsWith("/player/");
   return (
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] md:pb-0">
-      <div className={cn("sticky top-0 z-50", playerScreen && "max-md:hidden")}><Header /></div>
+      <div className="sticky top-0 z-50"><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
