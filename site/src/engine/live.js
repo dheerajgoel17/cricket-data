@@ -370,18 +370,19 @@ export function parseCardPage(html) {
     const batTeam = teamName(batId), bowlTeam = teamName(bowlId);
     const tot = String(row.d || "").match(/^(\d+)\/(\d+)\((\d+)/);
     const balls = tot ? +tot[3] : null;
-    const batters = [], yetToBat = [], fow = [];
+    const batters = [], yetToBat = [], fow = [], xi = []; // xi: the side's eleven as the source lists them, with the source's own player ids
     for (const raw of row.b || []) {
       const p = cardBatter(raw, names, batTeam);
-      if (p.dnb) { if (names[p.id]) yetToBat.push(p.name); continue; }
+      if (p.dnb) { if (names[p.id]) { yetToBat.push(p.name); xi.push({ id: p.id, name: p.name }); } continue; }
       batters.push(p);
+      xi.push({ id: p.id, name: p.name });
       if (p.out && p.fowRuns != null) fow.push({ name: p.name, runs: p.fowRuns, balls: p.fowBalls, wkts: fow.length + 1 });
     }
     fow.sort((x, y) => x.runs - y.runs || (x.balls ?? 0) - (y.balls ?? 0)).forEach((w, k) => { w.wkts = k + 1; }); // the card lists batters in order, wickets fell in another
     const extras = extrasOf(String(row.e || "").split("."));
     return {
       n: i + 1, team: batTeam, batters, bowlers: (row.a || []).map((raw) => cardBowler(raw, names, bowlTeam)),
-      yetToBat, fow, extras, runs: tot ? +tot[1] : null, wkts: tot ? +tot[2] : null, overs: balls != null ? ballsToOvers(balls) : null,
+      yetToBat, xi, fow, extras, runs: tot ? +tot[1] : null, wkts: tot ? +tot[2] : null, overs: balls != null ? ballsToOvers(balls) : null,
     };
   });
   const shown = card.filter((i) => i.batters.length || i.bowlers.length || i.runs != null || i.yetToBat.length); // before the first ball a card is the batting XI, all yet to bat
@@ -602,15 +603,25 @@ export function liveMarket(match, key, team) {
 export function playingXI(match) {
   const out = new Map();
   for (const inn of match?.card || []) {
-    const names = [...(inn.batters || []).map((p) => p.name), ...(inn.yetToBat || [])];
+    const list = inn.xi?.length ? inn.xi : [...(inn.batters || []).map((p) => ({ id: p.id, name: p.name })), ...(inn.yetToBat || []).map((n) => ({ id: "", name: n }))];
     const k = teamKey(inn.team);
-    if (names.length && (!out.has(k) || names.length > out.get(k).names.length)) out.set(k, { names, complete: names.length >= 11 });
+    if (list.length && (!out.has(k) || list.length > out.get(k).names.length)) out.set(k, { names: list.map((x) => x.name), ids: new Set(list.map((x) => x.id).filter(Boolean)), complete: list.length >= 11 });
   }
   return out;
 }
 
-/** True only when the side's XI is fully known and the player is not in it. */
-export function notInXI(match, name, team) {
+const surname = (n) => norm(n).split(" ").filter(Boolean).pop() || "";
+
+/**
+ * True only when the side's XI is fully known and the player is not in it. With the source's own id for the player the answer is exact. Without one it goes by name,
+ * and a name is not enough to say "not in": the source gives the common name ("Kusal Mendis") where the data has initials ("BKG Mendis"), so anyone in the XI
+ * who shares his surname might be him, and he is left unmarked. (Better a missed mark than a wrong one.)
+ */
+export function notInXI(match, name, team, sourceId = "") {
   const xi = playingXI(match).get(teamKey(team));
-  return !!xi?.complete && !xi.names.some((n) => namesMatch(n, name));
+  if (!xi?.complete) return false;
+  if (sourceId && xi.ids.size) return !xi.ids.has(sourceId);
+  if (xi.names.some((n) => namesMatch(n, name))) return false;
+  const sur = surname(name);
+  return !xi.names.some((n) => surname(n) === sur);
 }

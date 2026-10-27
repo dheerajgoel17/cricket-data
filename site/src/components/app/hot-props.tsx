@@ -129,9 +129,11 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
     const m = liveForFixture(live.data, { a, b, start: r.start }), p = livePlayer(m, r.name, r.stat), v = liveStat(p, r.stat);
     return v == null ? null : { v, state: liveState(m, p, r.stat) };
   };
+  const { store, photos } = useData();
   const outOf = (r: Row) => {
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team);
+    const v = (photos as any)?.p?.[store.P.id[r.idx]], sourceId = typeof v === "string" && v.startsWith("c:") ? v.slice(2) : ""; // the source's id for him, when the data has linked it
+    return notInXI(liveForFixture(live.data, { a, b, start: r.start }), r.name, r.team, sourceId);
   };
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
