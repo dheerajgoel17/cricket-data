@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, withArchive } from "../src/engine/lines.js";
+import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -138,6 +138,14 @@ test("sameFixture tells a series' matches apart: the same two sides, and a start
   assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, fx), false, "the next game of the series");
   assert.equal(sameFixture({ match: "New Zealand vs Pakistan", start_utc: "2026-10-27T07:00:00Z" }, fx), false);
   assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, { a: "New Zealand", b: "India" }), true, "no start known: the names decide");
+});
+
+test("sameFixture knows a side the books and the schedule name differently (the Ford Trophy)", () => {
+  const at = { start: "2026-10-27T21:30Z" };
+  const books = [["Auckland Aces vs Canterbury Kings", "Auckland", "Canterbury"], ["Central Stags vs Northern Districts", "Central Stags", "Northern Brave"], ["Wellington Firebirds vs Otago Volts", "Wellington", "Otago"]];
+  for (const [match, a, b] of books) assert.equal(sameFixture({ match, start_utc: "2026-10-27T21:30:00Z" }, { a, b, ...at }), true, match);
+  assert.equal(sameFixture({ match: "Auckland Aces vs Otago Volts", start_utc: "2026-10-27T21:30:00Z" }, { a: "Auckland", b: "Canterbury", ...at }), false);
+  assert.equal(teamKey("Northern Districts"), teamKey("Northern Brave"));
 });
 
 test("withArchive puts a stored result on the archived line it belongs to, matched by id and stat, and leaves the others without one", () => {

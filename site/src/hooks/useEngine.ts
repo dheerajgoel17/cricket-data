@@ -34,7 +34,11 @@ export function useFixtureBooks(id: string) {
   const archive = useQuery({ queryKey: ["archive", id], enabled: need, queryFn: () => loadArchive(id), staleTime: Infinity });
   const entry = need ? archive.data ?? null : null;
   return useMemo(() => {
-    const teamIx = (name: string, g: string) => (store.teams || []).findIndex((t: any) => teamKey(t.n) === teamKey(name) && (t.g ?? 0) === (g === "female" ? 1 : 0));
+    const teamIx = (name: string, g: string) => {
+      const ts: any[] = store.teams || [], gi = g === "female" ? 1 : 0, mine = (t: any) => (t.g ?? 0) === gi;
+      const i = ts.findIndex((t) => mine(t) && t.n === name);
+      return i >= 0 ? i : ts.findIndex((t) => mine(t) && teamKey(t.n) === teamKey(name));
+    };
     return { fx: listed ?? (entry ? archiveFixture(entry, teamIx) : null), doc: entry ? withArchive(lines.data, entry) : lines.data, archived: !!entry,
       isLoading: fixtures.isLoading || (need && archive.isLoading) };
   }, [listed, entry, lines.data, fixtures.isLoading, need, archive.isLoading, store]);

@@ -1,5 +1,6 @@
 // Bookmaker / exchange lines for a player (value_bets/out/book_lines.json): which line is "the" line and how the market prices it.
 // All prices are decimal back prices as published; nothing here is computed by a model. Pure functions, unit-tested.
+import { SAME_SIDE } from "./util.js";
 
 export const BOOK_NAMES = { bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
 export const bookName = (src) => BOOK_NAMES[src] || src;
@@ -37,7 +38,10 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
 }
 
 /** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
-export const teamKey = (n) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
+export const teamKey = (n) => {
+  const k = String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
+  return SAME_SIDE[k] || k;
+};
 
 const BOOK_WINDOW_MS = 14 * 3600e3;
 
