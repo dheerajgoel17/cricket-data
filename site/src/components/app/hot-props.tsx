@@ -192,7 +192,6 @@ export function HotProps() {
           </>
         )}
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">Price is the best decimal price on the over from the books we track. L10, season and H2H are hit rates over the line from the player's own history in that format; Edge is the best over price × the all-time hit rate − 1 (needs 10+ games). A guide, not betting advice.</p>
     </section>
   );
 }
