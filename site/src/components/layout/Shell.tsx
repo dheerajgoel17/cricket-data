@@ -46,15 +46,21 @@ function AppSidebar() {
   );
 }
 
+/** Phones: iOS-style tab bar. Full width, translucent blur over a hairline top border, 49pt tall plus the home-indicator inset, 10pt labels, tint on the active tab, a press-in on tap. */
 function TabBar() {
   const { pathname } = useLocation();
   return (
-    <nav className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-60 flex rounded-full border bg-background/85 px-2 shadow-[0_8px_30px_rgba(0,0,0,.55)] backdrop-blur-xl md:hidden" aria-label="Sections">
-      {TAB_NAV.map(({ to, label, icon: Icon, match }) => (
-        <NavLink key={to} to={to} className={cn("grid flex-1 justify-items-center gap-0.5 py-2 text-[11px] font-semibold", match(pathname) ? "text-foreground" : "text-muted-foreground")}>
-          <Icon className="size-5" strokeWidth={1.8} />{label}
-        </NavLink>
-      ))}
+    <nav className="fixed inset-x-0 bottom-0 z-60 flex border-t border-white/10 bg-background/70 pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-[1.8] md:hidden" aria-label="Sections">
+      {TAB_NAV.map(({ to, label, icon: Icon, match }) => {
+        const on = match(pathname);
+        return (
+          <NavLink key={to} to={to} aria-current={on ? "page" : undefined} className={cn("flex h-[49px] flex-1 flex-col items-center justify-center gap-[3px] pt-1 text-[10px] font-medium tracking-[.01em] transition-colors", on ? "text-primary" : "text-muted-foreground")}>
+            <motion.span whileTap={{ scale: 0.86 }} transition={{ type: "spring", stiffness: 600, damping: 30 }} className="grid justify-items-center gap-[3px]">
+              <Icon className="size-[25px]" strokeWidth={on ? 2.2 : 1.7} />{label}
+            </motion.span>
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }
@@ -80,7 +86,7 @@ export function Shell() {
   const { pathname } = useLocation();
   const playerScreen = pathname.startsWith("/player/");
   return (
-    <SidebarProvider className="min-h-screen flex-col pb-24 md:pb-0">
+    <SidebarProvider className="min-h-screen flex-col pb-[calc(49px+env(safe-area-inset-bottom))] md:pb-0">
       <div className={cn(playerScreen && "max-md:hidden")}><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
