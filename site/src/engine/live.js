@@ -128,6 +128,45 @@ export function fixtureInBooks(books, fixture) {
   return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < BOOK_WINDOW_MS));
 }
 
+/** A comma-separated file with quoted fields (`"a,b"`, `""` for a quote) as one object per row, keyed by the header line. */
+export function parseFixtureCsv(text) {
+  const rows = [];
+  let row = [], cur = "", quoted = false;
+  const end = () => { row.push(cur); cur = ""; if (row.length > 1 || row[0]) rows.push(row); row = []; };
+  const t = String(text || "");
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (quoted) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else quoted = false; } else cur += c; }
+    else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && t[i + 1] === "\n") i++; end(); }
+    else cur += c;
+  }
+  if (cur || row.length) end();
+  const [head = [], ...body] = rows;
+  return body.map((r) => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ""])));
+}
+
+/**
+ * Priced matches that began in the last 40 hours and are not on the source's schedule page. The page lists live and upcoming games only, so a finished match drops off it
+ * soon after the end and its scorecard with it, though the match page itself is still served. The rows come from our own schedule file (team names, start and the match
+ * page's own path), so that page can still be read and the props on the match settled from the real numbers.
+ */
+export function unlistedRows(listed, books, schedule, base = "", now = Date.now()) {
+  const out = [];
+  for (const b of books || []) {
+    if (!Number.isFinite(b.t) || b.t > now || now - b.t > 40 * 3600e3) continue;
+    const there = (listed || []).some((m) => { const n = (m.teams || []).map((x) => teamKey(x.name)); return n.includes(b.a) && n.includes(b.b) && (!m.start || Math.abs(Date.parse(m.start) - b.t) < BOOK_WINDOW_MS); });
+    if (there) continue;
+    const f = (schedule || []).find((r) => r.url && r.start_utc && Math.abs(Date.parse(r.start_utc) - b.t) < BOOK_WINDOW_MS
+      && ((teamKey(r.team_a) === b.a && teamKey(r.team_b) === b.b) || (teamKey(r.team_a) === b.b && teamKey(r.team_b) === b.a)));
+    if (!f || out.some((m) => m.id === f.match_id)) continue;
+    out.push({ id: f.match_id, status: f.status === "Completed" ? "final" : "live", fmt: f.format, start: new Date(f.start_utc).toISOString(), summary: f.result || "", note: "",
+      url: `${base}${f.url}`, teams: [{ name: f.team_a, abbr: f.team_a }, { name: f.team_b, abbr: f.team_b }], innings: [], players: [] });
+  }
+  return out;
+}
+
 export function pricedLive(matches, books) {
   if (!books?.length) return [];
   return (matches || []).filter((m) => {
@@ -273,11 +312,14 @@ export function parseMatchPage(html) {
   const thisOver = overs.length ? overs[overs.length - 1].balls : [];
   const inn = batIsA ? t1 : t2;
   const crr = nFloat(sv.crr), rrr = nFloat(sv.rrr);
+  // `status` is the schedule's own code (0 not started, 1 in play, 2 finished); `B` is the line the page shows under the score ("Sri Lanka won by 8 wickets")
+  const done = Number(sv.status) === 2;
+  const text = (x) => String(x || "").replace(/<[^>]*>/g, "").replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, "").replace(/\s+/g, " ").trim();
   return {
     id: String(sv.mf || ""),
-    status: t1.display || t2.display ? "live" : "upcoming",
+    status: done ? "final" : t1.display || t2.display ? "live" : "upcoming",
     start: "",
-    summary: String(sv.comment1 || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim(),
+    summary: text(sv.comment1) || (done ? text(sv.B) : ""),
     note: "",
     url: "",
     teams: [
@@ -440,7 +482,7 @@ export function buildMatch(row, live, card) {
   });
   return {
     ...row,
-    status: row.status === "final" ? "final" : lined.some((t) => t.display) ? "live" : "upcoming",
+    status: row.status === "final" || live?.status === "final" ? "final" : lined.some((t) => t.display) ? "live" : "upcoming",
     summary: live?.summary || row.summary,
     teams: lined,
     innings,

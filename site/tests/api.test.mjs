@@ -115,6 +115,7 @@ test("GET /api/live builds priced matches from the one source's pages, then reus
     seen.push({ url: String(url), init: {} });
     const u = String(url), html = (t) => ({ ok: true, status: 200, text: async () => t });
     if (u.includes("book_lines.json")) return { ok: true, status: 200, json: async () => BOOKS };
+    if (u.includes("upcoming.csv")) return html("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n");
     if (u === "https://src.test/schedule") return html(SCHEDULE);
     if (u.endsWith("ned-vs-oma-14VC/match-scorecard")) return html(SCORECARD);
     if (u.endsWith("ned-vs-oma-14VC")) return html(MATCH_PAGE);
@@ -136,11 +137,40 @@ test("GET /api/live builds priced matches from the one source's pages, then reus
   assert.equal(m.card.length, 1);
   assert.deepEqual(m.partnership, { runs: 19, balls: 19 });
   assert.ok(seen.some((s) => s.url.endsWith("ned-vs-oma-14VC")) && seen.some((s) => s.url.endsWith("/match-scorecard")));
-  assert.ok(seen.every((s) => s.url.includes("src.test") || s.url.includes("book_lines.json")), "only the one source and our own book file");
+  assert.ok(seen.every((s) => s.url.includes("src.test") || s.url.includes("book_lines.json") || s.url.includes("upcoming.csv")), "only the one source and our own book and schedule files");
   assert.ok(!seen.some((s) => s.url.includes("oma-u19")), "no pages for unpriced games");
   assert.match(r.headers["Cache-Control"], /s-maxage=15/);
   const n = seen.length;
   await callLive();
   assert.equal(seen.length, n);
   assert.equal((await callLive("POST")).code, 405);
+});
+
+test("GET /api/live reads a finished match from its own page when the schedule page has dropped it, and keeps it for ten minutes", async () => {
+  const { default: fresh } = await import("../api/live.js?dropped"); // its own cache
+  const start = new Date(Date.now() - 6 * 3600e3), iso = start.toISOString().slice(0, 16) + "Z";
+  const books = { events: [{ match: "Pakistan vs Sri Lanka", start_utc: start.toISOString() }, { match: "Namibia vs Ireland", start_utc: start.toISOString() }] };
+  const csv = ["start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result",
+    `${iso},pak-vs-sl-5th-odi,Tri Series,ODI,male,Pakistan,Sri Lanka,"Gaddafi Stadium, Lahore",Live,/cricket-live-score/pak-vs-sl-5th-odi,`,
+    `${iso},nam-vs-ire-3rd-odi,League 2,ODI,male,Namibia,Ireland,Windhoek,Live,/cricket-live-score/nam-vs-ire-3rd-odi,`].join("\n");
+  const page = pageHtml({ "https://src.test/v3/getSV3": { team1_f_n: "Sri Lanka", team2_f_n: "Pakistan", team1short: "SL", team2short: "PAK", inning: 2, status: 2, score1: "114-2", over1: "(18.1)",
+    score2: "110-10", over2: "(25.3)", B: "Sri Lanka won by 8 wickets" } });
+  const hits = [];
+  globalThis.fetch = async (url) => {
+    const u = String(url), html = (t) => ({ ok: true, status: 200, text: async () => t });
+    hits.push(u);
+    if (u.includes("book_lines.json")) return { ok: true, status: 200, json: async () => books };
+    if (u.includes("upcoming.csv")) return html(csv);
+    if (u === "https://src.test/schedule") return html(pageHtml({ "https://src.test/fixture/getFixture": [] }));
+    if (u.endsWith("pak-vs-sl-5th-odi")) return html(page);
+    return { ok: false, status: 404, json: async () => ({}), text: async () => "" }; // Namibia v Ireland's page is not served
+  };
+  const call = () => new Promise((resolve) => { const res = { setHeader() {}, status(c) { this.code = c; return this; }, json(o) { resolve({ code: this.code, body: o }); } }; fresh({ method: "GET" }, res); });
+  const r = await call();
+  assert.equal(r.code, 200);
+  assert.equal(r.body.matches.length, 1, "Namibia v Ireland's page could not be read, so it is not shown as a match in play");
+  const [m] = r.body.matches;
+  assert.deepEqual([m.status, m.summary, m.teams[0].name, m.teams[1].display], ["final", "Sri Lanka won by 8 wickets", "Pakistan", "114/2 (18.1 ov)"]);
+  assert.ok(!JSON.stringify(r.body).includes("src.test"), "no source URL in the public body");
+  assert.ok(hits.some((u) => u.endsWith("pak-vs-sl-5th-odi/match-scorecard")), "the scorecard page is read too");
 });

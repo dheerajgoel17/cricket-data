@@ -1,11 +1,13 @@
 // GET /api/live -> {asOf, source, matches[]}. Source A only, cached ~15 s.
 // The schedule page lists live and upcoming games with their match URLs and scores (Source A caches it ~5 min); only matches the books price are kept.
+// A finished match drops off that page soon after the end; a priced one that began in the last 40 h is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
 // and the match-scorecard page (getSC4) adds every innings. All three are HTML pages ($LIVE_SOURCE_BASE robots Allow); we never hit $LIVE_SOURCE_BASE/api.
 // "So far" numbers only — the site never settles a prop from this feed.
-import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseMatchPage, parseSchedule, parseCardPage, pricedLive, wantsCard } from "../src/engine/live.js";
+import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, unlistedRows, wantsCard } from "../src/engine/live.js";
 
 const BOOKS = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
+const SCHEDULE_FILE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer lists
 // Where the pages live is configuration, not code: LIVE_SOURCE_BASE (no trailing slash) comes from the deployment's environment variables.
 const base = () => {
   const b = String(process.env.LIVE_SOURCE_BASE || "").replace(/\/+$/, "");
@@ -14,16 +16,24 @@ const base = () => {
 };
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
 const HTML_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-const MAX_CARDS = 8;
+const MAX_CARDS = 12;
+const FINAL_TTL_MS = 10 * 60e3; // a finished match does not change: its pages are read once in ten minutes, not every 15 seconds
 const FETCH_MS = 8000;
 
 let inflight = null;
+const finals = new Map(); // match page URL -> { t, pages }
 let memo = { t: 0, body: null };
 
 async function getJson(url) {
   const r = await fetch(url, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(FETCH_MS) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
+}
+
+async function getText(url) {
+  const r = await fetch(url, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(FETCH_MS) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.text();
 }
 
 async function getHtml(url) {
@@ -37,16 +47,22 @@ async function snapshot() {
   if (memo.body && now - memo.t < LIVE_TTL_MS) return memo.body;
   if (inflight) return inflight;
   inflight = (async () => {
-    const [booksDoc, schedule] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`)]);
-    const rows = pricedLive(parseSchedule(schedule, base()), bookFixtures(booksDoc));
+    const [booksDoc, schedule, ours] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`), getText(SCHEDULE_FILE).catch(() => "")]);
+    const books = bookFixtures(booksDoc), listed = pricedLive(parseSchedule(schedule, base()), books);
+    const gaps = unlistedRows(listed, books, parseFixtureCsv(ours), base());
+    const rows = [...listed, ...gaps];
     const pages = new Map();
     const rank = { live: 0, upcoming: 1, final: 2 }; // the cap goes to matches in play first, finished ones last
     await Promise.allSettled(rows.filter((m) => m.url && wantsCard(m)).sort((a, b) => rank[a.status] - rank[b.status]).slice(0, MAX_CARDS).map(async (m) => {
+      const kept = finals.get(m.url);
+      if (kept && Date.now() - kept.t < FINAL_TTL_MS) return void pages.set(m, kept.pages);
       const [live, card] = await Promise.all([getHtml(m.url).catch(() => ""), getHtml(cardPageUrl(m.url)).catch(() => "")]);
-      pages.set(m, { live: parseMatchPage(live), card: parseCardPage(card) });
+      const got = { live: parseMatchPage(live), card: parseCardPage(card) };
+      pages.set(m, got);
+      if (got.live && (got.live.status === "final" || m.status === "final")) finals.set(m.url, { t: Date.now(), pages: got });
     }));
-    // the public body names no source: match URLs stay on the server
-    const matches = rows.map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return pub; });
+    // the public body names no source: match URLs stay on the server. A match the schedule no longer lists is kept only if its own page was read.
+    const matches = rows.filter((m) => !gaps.includes(m) || pages.get(m)?.live).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return pub; });
     const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, matches };
     memo = { t: Date.now(), body };
     return body;

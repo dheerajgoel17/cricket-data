@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  namesMatch, oversToBalls, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, wantsCard,
+  namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, strikeRate, teamKey, teamScore, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
 
 function pageHtml(payload) {
@@ -514,4 +514,59 @@ test("a player is found by the name the books use: BKG Mendis is Kusal Mendis, a
   assert.equal(liveStat(livePlayer(m, "PHKD Mendis", "runs", "Kamindu Mendis"), "runs"), 5);
   assert.equal(lineVerdict(liveStat(livePlayer(m, "BKG Mendis", "sixes", "Kusal Mendis"), "sixes"), 0.5), "cleared", "he has hit his six");
   assert.equal(livePlayer(m, "Dasun Shanaka", "runs", "Dasun Shanaka"), null, "a name nobody has is no match");
+});
+
+// ---- a finished match the schedule page no longer lists: read from its own match page, found through our schedule file
+const pkSl = pageHtml({ [LIVE]: {
+  team1_f_n: "Sri Lanka", team2_f_n: "Pakistan", team1short: "SL", team2short: "PAK", inning: 2, status: 2, score1: "114-2", over1: "(18.1)", score2: "110-10", over2: "(25.3)",
+  B: "Sri Lanka won by 8 wickets \u{1F3C6}", comment1: "", player_full_name1: "Kusal Mendis", run1: "62", ball1: "(60)", four1: "6", six1: "2", os1: 1,
+} });
+const SCHEDULE_CSV = [
+  "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result",
+  '2026-10-27T08:00Z,pak-vs-sl-5th-odi,ODI Tri Series in Pakistan 2026,ODI,male,Pakistan,Sri Lanka,"Gaddafi Stadium, Lahore",Live,/cricket-live-score/pak-vs-sl-5th-odi,',
+  '2026-10-27T14:30Z,afg-vs-zim-1st-t20i,Afghanistan vs Zimbabwe in UAE 2026,T20,male,Afghanistan,Zimbabwe,"Sharjah Cricket Stadium, Sharjah",Upcoming,/cricket-live-score/afg-vs-zim-1st-t20i,',
+  '2026-10-27T07:00Z,ind-vs-nz-3rd-t20i,India tour of New Zealand 2026,T20,male,New Zealand,India,"Hnry Stadium, Wellington",Completed,/cricket-live-score/ind-vs-nz-3rd-t20i,"India won by 5 runs, ""DLS"""',
+].join("\n");
+
+test("parseFixtureCsv reads quoted commas and quotes, and survives an empty file", () => {
+  const rows = parseFixtureCsv(SCHEDULE_CSV);
+  assert.equal(rows.length, 3);
+  assert.equal(rows[0].venue, "Gaddafi Stadium, Lahore");
+  assert.equal(rows[0].result, "");
+  assert.equal(rows[2].result, 'India won by 5 runs, "DLS"');
+  assert.deepEqual([rows[1].match_id, rows[1].status, rows[1].url], ["afg-vs-zim-1st-t20i", "Upcoming", "/cricket-live-score/afg-vs-zim-1st-t20i"]);
+  assert.deepEqual(parseFixtureCsv(""), []);
+  assert.deepEqual(parseFixtureCsv("a,b\r\n1,2\r\n"), [{ a: "1", b: "2" }]);
+});
+
+test("a match page that says status 2 is final, with its result line; the schedule's word 'live' no longer beats it", () => {
+  const m = parseMatchPage(pkSl);
+  assert.equal(m.status, "final");
+  assert.equal(m.summary, "Sri Lanka won by 8 wickets", "the trophy is dropped");
+  const row = { id: "x", status: "live", start: "2026-10-27T08:00:00.000Z", teams: [{ name: "Pakistan", abbr: "Pakistan" }, { name: "Sri Lanka", abbr: "Sri Lanka" }], innings: [], players: [] };
+  const b = buildMatch(row, m, null);
+  assert.equal(b.status, "final");
+  assert.equal(b.summary, "Sri Lanka won by 8 wickets");
+  assert.deepEqual(b.teams.map((t) => t.display), ["110/10 (25.3 ov)", "114/2 (18.1 ov)"]);
+  // a live match page (status 1) and a match not yet started (status 0) are unchanged
+  assert.equal(parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "A", team2_f_n: "B", status: 1, score1: "10-0", over1: "(1.0)" } })).status, "live");
+  assert.equal(parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "A", team2_f_n: "B", status: 0, score1: "0-0" } })).status, "upcoming");
+});
+
+test("unlistedRows: a priced match that began and is not on the schedule page comes back from our schedule file", () => {
+  const now = Date.parse("2026-10-27T14:00:00Z"), sched = parseFixtureCsv(SCHEDULE_CSV);
+  const books = bookFixtures({ events: [{ match: "Pakistan vs Sri Lanka", start_utc: "2026-10-27T08:00:00Z" }, { match: "Afghanistan vs Zimbabwe", start_utc: "2026-10-27T14:30:00Z" },
+    { match: "India vs New Zealand", start_utc: "2026-10-27T07:00:00Z" }, { match: "Namibia vs Ireland", start_utc: "2026-10-27T07:30:00Z" }, { match: "South Africa vs Australia", start_utc: "2026-10-24T08:30:00Z" }] });
+  const listed = [{ id: "n", start: "2026-10-27T07:00:00.000Z", teams: [{ name: "New Zealand" }, { name: "India" }] }];
+  const rows = unlistedRows(listed, books, sched, "https://src.test", now);
+  assert.deepEqual(rows.map((r) => r.id), ["pak-vs-sl-5th-odi"], "NZ v India is listed; Afghanistan v Zimbabwe has not begun; no schedule row for Namibia; the old one is past 40 hours");
+  const [r] = rows;
+  assert.deepEqual([r.status, r.fmt, r.start, r.url], ["live", "ODI", "2026-10-27T08:00:00.000Z", "https://src.test/cricket-live-score/pak-vs-sl-5th-odi"]);
+  assert.deepEqual(r.teams.map((t) => t.name), ["Pakistan", "Sri Lanka"]);
+  assert.ok(wantsCard(r, now), "its page is read");
+  // a match our schedule file already calls Completed is final from the start, and the file's own result line is kept
+  const done = unlistedRows([], books, sched, "", now).find((x) => x.id === "ind-vs-nz-3rd-t20i");
+  assert.deepEqual([done.status, done.summary], ["final", 'India won by 5 runs, "DLS"']);
+  assert.deepEqual(unlistedRows(listed, null, sched), []);
+  assert.deepEqual(unlistedRows(listed, books, null, "", now).length, 0);
 });
