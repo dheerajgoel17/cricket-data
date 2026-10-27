@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 
-from . import booklines, config, fancy, history, store, strategy, weather
+from . import archive, booklines, config, fancy, history, store, strategy, weather
 from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
@@ -736,6 +736,12 @@ def run():
         prev_book = json.loads((config.OUT / "book_lines.json").read_text())
     except (OSError, ValueError):
         prev_book = None
+    try:  # every match's props are kept for good; this must never stop the run
+        fx_of = {(r.get("match"), r.get("start_utc")): clusters[r["event_key"]]["fixture"] for r in rows if (clusters.get(r.get("event_key")) or {}).get("fixture")}
+        wrote, bad = archive.update(config.ARCHIVE, book, now, fx_of, fixtures)
+        log(f"archive: {len(wrote)} match file(s) written" + (f", {len(bad)} unreadable and left as they are" if bad else ""))
+    except Exception as e:
+        log(f"archive failed: {e!r}")
     book = booklines.carry_started(book, prev_book, now)  # a match stays in the file while it is being played
     (config.OUT / "book_lines.json").write_text(json.dumps(book, separators=(",", ":")))
     (config.OUT / "new_alerts.json").write_text(json.dumps({"generated_at_ist": ist(now), "alerts": alerts},

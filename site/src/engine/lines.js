@@ -84,3 +84,30 @@ export function fancyFor(doc, fixture, key, team = null) {
     return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < 14 * 3600e3;
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
 }
+
+/** A fixture id as the schedule makes it (start date + team slugs): the only thing the archive is asked for, so a link cannot name another path. */
+export const isFixtureId = (id) => /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*$/.test(String(id));
+
+/**
+ * The fixture an archive file (value_bets/archive, see src/value_bets/archive.py) stands for: the schedule row it was filed with, else one made from the books' own names.
+ * `teamIx(name, gender)` gives the data's index for a team (-1 if unknown). A match that began long ago (12 h; 6 days for a Test) is Completed.
+ */
+export function archiveFixture(entry, teamIx, now = Date.now()) {
+  if (!entry?.id) return null;
+  const [pa, pb] = String(entry.match || "").split(/\s+vs\s+/i);
+  const f = entry.fixture || { start: entry.start_utc, fmt: entry.lines?.[0]?.fmt || "", gender: /\(w\)|women/i.test(entry.match || "") ? "female" : "male", a: pa, b: pb, venue: "", series: entry.competition || "" };
+  const age = now - Date.parse(f.start);
+  return { ...f, id: entry.id, a_ix: teamIx?.(f.a, f.gender) ?? -1, b_ix: teamIx?.(f.b, f.gender) ?? -1, status: age > (f.fmt === "Test" ? 6 * 86400e3 : 12 * 3600e3) ? "Completed" : "", result: "", source: "archive" };
+}
+
+/**
+ * The book doc with an archived match's lines and fancy lines added, for the sections that match has none of in the doc (the live file lets a match go a day and a half
+ * after the start; the archive keeps it for good). Lines come back with the match, competition and start the file holds once. `events` are left out: they decide which
+ * fixtures the home page lists, and an old match must not come back there.
+ */
+export function withArchive(doc, entry) {
+  const fx = archiveFixture(entry);
+  if (!fx) return doc;
+  const have = fixtureBooks(doc, fx), shared = { match: entry.match, competition: entry.competition, start_utc: entry.start_utc };
+  return { ...doc, lines: have.props ? doc?.lines : [...(doc?.lines || []), ...(entry.lines || []).map((l) => ({ ...l, ...shared }))], fancy: have.fancy ? doc?.fancy : [...(doc?.fancy || []), ...(entry.fancy || [])] };
+}

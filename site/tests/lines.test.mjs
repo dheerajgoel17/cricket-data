@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bookLinesFor, bookName, fancyFor, fixtureBooks, lineProb, overProb } from "../src/engine/lines.js";
+import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -77,4 +77,56 @@ test("fixtureBooks hides player-prop vs fancy sections when that match has no li
   assert.deepEqual(fixtureBooks(both, fx), { props: true, fancy: true });
   assert.deepEqual(fixtureBooks({ lines: [L(17.5, 1.85, 1.95)], fancy: [] }, fx), { props: false, fancy: false });
   assert.deepEqual(fixtureBooks(null, fx), { props: false, fancy: false });
+});
+
+// an archive file as src/value_bets/archive.py writes it: the match, competition and start once, lines without them
+const ENTRY = {
+  id: "2026-10-27-new-zealand-v-india", match: "New Zealand vs India", competition: "NZ v IND - 3rd T20", start_utc: "2026-10-27T07:00:00Z",
+  fixture: { id: "2026-10-27-new-zealand-v-india", start: "2026-10-27T07:00Z", fmt: "T20", gender: "male", a: "New Zealand", b: "India", venue: "Eden Park", series: "NZ v IND" },
+  events: [{ match: "New Zealand vs India", n: 10 }],
+  lines: [{ pid: "ab12", player: "Abhishek Sharma", team: "India", fmt: "T20", stat: "runs", line: 17.5, books: [{ source: "bet365", kind: "bookmaker", over: 1.85, under: 1.95 }] }],
+  fancy: [{ match: "New Zealand vs India", home: "New Zealand", away: "India", start_utc: "2026-10-27T07:00:00Z", key: "first_innings_runs", scope: "match", team: null, line: 198.5, over: 1.833, under: 1.833, source: "bet365", kind: "bookmaker" }],
+};
+const teamIx = (name, g) => ({ "New Zealand|male": 7, "India|male": 3 })[`${name}|${g}`] ?? -1;
+
+test("only a fixture id can name an archive file", () => {
+  assert.ok(isFixtureId("2026-10-27-new-zealand-v-india") && isFixtureId("2026-10-29-melbourne-stars-w-v-hobart-hurricanes-w"));
+  for (const bad of ["", "../../main/README", "2026-10-27-a/b", "2026-10-27", "x-y", "2026-10-27-India v NZ", "2026-10-27-a--b"]) assert.equal(isFixtureId(bad), false, bad);
+});
+
+test("an archived match is a fixture again: the schedule row it was filed with, the data's team index, Completed once it is old", () => {
+  const f = archiveFixture(ENTRY, teamIx, Date.parse("2026-10-30T00:00:00Z"));
+  assert.deepEqual([f.id, f.a, f.b, f.a_ix, f.b_ix, f.fmt, f.gender, f.venue, f.status, f.source], ["2026-10-27-new-zealand-v-india", "New Zealand", "India", 7, 3, "T20", "male", "Eden Park", "Completed", "archive"]);
+  assert.equal(archiveFixture(ENTRY, teamIx, Date.parse("2026-10-27T10:00:00Z")).status, "", "3 hours after the start it is still on");
+  assert.equal(archiveFixture({ ...ENTRY, fixture: { ...ENTRY.fixture, fmt: "Test" } }, teamIx, Date.parse("2026-10-30T00:00:00Z")).status, "", "a Test runs for days");
+  assert.equal(archiveFixture(null), null);
+});
+
+test("a match the schedule never listed is built from the books' names (women's sides by their label)", () => {
+  const f = archiveFixture({ id: "2026-10-29-melbourne-stars-w-v-hobart-hurricanes-w", match: "Melbourne Stars (W) vs Hobart Hurricanes (W)", competition: "WBBL", start_utc: "2026-10-29T08:00:00Z", fixture: null, lines: [{ fmt: "T20" }], fancy: [] });
+  assert.deepEqual([f.a, f.b, f.gender, f.fmt, f.series, f.start, f.a_ix], ["Melbourne Stars (W)", "Hobart Hurricanes (W)", "female", "T20", "WBBL", "2026-10-29T08:00:00Z", -1]);
+});
+
+test("withArchive adds the archived lines the live doc no longer has, with the match, competition and start put back on each", () => {
+  const live = { generated_at_utc: "g", lines: [{ ...L(30.5, 1.9, 1.9), match: "Pakistan vs Sri Lanka", pid: "zz99" }], fancy: [], events: [{ match: "Pakistan vs Sri Lanka" }] };
+  const doc = withArchive(live, ENTRY), fx = archiveFixture(ENTRY);
+  assert.deepEqual(fixtureBooks(live, fx), { props: false, fancy: false });
+  assert.deepEqual(fixtureBooks(doc, fx), { props: true, fancy: true });
+  const mine = doc.lines.find((l) => l.pid === "ab12");
+  assert.deepEqual([mine.match, mine.competition, mine.start_utc, mine.line, mine.books[0].over], ["New Zealand vs India", "NZ v IND - 3rd T20", "2026-10-27T07:00:00Z", 17.5, 1.85]);
+  assert.equal(doc.lines.length, 2, "the other match's line stays");
+  assert.deepEqual(doc.events, live.events, "events are left alone: an old match must not come back to the home rail");
+  assert.equal(doc.generated_at_utc, "g");
+  // far from now, the player page's window and the home list's still drop it: only the fixture's own page asks for it
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "T20", Date.parse("2026-11-20T00:00:00Z")), null);
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "T20", Date.parse("2026-11-20T00:00:00Z"), Infinity).main.line, 17.5);
+});
+
+test("withArchive leaves the live doc as it is when it still has the match's lines, and survives no doc or no archive", () => {
+  const live = { lines: [{ ...L(20.5, 1.8, 2.0), match: "New Zealand vs India", pid: "ab12" }], fancy: ENTRY.fancy };
+  const doc = withArchive(live, ENTRY);
+  assert.deepEqual(doc.lines, live.lines);
+  assert.deepEqual(doc.fancy, live.fancy);
+  assert.equal(withArchive(live, null), live);
+  assert.equal(withArchive(undefined, ENTRY).lines.length, 1);
 });

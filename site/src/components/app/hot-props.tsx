@@ -38,24 +38,26 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 interface Row { day: number; idx: number; name: string; bookName: string; settled?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
-function useHotRows() {
+function useHotRows(archive?: any, teams?: [string, string]) {
   const { store, rz } = useData();
-  const doc = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
   const rows = useQuery({
-    queryKey: ["hot-props", doc.data?.generated_at_utc, today],
+    queryKey: ["hot-props", doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : ""],
     enabled: !!doc.data,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
-      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && dayOffset(l.start_utc) >= -1 && Date.parse(l.start_utc) > now - 40 * 3600e3 && l.books?.length) };
+      // an archived match is read whatever its age: only that match's lines, none of the day filters
+      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && l.books?.length && (archive ? sameMatch(l.match, teams!) : dayOffset(l.start_utc) >= -1 && Date.parse(l.start_utc) > now - 40 * 3600e3)) };
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}`, l);
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const work = [...keys.values()].map((l) => async () => {
         const idx = store.P.id.indexOf(l.pid);
-        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, 40 * 3600e3);
+        const b = bookLinesFor(todays, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt }, split_by: [] }, { playerIdx: idx });
@@ -119,8 +121,8 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
 
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams }: { teams?: [string, string] } = {}) {
-  const { data: all, isLoading } = useHotRows();
+export function HotProps({ teams, archive }: { teams?: [string, string]; archive?: any } = {}) {
+  const { data: all, isLoading } = useHotRows(archive, teams);
   const live = useLiveDoc();
   // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
   const onFixture = !!teams;

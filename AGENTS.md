@@ -27,6 +27,7 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 6. Work on a branch, add tests, open a PR; CI must pass (`build`, `site-js`, `test (3.10)`, `test (3.12)`). Python code must stay 3.10-compatible and stdlib-only in `src/cricket_site`. The site is React + TypeScript with a build step; free MIT libraries only, versions pinned by `package-lock.json`.
 7. YAML workflows: lint with `actionlint`; never put `: ` unquoted inside a one-line `run:`.
 8. Prefer editing existing modules over adding abstractions; match the surrounding style (compact, few comments, explain non-obvious rules in docstrings).
+9. Props are never deleted: `value_bets/archive/` (one file per match, written by the pipeline) only grows; never add a job or script that removes or trims it, and keep the fixture page's fallback to it working.
 
 ## Where to look
 * Rules for parsing matches -> `src/cricket_site/parse.py`; output format -> `build.py` (+ the table in PROJECT_GUIDE 5.1).
