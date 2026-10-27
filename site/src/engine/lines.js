@@ -1,7 +1,7 @@
 // Bookmaker / exchange lines for a player (value_bets/out/book_lines.json): which line is "the" line and how the market prices it.
 // All prices are decimal back prices as published; nothing here is computed by a model. Pure functions, unit-tested.
 
-export const BOOK_NAMES = { bet365: "bet365", moviodds_bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
+export const BOOK_NAMES = { bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
 export const bookName = (src) => BOOK_NAMES[src] || src;
 
 /** The market's no-vig probability of the over, from one book's two prices (null if either is missing). */

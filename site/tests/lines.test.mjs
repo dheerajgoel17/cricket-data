@@ -4,7 +4,7 @@ import { bookLinesFor, bookName, fancyFor, fixtureBooks, lineProb, overProb } fr
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
-  start_utc: "2026-10-27T07:00:00Z", books: [{ source: "moviodds_bet365", kind: "bookmaker", over, under }], ...extra });
+  start_utc: "2026-10-27T07:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over, under }], ...extra });
 
 test("overProb removes the margin (hand-computed)", () => {
   // 1.90 / 1.90 -> evens; 1.50 / 2.75: (1/1.5)/((1/1.5)+(1/2.75)) = 0.66667/(0.66667+0.36364) = 0.6471
@@ -52,7 +52,6 @@ test("the nearest upcoming match wins; a match that started long ago is ignored"
 });
 
 test("book names are readable, unknown sources are shown as-is", () => {
-  assert.equal(bookName("moviodds_bet365"), "bet365");
   assert.equal(bookName("smarkets"), "Smarkets");
   assert.equal(bookName("bet365"), "bet365", "published under the book's own name");
   assert.equal(bookName("newbook"), "newbook");
@@ -60,7 +59,7 @@ test("book names are readable, unknown sources are shown as-is", () => {
 
 
 test("fancyFor matches the fixture by team names and time, whole-match or team-total", () => {
-  const f = (o) => ({ home: "New Zealand", away: "India", start_utc: "2026-10-27T07:00:00Z", scope: "match", team: null, source: "moviodds_bet365", over: 1.83, under: 1.83, ...o });
+  const f = (o) => ({ home: "New Zealand", away: "India", start_utc: "2026-10-27T07:00:00Z", scope: "match", team: null, source: "bet365", over: 1.83, under: 1.83, ...o });
   const doc = { fancy: [f({ key: "match_runs", line: 384.5 }), f({ key: "team_total_sixes", scope: "team", team: "New Zealand", line: 9.5 }),
     f({ key: "match_runs", line: 300.5, home: "Pakistan", away: "Sri Lanka" }), f({ key: "match_runs", line: 99.5, start_utc: "2026-11-02T07:00:00Z" })] };
   const fx = { a: "India", b: "New Zealand", startMs: Date.parse("2026-10-27T07:30:00Z") };

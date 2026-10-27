@@ -7,6 +7,7 @@ and use the market line as the default. Prices are decimal back prices only; no 
 from __future__ import annotations
 
 import datetime as dt
+import json
 from collections import defaultdict
 
 from .util import parse_ts
@@ -14,6 +15,14 @@ from .util import parse_ts
 STAT = {"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
 PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
 PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}  # published under the book's own name; the key names the feed it came through
+
+
+def public(doc: dict) -> dict:
+    """The document with every source key under its published name (rows carried over from an older pull included)."""
+    s = json.dumps(doc)
+    for key, name in PUBLIC_SOURCE.items():
+        s = s.replace(key, name)
+    return json.loads(s)
 FMT = {"T20": "T20", "ODI": "ODI", "MULTI": "Test"}  # the pipeline calls a multi-day match MULTI; the site calls it Test
 
 
@@ -89,4 +98,4 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
         old = [x for x in prev.get(kind, []) if (x.get("match"), x.get("start_utc")) not in have and alive(x)]
         if old:
             out[kind] = sorted([*book.get(kind, []), *old], key=order)
-    return out
+    return public(out)
