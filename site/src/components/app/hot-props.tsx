@@ -4,7 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { type ColumnDef, TableBody, TableCell, TableColumnHeader, TableHead, TableHeader, TableHeaderGroup, TableProvider, TableRow } from "@/components/kibo-ui/table";
 import { bookLinesFor } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -115,6 +115,26 @@ export function HotProps() {
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   const rows = useMemo(() => (data || []).filter((r) => (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need]);
+  const columns = useMemo<ColumnDef<Row>[]>(() => {
+    const head = (title: string) => ({ column }: { column: any }) => <TableColumnHeader column={column} title={title} />;
+    const rate = (id: string, title: string, get: (r: Row) => any, tip?: boolean): ColumnDef<Row> => ({ id, accessorFn: (r) => get(r).p ?? -1, header: head(title), sortUndefined: "last",
+      cell: ({ row }) => { const w = get(row.original); return <span className={cn("font-medium tabular-nums", pctClass(w.p))} title={tip && w.played ? `${w.hits} of ${w.played} vs ${row.original.opp}` : undefined}>{pct(w.p)}</span>; } });
+    return [
+      { id: "player", accessorFn: (r) => r.name, header: head("Lines"), cell: ({ row: { original: r } }) => (
+        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 outline-none focus-visible:underline">
+          <PlayerBadge idx={r.idx} size="md" />
+          <span className="min-w-0"><b className="block truncate text-[15px] font-medium">{r.name}<span className="ml-1.5 font-condensed text-xs font-normal uppercase tracking-wide text-muted-foreground">{abbr(r.team)}</span></b>
+            <span className="text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}</span></span></span>
+        </Link>) },
+      { id: "chart", header: "L10 chart", enableSorting: false, cell: ({ row }) => <Spark r={row.original} /> },
+      { id: "odds", accessorFn: (r) => r.over, header: head("Odds"), cell: ({ row }) => <span className="tabular-nums">{odds(row.original.over)}</span> },
+      rate("win", wl, (r) => r[win]),
+      rate("season", String(new Date().getFullYear()), (r) => r.season),
+      rate("h2h", "H2H", (r) => r.h2h, true),
+      { id: "matchup", header: "Matchup", enableSorting: false, cell: ({ row: { original: r } }) => <span className="flex items-center gap-2 text-sm" title={r.match}><TeamBadge name={r.opp} size="xs" />{abbr(r.opp)}</span> },
+      { id: "edge", accessorFn: (r) => r.edge ?? -9, header: head("Edge"), cell: ({ row: { original: r } }) => <span className={cn("font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span> },
+    ];
+  }, [win, wl]);
   return (
     <section aria-label="Hot player props today">
       <div className="flex flex-wrap items-end justify-between gap-2 pt-3">
@@ -131,40 +151,10 @@ export function HotProps() {
           <ul className="divide-y border-b sm:hidden">
             {rows.map((r) => <MobileRow key={`${r.idx}${r.stat}${r.fmt}`} r={r} win={win} wl={wl} />)}
           </ul>
-          <Table className="hidden sm:table">
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="h-11 pl-1 font-condensed text-[13px] uppercase tracking-wider">Lines</TableHead>
-                <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider sm:table-cell">L10 chart</TableHead>
-                <TableHead className="font-condensed text-[13px] uppercase tracking-wider">Odds</TableHead>
-                <TableHead className="font-condensed text-[13px] uppercase tracking-wider">{wl}</TableHead>
-                <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider md:table-cell">{new Date().getFullYear()}</TableHead>
-                <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider md:table-cell">H2H</TableHead>
-                <TableHead className="hidden font-condensed text-[13px] uppercase tracking-wider lg:table-cell">Matchup</TableHead>
-                <TableHead className="pr-1 text-right font-condensed text-[13px] uppercase tracking-wider">Edge</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((r) => (
-                <TableRow key={`${r.idx}${r.stat}${r.fmt}`} className="group h-[62px] cursor-pointer">
-                  <TableCell className="py-2 pl-1">
-                    <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`} className="flex items-center gap-3 outline-none after:absolute after:inset-0 focus-visible:underline">
-                      <PlayerBadge idx={r.idx} size="md" />
-                      <span className="min-w-0"><b className="block truncate text-[15px] font-medium">{r.name}<span className="ml-1.5 font-condensed text-xs font-normal uppercase tracking-wide text-muted-foreground">{abbr(r.team)}</span></b>
-                        <span className="text-[13px] text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}</span></span></span>
-                    </Link>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell"><Spark r={r} /></TableCell>
-                  <TableCell className="tabular-nums">{odds(r.over)}</TableCell>
-                  <TableCell className={cn("font-medium tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)}</TableCell>
-                  <TableCell className={cn("hidden tabular-nums md:table-cell", pctClass(r.season.p))}>{pct(r.season.p)}</TableCell>
-                  <TableCell className={cn("hidden tabular-nums md:table-cell", pctClass(r.h2h.p))} title={r.h2h.played ? `${r.h2h.hits} of ${r.h2h.played} vs ${r.opp}` : "No games against this opponent"}>{pct(r.h2h.p)}</TableCell>
-                  <TableCell className="hidden lg:table-cell"><span className="flex items-center gap-2 text-sm" title={r.match}><TeamBadge name={r.opp} size="xs" />{abbr(r.opp)}</span></TableCell>
-                  <TableCell className={cn("pr-1 text-right font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <TableProvider columns={columns as ColumnDef<unknown, unknown>[]} data={rows} className="hidden sm:table">
+            <TableHeader>{({ headerGroup }) => <TableHeaderGroup key={headerGroup.id} headerGroup={headerGroup}>{({ header }) => <TableHead key={header.id} header={header} className="h-11 font-condensed text-[13px] uppercase tracking-wider" />}</TableHeaderGroup>}</TableHeader>
+            <TableBody>{({ row }) => <TableRow key={row.id} row={row} className="h-[62px]">{({ cell }) => <TableCell key={cell.id} cell={cell} />}</TableRow>}</TableBody>
+          </TableProvider>
           </>
         )}
       </div>

@@ -96,3 +96,13 @@ The Site workflow runs it hourly (resumable, at most `SYNC_LIMIT` new images per
 the browser then tries our copy first and CREX second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
 (dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and CREX is used directly.
 Schema: see the `cricket_assets_schema` migration (tables above plus the `avatars` bucket: public, 200 KB limit, png/webp/jpeg only).
+
+## UI libraries and the iOS / Android apps
+The apps are planned natively (Expo / React Native), like props.cash, whose website is a plain React SPA with separate store apps. So the website and the apps share
+**data and logic, not components**:
+* `site/src/engine/*` (plain ESM, no DOM) and the JSON data files are the shared core. Keep every number and rule there; never import React or the DOM into the engine.
+* Web UI uses free MIT components from the shadcn CLI and its registries (`@magicui`, `@kibo-ui`, `@originui`, `@animate-ui` are registered in `site/components.json`; add with `npx shadcn@latest add @kibo-ui/<name>`),
+  not hand-built widgets. Check the install diff: the CLI can overwrite `ui/*` files and the `.dark` tokens in `index.css`.
+* Prefer touch-first components: nothing that only works on hover (for example the Magic UI dock's magnification), targets of at least 44 px on phones, and `env(safe-area-inset-*)`
+  for fixed bars (`viewport-fit=cover` is set in `site/index.html`, which iOS needs for the insets to be non-zero).
+* Pinned, because Kibo's table is written for TanStack Table v8: `@tanstack/react-table@8`.
