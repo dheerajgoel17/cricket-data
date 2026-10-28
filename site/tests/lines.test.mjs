@@ -198,11 +198,11 @@ test("bookQuotes: a lower line is the friendlier over even at a worse price, and
   assert.deepEqual(q.map((x) => [x.name, x.line, x.over, x.best]), [["bet365", 11.5, 1.833, true], ["Ladbrokes", 11.5, 1.83, false], ["LeoVegas", 12.5, 2.0, false]]);
 });
 
-test("bookQuotes gives a book that lists several lines the one nearest evens, and skips a book with no over price", () => {
+test("bookQuotes gives a book that lists several lines the one nearest evens, and lists a book with no over price last, as an under-only quote", () => {
   // Smarkets: 12.5 at 1.4 / 3.0 is p(over) 0.682 (0.182 from evens), 17.5 at 1.85 / 1.95 is 0.513 (0.013 from evens)
   const q = bookQuotes([{ line: 12.5, books: [B("smarkets", 1.4, 3.0)] }, { line: 17.5, books: [B("smarkets", 1.85, 1.95), B("bet365", null, 1.9), B("Ladbrokes", 1.83, null)] }]);
-  assert.deepEqual(q.map((x) => [x.name, x.line, x.under]), [["Smarkets", 17.5, 1.95], ["Ladbrokes", 17.5, null]]);
-  assert.deepEqual(bookQuotes([{ line: 17.5, books: [B("bet365", 1.0, 1.9)] }]), []);
+  assert.deepEqual(q.map((x) => [x.name, x.line, x.under]), [["Smarkets", 17.5, 1.95], ["Ladbrokes", 17.5, null], ["bet365", 17.5, 1.9]]);
+  assert.deepEqual(bookQuotes([{ line: 17.5, books: [B("bet365", 1.0, 1.9)] }]).map((x) => [x.over, x.under]), [[null, 1.9]]); // 1.0 is no price
   assert.deepEqual(bookQuotes(undefined), []);
   assert.deepEqual(bookQuotes([]), []);
 });
@@ -287,4 +287,17 @@ test("a Test is the same match on any of its days (books price it day by day), a
   assert.equal(sameFixture(line, { ...test, fmt: "T20" }), false);
   assert.equal(sameFixture({ ...line, start_utc: "2026-11-10T03:30:00Z" }, test), false, "a different match of the series, a week or more later");
   assert.equal(fancyFor({ fancy: [{ key: "match_fours", scope: "match", home: "Bangladesh", away: "West Indies", start_utc: "2026-10-29T03:30:00Z", line: 20.5, over: 1.9, under: 1.9, source: "x" }] }, { a: "Bangladesh", b: "West Indies", fmt: "Test", startMs: Date.parse("2026-10-28T03:30:00Z") }, "match_fours").length, 1);
+});
+
+test("an exchange's No on its own line is quoted beside its Yes, and an under-only line is never the main one", async () => {
+  const { bookQuotes, bookLinesFor } = await import("../src/engine/lines.js");
+  const fw = (line, over, under) => ({ line, books: [{ source: "FairWin247 Fancy", over, under }] });
+  const lines = [fw(41.5, null, 1.95), fw(43.5, 2.0, null)];
+  const q = bookQuotes(lines);
+  assert.equal(q.length, 1);
+  assert.deepEqual([q[0].line, q[0].over, q[0].underAt], [43.5, 2.0, { line: 41.5, price: 1.95 }]);
+  const only = bookQuotes([fw(41.5, null, 1.95)]);
+  assert.deepEqual([only[0].over, only[0].under, only[0].underOnly], [null, 1.95, true]);
+  const doc = { lines: lines.map((l) => ({ ...l, pid: "p", stat: "points", fmt: "T20", start_utc: "2099-01-01T00:00:00Z", match: "A vs B" })) };
+  assert.equal(bookLinesFor(doc, "p", "points", "T20").main.line, 43.5);
 });

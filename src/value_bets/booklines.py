@@ -73,9 +73,9 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
         g["_books"][(r["source"], r.get("source_type"))][side] = round(float(back), 3)
     lines = []
     for g in groups.values():
-        books = [{"source": names.get(s, s), "kind": k, "over": sides["over"], "under": sides.get("under")}
+        books = [{"source": names.get(s, s), "kind": k, "over": sides.get("over"), "under": sides.get("under")}
                  for (s, k), sides in sorted(g.pop("_books").items(), key=lambda kv: kv[0])
-                 if "over" in sides]  # a book quoting only the over (an exchange's Yes, whose No sits on another line) still shows its over price; one with no over has nothing the player page shows
+                 ]  # an exchange's Yes (over) and No (under) sit on their own lines: each is a line of its own, with the other side empty
         if books:
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x.get("inn", 0), x["line"]))

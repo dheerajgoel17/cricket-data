@@ -30,15 +30,24 @@ export const SCOPE_LABEL = ["Both innings", "1st innings", "2nd innings"]; // a 
  */
 export function bookQuotes(lines) {
   const far = (q) => Math.abs((overProb(q.over, q.under) ?? 0.5) - 0.5);
-  const mine = new Map();
+  const mine = new Map(), unders = new Map();
   for (const l of lines || []) for (const b of l.books || []) {
-    if (!(b.over > 1)) continue;
+    if (!(b.over > 1)) {
+      // an exchange's No sits on its own line (under L - 0.5 where its Yes is over L' - 0.5): the friendliest under (the highest line) is shown beside the over
+      if (b.under > 1 && !(unders.get(b.source)?.line >= l.line)) unders.set(b.source, { line: l.line, price: b.under });
+      continue;
+    }
     const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null };
     const cur = mine.get(b.source);
     if (!cur || far(q) < far(cur) - 1e-9 || (Math.abs(far(q) - far(cur)) <= 1e-9 && q.line < cur.line)) mine.set(b.source, q);
   }
-  const out = [...mine.values()].sort((a, b) => a.line - b.line || b.over - a.over || a.name.localeCompare(b.name));
-  return out.map((q) => ({ ...q, best: out.length > 1 && q.line === out[0].line && q.over === out[0].over }));
+  for (const [source, u] of unders) {
+    const q = mine.get(source);
+    if (q && q.under == null) q.underAt = u;
+    else if (!q) mine.set(source, { source, name: bookName(source), line: u.line, over: null, under: u.price, underOnly: true });
+  }
+  const out = [...mine.values()].sort((a, b) => (a.over == null) - (b.over == null) || a.line - b.line || (b.over ?? 0) - (a.over ?? 0) || a.name.localeCompare(b.name)); // under-only quotes last
+  return out.map((q) => ({ ...q, best: out.length > 1 && q.over != null && q.line === out[0].line && q.over === out[0].over }));
 }
 
 /**
@@ -56,8 +65,8 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
   if (!here.length) return null;
   const mine = here.map((l) => ({ line: l.line, books: l.books, prob: lineProb(l.books) })).sort((a, b) => a.line - b.line);
   const ref = here[0];
-  const scored = mine.filter((l) => l.prob != null);
-  const main = (scored.length ? scored : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
+  const scored = mine.filter((l) => l.prob != null), withOver = mine.filter((l) => l.books.some((b) => b.over > 1)); // a line is "the" line by its over: an under-only line (an exchange's No) is never the main one while an over is priced
+  const main = (scored.length ? scored : withOver.length ? withOver : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
   return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, inn, lines: mine, main };
 }
 
