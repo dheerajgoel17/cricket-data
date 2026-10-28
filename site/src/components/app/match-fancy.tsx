@@ -7,7 +7,8 @@ import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { lineVerdict, liveMarket } from "@/engine/live.js";
-import { bookName, fancyByLine, fancyFor } from "@/engine/lines.js";
+import { fancyByLine, fancyFor } from "@/engine/lines.js";
+import { BookBadge } from "./book-badge";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -35,7 +36,6 @@ const teamReport = teamTotalReport as (store: any, ms: number[], team: number, k
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null) => { line: number; over: number; under: number; source: string }[];
 type BookLine = { line: number; over: number; under: number; books: { over: number; under: number; source: string }[] };
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
-const names = (l?: BookLine) => (l ? l.books.map((b) => bookName(b.source)).join(" / ") : "");
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const edgeOf = (p: number | null, price: number) => (p != null && price > 1 ? p * price - 1 : null);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
@@ -83,7 +83,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
       const eo = s.n >= 10 ? edgeOf(s.pOver, b.over) : null, eu = s.n >= 10 ? edgeOf(s.pUnder, b.under) : null;
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
       const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
-      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, overBook: b.books.find((x) => x.over === b.over)?.source, underBook: b.books.find((x) => x.under === b.under)?.source, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
     });
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -132,7 +132,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
                         <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
-                          <span className="truncate text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· O {odds(r.over)} · U {odds(r.under)}</span>{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
+                          <span className="line-clamp-2 text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span>{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
                           <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
@@ -167,7 +167,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                           <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">O/U {line}</span>
                           <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => set({ ml: Math.round((line + stepOf(key)) * 2) / 2 })}><Plus /></Button>
                         </div>
-                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{names(b)} line {b.line}</Button>)}
+                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{b.books.map((x) => <BookBadge key={x.source} source={x.source} />)} line {b.line}</Button>)}
                       </div>
                       <div className="grid grid-cols-2 gap-snug">
                         {(["over", "under"] as const).map((side) => {
@@ -182,7 +182,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                                 <div className="grid gap-hair border-t border-white/10 pt-tight text-footnote">
                                   {bookHere.books.map((b) => (
                                     <div key={b.source} className="flex items-baseline justify-between gap-tight">
-                                      <span className="truncate text-muted-foreground">{bookName(b.source)}</span>
+                                      <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
                                       <b className={cn("tabular-nums", bookHere.books.length > 1 && b[side] === bookHere[side] && "text-primary")}>{odds(b[side])}</b>
                                     </div>))}
                                 </div>)}
@@ -198,7 +198,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
                           className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-white/5 px-inset py-snug text-left text-body transition-colors active:bg-accent">
                           {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.some((b) => b.line === l.line) && <span className="truncate rounded-full bg-primary/15 px-tight py-hair text-caption font-semibold text-primary">{names(book.find((b) => b.line === l.line))}</span>}</span>
+                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
                           <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
                           <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
                         </motion.button>))}

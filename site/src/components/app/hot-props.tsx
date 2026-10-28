@@ -21,6 +21,7 @@ import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
+import { BookBadge } from "./book-badge";
 import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
@@ -101,7 +102,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-wrap gap-x-snug gap-y-hair text-footnote tabular-nums text-muted-foreground", className)}>
       {quotes.map((q) => (
         <span key={q.source} className={cn("whitespace-nowrap", q.best && "font-semibold text-primary")}>
-          {q.name} O {q.line} {odds(q.over)}{q.best && <span className="sr-only"> (lowest line, best price)</span>}
+          <BookBadge source={q.source} /> O {q.line} {odds(q.over)}{q.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
       ))}
     </div>
@@ -118,7 +119,7 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{!(books && r.quotes.some((q) => q.line === r.line)) && ` · ${odds(r.over)}`}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
+            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{!(books && r.quotes.some((q) => q.line === r.line)) && <> · {r.quotes.length === 1 && <><BookBadge source={r.quotes[0].source} />{" "}</>}{odds(r.over)}</>}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
