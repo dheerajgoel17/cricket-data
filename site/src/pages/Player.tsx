@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { bookLinesFor, bookName } from "@/engine/lines.js";
+import { bookFormatFor, bookLinesFor, bookName } from "@/engine/lines.js";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
-import { FORMATS } from "@/engine/util.js";
+import { FORMATS, fmtIndex } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
@@ -110,11 +110,12 @@ function PlayerScreen({ idx }: { idx: number }) {
   };
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1);
-  const fmtVal = Number(q.fmt ?? (fmts.length ? fmts[0][0] : 0));
   const stat = q.stat || "runs";
   setTitle("Player stats, hit rates and form chart");
 
   const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out
+  const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
   const book = lines.data ? bookLinesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
   const plan = {
@@ -192,6 +193,13 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
               <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => stepLine(0.5)}><Plus /></Button>
             </div>
           </div>
+          {book && (bookAt ? (
+            <p className="-mt-tight text-callout text-muted-foreground">
+              {bookAt.books.map((b: any) => <span key={b.source} className="mr-snug whitespace-nowrap"><span className="text-footnote">{bookName(b.source)}</span> <b className={cn("font-semibold tabular-nums", side === "over" ? "text-foreground" : "")}>{odds(b.over)}</b> / <b className={cn("font-semibold tabular-nums", side === "under" ? "text-foreground" : "")}>{odds(b.under)}</b></span>)}
+            </p>
+          ) : (
+            <p className="-mt-tight text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
+          ))}
 
           <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
             <ChartBars entries={shown} line={line} side={side} height={300} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />

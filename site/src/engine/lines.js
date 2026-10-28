@@ -37,6 +37,18 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
   return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, lines: mine, main };
 }
 
+/**
+ * The format the books have a line out for this player in (the nearest match that has not started more than `graceMs` ago; lines for `stat` first), or null.
+ * A player page with no format in its link opens on this one, so a Test-priced batter is not shown in T20 where no book has a line.
+ */
+export function bookFormatFor(doc, pid, stat = "", now = Date.now(), graceMs = 3 * 3600e3) {
+  const open = (doc?.lines || []).filter((l) => l.pid === pid && l.books?.length && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
+  const pool = stat && open.some((l) => l.stat === stat) ? open.filter((l) => l.stat === stat) : open;
+  if (!pool.length) return null;
+  const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
+  return pool.reduce((a, l) => (startOf(l) < startOf(a) ? l : a)).fmt;
+}
+
 /** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
 export const teamKey = (n) => {
   const k = String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
