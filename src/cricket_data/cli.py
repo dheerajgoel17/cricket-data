@@ -295,7 +295,14 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
         write_fixtures(out, found)
         rows = [f.row() for f in found]
     else:
-        rows = fetch_schedule()
+        try:  # the first page only reaches ~1-2 days; the paged read goes 5 days ahead and must never cost us the plain one
+            from .crex_schedule import fetch_schedule_paged
+            rows = fetch_schedule_paged()
+        except Exception as exc:  # noqa: BLE001
+            print(f"paged schedule failed ({type(exc).__name__}: {exc}); using the first page only", file=sys.stderr)
+            rows = []
+        if not rows:
+            rows = fetch_schedule()
         if not rows:  # a failed or empty fetch must never wipe the schedule we already have
             print("no fixtures parsed from the Source A schedule page; leaving the existing file alone", file=sys.stderr)
             return 1

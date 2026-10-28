@@ -85,7 +85,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
           </div>
           <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
             <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
-            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
+            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
           </div>
         </div>
       </Card>

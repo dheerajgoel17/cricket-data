@@ -86,3 +86,16 @@ def test_a_finished_match_is_completed_with_its_result_line():
     r = cs.parse_schedule(page([item(status=2, result="IND Won by 6 wickets")]))[0]
     assert r["status"] == "Completed" and r["result"] == "IND Won by 6 wickets"
     assert cs.parse_schedule(page([item(status=1)]))[0]["result"] == ""
+
+
+def test_a_later_page_card_becomes_a_row_and_a_live_or_odd_card_is_skipped():
+    from cricket_data.crex_schedule import row_from_card
+
+    card = {"day": "Thu, 29 Oct 2026", "href": "/cricket-live-score/ind-w-vs-zim-w-3rd-odi-zimbabwe-women-tour-of-india-2026-match-updates-1223", "teams": ["India Women", "Zimbabwe Women"],
+            "time": "2:00 PM", "fmt": "ODI", "meta": "3rd ODI, Zimbabwe Women tour of India 2026"}
+    r = row_from_card(card)
+    assert (r["start_utc"], r["format"], r["gender"], r["series"], r["status"], r["venue"]) == ("2026-10-29T14:00Z", "ODI", "female", "Zimbabwe Women tour of India 2026", "Upcoming", "")
+    assert r["match_id"].endswith("match-updates-1223") and r["url"].startswith("/cricket-live-score/")
+    assert row_from_card({**card, "time": ""}) is None  # a live card shows a score, not a start time
+    assert row_from_card({**card, "teams": ["Only one"]}) is None
+    assert row_from_card({**card, "meta": "1st Multi Day, Sheffield Shield", "fmt": "Multi Day", "teams": ["Tasmania", "New South Wales"], "href": "/cricket-live-score/tas-vs-nsw-x-1"})["format"] == "FC"
