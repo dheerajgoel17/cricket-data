@@ -156,6 +156,16 @@ export function fancyByLine(entries) {
   }));
 }
 
+/**
+ * The lines a fancy market's headline shows, from `fancyByLine`: the first line priced on both sides; else, where an exchange quotes Yes and No on lines a gap apart, the first line
+ * with an over price and the first with an under price, each on its own line. Either can be null.
+ */
+export function fancyHeadline(lines) {
+  const all = lines || [];
+  const two = all.find((l) => l.over != null && l.under != null);
+  return { over: two ?? all.find((l) => l.over != null) ?? null, under: two ?? all.find((l) => l.under != null) ?? null };
+}
+
 /** A fixture id as the schedule makes it (start date + team slugs): the only thing the archive is asked for, so a link cannot name another path. */
 export const isFixtureId = (id) => /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*$/.test(String(id));
 

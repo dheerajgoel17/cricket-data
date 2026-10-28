@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -270,4 +270,12 @@ test("fancyByLine keeps a one-sided line (an exchange's Yes and No sit on lines 
   const e = (line, over, under, source) => ({ line, over, under, source });
   const lines = fancyByLine([e(315.5, 2.0, null, "x"), e(311.5, null, 2.0, "x"), e(315.5, 1.9, null, "y")]);
   assert.deepEqual(lines.map((l) => [l.line, l.over, l.under]), [[311.5, null, 2.0], [315.5, 2.0, null]]);
+});
+
+test("fancyHeadline: the first two-sided line, else the first over line and the first under line each on its own", () => {
+  const L = (line, over, under) => ({ line, over, under });
+  assert.deepEqual(fancyHeadline([L(11.5, null, 2.0), L(12.5, 1.9, 1.9), L(13.5, 2.0, null)]), { over: L(12.5, 1.9, 1.9), under: L(12.5, 1.9, 1.9) });
+  assert.deepEqual(fancyHeadline([L(11.5, null, 2.0), L(13.5, 2.0, null)]), { over: L(13.5, 2.0, null), under: L(11.5, null, 2.0) });
+  assert.deepEqual(fancyHeadline([L(11.5, null, 2.0)]), { over: null, under: L(11.5, null, 2.0) });
+  assert.deepEqual(fancyHeadline([]), { over: null, under: null });
 });
