@@ -1,0 +1,69 @@
+{
+ "data": {
+  "events": [
+   {
+    "event_id": 36224613,
+    "name": "Melbourne Renegades W v Sydney Thunder W",
+    "category": "0",
+    "provider": 0,
+    "competition_id": 10529093,
+    "event_type_id": 4,
+    "open_date": "2026-10-29 04:40:00",
+    "bet_allow": 1,
+    "in_play": 0,
+    "tv_channel": "35244",
+    "bm_active": 1,
+    "fancy_active": 1,
+    "custom_active": "T",
+    "featured_event": 0,
+    "shortcut_event": 0,
+    "market_id": "1.264337425",
+    "id": 10529093,
+    "competition_name": "WBBL",
+    "open_date_format": "2026-10-29T04:40:00.000000Z"
+   },
+   {
+    "event_id": 36224253,
+    "name": "South Africa v Australia",
+    "category": "0",
+    "provider": 0,
+    "competition_id": 11365612,
+    "event_type_id": 4,
+    "open_date": "2026-10-27 08:30:00",
+    "bet_allow": 1,
+    "in_play": 1,
+    "tv_channel": "35262",
+    "bm_active": 1,
+    "fancy_active": 1,
+    "custom_active": "",
+    "featured_event": 1,
+    "shortcut_event": 1,
+    "market_id": "1.264346922",
+    "id": 11365612,
+    "competition_name": "Test Matches",
+    "open_date_format": "2026-10-27T08:30:00.000000Z"
+   },
+   {
+    "event_id": 1789380808,
+    "name": "\ud83c\udfce\ufe0fAZERBAIJAN GRAND PRIX\ud83c\udfc1- RACE",
+    "category": "0",
+    "provider": 1,
+    "competition_id": 999999993,
+    "event_type_id": 100000,
+    "open_date": "2026-09-26 11:00:00",
+    "bet_allow": 1,
+    "in_play": 0,
+    "tv_channel": null,
+    "bm_active": 1,
+    "fancy_active": 0,
+    "custom_active": "",
+    "featured_event": 0,
+    "shortcut_event": 0,
+    "market_id": "1789380808",
+    "id": 999999993,
+    "competition_name": "Others",
+    "open_date_format": "2026-09-26T11:00:00.000000Z"
+   }
+  ]
+ }
+}

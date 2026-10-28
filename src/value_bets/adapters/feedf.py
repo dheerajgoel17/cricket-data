@@ -83,13 +83,21 @@ def dec(rate, lay: bool = False) -> float | None:
     return round(1 + 100 / r, 3) if lay else round(1 + r / 100, 3)
 
 
+def session(yes_line, yes_rate, no_line, no_rate) -> tuple[tuple[float, float] | None, tuple[float, float] | None]:
+    """A session market's two quotes as (over, under) = ((line, decimal), (line, decimal)): Yes at Ly is "over Ly - 0.5", No at Ln is "under Ln - 0.5"; None for a side that is not quoted."""
+    yes, no = dec(yes_rate), dec(no_rate, lay=True)
+    ov = (float(yes_line) - 0.5, yes) if yes and isinstance(yes_line, (int, float)) and yes_line > 0 else None
+    un = (float(no_line) - 0.5, no) if no and isinstance(no_line, (int, float)) and no_line > 0 else None
+    return ov, un
+
+
 def person(last: str, first: str) -> str:
     return f"{first.strip()} {last.strip()}"
 
 
 def abbreviates(abbr: str, name: str) -> bool:
     """True when ``abbr`` ("SL", "ENG") is the initials of ``name`` or its letters in order ("England" -> ENG)."""
-    a, words = abbr.lower(), name.lower().split()
+    a, words = re.sub(r"[\s.]", "", abbr.lower()), name.lower().split()
     if a == "".join(w[0] for w in words):
         return True
     it = iter(name.lower().replace(" ", ""))
@@ -224,10 +232,7 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
             r = (m.get("runners") or [{}])[0]
             if m.get("status") != "OPEN" or m.get("ballRunning") or r.get("rnrSuspended") or r.get("backRnrSuspended") or r.get("layRnrSuspended"):
                 continue
-            yes_line, no_line = r.get("backRuns"), r.get("layRuns")
-            yes, no = dec(r.get("backOdds")), dec(r.get("layOdds"), lay=True)
-            ov = (float(yes_line) - 0.5, yes) if yes and isinstance(yes_line, (int, float)) and yes_line > 0 else None
-            un = (float(no_line) - 0.5, no) if no and isinstance(no_line, (int, float)) and no_line > 0 else None
+            ov, un = session(r.get("backRuns"), r.get("backOdds"), r.get("layRuns"), r.get("layOdds"))
             if not (ov or un):
                 left[name] += 1
                 continue

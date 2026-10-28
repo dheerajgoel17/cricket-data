@@ -39,6 +39,8 @@ env:
   FEEDF_API: ${{ secrets.FEEDF_API }}
   FEEDF_PREMIUM: ${{ secrets.FEEDF_PREMIUM }}
   FEEDF_TENANT: ${{ secrets.FEEDF_TENANT }}
+  FEEDG_NAME: ${{ secrets.FEEDG_NAME }}
+  FEEDG_API: ${{ secrets.FEEDG_API }}
 
 permissions:
   contents: write
