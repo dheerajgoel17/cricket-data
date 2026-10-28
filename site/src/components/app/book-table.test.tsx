@@ -10,7 +10,7 @@ describe("BookTable (the books not shown up front on a fancy line)", () => {
   it("counts only the books that are not shown, and opens a table of their over and under prices", () => {
     render(<BookTable books={books} shown={["Ladbrokes", "bet365"]} />);
     fireEvent.click(screen.getByRole("button", { name: "+1 book" }));
-    expect([...screen.getByRole("table").querySelectorAll("tbody td")].map((c) => c.textContent)).toEqual(["smarkets", "1.85", "1.90"]);
+    expect([...screen.getByRole("table").querySelectorAll("tbody td")].map((c) => c.textContent)).toEqual(["Smarkets", "1.85", "1.90"]);
     expect(screen.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-expanded", "true");
   });
   it("renders nothing when every book is already shown", () => {
