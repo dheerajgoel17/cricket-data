@@ -39,7 +39,7 @@ const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
-type Quote = { source: string; name: string; line: number; over: number; under: number | null; best: boolean };
+type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
 interface Row { day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /**
@@ -124,7 +124,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug">
         <span className={cn("whitespace-nowrap", top.best && "font-semibold text-primary")}>
-          <BookBadge source={top.source} /> O {top.line} {odds(top.over)}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
+          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} {odds(top.over)}{top.underAt && <> · U {top.underAt.line} {odds(top.underAt.price)}</>}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-white/10"
@@ -136,7 +136,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
       {open && (
         <table id={id} className="w-full max-w-sm text-left">
           <thead><tr className="text-caption uppercase tracking-wider"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td>{odds(q.over)}</td><td>{odds(q.under)}</td></tr>)}</tbody>
+          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td>{odds(q.over)}</td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
     </div>
