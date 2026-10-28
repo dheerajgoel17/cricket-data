@@ -104,3 +104,17 @@ export async function renderCard(f, { photo = null, fonts = {} } = {}) {
   text(".", 1000 + fw, 592, 44, GREEN, bold); text("cash", 1000 + fw + 12, 592, 44, "#ffffff", bold);
   return c.toBuffer("image/jpeg", 86);
 }
+
+/** The card's address as a file path (some link-preview crawlers only trust an image URL that looks like a file): /card/player/12/runs/24.5.jpg, /card/fixture/<id>.jpg. */
+export function cardPath(q) {
+  if (q.p != null) return `/card/player/${q.p}${q.stat && q.line != null ? `/${encodeURIComponent(q.stat)}/${q.line}` : ""}.jpg`;
+  return q.f ? `/card/fixture/${encodeURIComponent(q.f)}.jpg` : "/og.png";
+}
+
+/** The inverse: "player/12/runs/24.5.jpg" -> the query `cardFields` takes; {} for anything else. */
+export function cardQuery(path) {
+  const seg = String(path || "").replace(/^\/?card\//, "").replace(/\.jpg$/i, "").split("/").filter(Boolean).map((x) => decodeURIComponent(x));
+  if (seg[0] === "player" && /^\d+$/.test(seg[1] || "")) return seg[2] && seg[3] ? { p: seg[1], stat: seg[2], line: seg[3] } : { p: seg[1] };
+  if (seg[0] === "fixture" && seg[1]) return { f: seg[1] };
+  return {};
+}

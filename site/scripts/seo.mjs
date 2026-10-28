@@ -5,6 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta } from "../src/lib/seo.js";
+import { cardPath } from "../src/engine/card.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
@@ -65,7 +66,7 @@ export function pages({ site, index, fixtures, sitemap }) {
     const title = `${name}: player props, hit rates and book lines`;
     const when = f.start ? new Date(f.start).toUTCString().replace(/ GMT$/, " UTC") : "";
     const { description } = pageMeta(path, title);
-    out.push([`fixture/${f.id}`, { title, description: `${description}${f.venue ? ` ${f.venue}.` : ""}${when ? ` ${when}.` : ""}`, url: abs(path), image: site ? `${site}/api/og?f=${encodeURIComponent(f.id)}` : "", h1: title,
+    out.push([`fixture/${f.id}`, { title, description: `${description}${f.venue ? ` ${f.venue}.` : ""}${when ? ` ${when}.` : ""}`, url: abs(path), image: site ? `${site}${cardPath({ f: f.id })}` : "", h1: title,
       jsonld: [{ "@context": "https://schema.org", "@type": "SportsEvent", name, sport: "Cricket", startDate: f.start || undefined, url: abs(path) || undefined,
         location: f.venue ? { "@type": "Place", name: f.venue } : undefined, homeTeam: { "@type": "SportsTeam", name: f.a }, awayTeam: { "@type": "SportsTeam", name: f.b },
         eventStatus: f.status === "Completed" ? "https://schema.org/EventCompleted" : "https://schema.org/EventScheduled" }, ...(site ? [crumbs(site, [[BRAND, "/"], [name, path]])] : [])] }]);
@@ -80,7 +81,7 @@ export function pages({ site, index, fixtures, sitemap }) {
     seen[m[1]]++;
     const title = { player: `${name}: stats, hit rates and form`, team: `${name}: stats and player grid`, league: `${name}: team tables, totals and top scores` }[m[1]];
     const ldType = { player: { "@type": "Person", jobTitle: "Cricketer" }, team: { "@type": "SportsTeam", sport: "Cricket" }, league: { "@type": "SportsOrganization", sport: "Cricket" } }[m[1]];
-    out.push([`${m[1]}/${m[2]}`, { title, description: pageMeta(p, title).description, url: abs(p), image: m[1] === "player" && site ? `${site}/api/og?p=${m[2]}` : image, h1: title,
+    out.push([`${m[1]}/${m[2]}`, { title, description: pageMeta(p, title).description, url: abs(p), image: m[1] === "player" && site ? `${site}${cardPath({ p: m[2] })}` : image, h1: title,
       jsonld: [{ "@context": "https://schema.org", ...ldType, name, url: abs(p) || undefined }, ...(site ? [crumbs(site, [[BRAND, "/"], [name, p]])] : [])] }]);
   }
   return out;
