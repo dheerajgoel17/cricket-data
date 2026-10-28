@@ -5,9 +5,10 @@ root: event list, menu, fancy markets), ``FEEDF_PREMIUM`` (the sportsbook root) 
 polite by construction: two listings and, per event, one fancy and one premium call, ``FEEDF_SPACING_SECS`` apart, one attempt each, and an HTTP error ends the run.
 
 Premium is decimal and two-way: "1st innings - <Last, First> total" over/unders and "to score N" yes/nos are player rows; "Total fours / sixes" and a side's "total fours /
-sixes" are ``fancy`` lines. Fancy is the exchange's session format: a market quotes Yes at line Ly and No at line Ln with a rate each (100 is even money, so decimal =
-1 + rate / 100). Yes wins at Ly or more, No wins at Ln - 1 or fewer: so Yes is "over Ly - 0.5" and No is "under Ln - 0.5", two lines a gap apart that are one-sided
-unless Ly == Ln. A player's "<name> Run Adv" gives two player rows; match totals (fours, sixes, boundaries, wickets, fifties) and a side's innings runs give ``fancy`` lines.
+sixes" are ``fancy`` lines. Fancy is the exchange's session format: a market quotes Yes at line Ly and No at line Ln with a rate each. Yes (back) at rate R: 100
+staked wins R, so decimal 1 + R / 100. No (lay) at rate R: R staked wins 100, so decimal 1 + 100 / R (100 is even money, 2.00, either way). Yes wins at Ly or more and No wins at
+Ln - 1 or fewer: so Yes is "over Ly - 0.5" and No is "under Ln - 0.5", two lines a gap apart that are one-sided unless Ly == Ln. A player's "<name> Run Adv" gives two player
+rows; match totals (fours, sixes, boundaries, wickets, fifties) and a side's innings runs give ``fancy`` lines.
 
 Rules the book states and the lines carry (``rules``): premium markets void unless 80% of the match is played and have no batting-order condition; fancy side lines count
 only the side batting first (``bat_first``) and void if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
@@ -70,13 +71,16 @@ def published() -> dict[str, str]:
     return {PREMIUM: f"{s['NAME']} Premium", FANCY: f"{s['NAME']} Fancy"} if s else {}
 
 
-def dec(rate) -> float | None:
-    """A session rate as a decimal price: 100 is even money, so 2.00; 85 is 1.85, 115 is 2.15."""
+def dec(rate, lay: bool = False) -> float | None:
+    """A session rate as a decimal price. Yes (back) at rate R: 100 staked wins R, so 1 + R / 100 (100 is 2.00, 85 is 1.85, 115 is 2.15).
+    No (lay) at rate R: R staked wins 100, so 1 + 100 / R (100 is 2.00, 115 is 1.87, 85 is 2.18)."""
     try:
         r = float(rate)
     except (TypeError, ValueError):
         return None
-    return round(1 + r / 100, 3) if r > 0 else None
+    if r <= 0:
+        return None
+    return round(1 + 100 / r, 3) if lay else round(1 + r / 100, 3)
 
 
 def person(last: str, first: str) -> str:
@@ -221,7 +225,7 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
             if m.get("status") != "OPEN" or m.get("ballRunning") or r.get("rnrSuspended") or r.get("backRnrSuspended") or r.get("layRnrSuspended"):
                 continue
             yes_line, no_line = r.get("backRuns"), r.get("layRuns")
-            yes, no = dec(r.get("backOdds")), dec(r.get("layOdds"))
+            yes, no = dec(r.get("backOdds")), dec(r.get("layOdds"), lay=True)
             ov = (float(yes_line) - 0.5, yes) if yes and isinstance(yes_line, (int, float)) and yes_line > 0 else None
             un = (float(no_line) - 0.5, no) if no and isinstance(no_line, (int, float)) and no_line > 0 else None
             if not (ov or un):
