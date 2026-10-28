@@ -1,5 +1,4 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "motion/react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
@@ -57,11 +56,10 @@ export function Shell() {
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.main key={pathname} id="main" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-full min-w-0 max-w-[900px] px-gutter pb-section pt-stack">
-              <Outlet />
-            </motion.main>
-          </AnimatePresence>
+          {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
+          <main key={pathname} id="main" className="mx-auto w-full min-w-0 max-w-[900px] animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack duration-200">
+            <Outlet />
+          </main>
         </SidebarInset>
       </div>
       <IosTabBar />
