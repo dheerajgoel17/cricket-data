@@ -1,45 +1,45 @@
 {
- "generated_at_utc": "2026-10-28T14:16:31Z",
- "generated_at_ist": "2026-10-28 19:46 IST",
- "runtime_secs": 115.4,
+ "generated_at_utc": "2026-10-28T14:25:54Z",
+ "generated_at_ist": "2026-10-28 19:55 IST",
+ "runtime_secs": 119.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-28",
-  "commit": "8c96082e66"
+  "commit": "726e9d570b"
  },
  "sources": {
   "feedg": {
    "status": "error",
    "reason": "blocked (HTTP 403) - likely geo/bot protection from this box's US IP",
-   "secs": 0.1
+   "secs": 0.2
   },
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1674,
-   "secs": 0.4
+   "rows": 1783,
+   "secs": 1.2
   },
   "smarkets": {
    "status": "ok",
    "rows": 361,
-   "secs": 2.4
+   "secs": 3.1
   },
   "feedk": {
    "status": "ok",
-   "rows": 180,
-   "secs": 17.5
+   "rows": 196,
+   "secs": 18.0
   },
   "feede": {
    "status": "ok",
    "rows": 504,
-   "secs": 31.6
+   "secs": 32.3
   },
   "feedf": {
    "status": "ok",
-   "rows": 350,
-   "secs": 40.6
+   "rows": 360,
+   "secs": 41.3
   }
  },
- "snapshot": "odds_20261028T141631Z.jsonl.gz",
+ "snapshot": "odds_20261028T142554Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -104,14 +104,14 @@
  },
  "stats": {
   "events_in_window": 30,
-  "rows_in_window": 1929,
-  "selections_with_model": 868,
-  "selections_with_market_fair": 1006,
-  "markets_in_window": 174,
+  "rows_in_window": 2008,
+  "selections_with_model": 876,
+  "selections_with_market_fair": 1031,
+  "markets_in_window": 177,
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 6,
-   "model_market_gap": 300,
+   "model_market_gap": 306,
    "model_disagrees": 2,
    "model_only_no_market": 206,
    "liquidity": 1,
@@ -124,12 +124,12 @@
   "innings_milestones_unmodelled": 0,
   "model_vs_market": {
    "batter_runs": {
-    "n_prices": 214,
+    "n_prices": 222,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.644,
-    "corr": 0.284
+    "mean_abs_logit_diff": 0.653,
+    "corr": 0.303
    },
    "batter_sixes": {
     "n_prices": 26,
@@ -245,6 +245,7 @@
     "Wellington Firebirds"
    ],
    "sources": [
+    "feedf_f",
     "feedf_p",
     "moviodds_bet365",
     "smarkets"
@@ -840,19 +841,19 @@
   }
  },
  "log": [
-  "[19:46 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[19:46 IST] history: 23678 matches, last 2026-10-28, players 425398",
-  "[19:47 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.1}",
-  "[19:47 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1674, 'secs': 0.4}",
-  "[19:47 IST] source smarkets: {'status': 'ok', 'rows': 361, 'secs': 2.4}",
-  "[19:47 IST] source feedk: {'status': 'ok', 'rows': 180, 'secs': 17.5}",
-  "[19:47 IST] source feede: {'status': 'ok', 'rows': 504, 'secs': 31.6}",
-  "[19:47 IST] source feedf: {'status': 'ok', 'rows': 350, 'secs': 40.6}",
-  "[19:47 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[19:47 IST] 99 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[19:47 IST] player performance markets not read yet: {'moviodds_bet365': ['Player Performance'], 'feedk': ['Player Performance'], 'feedf': ['Samantha Bates total player performance']}",
-  "[19:47 IST] book lines: 281 player lines from 5 source(s)",
-  "[19:48 IST] weather: forecasts for 13 events, 0 failed",
-  "[19:48 IST] prop model: 1238 prop selections modelled, 336 milestone ladder prices anchored to O/U"
+  "[19:55 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[19:56 IST] history: 23678 matches, last 2026-10-28, players 425398",
+  "[19:56 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.2}",
+  "[19:56 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1783, 'secs': 1.2}",
+  "[19:56 IST] source smarkets: {'status': 'ok', 'rows': 361, 'secs': 3.1}",
+  "[19:56 IST] source feedk: {'status': 'ok', 'rows': 196, 'secs': 18.0}",
+  "[19:56 IST] source feede: {'status': 'ok', 'rows': 504, 'secs': 32.3}",
+  "[19:56 IST] source feedf: {'status': 'ok', 'rows': 360, 'secs': 41.3}",
+  "[19:57 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[19:57 IST] 99 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[19:57 IST] player performance markets not read yet: {'moviodds_bet365': ['Player Performance']}",
+  "[19:57 IST] book lines: 320 player lines from 5 source(s)",
+  "[19:57 IST] weather: forecasts for 13 events, 0 failed",
+  "[19:57 IST] prop model: 1246 prop selections modelled, 336 milestone ladder prices anchored to O/U"
  ]
 }
