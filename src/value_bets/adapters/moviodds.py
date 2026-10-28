@@ -27,8 +27,9 @@ MAP = {
     "Batsman to score a Hundred in the match": "batter_milestone",
     "Batter Milestones": "batter_milestone",
     "Bowler Milestones": "bowler_milestone",
+    "Player Performance": "player_points",  # fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping (the site's one scoring)
 }
-OU = ("batter_runs", "batter_sixes", "batter_fours", "bowler_wickets")
+OU = ("batter_runs", "batter_sixes", "batter_fours", "bowler_wickets", "player_points")
 YESNO_LINE = {"Batsman to Score a Fifty in the Match": 49.5, "Batsman to score a Hundred in the match": 99.5}
 LADDER_RE = re.compile(r"^\s*(\d+)\+")
 

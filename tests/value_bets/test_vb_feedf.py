@@ -158,3 +158,10 @@ def test_a_stray_comma_in_the_event_name_is_dropped_and_multi_day_matches_are_no
     monkeypatch.setattr(feedf, "http_json", lambda url, headers=None, retries=0, **_: (names if "getEventNames" in url else menu if "loadPlayerMenu" in url else (J("feedf_fancy.json") if "Fancy" in url else J("feedf_premium.json")), {}))
     rows, raw = feedf.fetch(STAMP)
     assert raw["books"]["Test Book"]["left_out"]["multi-day match"] == 1 and "South Australia vs Western Australia" not in {r["match"] for r in rows}
+
+
+def test_a_player_performance_name_without_a_comma_is_read_as_it_is():
+    ev = england_sri_lanka()
+    mk = {"marketName": "Samantha Bates total player performance", "marketStatus": "Active", "marketId": 5, "uofOutComeOdds": [{"name": "over 40.5", "odd": 1.85, "active": True}, {"name": "under 40.5", "odd": 1.85, "active": True}]}
+    rows, _, left = feedf.parse_premium([mk], ev, STAMP)
+    assert [(r["player"], r["market_type"], r["line"], r["side"], r["back"]) for r in rows] == [("Samantha Bates", "player_points", 40.5, "over", 1.85), ("Samantha Bates", "player_points", 40.5, "under", 1.85)] and not left
