@@ -1,29 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { fixtureStart, localTime } from "@/lib/format";
 import { setTitle } from "@/lib/title";
-import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
-import { useLiveDoc } from "@/hooks/useLive";
-import { liveForFixture } from "@/engine/live.js";
-import { homeTeam, rankFixtures } from "@/lib/priority";
-import { useRail } from "@/hooks/useRail";
+import { useHomeRail } from "@/hooks/useHomeRail";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
 import { HotProps } from "@/components/app/hot-props";
 import { Muted } from "@/components/app/page";
+import { RailSkeleton } from "@/components/app/skeletons";
 
 export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
-  const { fixtures: fx } = usePricedFixtures();
-  const live = useLiveDoc();
-  const rail = useRail();
   // matches in play first, then the ones to come, finished ones last; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
-  const ranked = useMemo(() => rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status), rail), [fx, live.data, rail]);
+  const { ready, fixtures } = useHomeRail();
   return (
     <div className="flex flex-col gap-section">
-      <FixtureRail fx={ranked.slice(0, 14)} />
+      {ready ? <FixtureRail fx={fixtures} /> : <RailSkeleton />}
       <HotProps />
     </div>
   );

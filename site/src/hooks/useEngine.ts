@@ -5,7 +5,8 @@ import { bookFixtures, fixtureInBooks, liveForFixture } from "@/engine/live.js";
 import { archiveFixture, fixtureBooks, teamKey, withArchive } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { useData } from "@/lib/data";
-import { loadArchive, loadLines } from "@/lib/feeds";
+import { loadArchive } from "@/lib/feeds";
+import { linesQuery } from "@/lib/queries";
 import { useLiveDoc } from "@/hooks/useLive";
 import { fixtureStart } from "@/lib/format";
 
@@ -27,7 +28,7 @@ export function useFixtures() {
 export function useFixtureBooks(id: string) {
   const { store } = useData();
   const fixtures = useFixtures();
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery(linesQuery);
   const listed = (fixtures.data || []).find((f) => f.id === id);
   const books = listed ? fixtureBooks(lines.data, listed) : { props: false, fancy: false };
   const need = !fixtures.isLoading && !lines.isLoading && (!listed || (!books.props && !books.fancy));
@@ -65,18 +66,20 @@ export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (
 
 /** Upcoming fixtures the books price (player props, event markets, or fancy). Unpriced games stay off the rail.
  *  A fixture matches a feed match when both team names agree (ignoring "(W)"/"Women") and the starts are within 14 h.
- *  With no book feed it falls back to every upcoming fixture (`priced: false`) rather than an empty home page. */
+ *  With no book feed it falls back to every upcoming fixture (`priced: false`) rather than an empty home page, but only once the feed has been read or given up on:
+ *  until then `fixtures` is empty (`ready` false), so the list never shows games the books turn out not to price. */
 export function usePricedFixtures() {
   const fx = useFixtures();
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery(linesQuery);
   const live = useLiveDoc();
   return useMemo(() => {
     const feed = bookFixtures(lines.data), haveBooks = feed.length > 0;
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
     const all = shownFixtures(fx.data || [], stateOf);
-    const fixtures = haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f)) : all;
+    const ready = !fx.isLoading && !lines.isLoading;
+    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f)) : all;
     const priced = all.filter((f) => fixtureInBooks(feed, f));
     const last = priced.length ? Math.max(...priced.map((f) => fixtureStart(f).getTime())) : 0;
-    return { loading: fx.isLoading, ready: !fx.isLoading && !lines.isLoading, all, fixtures, priced: haveBooks, through: priced.length ? new Date(last) : null, feedMatches: feed.length, doc: lines.data };
+    return { loading: fx.isLoading, ready, all, fixtures, priced: haveBooks, through: priced.length ? new Date(last) : null, feedMatches: feed.length, doc: lines.data };
   }, [fx.data, fx.isLoading, lines.isLoading, lines.data, live.data]);
 }
