@@ -3,6 +3,10 @@
 The pipeline already holds these rows (to price value bets) and used to discard them. ``book_lines`` keeps the ones whose
 player was matched to the Base registry, so the site can show the market's line and decimal odds on that player's page
 and use the market line as the default. Prices are decimal back prices only; no stake advice is made here.
+
+A line is the whole match's unless it carries ``inn``: 1 or 2, the player's own side's first or second innings, which only a Test has. A Test's first-innings line is
+a different bet from its match total (a book's 26.5 for the first innings and 72.5 for the match are two lines of one player), so ``inn`` is part of the line's key here,
+in the archive and in the site's chart. A line with no ``inn`` is the whole match, which is how every line filed before the field existed reads.
 """
 from __future__ import annotations
 
@@ -59,12 +63,13 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
         if not stat or not pid or line is None or side not in ("over", "under") or not back or r.get("in_play"):
             continue
         fmt = FMT.get(r.get("fmt") or "")
-        if fmt is None:
+        inn = r.get("inn") or 0
+        if fmt is None or (inn and fmt != "Test"):  # only a Test has an innings of its own to price
             continue
-        key = (r["event_key"], pid, stat, float(line))
+        key = (r["event_key"], pid, stat, inn, float(line))
         g = groups.setdefault(key, {
             "pid": pid, "player": r.get("player_hist_name") or r.get("player"), "book_name": r.get("player"), "team": r.get("player_team"), "fmt": fmt, "stat": stat,
-            "line": float(line), "match": r.get("match"), "competition": r.get("competition"), "start_utc": r.get("start_utc"), "_books": defaultdict(dict)})
+            "line": float(line), **({"inn": inn} if inn else {}), "match": r.get("match"), "competition": r.get("competition"), "start_utc": r.get("start_utc"), "_books": defaultdict(dict)})
         g["_books"][(r["source"], r.get("source_type"))][side] = round(float(back), 3)
     lines = []
     for g in groups.values():
@@ -73,7 +78,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
                  if "over" in sides and "under" in sides]  # a one-sided price is not a line the player page can show
         if books:
             lines.append({**g, "books": books})
-    lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x["line"]))
+    lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x.get("inn", 0), x["line"]))
     return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}
 
 
@@ -97,7 +102,7 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
 
     def order(x: dict):
         line = x.get("line")
-        return (x.get("start_utc") or "", x.get("match") or "", x.get("player") or "", x.get("stat") or x.get("key") or "", x.get("team") or "",
+        return (x.get("start_utc") or "", x.get("match") or "", x.get("player") or "", x.get("stat") or x.get("key") or "", x.get("team") or "", x.get("inn", 0),
                 line if isinstance(line, (int, float)) else 0.0)
 
     out = dict(book)

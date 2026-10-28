@@ -5,8 +5,9 @@ name its prices are published under, and its feed root. Unset, the source is ski
 pages per book per run, ``FEEDE_SPACING_SECS`` apart, one attempt each, and an HTTP error ends that book for the run.
 
 Rows are the player markets a line can be read from: "<player> - Over/Under N Runs" and the "<player> To Score N" yes/nos. Match totals of sixes and
-fours come back as ``fancy`` lines (the site's Match Fancy tab), not rows. A multi-day match gives fancy lines only: its player runs lines are not
-the match total the pipeline prices. Top-runscorer style markets are left out until their scope is checked.
+fours come back as ``fancy`` lines (the site's Match Fancy tab), not rows. A multi-day match gives fancy lines and the innings-scoped lines: its unscoped player
+runs lines are not the match total the pipeline prices, but "<player> - Over/Under N Runs 1st innings" (a Test only) is a row with ``inn`` set (1 or 2, the side's
+own innings), and "<team> Over/Under N Runs 1st innings" is a ``fancy`` line with the same ``inn``. Top-runscorer style markets are left out until their scope is checked.
 """
 from __future__ import annotations
 
@@ -27,11 +28,14 @@ AUTO = True  # on whenever FEEDE_BOOKS is set; no need to list it in CV_SOURCES
 PREFIX = "feede_"
 QS = "translationLang=en&responseFormat=json"
 
-RUNS = re.compile(r"^(?P<p>.+?) - Over/Under (?P<line>\d+(?:\.\d+)?) Runs$")
+RUNS = re.compile(r"^(?P<p>.+?) - Over/Under (?P<line>\d+(?:\.\d+)?) Runs(?: (?P<inn>1st|2nd) innings)?$")
+TEAM_RUNS = re.compile(r"^(?P<team>.+?) Over/Under (?P<line>\d+(?:\.\d+)?) Runs (?P<inn>1st|2nd) innings$")
+INNINGS_NO = {"1st": 1, "2nd": 2}
 TO_SCORE = re.compile(r"^(?P<p>.+?) To Score (?P<n>\d+)$")
 MATCH_TOTAL = re.compile(r"^Over/Under (?P<line>\d+(?:\.\d+)?) Match (?P<what>Sixes|Fours)$")
 FANCY_KEY = {"Sixes": "match_sixes", "Fours": "match_fours"}
 MULTI_DAY = re.compile(r"test|ashes|shield|first.class|championship|ranji", re.I)
+TEST = re.compile(r"\btests?\b|ashes", re.I)  # the one multi-day format the site charts
 WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
 
 
@@ -101,7 +105,7 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
     if not home or not away:
         return [], [], Counter()
     typ = ev.get("typeName") or ""
-    multi = bool(MULTI_DAY.search(typ))
+    multi, test = bool(MULTI_DAY.search(typ)), bool(TEST.search(typ))
     female = "female" if WOMEN.search(f"{typ} {ev['name']}") else gender_hint(home, away)
     start = iso(parse_ts(ev["startTime"])) if ev.get("startTime") else None
     common = dict(source=src, source_type="bookmaker", event_id=str(ev["id"]), match=f"{home} vs {away}", team_a=home, team_b=away,
@@ -121,17 +125,27 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
             else:
                 left[name] += 1
             continue
-        if multi:
-            left[name] += 1
+        if multi and (mm := TEAM_RUNS.match(name)) and m.get("templateMarketName", "").endswith("Team Innings Runs"):
+            px = _sides(m, {"over": "over", "under": "under"})
+            if px and len(px) == 2:
+                fancy.append({"match": common["match"], "home": home, "away": away, "start_utc": start, "key": "team_total_runs", "scope": "team",
+                              "team": mm["team"], "line": float(mm["line"]), "over": round(px["over"], 3), "under": round(px["under"], 3), "source": src,
+                              "kind": "bookmaker", "inn": INNINGS_NO[mm["inn"]]})
+            else:
+                left[name] += 1
             continue
-        if (mm := RUNS.match(name)) and m.get("templateMarketName") == "Batsman Runs":
+        mm = RUNS.match(name)
+        if mm and m.get("templateMarketName") == "Batsman Runs" and (mm["inn"] is None and not multi or mm["inn"] is not None and test):  # a Test line names its innings; a limited-overs one does not
             px, line = _sides(m, {"over": "over", "under": "under"}), float(mm["line"])
             if not px or len(px) != 2:
                 left[name] += 1
                 continue
             for side in ("over", "under"):
                 rows.append(row(**common, market_type="batter_runs", market_raw=name, group_key=gk, selection=f"{mm['p']} {side} {line}", player=mm["p"],
-                                line=line, side=side, back=px[side]))
+                                line=line, side=side, back=px[side], inn=INNINGS_NO.get(mm["inn"])))
+            continue
+        if multi:
+            left[name] += 1
             continue
         if (mm := TO_SCORE.match(name)) and m.get("templateMarketName") == "Player To Score X Runs":
             px, line = _sides(m, {"yes": "over", "no": "under"}), int(mm["n"]) - 0.5

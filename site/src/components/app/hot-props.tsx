@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
-import { bookLinesFor, sameFixture } from "@/engine/lines.js";
+import { SCOPE_LABEL, bookLinesFor, lineScope, sameFixture } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
 import { fmtIndex } from "@/engine/util.js";
@@ -34,7 +34,7 @@ const PUBLISH_MS = 300; // rows already scored are shown at most this often whil
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
-interface Row { day: number; idx: number; pid: string; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
@@ -58,15 +58,16 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
       const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
       const keys = new Map<string, any>();
-      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${l.start_utc}`, l);
+      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${l.start_utc}|${lineScope(l)}`, l); // a Test's first-innings line is a row of its own beside the match line
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const score = async (l: any) => {
         const idx = store.P.id.indexOf(l.pid);
-        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3);
+        const inn = lineScope(l);
+        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3, inn);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
-        const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt }, split_by: [] }, { playerIdx: idx });
+        const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null }, split_by: [] }, { playerIdx: idx });
         const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
         if (!entries.length) return;
         const [a, c] = String(b.match).split(/\s+vs\s+/i);
@@ -79,7 +80,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
+        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
           edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -110,11 +111,11 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
       <Item asChild size="sm" className={cn("min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-card", out && "opacity-60")}>
-        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}`}>
+        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}>
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
+            <ItemDescription className="truncate text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""} · {odds(r.over)}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
@@ -151,7 +152,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`
   // shows those first and reads the card itself only as the fallback.
   const matchOf = (r: Row) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start }); };
-  const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line });
+  const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: Row): SoFar | null => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
   const [stat, setStat] = useState("all");
@@ -209,7 +210,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
         {waiting ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
             </AnimatePresence>
           </ul>
         )}

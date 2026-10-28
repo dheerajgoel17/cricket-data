@@ -1,5 +1,6 @@
 // Loads the generated data files and joins player rows to their match. Works in the browser and in node tests:
 // pass `fetchJson(relativePath)`; the default uses fetch().
+import { teamInningNo } from "./filters.js";
 import { norm } from "./util.js";
 
 export async function createStore({ base = "data/", fetchJson } = {}) {
@@ -75,7 +76,7 @@ export class Store {
   _row(m, t, extra) {
     const M = this.M;
     return { m, date: M.d[m], fmt: M.f[m], g: M.g[m], intl: M.i[m], e: M.e[m], v: M.v[m], pv: M.pv[m], q: M.q[m],
-      home: this.venueType(m, t), bf: this.battedFirst(m, t), ...extra };
+      home: this.venueType(m, t), bf: this.battedFirst(m, t), ti: teamInningNo(M.inn?.[m], t, extra?.i), ...extra };
   }
 
   /** Every batting innings and bowling spell of one player, joined to its match, oldest first. */
