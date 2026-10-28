@@ -161,7 +161,7 @@ export function FixturePage() {
       <MatchAccordions match={match} teams={known} fmt={fmt} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
-          <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
+          <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
             <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
           <div ref={bodyRef} className="scroll-mt-32">
