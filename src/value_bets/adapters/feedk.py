@@ -5,8 +5,10 @@ The feed root and the books are deployment configuration, never code (docs/OPERA
 one listing and a few event pages per book per run, ``FEEDK_SPACING_SECS`` apart, and a 429 ends that book for the run.
 
 Rows are the player markets a line can be read from: "Player's Total Runs" (and sixes, fours, wickets) over/unders, and the "To score a
-Half-Century / Century / at least N runs" yes/nos. A Test's "Innings 1" runs line is not the match total the pipeline prices, so multi-day matches give milestones only
-(single-innings scope, as in Feed P). Top-batter style markets are left out: their team and innings scope has not been checked against a limited-overs match.
+Half-Century / Century / at least N runs" yes/nos. A Test's "Player's Total Runs - Innings 1" is the player's own first innings, not the match total the pipeline
+prices: it comes back as a row with ``inn`` set (1 or 2, the side's own innings), which the site charts against first-innings scores only; a multi-day line with no
+innings in its name is left out. A Test's "Total Runs - Home/Away Team, Innings N" comes back as a ``fancy`` line with the same ``inn``. Top-batter style markets are
+left out: their team and innings scope has not been checked against a limited-overs match.
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ import urllib.error
 from collections import Counter
 
 from .. import config
-from ..util import http_json, parse_ts
+from ..util import http_json, iso, parse_ts
 from .base import Pace, gender_hint, row
 
 NAME = "feedk"
@@ -35,6 +37,9 @@ HALF_CENTURY = re.compile(r"^To score a Half-Century\b", re.I)
 CENTURY = re.compile(r"^To score a Century\b", re.I)
 AT_LEAST = re.compile(r"^To score at least (\d+) Runs?\b", re.I)
 OVER_UNDER = re.compile(r"^(Over|Under) (\d+(?:\.\d+)?)$", re.I)
+INNINGS = re.compile(r"\bInnings (\d)\b", re.I)
+TEAM_INNINGS_RUNS = re.compile(r"^Total Runs - (Home|Away) Team, Innings (\d)$", re.I)
+BATTER_MARKETS = ("batter_runs", "batter_sixes", "batter_fours")
 
 
 class Skip(Exception):
@@ -89,6 +94,17 @@ def multi_day(ev: dict, offers: list[dict]) -> bool:
     return any(_label(b) == "Match Odds" and any(o.get("type") == "OT_CROSS" for o in b.get("outcomes") or []) for b in offers)
 
 
+def is_test(ev: dict) -> bool:
+    """A Test, by its competition path: the one multi-day format the site charts. (A draw outcome also marks a first-class match, whose history is not in the data.)"""
+    return any("test" in (p.get("englishName") or p.get("name") or "").lower() for p in ev.get("path") or [])
+
+
+def innings_of(label: str) -> int | None:
+    """The innings a label names ("Player's Total Runs - Innings 1" -> 1), else None. It is the side's own innings: its first is 1 whoever bats first."""
+    m = INNINGS.search(label)
+    return int(m.group(1)) if m else None
+
+
 def _over_under(offer: dict):
     """-> (player, line, {"over": price, "under": price}) for a two-sided player line, else None."""
     player, line, sides = None, None, {}
@@ -119,29 +135,47 @@ def _yes_no(offer: dict):
     return (player, sides) if player and "over" in sides else None
 
 
-def parse_event(ev: dict, offers: list[dict], src: str, fetched_at: str) -> tuple[list[dict], Counter]:
-    """The player rows of one event, and a count of the criterion labels it left out (so a run can say what it did not read)."""
+def _team_total(offer: dict):
+    """-> (line, {"over": price, "under": price}) of a team total, whose line sits on the outcomes in thousandths (360500 = 360.5), else None."""
+    line, sides = None, {}
+    for o in offer.get("outcomes") or []:
+        side, p = (o.get("englishLabel") or o.get("label") or "").strip().lower(), _price(o)
+        try:
+            ln = float(o["line"]) / 1000.0
+        except (KeyError, TypeError, ValueError):
+            return None
+        if side not in ("over", "under") or p is None or (line is not None and ln != line):
+            return None
+        line, sides[side] = ln, p
+    return (line, sides) if len(sides) == 2 else None
+
+
+def parse_event(ev: dict, offers: list[dict], src: str, fetched_at: str) -> tuple[list[dict], list[dict], Counter]:
+    """(player rows, fancy lines, a count of the criterion labels left out so a run can say what it did not read) of one event."""
     home, away = ev.get("homeName"), ev.get("awayName")
     if not home or not away or ev.get("state") not in (None, "NOT_STARTED"):
-        return [], Counter()
+        return [], [], Counter()
     comp = " / ".join(p.get("englishName") or p.get("name") or "" for p in (ev.get("path") or [])[1:])
-    multi = multi_day(ev, offers)
+    multi, test = multi_day(ev, offers), is_test(ev)
+    start = iso(parse_ts(ev["start"])) if ev.get("start") else None
     common = dict(source=src, source_type="bookmaker", event_id=str(ev["id"]), match=f"{home} vs {away}", team_a=home, team_b=away,
                   gender_hint=gender_hint(home, away), competition=comp, start_utc=ev.get("start"), in_play=False, fetched_at=fetched_at)
     rows: list[dict] = []
+    fancy: list[dict] = []
     skipped: Counter = Counter()
     for offer in offers:
         label, gk = _label(offer), f"{src}:{ev['id']}:{offer.get('id')}"
         market = next((mt for rx, mt in OU_MARKETS if rx.match(label)), None)
         if market:
-            got = None if multi else _over_under(offer)
+            inn = innings_of(label) if multi else None  # a limited-overs line is the match's; a multi-day one counts only with the innings it names, and in a Test
+            got = _over_under(offer) if not multi or (inn is not None and test and market in BATTER_MARKETS) else None
             if not got:
                 skipped[label] += 1
                 continue
             player, line, sides = got
             for side in ("over", "under"):
                 rows.append(row(**common, market_type=market, market_raw=label, group_key=gk, selection=f"{player} {side} {line}",
-                                player=player, line=line, side=side, back=sides[side]))
+                                player=player, line=line, side=side, back=sides[side], inn=inn))
             continue
         ms = milestone_line(label)
         if ms is not None:
@@ -156,8 +190,18 @@ def parse_event(ev: dict, offers: list[dict], src: str, fetched_at: str) -> tupl
                                 selection=f"{player} {int(ms + 0.5)}+ {'yes' if side == 'over' else 'no'}", player=player, line=ms, side=side,
                                 back=price, ms_scope="match" if ladder else "innings"))
             continue
+        if (mm := TEAM_INNINGS_RUNS.match(label)):
+            got = _team_total(offer) if test else None
+            if not got:
+                skipped[label] += 1
+                continue
+            line, sides = got
+            fancy.append({"match": common["match"], "home": home, "away": away, "start_utc": start, "key": "team_total_runs", "scope": "team",
+                          "team": home if mm[1].lower() == "home" else away, "line": line, "over": round(sides["over"], 3), "under": round(sides["under"], 3),
+                          "source": src, "kind": "bookmaker", "inn": int(mm[2])})
+            continue
         skipped[label] += 1
-    return rows, skipped
+    return rows, fancy, skipped
 
 
 def fetch(fetched_at: str):
@@ -173,10 +217,11 @@ def fetch(fetched_at: str):
     deadline = time.monotonic() + config.get("FEEDK_BUDGET_SECS")
     horizon = parse_ts(fetched_at) + dt.timedelta(hours=config.get("FEEDK_HORIZON_HOURS"))
     rows: list[dict] = []
+    fancy: list[dict] = []
     raw: dict = {"books": {}}
     errors: list[Exception] = []
     for aid, name in accounts.items():
-        src, info = PREFIX + aid, {"events": 0, "rows": 0, "left_out": Counter()}
+        src, info = PREFIX + aid, {"events": 0, "rows": 0, "fancy": 0, "left_out": Counter()}
         raw["books"][name] = info
         try:
             listing = pace.get(f"{base}/{aid}/listView/cricket.json?{QS}&useCombined=true&ncid={int(time.time() * 1000)}")
@@ -200,11 +245,13 @@ def fetch(fetched_at: str):
                 errors.append(e)
                 info["stopped"] = f"{type(e).__name__}"
                 break
-            r, left = parse_event(j.get("events", [ev])[0] if j.get("events") else ev, j.get("betOffers") or [], src, fetched_at)
+            r, fx, left = parse_event(j.get("events", [ev])[0] if j.get("events") else ev, j.get("betOffers") or [], src, fetched_at)
             rows += r
+            fancy += fx
             info["events"] += 1
             info["rows"] += len(r)
+            info["fancy"] += len(fx)
             info["left_out"].update(left)
-    if not rows and errors:
+    if not rows and not fancy and errors:
         raise errors[-1]
-    return rows, {"books": {k: {**v, "left_out": dict(v["left_out"])} for k, v in raw["books"].items()}}
+    return rows, {"books": {k: {**v, "left_out": dict(v["left_out"])} for k, v in raw["books"].items()}, "fancy": fancy}

@@ -178,7 +178,7 @@ NOW = at(18, 27)
 def test_only_settled_lines_of_a_finished_match_are_results_and_one_value_per_player_and_stat():
     m = live_match([settled("ab12", "runs", 17.5, 31), settled("ab12", "runs", 24.5, 31), settled("ab12", "sixes", 1.5, 2, state="live"),
                     settled("cd34", "runs", 22.5, None, notInXI=True), settled("ef56", "wickets", 0.5, 0), settled("gh78", "runs", 9.5, 4), settled("gh78", "runs", 14.5, 5)])
-    assert match_results(m) == {("ab12", "runs"): 31, ("ef56", "wickets"): 0}  # a zero is a result; "so far", not-in-XI and a player whose lines disagree are not
+    assert match_results(m) == {("ab12", "runs", 0): 31, ("ef56", "wickets", 0): 0}  # a zero is a result; "so far", not-in-XI and a player whose lines disagree are not
     assert match_results({**m, "status": "live"}) == {} and match_results({}) == {}
 
 
@@ -258,3 +258,66 @@ def test_the_command_reads_the_route_twice_and_a_route_that_is_down_costs_nothin
     assert main(["--results", str(body)], sleep=slept.append) == 0 and "::warning::" in capsys.readouterr().out
     with pytest.raises(SystemExit):
         main(["--results"])
+
+
+# ---- a Test's first-innings lines are lines of their own
+
+def test_a_first_innings_line_is_not_the_match_total_line_of_the_same_player_stat_and_number(tmp_path):
+    test_line = lambda **kw: line(**{"fmt": "Test", "ln": 26.5, **kw})  # noqa: E731
+    pull = book([test_line(), test_line(inn=1, books=(("Alpha", 2.0, 1.73),)), test_line(inn=1, ln=36.5, books=(("Alpha", 2.1, 1.61),)), test_line(inn=2)])
+    update(tmp_path, pull, at(20), None, SCHED)
+    d = read(tmp_path)
+    assert [(x.get("inn", 0), x["line"]) for x in d["lines"]] == [(0, 26.5), (1, 26.5), (1, 36.5), (2, 26.5)], "four lines, not three: ordered match, 1st, 2nd"
+    assert "inn" not in d["lines"][0], "a match-total line reads exactly as the ones filed before the field existed"
+    # seen again a day out: the price of the first-innings line stays, a new first-innings line is added beside it
+    update(tmp_path, book([test_line(inn=1, books=(("Alpha", 1.5, 2.6),)), test_line(inn=1, ln=41.5)]), at(21), None, SCHED)
+    d = read(tmp_path)
+    assert [(x.get("inn", 0), x["line"], x["books"][0]["over"]) for x in d["lines"] if x.get("inn") == 1] == [(1, 26.5, 2.0), (1, 36.5, 2.1), (1, 41.5, 1.85)]
+    # inside the last 3 hours the closing price replaces it, for that innings only
+    update(tmp_path, book([test_line(inn=1, books=(("Alpha", 1.5, 2.6),))]), at(4, 27), None, SCHED)
+    d = read(tmp_path)
+    assert [(x.get("inn", 0), x["books"][0]["over"]) for x in d["lines"] if x["line"] == 26.5] == [(0, 1.85), (1, 1.5), (2, 1.85)]
+
+
+def test_a_file_filed_before_innings_lines_existed_keeps_its_order_and_content(tmp_path):
+    update(tmp_path, book([line(), line(ln=24.5), line(pid="cd34", player="Tilak Varma", ln=22.5)]), at(20), None, SCHED)
+    p = tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json"
+    before = p.read_text()
+    assert update(tmp_path, book([line(), line(ln=24.5), line(pid="cd34", player="Tilak Varma", ln=22.5)]), at(21), None, SCHED)[0] == [] and p.read_text() == before
+    assert all("inn" not in x for x in json.loads(before)["lines"])
+
+
+def test_fancy_lines_of_an_innings_are_kept_apart_from_the_whole_match_ones(tmp_path):
+    team = lambda **kw: fancy(ln=360.5, key="team_total_runs", scope="team", team="Bangladesh", **kw)  # noqa: E731
+    update(tmp_path, book([line(fmt="Test")], [team(), team(inn=1), team(inn=2)]), at(20), None, SCHED)
+    assert [(x.get("inn", 0), x["line"]) for x in read(tmp_path)["fancy"]] == [(0, 360.5), (1, 360.5), (2, 360.5)]
+
+
+def test_innings_results_are_stored_beside_the_match_ones_and_never_mix_with_them(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5), line(fmt="Test", ln=26.5, inn=1), line(fmt="Test", ln=26.5, inn=2))
+    m = live_match([settled("ab12", "runs", 72.5, 80, state="live"), settled("ab12", "runs", 26.5, 31, inn=1), settled("ab12", "runs", 26.5, 12, inn=2, state="live"),
+                    settled("ab12", "runs", 99.5, 31, inn=1)], status="live")
+    assert match_results(m) == {("ab12", "runs", 1): 31}, "an over is settled when its innings is, even with the match still on; the match total and the 2nd innings are not"
+    assert settle(tmp_path, [{"matches": [m]}, {"matches": [m]}], NOW)[0] == ["2026-10-27-new-zealand-v-india"]
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}]
+    done = live_match([settled("ab12", "runs", 72.5, 80), settled("ab12", "runs", 26.5, 99, inn=1), settled("ab12", "runs", 26.5, 12, inn=2)])  # the match is over; the stored 1st innings stays
+    assert settle(tmp_path, [{"matches": [done]}], at(19, 27))[0] == ["2026-10-27-new-zealand-v-india"]
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 80}, {"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}, {"pid": "ab12", "stat": "runs", "inn": 2, "value": 12}]
+    assert settle(tmp_path, [{"matches": [done]}], at(20, 27)) == ([], [])
+
+
+def test_a_result_for_an_innings_nobody_priced_is_not_stored(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5))
+    m = live_match([settled("ab12", "runs", 26.5, 31, inn=1)], status="live")
+    assert settle(tmp_path, [{"matches": [m]}], NOW) == ([], []), "only the match total was priced"
+
+
+def test_the_command_reads_a_live_route_twice_when_an_innings_is_settled(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(arch.config, "ARCHIVE", tmp_path)
+    filed(tmp_path, line(fmt="Test", ln=26.5, inn=1))
+    body = tmp_path / "live.json"
+    body.write_text(json.dumps({"matches": [live_match([settled("ab12", "runs", 26.5, 31, inn=1)], status="live")]}))
+    slept = []
+    monkeypatch.setattr(arch, "_read_body", lambda src: json.loads(body.read_text()))
+    assert main(["--results", "https://site.test/api/live", "--again", "30"], sleep=slept.append) == 0 and slept == [30.0]
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}] and json.loads(capsys.readouterr().out)["results_written"]

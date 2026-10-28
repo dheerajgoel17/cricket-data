@@ -52,6 +52,7 @@ export function sanitizePlan(raw) {
       format: fmt, gender: ["male", "female"].includes(f.gender) ? f.gender : null,
       opposition: str(f.opposition), venueType: ["home", "away", "neutral"].includes(f.venue_type) ? f.venue_type : null,
       forTeam: str(f.for_team), innings: ["first", "second"].includes(f.innings) ? f.innings : null,
+      teamInnings: [1, 2].includes(Number(f.team_innings)) ? Number(f.team_innings) : null,
       position: pos, since: isoDate(f.since), until: isoDate(f.until),
       lastN: num(f.last_n) && num(f.last_n) >= 1 ? Math.min(500, Math.round(num(f.last_n))) : null,
       international: typeof f.international === "boolean" ? f.international : null,
@@ -73,6 +74,7 @@ function chips(store, plan, extra = []) {
   if (plan.venue) out.push(["Venue", plan.venue]);
   if (f.venueType) out.push(["Venue type", f.venueType + (f.forTeam ? ` for ${title(f.forTeam)}` : "")]);
   if (f.innings) out.push(["Innings", f.innings === "first" ? "batting first" : "chasing"]);
+  if (f.teamInnings) out.push(["Test innings", f.teamInnings === 1 ? "his side's 1st" : "his side's 2nd"]);
   if (f.position) out.push(["Batting position", f.position[0] === f.position[1] ? `No. ${f.position[0]}` : `Nos ${f.position[0]}-${f.position[1]}`]);
   if (f.since || f.until) out.push(["Dates", `${f.since || "start"} → ${f.until || "latest"}`]);
   if (f.lastN) out.push(["Last N", String(f.lastN)]);
@@ -109,6 +111,7 @@ export function buildFilters(store, rz, plan, ctx = {}) {
   }
   if (f.venueType) out.venueType = f.venueType;
   if (f.innings) out.innings = f.innings;
+  if (f.teamInnings) out.tinn = f.teamInnings;
   if (f.position) out.pos = f.position;
   if (f.since) out.since = f.since;
   if (f.until) out.until = f.until;

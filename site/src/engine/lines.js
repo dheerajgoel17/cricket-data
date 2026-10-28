@@ -18,23 +18,46 @@ export function lineProb(books) {
   return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : null;
 }
 
+/** The scope of a line: 0 for the whole match (every line published before innings lines existed), 1 or 2 for the player's own side's first or second innings (a Test only). */
+export const lineScope = (l) => l?.inn || 0;
+export const SCOPE_LABEL = ["Both innings", "1st innings", "2nd innings"]; // a Test: his two innings combined (the match total), his first, his second
+
 /**
- * The lines on offer for this player and stat in this format, for the nearest match that has not started more than `graceMs` ago.
- * Returns null when there are none, else { match, competition, start_utc, lines: [{line, books, prob}], main } where `main` is the line
- * priced closest to evens (the line a book hangs as "the" line), ties going to the lower line.
+ * The lines on offer for this player and stat in this format, for the nearest match that has not started more than `graceMs` ago, in one scope. `inn` is 0 for the
+ * whole match's lines (the default: what every caller that does not chart one innings wants), 1 or 2 for a Test's first or second innings: a first-innings line is a
+ * different bet from a match total and is never mixed into it. The match is the nearest one any scope prices, so the scopes of one page are always one match's.
+ * Returns null when there are none, else { match, competition, start_utc, lines: [{line, books, prob}], main } where `main` is the line priced closest to evens
+ * (the line a book hangs as "the" line), ties going to the lower line.
  */
-export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
-  const all = (doc?.lines || []).filter((l) => l.pid === pid && l.stat === stat && l.fmt === fmt && l.books?.length
-    && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
+export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, inn = 0) {
+  const all = openLines(doc, pid, stat, fmt, now, graceMs);
   if (!all.length) return null;
-  const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
   const first = Math.min(...all.map(startOf));
-  const mine = all.filter((l) => startOf(l) === first).map((l) => ({ line: l.line, books: l.books, prob: lineProb(l.books) }))
-    .sort((a, b) => a.line - b.line);
-  const ref = all.find((l) => startOf(l) === first);
+  const here = all.filter((l) => startOf(l) === first && lineScope(l) === inn);
+  if (!here.length) return null;
+  const mine = here.map((l) => ({ line: l.line, books: l.books, prob: lineProb(l.books) })).sort((a, b) => a.line - b.line);
+  const ref = here[0];
   const scored = mine.filter((l) => l.prob != null);
   const main = (scored.length ? scored : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
-  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, lines: mine, main };
+  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, inn, lines: mine, main };
+}
+
+const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
+
+/** The player's lines that are still open (the match has not started more than `graceMs` ago) for this stat and format, in every scope. */
+function openLines(doc, pid, stat, fmt, now, graceMs) {
+  return (doc?.lines || []).filter((l) => l.pid === pid && l.stat === stat && l.fmt === fmt && l.books?.length && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
+}
+
+/**
+ * The scopes the books price this player's stat in, for the same match `bookLinesFor` picks: a sorted list of 0 (the whole match), 1 and 2 (a Test's first and second
+ * innings). Empty when there are no lines. The player page offers a switch between them.
+ */
+export function bookScopesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
+  const all = openLines(doc, pid, stat, fmt, now, graceMs);
+  if (!all.length) return [];
+  const first = Math.min(...all.map(startOf));
+  return [...new Set(all.filter((l) => startOf(l) === first).map(lineScope))].sort((a, b) => a - b);
 }
 
 /**
@@ -45,7 +68,6 @@ export function bookFormatFor(doc, pid, stat = "", now = Date.now(), graceMs = 3
   const open = (doc?.lines || []).filter((l) => l.pid === pid && l.books?.length && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
   const pool = stat && open.some((l) => l.stat === stat) ? open.filter((l) => l.stat === stat) : open;
   if (!pool.length) return null;
-  const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
   return pool.reduce((a, l) => (startOf(l) < startOf(a) ? l : a)).fmt;
 }
 
@@ -88,13 +110,14 @@ export function fixtureBooks(doc, fixture) {
 
 /**
  * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams, start
- * times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for whole-match markets.
+ * times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for whole-match markets. `inn` is 0 for the whole match
+ * (the lines a team's match total is charted against) or 1 / 2 for one innings of a Test: a team's first-innings total is not its match total and never appears among them.
  * Returns [{ line, over, under, source }] sorted by line.
  */
-export function fancyFor(doc, fixture, key, team = null) {
+export function fancyFor(doc, fixture, key, team = null, inn = 0) {
   const a = teamKey(fixture.a), b = teamKey(fixture.b);
   return (doc?.fancy || []).filter((l) => {
-    if (l.key !== key || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
+    if (l.key !== key || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
     const h = teamKey(l.home), w = teamKey(l.away);
     if (!((h === a && w === b) || (h === b && w === a))) return false;
     return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < 14 * 3600e3;
@@ -136,7 +159,8 @@ export function withArchive(doc, entry) {
   const fx = archiveFixture(entry);
   if (!fx) return doc;
   const have = fixtureBooks(doc, fx), shared = { match: entry.match, competition: entry.competition, start_utc: entry.start_utc };
-  const done = new Map((entry.results || []).map((r) => [`${r.pid}|${r.stat}`, r.value]));
-  const archived = (l) => (done.has(`${l.pid}|${l.stat}`) ? { ...l, ...shared, result: done.get(`${l.pid}|${l.stat}`) } : { ...l, ...shared });
+  const rkey = (x) => `${x.pid}|${x.stat}|${lineScope(x)}`; // a first-innings result is not the match total's
+  const done = new Map((entry.results || []).map((r) => [rkey(r), r.value]));
+  const archived = (l) => (done.has(rkey(l)) ? { ...l, ...shared, result: done.get(rkey(l)) } : { ...l, ...shared });
   return { ...doc, lines: have.props ? doc?.lines : [...(doc?.lines || []), ...(entry.lines || []).map(archived)], fancy: have.fancy ? doc?.fancy : [...(doc?.fancy || []), ...(entry.fancy || [])] };
 }
