@@ -1,1 +1,17 @@
-{}
+{
+ "male|Afghanistan|Zimbabwe|2026-10-29|batter_runs||Sediqullah Atal under 22.5|22.5|under": {
+  "edge": 0.0713,
+  "start_utc": "2026-10-29T14:30:00Z",
+  "alerted_at": "2026-10-28T15:05:10.363304+00:00"
+ },
+ "male|Afghanistan|Zimbabwe|2026-10-29|batter_runs||Ibrahim Zadran under 27.5|27.5|under": {
+  "edge": 0.0666,
+  "start_utc": "2026-10-29T14:30:00Z",
+  "alerted_at": "2026-10-28T15:05:10.363304+00:00"
+ },
+ "male|Afghanistan|Zimbabwe|2026-10-29|batter_milestone||Ibrahim Zadran 50+ no|49.5|under": {
+  "edge": 0.0589,
+  "start_utc": "2026-10-29T14:30:00Z",
+  "alerted_at": "2026-10-28T15:05:10.363304+00:00"
+ }
+}
