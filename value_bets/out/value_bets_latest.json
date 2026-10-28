@@ -1,40 +1,40 @@
 {
- "generated_at_utc": "2026-10-28T13:13:39Z",
- "generated_at_ist": "2026-10-28 18:43 IST",
- "runtime_secs": 126.9,
+ "generated_at_utc": "2026-10-28T13:21:36Z",
+ "generated_at_ist": "2026-10-28 18:51 IST",
+ "runtime_secs": 123.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-28",
-  "commit": "762e267eb0"
+  "commit": "2bc8c0069a"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1693,
-   "secs": 0.4
+   "secs": 0.3
   },
   "smarkets": {
    "status": "ok",
    "rows": 372,
-   "secs": 2.2
+   "secs": 2.1
   },
   "feedk": {
    "status": "ok",
-   "rows": 146,
-   "secs": 15.5
+   "rows": 180,
+   "secs": 17.8
   },
   "feede": {
    "status": "ok",
    "rows": 504,
-   "secs": 31.4
+   "secs": 31.2
   },
   "feedf": {
    "status": "ok",
    "rows": 370,
-   "secs": 49.7
+   "secs": 48.2
   }
  },
- "snapshot": "odds_20261028T131339Z.jsonl.gz",
+ "snapshot": "odds_20261028T132136Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -101,7 +101,7 @@
   "markets_in_window": 183,
   "value_bets": 0,
   "dropped_by_filter": {
-   "model_market_gap": 326,
+   "model_market_gap": 327,
    "odds_range": 6,
    "model_only_no_market": 212,
    "liquidity": 1,
@@ -172,11 +172,11 @@
    },
    "top_bowler_team": {
     "n_prices": 23,
-    "mean_model_p": 0.088,
+    "mean_model_p": 0.089,
     "mean_market_p": 0.087,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.501,
-    "corr": 0.483
+    "mean_abs_logit_diff": 0.489,
+    "corr": 0.493
    },
    "top_batter_match": {
     "n_prices": 32,
@@ -281,6 +281,16 @@
    ]
   },
   {
+   "event": "female|Delhi Capitals|hyderabad|2026-10-29",
+   "start_ist": "2026-10-29 09:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "female|kerala|punjab|2026-10-29",
    "start_ist": "2026-10-29 09:00 IST",
    "format": "T20",
@@ -292,16 +302,6 @@
   },
   {
    "event": "female|odisha|saurashtra|2026-10-29",
-   "start_ist": "2026-10-29 09:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Mumbai Indians|uttarakhand|2026-10-29",
    "start_ist": "2026-10-29 09:00 IST",
    "format": "T20",
    "format_source": "name",
@@ -386,16 +386,6 @@
    ]
   },
   {
-   "event": "female|Delhi Capitals|hyderabad|2026-10-29",
-   "start_ist": "2026-10-29 11:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
    "event": "female|railways|vidarbha|2026-10-29",
    "start_ist": "2026-10-29 11:00 IST",
    "format": "T20",
@@ -407,6 +397,16 @@
   },
   {
    "event": "female|himachal pradesh|rajasthan|2026-10-29",
+   "start_ist": "2026-10-29 11:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Mumbai Indians|uttarakhand|2026-10-29",
    "start_ist": "2026-10-29 11:00 IST",
    "format": "T20",
    "format_source": "name",
@@ -846,17 +846,17 @@
   }
  },
  "log": [
-  "[18:43 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[18:43 IST] history: 23678 matches, last 2026-10-28, players 425398",
-  "[18:44 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1693, 'secs': 0.4}",
-  "[18:44 IST] source smarkets: {'status': 'ok', 'rows': 372, 'secs': 2.2}",
-  "[18:44 IST] source feedk: {'status': 'ok', 'rows': 146, 'secs': 15.5}",
-  "[18:44 IST] source feede: {'status': 'ok', 'rows': 504, 'secs': 31.4}",
-  "[18:44 IST] source feedf: {'status': 'ok', 'rows': 370, 'secs': 49.7}",
-  "[18:44 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[18:44 IST] 113 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[18:44 IST] book lines: 257 player lines from 5 source(s)",
-  "[18:45 IST] weather: forecasts for 14 events, 0 failed",
-  "[18:45 IST] prop model: 1252 prop selections modelled, 336 milestone ladder prices anchored to O/U"
+  "[18:51 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:51 IST] history: 23678 matches, last 2026-10-28, players 425398",
+  "[18:52 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1693, 'secs': 0.3}",
+  "[18:52 IST] source smarkets: {'status': 'ok', 'rows': 372, 'secs': 2.1}",
+  "[18:52 IST] source feedk: {'status': 'ok', 'rows': 180, 'secs': 17.8}",
+  "[18:52 IST] source feede: {'status': 'ok', 'rows': 504, 'secs': 31.2}",
+  "[18:52 IST] source feedf: {'status': 'ok', 'rows': 370, 'secs': 48.2}",
+  "[18:52 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:52 IST] 113 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[18:52 IST] book lines: 285 player lines from 5 source(s)",
+  "[18:53 IST] weather: forecasts for 14 events, 0 failed",
+  "[18:53 IST] prop model: 1262 prop selections modelled, 336 milestone ladder prices anchored to O/U"
  ]
 }
