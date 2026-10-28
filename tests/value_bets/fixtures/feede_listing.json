@@ -1,0 +1,56 @@
+{
+ "SSResponse": {
+  "children": [
+   {
+    "event": {
+     "id": "259427493",
+     "name": "India v Zimbabwe",
+     "startTime": "2026-10-28T08:30:00Z",
+     "typeName": "Women's ODI",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH"
+    }
+   },
+   {
+    "event": {
+     "id": "259472540",
+     "name": "United Arab Emirates v Oman",
+     "startTime": "2026-10-29T05:30:00Z",
+     "typeName": "ICC Cricket World Cup League",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH"
+    }
+   },
+   {
+    "event": {
+     "id": "259469394",
+     "name": "England v Sri Lanka",
+     "startTime": "2026-10-29T08:00:00Z",
+     "typeName": "ODIs",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH"
+    }
+   },
+   {
+    "event": {
+     "id": "259472365",
+     "name": "Sharjah v Emirates Red",
+     "startTime": "2026-10-28T12:30:00Z",
+     "typeName": "Emirates D20",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH"
+    }
+   },
+   {
+    "event": {
+     "id": "9",
+     "name": "WBBL 2026",
+     "startTime": "2026-12-05T08:15:00Z",
+     "typeName": "WBBL",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH"
+    }
+   }
+  ]
+ }
+}

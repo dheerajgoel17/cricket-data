@@ -11,19 +11,20 @@ import traceback
 from collections import defaultdict
 
 from . import archive, booklines, config, fancy, history, store, strategy, weather
-from .adapters import betfair, matchbook, moviodds, oddsapi, polymarket, smarkets
+from .adapters import betfair, feede, feedk, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
 from .pricing import devig, edge, effective_odds, exchange_mid, kelly_pct, logit
 from .props_live import PropEngine
 from .util import iso, ist, now_utc, parse_ts
 
-ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair]
+ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede]
 
 
 def adapters():
+    """The sources named in CV_SOURCES, plus any that switch themselves on (``AUTO``: skipped unless their own variables are set)."""
     want = {x.strip() for x in config.get("SOURCES").split(",") if x.strip()}
-    return [m for m in ALL_ADAPTERS if m.NAME in want]
+    return [m for m in ALL_ADAPTERS if m.NAME in want or getattr(m, "AUTO", False)]
 
 
 
@@ -346,7 +347,7 @@ def run():
     if n_inns_ms:
         log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")
 
-    book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
+    book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")) + fancy.adapter_fancy(raws))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
 
     # ---- fair-price signals per source group

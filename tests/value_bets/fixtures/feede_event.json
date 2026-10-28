@@ -1,0 +1,635 @@
+{
+ "SSResponse": {
+  "children": [
+   {
+    "event": {
+     "id": "259474069",
+     "name": "Afghanistan v Zimbabwe",
+     "startTime": "2026-10-29T14:30:00Z",
+     "typeName": "T20 Internationals",
+     "eventStatusCode": "A",
+     "eventSortCode": "MTCH",
+     "children": [
+      {
+       "market": {
+        "id": "1160677541",
+        "name": "Sediqullah Atal - Over/Under 22.5 Runs",
+        "templateMarketName": "Batsman Runs",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169224",
+           "name": "Over - (22.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169225",
+           "name": "Under - (22.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160697591",
+        "name": "Ben Curran - Over/Under 14.5 Runs",
+        "templateMarketName": "Batsman Runs",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538234492",
+           "name": "Under - (14.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538234493",
+           "name": "Over - (14.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677551",
+        "name": "Ben Curran To Score 50",
+        "templateMarketName": "Player To Score X Runs",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169242",
+           "name": "Yes",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "6",
+              "priceDen": "1",
+              "priceDec": "7.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169243",
+           "name": "No",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "1",
+              "priceDen": "16",
+              "priceDec": "1.06"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677598",
+        "name": "Ibrahim Zadran To Score 50",
+        "templateMarketName": "Player To Score X Runs",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169410",
+           "name": "Yes",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "2",
+              "priceDec": "3.50"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169411",
+           "name": "No",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "1",
+              "priceDen": "4",
+              "priceDec": "1.25"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677588",
+        "name": "Over/Under 13.5 Match Sixes",
+        "templateMarketName": "Match Total Sixes",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169349",
+           "name": "Under - (13.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "10",
+              "priceDen": "11",
+              "priceDec": "1.91"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169350",
+           "name": "Over - (13.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "4",
+              "priceDen": "5",
+              "priceDec": "1.80"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677595",
+        "name": "Zimbabwe Top Runscorer",
+        "templateMarketName": "Away Team Top Runscorer",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169391",
+           "name": "Matigimu, Kundai",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169392",
+           "name": "Curran, Ben",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "7",
+              "priceDen": "2",
+              "priceDec": "4.50"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169393",
+           "name": "Nyamhuri, Newman Takudzwa",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169394",
+           "name": "Kaia, Innocent",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "4",
+              "priceDen": "1",
+              "priceDec": "5.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169395",
+           "name": "Masuku, Ernest",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169396",
+           "name": "Tsiga, Tafadzwa",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "1",
+              "priceDec": "6.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169397",
+           "name": "Bennet, Brian",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "9",
+              "priceDen": "4",
+              "priceDec": "3.25"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169398",
+           "name": "Evans, Brad",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "20",
+              "priceDen": "1",
+              "priceDec": "21.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169399",
+           "name": "Marumani, Tadiwanashe",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "7",
+              "priceDen": "1",
+              "priceDec": "8.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169400",
+           "name": "Muzarabani, Blessing",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169401",
+           "name": "Burl, Ryan",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "7",
+              "priceDen": "2",
+              "priceDec": "4.50"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169402",
+           "name": "Madhevere, Wesley",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "10",
+              "priceDen": "1",
+              "priceDec": "11.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169403",
+           "name": "Masekesa, Vincent",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169404",
+           "name": "Masakadza, Wellington",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "33",
+              "priceDen": "1",
+              "priceDec": "34.00"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169405",
+           "name": "Raza, Sikandar",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "4",
+              "priceDen": "1",
+              "priceDec": "5.00"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677615",
+        "name": "Match Winner",
+        "templateMarketName": "Match Betting",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169444",
+           "name": "Zimbabwe",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "7",
+              "priceDen": "2",
+              "priceDec": "4.50"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169445",
+           "name": "Afghanistan",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "2",
+              "priceDen": "9",
+              "priceDec": "1.22"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677609",
+        "name": "Any Player To Score 50",
+        "templateMarketName": "Any Player To Score X",
+        "marketStatusCode": "A",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169432",
+           "name": "Yes",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "2",
+              "priceDen": "9",
+              "priceDec": "1.22"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169433",
+           "name": "No",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "3",
+              "priceDen": "1",
+              "priceDec": "4.00"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      },
+      {
+       "market": {
+        "id": "1160677600",
+        "name": "Rahmanullah Gurbaz - Over/Under 21.5 Runs",
+        "templateMarketName": "Batsman Runs",
+        "marketStatusCode": "S",
+        "children": [
+         {
+          "outcome": {
+           "id": "3538169414",
+           "name": "Under - (21.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         },
+         {
+          "outcome": {
+           "id": "3538169415",
+           "name": "Over - (21.5)",
+           "outcomeStatusCode": "A",
+           "children": [
+            {
+             "price": {
+              "priceType": "LP",
+              "priceNum": "5",
+              "priceDen": "6",
+              "priceDec": "1.83"
+             }
+            }
+           ]
+          }
+         }
+        ]
+       }
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

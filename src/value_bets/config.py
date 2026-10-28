@@ -52,6 +52,15 @@ DEFAULTS = {
     # Props only (match winner dropped). Polymarket/Matchbook/Odds API/Exchange B only price match winner, so they
     # are off by default; add them back e.g. CV_SOURCES=smarkets,moviodds_bet365,betfair
     "SOURCES": "smarkets,moviodds_bet365",
+    "FEEDK_SPACING_SECS": 2.0,     # Feed K (adapters/feedk.py, on whenever FEEDK_URL and FEEDK_BOOKS are set): seconds between its requests
+    "FEEDK_MAX_EVENTS": 10,        # ... event pages fetched per book per run
+    "FEEDK_MIN_OFFERS": 4,         # ... only events with at least this many offers (the others carry no player markets)
+    "FEEDK_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDK_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDE_SPACING_SECS": 2.0,     # Feed E (adapters/feede.py, on whenever FEEDE_BOOKS is set): seconds between its requests
+    "FEEDE_MAX_EVENTS": 24,        # ... event pages fetched per book per run
+    "FEEDE_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDE_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

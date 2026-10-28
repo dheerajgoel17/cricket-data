@@ -1,0 +1,276 @@
+{
+ "events": [
+  {
+   "id": 1029490008,
+   "name": "Melbourne Renegades (W) - Sydney Thunder (W)",
+   "homeName": "Melbourne Renegades (W)",
+   "awayName": "Sydney Thunder (W)",
+   "start": "2026-10-29T04:40:00Z",
+   "state": "NOT_STARTED",
+   "path": [
+    {
+     "name": "Cricket",
+     "englishName": "Cricket"
+    },
+    {
+     "name": "T20 Womens Big Bash",
+     "englishName": "T20 Womens Big Bash"
+    }
+   ],
+   "nonLiveBoCount": 47
+  }
+ ],
+ "betOffers": [
+  {
+   "id": 2708649242,
+   "criterion": {
+    "label": "Match Odds",
+    "englishLabel": "Match Odds"
+   },
+   "outcomes": [
+    {
+     "label": "1",
+     "englishLabel": "1",
+     "odds": 1900,
+     "participant": "Melbourne Renegades (W)",
+     "type": "OT_ONE",
+     "status": "OPEN"
+    },
+    {
+     "label": "2",
+     "englishLabel": "2",
+     "odds": 1880,
+     "participant": "Sydney Thunder (W)",
+     "type": "OT_TWO",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898574,
+   "criterion": {
+    "label": "Top Run Scorer - Melbourne Renegades (W)",
+    "englishLabel": "Top Run Scorer - Melbourne Renegades (W)"
+   },
+   "outcomes": [
+    {
+     "label": "Annie Wikman",
+     "englishLabel": "Annie Wikman",
+     "odds": 7500,
+     "participant": "Annie Wikman",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Chloe Tryon",
+     "englishLabel": "Chloe Tryon",
+     "odds": 9500,
+     "participant": "Chloe Tryon",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Courtney Webb",
+     "englishLabel": "Courtney Webb",
+     "odds": 5000,
+     "participant": "Courtney Webb",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Deandra Dottin",
+     "englishLabel": "Deandra Dottin",
+     "odds": 5500,
+     "participant": "Deandra Dottin",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Georgia Wareham",
+     "englishLabel": "Georgia Wareham",
+     "odds": 6000,
+     "participant": "Georgia Wareham",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Hayley Matthews",
+     "englishLabel": "Hayley Matthews",
+     "odds": 3750,
+     "participant": "Hayley Matthews",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Milly Illingworth",
+     "englishLabel": "Milly Illingworth",
+     "odds": 151000,
+     "participant": "Milly Illingworth",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Nicole Faltum",
+     "englishLabel": "Nicole Faltum",
+     "odds": 7500,
+     "participant": "Nicole Faltum",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Olivia Porter",
+     "englishLabel": "Olivia Porter",
+     "odds": 29000,
+     "participant": "Olivia Porter",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Sara Kennedy",
+     "englishLabel": "Sara Kennedy",
+     "odds": 151000,
+     "participant": "Sara Kennedy",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Sophie Molineux",
+     "englishLabel": "Sophie Molineux",
+     "odds": 4750,
+     "participant": "Sophie Molineux",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Sophie Reid",
+     "englishLabel": "Sophie Reid",
+     "odds": 6500,
+     "participant": "Sophie Reid",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Tayla Vlaeminck",
+     "englishLabel": "Tayla Vlaeminck",
+     "odds": 101000,
+     "participant": "Tayla Vlaeminck",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Tess Flintoff",
+     "englishLabel": "Tess Flintoff",
+     "odds": 13000,
+     "participant": "Tess Flintoff",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898580,
+   "criterion": {
+    "label": "Player's Total Runs",
+    "englishLabel": "Player's Total Runs"
+   },
+   "outcomes": [
+    {
+     "label": "Over 24.5",
+     "englishLabel": "Over 24.5",
+     "odds": 2000,
+     "participant": "Hayley Matthews",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Under 24.5",
+     "englishLabel": "Under 24.5",
+     "odds": 1730,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898581,
+   "criterion": {
+    "label": "Player's Total Runs",
+    "englishLabel": "Player's Total Runs"
+   },
+   "outcomes": [
+    {
+     "label": "Over 19.5",
+     "englishLabel": "Over 19.5",
+     "odds": 2000,
+     "participant": "Courtney Webb",
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Under 19.5",
+     "englishLabel": "Under 19.5",
+     "odds": 1730,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898591,
+   "criterion": {
+    "label": "To score at least 20 Runs",
+    "englishLabel": "To score at least 20 Runs"
+   },
+   "outcomes": [
+    {
+     "label": "Yes",
+     "englishLabel": "Yes",
+     "odds": 1650,
+     "participant": "Hayley Matthews",
+     "type": "OT_YES",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898592,
+   "criterion": {
+    "label": "To score at least 20 Runs",
+    "englishLabel": "To score at least 20 Runs"
+   },
+   "outcomes": [
+    {
+     "label": "Yes",
+     "englishLabel": "Yes",
+     "odds": 1910,
+     "participant": "Courtney Webb",
+     "type": "OT_YES",
+     "status": "OPEN"
+    }
+   ]
+  },
+  {
+   "id": 2708898609,
+   "criterion": {
+    "label": "Next Method of Dismissal (2-Way) - Melbourne Renegades (W), Wicket 1",
+    "englishLabel": "Next Method of Dismissal (2-Way) - Melbourne Renegades (W), Wicket 1"
+   },
+   "outcomes": [
+    {
+     "label": "Caught",
+     "englishLabel": "Caught",
+     "odds": 1400,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    },
+    {
+     "label": "Not Caught",
+     "englishLabel": "Not Caught",
+     "odds": 2750,
+     "type": "OT_UNTYPED",
+     "status": "OPEN"
+    }
+   ]
+  }
+ ]
+}
