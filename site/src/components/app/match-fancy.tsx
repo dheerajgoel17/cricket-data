@@ -9,6 +9,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle }
 import { lineVerdict, liveMarket } from "@/engine/live.js";
 import { fancyByLine, fancyFor, lineProb } from "@/engine/lines.js";
 import { BookBadge } from "./book-badge";
+import { BookTable } from "./book-table";
 import { sideEdge } from "@/engine/stats.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
@@ -84,7 +85,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
       const eo = sideEdge(s.over, live, prior, b.over), eu = sideEdge(s.under, live, prior == null ? null : 1 - prior, b.under);
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
       const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
-      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, overBook: b.books.find((x) => x.over === b.over)?.source, underBook: b.books.find((x) => x.under === b.under)?.source, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, books: b.books, overBook: b.books.find((x) => x.over === b.over)?.source, underBook: b.books.find((x) => x.under === b.under)?.source, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
     });
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -142,6 +143,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         <MiniBars last={r.last} line={r.line} />
                         <ChevronRight className="size-4 text-muted-foreground" />
                       </button>
+                      <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
                     </motion.li>))}
                 </AnimatePresence>
               </ul>
@@ -179,17 +181,15 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                               <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                               <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
                               <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                              {bookHere && (
-                                <div className="grid gap-hair border-t border-white/10 pt-tight text-footnote">
-                                  {bookHere.books.map((b) => (
-                                    <div key={b.source} className="flex items-baseline justify-between gap-tight">
-                                      <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
-                                      <b className={cn("tabular-nums", bookHere.books.length > 1 && b[side] === bookHere[side] && "text-primary")}>{odds(b[side])}</b>
-                                    </div>))}
-                                </div>)}
+                              {bookHere && (() => { const b = bookHere.books.find((x: any) => x[side] === bookHere[side]); return b && (
+                                <div className="flex items-baseline justify-between gap-tight border-t border-white/10 pt-tight text-footnote">
+                                  <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
+                                  <b className="tabular-nums text-primary">{odds(b[side])}</b>
+                                </div>); })()}
                             </div>);
                         })}
                       </div>
+                      {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => bookHere.books.find((x: any) => x[side] === bookHere[side])?.source)} />}
                       {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                     </section>
 
