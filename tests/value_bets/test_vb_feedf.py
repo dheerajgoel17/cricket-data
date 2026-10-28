@@ -50,7 +50,9 @@ def test_premium_gives_decimal_player_rows_and_two_way_fancy_lines_and_skips_sus
     assert got[("match_fours", None)] == (48.5, 1.9, 1.8, "void_below_80pct") and got[("match_sixes", None)] == (13.5, 1.75, 1.95, "void_below_80pct")
     assert got[("team_total_sixes", "England")] == (8.5, 2.15, 1.65, "void_below_80pct")  # the suspended duplicate of this market carries no prices
     assert len([f for f in fx if f["key"] == "team_total_sixes"]) == 2 and all("bat_first" not in f for f in fx)  # no batting-order condition in premium
-    assert left["Winner (incl. super over)"] == 1 and left["Top batter"] == 1 and left["Brook, Harry total player performance"] == 1
+    pp = [(r["player"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "player_points"]
+    assert pp == [("Harry Brook", 34.5, "over", 1.85), ("Harry Brook", 34.5, "under", 1.85)]  # the suspended duplicate has no prices
+    assert left["Winner (incl. super over)"] == 1 and left["Top batter"] == 1 and "Brook, Harry total player performance" not in left
 
 
 def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
@@ -65,8 +67,10 @@ def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
     # match fours 50 / 47: over 49.5, under 46.5; fifties 3 / 3 at 80 / 130: one two-way line at 2.5
     assert (by["match_fours", 49.5]["over"], by["match_fours", 46.5]["under"]) == (2.0, 2.0)
     assert (by["match_50s", 2.5]["over"], by["match_50s", 2.5]["under"], by["match_50s", 2.5]["rules"]) == (1.8, 2.3, "not_voided_by_lost_balls")
-    # not read: first-over, 10-over, wicket-fall, meter, khado, and the player-performance (fantasy points) markets
-    assert {"H Brook", "1st Wkt Meter Eng", "Match 1st Over Run Adv"} <= set(left)
+    # player performance (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping): H Brook 32 / 34 at 100 / 100 is Yes at 34 (over 33.5) and No at 32 (under 31.5)
+    assert [(r["player"], r["market_type"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "player_points"] == [("H Brook", "player_points", 33.5, "over", 2.0), ("H Brook", "player_points", 31.5, "under", 2.0)]
+    # not read: first-over, 10-over, wicket-fall, meter and khado markets
+    assert {"1st Wkt Meter Eng", "Match 1st Over Run Adv"} <= set(left) and "H Brook" not in left
 
 
 def test_a_suspended_or_ball_running_market_is_not_a_price():

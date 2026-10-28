@@ -11,8 +11,9 @@ unless Ly == Ln. A player's "<name> Run Adv" gives two player rows; match totals
 
 Rules the book states and the lines carry (``rules``): premium markets void unless 80% of the match is played and have no batting-order condition; fancy side lines count
 only the side batting first (``bat_first``) and void if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
-fancy match totals are not voided by lost balls. Fancy and player-performance markets close an hour before the scheduled start. Player-performance markets are fantasy
-points (1 per run, 20 per wicket, 10 per catch, 25 per stumping), a stat the engine does not hold: they are left out, as are meter, khado and lucky-number markets.
+fancy match totals are not voided by lost balls. Fancy and player-performance markets close an hour before the scheduled start. Player-performance markets are
+fantasy points (1 per run, 20 per wicket, 10 per catch, 25 per stumping; the premium one does not state its scoring): they come back as ``player_points`` rows,
+which nothing prices or publishes until the engine holds a points stat (the builder does not yet count catches and stumpings). Meter, khado and lucky-number markets are left out.
 """
 from __future__ import annotations
 
@@ -36,6 +37,7 @@ TZ_HEADER = "Asia/Calcutta"
 
 TOTAL = re.compile(r"^1st innings - (?P<last>[^,]+), (?P<first>.+?) total$")
 TO_SCORE = re.compile(r"^1st innings - (?P<last>[^,]+), (?P<first>.+?) to score (?P<n>\d+)$")
+PERFORMANCE = re.compile(r"^(?P<last>[^,]+), (?P<first>.+?) total player performance$")
 TEAM_TOTAL = re.compile(r"^1st innings - (?P<team>.+?) total (?P<what>fours|sixes)$")
 MATCH_TOTAL = {"Total fours": "match_fours", "Total sixes": "match_sixes"}
 TEAM_KEY = {"fours": "team_total_fours", "sixes": "team_total_sixes"}
@@ -164,6 +166,15 @@ def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[
             for side, price in p[1].items():
                 rows.append(row(**common, market_type="batter_runs", market_raw=name, group_key=f"{gk}:{line}", selection=f"{player} {side} {line}", player=player,
                                 line=line, side=side, back=price))
+        elif (mm := PERFORMANCE.match(name)):
+            p = _pair(m)
+            if not p:
+                left[name] += 1
+                continue
+            player, line = person(mm["last"], mm["first"]), p[0]
+            for side, price in p[1].items():
+                rows.append(row(**common, market_type="player_points", market_raw=name, group_key=f"{gk}:{line}", selection=f"{player} {side} {line}", player=player,
+                                line=line, side=side, back=price))
         elif (mm := TO_SCORE.match(name)):
             px = _yes_no(m)
             if not px:
@@ -197,9 +208,10 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
     rows, fancy, left = [], [], Counter()
     common = ev["common"]
     for cat in data or []:
-        if (cat.get("categoryDetails") or {}).get("catName") != "Fancy Market":
+        catname = (cat.get("categoryDetails") or {}).get("catName")
+        if catname not in ("Fancy Market", "Player Performance Market"):
             for m in cat.get("markets") or []:
-                left[m.get("marketType") or "?"] += 1  # bookmaker, meter, khado, player performance, lucky number: not read
+                left[m.get("marketType") or "?"] += 1  # bookmaker, meter, khado, lucky number: not read
             continue
         for m in cat.get("markets") or []:
             name = (m.get("marketType") or "").strip()
@@ -215,6 +227,12 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
                 continue
             gk = f"{SOURCE}:{ev['id']}:{m.get('marketId')}"
             clean = re.sub(r"\s+", " ", name)
+            if catname == "Player Performance Market":  # "H Brook": runs + 20 per wicket + 10 per catch + 25 per stumping, Yes / No like any session market
+                for side, v in (("over", ov), ("under", un)):
+                    if v:
+                        rows.append(row(**common, market_type="player_points", market_raw=name, group_key=f"{gk}:{v[0]}", selection=f"{clean} {side} {v[0]}",
+                                        player=clean, line=v[0], side=side, back=v[1]))
+                continue
             if clean in FANCY_MATCH:
                 key, team, rules = FANCY_MATCH[clean], None, "fancy_total"
             elif (mm := FANCY_TEAM_RUNS.match(clean)) and int(mm["n"]) >= 20:
