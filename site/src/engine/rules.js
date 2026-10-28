@@ -17,6 +17,8 @@ export const STATS = {
   wickets: { label: "Wickets", side: "bowl", key: "w", step: 1 },
   runs_conceded: { label: "Runs conceded", side: "bowl", key: "c", step: 1 },
   balls_bowled: { label: "Balls bowled", side: "bowl", key: "n", step: 1 },
+  // the "player performance" market: runs + 20 per wicket + 10 per catch + 25 per stumping, from his batting, bowling and fielding in the match; named in the XI and doing none of it is 0, not void
+  points: { label: "Player performance", side: "all", key: "pts", step: 1, zeroIfNamed: true },
 };
 
 /** Stat aliases people actually type. */
@@ -27,4 +29,5 @@ export const STAT_WORDS = {
   sixes: "sixes", six: "sixes", "6s": "sixes", sixers: "sixes", maximums: "sixes",
   wickets: "wickets", wicket: "wickets", wkts: "wickets", wickts: "wickets", scalps: "wickets",
   conceded: "runs_conceded", expensive: "runs_conceded", leaked: "runs_conceded",
+  points: "points", performance: "points", fantasy: "points",
 };

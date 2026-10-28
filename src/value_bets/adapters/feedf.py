@@ -14,7 +14,7 @@ Rules the book states and the lines carry (``rules``): premium markets void unle
 only the side batting first (``bat_first``) and void if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
 fancy match totals are not voided by lost balls. Fancy and player-performance markets close an hour before the scheduled start. Player-performance markets are
 fantasy points (1 per run, 20 per wicket, 10 per catch, 25 per stumping; the premium one does not state its scoring): they come back as ``player_points`` rows,
-which nothing prices or publishes until the engine holds a points stat (the builder does not yet count catches and stumpings). Meter, khado and lucky-number markets and multi-day matches (their markets are per innings) are left out.
+published as the site's ``points`` stat (runs + 20 x wickets + 10 x catches + 25 x stumpings, counted from the ball by ball data; no model prices it). Meter, khado and lucky-number markets and multi-day matches (their markets are per innings) are left out.
 """
 from __future__ import annotations
 
