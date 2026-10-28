@@ -35,7 +35,7 @@ export function FancyPage() {
     <div className="flex flex-col gap-stack">
       <h1 className="text-title font-bold tracking-tight">Fancy</h1>
       {!rows.length ? <p className="text-callout text-muted-foreground">No fancy lines are live yet. They open a day or two before a match.</p> : (
-        <div className="grid gap-stack md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-stack md:grid-cols-2 xl:grid-cols-3">
           {rows.map((r: any, i: number) => <FancyCard key={r.f.id || `${r.f.a}${r.f.b}${r.f.start}`} {...r} i={i} />)}
         </div>)}
     </div>
