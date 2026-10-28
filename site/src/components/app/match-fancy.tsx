@@ -7,8 +7,9 @@ import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { lineVerdict, liveMarket } from "@/engine/live.js";
-import { fancyByLine, fancyFor } from "@/engine/lines.js";
+import { fancyByLine, fancyFor, lineProb } from "@/engine/lines.js";
 import { BookBadge } from "./book-badge";
+import { sideEdge } from "@/engine/stats.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -37,7 +38,6 @@ const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: stri
 type BookLine = { line: number; over: number; under: number; books: { over: number; under: number; source: string }[] };
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
-const edgeOf = (p: number | null, price: number) => (p != null && price > 1 ? p * price - 1 : null);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any };
@@ -80,7 +80,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
       if (!b) return [];
       const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line), s = rep.summary;
       if (!s.n) return [];
-      const eo = s.n >= 10 ? edgeOf(s.pOver, b.over) : null, eu = s.n >= 10 ? edgeOf(s.pUnder, b.under) : null;
+      const prior = lineProb(b.books), live = s.over + s.under; // the market's no-vig chance of the over, across the books
+      const eo = sideEdge(s.over, live, prior, b.over), eu = sideEdge(s.under, live, prior == null ? null : 1 - prior, b.under);
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
       const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
       return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, overBook: b.books.find((x) => x.over === b.over)?.source, underBook: b.books.find((x) => x.under === b.under)?.source, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];

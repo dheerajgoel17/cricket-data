@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { archiveFixture, bookLinesFor, bookName, bookQuotes, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -40,6 +40,17 @@ test("only this player, stat and format; none at all gives null", () => {
   assert.equal(bookLinesFor(doc, "ab12", "runs", "Test", NOW), null);
   assert.equal(bookLinesFor({ lines: [] }, "ab12", "runs", "T20", NOW), null);
   assert.equal(bookLinesFor(null, "ab12", "runs", "T20", NOW), null);
+});
+
+test("bookFormatFor names the format the books price a player in, the soonest match and the asked stat first", () => {
+  const doc = { lines: [L(72.5, 1.83, 1.83, { fmt: "Test", start_utc: "2026-10-27T04:30:00Z" }), L(1.5, 1.9, 1.9, { fmt: "T20", stat: "sixes", start_utc: "2026-10-27T07:00:00Z" }),
+    L(9.5, 1.9, 1.9, { pid: "zz99", fmt: "ODI" })] };
+  assert.equal(bookFormatFor(doc, "ab12", "runs", NOW), "Test");
+  assert.equal(bookFormatFor(doc, "ab12", "sixes", NOW), "T20");                 // the asked stat is looked at first
+  assert.equal(bookFormatFor(doc, "ab12", "wickets", NOW), "Test");              // none for that stat: the soonest line of any stat
+  assert.equal(bookFormatFor(doc, "ab12", "runs", Date.parse("2026-10-27T09:30:00Z")), "T20"); // the Test began over 3 h ago and is let go
+  assert.equal(bookFormatFor(doc, "nobody", "runs", NOW), null);
+  assert.equal(bookFormatFor(null, "ab12", "runs", NOW), null);
 });
 
 test("the nearest upcoming match wins; a match that started long ago is ignored", () => {
@@ -194,4 +205,63 @@ test("bookQuotes gives a book that lists several lines the one nearest evens, an
   assert.deepEqual(bookQuotes([{ line: 17.5, books: [B("bet365", 1.0, 1.9)] }]), []);
   assert.deepEqual(bookQuotes(undefined), []);
   assert.deepEqual(bookQuotes([]), []);
+});
+
+// --- a Test's innings lines: a first-innings line is a different bet from a match total, even for the same player, stat and number ---
+const TNOW = Date.parse("2026-10-27T02:00:00Z");
+const T = (line, over, under, extra = {}) => L(line, over, under, { fmt: "Test", match: "Bangladesh vs West Indies", start_utc: "2026-10-28T03:30:00Z", ...extra });
+const TEST_DOC = { lines: [T(72.5, 1.83, 1.83), T(26.5, 2.0, 1.73, { inn: 1 }), T(36.5, 2.5, 1.5, { inn: 1 }), T(22.5, 1.9, 1.9, { inn: 2 }), T(26.5, 1.9, 1.9)] };
+
+test("bookLinesFor gives one scope at a time: the match total by default, an innings when asked, never mixed", () => {
+  assert.deepEqual(bookLinesFor(TEST_DOC, "ab12", "runs", "Test", TNOW).lines.map((x) => x.line), [26.5, 72.5], "no scope asked: the match-total lines only");
+  const first = bookLinesFor(TEST_DOC, "ab12", "runs", "Test", TNOW, undefined, 1);
+  assert.deepEqual(first.lines.map((x) => [x.line, x.books[0].over]), [[26.5, 2.0], [36.5, 2.5]]);
+  assert.equal(first.inn, 1);
+  // p(over) 2.0 / 1.73: (1/2) / (1/2 + 1/1.73) = 0.5 / 1.07803 = 0.4638; 2.5 / 1.5: 0.4 / 1.0667 = 0.375; the 26.5 is closer to evens
+  assert.equal(first.main.line, 26.5);
+  assert.deepEqual(bookLinesFor(TEST_DOC, "ab12", "runs", "Test", TNOW, undefined, 2).lines.map((x) => x.line), [22.5]);
+  assert.equal(bookLinesFor({ lines: [T(26.5, 2.0, 1.73, { inn: 1 })] }, "ab12", "runs", "Test", TNOW), null, "only an innings priced: no match-total lines to offer");
+});
+
+test("every scope is one match's: the nearest match any scope prices", () => {
+  const doc = { lines: [T(72.5, 1.83, 1.83, { start_utc: "2026-11-05T03:30:00Z", match: "later" }), T(26.5, 2.0, 1.73, { inn: 1 })] };
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "Test", TNOW, undefined, 1).match, "Bangladesh vs West Indies");
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "Test", TNOW), null, "the nearest match prices only an innings; the later match's total is not offered in its place");
+  assert.deepEqual(bookScopesFor(doc, "ab12", "runs", "Test", TNOW), [1]);
+});
+
+test("bookScopesFor lists the scopes the books price, sorted, for the page's switch", () => {
+  assert.deepEqual(bookScopesFor(TEST_DOC, "ab12", "runs", "Test", TNOW), [0, 1, 2]);
+  assert.deepEqual(bookScopesFor({ lines: [T(72.5, 1.83, 1.83)] }, "ab12", "runs", "Test", TNOW), [0]);
+  assert.deepEqual(bookScopesFor({ lines: [T(26.5, 2.0, 1.73, { inn: 1 })] }, "ab12", "runs", "Test", TNOW), [1]);
+  assert.deepEqual(bookScopesFor(TEST_DOC, "ab12", "sixes", "Test", TNOW), [], "none for that stat");
+  assert.deepEqual(bookScopesFor(TEST_DOC, "ab12", "runs", "T20", TNOW), []);
+  assert.deepEqual(bookScopesFor(null, "ab12", "runs", "Test", TNOW), []);
+  assert.deepEqual([lineScope({}), lineScope({ inn: 2 }), lineScope(null)], [0, 2, 0]);
+  assert.deepEqual(SCOPE_LABEL, ["Both innings", "1st innings", "2nd innings"]);
+});
+
+test("a line with no innings reads as before: bookLinesFor and bookFormatFor on a doc without any are unchanged", () => {
+  const doc = { lines: [L(12.5, 1.4, 3.0), L(17.5, 1.85, 1.95), L(22.5, 2.6, 1.45)] };
+  assert.deepEqual(bookLinesFor(doc, "ab12", "runs", "T20", NOW).lines.map((x) => x.line), [12.5, 17.5, 22.5]);
+  assert.equal(bookFormatFor(TEST_DOC, "ab12", "runs", TNOW), "Test");
+});
+
+test("a team's innings total is never among its match totals: fancyFor lists the whole match or one innings, not both", () => {
+  const fx = { a: "Bangladesh", b: "West Indies", startMs: Date.parse("2026-10-28T03:30:00Z") };
+  const f = (o) => ({ home: "Bangladesh", away: "West Indies", start_utc: "2026-10-28T03:30:00Z", key: "team_total_runs", scope: "team", team: "Bangladesh", source: "bet365", over: 1.83, under: 1.83, ...o });
+  const doc = { fancy: [f({ line: 610.5 }), f({ line: 360.5, inn: 1, source: "Alpha" }), f({ line: 363.5, inn: 1, source: "Beta" }), f({ line: 280.5, inn: 2 })] };
+  assert.deepEqual(fancyFor(doc, fx, "team_total_runs", "Bangladesh").map((x) => x.line), [610.5]);
+  assert.deepEqual(fancyFor(doc, fx, "team_total_runs", "Bangladesh", 1).map((x) => [x.line, x.source]), [[360.5, "Alpha"], [363.5, "Beta"]]);
+  assert.deepEqual(fancyFor(doc, fx, "team_total_runs", "Bangladesh", 2).map((x) => x.line), [280.5]);
+  assert.deepEqual(fancyFor(doc, fx, "team_total_runs", "West Indies", 1), []);
+});
+
+test("withArchive puts each stored result on the line of its own scope", () => {
+  const entry = { ...ENTRY, id: "2026-10-28-bangladesh-v-west-indies", match: "Bangladesh vs West Indies", start_utc: "2026-10-28T03:30:00Z", fixture: null,
+    lines: [{ pid: "ab12", stat: "runs", fmt: "Test", line: 26.5, books: [{ source: "x", kind: "bookmaker", over: 1.9, under: 1.9 }] }, { pid: "ab12", stat: "runs", fmt: "Test", line: 26.5, inn: 1, books: [{ source: "x", kind: "bookmaker", over: 2.0, under: 1.73 }] },
+      { pid: "ab12", stat: "runs", fmt: "Test", line: 26.5, inn: 2, books: [{ source: "x", kind: "bookmaker", over: 2.0, under: 1.73 }] }],
+    results: [{ pid: "ab12", stat: "runs", value: 80 }, { pid: "ab12", stat: "runs", inn: 1, value: 31 }], fancy: [] };
+  const doc = withArchive({ lines: [], fancy: [] }, entry);
+  assert.deepEqual(doc.lines.map((l) => [lineScope(l), l.result]), [[0, 80], [1, 31], [2, undefined]]);
 });

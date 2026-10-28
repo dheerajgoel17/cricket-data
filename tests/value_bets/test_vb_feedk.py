@@ -18,7 +18,7 @@ def load(name):
 
 def test_limited_overs_player_lines_and_ladders():
     ev, offers = load("feedk_t20.json")
-    rows, left = feedk.parse_event(ev, offers, "feedk_a", STAMP)
+    rows, fancy, left = feedk.parse_event(ev, offers, "feedk_a", STAMP)
     runs = [r for r in rows if r["market_type"] == "batter_runs"]
     assert [(r["player"], r["side"], r["line"], r["back"]) for r in runs] == [
         ("Hayley Matthews", "over", 24.5, 2.0), ("Hayley Matthews", "under", 24.5, 1.73),
@@ -30,30 +30,68 @@ def test_limited_overs_player_lines_and_ladders():
     assert [(r["player"], r["line"], r["side"], r["ms_scope"], r["back"]) for r in ladder] == [
         ("Hayley Matthews", 19.5, "over", "match", 1.65), ("Courtney Webb", 19.5, "over", "match", 1.91)], "a Yes-only rung is one-sided, as a ladder"
     assert left["Match Odds"] == 1 and left["Top Run Scorer - Melbourne Renegades (W)"] == 1, "what was not read is counted"
+    assert fancy == [] and all(r["inn"] is None for r in rows), "a limited-overs match has no innings of its own to price"
 
 
-def test_a_test_gives_innings_milestones_only():
+def team_total(inn=1, side="Home", line=360500, over=1820, under=1820, label=None):
+    lab = label or f"Total Runs - {side} Team, Innings {inn}"
+    return {"id": 99, "criterion": {"label": lab, "englishLabel": lab}, "outcomes": [
+        {"label": "Over", "englishLabel": "Over", "odds": over, "line": line, "status": "OPEN"}, {"label": "Under", "englishLabel": "Under", "odds": under, "line": line, "status": "OPEN"}]}
+
+
+def test_a_test_gives_first_innings_lines_scoped_to_the_innings_and_milestones():
     ev, offers = load("feedk_test.json")
-    assert feedk.multi_day(ev, offers)
-    rows, left = feedk.parse_event(ev, offers, "feedk_a", STAMP)
-    assert {r["market_type"] for r in rows} == {"batter_milestone"}, "an 'Innings 1' runs line is not the match total"
+    assert feedk.multi_day(ev, offers) and feedk.is_test(ev)
+    rows, fancy, left = feedk.parse_event(ev, offers + [team_total(), team_total(2, "Away", 280500, 1900, 1800)], "feedk_a", STAMP)
+    runs = [r for r in rows if r["market_type"] == "batter_runs"]
+    assert [(r["player"], r["side"], r["line"], r["back"], r["inn"]) for r in runs] == [
+        ("Shadman Islam", "over", 26.5, 2.0, 1), ("Shadman Islam", "under", 26.5, 1.73, 1), ("Tanzid Hasan", "over", 26.5, 2.0, 1), ("Tanzid Hasan", "under", 26.5, 1.73, 1)]
+    assert runs[0]["market_raw"] == "Player's Total Runs - Innings 1" and runs[0]["group_key"] != runs[2]["group_key"] and runs[0]["in_play"] is False
     fifty = [r for r in rows if r["line"] == 49.5]
     assert {(r["player"], r["side"], r["ms_scope"]) for r in fifty} == {("Shadman Islam", "over", "innings"), ("Shadman Islam", "under", "innings"),
                                                                        ("Tanzid Hasan", "over", "innings"), ("Tanzid Hasan", "under", "innings")}
-    assert left["Player's Total Runs - Innings 1"] == 2
+    assert all(r["inn"] is None for r in rows if r["market_type"] == "batter_milestone"), "milestones keep the scope they already had"
+    assert [(x["team"], x["inn"], x["line"], x["over"], x["under"], x["key"], x["scope"]) for x in fancy] == [
+        ("Bangladesh", 1, 360.5, 1.82, 1.82, "team_total_runs", "team"), ("West Indies", 2, 280.5, 1.9, 1.8, "team_total_runs", "team")]
+    assert fancy[0]["start_utc"] == "2026-10-28T04:00:00Z" and fancy[0]["home"] == "Bangladesh" and fancy[0]["source"] == "feedk_a" and fancy[0]["kind"] == "bookmaker"
+    assert "Top Run Scorer - Bangladesh, Innings 1" in left and "Player's Total Runs - Innings 1" not in left
     assert not feedk.multi_day(*load("feedk_t20.json"))
+
+
+def test_a_multi_day_line_counts_only_with_an_innings_in_a_test_and_for_a_batter():
+    ev, offers = load("feedk_test.json")
+    runs = next(b for b in offers if b["criterion"]["label"] == "Player's Total Runs - Innings 1")
+    bare = {**runs, "criterion": {"label": "Player's Total Runs", "englishLabel": "Player's Total Runs"}}
+    wkts = {**runs, "criterion": {"label": "Bowler's Total Wickets - Innings 1", "englishLabel": "Bowler's Total Wickets - Innings 1"}}
+    rows, fancy, left = feedk.parse_event(ev, [bare, wkts], "feedk_a", STAMP)
+    assert rows == [] and left["Player's Total Runs"] == 1 and left["Bowler's Total Wickets - Innings 1"] == 1, "no innings named, or not a batter: not a line we can scope"
+    ev["path"][1]["englishName"] = "Sheffield Shield"  # still multi-day (the draw outcome), no longer a Test
+    assert feedk.multi_day(ev, offers) and not feedk.is_test(ev)
+    rows, fancy, left = feedk.parse_event(ev, [runs, team_total()], "feedk_a", STAMP)
+    assert rows == [] and fancy == [] and left["Player's Total Runs - Innings 1"] == 1 and left["Total Runs - Home Team, Innings 1"] == 1, "the site has no first-class history to chart it against"
+
+
+def test_a_team_total_needs_both_sides_on_one_line():
+    ev, offers = load("feedk_test.json")
+    odd = team_total()
+    odd["outcomes"][1]["line"] = 365500
+    assert feedk.parse_event(ev, [odd], "feedk_a", STAMP)[1] == []
+    odd = team_total()
+    odd["outcomes"][0]["status"] = "SUSPENDED"
+    assert feedk.parse_event(ev, [odd], "feedk_a", STAMP)[1] == []
+    assert feedk.parse_event(ev, [team_total(label="Total Runs - Home Team, Innings 1, Over 5")], "feedk_a", STAMP)[1] == [], "a team's runs in one over is another market"
 
 
 def test_unusable_offers_are_left_out_not_guessed():
     ev, offers = load("feedk_t20.json")
     runs = next(b for b in offers if b["criterion"]["label"] == "Player's Total Runs")
     runs["outcomes"][1]["status"] = "SUSPENDED"
-    rows, left = feedk.parse_event(ev, [runs], "feedk_a", STAMP)
+    rows, _, left = feedk.parse_event(ev, [runs], "feedk_a", STAMP)
     assert rows == [] and left["Player's Total Runs"] == 1, "one side closed: no line"
     runs["outcomes"][1].update(status="OPEN", label="Under 25.5", englishLabel="Under 25.5")
     assert feedk.parse_event(ev, [runs], "feedk_a", STAMP)[0] == [], "two different lines are not one market"
     ev["state"] = "STARTED"
-    assert feedk.parse_event(ev, offers, "feedk_a", STAMP) == ([], feedk.Counter())
+    assert feedk.parse_event(ev, offers, "feedk_a", STAMP) == ([], [], feedk.Counter())
 
 
 def test_milestone_lines():
@@ -96,7 +134,7 @@ def test_fetch_is_polite_and_keeps_the_good_books(monkeypatch):
     fake_feed(monkeypatch, calls, fail=("b", 429))
     rows, raw = feedk.fetch("2026-10-28T01:00:00Z")
     assert {r["source"] for r in rows} == {"feedk_a"}, "a 429 on one book costs only that book"
-    assert raw["books"]["Alpha"]["events"] == 1 and raw["books"]["Beta"]["stopped"] == "HTTP 429"
+    assert raw["books"]["Alpha"]["events"] == 1 and raw["books"]["Beta"]["stopped"] == "HTTP 429" and raw["fancy"] == []
     assert [u.split("/root/")[1].split("?")[0] for u in calls] == ["a/listView/cricket.json", "a/betoffer/event/" + str(load("feedk_t20.json")[0]["id"]) + ".json",
                                                                  "b/listView/cricket.json", "b/betoffer/event/" + str(load("feedk_t20.json")[0]["id"]) + ".json"]
     assert all("&ncid=" in u for u in calls) and not any("/2.json" in u for u in calls), "an event with too few offers is not fetched"

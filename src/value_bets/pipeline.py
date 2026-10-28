@@ -53,6 +53,12 @@ def split_innings_milestones(rows):
     return n
 
 
+def whole_match(rows):
+    """The rows that are about the whole match. An innings-scoped price ("his first innings", a Test only) is published as a book line (and so filed in the archive) but never
+    priced: the history has one row per player per match, both innings summed, so there is no model for it and it must not meet the match-total lines of the same player."""
+    return [r for r in rows if not r.get("inn")]
+
+
 def fill_team_scope(rows):
     """Team top-batter/bowler: a book's market id is already one team's market (Feed P/Book A rows carry no team),
     and the team scope is inferred from the resolved players. Players we fail to match to history used to fall into a
@@ -349,6 +355,10 @@ def run():
 
     book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")) + fancy.adapter_fancy(raws))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
+    n_inn = sum(1 for r in rows if r.get("inn"))
+    if n_inn:
+        rows = whole_match(rows)
+        log(f"{n_inn} innings-scoped prices published as book lines, kept out of the value-bet pricing")
 
     # ---- fair-price signals per source group
     groups = defaultdict(list)

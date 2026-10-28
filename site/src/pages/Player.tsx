@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { bookLinesFor } from "@/engine/lines.js";
+import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor } from "@/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
-import { FORMATS } from "@/engine/util.js";
+import { sideEdge } from "@/engine/stats.js";
+import { FORMATS, fmtIndex } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
 import { loadLines } from "@/lib/feeds";
@@ -31,7 +32,7 @@ import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 
-const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side"]); // those are on screen already
+const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side", "Test innings"]); // those are on screen already (the Scope switch for the last)
 const band = (p: number | null) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo");
 const bandText = { hi: "text-primary", mid: "text-amber", lo: "text-miss", "": "" } as const;
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
@@ -111,18 +112,26 @@ function PlayerScreen({ idx }: { idx: number }) {
   };
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1);
-  const fmtVal = Number(q.fmt ?? (fmts.length ? fmts[0][0] : 0));
   const stat = q.stat || "runs";
   setTitle("Player stats, hit rates and form chart");
 
   const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
-  const book = lines.data ? bookLinesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : null;
+  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out
+  const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
+  // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
+  // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
+  // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
+  const testBat = FORMATS[fmtVal] === "Test" && (STATS as any)[stat]?.side === "bat";
+  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : [];
+  const asked = q.scope === undefined || q.scope === "" ? null : Number(q.scope);
+  const scope = !testBat ? 0 : asked != null && [0, 1, 2].includes(asked) ? asked : priced.length && !priced.includes(0) ? priced[0] : 0;
+  const book = lines.data ? bookLinesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal], undefined, undefined, scope) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
   const plan = {
     kind: "player_prop", stat, line: q.line !== undefined && q.line !== "" ? Number(q.line) : bookDefault ? book.main.line : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
     filters: { format: FORMATS[fmtVal], opposition: q.opp || null, venue_type: q.vt || null, innings: q.inn || null, position: q.pos || null, since: q.since || null, until: q.until || null,
-      last_n: q.last ? Number(q.last) : null, international: q.lvl === "intl" ? true : q.lvl === "club" ? false : null },
+      last_n: q.last ? Number(q.last) : null, international: q.lvl === "intl" ? true : q.lvl === "club" ? false : null, team_innings: scope || null },
     venue: q.venue || null,
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
@@ -135,15 +144,17 @@ function PlayerScreen({ idx }: { idx: number }) {
       <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
         <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={STAT_OPTIONS} />
       </div>
-      {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
+      {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
+      {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+        items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       {loading ? <PlayerSkeleton />
-        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, res: res.data, q, book, bookDefault, navigateWith }} />
+        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, res: res.data, q, book, bookDefault, navigateWith, scope }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
     </div>
   );
 }
 
-function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
+function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
   const { store } = useData();
   const c = res.chart;
   const entries: any[] = c ? c.entries : [];
@@ -163,7 +174,8 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
   const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
   const bookAt = book ? book.lines.find((l: any) => l.line === line) : null;
   const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
-  const edge = bestPrice && cur?.p ? bestPrice * cur.p - 1 : 0;
+  const prior = bookAt?.prob == null ? null : side === "over" ? bookAt.prob : 1 - bookAt.prob; // the market's no-vig chance of this side
+  const edge = bookAt && cur ? sideEdge(cur.hits, cur.played, prior, bestPrice) : null;
   const active = (res.filters || []).filter(([k]: [string]) => !FILTER_SKIP.has(k));
   const logs = [...entries].reverse();
   const stepLine = (d: number) => { const v = Math.max(0.5, Math.round((line + d) * 100) / 100); setLine(v); keep({ line: v, side }); };
@@ -193,12 +205,19 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
               <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => stepLine(0.5)}><Plus /></Button>
             </div>
           </div>
+          {book && (bookAt ? (
+            <p className="-mt-tight text-callout text-muted-foreground">
+              {bookAt.books.map((b: any) => <span key={b.source} className="mr-snug whitespace-nowrap"><BookBadge source={b.source} /> <b className={cn("font-semibold tabular-nums", side === "over" ? "text-foreground" : "")}>{odds(b.over)}</b> / <b className={cn("font-semibold tabular-nums", side === "under" ? "text-foreground" : "")}>{odds(b.under)}</b></span>)}
+            </p>
+          ) : (
+            <p className="-mt-tight text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
+          ))}
 
           <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
             <ChartBars entries={shown} line={line} side={side} height={300} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
             <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
               items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
-            <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
+            <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
           </div>
         </section>
       )}
@@ -206,7 +225,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
       {book && cur && (
         <section className="flex flex-col gap-snug">
           <div className="grid gap-hair">
-            <h2 className="text-title font-bold tracking-tight">Bookmaker lines</h2>
+            <h2 className="text-title font-bold tracking-tight">Bookmaker lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}</h2>
             <p className="text-footnote text-muted-foreground">{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal prices, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</p>
           </div>
           <ul className={cn("overflow-hidden", CARD)}>
@@ -230,7 +249,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
               );
             })}
           </ul>
-          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the games on the chart.{bestPrice && cur.p ? ` At ${line}: best price ${odds(bestPrice)}, ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% vs his hit rate.` : ""}</p>
+          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the {scope ? "innings" : "games"} on the chart.{edge != null ? ` At ${line}: best price ${odds(bestPrice)}, edge ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% (his ${cur.label} hit rate pulled toward the market's chance).` : ""}</p>
         </section>
       )}
 
@@ -305,7 +324,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
             <Field label="Opposition"><Input name="opp" list="dl-teams" defaultValue={q.opp} /></Field>
             <Field label="Venue"><Input name="venue" list="dl-venues" defaultValue={q.venue} /></Field>
             <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={q.vt} className="w-full" /></Field>
-            <Field label="Innings"><NativeSelect name="inn" options={[["", "any"], ["first", "batting first"], ["second", "chasing"]]} defaultValue={q.inn} className="w-full" /></Field>
+            <Field label="Batted first / chasing"><NativeSelect name="inn" options={[["", "any"], ["first", "batted first"], ["second", "chasing"]]} defaultValue={q.inn} className="w-full" /></Field>
             <Field label="Position"><NativeSelect name="pos" options={[["", "any"], ["1-2", "openers"], ["1-3", "top 3"], ["4-6", "middle"], ["7-11", "lower"], ...Array.from({ length: 11 }, (_, i) => [`${i + 1}`, `No. ${i + 1}`] as [string, string])]} defaultValue={q.pos} className="w-full" /></Field>
             <Field label="Level"><NativeSelect name="lvl" options={[["", "all"], ["intl", "international"], ["club", "club / league"]]} defaultValue={q.lvl} className="w-full" /></Field>
             <Field label="From"><Input name="since" type="date" defaultValue={q.since} /></Field>

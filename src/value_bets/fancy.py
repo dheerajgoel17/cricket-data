@@ -1,5 +1,8 @@
 """Match-level "fancy" over/under lines from the Feed P (Book A mirror) feed, for the site's Match Fancy tab.
 
+A fancy line is the whole match's (or one side's across the match) unless it carries ``inn``: 1 or 2, one side's first or second innings, which only a Test has (Feed K and
+Feed E give those). ``inn`` is part of the line's key and the Match Fancy tab shows only the lines without it.
+
 These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score,
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,
 paired into a line with its over and under decimal prices, and published as ``fancy`` in ``book_lines.json``. Keys match the site's engine
@@ -48,7 +51,7 @@ def _line(q):
 def adapter_fancy(raws: dict) -> list[dict]:
     """The fancy lines other adapters read themselves: a raw feed may carry ``fancy`` in the shape ``match_fancy`` returns (Feed E's match sixes / fours)."""
     out = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("fancy") or []]
-    return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x["line"], x["source"]))
+    return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x.get("inn", 0), x["line"], x["source"]))
 
 
 def match_fancy(raw: dict | None) -> list[dict]:

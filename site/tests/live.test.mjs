@@ -727,3 +727,58 @@ test("unlistedRows: a match our file calls Completed without a result is not fin
   const over = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "South Africa", team2_f_n: "Australia", status: 2, inning: 4, score1: "308-6", over1: "(76.0)", B: "South Africa won by 5 wickets" } }));
   assert.equal(buildMatch(rows[0], over, null).status, "final", "and once it says it is over, it is");
 });
+
+// --- a Test's first- and second-innings lines: read off the innings of the player's own side, not the match total ---
+const bat = (id, name, runs, balls, fours, sixes, out) => ({ id, name, runs, balls, fours, sixes, out });
+function testMatch(card, extra = {}) {
+  return { id: "t1", status: "live", fmt: "Test", start: "2026-10-28T03:30:00.000Z", teams: [{ name: "Bangladesh" }, { name: "West Indies" }], players: [], card, ...extra };
+}
+const TANZID = [bat("T1", "Tanzid Hasan", 40, 52, 5, 1, true), bat("S1", "Shadman Islam", 12, 30, 2, 0, false)]; // Bangladesh, first innings
+const WI_1 = [bat("B1", "Kraigg Brathwaite", 70, 110, 8, 0, true)];                                              // West Indies, their first
+const BAN_2 = [bat("T1", "Tanzid Hasan", 5, 9, 1, 0, false)];                                                    // Bangladesh, second, in progress
+const TEST_LINES = (inn, pid, player, team, stat, line) => ({ pid, player, team, fmt: "Test", stat, line, inn, match: "Bangladesh vs West Indies", start_utc: "2026-10-28T03:30:00Z", books: [{ source: "x", kind: "bookmaker", over: 1.9, under: 1.9 }] });
+const TEST_IDN = identityIndex({ v: 1, s: { tz: "T1", sh: "S1", bw: "B1" } });
+const summarise = (got) => got.map(({ pid, stat, line, inn, value, state, verdict }) => [pid, stat, line, inn, value, state, verdict]);
+
+test("settleLines: a Test's first-innings line is what he made in his side's first innings, final once the next innings has begun", () => {
+  const m = testMatch([{ n: 1, team: "Bangladesh", batters: TANZID }, { n: 2, team: "West Indies", batters: WI_1 }, { n: 3, team: "Bangladesh", batters: BAN_2 }]);
+  const L = (inn, line, pid = "tz", player = "Tanzid Hasan", team = "Bangladesh") => TEST_LINES(inn, pid, player, team, "runs", line);
+  assert.deepEqual(summarise(settleLines(m, [L(1, 31.5), L(1, 40.5), L(1, 40), L(2, 4.5), L(2, 9.5), L(1, 5.5, "bw", "Kraigg Brathwaite", "West Indies"), L(2, 5.5, "bw", "Kraigg Brathwaite", "West Indies")], TEST_IDN)), [
+    ["tz", "runs", 31.5, 1, 40, "final", "cleared"],  // 40 in the first innings, and West Indies are in and Bangladesh batting again
+    ["tz", "runs", 40.5, 1, 40, "final", "missed"],
+    ["tz", "runs", 40, 1, 40, "final", "push"],       // met exactly
+    ["tz", "runs", 4.5, 2, 5, "live", "cleared"],      // 5 not out in the second: over 4.5 is cleared the moment it is passed
+    ["tz", "runs", 9.5, 2, 5, "live", null],           // ... and 9.5 is still to play for
+    ["bw", "runs", 5.5, 1, 70, "final", "cleared"],    // the West Indies' first turn is the card's second innings
+  ]);
+  // the match total of the same player at the same number is a different line: it never takes an innings's value (with two rows for him it is ambiguous, as before)
+  const both = { ...m, players: [{ ...TANZID[0], team: "Bangladesh" }, { ...BAN_2[0], team: "Bangladesh" }] };
+  assert.deepEqual(settleLines(both, [{ ...L(1, 31.5), inn: undefined }], TEST_IDN), []);
+});
+
+test("settleLines: a first innings in progress is live until he is out, then his number is out and cannot move", () => {
+  const live = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 31, 40, 4, 0, false)] }]);
+  const line = TEST_LINES(1, "tz", "Tanzid Hasan", "Bangladesh", "runs", 31.5);
+  assert.deepEqual(summarise(settleLines(live, [line, { ...line, line: 30.5 }], TEST_IDN)), [["tz", "runs", 31.5, 1, 31, "live", null], ["tz", "runs", 30.5, 1, 31, "live", "cleared"]]);
+  const dismissed = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 31, 40, 4, 0, true)] }]);
+  assert.deepEqual(summarise(settleLines(dismissed, [line], TEST_IDN)), [["tz", "runs", 31.5, 1, 31, "out", "missed"]]);
+  const over = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 31, 40, 4, 0, false)] }], { status: "final" });
+  assert.deepEqual(summarise(settleLines(over, [line], TEST_IDN)), [["tz", "runs", 31.5, 1, 31, "final", "missed"]], "a match that is over settles every innings");
+});
+
+test("settleLines: an innings that has not happened, or that he did not bat in, has no entry", () => {
+  const m = testMatch([{ n: 1, team: "Bangladesh", batters: TANZID, yetToBat: ["Litton Das"] }]);
+  const L = (inn, pid, player, team) => TEST_LINES(inn, pid, player, team, "runs", 20.5);
+  assert.deepEqual(settleLines(m, [L(2, "tz", "Tanzid Hasan", "Bangladesh"), L(1, "bw", "Kraigg Brathwaite", "West Indies"), L(1, "ld", "Litton Das", "Bangladesh")], TEST_IDN), [],
+    "Bangladesh have batted once; West Indies not at all; Litton Das is yet to bat (his bet is void if he never does)");
+  assert.deepEqual(settleLines(testMatch([]), [L(1, "tz", "Tanzid Hasan", "Bangladesh")], TEST_IDN), [], "no card at all");
+});
+
+test("lineStanding: a server entry is found by the innings of its line, so a first-innings number is never read as the match total's", () => {
+  const m = testMatch([]);
+  const served = { ...m, lines: [{ pid: "tz", stat: "runs", line: 31.5, value: 70, state: "live", verdict: "cleared" }, { pid: "tz", stat: "runs", line: 31.5, inn: 1, value: 40, state: "final", verdict: "cleared" }] };
+  const l = { pid: "tz", player: "Tanzid Hasan", team: "Bangladesh", stat: "runs", line: 31.5 };
+  assert.deepEqual(lineStanding(served, l, TEST_IDN), { v: 70, state: "live", verdict: "cleared" });
+  assert.deepEqual(lineStanding(served, { ...l, inn: 1 }, TEST_IDN), { v: 40, state: "final", verdict: "cleared" });
+  assert.equal(lineStanding(served, { ...l, inn: 2 }, TEST_IDN), null);
+});

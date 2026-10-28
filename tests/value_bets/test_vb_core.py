@@ -117,3 +117,9 @@ def test_alert_dedupe(monkeypatch, tmp_path):
     assert len(store.new_alerts([{**v, "edge": 0.08}])) == 0    # +2pp: below re-alert delta
     out = store.new_alerts([{**v, "edge": 0.095}])               # +3.5pp vs last alert
     assert len(out) == 1 and out[0]["realert"]
+
+
+def test_innings_scoped_prices_never_reach_the_pricing():
+    from value_bets.pipeline import whole_match
+    rows = [{"id": 1, "inn": None}, {"id": 2, "inn": 1}, {"id": 3}, {"id": 4, "inn": 2}]
+    assert [r["id"] for r in whole_match(rows)] == [1, 3]
