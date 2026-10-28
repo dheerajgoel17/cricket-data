@@ -1,0 +1,187 @@
+{
+ "data": {
+  "event": {
+   "event": {
+    "name": "Melbourne Renegades W v Sydney Thunder W"
+   },
+   "fancy": [
+    {
+     "market_id": "9.226102812490004",
+     "name": "6 Over Runs ST W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490001",
+     "name": "6 Over Runs MR W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490002",
+     "name": "10 Over Runs MR W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490005",
+     "name": "10 Over Runs ST W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490003",
+     "name": "15 Over Runs MR W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490006",
+     "name": "15 Over Runs ST W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490011",
+     "name": "20 Over Runs MR W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490012",
+     "name": "20 Over Runs ST W Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490163",
+     "name": "Match 1st Over Run Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490171",
+     "name": "C Webb Runs Adv ",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490172",
+     "name": "H Matthews Runs Adv ",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490263",
+     "name": "T Wilson Boundaries Adv ",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490018",
+     "name": "6 Over Odd Even Run Bhav MR W Adv",
+     "fancy_type": "ODD_EVEN"
+    },
+    {
+     "market_id": "9.226102812490022",
+     "name": "10 Over Odd Even Run Bhav MR W Adv",
+     "fancy_type": "ODD_EVEN"
+    },
+    {
+     "market_id": "9.226102812490027",
+     "name": "15 Over Odd Even Run Bhav MR W Adv",
+     "fancy_type": "ODD_EVEN"
+    },
+    {
+     "market_id": "9.226102812490032",
+     "name": "20 Over Odd Even Run Bhav MR W Adv",
+     "fancy_type": "ODD_EVEN"
+    },
+    {
+     "market_id": "9.226102812540001",
+     "name": "1st Inn Total Match Fours MR W (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812550001",
+     "name": "1st Inn Total Match Fours ST W (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490448",
+     "name": "Most Wickets By a Bowlers (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490439",
+     "name": "Top Batsman Runs in Match (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490435",
+     "name": "Highest Scoring Over Runs in Match (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490422",
+     "name": "Total Match Fifties (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490421",
+     "name": "Total Match 30s (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490416",
+     "name": "Total Match Extras (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490414",
+     "name": "Total Match Wkts (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    },
+    {
+     "market_id": "9.226102812490410",
+     "name": "Total Match Fours (MR W vs ST W) Adv",
+     "fancy_type": "RUN"
+    }
+   ]
+  },
+  "odds_hub": "hub.invalid",
+  "fancy_odds_keys": {
+   "id": 1,
+   "selection_id": 2,
+   "event_id": 3,
+   "market_id": 0,
+   "market_type_id": 4,
+   "betting_type": 5,
+   "fancy_type": 6,
+   "name": 7,
+   "min_bet": 8,
+   "max_bet": 9,
+   "max_profit": 10,
+   "max_market_profit": 11,
+   "bet_delay": 12,
+   "bet_allow": 13,
+   "check_volume": 14,
+   "is_api_fancy": 15,
+   "api_fancy_ref": 16,
+   "back_rate": 17,
+   "back_price": 18,
+   "lay_rate": 19,
+   "lay_price": 20,
+   "back1_rate": 21,
+   "back1_price": 22,
+   "lay1_rate": 23,
+   "lay1_price": 24,
+   "back2_rate": 25,
+   "back2_price": 26,
+   "lay2_rate": 27,
+   "lay2_price": 28,
+   "active_rate": 29,
+   "active_rate1": 30,
+   "active_rate2": 31,
+   "ball_running": 32,
+   "ball_running1": 33,
+   "ball_running2": 34,
+   "suspended": 35,
+   "suspended1": 36,
+   "suspended2": 37,
+   "sort_priority": 38,
+   "vol_multi": 39,
+   "message": 40,
+   "status": 41,
+   "last_updated_time": 42
+  }
+ }
+}

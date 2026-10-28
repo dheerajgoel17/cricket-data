@@ -65,6 +65,10 @@ DEFAULTS = {
     "FEEDF_MAX_EVENTS": 12,        # ... matches read per run (two calls each)
     "FEEDF_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
     "FEEDF_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDG_SPACING_SECS": 2.0,     # Feed G (adapters/feedg.py, on whenever FEEDG_NAME and FEEDG_API are set): seconds between its requests
+    "FEEDG_MAX_EVENTS": 12,        # ... matches read per run (a catalogue call and an odds call each)
+    "FEEDG_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDG_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off
