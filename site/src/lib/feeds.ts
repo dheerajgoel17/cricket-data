@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
 import { isFixtureId } from "@/engine/lines.js";
+import { saveLive } from "@/lib/live-cache";
 
 const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out";
 const CONFIG = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/config";
@@ -56,6 +57,8 @@ export async function askApi(question: string): Promise<any | null> {
 export async function loadLive(): Promise<any | null> {
   try {
     const r = await fetch("/api/live", { headers: { accept: "application/json" } });
-    return r.ok ? await r.json() : null;
+    const body = r.ok ? await r.json() : null;
+    saveLive(body);
+    return body;
   } catch { return null; }
 }

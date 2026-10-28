@@ -82,18 +82,3 @@ export function fixtureScore(f: any, home: string | null, cfg: RailConfig = DEFA
 export function rankFixtures(fx: any[], home: string | null, stateOf: (f: any) => RailState = () => "upcoming", cfg: RailConfig = DEFAULT_RAIL): any[] {
   return fx.map((f, i) => ({ f, i, t: cfg.tiers.indexOf(stateOf(f)), s: fixtureScore(f, home, cfg) })).sort((x, y) => x.t - y.t || y.s - x.s || x.i - y.i).map((x) => x.f);
 }
-
-/** A fixture's identity on screen (the same two sides can meet again in a series, so the start is part of it). */
-export const fixtureKey = (f: any): string => `${f.id ?? ""}|${f.a}|${f.b}|${f.start ?? ""}`;
-
-/**
- * `next` (the fresh ranking, cut to what the rail shows) with the cards already on screen left where they were: the cards of `shown` (their keys, in screen order) that are still
- * in `next` keep their places relative to each other, and a card that was not on screen takes the slot the ranking gives it. A late change of rank (a match that has gone live,
- * new rail settings) then changes what a card says and not where it sits.
- */
-export function settleOrder<T>(shown: string[], next: T[], keyOf: (x: T) => string): T[] {
-  const at = new Map(shown.map((k, i) => [k, i] as const));
-  const kept = next.filter((x) => at.has(keyOf(x))).sort((p, q) => at.get(keyOf(p))! - at.get(keyOf(q))!);
-  let j = 0;
-  return next.map((x) => (at.has(keyOf(x)) ? kept[j++] : x));
-}

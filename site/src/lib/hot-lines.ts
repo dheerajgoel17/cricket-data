@@ -28,6 +28,12 @@ export function hotLines(lines: any[], scope: HotScope, now = Date.now()): any[]
   return lines.filter((l) => priced(l) && dayOffset(l.start_utc, now) === scope.day);
 }
 
+/** What orders a Hot props row: whether its match is in play now, the hit rate over the window shown, the edge. */
+export interface HotKey { live: boolean; p: number | null; edge: number | null }
+
+/** Hot props order: rows of a match in play first (the live feed's word for it, as the home rail uses), then the higher hit rate, then the higher edge. */
+export const hotOrder = (x: HotKey, y: HotKey): number => Number(y.live) - Number(x.live) || (y.p ?? 0) - (x.p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1);
+
 /** The lines grouped by the player file (shard) their player is in, the file with the most lines first (the most rows are ready when it lands). Lines of players the data does not know are left out. */
 export function byShard(lines: any[], indexOf: (pid: string) => number, shardOf: (idx: number) => number): { shard: number; lines: any[] }[] {
   const groups = new Map<number, any[]>();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { DEFAULT_RAIL, fixtureKey, fixtureScore, homeTeam, rankFixtures, sanitizeRail, settleOrder } from "./priority";
+import { DEFAULT_RAIL, fixtureScore, homeTeam, rankFixtures, sanitizeRail } from "./priority";
 
 const fx = (a: string, b: string, extra: Record<string, unknown> = {}) => ({ a, b, fmt: "ODI", gender: "male", series: "", ...extra });
 // today's list, in the order the schedule gives it
@@ -84,27 +84,5 @@ describe("the published settings", () => {
   it("matches a tournament by whole words, so 'ipl' is not found inside 'triple'", () => {
     expect(fixtureScore(fx("Ireland", "Scotland", { series: "Triple Crown Cup" }), null)).toBe(fixtureScore(fx("Ireland", "Scotland"), null));
     expect(fixtureScore(fx("Ireland", "Scotland", { series: "Indian Premier League 2026" }), null)).toBe(fixtureScore(fx("Ireland", "Scotland"), null) + 30);
-  });
-});
-
-describe("settleOrder", () => {
-  const key = (x: string) => x;
-  it("is the fresh ranking when nothing is on screen yet", () => {
-    expect(settleOrder([], ["a", "b", "c"], key)).toEqual(["a", "b", "c"]);
-  });
-  it("leaves the cards on screen where they are when the ranking changes under them", () => {
-    expect(settleOrder(["a", "b", "c", "d"], ["d", "a", "b", "c"], key)).toEqual(["a", "b", "c", "d"]); // d has gone live and now ranks first: it keeps its seat
-  });
-  it("lets a card that was not on screen take the slot the ranking gives it, the others keeping their order", () => {
-    expect(settleOrder(["a", "b", "c"], ["n", "c", "a", "b"], key)).toEqual(["n", "a", "b", "c"]);
-    expect(settleOrder(["a", "b", "c"], ["c", "a", "n", "b"], key)).toEqual(["a", "b", "n", "c"]);
-  });
-  it("drops a card that has left, without moving the rest", () => {
-    expect(settleOrder(["a", "b", "c", "d"], ["d", "c", "a"], key)).toEqual(["a", "c", "d"]);
-  });
-  it("tells two meetings of the same sides apart by their start", () => {
-    const g1 = { id: "1", a: "India", b: "Australia", start: "2026-10-28T09:00Z" }, g2 = { id: "2", a: "India", b: "Australia", start: "2026-10-30T09:00Z" };
-    expect(fixtureKey(g1)).not.toBe(fixtureKey(g2));
-    expect(settleOrder([fixtureKey(g1), fixtureKey(g2)], [g2, g1], fixtureKey)).toEqual([g1, g2]);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byShard, dayOffset, hotLines, pool } from "./hot-lines";
+import { byShard, dayOffset, hotLines, hotOrder, pool } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -77,5 +77,25 @@ describe("pool", () => {
     const seen: number[] = [];
     await pool([1, 2], 8, async (x) => { seen.push(x); });
     expect(seen).toEqual([1, 2]);
+  });
+});
+
+describe("hotOrder", () => {
+  type K = { id: string; live: boolean; p: number | null; edge: number | null };
+  const row = (id: string, live: boolean, p: number | null, edge: number | null = null): K => ({ id, live, p, edge });
+  const order = (rows: K[]) => [...rows].sort(hotOrder).map((r) => r.id);
+
+  it("puts a row of a match in play above a row of another match with a higher hit rate", () => {
+    expect(order([row("pre-90", false, 0.9), row("live-60", true, 0.6)])).toEqual(["live-60", "pre-90"]);
+  });
+  it("orders two rows in play by hit rate, and two others by hit rate", () => {
+    expect(order([row("live-50", true, 0.5), row("pre-80", false, 0.8), row("live-70", true, 0.7), row("pre-60", false, 0.6)])).toEqual(["live-70", "live-50", "pre-80", "pre-60"]);
+  });
+  it("breaks a tie on hit rate by the edge, a row with no edge last", () => {
+    expect(order([row("none", false, 0.7, null), row("low", false, 0.7, 0.01), row("high", false, 0.7, 0.2)])).toEqual(["high", "low", "none"]);
+    expect(order([row("live-low", true, 0.7, 0.01), row("live-high", true, 0.7, 0.2), row("pre", false, 0.9, 0.5)])).toEqual(["live-high", "live-low", "pre"]);
+  });
+  it("puts a row with no hit rate after those with one", () => {
+    expect(order([row("none", false, null), row("some", false, 0.1)])).toEqual(["some", "none"]);
   });
 });

@@ -17,7 +17,7 @@ import { fmtIndex } from "@/engine/util.js";
 import { barState, windowRate } from "@/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
-import { byShard, dayOffset, hotLines, norm, pool, sameMatch } from "@/lib/hot-lines";
+import { byShard, dayOffset, hotLines, hotOrder, norm, pool, sameMatch } from "@/lib/hot-lines";
 import { odds } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -165,9 +165,9 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   }, [data]);
   const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
-  // the edge is worked out from the window shown, so it moves with it
-  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over) })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start]);
+  // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
+  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, live.data]);
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
