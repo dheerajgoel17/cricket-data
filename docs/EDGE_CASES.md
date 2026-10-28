@@ -24,6 +24,8 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | First-class (MDM) | not included | not a Test |
 
 ## Known gaps
+How the books settle each of these (and what to change) is in `docs/BETTING_RULES.md`, section 6.
+
 * Whether a named 12th man / impact sub counts as "in the XI" differs between books; we treat every named player as in.
 * Per-innings Test props (rather than whole-match) are not modelled.
 * Rain-curtailed games still count for player props (only summary markets apply the void rules); add a filter if your book voids them.
