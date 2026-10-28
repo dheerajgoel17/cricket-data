@@ -141,3 +141,19 @@ def test_an_http_error_ends_the_run_for_the_book_and_keeps_what_was_read(env, mo
     rows, raw = feedf.fetch(STAMP)
     assert raw["books"]["Test Book"]["stopped"] == "HTTP 429" and raw["books"]["Test Book"]["events"] == 0
     assert rows  # the first match's fancy rows were read before the premium call failed
+
+
+def test_a_stray_comma_in_the_event_name_is_dropped_and_multi_day_matches_are_not_read(env, monkeypatch):
+    stub = {"eventId": "1", "eventName": "South Australia v Western Australia,", "eventDateTime": "29/10/2026 05:30:00"}
+    ev = feedf._event(stub, (1, "Sheffield Shield 2026-27"), STAMP)
+    assert (ev["home"], ev["away"], ev["common"]["match"]) == ("South Australia", "Western Australia", "South Australia vs Western Australia")
+    assert all(feedf.MULTI_DAY.search(c) for c in ("Test Matches", "Sheffield Shield 2026-27", "Ranji Trophy Plate 2026-27", "Presidents Trophy"))
+    assert not any(feedf.MULTI_DAY.search(c) for c in ("One Day Internationals", "Ford Trophy", "Global T20 Canada", "International Twenty20 Matches", "WBBL"))
+    calls = serve(monkeypatch)
+    names = J("feedf_names.json")
+    names["data"]["children"].append({**stub, "eventTypeId": "4"})
+    menu = J("feedf_menu.json")
+    menu["data"][0]["children"].append({"data": {"name": "Sheffield Shield"}, "children": [{"betRadarId": "sr:match:7", "eventId": "1", "eventName": stub["eventName"]}]})
+    monkeypatch.setattr(feedf, "http_json", lambda url, headers=None, retries=0, **_: (names if "getEventNames" in url else menu if "loadPlayerMenu" in url else (J("feedf_fancy.json") if "Fancy" in url else J("feedf_premium.json")), {}))
+    rows, raw = feedf.fetch(STAMP)
+    assert raw["books"]["Test Book"]["left_out"]["multi-day match"] == 1 and "South Australia vs Western Australia" not in {r["match"] for r in rows}

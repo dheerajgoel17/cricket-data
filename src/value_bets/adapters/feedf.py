@@ -13,7 +13,7 @@ Rules the book states and the lines carry (``rules``): premium markets void unle
 only the side batting first (``bat_first``) and void if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
 fancy match totals are not voided by lost balls. Fancy and player-performance markets close an hour before the scheduled start. Player-performance markets are
 fantasy points (1 per run, 20 per wicket, 10 per catch, 25 per stumping; the premium one does not state its scoring): they come back as ``player_points`` rows,
-which nothing prices or publishes until the engine holds a points stat (the builder does not yet count catches and stumpings). Meter, khado and lucky-number markets are left out.
+which nothing prices or publishes until the engine holds a points stat (the builder does not yet count catches and stumpings). Meter, khado and lucky-number markets and multi-day matches (their markets are per innings) are left out.
 """
 from __future__ import annotations
 
@@ -48,6 +48,8 @@ FANCY_MATCH = {"Total Match Fours Adv": "match_fours", "Total Match Sixes Adv": 
 FANCY_PLAYER = re.compile(r"^(?P<p>[A-Za-z][A-Za-z.' -]*?)\s+Run Adv$")
 NOT_A_PLAYER = re.compile(r"\b(over|wkt|pship|match|fall|total|top|boundaries)\b", re.I)
 FANCY_TEAM_RUNS = re.compile(r"^(?P<n>\d+) Over Run (?P<abbr>[A-Z]{2,4})\s+Adv$")
+
+MULTI_DAY = re.compile(r"\btests?\b|ashes|shield|first.class|championship|ranji|presidents? trophy", re.I)  # innings-scoped markets there: not the match totals the pipeline prices (a later job)
 
 RULES = {"premium": "void_below_80pct", "fancy_side": "void_any_ball", "fancy_player": "stands_once_decided", "fancy_total": "not_voided_by_lost_balls"}
 
@@ -261,7 +263,7 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
 
 
 def _event(stub: dict, sr: tuple[int | None, str], fetched_at: str) -> dict | None:
-    home, sep, away = str(stub.get("eventName") or "").partition(" v ")
+    home, sep, away = str(stub.get("eventName") or "").strip(" ,").partition(" v ")  # the list prints "South Australia v Western Australia," with a stray comma
     if not sep or not home.strip() or not away.strip():
         return None
     home, away, comp = home.strip(), away.strip(), sr[1]
@@ -297,6 +299,9 @@ def fetch(fetched_at: str):
             break
         ev = _event(stub, menu[stub["eventId"]], fetched_at)
         if not ev:
+            continue
+        if MULTI_DAY.search(ev["common"]["competition"] or ""):
+            info["left_out"]["multi-day match"] += 1
             continue
         try:
             if True:  # the event list does not flag fancy markets reliably: ask
