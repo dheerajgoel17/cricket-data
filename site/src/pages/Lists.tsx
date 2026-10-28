@@ -4,15 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
-import { fancyFor, fixtureBooks } from "@/engine/lines.js";
-import { MATCH_MARKETS, selectMatches } from "@/engine/markets.js";
-import { FORMATS } from "@/engine/util.js";
-import { useData } from "@/lib/data";
 import { dayKey, dayLabel, fixtureStart, localTime } from "@/lib/format";
 import { setTitle } from "@/lib/title";
-import { usePricedFixtures } from "@/hooks/useEngine";
 import { HotProps } from "@/components/app/hot-props";
-import { MATCH_KEYS, OverviewRow, buildOverview } from "@/components/app/match-fancy";
+import { BookTable } from "@/components/app/book-table";
+import { OverviewRow } from "@/components/app/match-fancy";
+import { useFancyCards } from "@/hooks/useFancyCards";
 import { TeamBadge } from "@/components/app/badges";
 import { RowsSkeleton } from "@/components/app/skeletons";
 
@@ -28,20 +25,11 @@ export function PropsPage() {
 }
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
-const WINDOW = 20;    // the sides' last matches the lines are scored on
 
 /** Fancy: every priced match with its best-edge whole-match markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. */
 export function FancyPage() {
   setTitle("Cricket fancy lines: match totals and over/unders");
-  const { store } = useData();
-  const { fixtures, ready, doc } = usePricedFixtures();
-  const rows = useMemo(() => fixtures.filter((f: any) => !f.noProps && fixtureBooks(doc, f).fancy).map((f: any) => {
-    const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
-    const fmtIdx = FORMATS.indexOf(f.fmt);
-    const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
-    const keys = MATCH_KEYS.filter(([k]) => fancyFor(doc, fx, k).length > 0);
-    return { f, ms, rows: buildOverview({ store, doc, fxInfo: fx, ms, scope: -1, teamName: null, keys, label: (k) => (MATCH_MARKETS as any)[k]?.label ?? k }) };
-  }), [fixtures, doc, store]);
+  const { cards: rows, ready } = useFancyCards();
   if (!ready) return <RowsSkeleton />;
   return (
     <div className="flex flex-col gap-stack">
@@ -80,7 +68,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           </Link>
           {rows.length ? (
             <ul className="border-t border-white/10">
-              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-white/5 first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /></li>)}
+              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-white/5 first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
             </ul>
           ) : <p className="border-t border-white/10 px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug px-inset pb-inset pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">

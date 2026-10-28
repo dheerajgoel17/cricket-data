@@ -143,7 +143,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
   );
 }
 
-function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
+export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
   const books = r.quotes.length > 1; // 2+ books price him: each shows its own line and price below, so the main line's price is not said twice
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -211,8 +211,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
-    <section aria-label="Hot player props today" className="flex flex-col gap-stack">
-      {!teams && <div><h1 className="text-display font-bold">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
+    <section aria-label="Player props" className="flex flex-col gap-stack">
       {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
       <div className="flex items-center gap-snug">
         <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
