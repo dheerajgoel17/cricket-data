@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { fancyByLine, fancyFor, fancyHeadline, fixtureBooks } from "@/engine/lines.js";
-import { MATCH_MARKETS } from "@/engine/markets.js";
-import { fixtureStart, localWhen, odds } from "@/lib/format";
+import { motion } from "motion/react";
+import { Card } from "@/components/ui/card";
+import { fancyFor, fixtureBooks } from "@/engine/lines.js";
+import { MATCH_MARKETS, selectMatches } from "@/engine/markets.js";
+import { FORMATS } from "@/engine/util.js";
+import { useData } from "@/lib/data";
+import { dayKey, dayLabel, fixtureStart, localTime } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { usePricedFixtures } from "@/hooks/useEngine";
 import { HotProps } from "@/components/app/hot-props";
+import { MATCH_KEYS, OverviewRow, buildOverview } from "@/components/app/match-fancy";
 import { TeamBadge } from "@/components/app/badges";
 import { RowsSkeleton } from "@/components/app/skeletons";
 
@@ -22,41 +27,68 @@ export function PropsPage() {
   );
 }
 
-const SHOWN = ["match_runs", "first_innings_runs", "match_sixes", "match_fours", "match_boundaries", "match_wickets", "highest_over", "top_score"]; // the match markets, in the order the fixture's Fancy tab lists them
+const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
+const WINDOW = 20;    // the sides' last matches the lines are scored on
 
-/** Fancy: every priced match's whole-match lines (the exchange-style over/under markets), each match linking to its own Fancy tab for the team markets and the stats behind them. */
+/** Fancy: every priced match with its best-edge whole-match markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. */
 export function FancyPage() {
   setTitle("Cricket fancy lines: match totals and over/unders");
+  const { store } = useData();
   const { fixtures, ready, doc } = usePricedFixtures();
   const rows = useMemo(() => fixtures.filter((f: any) => !f.noProps && fixtureBooks(doc, f).fancy).map((f: any) => {
     const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
-    const lines = SHOWN.flatMap((k) => {
-      const h = fancyHeadline(fancyByLine(fancyFor(doc, fx, k)));
-      return h.over || h.under ? [{ key: k, label: (MATCH_MARKETS as any)[k]?.label ?? k, ...h }] : [];
-    });
-    return { f, lines };
-  }).filter((r: any) => r.lines.length || fixtureBooks(doc, r.f).fancy), [fixtures, doc]);
+    const fmtIdx = FORMATS.indexOf(f.fmt);
+    const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
+    const keys = MATCH_KEYS.filter(([k]) => fancyFor(doc, fx, k).length > 0);
+    return { f, ms, rows: buildOverview({ store, doc, fxInfo: fx, ms, scope: -1, teamName: null, keys, label: (k) => (MATCH_MARKETS as any)[k]?.label ?? k }) };
+  }), [fixtures, doc, store]);
   if (!ready) return <RowsSkeleton />;
   return (
     <div className="flex flex-col gap-stack">
       <h1 className="text-title font-bold tracking-tight">Fancy</h1>
-      {!rows.length ? <p className="text-callout text-muted-foreground">No fancy lines are live yet. They open a day or two before a match.</p> : rows.map(({ f, lines }: any) => (
-        <Link key={f.id || `${f.a}${f.b}${f.start}`} to={`/fixture/${f.id}?tab=fancy`} className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-white/5 transition-colors active:bg-accent">
-          <div className="flex items-center gap-snug">
-            <TeamBadge name={f.a} size="sm" /><TeamBadge name={f.b} size="sm" />
-            <div className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-semibold">{f.a} v {f.b}</span><span className="truncate text-footnote text-muted-foreground">{localWhen(fixtureStart(f).toISOString())}{f.series ? ` · ${f.series}` : ""}</span></div>
-            <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
-          </div>
-          {lines.length ? <ul className="grid gap-hair text-callout">
-            {lines.map((l: any) => (
-              <li key={l.key} className="flex items-baseline justify-between gap-snug">
-                <span className="text-muted-foreground">{l.label}</span>
-                <span className="tabular-nums text-primary">{l.over ? `O ${l.over.line} ${odds(l.over.over)}` : ""}{l.over && l.under ? <span className="text-muted-foreground"> · </span> : ""}{l.under ? `U ${l.under.line} ${odds(l.under.under)}` : ""}</span>
-              </li>
-            ))}
-          </ul> : null}
-        </Link>
-      ))}
+      {!rows.length ? <p className="text-callout text-muted-foreground">No fancy lines are live yet. They open a day or two before a match.</p> : (
+        <div className="grid gap-stack md:grid-cols-2 xl:grid-cols-3">
+          {rows.map((r: any, i: number) => <FancyCard key={r.f.id || `${r.f.a}${r.f.b}${r.f.start}`} {...r} i={i} />)}
+        </div>)}
     </div>
+  );
+}
+
+/** One match's fancy markets, laid out like the fixture card (format and ground on top, the two sides with the start time) with the best-edge market rows of the Match Fancy tab under them. */
+function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: number }) {
+  const nav = useNavigate();
+  const when = fixtureStart(f);
+  const ground = String(f.venue || "").split(",")[0].replace(/\(.*\)/, "").trim();
+  const to = (fm?: string) => `/fixture/${f.id}?tab=fancy${fm ? `&fm=${fm}` : ""}`;
+  return (
+    <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+      <Card className="h-full gap-0 overflow-hidden rounded-2xl border-0 bg-white/[0.03] py-0 shadow-none ring-1 ring-white/[0.06]">
+        <div className="flex h-full flex-col gap-snug pt-inset">
+          <Link to={to()} className="flex flex-col gap-snug px-inset outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wider">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
+              {ground && <span className="ml-auto min-w-0 truncate" title={f.venue}>{ground}</span>}
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
+              {[f.a, f.b].map((t: string, k: number) => (
+                <div key={t} className="contents">
+                  <div className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold">{t}</span></div>
+                  {k === 0 && <span className="row-span-2 grid justify-items-end text-right"><span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span><span className="text-callout font-semibold tabular-nums">{localTime(when)}</span></span>}
+                </div>
+              ))}
+            </div>
+          </Link>
+          {rows.length ? (
+            <ul className="border-t border-white/10">
+              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-white/5 first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /></li>)}
+            </ul>
+          ) : <p className="border-t border-white/10 px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
+          <Link to={to()} className="mt-auto flex items-center justify-between gap-snug px-inset pb-inset pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
+            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRight className="size-4" aria-hidden /></span>
+          </Link>
+        </div>
+      </Card>
+    </motion.div>
   );
 }
