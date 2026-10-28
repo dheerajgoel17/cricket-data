@@ -7,7 +7,7 @@ from rapidfuzz import fuzz, process
 
 from . import config
 
-WOMEN = re.compile(r"\(w\)|\bwomen'?s?\b|\bladies\b", re.I)
+WOMEN = re.compile(r"\(w\)|\bwomen'?s?\b|\bladies\b|(?<=\s)w$", re.I)  # a trailing " W" is how some books mark a women's side
 SUFFIX = re.compile(r"\b(t20i?|odi|cricket|cc|xi|men)\b", re.I)
 
 

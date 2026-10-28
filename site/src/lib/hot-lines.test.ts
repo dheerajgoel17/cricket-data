@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byShard, dayOffset, hotLines, hotOrder, pool } from "./hot-lines";
+import { byShard, dayOffset, hotLines, hotOrder, norm, pool, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -97,5 +97,12 @@ describe("hotOrder", () => {
   });
   it("puts a row with no hit rate after those with one", () => {
     expect(order([row("none", false, null), row("some", false, 0.1)])).toEqual(["some", "none"]);
+  });
+});
+
+describe("a trailing W on a side", () => {
+  it("is the same side as Women and (W)", () => {
+    expect(norm("Melbourne Renegades W")).toBe(norm("Melbourne Renegades Women"));
+    expect(sameMatch("Melbourne Renegades W vs Sydney Thunder W", ["Melbourne Renegades Women", "Sydney Thunder Women"])).toBe(true);
   });
 });

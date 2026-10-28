@@ -10,7 +10,7 @@ export const BOOK_WINDOW_MS = 14 * 3600e3;
 export function teamKey(n) {
   const k = String(n || "")
     .toLowerCase()
-    .replace(/\(w\)|women'?s?/g, "")
+    .replace(/\(w\)|women'?s?|\sw$/g, "")
     .replace(/under-?19s?/g, "u19")
     .replace(/[^a-z0-9]/g, "");
   return SAME_SIDE[k] || k;
