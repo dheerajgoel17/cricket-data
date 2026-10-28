@@ -6,6 +6,7 @@ export const BOOK_LOGOS: Record<string, string> = {
   bet365: "/books/bet365.svg",
   ladbrokes: "/books/ladbrokes.svg",
   leovegas: "/books/leovegas.png",
+  fairwin247: "/books/fairwin247.png",
   polymarket: "/books/polymarket.svg",
 };
 
