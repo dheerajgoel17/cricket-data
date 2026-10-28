@@ -562,7 +562,7 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
     if not site_url:
         return 0
     base = site_url.rstrip("/")
-    urls = [f"{base}/{p}" for p in ("", "players", "teams", "competitions", "props", "trends", "tools", "odds", "glossary", "features", "about", "pair", "ask")]
+    urls = [f"{base}/{p}" for p in ("", "players", "teams", "competitions", "trends", "tools", "odds", "glossary", "features", "about", "pair")]
     top = sorted(range(len(A["pids"])), key=lambda i: -A["pstat"][A["pids"][i]]["n"])[:3000]
     urls += [f"{base}/player/{i}" for i in top]
     cnt = Counter(m["event"] for m in A["ms"] if m["event"])

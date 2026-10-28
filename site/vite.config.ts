@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { loadEnv } from "vite";
 import { defineConfig, type Plugin } from "vitest/config";
 
-/** Dev only: serves /api/* with the same handlers Vercel runs (ask, live). */
+/** Dev only: serves /api/* with the same handlers Vercel runs (live). */
 function devApi(): Plugin {
   return {
     name: "dev-api",
@@ -12,7 +12,7 @@ function devApi(): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const name = /^\/api\/([a-z]+)$/.exec((req.url || "").split("?")[0] || "")?.[1];
-        const load = name === "ask" ? () => import("./api/ask.js") : name === "live" ? () => import("./api/live.js") : null;
+        const load = name === "live" ? () => import("./api/live.js") : null;
         if (!load) return next();
         const { default: handler } = await load();
         let raw = "";

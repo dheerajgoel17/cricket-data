@@ -146,7 +146,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   return (
     <div className="flex flex-col gap-stack">
       <PlayerHeader {...{ idx, name, team, fmts, share }} />
-      <div className="sticky top-14 z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150 md:top-[60px]">
+      <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
         <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={STAT_OPTIONS} />
       </div>
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}

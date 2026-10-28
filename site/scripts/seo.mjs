@@ -34,7 +34,7 @@ export function headTags({ title, description, url = "", image = "", type = "web
   ].filter(Boolean).join("\n    ");
 }
 
-const NAV = [["/", "Fixtures and hot props"], ["/players", "Players"], ["/teams", "Teams and venues"], ["/competitions", "Competitions"], ["/props", "Prop Hunter"], ["/tools", "Free tools"], ["/glossary", "Stats explained"], ["/about", "Rules and data"]];
+const NAV = [["/", "Fixtures and hot props"], ["/players", "Players"], ["/teams", "Teams and venues"], ["/competitions", "Competitions"], ["/tools", "Free tools"], ["/glossary", "Stats explained"], ["/about", "Rules and data"]];
 
 /** A short text body for crawlers; the app replaces it as soon as it starts. */
 export function bodyHtml(h1, text) {

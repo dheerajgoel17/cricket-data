@@ -48,10 +48,6 @@ export async function loadProps(): Promise<{ snap: any | null; live: boolean }> 
   return { snap, live: isLive };
 }
 
-/** The engine's question parser + the optional LLM route (api/ask only turns the question into a validated plan). */
-export async function askApi(question: string): Promise<any | null> {
-  try { const r = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ question }) }); return r.ok ? await r.json() : null; } catch { return null; }
-}
 
 /** Live scores + player so-far from /api/live (Source A schedule, match and scorecard pages, ~15 s). Null if the route is down. */
 export async function loadLive(): Promise<any | null> {

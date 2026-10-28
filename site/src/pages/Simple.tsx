@@ -6,6 +6,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ChevronRight, Search, X } from "lucide-react";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { RULES } from "@/engine/rules.js";
 import { useData } from "@/lib/data";
 import { localWhen, num, odds, pc, tzName } from "@/lib/format";
@@ -20,10 +23,10 @@ import { setTitle } from "@/lib/title";
 void localWhen; void num; void tzName;
 
 // ------------------------------------------------------------------ tools
-const TOOLS: [string, string, string, string][] = [["trends", "Player trends", "Players whose recent games clear a line, for any upcoming match.", "Popular"], ["props", "Prop Hunter", "Value bets from the hourly market scan.", "Popular"],
+const TOOLS: [string, string, string, string][] = [["trends", "Player trends", "Players whose recent games clear a line, for any upcoming match.", "Popular"],
   ["odds", "Price & probability calculator", "Decimal prices, implied probability, margin removal, EV and Kelly stake.", "New"], ["players", "Player stats", "Hit rates over any line with DNP-aware form charts.", ""],
   ["teams", "Team & venue stats", "Match totals, fancy markets and player grids.", ""], ["pair", "Partnerships", "Who gets out first for any pair of batters.", ""],
-  ["competitions", "Competitions", "Markets, teams and results for every league and series.", ""], ["ask", "Ask anything", "Type a question in your own words.", ""], ["glossary", "Cricket stats explained", "What every market and rule means.", ""]];
+  ["competitions", "Competitions", "Markets, teams and results for every league and series.", ""], ["glossary", "Cricket stats explained", "What every market and rule means.", ""]];
 export function ToolsPage() {
   setTitle("Free cricket betting tools");
   return (
@@ -170,13 +173,33 @@ export function PlayersPage() {
   const [text, setText] = useState(q.q || "");
   const t = text.trim();
   const rows = useMemo(() => (t.length < 2 ? [] : rz.players(t, {}, 20)), [t, rz]);
+  const change = (v: string) => { setText(v); setQ({ q: v }); };
   return (
-    <div>
-      <PageTitle>Players</PageTitle>
-      <Input type="search" placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
-      {t.length < 2 ? <Muted>Type at least two letters.</Muted> : (
-        <Panel flat><DataTable columns={["Player", "Team", "Formats", "Last match", "Innings/spells"]}
-          rows={rows.map((p: any) => [<Link key={p.idx} className="flex items-center gap-2 text-primary" to={`/player/${p.idx}`}><PlayerBadge idx={p.idx} />{p.name}</Link>, store.teamName(p.team), FORMATS.filter((_: string, i: number) => (store.P.fm[p.idx] >> i) & 1).join(" "), p.last, store.P.n[p.idx]])} /></Panel>)}
+    <div className="flex flex-col gap-stack">
+      <h1 className="text-title font-bold tracking-tight">Players</h1>
+      <InputGroup className="h-control rounded-[10px] border-0 bg-white/10">
+        <InputGroupAddon><Search /></InputGroupAddon>
+        <InputGroupInput type="search" autoFocus placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
+        {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><X /></InputGroupButton></InputGroupAddon>}
+      </InputGroup>
+      {t.length < 2 ? <p className="text-callout text-muted-foreground">Type at least two letters.</p>
+        : !rows.length ? <p className="text-callout text-muted-foreground">No player matches “{t}”.</p> : (
+          <ul className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
+            {rows.map((p: any) => (
+              <li key={p.idx} className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden">
+                <Item asChild size="sm" className="min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-accent">
+                  <Link to={`/player/${p.idx}`}>
+                    <ItemMedia><PlayerBadge idx={p.idx} size="md" className="size-control" /></ItemMedia>
+                    <ItemContent className="min-w-0 gap-hair">
+                      <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
+                      <ItemDescription className="truncate text-callout text-muted-foreground">{store.teamName(p.team)} · {FORMATS.filter((_: string, i: number) => (store.P.fm[p.idx] >> i) & 1).join(" ")}{p.last ? ` · last ${p.last}` : ""}</ItemDescription>
+                    </ItemContent>
+                    <ItemActions className="gap-tight text-footnote tabular-nums text-muted-foreground">{store.P.n[p.idx]} inns<ChevronRight className="size-4" aria-hidden /></ItemActions>
+                  </Link>
+                </Item>
+              </li>
+            ))}
+          </ul>)}
     </div>
   );
 }

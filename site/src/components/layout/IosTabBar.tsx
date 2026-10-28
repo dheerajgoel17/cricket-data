@@ -4,7 +4,7 @@ import { defineCustomElement as defineLabel } from "@ionic/core/components/ion-l
 import { defineCustomElement as defineTabBar } from "@ionic/core/components/ion-tab-bar.js";
 import { defineCustomElement as defineTabButton } from "@ionic/core/components/ion-tab-button.js";
 import { defineCustomElement as defineIcon } from "ionicons/components/ion-icon.js";
-import { calendar, calendarOutline, chatbubble, chatbubbleOutline, locate, locateOutline, person, personOutline } from "ionicons/icons";
+import { calendar, calendarOutline, person, personOutline } from "ionicons/icons";
 import { TAB_NAV } from "./nav";
 
 // Ionic's own iOS tab bar (web components, MIT), not a copy of it: the classic iOS bar, translucent with the hairline on top, 49 pt plus the safe area,
@@ -13,7 +13,7 @@ initialize({ mode: "ios" });
 for (const define of [defineLabel, defineTabBar, defineTabButton, defineIcon]) define();
 
 const ICON: Record<string, [string, string]> = {
-  "/": [calendarOutline, calendar], "/props": [locateOutline, locate], "/players": [personOutline, person], "/ask": [chatbubbleOutline, chatbubble],
+  "/": [calendarOutline, calendar], "/players": [personOutline, person],
 };
 
 /** Phones only. Fixed to the bottom; the page keeps clear of it with `--tabbar-h` (see Shell). */

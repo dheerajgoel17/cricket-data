@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.2.0",
-  "description": "Free cricket stats and player-props site: Vite + React + shadcn/ui + Motion, serverless functions (api/ask.js, api/live.js).",
+  "description": "Free cricket stats and player-props site: Vite + React + shadcn/ui + Motion, serverless functions (api/live.js).",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build && node scripts/seo.mjs",
