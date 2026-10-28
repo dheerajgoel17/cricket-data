@@ -7,7 +7,6 @@ import { setTitle } from "@/lib/title";
 import { useHomeRail } from "@/hooks/useHomeRail";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
-import { HotProps } from "@/components/app/hot-props";
 import { Muted } from "@/components/app/page";
 import { RailSkeleton } from "@/components/app/skeletons";
 
@@ -18,7 +17,6 @@ export function HomePage() {
   return (
     <div className="flex flex-col gap-section">
       {ready ? <FixtureRail fx={fixtures} /> : <RailSkeleton />}
-      <HotProps />
     </div>
   );
 }
