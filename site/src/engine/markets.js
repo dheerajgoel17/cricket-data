@@ -86,11 +86,13 @@ export function selectMatches(store, f) {
  * "Cricket Association Stadium"), so venues match on the name before the comma with "association" dropped. [] when the fixture has no venue or the data has no such ground.
  */
 export function venueIndices(store, name) {
-  const stem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
-  const want = stem(name);
+  const want = venueStem(name);
   if (!want) return [];
-  return store.venues.flatMap((v, i) => (stem(v) === want ? [i] : []));
+  return store.venues.flatMap((v, i) => (venueStem(v) === want ? [i] : []));
 }
+
+/** A ground's name for comparing: the part before the comma, "association" dropped, case and punctuation ignored. */
+export const venueStem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
 
 export function marketReport(store, ms, key, line = null) {
   const def = ALL_MARKETS[key];
