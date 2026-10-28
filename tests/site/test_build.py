@@ -99,6 +99,19 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
     assert "prov-dup" not in M["id"]
 
 
+def test_a_scraped_players_catches_and_stumpings_are_kept_and_a_row_with_no_side_is_skipped_not_fatal(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    bro = synth.pid(synth.BROOK)
+    pl = [{"player": "Harry Brook", "player_id": bro, "team": "Alpha", "opponent": "Beta", "runs": "10", "balls": "8", "catches": "2", "stumpings": "1"},
+          {"player": "Harry Brook", "player_id": bro, "team": "", "opponent": "", "runs": "0", "balls": "0", "catches": "1"}]  # a scraped row naming no side
+    (data / "provisional" / "crex-new.json").write_text(json.dumps(_prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)))
+    B.build(z, data, out, None, workers=1)  # used to be a KeyError on the empty side
+    M, IX = _load(out)
+    m, brook = M["id"].index("prov-new"), IX["players"]["id"].index(bro)
+    sh = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())["fld"]
+    assert [(sh["ct"][k], sh["st"][k]) for k in range(len(sh["p"])) if sh["p"][k] == brook and sh["m"][k] == m] == [(2, 1)]
+
+
 def test_event_host_parses_tour_events():
     national = {"England", "India", "West Indies"}
     assert B.event_host("India tour of England, 2021", national) == "England"

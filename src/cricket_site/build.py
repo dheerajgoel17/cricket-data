@@ -163,7 +163,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
                 m["bat"].append((pid, 0, p["team"], p["opponent"], 0, n("runs"), n("balls"), n("fours"), n("sixes"), -1, -1, -1))
             if n("balls_bowled"):
                 m["bowl"].append((pid, 0, p["team"], p["opponent"], n("wickets"), n("runs_conceded"), n("balls_bowled")))
-            if n("catches") or n("stumpings"):
+            if (n("catches") or n("stumpings")) and p.get("team") and p.get("opponent"):  # a row with no side cannot be filed
                 m["fld"].append((pid, 0, p["team"], p["opponent"], n("catches"), n("stumpings")))
         sides: dict[str, int] = {}
         for p in d.get("players", []):
@@ -389,8 +389,12 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             S = shards[shard_of(pid)]["bowl"]
             _push(S, BOWL_KEYS, (pix[pid], mi, r[1], T(r[2]), T(r[3]), r[4], r[5], r[6]))
         for r in m.get("fld", []):
-            if r[0] in pix:  # a fielder who neither batted nor bowled has no player entry: his credits are left out
-                _push(shards[shard_of(r[0])]["fld"], FLD_KEYS, (pix[r[0]], mi, r[1], T(r[2]), T(r[3]), r[4], r[5]))
+            if r[0] in pix and r[2] and r[3]:  # a fielder who neither batted nor bowled has no player entry (his credits are left out), and a row must name both sides
+                try:
+                    teams_ = (T(r[2]), T(r[3]))
+                except KeyError:  # a side the match table does not hold: skip the row, never sink the build
+                    continue
+                _push(shards[shard_of(r[0])]["fld"], FLD_KEYS, (pix[r[0]], mi, r[1], *teams_, r[4], r[5]))
         for r in m["parts"]:
             a_, b_ = pix.get(r[0]), pix.get(r[1])
             if a_ is None or b_ is None:
