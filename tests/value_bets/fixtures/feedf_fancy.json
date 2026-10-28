@@ -1,0 +1,268 @@
+{
+ "status": "OK",
+ "code": 200,
+ "data": [
+  {
+   "categoryDetails": {
+    "catName": "Fancy Market"
+   },
+   "markets": [
+    {
+     "marketId": "1984750",
+     "marketType": "Match 1st Over Run Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 5.0,
+       "layRuns": 4.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984751",
+     "marketType": "10 Over Run ENG   Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 61.0,
+       "layRuns": 59.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984753",
+     "marketType": "50 Over Run ENG   Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 316.0,
+       "layRuns": 312.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984755",
+     "marketType": "Fall Of 1st Wkt ENG   Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 85.0,
+       "layOdds": 115.0,
+       "backRuns": 30.0,
+       "layRuns": 30.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984761",
+     "marketType": "B Duckett  Run Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 85.0,
+       "layOdds": 115.0,
+       "backRuns": 30.0,
+       "layRuns": 30.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984763",
+     "marketType": "Kamindu Mendis  Run Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 85.0,
+       "layOdds": 115.0,
+       "backRuns": 25.0,
+       "layRuns": 25.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984771",
+     "marketType": "Total Match Fours Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 50.0,
+       "layRuns": 47.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984772",
+     "marketType": "Total Match Sixes Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 15.0,
+       "layRuns": 13.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984774",
+     "marketType": "Total Match Wkts Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 17.0,
+       "layRuns": 16.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    },
+    {
+     "marketId": "1984780",
+     "marketType": "Total Match Fifties Adv",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 80.0,
+       "layOdds": 130.0,
+       "backRuns": 3.0,
+       "layRuns": 3.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "categoryDetails": {
+    "catName": "Meter Market"
+   },
+   "markets": [
+    {
+     "marketId": "1984786",
+     "marketType": "1st Wkt Meter Eng",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 48.0,
+       "layRuns": 44.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "categoryDetails": {
+    "catName": "Khado Market"
+   },
+   "markets": [
+    {
+     "marketId": "1984837",
+     "marketType": "10 Over Khado Run Eng Adv - 11",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 0.0,
+       "backRuns": 55.0,
+       "layRuns": 11.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "categoryDetails": {
+    "catName": "Player Performance Market"
+   },
+   "markets": [
+    {
+     "marketId": "1984828",
+     "marketType": "H Brook",
+     "status": "OPEN",
+     "ballRunning": false,
+     "runners": [
+      {
+       "runnerName": "",
+       "backOdds": 100.0,
+       "layOdds": 100.0,
+       "backRuns": 34.0,
+       "layRuns": 32.0,
+       "rnrSuspended": false,
+       "backRnrSuspended": false,
+       "layRnrSuspended": false
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

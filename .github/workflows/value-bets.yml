@@ -35,6 +35,10 @@ env:
   FEEDK_URL: ${{ secrets.FEEDK_URL }}
   FEEDK_BOOKS: ${{ secrets.FEEDK_BOOKS }}
   FEEDE_BOOKS: ${{ secrets.FEEDE_BOOKS }}
+  FEEDF_NAME: ${{ secrets.FEEDF_NAME }}
+  FEEDF_API: ${{ secrets.FEEDF_API }}
+  FEEDF_PREMIUM: ${{ secrets.FEEDF_PREMIUM }}
+  FEEDF_TENANT: ${{ secrets.FEEDF_TENANT }}
 
 permissions:
   contents: write

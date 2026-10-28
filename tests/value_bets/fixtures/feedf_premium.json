@@ -1,0 +1,1217 @@
+{
+ "status": "OK",
+ "code": 200,
+ "data": [
+  {
+   "marketId": 340,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Winner (incl. super over)",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all",
+    "score",
+    "incl_so"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "4",
+     "name": "England",
+     "odd": 1.35,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.707781252372016,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 4
+    },
+    {
+     "id": "5",
+     "name": "Sri Lanka",
+     "odd": 3.05,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.292218747627984,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 5
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {},
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155088
+  },
+  {
+   "marketId": 638,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Root, Joe total",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 36.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.5,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 36.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.5,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "36.5",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:656880"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155075
+  },
+  {
+   "marketId": 638,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Duckett, Ben total",
+   "voidReason": null,
+   "favourite": false,
+   "marketStatus": "Suspended",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "29.5",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:720854"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155067
+  },
+  {
+   "marketId": 638,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Duckett, Ben total",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 30.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.5,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 30.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.5,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "30.5",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:720854"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155066
+  },
+  {
+   "marketId": 639,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Total fours",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 48.5",
+     "odd": 1.9,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.48399657762345,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 48.5",
+     "odd": 1.8,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.51600342237655,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "48.5",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155087
+  },
+  {
+   "marketId": 640,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Total sixes",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 13.5",
+     "odd": 1.75,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.525303435669903,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 13.5",
+     "odd": 1.95,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.474696564330097,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "13.5",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155087
+  },
+  {
+   "marketId": 658,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - England total fours",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 25.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.496260625124277,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 25.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.503739374875723,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "25.5",
+    "inningnr": "1",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155081
+  },
+  {
+   "marketId": 659,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Sri Lanka total fours",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 22.5",
+     "odd": 1.95,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.475511281073746,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 22.5",
+     "odd": 1.75,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.524488718926254,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "22.5",
+    "inningnr": "1",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155077
+  },
+  {
+   "marketId": 660,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - England total sixes",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 8.5",
+     "odd": 2.15,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.425473965564616,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 8.5",
+     "odd": 1.65,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.574526034435384,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "8.5",
+    "inningnr": "1",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155066
+  },
+  {
+   "marketId": 660,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - England total sixes",
+   "voidReason": null,
+   "favourite": false,
+   "marketStatus": "Suspended",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "7.5",
+    "inningnr": "1",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155067
+  },
+  {
+   "marketId": 661,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Sri Lanka total sixes",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 6.5",
+     "odd": 2.05,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.451783922300559,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 6.5",
+     "odd": 1.7,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.548216077699441,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "6.5",
+    "inningnr": "1",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155076
+  },
+  {
+   "marketId": 662,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Duckett, Ben to score 100",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "74",
+     "name": "yes",
+     "odd": 6.25,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.122390951458512,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 74
+    },
+    {
+     "id": "76",
+     "name": "no",
+     "odd": 1.1,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.877609048541488,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 76
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "milestone": "100",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:720854"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155072
+  },
+  {
+   "marketId": 662,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Root, Joe to score 100",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "74",
+     "name": "yes",
+     "odd": 5.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.160050742227266,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 74
+    },
+    {
+     "id": "76",
+     "name": "no",
+     "odd": 1.15,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.839949257772734,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 76
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "milestone": "100",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:656880"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155072
+  },
+  {
+   "marketId": 662,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Root, Joe to score 50",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "74",
+     "name": "yes",
+     "odd": 2.35,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.391518717067348,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 74
+    },
+    {
+     "id": "76",
+     "name": "no",
+     "odd": 1.55,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.608481282932652,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 76
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "milestone": "50",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:656880"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155074
+  },
+  {
+   "marketId": 662,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "1st innings - Duckett, Ben to score 50",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "74",
+     "name": "yes",
+     "odd": 2.8,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.321765351370353,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 74
+    },
+    {
+     "id": "76",
+     "name": "no",
+     "odd": 1.4,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.678234648629647,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 76
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "milestone": "50",
+    "inningnr": "1",
+    "maxovers": "50",
+    "player": "sr:player:720854"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155074
+  },
+  {
+   "marketId": 683,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Top batter",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "sr:player:720854",
+     "name": "Duckett, Ben",
+     "odd": 5.5,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.115736022513335,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 720854
+    },
+    {
+     "id": "sr:player:1097574",
+     "name": "Banton, Tom",
+     "odd": 6.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.105953038773547,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1097574
+    },
+    {
+     "id": "sr:player:656880",
+     "name": "Root, Joe",
+     "odd": 4.55,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.141916406708273,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 656880
+    },
+    {
+     "id": "sr:player:1097576",
+     "name": "Brook, Harry",
+     "odd": 4.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.132257019535519,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1097576
+    },
+    {
+     "id": "sr:player:1726456",
+     "name": "Cox, Jordan",
+     "odd": 13.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0464467168118416,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1726456
+    },
+    {
+     "id": "sr:player:741190",
+     "name": "Curran, Sam",
+     "odd": 35.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0163501542772558,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 741190
+    },
+    {
+     "id": "sr:player:1097578",
+     "name": "Jacks, Will",
+     "odd": 32.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0189274769938338,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1097578
+    },
+    {
+     "id": "sr:player:633554",
+     "name": "Dawson, Liam",
+     "odd": 65.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00891781481788602,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 633554
+    },
+    {
+     "id": "sr:player:717426",
+     "name": "Overton, Jamie",
+     "odd": 70.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00853115657017113,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 717426
+    },
+    {
+     "id": "sr:player:1431253",
+     "name": "Atkinson, Gus",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1431253
+    },
+    {
+     "id": "sr:player:2190174",
+     "name": "Baker, Sonny",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 2190174
+    },
+    {
+     "id": "sr:player:1021271",
+     "name": "Fernando, Avishka",
+     "odd": 10.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0604468384338877,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1021271
+    },
+    {
+     "id": "sr:player:1382157",
+     "name": "Mendis, Kamindu",
+     "odd": 9.75,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0640092076169642,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1382157
+    },
+    {
+     "id": "sr:player:739136",
+     "name": "Mendis, Kusal",
+     "odd": 7.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0899110894372045,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 739136
+    },
+    {
+     "id": "sr:player:1672417",
+     "name": "Rathnayake, Paven",
+     "odd": 7.5,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0834310342542025,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1672417
+    },
+    {
+     "id": "sr:player:743022",
+     "name": "Arachchige, Sahan",
+     "odd": 18.5,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0323469873055146,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 743022
+    },
+    {
+     "id": "sr:player:742184",
+     "name": "Liyanage, Janith",
+     "odd": 16.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0380314760390629,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 742184
+    },
+    {
+     "id": "sr:player:697038",
+     "name": "Shanaka, Dasun",
+     "odd": 24.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0249741410729524,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 697038
+    },
+    {
+     "id": "sr:player:1984093",
+     "name": "Wellalage, Dunith Nethmika",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00576674510192964,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1984093
+    },
+    {
+     "id": "sr:player:2360229",
+     "name": "Malinga, Eshan",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00201555791220614,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 2360229
+    },
+    {
+     "id": "sr:player:1021543",
+     "name": "Fernando, Asitha",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1021543
+    },
+    {
+     "id": "sr:player:1658179",
+     "name": "Madushanka, Dilshan",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1658179
+    },
+    {
+     "id": "sr:player:993061",
+     "name": "Tongue, Josh",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 993061
+    },
+    {
+     "id": "sr:player:2155738",
+     "name": "Coles, James Matthew",
+     "odd": 20.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.029883524603961,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 2155738
+    },
+    {
+     "id": "sr:player:741092",
+     "name": "Crane, Mason",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00403111582441229,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 741092
+    },
+    {
+     "id": "sr:player:640924",
+     "name": "Rashid, Adil",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 640924
+    },
+    {
+     "id": "sr:player:2055531",
+     "name": "Crocombe, Henry T",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00100777895610307,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 2055531
+    },
+    {
+     "id": "sr:player:2098072",
+     "name": "Colombage, Sachindu",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00403111582441229,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 2098072
+    },
+    {
+     "id": "sr:player:1021323",
+     "name": "Nissanka, Pathum",
+     "odd": 8.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0775751862402602,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1021323
+    },
+    {
+     "id": "sr:player:1727012",
+     "name": "Mishara, Kamil",
+     "odd": 17.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.0356999860975525,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1727012
+    },
+    {
+     "id": "sr:player:729354",
+     "name": "Chameera, Dushmantha",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00201555791220614,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 729354
+    },
+    {
+     "id": "sr:player:1726626",
+     "name": "Theekshana, Morawakage Maheesh",
+     "odd": 100.0,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.00201555791220614,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 1726626
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "type": "prematch",
+    "maxovers": "50"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155070
+  },
+  {
+   "marketId": 709,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Brook, Harry total player performance",
+   "voidReason": null,
+   "favourite": false,
+   "marketStatus": "Suspended",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "37.5",
+    "maxovers": "50",
+    "player": "sr:player:1097576"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155067
+  },
+  {
+   "marketId": 709,
+   "eventName": "England vs. Sri Lanka",
+   "marketName": "Brook, Harry total player performance",
+   "voidReason": null,
+   "favourite": true,
+   "marketStatus": "Active",
+   "groups": [
+    "all"
+   ],
+   "properties": null,
+   "uofOutComeOdds": [
+    {
+     "id": "12",
+     "name": "over 34.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.499924288963534,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 12
+    },
+    {
+     "id": "13",
+     "name": "under 34.5",
+     "odd": 1.85,
+     "active": true,
+     "playerOutcome": false,
+     "probability": 0.500075711036466,
+     "isSettled": false,
+     "voidFactor": null,
+     "deadHeatFactor": null,
+     "outcomeResult": null,
+     "oid": 13
+    }
+   ],
+   "lastUpdate": "2026-10-28T10:59:15.062+00:00",
+   "specifiers": {
+    "total": "34.5",
+    "maxovers": "50",
+    "player": "sr:player:1097576"
+   },
+   "marketDefinition": null,
+   "isOutright": null,
+   "producerName": "PremiumCricket",
+   "lastUpdateMillis": 1793185155066
+  }
+ ]
+}

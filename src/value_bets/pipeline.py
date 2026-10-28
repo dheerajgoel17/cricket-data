@@ -11,14 +11,14 @@ import traceback
 from collections import defaultdict
 
 from . import archive, booklines, config, fancy, history, store, strategy, weather
-from .adapters import betfair, feede, feedk, matchbook, moviodds, oddsapi, polymarket, smarkets
+from .adapters import betfair, feede, feedf, feedk, matchbook, moviodds, oddsapi, polymarket, smarkets
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
 from .pricing import devig, edge, effective_odds, exchange_mid, kelly_pct, logit
 from .props_live import PropEngine
 from .util import iso, ist, now_utc, parse_ts
 
-ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede]
+ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede, feedf]
 
 
 def adapters():

@@ -265,3 +265,9 @@ test("withArchive puts each stored result on the line of its own scope", () => {
   const doc = withArchive({ lines: [], fancy: [] }, entry);
   assert.deepEqual(doc.lines.map((l) => [lineScope(l), l.result]), [[0, 80], [1, 31], [2, undefined]]);
 });
+
+test("fancyByLine keeps a one-sided line (an exchange's Yes and No sit on lines a gap apart) with null for the side nobody quotes", () => {
+  const e = (line, over, under, source) => ({ line, over, under, source });
+  const lines = fancyByLine([e(315.5, 2.0, null, "x"), e(311.5, null, 2.0, "x"), e(315.5, 1.9, null, "y")]);
+  assert.deepEqual(lines.map((l) => [l.line, l.over, l.under]), [[311.5, null, 2.0], [315.5, 2.0, null]]);
+});

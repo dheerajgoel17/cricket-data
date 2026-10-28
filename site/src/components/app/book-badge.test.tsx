@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BookBadge } from "./book-badge";
 
 const logos = vi.hoisted(() => ({ map: {} as Record<string, string> }));
-vi.mock("@/lib/books", () => ({ bookLogo: (s: string) => logos.map[String(s).toLowerCase()] }));
+vi.mock("@/lib/books", () => ({ bookLogo: (s: string) => logos.map[String(s).replace(/ (Premium|Fancy)$/i, "").toLowerCase()], bookVariant: (s: string) => /(Premium|Fancy)$/i.exec(s)?.[1] ?? "" }));
 
 describe("BookBadge (where a price comes from)", () => {
   beforeEach(() => { logos.map = {}; });
@@ -19,6 +19,15 @@ describe("BookBadge (where a price comes from)", () => {
     render(<BookBadge source="bet365" />);
     const img = screen.getByRole("img", { name: "bet365" });
     expect(img).toHaveAttribute("src", "/books/bet365.svg");
+  });
+
+  it("puts the feed's name beside the logo when a book quotes two feeds", () => {
+    logos.map = { fairwin247: "/books/fairwin247.png" };
+    render(<><BookBadge source="FairWin247 Premium" /><BookBadge source="FairWin247 Fancy" /></>);
+    expect(screen.getByRole("img", { name: "FairWin247 Premium" })).toHaveAttribute("src", "/books/fairwin247.png");
+    expect(screen.getByRole("img", { name: "FairWin247 Fancy" })).toHaveAttribute("src", "/books/fairwin247.png");
+    expect(screen.getByText("Premium")).toBeInTheDocument();
+    expect(screen.getByText("Fancy")).toBeInTheDocument();
   });
 
   it("falls back to the name when the logo does not load, for this badge and the next one", () => {

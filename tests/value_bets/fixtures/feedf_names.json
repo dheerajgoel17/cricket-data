@@ -1,0 +1,47 @@
+{
+ "status": "OK",
+ "code": 200,
+ "data": {
+  "children": [
+   {
+    "eventId": "36175449",
+    "eventName": "EIF v KaPa",
+    "eventTypeId": "1",
+    "eventDateTime": "24/10/2026 08:26:33",
+    "update9wktFancy": false,
+    "fancyIcon": false,
+    "bookMakerIcon": false,
+    "tvIcon": false,
+    "premiumIcon": false,
+    "endResult": false,
+    "premium": false
+   },
+   {
+    "eventId": "36246415",
+    "eventName": "Afghanistan v Zimbabwe",
+    "eventTypeId": "4",
+    "eventDateTime": "29/10/2026 20:00:00",
+    "update9wktFancy": false,
+    "fancyIcon": false,
+    "bookMakerIcon": false,
+    "tvIcon": false,
+    "premiumIcon": false,
+    "endResult": false,
+    "premium": false
+   },
+   {
+    "eventId": "36246014",
+    "eventName": "England v Sri Lanka",
+    "eventTypeId": "4",
+    "eventDateTime": "29/10/2026 13:30:00",
+    "update9wktFancy": false,
+    "fancyIcon": false,
+    "bookMakerIcon": false,
+    "tvIcon": false,
+    "premiumIcon": false,
+    "endResult": false,
+    "premium": false
+   }
+  ]
+ }
+}

@@ -143,13 +143,16 @@ export function fancyFor(doc, fixture, key, team = null, inn = 0) {
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
 }
 
+/** The best price of a side among the books quoting it, or null when none does (an exchange quotes Yes and No on lines a gap apart, so a line can be one-sided). */
+const bestPrice = (books, side) => { const p = books.map((b) => b[side]).filter((x) => x > 1); return p.length ? Math.max(...p) : null; };
+
 /** The lines of a market (from `fancyFor`) as {line, books}: every book that prices it, lowest line first, and per line the best over and the best under among them. */
 export function fancyByLine(entries) {
   const by = new Map();
   for (const e of entries || []) by.set(e.line, [...(by.get(e.line) || []), e]);
   return [...by.entries()].sort((x, y) => x[0] - y[0]).map(([line, books]) => ({
     line, books: [...books].sort((x, y) => bookName(x.source).localeCompare(bookName(y.source))),
-    over: Math.max(...books.map((b) => b.over)), under: Math.max(...books.map((b) => b.under)),
+    over: bestPrice(books, "over"), under: bestPrice(books, "under"),
   }));
 }
 

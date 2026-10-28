@@ -38,7 +38,7 @@ const report = marketReport as (store: any, ms: number[], key: string, line?: nu
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const teamReport = teamTotalReport as (store: any, ms: number[], team: number, key: string, line?: number | null) => any;
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null) => { line: number; over: number; under: number; source: string }[];
-type BookLine = { line: number; over: number; under: number; books: { over: number; under: number; source: string }[] };
+type BookLine = { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] };
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
@@ -94,7 +94,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
       const eo = sideEdge(s.over, live, prior, b.over), eu = sideEdge(s.under, live, prior == null ? null : 1 - prior, b.under);
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
       const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
-      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, books: b.books, overBook: b.books.find((x) => x.over === b.over)?.source, underBook: b.books.find((x) => x.under === b.under)?.source, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, books: b.books, overBook: b.over != null ? b.books.find((x) => x.over === b.over)?.source : undefined, underBook: b.under != null ? b.books.find((x) => x.under === b.under)?.source : undefined, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
     });
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -203,7 +203,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                               <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                               <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
                               <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                              {bookHere && (() => { const b = bookHere.books.find((x: any) => x[side] === bookHere[side]); return b && (
+                              {bookHere && (() => { const b = bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side]) : null; return b && (
                                 <div className="flex items-baseline justify-between gap-tight border-t border-white/10 pt-tight text-footnote">
                                   <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
                                   <b className="tabular-nums text-primary">{odds(b[side])}</b>
@@ -216,7 +216,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                           {ground.differs && <b className="font-semibold">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
                           {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
                         </p>)}
-                      {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => bookHere.books.find((x: any) => x[side] === bookHere[side])?.source)} />}
+                      {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
                       {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                     </section>
 
