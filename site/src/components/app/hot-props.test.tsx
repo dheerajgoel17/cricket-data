@@ -48,18 +48,18 @@ const landAll = () => { for (let n = 0; n < 12; n++) env.store.land(n); };
 beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ["setTimeout", "clearTimeout", "Date"] });
   env.plans = [];
-  // 24 players over 12 files; today has players 0-9, tomorrow 10-11, and a third day 12 more lines that the home never shows
-  env.store = fakeStore(24, 12);
+  // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines that the home never shows
+  env.store = fakeStore(60, 12);
   env.doc = { generated_at_utc: "2026-10-28T05:00:00Z", events: [], fancy: [], lines: [
-    ...Array.from({ length: 10 }, (_, i) => line(`id${i}`, at(28, 19))),
-    line("id10", at(29, 9)), line("id11", at(29, 9)),
-    ...Array.from({ length: 12 }, (_, i) => line(`id${12 + i}`, at(31, 9))),
+    ...Array.from({ length: 36 }, (_, i) => line(`id${i}`, at(28, 19))),
+    line("id36", at(29, 9)), line("id37", at(29, 9)),
+    ...Array.from({ length: 22 }, (_, i) => line(`id${38 + i}`, at(31, 9))),
   ] };
 });
 afterEach(() => { vi.useRealTimers(); });
 
 describe("useHotRows", () => {
-  it("asks for the player files the selected day's lines need, several at once (not one after the other), and only those", async () => {
+  it("asks for the player files the selected day's lines need, several at once (not one after the other)", async () => {
     const { result } = run(0);
     await flush();
     expect(env.store.requested).toEqual([0, 1, 2, 3, 4, 5, 6, 7]); // eight files in flight before any has landed
@@ -68,8 +68,8 @@ describe("useHotRows", () => {
     expect(env.store.requested).toHaveLength(9); // a free slot starts the next file
     landAll();
     await settle();
-    expect([...env.store.requested].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]); // today's ten players: files 10 and 11 (tomorrow's players) never asked for
-    expect(result.current.data).toHaveLength(10);
+    expect([...env.store.requested].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(result.current.data).toHaveLength(36);
     expect(result.current.scoring).toBe(false);
   });
 
@@ -78,7 +78,7 @@ describe("useHotRows", () => {
     await flush();
     landAll();
     await settle();
-    expect([...env.plans].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect([...env.plans].sort((a, b) => a - b)).toEqual(Array.from({ length: 36 }, (_, i) => i)); // today's 36 players and nobody else
     expect(result.current.data!.every((r) => r.day === 0)).toBe(true);
   });
 
@@ -87,28 +87,32 @@ describe("useHotRows", () => {
     await flush();
     landAll();
     await settle();
-    expect(env.plans).toHaveLength(10);
+    expect(env.plans).toHaveLength(36);
     rerender({ day: 1 });
     await flush();
     expect(result.current.data).toBeUndefined();
     expect(result.current.isLoading).toBe(true);
     await settle();
-    expect(result.current.data!.map((r) => r.idx).sort((a, b) => a - b)).toEqual([10, 11]);
-    expect(result.current.otherDay).toBe(10);
+    expect(result.current.data!.map((r) => r.idx).sort((a, b) => a - b)).toEqual([36, 37]);
+    expect(result.current.otherDay).toBe(36);
   });
 
-  it("puts the rows of a file that has landed on screen while the others are still on their way", async () => {
+  it("puts the rows on screen while the last files are still on their way, once there is a page of them", async () => {
     const { result } = run(0);
     await flush();
     expect(result.current.isLoading).toBe(true);
-    env.store.land(3);
+    for (const n of [3, 4, 5]) env.store.land(n); // nine rows: not yet a page
+    await settle();
+    expect(result.current.isLoading).toBe(true);
+    for (const n of [0, 1, 2, 6, 7, 8, 9, 10]) env.store.land(n); // 33 rows, file 11 still out
     await settle();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.scoring).toBe(true);
-    expect(result.current.data!.map((r) => r.idx)).toEqual([3]);
-    landAll();
+    expect(result.current.data!.length).toBeGreaterThanOrEqual(30);
+    expect(result.current.data!.length).toBeLessThan(36);
+    env.store.land(11);
     await settle();
-    expect(result.current.data).toHaveLength(10);
+    expect(result.current.data).toHaveLength(36);
     expect(result.current.scoring).toBe(false);
   });
 
@@ -130,6 +134,6 @@ describe("useHotRows", () => {
     await settle();
     expect(result.current.isError).toBe(false);
     expect(result.current.data!.map((r) => r.idx)).not.toContain(2);
-    expect(result.current.data).toHaveLength(9);
+    expect(result.current.data).toHaveLength(33); // file 2 held players 2, 14 and 26
   });
 });

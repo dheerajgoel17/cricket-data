@@ -30,7 +30,7 @@ const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
 const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
 const SHARDS_AT_ONCE = 8; // player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early
-const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming
+const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming, and only once there are a full page of them (a shorter list would only be reshuffled)
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
@@ -90,7 +90,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
       await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
         await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the page
         for (let i = 0; i < g.lines.length; i += 4) { await Promise.all(g.lines.slice(i, i + 4).map(score)); await yieldToMain(); }
-        if (Date.now() - published >= PUBLISH_MS) { published = Date.now(); qc.setQueryData(key, [...out]); }
+        if (out.length >= MAX_ROWS && Date.now() - published >= PUBLISH_MS) { published = Date.now(); qc.setQueryData(key, [...out]); }
       });
       return out;
     },
