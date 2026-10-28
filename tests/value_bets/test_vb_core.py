@@ -131,3 +131,12 @@ def test_performance_markets_lists_what_sources_offered_and_no_adapter_reads():
             "moviodds_bet365": {"matches": [{"quotes": [{"group_name": "Player Performance Points"}, {"group_name": "Match Totals"}]}]},
             "feedf": {"books": {"B": {"left_out": {"Winner": 1}}}}, "smarkets": None}
     assert performance_markets(raws) == {"feedk": ["Player Performance"], "moviodds_bet365": ["Player Performance Points"]}
+
+
+def test_the_book_a_mirror_reads_player_performance_like_its_other_over_unders(monkeypatch):
+    quote = lambda side: {"group_name": "Player Performance", "line": "Hayley Matthews", "n2": "Melbourne Renegades", "side": side, "handicap": "45.5", "odds_dec": 1.9, "market_id": "7"}  # noqa: E731
+    feed = {"matches": [{"id": "m1", "home": "Melbourne Renegades", "away": "Sydney Thunder", "kickoff_utc": "2026-10-29T04:40:00Z", "in_play": False, "league": "WBBL", "quotes": [quote("Over"), quote("Under")]}]}
+    monkeypatch.setattr(moviodds, "http_json", lambda *a, **k: (feed, {}))
+    monkeypatch.setattr(moviodds, "host", lambda name: "https://feed.invalid")
+    rows, _ = moviodds.fetch("2026-10-28T10:00:00Z")
+    assert [(r["market_type"], r["player"], r["side"], r["line"], r["back"]) for r in rows] == [("player_points", "Hayley Matthews", "over", 45.5, 1.9), ("player_points", "Hayley Matthews", "under", 45.5, 1.9)]

@@ -38,7 +38,7 @@ TZ_HEADER = "Asia/Calcutta"
 
 TOTAL = re.compile(r"^1st innings - (?P<last>[^,]+), (?P<first>.+?) total$")
 TO_SCORE = re.compile(r"^1st innings - (?P<last>[^,]+), (?P<first>.+?) to score (?P<n>\d+)$")
-PERFORMANCE = re.compile(r"^(?P<last>[^,]+), (?P<first>.+?) total player performance$")
+PERFORMANCE = re.compile(r"^(?P<name>.+?) total player performance$")  # "Brook, Harry" or, for some players, "Samantha Bates"
 TEAM_TOTAL = re.compile(r"^1st innings - (?P<team>.+?) total (?P<what>fours|sixes)$")
 MATCH_TOTAL = {"Total fours": "match_fours", "Total sixes": "match_sixes"}
 TEAM_KEY = {"fours": "team_total_fours", "sixes": "team_total_sixes"}
@@ -185,7 +185,8 @@ def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[
             if not p:
                 left[name] += 1
                 continue
-            player, line = person(mm["last"], mm["first"]), p[0]
+            last, comma, first = mm["name"].partition(", ")
+            player, line = (person(last, first) if comma else mm["name"].strip()), p[0]
             for side, price in p[1].items():
                 rows.append(row(**common, market_type="player_points", market_raw=name, group_key=f"{gk}:{line}", selection=f"{player} {side} {line}", player=player,
                                 line=line, side=side, back=price))

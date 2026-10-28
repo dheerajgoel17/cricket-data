@@ -160,3 +160,15 @@ def test_the_source_switches_itself_on(monkeypatch):
     from value_bets import pipeline
     assert feedk in pipeline.adapters() and feedk.NAME == "feedk"
     assert config.get("FEEDK_MAX_EVENTS") > 0
+
+
+def test_player_performance_is_the_points_stat_for_a_limited_overs_match_only():
+    ev, offers = load("feedk_t20.json")
+    runs = next(o for o in offers if o["criterion"]["englishLabel"] == "Player's Total Runs")
+    pp = json.loads(json.dumps(runs))
+    pp["criterion"] = {"label": "Player Performance", "englishLabel": "Player Performance"}
+    pp["id"] = 77
+    rows, _, _ = feedk.parse_event(ev, offers + [pp], "feedk_a", STAMP)
+    pts = [(r["player"], r["side"], r["line"], r["back"]) for r in rows if r["market_type"] == "player_points"]
+    assert pts == [("Hayley Matthews", "over", 24.5, 2.0), ("Hayley Matthews", "under", 24.5, 1.73)]  # the same over/under reading as a player's total runs
+    assert booklines.STAT["player_points"] == "points"
