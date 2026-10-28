@@ -67,12 +67,12 @@ export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, l
 }
 
 /** One market's row, in the props-list style: the label and the book's line and price(s), the better side's edge, and the last ten results as bars. */
-export function OverviewRow({ r, onOpen, active }: { r: any; onOpen: () => void; active?: boolean }) {
+export function OverviewRow({ r, onOpen, active, sub }: { r: any; onOpen: () => void; active?: boolean; sub?: string }) {
   return (
     <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
       className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
     <span className="grid min-w-0 gap-hair">
-                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
+                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
                           <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
