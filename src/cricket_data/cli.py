@@ -306,6 +306,12 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
         if not rows:  # a failed or empty fetch must never wipe the schedule we already have
             print("no fixtures parsed from the Source A schedule page; leaving the existing file alone", file=sys.stderr)
             return 1
+        held = list(csv.DictReader(out.open(encoding="utf-8", newline=""))) if out.exists() else []
+        try:
+            from .crex_schedule import fill_venues
+            fill_venues(rows, held, PoliteFetcher(min_interval=2.0))
+        except Exception as exc:  # noqa: BLE001  a missing venue must never cost the schedule
+            print(f"venues not filled ({type(exc).__name__}: {exc})", file=sys.stderr)
         rows = _merge_fixtures(rows, out)
         buf = io.StringIO(newline="")
         w = csv.DictWriter(buf, fieldnames=FIELDS, lineterminator="\n")

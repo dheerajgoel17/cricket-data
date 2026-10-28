@@ -144,3 +144,13 @@ test("freshness is reported on every answer", async () => {
   assert.equal(res.sample.n, res.summary.n);
   assert.ok(res.filters.some(([k]) => k === "Format"));
 });
+
+test("venueIndices finds a ground under every spelling the data holds, and nothing for a different or missing one", async () => {
+  const { venueIndices } = await import("../src/engine/markets.js");
+  const store = { venues: ["Sharjah Cricket Association Stadium", "Sharjah Cricket Stadium", "Sharjah Cricket Stadium, Sharjah", "Dubai International Cricket Stadium", "Sharjah Oval"] };
+  assert.deepEqual(venueIndices(store, "Sharjah Cricket Stadium, Sharjah"), [0, 1, 2]);
+  assert.deepEqual(venueIndices(store, "Dubai International Cricket Stadium, Dubai"), [3]);
+  assert.deepEqual(venueIndices(store, "Nowhere Ground"), []);
+  assert.deepEqual(venueIndices(store, ""), []);
+  assert.deepEqual(venueIndices(store, undefined), []);
+});

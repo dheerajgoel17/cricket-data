@@ -133,3 +133,29 @@ def fetch_schedule_paged(days: int = 5, max_pages: int = 12, now: datetime | Non
     rows = {r["match_id"]: r for r in cards}
     rows.update({r["match_id"]: r for r in parse_schedule(html)})  # the page's own first 20 carry the venue
     return sorted(rows.values(), key=lambda r: (r["start_utc"], r["match_id"]))
+
+
+def fill_venues(rows: list[dict], held: list[dict], fetcher=None, cap: int = 30) -> int:
+    """Give a row with no venue (a later schedule page has none) the one we already hold for that match, else the one on its own match page.
+
+    At most ``cap`` pages are fetched per run, the soonest matches first; the rest are filled on the runs after (the venue is then held). Returns how many were filled."""
+    from .crex_lookup import parse_match_page
+
+    have = {r["match_id"]: r["venue"] for r in held if r.get("venue")}
+    n = fetched = 0
+    for r in sorted(rows, key=lambda r: r["start_utc"]):
+        if r.get("venue"):
+            continue
+        if r["match_id"] in have:
+            r["venue"] = have[r["match_id"]]
+            n += 1
+        elif fetcher is not None and r.get("url") and fetched < cap:
+            fetched += 1
+            try:
+                facts = parse_match_page(fetcher.get(f"{host('LIVE_SOURCE_BASE')}{r['url']}"), url=r["url"])
+            except Exception:  # noqa: BLE001  one page that will not load must not cost the schedule
+                continue
+            if facts and facts.venue:
+                r["venue"] = facts.venue.replace("''", "'")
+                n += 1
+    return n

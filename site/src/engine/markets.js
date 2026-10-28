@@ -1,6 +1,6 @@
 // Match-level "fancy" markets for team and venue pages. Computed from the per-innings aggregates in matches.json.
 import { summarize, fairOdds, suggestLines } from "./stats.js";
-import { round } from "./util.js";
+import { norm, round } from "./util.js";
 
 // innings array layout (see src/cricket_site/parse.py INN_FIELDS)
 const [IT, IR, IW, IB, IF4, IF6, I30, I50, I100, I10, ISD, IDK, IHO, IMC, ITS, ITOP] = Array.from({ length: 16 }, (_, i) => i);
@@ -79,6 +79,17 @@ export function selectMatches(store, f) {
     out.push(m);
   }
   return f.lastN > 0 ? out.slice(-f.lastN) : out;
+}
+
+/**
+ * The store's venue indexes for a fixture's venue name ("Sharjah Cricket Stadium, Sharjah"): the data holds one ground under several spellings (with or without the city,
+ * "Cricket Association Stadium"), so venues match on the name before the comma with "association" dropped. [] when the fixture has no venue or the data has no such ground.
+ */
+export function venueIndices(store, name) {
+  const stem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
+  const want = stem(name);
+  if (!want) return [];
+  return store.venues.flatMap((v, i) => (stem(v) === want ? [i] : []));
 }
 
 export function marketReport(store, ms, key, line = null) {

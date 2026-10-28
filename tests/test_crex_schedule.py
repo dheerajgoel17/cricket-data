@@ -99,3 +99,24 @@ def test_a_later_page_card_becomes_a_row_and_a_live_or_odd_card_is_skipped():
     assert row_from_card({**card, "time": ""}) is None  # a live card shows a score, not a start time
     assert row_from_card({**card, "teams": ["Only one"]}) is None
     assert row_from_card({**card, "meta": "1st Multi Day, Sheffield Shield", "fmt": "Multi Day", "teams": ["Tasmania", "New South Wales"], "href": "/cricket-live-score/tas-vs-nsw-x-1"})["format"] == "FC"
+
+
+def test_a_row_with_no_venue_gets_the_held_one_else_its_match_page_and_a_failing_page_costs_nothing(monkeypatch):
+    monkeypatch.setenv("LIVE_SOURCE_BASE", "https://example.test")
+    ld = '<script type="application/ld+json" id="sports-event-schema">{"@type":"SportsEvent","name":"A v B","startDate":"2026-10-29T14:30:00+00:00","location":{"name":"Sharjah Cricket Stadium, Sharjah"},"competitor":[{"name":"A"},{"name":"B"}]}</script>'
+    rows = [{"match_id": "held", "venue": "", "start_utc": "2026-10-29T10:00Z", "url": "/m/held"}, {"match_id": "page", "venue": "", "start_utc": "2026-10-29T14:30Z", "url": "/m/page"},
+            {"match_id": "bad", "venue": "", "start_utc": "2026-10-30T14:30Z", "url": "/m/bad"}, {"match_id": "has", "venue": "Here", "start_utc": "2026-10-31T14:30Z", "url": "/m/has"}]
+
+    class F:
+        got: list[str] = []
+
+        def get(self, url):
+            self.got.append(url)
+            if url.endswith("/bad"):
+                raise OSError("down")
+            return f"<html>{ld}</html>"
+
+    f = F()
+    assert cs.fill_venues(rows, [{"match_id": "held", "venue": "Kept Oval"}], f, cap=5) == 2
+    assert [r["venue"] for r in rows] == ["Kept Oval", "Sharjah Cricket Stadium, Sharjah", "", "Here"]
+    assert f.got == ["https://example.test/m/page", "https://example.test/m/bad"]  # the held one and the one with a venue are not fetched
