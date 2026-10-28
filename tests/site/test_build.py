@@ -291,3 +291,13 @@ def test_a_priced_player_who_could_not_be_linked_goes_to_the_review_list_and_a_s
     assert gill not in json.loads((out / "identity.json").read_text())["s"]
     B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")  # nothing priced any more
     assert not (out / "identity_review.json").exists()
+
+
+def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_off_the_api(tmp_path):
+    A = {"pids": [], "pstat": {}, "ms": [], "events": [], "team_ix": {}}
+    out = tmp_path / "public" / "data"
+    out.mkdir(parents=True)
+    n = B.build_sitemap(out, A, {}, "https://example.test/", [{"id": "2026-10-29-afghanistan-v-zimbabwe"}])
+    sm = (tmp_path / "public" / "sitemap.xml").read_text()
+    assert "<loc>https://example.test/fixture/2026-10-29-afghanistan-v-zimbabwe</loc><lastmod>" in sm and n == len(sm.split("<url>")) - 1
+    assert "Disallow: /api/" in (tmp_path / "public" / "robots.txt").read_text()

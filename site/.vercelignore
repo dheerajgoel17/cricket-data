@@ -1,5 +1,4 @@
 tests/
-scripts/
 node_modules/
 .vercel/
 dist/

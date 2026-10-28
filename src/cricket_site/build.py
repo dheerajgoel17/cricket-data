@@ -543,7 +543,7 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
 
 
-def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> int:
+def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixtures: list[dict] | None = None) -> int:
     """sitemap.xml + robots.txt next to the site (real paths such as /player/12: the app uses path routes)."""
     if not site_url:
         return 0
@@ -558,10 +558,12 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> i
         for t in m["teams"]:
             tcnt[(t, m["gender"])] += 1
     urls += [f"{base}/team/{A['team_ix'][k]}" for k, c in tcnt.most_common(800) if c >= 10]
-    body = "".join(f"<url><loc>{u}</loc></url>" for u in urls)
+    urls += [f"{base}/fixture/{f['id']}" for f in fixtures or []]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    body = "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls)
     root = out.parent
     (root / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + body + "</urlset>", encoding="utf-8")
-    (root / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
+    (root / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
     return len(urls)
 
 
@@ -695,7 +697,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         (out / "identity_review.json").unlink(missing_ok=True)
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
-    build_sitemap(out, A, names, site_url)
+    build_sitemap(out, A, names, site_url, fx)
     if photos:
         keep = set(A["pids"])
         (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"]}, separators=(",", ":")), encoding="utf-8")

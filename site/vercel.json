@@ -6,6 +6,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/share/:path*",
+      "destination": "/api/share?path=:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
@@ -17,6 +21,14 @@
     "api/live.js": {
       "maxDuration": 20,
       "includeFiles": "public/data/identity.json"
+    },
+    "api/og.js": {
+      "maxDuration": 15,
+      "includeFiles": "{public/data/*.json,node_modules/@fontsource/barlow-condensed/files/*.woff}"
+    },
+    "api/share.js": {
+      "maxDuration": 10,
+      "includeFiles": "public/data/*.json"
     }
   },
   "headers": [

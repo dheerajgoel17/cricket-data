@@ -1,4 +1,6 @@
+import { useId } from "react";
 import { Link } from "react-router-dom";
+import { BRAND } from "@/lib/brand";
 import { Bookmark, BookOpen, Info, MessageSquare, Search, Wrench } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -6,16 +8,24 @@ import { useSaved } from "@/lib/saved";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 
-/** Props.Cash wordmark: three rising bars + "Props.Cash". Inline SVG so it stays crisp and needs no asset. */
+/** The Fancy.cash mark: a rounded green tile with an F whose top arm ends in a ball. Inline SVG, so it is crisp at any size and needs no file. */
+export function BrandMark({ className }: { className?: string }) {
+  const id = useId();
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden>
+      <defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#3cf0a6" /><stop offset="1" stopColor="#1fb877" /></linearGradient></defs>
+      <rect width="64" height="64" rx="15" fill={`url(#${id})`} />
+      <g fill="#0f0f0f"><rect x="17" y="14" width="10" height="37" rx="5" /><rect x="17" y="14" width="25" height="10" rx="5" /><rect x="17" y="29.5" width="18" height="10" rx="5" /><circle cx="48.5" cy="19" r="6" /></g>
+    </svg>
+  );
+}
+
+/** Wordmark: the mark and "Fancy.cash" in a heavy weight, the dot in the accent colour. */
 export function Brand() {
   return (
-    <Link to="/" aria-label="Props.Cash home" className="group flex shrink-0 items-center gap-tight">
-      <svg viewBox="0 0 28 26" className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5" aria-hidden>
-        <rect x="0" y="15" width="7" height="11" rx="1.5" fill="var(--primary)" opacity=".55" />
-        <rect x="10.5" y="8" width="7" height="18" rx="1.5" fill="var(--primary)" opacity=".8" />
-        <rect x="21" y="0" width="7" height="26" rx="1.5" fill="var(--primary)" />
-      </svg>
-      <span className="text-body font-extrabold leading-none tracking-tight">Props<span className="text-primary">.</span>Cash</span>
+    <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <BrandMark className="size-7 transition-transform duration-300 group-hover:-rotate-6 group-active:scale-95" />
+      <span className="text-[1.0625rem] font-extrabold leading-none tracking-tight">Fancy<span className="text-primary">.</span>cash</span>
     </Link>
   );
 }
@@ -45,23 +55,21 @@ function Profile() {
   );
 }
 
-/** Top bar: logo left, search centred on the page, profile right. Glass blur with a faint green glow line underneath. */
+/** Top bar: the logo at the left (after the sidebar toggle on wide screens), the search field centred on wide screens, search and profile at the right. A plain blurred bar with a hairline, like the iOS navigation bar. */
 export function Header() {
   const search = useSearchDialog();
   return (
-    <header className="sticky top-0 z-50 h-header border-b border-border/60 bg-background/70 backdrop-blur-xl backdrop-saturate-150">
-      <div className="relative mx-auto flex h-full items-center gap-snug px-gutter">
+    <header className="sticky top-0 z-50 h-header border-b border-white/10 bg-background/75 backdrop-blur-xl backdrop-saturate-150">
+      <div className="mx-auto flex h-full items-center gap-snug px-gutter">
         <SidebarTrigger className="-ml-2 hidden md:inline-flex" aria-label="Toggle sidebar" />
-        {/* phones: centred logo with search and profile icons (props.cash style); md+: logo left, search field centred */}
-        <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"><Brand /></div>
-        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[560px] md:flex-1" />
-        <div className="ml-auto flex shrink-0 items-center gap-tight">
+        <Brand />
+        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[520px] md:flex-1" />
+        <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-secondary md:hidden"><Search className="size-4" /></button>
           <Profile />
         </div>
       </div>
       <SearchDialog open={search.open} onOpenChange={search.setOpen} />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     </header>
   );
 }
