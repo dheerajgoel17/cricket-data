@@ -211,13 +211,14 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith }: any) {
           <ul className={cn("overflow-hidden", CARD)}>
             {book.lines.map((l: any) => {
               const hist = windowRate(entries, cur.n, l.line, "over");
+              const bestO = Math.max(0, ...l.books.map((b: any) => b.over || 0)), bestU = Math.max(0, ...l.books.map((b: any) => b.under || 0)); // with several books, the best price of each side stands out
               return (
                 <li key={l.line} className="border-t border-white/5 first:border-t-0">
                   <button type="button" onClick={() => pickLine(l.line)} aria-label={`Use line ${l.line}`}
                     className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
                     <span className="grid min-w-0 gap-hair">
                       <span className="text-body font-semibold">O/U {l.line}{l === book.main && <span className="ml-tight text-caption font-semibold uppercase tracking-wider text-primary">main</span>}</span>
-                      {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><span className="text-footnote">{bookName(b.source)}</span> {odds(b.over)} / {odds(b.under)}</span>)}
+                      {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><span className="text-footnote">{bookName(b.source)}</span> <span className={cn(l.books.length > 1 && b.over === bestO && "font-semibold text-primary")}>{odds(b.over)}</span> / <span className={cn(l.books.length > 1 && b.under === bestU && "font-semibold text-primary")}>{odds(b.under)}</span></span>)}
                     </span>
                     <span className="grid justify-items-end gap-hair text-right">
                       <span className="text-footnote text-muted-foreground">Market <b className="font-semibold tabular-nums text-foreground">{l.prob == null ? "–" : pc(l.prob)}</b></span>

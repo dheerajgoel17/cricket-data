@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { archiveFixture, bookLinesFor, bookName, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { archiveFixture, bookLinesFor, bookName, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -138,6 +138,17 @@ test("sameFixture tells a series' matches apart: the same two sides, and a start
   assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, fx), false, "the next game of the series");
   assert.equal(sameFixture({ match: "New Zealand vs Pakistan", start_utc: "2026-10-27T07:00:00Z" }, fx), false);
   assert.equal(sameFixture({ match: "New Zealand vs India", start_utc: "2026-10-30T07:00:00Z" }, { a: "New Zealand", b: "India" }), true, "no start known: the names decide");
+});
+
+test("fancyByLine puts every book's price on its line, with the best over and best under of each", () => {
+  const e = (line, over, under, source) => ({ line, over, under, source });
+  const lines = fancyByLine([e(13.5, 1.8, 1.91, "Ladbrokes"), e(14.5, 2.1, 1.7, "bet365"), e(13.5, 1.85, 1.86, "bet365")]);
+  assert.deepEqual(lines.map((l) => l.line), [13.5, 14.5], "lowest line first, one entry per line");
+  assert.deepEqual(lines[0].books.map((b) => b.source), ["bet365", "Ladbrokes"], "books in name order");
+  assert.equal(lines[0].over, 1.85, "best over: bet365's");
+  assert.equal(lines[0].under, 1.91, "best under: Ladbrokes'");
+  assert.equal(lines[1].books.length, 1);
+  assert.deepEqual(fancyByLine(undefined), []);
 });
 
 test("sameFixture knows a side the books and the schedule name differently (the Ford Trophy)", () => {

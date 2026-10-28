@@ -89,6 +89,16 @@ export function fancyFor(doc, fixture, key, team = null) {
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
 }
 
+/** The lines of a market (from `fancyFor`) as {line, books}: every book that prices it, lowest line first, and per line the best over and the best under among them. */
+export function fancyByLine(entries) {
+  const by = new Map();
+  for (const e of entries || []) by.set(e.line, [...(by.get(e.line) || []), e]);
+  return [...by.entries()].sort((x, y) => x[0] - y[0]).map(([line, books]) => ({
+    line, books: [...books].sort((x, y) => bookName(x.source).localeCompare(bookName(y.source))),
+    over: Math.max(...books.map((b) => b.over)), under: Math.max(...books.map((b) => b.under)),
+  }));
+}
+
 /** A fixture id as the schedule makes it (start date + team slugs): the only thing the archive is asked for, so a link cannot name another path. */
 export const isFixtureId = (id) => /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*$/.test(String(id));
 
