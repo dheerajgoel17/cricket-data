@@ -179,7 +179,7 @@ def performance_markets(raws: dict) -> dict[str, list[str]]:
             for book in (raw.get("books") or {}).values():
                 seen |= {n for n in (book.get("left_out") or {}) if PERFORMANCE.search(n)}
             for m in raw.get("matches", []):
-                seen |= {g for q in m.get("quotes", []) if PERFORMANCE.search(g := q.get("group_name") or "")}
+                seen |= {g for q in m.get("quotes", []) if PERFORMANCE.search(g := (q.get("group_name") or "").strip()) and g not in moviodds.MAP}  # the groups the mirror adapter maps are read
         if seen:
             out[src] = sorted(seen)[:8]
     return out
