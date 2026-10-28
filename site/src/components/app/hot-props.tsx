@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { SlidersHorizontal } from "lucide-react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -109,15 +109,31 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const; // the words the player page's chart uses
 
-/** Every book's line and over price for the row's player and stat (books rarely agree on the line), the lowest line and the best price at it in the accent colour. */
+/** The best quote up front (the lowest line, and the best price at it, in the accent colour) with its book; the other books' line, over and under prices sit in a table that a "+N books" toggle opens. */
 export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?: string }) {
+  const [open, setOpen] = useState(false);
+  const id = useId();
+  const [top, ...rest] = quotes;
+  if (!top) return null;
   return (
-    <div className={cn("flex flex-wrap gap-x-snug gap-y-hair text-footnote tabular-nums text-muted-foreground", className)}>
-      {quotes.map((q) => (
-        <span key={q.source} className={cn("whitespace-nowrap", q.best && "font-semibold text-primary")}>
-          <BookBadge source={q.source} /> O {q.line} {odds(q.over)}{q.best && <span className="sr-only"> (lowest line, best price)</span>}
+    <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
+      <div className="flex flex-wrap items-center gap-x-snug">
+        <span className={cn("whitespace-nowrap", top.best && "font-semibold text-primary")}>
+          <BookBadge source={top.source} /> O {top.line} {odds(top.over)}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
-      ))}
+        {rest.length > 0 && (
+          <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-white/10"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}>
+            {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+          </button>
+        )}
+      </div>
+      {open && (
+        <table id={id} className="w-full max-w-sm text-left">
+          <thead><tr className="text-caption uppercase tracking-wider"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
+          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td>{odds(q.over)}</td><td>{odds(q.under)}</td></tr>)}</tbody>
+        </table>
+      )}
     </div>
   );
 }
