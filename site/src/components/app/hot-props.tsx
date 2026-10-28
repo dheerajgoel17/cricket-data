@@ -88,7 +88,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
