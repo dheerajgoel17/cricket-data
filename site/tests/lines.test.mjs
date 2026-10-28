@@ -210,7 +210,7 @@ test("bookScopesFor lists the scopes the books price, sorted, for the page's swi
   assert.deepEqual(bookScopesFor(TEST_DOC, "ab12", "runs", "T20", TNOW), []);
   assert.deepEqual(bookScopesFor(null, "ab12", "runs", "Test", TNOW), []);
   assert.deepEqual([lineScope({}), lineScope({ inn: 2 }), lineScope(null)], [0, 2, 0]);
-  assert.deepEqual(SCOPE_LABEL, ["Match", "1st innings", "2nd innings"]);
+  assert.deepEqual(SCOPE_LABEL, ["Both innings", "1st innings", "2nd innings"]);
 });
 
 test("a line with no innings reads as before: bookLinesFor and bookFormatFor on a doc without any are unchanged", () => {

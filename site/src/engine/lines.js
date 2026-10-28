@@ -20,7 +20,7 @@ export function lineProb(books) {
 
 /** The scope of a line: 0 for the whole match (every line published before innings lines existed), 1 or 2 for the player's own side's first or second innings (a Test only). */
 export const lineScope = (l) => l?.inn || 0;
-export const SCOPE_LABEL = ["Match", "1st innings", "2nd innings"];
+export const SCOPE_LABEL = ["Both innings", "1st innings", "2nd innings"]; // a Test: his two innings combined (the match total), his first, his second
 
 /**
  * The lines on offer for this player and stat in this format, for the nearest match that has not started more than `graceMs` ago, in one scope. `inn` is 0 for the

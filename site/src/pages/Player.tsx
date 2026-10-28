@@ -116,8 +116,9 @@ function PlayerScreen({ idx }: { idx: number }) {
   const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
-  // A Test batter's chart can be the match total or one innings of his side's (the books price both: a first-innings line is not a match total). `?scope=` is 0, 1 or 2;
-  // with none, the page opens on the match total when the books price it, else on the first scope they do price.
+  // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
+  // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
+  // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
   const testBat = FORMATS[fmtVal] === "Test" && (STATS as any)[stat]?.side === "bat";
   const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : [];
   const asked = q.scope === undefined || q.scope === "" ? null : Number(q.scope);
@@ -142,8 +143,8 @@ function PlayerScreen({ idx }: { idx: number }) {
         <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={STAT_OPTIONS} />
       </div>
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
-      {testBat && <PillGroup segmented layoutId="pl-scope" label="Scope" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
-        items={[0, 1, ...(priced.includes(2) || scope === 2 ? [2] : [])].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
+      {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+        items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, res: res.data, q, book, bookDefault, navigateWith, scope }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
@@ -320,7 +321,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
             <Field label="Opposition"><Input name="opp" list="dl-teams" defaultValue={q.opp} /></Field>
             <Field label="Venue"><Input name="venue" list="dl-venues" defaultValue={q.venue} /></Field>
             <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={q.vt} className="w-full" /></Field>
-            <Field label="Innings"><NativeSelect name="inn" options={[["", "any"], ["first", "batting first"], ["second", "chasing"]]} defaultValue={q.inn} className="w-full" /></Field>
+            <Field label="Batted first / chasing"><NativeSelect name="inn" options={[["", "any"], ["first", "batted first"], ["second", "chasing"]]} defaultValue={q.inn} className="w-full" /></Field>
             <Field label="Position"><NativeSelect name="pos" options={[["", "any"], ["1-2", "openers"], ["1-3", "top 3"], ["4-6", "middle"], ["7-11", "lower"], ...Array.from({ length: 11 }, (_, i) => [`${i + 1}`, `No. ${i + 1}`] as [string, string])]} defaultValue={q.pos} className="w-full" /></Field>
             <Field label="Level"><NativeSelect name="lvl" options={[["", "all"], ["intl", "international"], ["club", "club / league"]]} defaultValue={q.lvl} className="w-full" /></Field>
             <Field label="From"><Input name="since" type="date" defaultValue={q.since} /></Field>
