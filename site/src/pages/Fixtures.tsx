@@ -151,7 +151,7 @@ export function FixturePage() {
   };
   const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
-  setTitle("Match preview, player grid and trends");
+  setTitle(fx ? `${fx.a} v ${fx.b}: player props, hit rates and book lines` : "Match preview, player grid and trends");
   if (isLoading) return <div><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return <div className="flex flex-col items-start gap-snug pt-snug"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;

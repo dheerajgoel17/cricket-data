@@ -113,7 +113,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1);
   const stat = q.stat || "runs";
-  setTitle("Player stats, hit rates and form chart");
+  setTitle(`${store.playerName(idx)}: stats, hit rates and form`);
 
   const lines = useQuery(linesQuery);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out

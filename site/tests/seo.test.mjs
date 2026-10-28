@@ -1,0 +1,57 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { headTags, pages, render } from "../scripts/seo.mjs";
+import { ROUTES, fullTitle, pageMeta } from "../src/lib/seo.js";
+
+const TPL = "<html><head><!--seo-head--></head><body><div id=\"root\"><!--seo-body--></div></body></html>";
+const fx = [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", status: "Upcoming" }];
+const index = { players: { nm: ["A Name", "Harry Brook"] }, teams: [{ n: "India", g: 0 }, { n: "India", g: 1 }], events: ["Global T20 Canada 2026"] };
+const SITE = "https://fancy.cash";
+
+test("titles carry the brand once, and a page that names itself gets a description built from the name", () => {
+  assert.equal(fullTitle("About"), "About | Fancy.cash");
+  assert.equal(fullTitle("Fancy.cash: free cricket"), "Fancy.cash: free cricket");
+  assert.match(pageMeta("/player/1", "Harry Brook: stats, hit rates and form | Fancy.cash").description, /^Harry Brook: hit rates over any line/);
+  assert.equal(pageMeta("/about", "x").description, ROUTES.about.description);
+  assert.equal(pageMeta("/saved", "Saved").noindex, true);
+});
+
+test("every page gets its own title, description, canonical link and structured data", () => {
+  const list = pages({ site: SITE, index, fixtures: fx, sitemap: ["/", "/player/1", "/team/1", "/league/0", "/player/9"] });
+  const by = Object.fromEntries(list);
+  const f = render(TPL, by["fixture/2026-10-29-afghanistan-v-zimbabwe"]);
+  assert.match(f, /<title>Afghanistan v Zimbabwe: player props, hit rates and book lines \| Fancy.cash<\/title>/);
+  assert.match(f, /rel="canonical" href="https:\/\/fancy.cash\/fixture\/2026-10-29-afghanistan-v-zimbabwe"/);
+  assert.match(f, /"@type":"SportsEvent"/);
+  assert.match(f, /Sharjah Cricket Stadium/);
+  assert.match(f, /<h1>Afghanistan v Zimbabwe/);
+  assert.match(render(TPL, by["player/1"]), /<title>Harry Brook: stats, hit rates and form/);
+  assert.match(render(TPL, by["team/1"]), /India Women: stats and player grid/); // the women's side keeps its name
+  assert.ok(by["league/0"] && !by["player/9"]); // a player the data does not know gets no page
+  assert.match(render(TPL, by.saved), /noindex, follow/);
+});
+
+test("the home page has no canonical link (the app shell also serves unknown paths) but has the site data", () => {
+  const home = render(TPL, Object.fromEntries(pages({ site: SITE, index, fixtures: [], sitemap: [] }))[""]);
+  assert.doesNotMatch(home, /rel="canonical"/);
+  assert.match(home, /"@type":"WebSite"/);
+  assert.match(home, /og:image" content="https:\/\/fancy.cash\/og.png"/);
+});
+
+test("markup in a name cannot break out of the tags, and a template without the markers is an error", () => {
+  const t = headTags({ title: 'Bad "name" <script>', description: "d <b>", jsonld: [{ n: "</script><script>alert(1)" }] });
+  assert.doesNotMatch(t, /<script>alert|<b>|"name" </);
+  assert.throws(() => render("<html></html>", { title: "x", description: "y" }), /seo markers/);
+});
+
+test("the site address is SITE_URL, else the one in the sitemap the data build wrote", async () => {
+  const { siteOf } = await import("../scripts/seo.mjs");
+  const { mkdtempSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const d = mkdtempSync(join(tmpdir(), "seo-"));
+  assert.equal(siteOf(d, ""), "");
+  writeFileSync(join(d, "sitemap.xml"), '<urlset><url><loc>https://fancy.cash/</loc></url><url><loc>https://fancy.cash/players</loc></url></urlset>');
+  assert.equal(siteOf(d, ""), "https://fancy.cash");
+  assert.equal(siteOf(d, "https://other.test/"), "https://other.test");
+});

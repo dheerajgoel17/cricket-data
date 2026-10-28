@@ -7,6 +7,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarInset, SidebarMenu, Sideb
 import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
+import { useMetaSync } from "@/lib/title";
 
 /** shadcn Sidebar under the header: full labels at lg, collapses to an icon rail (Ctrl/Cmd+B or the header trigger). Phones use the tab bar instead. */
 function AppSidebar() {
@@ -49,6 +50,7 @@ function AppSidebar() {
 /** Page chrome: header, left rail (>= md), bottom tab bar (phones), animated route outlet. */
 export function Shell() {
   const { pathname } = useLocation();
+  useMetaSync(pathname);
   return (
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] md:pb-0">
       <div className="sticky top-0 z-50"><Header /></div>

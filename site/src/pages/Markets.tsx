@@ -67,7 +67,7 @@ export function LeaguePage() {
     const recent = ms.slice(-15).reverse().map((m) => { const inn = store.M.inn[m]; const sc = (i: number) => (inn[i] ? `${inn[i][1]}/${inn[i][2]}` : "–"); return [store.M.d[m], `${store.teamName(store.M.a[m], true)} v ${store.teamName(store.M.b[m], true)}`, store.venueName(store.M.v[m]), inn.length ? `${sc(0)} · ${sc(1)}` : "–", store.M.w[m] >= 0 ? store.teamName(store.M.w[m], true) : "–"]; });
     return { ms, fmtName, seasons, tt, teams, mk, recent };
   }, [store, e, valid]);
-  setTitle("Competition stats");
+  setTitle(valid ? `${store.events[e]}: team tables, totals and top scores` : "Competition stats");
   if (!valid || !data) return <EmptyNote>Unknown competition.</EmptyNote>;
   const tab = ["overview", "teams", "results"].includes(q.tab) ? q.tab : "overview";
   const name = store.events[e];
@@ -103,7 +103,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const grid = useQuery({ queryKey: ["team-grid", idx, fmtName, gstat], enabled: isTeam, queryFn: () => collectGrid(store, idx, fmtName, gstat) });
   const { data: fixtures } = useFixtures();
   const nextFx = isTeam ? (fixtures || []).find((f) => (f.a_ix === idx || f.b_ix === idx) && (f.start.length > 10 ? Date.parse(f.start) > Date.now() : f.start >= new Date().toISOString().slice(0, 10))) : null;
-  setTitle(isTeam ? "Team stats and player grid" : "Venue stats");
+  setTitle(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length) ? (isTeam ? `${store.teamName(idx)}: stats and player grid` : `${store.venues[idx]}: venue stats`) : isTeam ? "Team stats and player grid" : "Venue stats");
   if (!(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length))) return <EmptyNote>Unknown {kind}.</EmptyNote>;
   const form = (
     <LiveForm onValues={(v) => setQ({ ...v })} className="mb-3">
