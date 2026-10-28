@@ -28,8 +28,10 @@ def england_sri_lanka():
     return feedf._event(stub, feedf.menu_index(J("feedf_menu.json"))["36246014"], STAMP)
 
 
-def test_a_session_rate_is_even_money_at_100_and_skewed_either_side():
+def test_a_session_rate_is_even_money_at_100_and_back_and_lay_read_it_oppositely():
+    # Yes (back) at R: 100 staked wins R. No (lay) at R: R staked wins 100.
     assert [feedf.dec(r) for r in (100, 85, 115, 0, None, "x")] == [2.0, 1.85, 2.15, None, None, None]
+    assert [feedf.dec(r, lay=True) for r in (100, 115, 85, 130, 0, None)] == [2.0, 1.87, 2.176, 1.769, None, None]
 
 
 def test_the_event_list_is_read_in_ist_and_the_menu_links_the_two_ids():
@@ -58,8 +60,8 @@ def test_premium_gives_decimal_player_rows_and_two_way_fancy_lines_and_skips_sus
 
 def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
     rows, fx, left = feedf.parse_fancy(J("feedf_fancy.json")["data"], england_sri_lanka(), STAMP)
-    # B Duckett 30 / 30 at rates 85 / 115: Yes wins at 30 or more (over 29.5, 1.85), No wins at 29 or fewer (under 29.5, 2.15)
-    assert [(r["player"], r["line"], r["side"], r["back"]) for r in rows if r["player"] == "B Duckett"] == [("B Duckett", 29.5, "over", 1.85), ("B Duckett", 29.5, "under", 2.15)]
+    # B Duckett 30 / 30 at rates 85 / 115: Yes wins at 30 or more (over 29.5, back 85 = 1.85), No wins at 29 or fewer (under 29.5, lay 115: 115 staked wins 100 = 1.87)
+    assert [(r["player"], r["line"], r["side"], r["back"]) for r in rows if r["player"] == "B Duckett"] == [("B Duckett", 29.5, "over", 1.85), ("B Duckett", 29.5, "under", 1.87)]
     assert {r["source"] for r in rows} == {"feedf_f"} and {f["source"] for f in fx} == {"feedf_f"}
     by = {(f["key"], f["line"]): f for f in fx}
     # 50 over runs, England: Yes 316 (over 315.5) and No 312 (under 311.5), both at rate 100: two one-sided lines a gap apart
@@ -68,7 +70,7 @@ def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
     assert by["team_total_runs", 315.5]["team"] == "England" and by["team_total_runs", 315.5]["bat_first"] and by["team_total_runs", 315.5]["rules"] == "void_any_ball"
     # match fours 50 / 47: over 49.5, under 46.5; fifties 3 / 3 at 80 / 130: one two-way line at 2.5
     assert (by["match_fours", 49.5]["over"], by["match_fours", 46.5]["under"]) == (2.0, 2.0)
-    assert (by["match_50s", 2.5]["over"], by["match_50s", 2.5]["under"], by["match_50s", 2.5]["rules"]) == (1.8, 2.3, "not_voided_by_lost_balls")
+    assert (by["match_50s", 2.5]["over"], by["match_50s", 2.5]["under"], by["match_50s", 2.5]["rules"]) == (1.8, 1.769, "not_voided_by_lost_balls")
     # player performance (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping): H Brook 32 / 34 at 100 / 100 is Yes at 34 (over 33.5) and No at 32 (under 31.5)
     assert [(r["player"], r["market_type"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "player_points"] == [("H Brook", "player_points", 33.5, "over", 2.0), ("H Brook", "player_points", 31.5, "under", 2.0)]
     # not read: first-over, 10-over, wicket-fall, meter and khado markets
