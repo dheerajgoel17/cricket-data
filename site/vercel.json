@@ -10,6 +10,10 @@
       "destination": "/api/share?path=:path*"
     },
     {
+      "source": "/card/:path*",
+      "destination": "/api/og?path=:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }

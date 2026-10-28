@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cardFields, cardText, renderCard } from "../src/engine/card.js";
+import { cardFields, cardPath, cardQuery, cardText, renderCard } from "../src/engine/card.js";
 import { parseShare } from "../api/share.js";
 
 const data = {
@@ -44,4 +44,10 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
   assert.equal(parseShare("player/x"), null);
   assert.equal(parseShare("admin/1"), null);
   assert.equal(parseShare("player/12/runs/abc").card.stat, undefined); // a line that is not a number is dropped
+});
+
+test("a card's file-like path and its query are each other's inverse", () => {
+  for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/player/12/runs/24.5.jpg");
+  assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });
