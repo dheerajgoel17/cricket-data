@@ -14,6 +14,7 @@ tags Feed F's fancy markets carry (an assumption: same family of exchange), and 
 from __future__ import annotations
 
 import datetime as dt
+import json
 import os
 import re
 import time
@@ -154,7 +155,44 @@ def parse_event(catalogue: list[dict], odds: dict[str, dict[str, str]], ev: dict
     return rows, fancy, left
 
 
-def fetch(fetched_at: str):
+STATE = config.STATE / "feedg_latest.json"
+BLOCKED = (401, 403, 451)
+
+
+def write_state(rows: list[dict], raw: dict, fetched_at: str, path=None) -> None:
+    """What a read from an allowed network (the India runner, ``python -m value_bets.feedg_run``) found, for the hourly run to use when GitHub's own servers are refused."""
+    p = path or STATE
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps({"fetched_at": fetched_at, "rows": rows, "fancy": raw["fancy"], "books": raw["books"]}, separators=(",", ":")), encoding="utf-8")
+
+
+def from_state(fetched_at: str, path=None):
+    """The last read from the allowed network if it is recent enough, minus matches that have started; None when there is none."""
+    p = path or STATE
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    now = parse_ts(fetched_at)
+    if now - parse_ts(d["fetched_at"]) > dt.timedelta(hours=config.get("FEEDG_STATE_MAX_HOURS")):
+        return None
+    upcoming = lambda x: x.get("start_utc") and parse_ts(x["start_utc"]) > now  # noqa: E731
+    rows, fancy = [r for r in d["rows"] if upcoming(r)], [f for f in d["fancy"] if upcoming(f)]
+    books = {k: {**v, "rows": len(rows), "fancy": len(fancy), "from_state": d["fetched_at"]} for k, v in d["books"].items()}
+    return rows, {"books": books, "fancy": fancy}
+
+
+def fetch(fetched_at: str, use_state: bool = True):
+    """Read the book now; if it refuses this network (GitHub's US servers are refused with 403) use the last read from the India runner when it is fresh."""
+    try:
+        return _fetch(fetched_at)
+    except urllib.error.HTTPError as e:
+        if use_state and e.code in BLOCKED and (got := from_state(fetched_at)) is not None:
+            return got
+        raise
+
+
+def _fetch(fetched_at: str):
     s = settings()
     if not s:
         raise Skip("FEEDG_* not set")

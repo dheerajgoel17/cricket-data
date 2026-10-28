@@ -55,3 +55,13 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 ## Cost and limits
 Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Supabase free). Watch: Supabase free projects pause after inactivity (the hourly sync keeps it active);
 1 GB storage / 500 MB DB; Vercel function limits; xAI Grok is the one **metered** dependency (a few hundred tokens per question), remove `XAI_API_KEY` to go fully free.
+
+
+## India runner (Feed G)
+Feed G's book answers GitHub's US servers with 403, so its read runs on a small server in an India region (not a personal computer) that is registered as a self-hosted runner with the label `india`. `.github/workflows/feedg-india.yml` runs only there, on a schedule and by hand (a pull request or push never reaches it, since the repository is public), and commits `value_bets/state/feedg_latest.json`; the hourly value-bets run uses that file when the book refuses it (at most `CV_FEEDG_STATE_MAX_HOURS`, default 3, old, and only for matches that have not started).
+1. Create the server (Ubuntu 24.04, 1 GB is enough, SSH key only) in an India region, e.g. DigitalOcean Bangalore.
+2. `sudo apt-get update && sudo apt-get install -y python3-venv git`.
+3. GitHub: Settings, Actions, Runners, New self-hosted runner, Linux. Run the download and configure commands it shows on the server, with the label `india`, then `sudo ./svc.sh install && sudo ./svc.sh start`.
+4. When the runner shows Idle, set the repository variable `FEEDG_INDIA_RUNNER` to `on` (Settings, Secrets and variables, Actions, Variables). Set it back to anything else to switch the job off. Until it is `on` the job is skipped, not queued.
+5. Run "Feed G (India runner)" once by hand and check that `value_bets/state/feedg_latest.json` is committed; the next value-bets run then lists Feed G as ok.
+The book may also refuse a cloud server's address: then the manual run fails with 403 and the server can be deleted. Nothing else depends on it.

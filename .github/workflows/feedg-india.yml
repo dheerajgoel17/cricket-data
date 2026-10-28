@@ -1,0 +1,45 @@
+name: Feed G (India runner)
+
+# Reads Feed G from a machine whose network the book accepts (a small server in an India region that registers itself as a self-hosted runner labelled `india`; never a personal computer)
+# and commits the result to value_bets/state/feedg_latest.json, which the hourly value-bets run uses when the book refuses GitHub's own servers (docs/OPERATIONS.md, "India runner").
+# Off until the repository variable FEEDG_INDIA_RUNNER is `on`, so no job waits for a runner that does not exist. Schedule and manual runs only: a pull request or push never reaches this runner.
+on:
+  schedule:
+    - cron: "10 3-17 * * *"  # 20 minutes before value-bets, so its read is fresh
+  workflow_dispatch:
+
+concurrency:
+  group: feedg-india
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  read:
+    if: vars.FEEDG_INDIA_RUNNER == 'on'
+    runs-on: [self-hosted, india]
+    timeout-minutes: 10
+    env:
+      FEEDG_NAME: ${{ secrets.FEEDG_NAME }}
+      FEEDG_API: ${{ secrets.FEEDG_API }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -q -e ".[value-bets]"
+      - name: Read Feed G
+        run: .venv/bin/python -m value_bets.feedg_run
+      - name: Commit the read
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add value_bets/state/feedg_latest.json
+          if git diff --cached --quiet; then echo "No changes."; exit 0; fi
+          git commit -q -m "feedg: India runner read $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase -q && git push -q && exit 0
+            sleep $((i * 10))
+          done
+          echo "::error::push failed after retries"; exit 1

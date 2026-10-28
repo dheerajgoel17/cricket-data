@@ -121,3 +121,41 @@ def test_an_http_error_ends_the_run_for_the_book_with_nothing_read(env, monkeypa
     serve(monkeypatch, fail="/api/guest/event/")
     rows, raw = feedg.fetch(STAMP)
     assert rows == [] and raw["fancy"] == [] and raw["books"]["Test Book"]["stopped"] == "HTTP 429" and raw["books"]["Test Book"]["events"] == 0
+
+
+def refuse(monkeypatch):
+    def get(url, **_):
+        raise urllib.error.HTTPError(url, 403, "blocked", {}, None)
+
+    monkeypatch.setattr(feedg, "http_json", get)
+
+
+def test_when_the_book_refuses_this_network_the_runners_last_read_is_used_if_fresh_and_upcoming_only(env, monkeypatch, tmp_path):
+    state = tmp_path / "feedg_latest.json"
+    monkeypatch.setattr(feedg, "STATE", state)
+    serve(monkeypatch)
+    rows, raw = feedg.fetch(STAMP)
+    feedg.write_state(rows, raw, STAMP)
+    refuse(monkeypatch)
+    got_rows, got = feedg.fetch("2026-10-28T11:30:00Z")  # 90 minutes later, before the match (04:40 on the 29th)
+    assert got_rows == rows and got["fancy"] == raw["fancy"] and got["books"]["Test Book"]["from_state"] == STAMP
+    d = json.loads(state.read_text())  # a read made at 03:00 on the 29th: at 04:50 the match has started
+    d["fetched_at"] = "2026-10-29T03:00:00Z"
+    state.write_text(json.dumps(d))
+    started_rows, started = feedg.fetch("2026-10-29T04:50:00Z")
+    assert started_rows == [] and started["fancy"] == []
+
+
+def test_a_stale_read_is_not_used_and_a_refusal_with_no_read_is_an_error(env, monkeypatch, tmp_path):
+    monkeypatch.setattr(feedg, "STATE", tmp_path / "feedg_latest.json")
+    refuse(monkeypatch)
+    with pytest.raises(urllib.error.HTTPError):
+        feedg.fetch(STAMP)  # no read yet
+    serve(monkeypatch)
+    rows, raw = feedg.fetch(STAMP)
+    feedg.write_state(rows, raw, STAMP)
+    refuse(monkeypatch)
+    with pytest.raises(urllib.error.HTTPError):
+        feedg.fetch("2026-10-28T14:00:00Z")  # four hours old: past the 3 hour limit
+    with pytest.raises(urllib.error.HTTPError):
+        feedg.fetch(STAMP, use_state=False)  # the India runner itself never reads the file
