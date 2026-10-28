@@ -123,3 +123,11 @@ def test_innings_scoped_prices_never_reach_the_pricing():
     from value_bets.pipeline import whole_match
     rows = [{"id": 1, "inn": None}, {"id": 2, "inn": 1}, {"id": 3}, {"id": 4, "inn": 2}]
     assert [r["id"] for r in whole_match(rows)] == [1, 3]
+
+
+def test_performance_markets_lists_what_sources_offered_and_no_adapter_reads():
+    from value_bets.pipeline import performance_markets
+    raws = {"feedk": {"books": {"A": {"left_out": {"Player Performance": 2, "Top Batter": 1}}}},
+            "moviodds_bet365": {"matches": [{"quotes": [{"group_name": "Player Performance Points"}, {"group_name": "Match Totals"}]}]},
+            "feedf": {"books": {"B": {"left_out": {"Winner": 1}}}}, "smarkets": None}
+    assert performance_markets(raws) == {"feedk": ["Player Performance"], "moviodds_bet365": ["Player Performance Points"]}
