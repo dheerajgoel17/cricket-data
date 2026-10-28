@@ -12,7 +12,7 @@ import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTot
 import { FORMATS } from "@/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
-import { loadLines } from "@/lib/feeds";
+import { linesQuery } from "@/lib/queries";
 import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { AnimatedHeight } from "./animated-height";
@@ -51,7 +51,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const { store } = useData();
   const { match: liveMatch } = useLiveMatch(fx);
   const reduce = useReducedMotion();
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery(linesQuery);
   const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
   const panelRef = useRef<HTMLDivElement>(null);
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);

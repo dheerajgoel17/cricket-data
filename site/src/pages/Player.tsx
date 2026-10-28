@@ -15,7 +15,7 @@ import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
-import { loadLines } from "@/lib/feeds";
+import { linesQuery } from "@/lib/queries";
 import { localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
@@ -114,7 +114,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   const stat = q.stat || "runs";
   setTitle("Player stats, hit rates and form chart");
 
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery(linesQuery);
   const book = lines.data ? bookLinesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
   const plan = {

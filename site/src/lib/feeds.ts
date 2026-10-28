@@ -12,11 +12,19 @@ async function live(file: string, ms: number): Promise<any | null> {
   try { const r = await fetch(`${RAW}/${file}`, { cache: "no-cache", signal: ctl.signal }); return r.ok ? await r.json() : null; } catch { return null; } finally { clearTimeout(t); }
 }
 
+/** The live book file is a faster-than-the-hour refresh of the bundled copy, never a requirement: past this it is given up on and the page goes with the bundle. */
+export const LINES_LIVE_MS = 1500;
+
+/** The newer of the bundled lines file and the live one (a tie goes to the live one); a live file from before `events` / `fancy` existed keeps the bundled lists. */
+export function newerLines(bundle: any | null, fresh: any | null): any {
+  if (fresh && (!bundle || (fresh.generated_at_utc || "") >= (bundle.generated_at_utc || ""))) return { ...fresh, events: fresh.events ?? bundle?.events ?? [], fancy: fresh.fancy ?? bundle?.fancy ?? [] };
+  return bundle || { lines: [], events: [], fancy: [] };
+}
+
+/** Both files are fetched at once (the page waits for the slower of the two, at most LINES_LIVE_MS for the live one), not the live one after the bundle. */
 export async function loadLines(): Promise<any> {
-  let doc = await bundled("lines.json");
-  const d = await live("book_lines.json", 3500);
-  if (d && (!doc || (d.generated_at_utc || "") >= (doc.generated_at_utc || ""))) doc = { ...d, events: d.events ?? doc?.events ?? [], fancy: d.fancy ?? doc?.fancy ?? [] }; // a live file from before `events` / `fancy` existed keeps the bundled lists
-  return doc || { lines: [], events: [], fancy: [] };
+  const [bundle, fresh] = await Promise.all([bundled("lines.json"), live("book_lines.json", LINES_LIVE_MS)]);
+  return newerLines(bundle, fresh);
 }
 
 /** The home rail's published settings (config/home_rail.json, read at view time so a change needs no deploy); null when it cannot be read, and the built-in ones apply. */

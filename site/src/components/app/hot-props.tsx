@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
@@ -16,8 +16,9 @@ import { fmtIndex } from "@/engine/util.js";
 import { barState, windowRate } from "@/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
-import { loadLines } from "@/lib/feeds";
+import { byShard, dayOffset, hotLines, norm, pool, sameMatch } from "@/lib/hot-lines";
 import { odds } from "@/lib/format";
+import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
@@ -28,35 +29,39 @@ import { MiniBars } from "./mini-bars";
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "l5" | "l10";
 const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
-const sameMatch = (match: string, [a, b]: [string, string]) => { const [x, y] = String(match).split(/\s+vs\s+/i); const s = new Set([norm(x), norm(y)]); return s.has(norm(a)) && s.has(norm(b)); };
-const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
-/** 0 = today, 1 = tomorrow (viewer's local days), else -1. */
-const dayOffset = (iso: string) => { const d = new Date(iso), t = new Date(); d.setHours(0, 0, 0, 0); t.setHours(0, 0, 0, 0); const n = Math.round((d.getTime() - t.getTime()) / 864e5); return n === 0 || n === 1 ? n : -1; };
+const SHARDS_AT_ONCE = 8; // player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early
+const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
 interface Row { day: number; idx: number; pid: string; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
-/** Today's bookmaker player lines, each scored from the player's own history by the engine: L10 hit rate, this year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. */
-function useHotRows(archive?: any, teams?: [string, string]) {
+/**
+ * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
+ * year's, vs today's opponent, and the edge of the best over price against the all-time hit rate. Only those lines are scored (each costs a player file), the files come
+ * several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
+ */
+export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
   const { store, rz } = useData();
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const qc = useQueryClient();
+  const lines = useQuery(linesQuery);
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
+  const key = ["hot-props", doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
-    queryKey: ["hot-props", doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : ""],
+    queryKey: key,
     enabled: !!doc.data,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
-      const todays = { lines: (doc.data.lines || []).filter((l: any) => l.start_utc && l.books?.length && (archive ? sameMatch(l.match, teams!) : dayOffset(l.start_utc) >= -1 && Date.parse(l.start_utc) > now - 40 * 3600e3)) };
+      const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${l.start_utc}`, l);
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
-      const work = [...keys.values()].map((l) => async () => {
+      const score = async (l: any) => {
         const idx = store.P.id.indexOf(l.pid);
         const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3);
         if (idx < 0 || !b) return;
@@ -76,15 +81,22 @@ function useHotRows(archive?: any, teams?: [string, string]) {
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
         out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, l5, l10, season, h2h,
           edge: p != null && n >= 10 && over > 1 ? over * p - 1 : null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
-      });
-      // a few plans at a time, giving the main thread back in between: on a phone the whole batch is seconds of work, and typing in search waited behind it
+      };
+      // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
+      // whole batch is seconds of work, and typing in search waited behind it. The rows so far are put in the cache as they come (not all at the end).
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
-      for (let i = 0; i < work.length; i += 4) { await Promise.all(work.slice(i, i + 4).map((w) => w())); await yieldToMain(); }
+      let published = 0;
+      await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
+        await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the page
+        for (let i = 0; i < g.lines.length; i += 4) { await Promise.all(g.lines.slice(i, i + 4).map(score)); await yieldToMain(); }
+        if (Date.now() - published >= PUBLISH_MS) { published = Date.now(); qc.setQueryData(key, [...out]); }
+      });
       return out;
     },
   });
+  const otherDay = useMemo(() => (teams ? 0 : hotLines(doc.data?.lines || [], { day: 1 - day }).length), [doc.data, teams, day]); // the other day's lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
-  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError) };
+  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
 }
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
@@ -123,7 +135,8 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
 export function HotProps({ teams, start, archive }: { teams?: [string, string]; start?: string; archive?: any } = {}) {
-  const { data: all, isLoading } = useHotRows(archive, teams);
+  const [day, setDay] = useState("0");
+  const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start }, { a: teams![0], b: teams![1], start }); // this match: the same two sides and the same start, not the series' next game
   const live = useLiveDoc();
   // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
@@ -143,7 +156,6 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
   const [stat, setStat] = useState("all");
   const [win, setWin] = useState<Win>("l10");
-  const [day, setDay] = useState("0");
   const [bars, setBars] = useState(true);
   const [team, setTeam] = useState("all");
   const tabs = useMemo(() => {
@@ -155,7 +167,8 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   const rows = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start]);
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
-  if (!isLoading && !priced.length) return null;
+  if (!isLoading && !scoring && !priced.length && !otherDay) return null;
+  const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
     <section aria-label="Hot player props today" className="flex flex-col gap-stack">
       {!teams && <div><h1 className="text-display font-bold">Hot Player Props{day === "1" && <span className="font-medium text-muted-foreground"> · Tomorrow</span>}</h1></div>}
@@ -193,7 +206,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
         </Sheet>
       </div>
       <AnimatedHeight>
-        {isLoading ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
+        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
           <ul className="-mx-gutter">
             <AnimatePresence mode="popLayout" initial={false}>
               {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
