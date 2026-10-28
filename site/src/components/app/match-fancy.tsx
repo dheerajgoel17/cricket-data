@@ -26,7 +26,7 @@ import { EmptyNote } from "./page";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
-const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"],
+export const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"],
   ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"], ["highest_over", "Top over"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
 const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"], ["top_batter", "Top batter"]];
 const WINDOWS = [5, 10, 20, 30];
@@ -42,6 +42,48 @@ type BookLine = { line: number; over: number | null; under: number | null; books
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
+
+/** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line. */
+export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, liveMatch }: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; liveMatch?: any }) {
+  if (!ms.length || !doc) return [];
+  const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
+    const all = byLine(fancyLines(doc, fxInfo, k, teamName));
+    // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
+    const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
+    if (!b) return [];
+    const run = (line: number) => (scope < 0 ? report(store, ms, k, line) : teamReport(store, ms, scope, k, line));
+    const so = lo ? run(lo.line).summary : null, su = lu ? run(lu.line).summary : null, base = so ?? su;
+    if (!base || !base.n) return [];
+    const eo = lo && so ? sideEdge(so.over, so.over + so.under, lineProb(lo.books), lo.over) : null;
+    const eu = lu && su ? sideEdge(su.under, su.over + su.under, lineProb(lu.books) == null ? null : 1 - (lineProb(lu.books) as number), lu.under) : null;
+    const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
+    const soFar = liveMarket(liveMatch, k, teamName);
+    const src = (l: BookLine | undefined, sd: "over" | "under") => (l && l[sd] != null ? l.books.find((x) => x[sd] === l[sd])?.source : undefined);
+    const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
+    const rep = run(b.line);
+    return [{ key: k, label: label(k), line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+  });
+  return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
+}
+
+/** One market's row, in the props-list style: the label and the book's line and price(s), the better side's edge, and the last ten results as bars. */
+export function OverviewRow({ r, onOpen, active }: { r: any; onOpen: () => void; active?: boolean }) {
+  return (
+    <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
+      className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
+    <span className="grid min-w-0 gap-hair">
+                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
+                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
+                        </span>
+                        <span className="grid justify-items-end text-right">
+                          <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
+                          <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+                        </span>
+                        <MiniBars last={r.last} line={r.line} />
+                        <ChevronRight className="size-4 text-muted-foreground" />
+    </button>
+  );
+}
 
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any };
 
@@ -83,27 +125,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // every market the books price, scored on the same matches and ranked by the better side's edge (like the props list ranks by hit rate)
-  const overview = useMemo(() => {
-    if (!ms.length || !doc.data) return [];
-    const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
-      const all = byLine(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null));
-      // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
-      const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
-      if (!b) return [];
-      const at = (line: number) => (scope < 0 ? report(store, ms, k, line) : teamReport(store, ms, scope, k, line)).summary;
-      const so = lo ? at(lo.line) : null, su = lu ? at(lu.line) : null, base = so ?? su;
-      if (!base || !base.n) return [];
-      const eo = lo && so ? sideEdge(so.over, so.over + so.under, lineProb(lo.books), lo.over) : null;
-      const eu = lu && su ? sideEdge(su.under, su.over + su.under, lineProb(lu.books) == null ? null : 1 - (lineProb(lu.books) as number), lu.under) : null;
-      const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
-      const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
-      const src = (l: BookLine | undefined, sd: "over" | "under") => (l && l[sd] != null ? l.books.find((x) => x[sd] === l[sd])?.source : undefined);
-      const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
-      const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line);
-      return [{ key: k, label: marketLabel(k), line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
-    });
-    return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
-  }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
+  const overview = useMemo(() => buildOverview({ store, doc: doc.data, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys, label: marketLabel, liveMatch }), [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => (!key || key === "top_batter" ? [] : byLine(fancyLines(doc.data, fxInfo, key, team?.[0] ?? null))), [doc.data, fxInfo, key, team]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -165,19 +187,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                     <motion.li key={r.key} layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
                       className="border-t border-white/5 first:border-t-0">
-                      <button type="button" onClick={() => open(r.key)} aria-label={`Open ${r.label}`}
-                        className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
-                        <span className="grid min-w-0 gap-hair">
-                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
-                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
-                        </span>
-                        <span className="grid justify-items-end text-right">
-                          <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
-                          <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-                        </span>
-                        <MiniBars last={r.last} line={r.line} />
-                        <ChevronRight className="size-4 text-muted-foreground" />
-                      </button>
+                      <OverviewRow r={r} onOpen={() => open(r.key)} active={r.key === key} />
                       <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
                     </motion.li>))}
                 </AnimatePresence>
