@@ -131,6 +131,8 @@ def test_performance_markets_lists_what_sources_offered_and_no_adapter_reads():
             "moviodds_bet365": {"matches": [{"quotes": [{"group_name": "Player Performance Points"}, {"group_name": "Match Totals"}]}]},
             "feedf": {"books": {"B": {"left_out": {"Winner": 1}}}}, "smarkets": None}
     assert performance_markets(raws) == {"feedk": ["Player Performance"], "moviodds_bet365": ["Player Performance Points"]}
+    raws["moviodds_bet365"]["matches"][0]["quotes"].append({"group_name": "Player Performance"})  # a group the mirror adapter reads is not "not read yet"
+    assert performance_markets(raws)["moviodds_bet365"] == ["Player Performance Points"]
 
 
 def test_the_book_a_mirror_reads_player_performance_like_its_other_over_unders(monkeypatch):
