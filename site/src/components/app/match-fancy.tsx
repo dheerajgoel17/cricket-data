@@ -11,7 +11,7 @@ import { fancyByLine, fancyFor, lineProb } from "@/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { BookTable } from "./book-table";
 import { sideEdge } from "@/engine/stats.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@/engine/markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters, venueIndices } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
@@ -29,7 +29,9 @@ import { FancySkeleton } from "./skeletons";
 const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"],
   ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"], ["highest_over", "Top over"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
 const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"], ["top_batter", "Top batter"]];
-const WINDOWS = [10, 20, 30];
+const WINDOWS = [5, 10, 20, 30];
+const HERE_MIN = 3; // fewest matches at the ground worth saying anything about
+const DIFFERS = 0.3; // how far (as a share of matches) the ground's hit rate must sit from the teams' form to be called out
 const EASE = [0.22, 1, 0.36, 1] as const;
 // the engine is plain JS: give its results the loose shape this view reads
 const report = marketReport as (store: any, ms: number[], key: string, line?: number | null) => any;
@@ -68,10 +70,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const marketLabel = (k: string) => (k === "top_batter" ? "Top batter" : (scope < 0 ? (MATCH_MARKETS as any)[k] : (TEAM_TOTAL_MARKETS as any)[k]).label as string);
   const run = (k: string, line?: number | null, ms_ = ms) => (scope < 0 ? report(store, ms_, k, line) : teamReport(store, ms_, scope, k, line));
 
+  // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
+  const venueIdx = useMemo(() => (venueIndices as (s: any, n: string) => number[])(store, fx.venue), [store, fx.venue]);
+  const gender = fx.gender === "female" ? 1 : 0;
+  const venueName = String(fx.venue || "").split(",")[0].trim();
+  const here = q.mv === "1" && venueIdx.length > 0;
+  const hereMatches = (n: number) => (scope < 0 ? selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, lastN: n }) : selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, team: scope, lastN: n })) as number[];
   const ms = useMemo(() => {
+    if (here) return hereMatches(win);
     const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: win }) as number[]);
     return [...new Set(sets.flat())].sort((a, b) => a - b);
-  }, [store, teams, scope, fmtIdx, win]);
+  }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // every market the books price, scored on the same matches and ranked by the better side's edge (like the props list ranks by hit rate)
   const overview = useMemo(() => {
@@ -103,6 +112,15 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   }, [rep, book, store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
+  // how this market has gone at the ground, set against the sample on screen: a ground can sit far from the teams' form (a small, slow one)
+  const ground = useMemo(() => {
+    if (!rep || key === "top_batter" || venueIdx.length === 0) return null;
+    const vms = hereMatches(10);
+    if (vms.length < HERE_MIN) return null;
+    const r = run(key, line, vms).summary, n = vms.length;
+    const share = (hit: number, total: number) => (total ? hit / total : 0);
+    return { n, under: r.under, over: r.over, max: r.max, differs: !here && Math.abs(share(r.under, n) - share(rep.summary.under, rep.n)) >= DIFFERS };
+  }, [rep, key, line, venueIdx, scope, fmtIdx, store, here]); // eslint-disable-line react-hooks/exhaustive-deps
   const open = (k: string) => { set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
 
   return (
@@ -114,8 +132,12 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
         )}
         <div className="flex items-center gap-snug">
           <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
-          <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
+          <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{here ? ` at ${venueName}` : scope >= 0 ? ` of ${team?.[0]}` : ""}</span>
         </div>
+        {venueIdx.length > 0 && (
+          <PillGroup segmented layoutId="fancy-sample" label="Matches from" value={here ? "1" : "0"} onChange={(v) => set({ mv: v === "1" ? "1" : "" })}
+            items={[["0", "Teams' form"], ["1", `At ${venueName}`]]} />
+        )}
       </div>
 
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : (
@@ -189,6 +211,11 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                             </div>);
                         })}
                       </div>
+                      {ground && (
+                        <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
+                          {ground.differs && <b className="font-semibold">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
+                          {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
+                        </p>)}
                       {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => bookHere.books.find((x: any) => x[side] === bookHere[side])?.source)} />}
                       {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                     </section>
