@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookName, bookScopesFor } from "@/engine/lines.js";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
+import { sideEdge } from "@/engine/stats.js";
 import { FORMATS, fmtIndex } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
@@ -172,7 +173,8 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
   const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
   const bookAt = book ? book.lines.find((l: any) => l.line === line) : null;
   const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
-  const edge = bestPrice && cur?.p ? bestPrice * cur.p - 1 : 0;
+  const prior = bookAt?.prob == null ? null : side === "over" ? bookAt.prob : 1 - bookAt.prob; // the market's no-vig chance of this side
+  const edge = bookAt && cur ? sideEdge(cur.hits, cur.played, prior, bestPrice) : null;
   const active = (res.filters || []).filter(([k]: [string]) => !FILTER_SKIP.has(k));
   const logs = [...entries].reverse();
   const stepLine = (d: number) => { const v = Math.max(0.5, Math.round((line + d) * 100) / 100); setLine(v); keep({ line: v, side }); };
@@ -246,7 +248,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
               );
             })}
           </ul>
-          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the {scope ? "innings" : "games"} on the chart.{bestPrice && cur.p ? ` At ${line}: best price ${odds(bestPrice)}, ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% vs his hit rate.` : ""}</p>
+          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the {scope ? "innings" : "games"} on the chart.{edge != null ? ` At ${line}: best price ${odds(bestPrice)}, edge ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% (his ${cur.label} hit rate pulled toward the market's chance).` : ""}</p>
         </section>
       )}
 
