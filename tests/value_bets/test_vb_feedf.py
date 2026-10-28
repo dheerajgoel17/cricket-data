@@ -151,7 +151,6 @@ def test_a_stray_comma_in_the_event_name_is_dropped_and_multi_day_matches_are_no
     assert (ev["home"], ev["away"], ev["common"]["match"]) == ("South Australia", "Western Australia", "South Australia vs Western Australia")
     assert all(feedf.MULTI_DAY.search(c) for c in ("Test Matches", "Sheffield Shield 2026-27", "Ranji Trophy Plate 2026-27", "Presidents Trophy"))
     assert not any(feedf.MULTI_DAY.search(c) for c in ("One Day Internationals", "Ford Trophy", "Global T20 Canada", "International Twenty20 Matches", "WBBL"))
-    calls = serve(monkeypatch)
     names = J("feedf_names.json")
     names["data"]["children"].append({**stub, "eventTypeId": "4"})
     menu = J("feedf_menu.json")
