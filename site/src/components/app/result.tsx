@@ -76,7 +76,7 @@ function PlayerProp({ r }: { r: any }) {
       </StatGridCards>
       {r.player.alternatives?.length ? <Muted>Also matched: {r.player.alternatives.join(", ")} (be more specific to pick another).</Muted> : null}
       {r.chart?.entries.length ? <Panel title={`${r.player.name}: ${r.statLabel}`}><ChartBars entries={r.chart.entries.slice(-20)} line={r.chart.line} side={r.chart.side} height={260} animateKey={r.title} />
-        <div className="mt-2 text-center"><Link className="text-sm text-primary" to={`/player/${r.player.idx}?stat=${r.plan.stat}&line=${r.chart.line}&side=${r.chart.side}`}>Open the full player page →</Link></div></Panel> : null}
+        <div className="mt-2 text-center"><Link className="text-sm text-primary" to={`/player/${r.player.idx}?stat=${r.plan.stat}${Number.isInteger(r.fmt) ? `&fmt=${r.fmt}` : ""}${r.line != null ? `&line=${r.line}` : ""}&side=${r.chart.side}`}>Open the full player page →</Link></div></Panel> : null}
       {r.corr ? <Panel title={`Correlated props: when ${r.statLabel.toLowerCase()} ${side} ${r.chart?.line ?? r.line} hits`}>
         <Muted>{r.corr.n} of {r.corr.of} {r.sample.unit}. Shows how often his other props also clear in those games versus his normal rate.</Muted>
         <DataTable columns={["Prop", "Normal", "When it hits", "Lift"]} rows={r.corr.rows.map((c: any) => [`${c.label} over ${c.line}`, pc(c.base), pc(c.cond), `${c.lift >= 0 ? "+" : ""}${Math.round(c.lift * 100)}pp`])} /></Panel> : null}
