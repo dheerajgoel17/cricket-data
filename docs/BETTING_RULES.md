@@ -5,7 +5,7 @@ Research notes (2026-10-28) so lines, filters and offerings follow what bookmake
 
 **Sources and confidence.** High: the full published cricket rulebook of a large UK bookmaker (every market below marked UK-A comes from it), the NZ TAB cricket
 rules (Rule 13.11, in force 28 Oct 2023) and one casino sportsbook's house rules. Medium (search excerpts, the pages block direct fetches): bet365, Sportsbet and
-PointsBet (Australia), TAB (Australia), the shared Kambi terms behind Unibet-style books, Smarkets, Paddy Power, Betfred, an older Ladbrokes rulebook. Low: the
+PointsBet (Australia), TAB (Australia), the shared platform terms behind Unibet-style books, Smarkets, Paddy Power, Betfred, an older Ladbrokes rulebook. Low: the
 Indian "fancy" exchange markets (only promotional pages were reachable) and the Betfair Exchange's own cricket rules (blocked). Rules change and differ by book,
 jurisdiction and market: **treat every number here as "typical", and never hard-code one book's rule as the rule.**
 
@@ -42,7 +42,7 @@ jurisdiction and market: **treat every number here as "typical", and never hard-
 |---|---|---|---|
 | not in the XI | void (everyone) | void | void (most), stands for series outrights |
 | named in the XI, never bats | **void** (UK-A, William Hill UK, Paddy Power, Betfred, Sportsbet, PointsBet); older NZ rules and one casino sportsbook settle it as a **loss** | **loses** if he is in the XI (UK-A: "settled regardless of whether the player reaches the crease") | **loses** (Smarkets, bet365, UK-A) |
-| reaches the crease, faces no ball, not out | stands (PointsBet); Sportsbet needs a ball bowled while he is at the crease; Kambi: reach the crease while a ball is bowled | stands | stands |
+| reaches the crease, faces no ball, not out | stands (PointsBet); Sportsbet needs a ball bowled while he is at the crease; the shared platform terms: reach the crease while a ball is bowled | stands | stands |
 | retired hurt, returns | runs add up | as left | as left |
 
 So one stat can be **void** for one book and **a loser** for another. Hit rates that drop "VOID" games are right for an over/under and wrong for a ladder or a top-batter market.
@@ -53,7 +53,7 @@ Measured against the overs scheduled **at the time the bet was placed** (a pre-m
 
 | market | UK-A | NZ TAB | other |
 |---|---|---|---|
-| player runs / balls faced / fall of wicket (limited overs) | void if under **80%** of scheduled overs in either innings, unless determined | n/a | Smarkets and an older Ladbrokes rulebook: 80%; Kambi: a 50 / 100 bet voids only if the cut is **10%+** (any cut if the innings was 10 overs or fewer) |
+| player runs / balls faced / fall of wicket (limited overs) | void if under **80%** of scheduled overs in either innings, unless determined | n/a | Smarkets and an older Ladbrokes rulebook: 80%; the shared platform terms: a 50 / 100 bet voids only if the cut is **10%+** (any cut if the innings was 10 overs or fewer) |
 | team innings runs | 80% of the innings; once a ball is bowled TAB (Australia) settles on whatever was scored | void if overs cut **more than 20%** or the innings is under 10 overs | Smarkets: 80% |
 | match fours / sixes / extras / wickets / ducks | 80% of overs scheduled, or the match is complete with at least 80% scheduled | void at a 20%+ cut | a regulator-filed rulebook for match sixes: void at a cut of 10+ overs (50-over) or 4+ (T20) after the bet, which is the same 20% |
 | top batter / top bowler | void under **50%** of scheduled overs; the "to win and be top scorer" doubles need 25 (50-over) / 20 (40-over) / 10 (T20) overs unless all out or the chase ends sooner | 25 / 20 / 10 (T20 bowler 15) | an older Ladbrokes rule: 20 (T20 10) |
@@ -64,12 +64,12 @@ The Hundred counts balls, not overs (5-ball overs, 100 balls): 80 of 100 is the 
 
 ### 2.3 Test and first-class
 
-* **First innings only is common for pre-match player markets.** UK-A: "for pre-match bets, only the batter's first innings will count" (player runs, balls faced, a 50 or 100, bowler wickets), and top batter / bowler, team v team most fours / sixes / extras / run outs and highest opening partnership count only each team's first innings. bet365: its head-to-head batter market is first innings only in a Test, some match-level markets say all innings of the match count, and the wording for its batter match-runs market was not conclusive. Kambi's Test event prices "Player's Total Runs - Innings 1" separately. **The scope is per book and per market; it must be a field on the line, not assumed.**
+* **First innings only is common for pre-match player markets.** UK-A: "for pre-match bets, only the batter's first innings will count" (player runs, balls faced, a 50 or 100, bowler wickets), and top batter / bowler, team v team most fours / sixes / extras / run outs and highest opening partnership count only each team's first innings. bet365: its head-to-head batter market is first innings only in a Test, some match-level markets say all innings of the match count, and the wording for its batter match-runs market was not conclusive. Feed K's Test event prices "Player's Total Runs - Innings 1" separately. **The scope is per book and per market; it must be a field on the line, not assumed.**
 * **Minimum play:** a drawn first-class match voids most markets under **200 overs** bowled (NZ TAB: 200 overs for most unlimited-overs markets; its page text is ambiguous), an incomplete innings under **60 overs** voids innings runs, top batter / bowler need **60 overs** in the innings (a casino rulebook) or 50 (UK-A double markets), a session needs 20 overs. "All out or declared" counts as a natural end, so a short innings still settles.
 * Declaration = the innings is complete. A follow-on is its own market. DLS does not apply in Tests. A Test abandoned for a non-weather reason voids open bets (Smarkets).
 * Draw: a draw is a real result in a Test; where it is offered, draw bets win and a tie is a dead heat between the sides (UK-A: draw bets lose if the official result is a tie).
 * **Bets on a future innings stay valid whatever happens in the current one** (UK-A), which is why second-innings team lines exist before the match.
-* A player's "Innings 1" is his own team's first innings (the Kambi Test event prices it for both sides' batters; inferred from the labels), while a team-runs "first innings" market can mean the first innings of the match: label them differently.
+* A player's "Innings 1" is his own team's first innings (Feed K's Test event prices it for both sides' batters; inferred from the labels), while a team-runs "first innings" market can mean the first innings of the match: label them differently.
 
 ## 3. Lines
 
