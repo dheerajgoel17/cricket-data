@@ -14,8 +14,10 @@ import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
 import { sideEdge } from "@/engine/stats.js";
 import { fmtIndex } from "@/engine/util.js";
+import { venueStem } from "@/engine/markets.js";
 import { barState, windowRate } from "@/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
+import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { byShard, dayOffset, hotLines, hotOrder, norm, pool, sameMatch } from "@/lib/hot-lines";
 import { odds } from "@/lib/format";
@@ -29,8 +31,8 @@ import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
 
 const MAX_ROWS = 30;
-type Win = "season" | "h2h" | "l5" | "l10";
-const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
+type Win = "season" | "h2h" | "ven" | "l5" | "l10";
+const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["ven", "Venue", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
 const SHARDS_AT_ONCE = 8; // player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early
 const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming, and only once there are a full page of them (a shorter list would only be reshuffled)
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
@@ -38,7 +40,7 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number; under: number | null; best: boolean };
-interface Row { day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
@@ -49,12 +51,13 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
   const { store, rz } = useData();
   const qc = useQueryClient();
   const lines = useQuery(linesQuery);
+  const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const key = ["hot-props", fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
     queryKey: key,
-    enabled: !!doc.data,
+    enabled: !!doc.data && !fixtures.isLoading,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
@@ -79,11 +82,13 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         const l5 = windowRate(entries, 5, main.line), l10 = windowRate(entries, 10, main.line);
         const season = windowRate(entries.filter((e) => String(e.date).startsWith(year)), 0, main.line);
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
+        const venue = String((fixtures.data || []).find((f: any) => sameFixture({ match: b.match }, f) && Math.abs(Date.parse(f.start) - Date.parse(b.start_utc)) < 14 * 3600e3)?.venue || "");
+        const ven = windowRate(venue ? entries.filter((e) => venueStem(e.venueName) === venueStem(venue)) : [], 0, main.line); // his games at the match's ground (the data spells a ground several ways)
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h,
+        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -156,7 +161,7 @@ function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: st
               <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
             <span className="grid justify-items-end gap-hair">
-              <span className={cn("text-footnote font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}</span></span>
+              <span className={cn("text-footnote font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}{(win === "h2h" || win === "ven") && r[win].played ? ` · ${r[win].played}` : ""}</span></span>
               {bars && <Spark r={r} />}
             </span>
           </ItemActions>
