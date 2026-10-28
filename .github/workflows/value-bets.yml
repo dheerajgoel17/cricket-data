@@ -41,6 +41,8 @@ env:
   FEEDF_TENANT: ${{ secrets.FEEDF_TENANT }}
   FEEDG_NAME: ${{ secrets.FEEDG_NAME }}
   FEEDG_API: ${{ secrets.FEEDG_API }}
+  FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+  FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
 
 permissions:
   contents: write
