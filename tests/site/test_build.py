@@ -314,3 +314,23 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     sm = (tmp_path / "public" / "sitemap.xml").read_text()
     assert "<loc>https://example.test/fixture/2026-10-29-afghanistan-v-zimbabwe</loc><lastmod>" in sm and n == len(sm.split("<url>")) - 1
     assert "Disallow: /api/" in (tmp_path / "public" / "robots.txt").read_text()
+
+
+def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+
+    def book(name, start):
+        (arc / f"{name}.json").write_text(json.dumps({"match": "Bangladesh vs West Indies", "start_utc": start, "fixture": None, "lines": [{"fmt": "Test"}]}))
+
+    book("day2", "2026-10-29T03:30:00Z")   # the books' list for the Test's second day
+    book("later", "2026-11-10T03:30:00Z")  # a different match of the series
+    now = datetime(2026, 10, 29, 3, 0, tzinfo=timezone.utc)
+    test = [{"start": "2026-10-28T03:30Z", "fmt": "Test", "a": "Bangladesh", "b": "West Indies"}]
+    assert [r["start"] for r in B._unscheduled_priced(vb, test, now=now)] == ["2026-11-10T03:30Z"]  # day 2 is the schedule's Test
+    t20 = [{**test[0], "fmt": "T20"}]
+    assert [r["start"] for r in B._unscheduled_priced(vb, t20, now=now)] == ["2026-10-29T03:30Z", "2026-11-10T03:30Z"]  # a T20 a day apart is another match

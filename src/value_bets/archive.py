@@ -87,7 +87,7 @@ def _fixture(g: dict, fx_of: dict, schedule: list[dict]) -> dict | None:
                 return f
     for f in schedule:
         st = parse_ts(f.get("start_utc"))
-        if {team_key(f.get("team_a")), team_key(f.get("team_b"))} == g["k"] and st and abs((st - g["start"]).total_seconds()) < 12 * 3600:
+        if {team_key(f.get("team_a")), team_key(f.get("team_b"))} == g["k"] and st and abs((st - g["start"]).total_seconds()) < (6 * 86400 if f.get("format") == "Test" else 12 * 3600):  # a Test is priced day by day
             return f
     return None
 

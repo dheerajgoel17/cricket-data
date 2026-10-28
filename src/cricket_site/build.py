@@ -586,7 +586,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     if not vb_dir:
         return []
     now = now or datetime.now(timezone.utc)
-    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"])) for r in rows]
+    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] == "Test" else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
@@ -599,7 +599,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         if d.get("fixture") or mins < now.timestamp() // 60 - 6 * 60:
             continue
         pair = frozenset((_norm_team(a), _norm_team(b)))
-        if any(pair == k and abs(mins - m) < 14 * 60 for k, m in held):
+        if any(pair == k and abs(mins - m) < w for k, m, w in held):
             continue
         fmt = next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))

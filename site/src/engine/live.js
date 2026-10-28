@@ -127,7 +127,7 @@ export function fixtureInBooks(books, fixture) {
   if (!books?.length || !fixture) return false;
   const a = teamKey(fixture.a), b = teamKey(fixture.b), t = fixture.start ? Date.parse(fixture.start) : NaN;
   if (!a || !b) return false;
-  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < BOOK_WINDOW_MS));
+  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < (fixture.fmt === "Test" ? 6 * 86400e3 : BOOK_WINDOW_MS)));
 }
 
 /** A comma-separated file with quoted fields (`"a,b"`, `""` for a quote) as one object per row, keyed by the header line. */
