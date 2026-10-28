@@ -57,7 +57,11 @@ Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Su
 1 GB storage / 500 MB DB; Vercel function limits; xAI Grok is the one **metered** dependency (a few hundred tokens per question), remove `XAI_API_KEY` to go fully free.
 
 
-## India runner (Feed G)
+## Mumbai relay (Feed G)
+Feed G's book refuses GitHub's US servers (403) but answers a server in India. `relay/` is a tiny Vercel project (its own, free) pinned to the Mumbai region (`regions: ["bom1"]`): `relay/api/relay.js` forwards one request to a host on its allow list and returns the answer, and refuses anything without its key. Set on the relay's Vercel project: `RELAY_KEY` (a long random string) and `RELAY_ALLOW` (the book's two domains, comma separated). Set as repository secrets: `FEEDG_RELAY` (the relay project's address with `/api/relay` on the end) and `FEEDG_RELAY_KEY` (the same key). With both set, `adapters/feedg.py` sends every request through the relay: the book sees an AWS Mumbai address, whoever called the relay (checked from a GitHub US runner). Deploy with `cd relay && vercel deploy --prod`. No machine of ours is involved and nothing runs unless the hourly run calls it.
+
+## India runner (Feed G), the alternative
+(Not needed while the relay works.)
 Feed G's book answers GitHub's US servers with 403, so its read runs on a small server in an India region (not a personal computer) that is registered as a self-hosted runner with the label `india`. `.github/workflows/feedg-india.yml` runs only there, on a schedule and by hand (a pull request or push never reaches it, since the repository is public), and commits `value_bets/state/feedg_latest.json`; the hourly value-bets run uses that file when the book refuses it (at most `CV_FEEDG_STATE_MAX_HOURS`, default 3, old, and only for matches that have not started).
 1. Create the server (Ubuntu 24.04, 1 GB is enough, SSH key only) in an India region, e.g. DigitalOcean Bangalore.
 2. `sudo apt-get update && sudo apt-get install -y python3-venv git`.

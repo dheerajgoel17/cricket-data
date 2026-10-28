@@ -1,5 +1,6 @@
 import json
 import urllib.error
+import urllib.parse
 from pathlib import Path
 
 import pytest
@@ -159,3 +160,27 @@ def test_a_stale_read_is_not_used_and_a_refusal_with_no_read_is_an_error(env, mo
         feedg.fetch("2026-10-28T14:00:00Z")  # four hours old: past the 3 hour limit
     with pytest.raises(urllib.error.HTTPError):
         feedg.fetch(STAMP, use_state=False)  # the India runner itself never reads the file
+
+
+def test_with_a_relay_every_call_goes_through_it_with_the_key_and_the_real_address_in_u(env, monkeypatch):
+    monkeypatch.setenv("FEEDG_RELAY", "https://relay.invalid/api/relay")
+    monkeypatch.setenv("FEEDG_RELAY_KEY", "k-1")
+    calls = []
+
+    def get(url, method="GET", headers=None, data=None, retries=0, **_):
+        calls.append((method, url, headers, data))
+        real = urllib.parse.unquote(url)
+        if "event_list" in real:
+            return J("feedg_list.json"), {}
+        if "/api/guest/event/" in real:
+            return J("feedg_event.json"), {}
+        return J("feedg_odds.json"), {}
+
+    monkeypatch.setattr(feedg, "http_json", get)
+    rows, raw = feedg.fetch(STAMP)
+    assert rows and raw["books"]["Test Book"]["events"] == 1
+    assert all(u.startswith("https://relay.invalid/api/relay?u=https%3A%2F%2F") and h["x-relay-key"] == "k-1" for _, u, h, _ in calls)
+    assert [m for m, *_ in calls] == ["GET", "POST", "POST"] and calls[0][1].endswith("%2Fapi%2Fguest%2Fevent_list")
+    assert calls[1][2]["Content-Type"] == "application/x-www-form-urlencoded" and calls[2][3].startswith(b"market_ids[]=")
+    monkeypatch.delenv("FEEDG_RELAY_KEY")
+    assert feedg.relay() is None  # no key: direct calls
