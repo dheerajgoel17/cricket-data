@@ -67,7 +67,7 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
   const ref = here[0];
   const scored = mine.filter((l) => l.prob != null), withOver = mine.filter((l) => l.books.some((b) => b.over > 1)); // a line is "the" line by its over: an under-only line (an exchange's No) is never the main one while an over is priced
   const main = (scored.length ? scored : withOver.length ? withOver : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
-  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, inn, lines: mine, main };
+  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, team: ref.team, inn, lines: mine, main }; // `team`: the side the book files him under for this match (his profile team can be his country)
 }
 
 const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);

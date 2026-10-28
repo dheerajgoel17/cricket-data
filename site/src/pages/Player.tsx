@@ -163,8 +163,10 @@ function NextMatch({ book, team, q, navigateWith }: any) {
   const { store } = useData();
   const fixtures = useFixtures();
   const [a, b] = String(book.match).split(/\s+vs\s+/i);
-  const opp = norm(team) === norm(a) ? b : norm(team) === norm(b) ? a : "";
+  const side = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
+  const oppRaw = side(book.team) || side(team); // the book's side first: a club player's profile team is often his country
   const fx = (fixtures.data || []).find((f: any) => sameFixture({ match: book.match, start_utc: book.start_utc }, f));
+  const opp = [fx?.a, fx?.b].find((t) => t && norm(t) === norm(oppRaw)) || oppRaw; // the schedule's spelling of the side, which the data knows
   const ground = String(fx?.venue || "");
   const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
   const chips: [string, string, string][] = [];
@@ -179,7 +181,7 @@ function NextMatch({ book, team, q, navigateWith }: any) {
       </div>
       {chips.length ? <div className="flex flex-wrap gap-snug">
         {chips.map(([k, v, label]) => { const on = q[k] === v; return (
-          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => navigateWith({ [k]: on ? "" : v })}>{on ? `${label} ✓` : `Only ${label.toLowerCase()}`}</Button>); })}
+          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => navigateWith({ [k]: on ? "" : v })}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}
       </div> : null}
     </div>
   );
