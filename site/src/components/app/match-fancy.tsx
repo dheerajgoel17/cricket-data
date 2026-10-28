@@ -57,7 +57,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const lines = useQuery(linesQuery);
   const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
   const panelRef = useRef<HTMLDivElement>(null);
-  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
+  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName).length > 0;
   const scopes = [["-1", "Match", MATCH_KEYS.some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, TEAM_KEYS.some(([k]) => booked(k, name))] as const)].filter(([, , on]) => on);
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
@@ -127,6 +127,13 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     const share = (hit: number, total: number) => (total ? hit / total : 0);
     return { n, under: r.under, over: r.over, max: r.max, differs: !here && Math.abs(share(r.under, n) - share(rep.summary.under, rep.n)) >= DIFFERS };
   }, [rep, key, line, venueIdx, scope, fmtIdx, store, here]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the date and the sides of each match under its bar (the values are the matches of `ms`, oldest first)
+  const barLabels = useMemo(() => ms.map((m) => {
+    const M = store.M, a = M.a[m], b = M.b[m];
+    const d = new Date(`${M.d[m]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+    const opp = scope >= 0 ? (a === scope ? b : a) : -1;
+    return { date: d, text: scope >= 0 ? `v ${abbr(store.teamName(opp, true))}` : `${abbr(store.teamName(a, true))} v ${abbr(store.teamName(b, true))}` };
+  }), [ms, store, scope]);
   const open = (k: string) => { set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
 
   return (
@@ -191,7 +198,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-semibold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
                         <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-semibold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
                       </div>
-                      <ValueBars values={rep.values} line={line} />
+                      <ValueBars values={rep.values} line={line} labels={barLabels} />
                       <div className="flex flex-wrap items-center gap-snug">
                         <div className="flex h-control items-center rounded-[var(--chip-radius)] bg-background">
                           <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => set({ ml: Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) })}><Minus /></Button>

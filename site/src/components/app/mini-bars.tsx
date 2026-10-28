@@ -14,21 +14,35 @@ export function MiniBars({ last, line, max }: { last: { v: number | null; s: str
   );
 }
 
-/** One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. The bars grow up from the baseline in turn when the data changes. */
-export function ValueBars({ values, line }: { values: number[]; line: number }) {
+export type BarLabel = { date: string; text: string };
+
+/**
+ * One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. The bars fill the width, and with up to `LABELLED` matches each has its date and
+ * opponent under it (more than that would not fit: then the first and last dates only). The bars grow up from the baseline in turn when the data changes.
+ */
+export const LABELLED = 14;
+export function ValueBars({ values, line, labels }: { values: number[]; line: number; labels?: BarLabel[] }) {
   const reduce = useReducedMotion();
   const top = Math.max(line * 1.25, ...values, 1);
+  const each = !!labels && labels.length === values.length && values.length <= LABELLED;
   return (
     <div className="flex flex-col gap-tight" role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
-      <div className="relative flex h-28 items-end gap-hair">
+      <div className="relative flex h-28 items-end gap-tight">
         {values.map((v, i) => (
-          <motion.span key={`${i}-${v}`} title={String(v)} className={cn("flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
-            style={{ height: `${Math.max((v / top) * 100, 4)}%`, maxWidth: 28 }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.4, ease: [0.22, 1, 0.36, 1] }} />))}
-        <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ type: "spring", stiffness: 380, damping: 34 }}>
+          <motion.span key={`${i}-${v}`} title={labels?.[i] ? `${labels[i].date} ${labels[i].text}: ${v}` : String(v)} className={cn("min-w-0 flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
+            style={{ height: `${Math.max((v / top) * 100, 4)}%` }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} />
+        ))}
+        <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ duration: 0.3 }}>
           <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-caption font-semibold tabular-nums text-muted-foreground">{line}</span>
         </motion.span>
       </div>
-      <div className="flex justify-between text-caption text-muted-foreground"><span>Oldest</span><span>Latest</span></div>
+      {each ? (
+        <div className="flex gap-tight text-center text-caption leading-tight text-muted-foreground">
+          {labels!.map((l, i) => <span key={i} className="grid min-w-0 flex-1"><span className="truncate tabular-nums">{values[i]}</span><span className="truncate">{l.text}</span><span className="truncate tabular-nums">{l.date}</span></span>)}
+        </div>
+      ) : (
+        <div className="flex justify-between text-caption text-muted-foreground"><span>{labels?.[0] ? `Oldest · ${labels[0].date}` : "Oldest"}</span><span>{labels?.length ? `${labels[labels.length - 1].date} · Latest` : "Latest"}</span></div>
+      )}
     </div>
   );
 }

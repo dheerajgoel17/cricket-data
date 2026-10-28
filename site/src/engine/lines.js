@@ -97,6 +97,8 @@ export const teamKey = (n) => {
 };
 
 const BOOK_WINDOW_MS = 14 * 3600e3;
+/** How far a book's start may be from a fixture's: 14 h, but a Test is priced day by day (each day's list carries that day's start), so any day of it is the same match. */
+export const bookWindow = (fixture) => (fixture?.fmt === "Test" ? 6 * 86400e3 : BOOK_WINDOW_MS);
 
 function startMs(fixture) {
   if (Number.isFinite(fixture?.startMs)) return fixture.startMs;
@@ -117,7 +119,7 @@ export function sameFixture(line, fixture) {
   if (!((x === a && y === b) || (x === b && y === a))) return false;
   const t = startMs(fixture), u = line?.start_utc ? Date.parse(line.start_utc) : NaN;
   if (!Number.isFinite(t) || !Number.isFinite(u)) return true;
-  return Math.abs(t - u) < BOOK_WINDOW_MS;
+  return Math.abs(t - u) < bookWindow(fixture);
 }
 
 /** Which bookmaker sections this fixture can show. `props` = two-sided player lines; `fancy` = match/team totals. */
@@ -139,7 +141,7 @@ export function fancyFor(doc, fixture, key, team = null, inn = 0) {
     if (l.key !== key || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
     const h = teamKey(l.home), w = teamKey(l.away);
     if (!((h === a && w === b) || (h === b && w === a))) return false;
-    return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < 14 * 3600e3;
+    return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < bookWindow(fixture);
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
 }
 

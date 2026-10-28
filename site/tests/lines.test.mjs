@@ -279,3 +279,12 @@ test("fancyHeadline: the first two-sided line, else the first over line and the 
   assert.deepEqual(fancyHeadline([L(11.5, null, 2.0)]), { over: null, under: L(11.5, null, 2.0) });
   assert.deepEqual(fancyHeadline([]), { over: null, under: null });
 });
+
+test("a Test is the same match on any of its days (books price it day by day), a limited-overs match only within 14 hours", () => {
+  const line = { match: "Bangladesh vs West Indies", start_utc: "2026-10-29T03:30:00Z" };
+  const test = { a: "Bangladesh", b: "West Indies", start: "2026-10-28T03:30Z", fmt: "Test" };
+  assert.equal(sameFixture(line, test), true);
+  assert.equal(sameFixture(line, { ...test, fmt: "T20" }), false);
+  assert.equal(sameFixture({ ...line, start_utc: "2026-11-10T03:30:00Z" }, test), false, "a different match of the series, a week or more later");
+  assert.equal(fancyFor({ fancy: [{ key: "match_fours", scope: "match", home: "Bangladesh", away: "West Indies", start_utc: "2026-10-29T03:30:00Z", line: 20.5, over: 1.9, under: 1.9, source: "x" }] }, { a: "Bangladesh", b: "West Indies", fmt: "Test", startMs: Date.parse("2026-10-28T03:30:00Z") }, "match_fours").length, 1);
+});

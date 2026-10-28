@@ -113,7 +113,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   const chips = useMemo(() => {
     const c = new Map<string, number>();
     fx.forEach((f) => c.set(seriesName(f), (c.get(seriesName(f)) || 0) + 1));
-    return [...c.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    return [...c.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])); // every series in the rail (the row scrolls), the biggest first
   }, [fx]);
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
