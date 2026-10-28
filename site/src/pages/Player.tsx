@@ -17,7 +17,7 @@ import { sideEdge } from "@/engine/stats.js";
 import { FORMATS, fmtIndex } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
-import { loadLines } from "@/lib/feeds";
+import { linesQuery } from "@/lib/queries";
 import { localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
@@ -115,7 +115,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   const stat = q.stat || "runs";
   setTitle("Player stats, hit rates and form chart");
 
-  const lines = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
+  const lines = useQuery(linesQuery);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
