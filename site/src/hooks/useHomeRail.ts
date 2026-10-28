@@ -26,6 +26,9 @@ function useGaveUp(ms: number, done: boolean): boolean {
  * the first paint also has it: at once from the last /api/live body kept on the device (`live-cache.ts`), else after a short wait (the same for the rail settings). A fresh body that
  * changes a match's state (it has gone live, or ended) re-sorts the rail; one that changes nothing leaves the order as it was.
  */
+/** How many games without props the rail adds after the ones with props. */
+const NO_PROPS_LIMIT = 24;
+
 export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
   const { fixtures: fx, ready: haveFixtures } = usePricedFixtures();
   const live = useLiveDoc();
@@ -33,6 +36,10 @@ export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
   const haveLive = live.data !== undefined || live.isFetched;
   const railLate = useGaveUp(RAIL_WAIT_MS, settled), liveLate = useGaveUp(LIVE_WAIT_MS, haveLive);
   const ready = haveFixtures && (settled || railLate) && (haveLive || liveLate);
-  const fixtures = useMemo(() => (ready ? rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status), rail).slice(0, limit) : []), [ready, fx, live.data, rail, limit]);
+  const fixtures = useMemo(() => {
+    if (!ready) return [];
+    const ranked = rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status), rail);
+    return [...ranked.filter((f) => !f.noProps).slice(0, limit), ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
+  }, [ready, fx, live.data, rail, limit]);
   return { ready, fixtures };
 }

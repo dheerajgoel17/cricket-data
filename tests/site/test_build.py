@@ -194,6 +194,30 @@ def test_bookmaker_feed_is_odds_only_never_a_fixture_or_start_time(tmp_path):
         ("Afghanistan U19", "2026-10-23T05:00Z", "src"), ("Afghanistan", "2026-10-23T11:30Z", "src")]
 
 
+def test_a_priced_match_the_schedule_has_not_reached_yet_gets_a_stop_gap_fixture_until_the_schedule_lists_it(tmp_path):
+    (tmp_path / "fixtures").mkdir()
+    csv_p = tmp_path / "fixtures" / "upcoming.csv"
+    head = "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
+    csv_p.write_text(head + "2040-10-29T11:15Z,x,S,T20,male,Karnali Yaks,Biratnagar Kings,V,Upcoming,u,\n")
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    arc = tmp_path / "value_bets" / "archive" / "2040-10"
+    arc.mkdir(parents=True)
+    def book(name, **k):
+        (arc / f"{name}.json").write_text(json.dumps({"match": "Afghanistan vs Zimbabwe", "start_utc": "2040-10-29T14:30:00Z", "fixture": None, "lines": [{"fmt": "T20"}], **k}))
+
+    book("2040-10-29-afghanistan-v-zimbabwe")
+    book("2040-10-29-old", match="A vs B", fixture={"id": "x"})   # already linked to a schedule row once: not a stop-gap
+    book("2000-10-29-a-v-b", match="A vs B", start_utc="2000-10-29T14:30:00Z")   # long over
+    (arc / "broken.json").write_text("{")
+    fx = B.build_fixtures(tmp_path, vb, {})
+    assert [(f["id"], f["fmt"], f["gender"], f["source"]) for f in fx] == [
+        ("2040-10-29-karnali-yaks-v-biratnagar-kings", "T20", "male", "src"), ("2040-10-29-afghanistan-v-zimbabwe", "T20", "male", "books")]
+    csv_p.write_text(head + "2040-10-29T14:30Z,y,S,T20,male,Afghanistan,Zimbabwe,Sharjah,Upcoming,u,\n")
+    (f,) = B.build_fixtures(tmp_path, vb, {})
+    assert (f["source"], f["venue"]) == ("src", "Sharjah")
+
+
 def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_never_fails_the_build(tmp_path):
     z, data, out, _ = _out(tmp_path)
     vb = tmp_path / "vb"

@@ -565,11 +565,40 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> i
     return len(urls)
 
 
+def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | None = None) -> list[dict]:
+    """Stop-gap fixture rows for archived matches (not yet started) that the schedule has no row for: same two sides within 14 hours."""
+    if not vb_dir:
+        return []
+    now = now or datetime.now(timezone.utc)
+    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"])) for r in rows]
+    out = []
+    for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+            a, b = re.split(r"\s+vs\s+", d["match"], maxsplit=1, flags=re.I)
+            start = d["start_utc"]
+            mins = _minutes(start)
+        except (ValueError, KeyError, TypeError, OSError):
+            continue
+        if d.get("fixture") or mins < now.timestamp() // 60 - 6 * 60:
+            continue
+        pair = frozenset((_norm_team(a), _norm_team(b)))
+        if any(pair == k and abs(mins - m) < 14 * 60 for k, m in held):
+            continue
+        fmt = next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
+        women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
+        out.append({"start": start[:16] + "Z", "fmt": fmt, "gender": "female" if women else "male", "a": a.strip(), "b": b.strip(), "venue": "",
+                    "series": "", "status": "Upcoming", "result": "", "source": "books"})
+    return out
+
+
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
-    The bookmaker feed (vb_dir) is for odds: books serve different regions, so its start times and team labels
-    are not trustworthy as a schedule. vb_dir is accepted for call compatibility and deliberately unused."""
+    The bookmaker feed is for odds: books serve different regions, so its start times and team labels are not trustworthy as a
+    schedule. The one exception is a match the books already price that the schedule page has not reached yet (it lists only the next
+    ~20 matches): the archive (``value_bets/archive``, ``fixture`` still null) gives it a stop-gap row so its props show up, and the
+    schedule's own row replaces that as soon as it appears."""
     rows = []
     p = data_dir / "fixtures" / "upcoming.csv"
     if p.exists():
@@ -578,6 +607,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                 rows.append({"start": r["start_utc"], "fmt": r["format"], "gender": r["gender"], "a": r["team_a"],
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
                              "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
+    rows += _unscheduled_priced(vb_dir, rows)
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):

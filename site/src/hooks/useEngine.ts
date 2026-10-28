@@ -64,7 +64,10 @@ export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 
-/** Upcoming fixtures the books price (player props, event markets, or fancy). Unpriced games stay off the rail.
+/** How far ahead an unpriced game still shows (flagged `noProps`). */
+export const NO_PROPS_DAYS = 5;
+
+/** Upcoming fixtures: the ones the books price (player props, event markets, or fancy) and, up to `NO_PROPS_DAYS` ahead, the ones they do not (`noProps`).
  *  A fixture matches a feed match when both team names agree (ignoring "(W)"/"Women") and the starts are within 14 h.
  *  With no book feed it falls back to every upcoming fixture (`priced: false`) rather than an empty home page, but only once the feed has been read or given up on:
  *  until then `fixtures` is empty (`ready` false), so the list never shows games the books turn out not to price. */
@@ -77,7 +80,10 @@ export function usePricedFixtures() {
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
     const all = shownFixtures(fx.data || [], stateOf);
     const ready = !fx.isLoading && !lines.isLoading;
-    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f)) : all;
+    const now = Date.now();
+    const soon = (f: any) => fixtureStart(f).getTime() < now + NO_PROPS_DAYS * 86400e3;
+    // priced games first-class; the unpriced ones in the next days stay on the list, flagged `noProps` ("No props live yet"), as they may be priced later
+    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true })) : all;
     const priced = all.filter((f) => fixtureInBooks(feed, f));
     const last = priced.length ? Math.max(...priced.map((f) => fixtureStart(f).getTime())) : 0;
     return { loading: fx.isLoading, ready, all, fixtures, priced: haveBooks, through: priced.length ? new Date(last) : null, feedMatches: feed.length, doc: lines.data };
