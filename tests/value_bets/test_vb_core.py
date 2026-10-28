@@ -142,3 +142,10 @@ def test_the_book_a_mirror_reads_player_performance_like_its_other_over_unders(m
     monkeypatch.setattr(moviodds, "host", lambda name: "https://feed.invalid")
     rows, _ = moviodds.fetch("2026-10-28T10:00:00Z")
     assert [(r["market_type"], r["player"], r["side"], r["line"], r["back"]) for r in rows] == [("player_points", "Hayley Matthews", "over", 45.5, 1.9), ("player_points", "Hayley Matthews", "under", 45.5, 1.9)]
+
+
+def test_trailing_w_marks_a_womens_side():
+    from value_bets.names import norm_team
+    assert norm_team("Melbourne Renegades W") == ("melbourne renegades", "female")
+    assert norm_team("Melbourne Renegades Women") == norm_team("Melbourne Renegades (W)") == ("melbourne renegades", "female")
+    assert norm_team("West Indies")[1] is None

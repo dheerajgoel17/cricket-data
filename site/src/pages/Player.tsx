@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor } from "@/engine/lines.js";
+import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor, sameFixture } from "@/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
@@ -21,7 +21,9 @@ import { linesQuery } from "@/lib/queries";
 import { localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
-import { useRunPlan } from "@/hooks/useEngine";
+import { useFixtures, useRunPlan } from "@/hooks/useEngine";
+import { venueStem } from "@/engine/markets.js";
+import { norm } from "@/lib/hot-lines";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
@@ -151,13 +153,39 @@ function PlayerScreen({ idx }: { idx: number }) {
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       {loading ? <PlayerSkeleton />
-        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, res: res.data, q, book, bookDefault, navigateWith, scope }} />
+        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, team, res: res.data, q, book, bookDefault, navigateWith, scope }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
     </div>
   );
 }
 
-function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
+function NextMatch({ book, team, q, navigateWith }: any) {
+  const { store } = useData();
+  const fixtures = useFixtures();
+  const [a, b] = String(book.match).split(/\s+vs\s+/i);
+  const opp = norm(team) === norm(a) ? b : norm(team) === norm(b) ? a : "";
+  const fx = (fixtures.data || []).find((f: any) => sameFixture({ match: book.match, start_utc: book.start_utc }, f));
+  const ground = String(fx?.venue || "");
+  const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
+  const chips: [string, string, string][] = [];
+  if (opp) chips.push(["opp", opp, `vs ${opp}`]);
+  if (known) chips.push(["venue", known, `At ${ground.split(",")[0]}`]);
+  return (
+    <div className={cn("grid gap-snug p-inset", CARD)}>
+      <div className="grid gap-hair">
+        <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">Next match</span>
+        <span className="text-body font-semibold">{opp ? `vs ${opp}` : book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}</span>
+        {ground ? <span className="text-callout text-muted-foreground">{ground}{book.competition ? ` · ${book.competition}` : ""}</span> : null}
+      </div>
+      {chips.length ? <div className="flex flex-wrap gap-snug">
+        {chips.map(([k, v, label]) => { const on = q[k] === v; return (
+          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => navigateWith({ [k]: on ? "" : v })}>{on ? `${label} ✓` : `Only ${label.toLowerCase()}`}</Button>); })}
+      </div> : null}
+    </div>
+  );
+}
+
+function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: any) {
   const { store } = useData();
   const c = res.chart;
   const entries: any[] = c ? c.entries : [];
@@ -186,6 +214,7 @@ function Loaded({ name, res, q, book, bookDefault, navigateWith, scope }: any) {
 
   return (
     <div className="flex flex-col gap-section">
+      {book ? <NextMatch {...{ book, team, q, navigateWith }} /> : null}
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
         <section className="flex flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>

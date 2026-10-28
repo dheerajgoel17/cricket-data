@@ -92,7 +92,7 @@ export function bookFormatFor(doc, pid, stat = "", now = Date.now(), graceMs = 3
 
 /** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
 export const teamKey = (n) => {
-  const k = String(n || "").toLowerCase().replace(/\(w\)|women'?s?/g, "").replace(/[^a-z0-9]/g, "");
+  const k = String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
   return SAME_SIDE[k] || k;
 };
 
