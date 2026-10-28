@@ -61,6 +61,10 @@ DEFAULTS = {
     "FEEDE_MAX_EVENTS": 24,        # ... event pages fetched per book per run
     "FEEDE_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
     "FEEDE_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDF_SPACING_SECS": 2.0,     # Feed F (adapters/feedf.py, on whenever the FEEDF_* variables are set): seconds between its requests
+    "FEEDF_MAX_EVENTS": 12,        # ... matches read per run (two calls each)
+    "FEEDF_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDF_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

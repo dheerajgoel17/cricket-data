@@ -1,0 +1,42 @@
+{
+ "status": "OK",
+ "code": 200,
+ "data": [
+  {
+   "data": {
+    "id": 1,
+    "name": "Cricket"
+   },
+   "children": [
+    {
+     "data": {
+      "id": 924725,
+      "name": "One Day Internationals"
+     },
+     "children": [
+      {
+       "parentId": 924725,
+       "betRadarId": "sr:match:75329894",
+       "eventId": "36246014",
+       "eventName": "England v Sri Lanka"
+      }
+     ]
+    },
+    {
+     "data": {
+      "id": 931283,
+      "name": "Emirates D20"
+     },
+     "children": [
+      {
+       "parentId": 931283,
+       "betRadarId": "sr:match:75400001",
+       "eventId": "36246415",
+       "eventName": "Afghanistan v Zimbabwe"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
