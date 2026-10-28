@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { archiveFixture, bookLinesFor, bookName, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { archiveFixture, bookLinesFor, bookName, bookQuotes, fancyByLine, fancyFor, fixtureBooks, isFixtureId, lineProb, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -165,4 +165,33 @@ test("withArchive puts a stored result on the archived line it belongs to, match
   const doc = withArchive({ lines: [] }, entry);
   assert.deepEqual(doc.lines.map((l) => [l.pid, l.stat, l.line, l.result]), [["ab12", "runs", 17.5, 31], ["ab12", "fours", 2.5, undefined], ["cd34", "runs", 22.5, undefined]]);
   assert.ok(!("result" in withArchive({ lines: [] }, ENTRY).lines[0]), "a file without results adds none");
+});
+
+// books as the file publishes them: bet365 1.833 / 1.833, Ladbrokes 1.83 / 1.83, LeoVegas 2.0 / 1.73
+const B = (source, over, under) => ({ source, kind: "bookmaker", over, under });
+
+test("bookQuotes lists each book's own line and over price, the lowest line first and marked best", () => {
+  const doc = { lines: [L(17.5, 1.833, 1.833, { books: [B("bet365", 1.833, 1.833)] }), L(14.5, 1.83, 1.83, { books: [B("Ladbrokes", 1.83, 1.83)] })] };
+  const q = bookQuotes(bookLinesFor(doc, "ab12", "runs", "T20", NOW).lines);
+  assert.deepEqual(q.map((x) => [x.name, x.line, x.over, x.under, x.best]), [["Ladbrokes", 14.5, 1.83, 1.83, true], ["bet365", 17.5, 1.833, 1.833, false]]);
+});
+
+test("bookQuotes on one line: the best price wins, books tied on line and price are all best, a lone book is not marked", () => {
+  const same = bookQuotes([{ line: 25.5, books: [B("bet365", 1.83, 1.83), B("Ladbrokes", 1.91, 1.77), B("LeoVegas", 1.91, 1.8)] }]);
+  assert.deepEqual(same.map((x) => [x.name, x.best]), [["Ladbrokes", true], ["LeoVegas", true], ["bet365", false]], "same price: name order");
+  assert.deepEqual(bookQuotes([{ line: 25.5, books: [B("bet365", 1.83, 1.83)] }]).map((x) => x.best), [false]);
+});
+
+test("bookQuotes: a lower line is the friendlier over even at a worse price, and the price stays on show", () => {
+  const q = bookQuotes([{ line: 11.5, books: [B("Ladbrokes", 1.83, 1.83), B("bet365", 1.833, 1.833)] }, { line: 12.5, books: [B("LeoVegas", 2.0, 1.73)] }]);
+  assert.deepEqual(q.map((x) => [x.name, x.line, x.over, x.best]), [["bet365", 11.5, 1.833, true], ["Ladbrokes", 11.5, 1.83, false], ["LeoVegas", 12.5, 2.0, false]]);
+});
+
+test("bookQuotes gives a book that lists several lines the one nearest evens, and skips a book with no over price", () => {
+  // Smarkets: 12.5 at 1.4 / 3.0 is p(over) 0.682 (0.182 from evens), 17.5 at 1.85 / 1.95 is 0.513 (0.013 from evens)
+  const q = bookQuotes([{ line: 12.5, books: [B("smarkets", 1.4, 3.0)] }, { line: 17.5, books: [B("smarkets", 1.85, 1.95), B("bet365", null, 1.9), B("Ladbrokes", 1.83, null)] }]);
+  assert.deepEqual(q.map((x) => [x.name, x.line, x.under]), [["Smarkets", 17.5, 1.95], ["Ladbrokes", 17.5, null]]);
+  assert.deepEqual(bookQuotes([{ line: 17.5, books: [B("bet365", 1.0, 1.9)] }]), []);
+  assert.deepEqual(bookQuotes(undefined), []);
+  assert.deepEqual(bookQuotes([]), []);
 });

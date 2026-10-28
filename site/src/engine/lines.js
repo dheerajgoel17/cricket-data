@@ -19,6 +19,25 @@ export function lineProb(books) {
 }
 
 /**
+ * Each book's own line and over price for one player and stat, from `bookLinesFor(...).lines`: [{ source, name, line, over, under, best }], one per book, so a row can show who
+ * quotes what (books rarely agree on the line). A book that lists several lines gives the one its own prices put closest to evens (a tie goes to the lower line); a book with no
+ * over price is left out. Sorted by line, then the higher over price, then name. With 2+ books `best` marks the friendliest quote for the over: the lowest line and, at that line, the
+ * highest price (every book tied on both); a lower line at a worse price is still marked, the row shows both numbers.
+ */
+export function bookQuotes(lines) {
+  const far = (q) => Math.abs((overProb(q.over, q.under) ?? 0.5) - 0.5);
+  const mine = new Map();
+  for (const l of lines || []) for (const b of l.books || []) {
+    if (!(b.over > 1)) continue;
+    const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null };
+    const cur = mine.get(b.source);
+    if (!cur || far(q) < far(cur) - 1e-9 || (Math.abs(far(q) - far(cur)) <= 1e-9 && q.line < cur.line)) mine.set(b.source, q);
+  }
+  const out = [...mine.values()].sort((a, b) => a.line - b.line || b.over - a.over || a.name.localeCompare(b.name));
+  return out.map((q) => ({ ...q, best: out.length > 1 && q.line === out[0].line && q.over === out[0].over }));
+}
+
+/**
  * The lines on offer for this player and stat in this format, for the nearest match that has not started more than `graceMs` ago.
  * Returns null when there are none, else { match, competition, start_utc, lines: [{line, books, prob}], main } where `main` is the line
  * priced closest to evens (the line a book hangs as "the" line), ties going to the lower line.
