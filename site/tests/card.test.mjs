@@ -29,11 +29,11 @@ test("a line the books do not price has no price, a player alone is a player car
   assert.match(cardText(cardFields({ f: "2026-10-29-afghanistan-v-zimbabwe" }, data)).description, /Sharjah Cricket Stadium/);
 });
 
-test("every kind of card draws a 1200x630 PNG, with or without a photo", async () => {
+test("every kind of card draws a JPEG small enough for link previews, with or without a photo", async () => {
   for (const q of [{ p: "0", stat: "runs", line: "24.5" }, { p: "1" }, { f: "2026-10-29-afghanistan-v-zimbabwe" }]) {
-    const png = await renderCard(cardFields(q, data));
-    assert.deepEqual([...png.subarray(0, 4)], [0x89, 0x50, 0x4e, 0x47]);
-    assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [1200, 630]);
+    const img = await renderCard(cardFields(q, data));
+    assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+    assert.ok(img.length < 300 * 1024, `${img.length} bytes`);
   }
 });
 

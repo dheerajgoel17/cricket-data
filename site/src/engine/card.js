@@ -45,7 +45,7 @@ export function cardText(f, brand = "Fancy.cash") {
 
 const GREEN = "#27da8e";
 
-/** Draws the card as a PNG buffer. `photo` is image bytes or null (initials are drawn); `fonts` are { regular, bold } file paths. */
+/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` is image bytes or null (initials are drawn); `fonts` are { regular, bold } file paths. */
 export async function renderCard(f, { photo = null, fonts = {} } = {}) {
   const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
   if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
@@ -102,5 +102,5 @@ export async function renderCard(f, { photo = null, fonts = {} } = {}) {
   g.beginPath(); g.arc(48.5, 19, 6, 0, Math.PI * 2); g.fill(); g.restore();
   text("Fancy", 1000, 592, 44, "#ffffff", bold); const fw = (g.font = `44px ${bold}`, g.measureText("Fancy").width);
   text(".", 1000 + fw, 592, 44, GREEN, bold); text("cash", 1000 + fw + 12, 592, 44, "#ffffff", bold);
-  return c.toBuffer("image/png");
+  return c.toBuffer("image/jpeg", 86);
 }
