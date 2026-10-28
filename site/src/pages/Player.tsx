@@ -28,6 +28,7 @@ import { ChartBars } from "@/components/app/chart";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { StarButton } from "@/components/app/star";
+import { sharePlayerUrl } from "@/lib/share";
 import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
@@ -135,7 +136,9 @@ function PlayerScreen({ idx }: { idx: number }) {
     venue: q.venue || null,
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
-  const share = () => { const u = location.href; (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
+  // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
+  const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
+  const share = () => { const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
   const loading = lines.isLoading || res.isLoading || !res.data;
 
   return (

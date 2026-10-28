@@ -170,3 +170,10 @@ Type is in rem, so it follows the browser's font-size setting. One `cn()` (`site
 **Vertical rhythm.** A page is a `flex flex-col gap-section` of sections; a section is a `flex flex-col gap-stack` of blocks; related controls sit in a `gap-snug` group. Blocks never set their own vertical margins (the token test forbids `mt-*`/`mb-*`/`my-*` in governed files, except `mt-auto`), so every gap on a page comes from its parent.
 **Switching tabs smoothly.** Content that changes height (a tab body, a filtered list) goes in `AnimatedHeight`, so the page eases between heights instead of snapping and the browser never clamps your scroll. The fixture page pins its tab bar under the pinned header (`sticky`) and, when you switch tabs while scrolled past the body, eases the new body to the top (then re-aligns once the height animation ends).
 
+
+
+## SEO and share cards
+
+* **Per-page tags.** `site/src/lib/seo.js` holds each page's title and description; `lib/title.ts` sets the description, canonical link, robots hint and Open Graph / Twitter tags in the browser and keeps them in step with the title.
+* **Prebuilt pages.** `npm run build` ends with `site/scripts/seo.mjs`, which writes real HTML (title, description, canonical, share tags, JSON-LD, a short text body) for the static pages, every fixture and the biggest players, teams and competitions of the sitemap. The site address is `SITE_URL`, else the one in the sitemap the data build wrote. Every other path gets the app shell (no canonical; the app sets it).
+* **Dynamic cards.** `api/og.js` draws a 1200x630 PNG (player photo, name, line, best over price with its book, or a fixture's teams, time and ground) from the site's data files with `@napi-rs/canvas`; `api/share.js` serves `/share/player/<idx>[/<stat>/<line>]` and `/share/fixture/<id>` as a small page that link previews read and people are redirected from. The player page's Share button copies that link. Player and fixture shells point `og:image` at `/api/og`.
