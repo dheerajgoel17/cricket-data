@@ -7,6 +7,10 @@ file. The file name is the fixture id the site uses (``start date`` + team slugs
 
 Once a match is over its file also gets ``results``: ``[{pid, stat, value}]``, what each priced player actually did, as the site's live route settled it
 (``settle``). They are only ever added, never changed, so an old fixture page needs neither the live feed nor any name matching to show how its lines went.
+
+A Test's first-innings line (``inn``: 1, see ``booklines``) is a line of its own: the same player, stat and number as a match-total line is a different bet, so ``inn`` is
+part of the key of a line and of its result (``{pid, stat, inn, value}``). A line or result with no ``inn`` is the whole match's, which is every one filed before the
+field existed, and those files read and sort exactly as they did.
 """
 from __future__ import annotations
 
@@ -98,14 +102,14 @@ def _slim(line: dict) -> dict:
 
 
 KEY = {
-    "lines": lambda x: (x["pid"], x["stat"], x["line"]),
+    "lines": lambda x: (x["pid"], x["stat"], x.get("inn", 0), x["line"]),
     "events": lambda x: (x.get("match"), x.get("start_utc")),
-    "fancy": lambda x: (x.get("key"), x.get("scope"), x.get("team") or "", x.get("line"), x.get("source"), x.get("kind")),
+    "fancy": lambda x: (x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind")),
 }
 ORDER = {
-    "lines": lambda x: (x.get("player") or "", x["stat"], x["line"]),
+    "lines": lambda x: (x.get("player") or "", x["stat"], x.get("inn", 0), x["line"]),
     "events": lambda x: (x.get("match") or "", x.get("start_utc") or ""),
-    "fancy": lambda x: (x.get("key") or "", x.get("scope") or "", x.get("team") or "", x.get("line") or 0, x.get("source") or ""),
+    "fancy": lambda x: (x.get("key") or "", x.get("scope") or "", x.get("team") or "", x.get("inn", 0), x.get("line") or 0, x.get("source") or ""),
 }
 
 
@@ -211,15 +215,16 @@ def backfill(root: Path, *books: dict) -> list[str]:
     return changed
 
 
-def match_results(m: dict) -> dict[tuple[str, str], int | float]:
-    """{(pid, stat): value} for the lines of a finished live match that are settled for good: the site's live route marks each priced line with its value and state, and a
-    ``final`` state in a ``final`` match is a result. A player ruled out of the XI has no value; one whose lines disagree on it (never expected) is left out."""
-    if m.get("status") != "final":
-        return {}
-    seen: dict[tuple[str, str], set] = {}
+def match_results(m: dict) -> dict[tuple[str, str, int], int | float]:
+    """{(pid, stat, inn): value} (``inn`` 0 for the whole match) for the lines of a live match that are settled for good: the site's live route marks each priced line with
+    its value and state, and a ``final`` state in a ``final`` match is a result. So is a ``final`` innings line (``inn`` set) in a match still being played: the innings is
+    over once the side's next one has begun, and what a batter made in it cannot change. A player ruled out of the XI has no value; one whose lines disagree on it (never
+    expected) is left out."""
+    seen: dict[tuple[str, str, int], set] = {}
     for x in m.get("lines") or []:
-        if x.get("state") == "final" and x.get("value") is not None and not x.get("notInXI") and x.get("pid") and x.get("stat"):
-            seen.setdefault((x["pid"], x["stat"]), set()).add(x["value"])
+        inn = x.get("inn") or 0
+        if (m.get("status") == "final" or inn) and x.get("state") == "final" and x.get("value") is not None and not x.get("notInXI") and x.get("pid") and x.get("stat"):
+            seen.setdefault((x["pid"], x["stat"], inn), set()).add(x["value"])
     return {k: next(iter(v)) for k, v in seen.items() if len(v) == 1}
 
 
@@ -235,8 +240,8 @@ def _same_match(d: dict, keys: frozenset, start: dt.datetime) -> bool:
 def settle(root: Path, bodies: list[dict], now: dt.datetime) -> tuple[list[str], list[str]]:
     """Store what finished matches decided: add ``results`` to the archive file of every match the live route (``/api/live``) reports as final.
     Takes the route's body read more than once, some time apart, and keeps only the values every read agrees on, so a card a few seconds behind the final ball is
-    never written down. A file only gains results: a (player, stat) already there is never changed, one that was missing is added later. Results are kept for lines the
-    archive priced only. Returns (ids written, ids left alone because unreadable)."""
+    never written down. A file only gains results: a (player, stat, innings) already there is never changed, one that was missing is added later. Results are kept for lines
+    the archive priced only. Returns (ids written, ids left alone because unreadable)."""
     written, bad = [], []
     if not bodies:
         return written, bad
@@ -259,12 +264,12 @@ def settle(root: Path, bodies: list[dict], now: dt.datetime) -> tuple[list[str],
                 continue
             if not d or not _same_match(d, keys, start):
                 continue
-            priced = {(x["pid"], x["stat"]) for x in d.get("lines", [])}
-            have = {(r["pid"], r["stat"]) for r in d.get("results", [])}
-            add = [{"pid": p, "stat": s, "value": v} for (p, s), v in sorted(got.items()) if (p, s) in priced and (p, s) not in have]
+            priced = {(x["pid"], x["stat"], x.get("inn", 0)) for x in d.get("lines", [])}
+            have = {(r["pid"], r["stat"], r.get("inn", 0)) for r in d.get("results", [])}
+            add = [{"pid": p, "stat": s, **({"inn": i} if i else {}), "value": v} for (p, s, i), v in sorted(got.items()) if (p, s, i) in priced and (p, s, i) not in have]
             if not add:
                 continue
-            d["results"] = sorted([*d.get("results", []), *add], key=lambda r: (r["pid"], r["stat"]))
+            d["results"] = sorted([*d.get("results", []), *add], key=lambda r: (r["pid"], r["stat"], r.get("inn", 0)))
             d["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
             tmp = path.with_suffix(".tmp")
             tmp.write_text(json.dumps(public(d), separators=(",", ":")), encoding="utf-8")
@@ -296,7 +301,7 @@ def main(argv: list[str] | None = None, sleep=time.sleep) -> int:
     if a.results:
         try:
             first = _read_body(a.results)
-            if any(m.get("status") == "final" and m.get("lines") for m in first.get("matches") or []):
+            if any(match_results(m) for m in first.get("matches") or []):  # something is settled for good: read it again to be sure
                 sleep(a.again if a.results.startswith("http") else 0)
                 bodies = [first, _read_body(a.results)]
             else:

@@ -70,6 +70,37 @@ def test_prop_events_lists_every_prerelease_event_with_any_player_prop_even_with
     assert book_lines(rows, "t")["events"] == ev
 
 
+def test_a_tests_first_innings_line_is_a_line_of_its_own_beside_the_match_total_of_the_same_number():
+    def pair(line, over, under, **kw):
+        return [row(fmt="MULTI", line=line, back=over, **kw), row(fmt="MULTI", line=line, back=under, side="under", **kw)]
+    rows = [*pair(72.5, 1.83, 1.83), *pair(26.5, 2.0, 1.73, inn=1), *pair(26.5, 1.9, 1.9),
+            *pair(26.5, 2.1, 1.7, inn=1, source="smarkets", source_type="exchange"), *pair(36.5, 2.2, 1.6, inn=1), *pair(21.5, 1.8, 2.0, inn=2)]
+    out = book_lines(rows, "t")["lines"]
+    assert [(x.get("inn", 0), x["line"]) for x in out] == [(0, 26.5), (0, 72.5), (1, 26.5), (1, 36.5), (2, 21.5)], "ordered by player, stat, scope, line"
+    assert all(x["fmt"] == "Test" for x in out)
+    assert "inn" not in out[0] and "inn" not in out[1], "a whole-match line carries no scope, as every line published before did"
+    first = next(x for x in out if x.get("inn") == 1 and x["line"] == 26.5)
+    assert first["books"] == [{"source": "bet365", "kind": "bookmaker", "over": 2.0, "under": 1.73}, {"source": "smarkets", "kind": "exchange", "over": 2.1, "under": 1.7}]
+    assert next(x for x in out if x["line"] == 26.5 and "inn" not in x)["books"] == [{"source": "bet365", "kind": "bookmaker", "over": 1.9, "under": 1.9}]
+
+
+def test_an_innings_scope_means_something_only_in_a_test():
+    rows = [row(inn=1, line=26.5), row(inn=1, line=26.5, side="under"), row(fmt="ODI", inn=2, line=30.5), row(fmt="ODI", inn=2, line=30.5, side="under")]
+    assert book_lines(rows, "t")["lines"] == [], "a T20 or an ODI has one innings a side: the line is the match's or it is nothing"
+    assert len(book_lines([row(inn=None), row(inn=None, side="under", back=1.95)], "t")["lines"]) == 1
+
+
+def test_an_innings_line_makes_its_event_a_prop_event_like_any_player_line():
+    rows = [row(fmt="MULTI", inn=1, line=26.5), row(fmt="MULTI", inn=1, line=26.5, side="under")]
+    assert [e["markets"] for e in book_lines(rows, "t")["events"]] == [["batter_runs"]]
+
+
+def test_carried_innings_lines_keep_their_scope_and_order():
+    prev = doc(("SA vs Aus", "2026-10-25T08:30:00Z", "Test"))
+    prev["lines"] = [{**prev["lines"][0], "inn": 1}, prev["lines"][0], {**prev["lines"][0], "inn": 2}]
+    assert [x.get("inn", 0) for x in carry_started(doc(), prev, NOW)["lines"]] == [0, 1, 2]
+
+
 def test_book_lines_carries_the_fancy_lines_it_is_given():
     assert book_lines([], "t")["fancy"] == []
     assert book_lines([], "t", [{"key": "match_runs"}])["fancy"] == [{"key": "match_runs"}]

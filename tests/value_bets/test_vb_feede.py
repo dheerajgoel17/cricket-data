@@ -117,3 +117,52 @@ def test_fancy_lines_reach_the_book_file_under_the_published_name(monkeypatch):
     book = booklines.book_lines([], STAMP, merged)
     assert booklines.public(book)["fancy"][0]["source"] == "Alpha"
     assert feede in pipeline.adapters()
+
+
+# ---- a Test's innings-scoped lines
+
+def market(name, template, outcomes, status="A"):
+    return {"market": {"id": f"m{abs(hash(name)) % 10**6}", "name": name, "templateMarketName": template, "marketStatusCode": status, "children": [
+        {"outcome": {"id": f"o{i}", "name": n, "outcomeStatusCode": "A", "children": [{"price": {"priceType": "LP", "priceDec": str(dec)}}]}} for i, (n, dec) in enumerate(outcomes)]}}
+
+
+def innings_event(typ="Test Matches"):
+    ou = lambda line, o, u: [(f"Over - ({line})", o), (f"Under - ({line})", u)]  # noqa: E731
+    return {"id": "9", "name": "Bangladesh v West Indies", "startTime": "2026-10-28T03:30:00Z", "typeName": typ, "eventStatusCode": "A", "eventSortCode": "MTCH", "children": [
+        market("Tanzid Hasan - Over/Under 31.5 Runs 1st innings", "Batsman Runs", ou(31.5, 1.83, 1.83)),
+        market("Tanzid Hasan - Over/Under 36.5 Runs 1st innings", "Batsman Runs", ou(36.5, 2.1, 1.61)),
+        market("Tanzid Hasan - Over/Under 26.5 Runs", "Batsman Runs", ou(26.5, 1.67, 2.1)),
+        market("Bangladesh Over/Under 363.5 Runs 1st innings", "Home Team Innings Runs", ou(363.5, 1.83, 1.83)),
+        market("West Indies Over/Under 288.5 Runs 2nd innings", "Away Team Innings Runs", ou(288.5, 1.7, 2.0)),
+        market("Bangladesh Overs 0-10 Over/Under 21.5 Runs 1st innings", "Home Total Runs Between Overs", ou(21.5, 2.0, 1.83)),
+        market("Bangladesh Over/Under 30.5 Runs At Fall Of Wicket 1 1st innings", "Home Team Fall Of Wicket", ou(30.5, 1.83, 1.83)),
+    ]}
+
+
+def test_a_test_gives_first_innings_player_lines_and_team_innings_totals():
+    rows, fx, left = feede.parse_event(innings_event(), "feede_a", STAMP)
+    assert [(r["player"], r["side"], r["line"], r["back"], r["inn"], r["market_type"]) for r in rows] == [
+        ("Tanzid Hasan", "over", 31.5, 1.83, 1, "batter_runs"), ("Tanzid Hasan", "under", 31.5, 1.83, 1, "batter_runs"),
+        ("Tanzid Hasan", "over", 36.5, 2.1, 1, "batter_runs"), ("Tanzid Hasan", "under", 36.5, 1.61, 1, "batter_runs")]
+    assert len({r["group_key"] for r in rows}) == 2, "one over / under pair per market, a ladder of lines per player"
+    assert rows[0]["match"] == "Bangladesh vs West Indies" and rows[0]["competition"] == "Test Matches" and rows[0]["start_utc"] == "2026-10-28T03:30:00Z"
+    assert [(x["team"], x["inn"], x["line"], x["over"], x["under"], x["key"], x["scope"]) for x in fx] == [
+        ("Bangladesh", 1, 363.5, 1.83, 1.83, "team_total_runs", "team"), ("West Indies", 2, 288.5, 1.7, 2.0, "team_total_runs", "team")]
+    assert left["Tanzid Hasan - Over/Under 26.5 Runs"] == 1, "no innings named: not the match total, not a first innings either"
+    assert left["Bangladesh Overs 0-10 Over/Under 21.5 Runs 1st innings"] == 1 and left["Bangladesh Over/Under 30.5 Runs At Fall Of Wicket 1 1st innings"] == 1
+
+
+def test_a_first_class_match_gives_team_innings_but_no_player_lines_and_a_limited_overs_match_no_innings():
+    rows, fx, left = feede.parse_event(innings_event("Sheffield Shield"), "feede_a", STAMP)
+    assert rows == [] and [x["inn"] for x in fx] == [1, 2], "the site has no first-class history to chart a player line against"
+    assert left["Tanzid Hasan - Over/Under 31.5 Runs 1st innings"] == 1
+    rows, fx, left = feede.parse_event(innings_event("T20 Internationals"), "feede_a", STAMP)
+    assert [r["line"] for r in rows] == [26.5, 26.5], "a T20 line is the match's, and one that names an innings is not read"
+    assert rows[0]["inn"] is None and fx == [] and left["Tanzid Hasan - Over/Under 31.5 Runs 1st innings"] == 1
+
+
+def test_an_unusable_team_innings_total_is_left_out():
+    ev = innings_event()
+    ev["children"][3]["market"]["children"][1]["outcome"]["outcomeStatusCode"] = "S"
+    _, fx, left = feede.parse_event(ev, "feede_a", STAMP)
+    assert [x["team"] for x in fx] == ["West Indies"] and left["Bangladesh Over/Under 363.5 Runs 1st innings"] == 1

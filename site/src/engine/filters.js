@@ -3,7 +3,7 @@
 
 /**
  * filters: { fmt (0|1|2, required), gender, opp, venue, team, venueType, innings ('first'|'second'),
- *            pos [lo, hi], since, until, lastN, intl (0|1), event (event idx list), full (bool) }
+ *            tinn (1|2: the side's own first / second innings, a Test's), pos [lo, hi], since, until, lastN, intl (0|1), event (event idx list), full (bool) }
  */
 export function applyFilters(rows, f, store) {
   const dropped = { provisional_no_detail: 0, host_unknown: 0 };
@@ -29,6 +29,10 @@ export function applyFilters(rows, f, store) {
       if (r.bf == null) { dropped.provisional_no_detail++; return false; }
       if ((f.innings === "first") !== r.bf) return false;
     }
+    if (f.tinn) {
+      if (r.ti == null) { dropped.provisional_no_detail++; return false; }
+      if (r.ti !== f.tinn) return false;
+    }
     if (f.pos) {
       if (!r.o) { dropped.provisional_no_detail++; return false; }
       if (r.o < f.pos[0] || r.o > f.pos[1]) return false;
@@ -41,6 +45,18 @@ export function applyFilters(rows, f, store) {
 }
 
 const asList = (x) => (Array.isArray(x) ? x : [x]);
+
+/**
+ * Which innings of his own side a match innings is: 1 for the side's first, 2 for its second. `inn` is the match's innings list (`matches.json` `inn`, each
+ * `[team, ...]` in batting order) and `i` the 1-based match innings; null for a match with no innings detail (provisional). A Test has up to four innings and a side
+ * that follows on bats twice running, so this counts the side's own turns, not the match's.
+ */
+export function teamInningNo(inn, team, i) {
+  if (!Array.isArray(inn) || !inn.length || !(i >= 1) || i > inn.length || inn[i - 1][0] !== team) return null;
+  let n = 0;
+  for (let k = 0; k < i; k++) if (inn[k][0] === team) n++;
+  return n;
+}
 
 /** Test matches have two innings per player: markets on "match runs" aggregate them. */
 export function aggregateByMatch(rows, keys) {

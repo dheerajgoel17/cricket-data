@@ -651,20 +651,37 @@ export function lineVerdict(value, line, state = "live") {
   return value < line ? "missed" : "push";
 }
 
-/** One priced line read off the match's card, by the player's id through the identity table (names only for a player it does not know): `{value, state, verdict}`; a player the named XI rules out is `{value: null, notInXI: true}`; null when he has no row (he may not have batted yet). `l`: {pid, player, book_name, team, stat, line}. */
+/**
+ * A Test batter's innings of his own side's `inn`-th turn (1 = first, 2 = second) off the card, as `{p, state}` (his row in it, and "live" / "out" / "final") or null when the side has not had that turn or he did
+ * not bat in it. The card lists the match's innings in batting order, so the side's turns are the entries with its name. The innings is over, and what he made in it
+ * cannot move, once the side's next one (or the other side's) has begun or the match is over; before that it is "out" when he is dismissed and "live" when he is not.
+ */
+function inningsRow(match, l, idn, books, sid) {
+  const card = match?.card || [];
+  const turn = card.filter((i) => teamKey(i.team) === teamKey(l.team))[l.inn - 1];
+  if (!turn) return null;
+  const p = livePlayer({ players: (turn.batters || []).map((b) => ({ ...b, team: turn.team })) }, l.player, l.stat, books, sid, idn.isLinked);
+  if (!p) return null;
+  const over = match.status === "final" || card.some((i) => i.n > turn.n);
+  return { p, state: over ? "final" : p.out ? "out" : "live" };
+}
+
+/** One priced line read off the match's card, by the player's id through the identity table (names only for a player it does not know): `{value, state, verdict}`; a player the named XI rules out is `{value: null, notInXI: true}`; null when he has no row (he may not have batted yet). `l`: {pid, player, book_name, team, stat, line, inn?}; with `inn` it is the Test innings's own number. */
 function readLine(match, l, idn) {
   const sid = idn.sourceOf(l.pid), books = [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean);
-  const p = livePlayer(match, l.player, l.stat, books, sid, idn.isLinked), value = liveStat(p, l.stat);
-  if (value != null) { const state = liveState(match, p, l.stat); return { value, state, verdict: lineVerdict(value, l.line, state) }; }
+  const got = l.inn ? inningsRow(match, l, idn, books, sid) : null;
+  const p = l.inn ? got?.p : livePlayer(match, l.player, l.stat, books, sid, idn.isLinked), value = liveStat(p, l.stat);
+  if (value != null) { const state = l.inn ? got.state : liveState(match, p, l.stat); return { value, state, verdict: lineVerdict(value, l.line, state) }; }
   return notInXI(match, l.player, l.team, sid, books) ? { value: null, state: "live", verdict: null, notInXI: true } : null;
 }
 
 /**
  * Where every line the books priced for this match stands, settled on the server so the browser does no name matching of its own: one entry per priced line,
- * `{pid, stat, line, value, state, verdict}` with `state` and `verdict` as `liveState` and `lineVerdict` give them. A player the match's XI rules out is
+ * `{pid, stat, line, value, state, verdict}` with `state` and `verdict` as `liveState` and `lineVerdict` give them (and `inn` on a Test's first- or second-innings line, whose
+ * value is what he made in that innings of his side's, not the match total). A player the match's XI rules out is
  * `{notInXI: true, value: null}`: the bet is void, nothing was counted. A line whose player has no row yet has no entry. `lines` are the book file's player lines;
  * the match is the one with the same two sides and a start within 14 hours. Still "so far" while the match is on: only `state: "final"` in a `status: "final"`
- * match is a result.
+ * match is a result (a Test's innings line is one as soon as that innings is over).
  */
 export function settleLines(match, lines, idn = NO_IDENTITY) {
   const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
@@ -676,12 +693,12 @@ export function settleLines(match, lines, idn = NO_IDENTITY) {
     if (!b || !l.pid || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) continue;
     if (Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= BOOK_WINDOW_MS) continue;
     const got = readLine(match, l, idn);
-    if (got) out.push({ pid: l.pid, stat: l.stat, line: l.line, ...got });
+    if (got) out.push({ pid: l.pid, stat: l.stat, line: l.line, ...(l.inn ? { inn: l.inn } : {}), ...got });
   }
   return out;
 }
 
-const settledEntry = (match, l) => (match?.lines || []).find((x) => x.pid === l.pid && x.stat === l.stat && x.line === l.line);
+const settledEntry = (match, l) => (match?.lines || []).find((x) => x.pid === l.pid && x.stat === l.stat && x.line === l.line && (x.inn || 0) === (l.inn || 0));
 
 /**
  * What the page shows for a priced line, `{v, state, verdict}` or null. In order: the server's settled entry on the live match (`match.lines`); the result stored in the
