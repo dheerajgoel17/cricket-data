@@ -7,7 +7,7 @@ import { ChevronRight, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { lineVerdict, liveMarket } from "@/engine/live.js";
-import { fancyByLine, fancyFor, lineProb } from "@/engine/lines.js";
+import { fancyByLine, fancyFor, fancyHeadline, lineProb } from "@/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { BookTable } from "./book-table";
 import { sideEdge } from "@/engine/stats.js";
@@ -86,22 +86,28 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const overview = useMemo(() => {
     if (!ms.length || !doc.data) return [];
     const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
-      const b = byLine(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null))[0]; // the first line, at the best price any book offers
+      const all = byLine(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null));
+      // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
+      const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
       if (!b) return [];
-      const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line), s = rep.summary;
-      if (!s.n) return [];
-      const prior = lineProb(b.books), live = s.over + s.under; // the market's no-vig chance of the over, across the books
-      const eo = sideEdge(s.over, live, prior, b.over), eu = sideEdge(s.under, live, prior == null ? null : 1 - prior, b.under);
+      const at = (line: number) => (scope < 0 ? report(store, ms, k, line) : teamReport(store, ms, scope, k, line)).summary;
+      const so = lo ? at(lo.line) : null, su = lu ? at(lu.line) : null, base = so ?? su;
+      if (!base || !base.n) return [];
+      const eo = lo && so ? sideEdge(so.over, so.over + so.under, lineProb(lo.books), lo.over) : null;
+      const eu = lu && su ? sideEdge(su.under, su.over + su.under, lineProb(lu.books) == null ? null : 1 - (lineProb(lu.books) as number), lu.under) : null;
       const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
       const soFar = liveMarket(liveMatch, k, team?.[0] ?? null);
-      return [{ key: k, label: marketLabel(k), line: b.line, over: b.over, under: b.under, books: b.books, overBook: b.over != null ? b.books.find((x) => x.over === b.over)?.source : undefined, underBook: b.under != null ? b.books.find((x) => x.under === b.under)?.source : undefined, side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+      const src = (l: BookLine | undefined, sd: "over" | "under") => (l && l[sd] != null ? l.books.find((x) => x[sd] === l[sd])?.source : undefined);
+      const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
+      const rep = scope < 0 ? report(store, ms, k, b.line) : teamReport(store, ms, scope, k, b.line);
+      return [{ key: k, label: marketLabel(k), line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
     });
     return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => (!key || key === "top_batter" ? [] : byLine(fancyLines(doc.data, fxInfo, key, team?.[0] ?? null))), [doc.data, fxInfo, key, team]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
-  const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : book[0]?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
+  const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : (book.find((l) => l.over != null && l.under != null) ?? book.find((l) => l.over != null) ?? book[0])?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
   const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, ms, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
   // ladder rows: the engine's lines around the median plus the bookmaker's own line(s), computed on the same matches
   const ladder = useMemo(() => {
@@ -156,7 +162,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", r.key === key && "bg-card")}>
                         <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>
-                          <span className="line-clamp-2 text-callout text-primary">O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span>{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
+                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
                           <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
