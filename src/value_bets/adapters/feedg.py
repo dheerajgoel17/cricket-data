@@ -52,6 +52,23 @@ def settings() -> dict[str, str]:
     return s if all(s.values()) and s["API"].startswith("http") else {}
 
 
+def relay() -> tuple[str, str] | None:
+    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the relay (relay/api/relay.js, which runs in Mumbai)."""
+    addr, key = os.environ.get("FEEDG_RELAY", "").strip(), os.environ.get("FEEDG_RELAY_KEY", "").strip()
+    return (addr, key) if addr.startswith("https://") and key else None
+
+
+def request(url: str, body: bytes | None = None):
+    """One call to the book: direct, or through the relay when it is configured. ``body`` makes it a form POST."""
+    rl = relay()
+    if rl is None:
+        if body is None:
+            return http_json(url, retries=0)[0]
+        return http_json(url, method="POST", data=body, headers={"Content-Type": "application/x-www-form-urlencoded"}, retries=0)[0]
+    head = {"x-relay-key": rl[1], **({"Content-Type": "application/x-www-form-urlencoded"} if body is not None else {})}
+    return http_json(f"{rl[0]}?u={urllib.parse.quote(url, safe='')}", method="GET" if body is None else "POST", data=body, headers=head, retries=0)[0]
+
+
 def published() -> dict[str, str]:
     """{source key: the name it is published under}."""
     s = settings()
@@ -197,8 +214,8 @@ def _fetch(fetched_at: str):
     if not s:
         raise Skip("FEEDG_* not set")
     gap = config.get("FEEDG_SPACING_SECS")
-    pace = Pace(gap, lambda u: http_json(u, retries=0)[0])
-    post = Pace(gap, lambda a: http_json(a[0], method="POST", data=a[1], headers={"Content-Type": "application/x-www-form-urlencoded"}, retries=0)[0])
+    pace = Pace(gap, request)
+    post = Pace(gap, lambda a: request(*a))
     deadline = time.monotonic() + config.get("FEEDG_BUDGET_SECS")
     now = parse_ts(fetched_at)
     horizon = now + dt.timedelta(hours=config.get("FEEDG_HORIZON_HOURS"))
