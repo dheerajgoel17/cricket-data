@@ -46,6 +46,7 @@ def test_premium_gives_decimal_player_rows_and_two_way_fancy_lines_and_skips_sus
     assert runs == [("Joe Root", 36.5, "over", 1.85), ("Joe Root", 36.5, "under", 1.85), ("Ben Duckett", 30.5, "over", 1.85), ("Ben Duckett", 30.5, "under", 1.85)]
     ms = {(r["player"], r["line"], r["side"]): r["back"] for r in rows if r["market_type"] == "batter_milestone"}
     assert ms[("Ben Duckett", 99.5, "over")] == 6.25 and ms[("Ben Duckett", 99.5, "under")] == 1.1 and ms[("Joe Root", 49.5, "over")] == 2.35  # "to score 100" is 99.5
+    assert {r["source"] for r in rows} == {"feedf_p"} and {f["source"] for f in fx} == {"feedf_p"}
     got = {(f["key"], f["team"]): (f["line"], f["over"], f["under"], f["rules"]) for f in fx}
     assert got[("match_fours", None)] == (48.5, 1.9, 1.8, "void_below_80pct") and got[("match_sixes", None)] == (13.5, 1.75, 1.95, "void_below_80pct")
     assert got[("team_total_sixes", "England")] == (8.5, 2.15, 1.65, "void_below_80pct")  # the suspended duplicate of this market carries no prices
@@ -59,6 +60,7 @@ def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
     rows, fx, left = feedf.parse_fancy(J("feedf_fancy.json")["data"], england_sri_lanka(), STAMP)
     # B Duckett 30 / 30 at rates 85 / 115: Yes wins at 30 or more (over 29.5, 1.85), No wins at 29 or fewer (under 29.5, 2.15)
     assert [(r["player"], r["line"], r["side"], r["back"]) for r in rows if r["player"] == "B Duckett"] == [("B Duckett", 29.5, "over", 1.85), ("B Duckett", 29.5, "under", 2.15)]
+    assert {r["source"] for r in rows} == {"feedf_f"} and {f["source"] for f in fx} == {"feedf_f"}
     by = {(f["key"], f["line"]): f for f in fx}
     # 50 over runs, England: Yes 316 (over 315.5) and No 312 (under 311.5), both at rate 100: two one-sided lines a gap apart
     assert (by["team_total_runs", 315.5]["over"], by["team_total_runs", 315.5]["under"]) == (2.0, None)
@@ -92,8 +94,8 @@ def test_team_abbreviations_match_one_side_only():
 
 
 def test_not_configured_is_skipped_and_the_book_is_published_under_its_configured_name(env, monkeypatch):
-    assert feedf.published() == {"feedf_a": "Test Book"}
-    assert booklines.public({"source": "feedf_a"}) == {"source": "Test Book"}
+    assert feedf.published() == {"feedf_p": "Test Book Premium", "feedf_f": "Test Book Fancy"}  # one book, two feeds, two names
+    assert booklines.public({"a": "feedf_p", "b": "feedf_f"}) == {"a": "Test Book Premium", "b": "Test Book Fancy"}
     assert "feedf" in {m.NAME for m in pipeline.adapters()}
     for k in ENV:
         monkeypatch.delenv(k)
@@ -126,9 +128,12 @@ def test_a_run_reads_the_list_and_menu_once_and_each_upcoming_match_twice(env, m
     assert sum("getFancyEventDetails" in p for p in paths) == 2 and sum("getMarketWithOdds" in p for p in paths) == 2
     assert "SB/exsr/v1/sports/getMarketWithOdds?eventId=75329894&etId=21" in paths and "SB/exsr/v1/sports/getMarketWithOdds?eventId=75400001&etId=21" in paths
     assert all(h == {"x-timeZone": "Asia/Calcutta", "Tenant-ID": "42"} for _, h in calls)  # the only headers: a time zone and the account id; no session
-    assert {r["source"] for r in rows} == {"feedf_a"} and all(r["start_utc"] in ("2026-10-29T08:00:00Z", "2026-10-29T14:30:00Z") for r in rows)
+    assert {r["source"] for r in rows} == {"feedf_p", "feedf_f"} and all(r["start_utc"] in ("2026-10-29T08:00:00Z", "2026-10-29T14:30:00Z") for r in rows)
     assert raw["books"]["Test Book"]["events"] == 2 and len(raw["fancy"]) == raw["books"]["Test Book"]["fancy"] > 0
-    assert all(f["source"] == "feedf_a" and f["kind"] == "bookmaker" for f in raw["fancy"])
+    assert {f["source"] for f in raw["fancy"]} == {"feedf_p", "feedf_f"} and all(f["kind"] == "bookmaker" for f in raw["fancy"])
+    # the same market in both feeds (match fours) stays two lines from two sources: premium 48.5 two-way, fancy 49.5 / 46.5 one-sided
+    fours = {(f["source"], f["line"]) for f in raw["fancy"] if f["key"] == "match_fours"}
+    assert {("feedf_p", 48.5), ("feedf_f", 49.5), ("feedf_f", 46.5)} <= fours
 
 
 def test_an_http_error_ends_the_run_for_the_book_and_keeps_what_was_read(env, monkeypatch):

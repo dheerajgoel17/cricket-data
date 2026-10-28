@@ -30,7 +30,7 @@ from .base import Pace, gender_hint, row
 
 NAME = "feedf"
 AUTO = True  # on whenever the FEEDF_* variables are set; no need to list it in CV_SOURCES
-SOURCE = "feedf_a"
+PREMIUM, FANCY = "feedf_p", "feedf_f"  # one book, two feeds with their own rules and lines: kept apart as two sources, never blended into one price
 CRICKET = "4"  # the event list's own code for cricket
 IST = dt.timedelta(hours=5, minutes=30)
 TZ_HEADER = "Asia/Calcutta"
@@ -63,9 +63,9 @@ def settings() -> dict[str, str]:
 
 
 def published() -> dict[str, str]:
-    """{source key: the name it is published under}: ``booklines.public`` swaps the first for the second."""
+    """{source key: the name it is published under}: ``booklines.public`` swaps the first for the second. The two feeds are two names ("<book> Premium", "<book> Fancy")."""
     s = settings()
-    return {SOURCE: s["NAME"]} if s else {}
+    return {PREMIUM: f"{s['NAME']} Premium", FANCY: f"{s['NAME']} Fancy"} if s else {}
 
 
 def dec(rate) -> float | None:
@@ -151,12 +151,12 @@ def _yes_no(m: dict) -> dict[str, float] | None:
 def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict], list[dict], Counter]:
     """(player rows, fancy lines, a count of the market names left out) of one event's sportsbook markets. ``ev`` has the event's names and times."""
     rows, fancy, left = [], [], Counter()
-    common = ev["common"]
+    common = {**ev["common"], "source": PREMIUM}
     for m in markets:
         name = m.get("marketName") or ""
         if not _open(m):
             continue  # a suspended or closed market carries no prices
-        gk = f"{SOURCE}:{ev['id']}:{m.get('marketId')}"
+        gk = f"{PREMIUM}:{ev['id']}:{m.get('marketId')}"
         if (mm := TOTAL.match(name)):
             p = _pair(m)
             if not p:
@@ -190,15 +190,15 @@ def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[
                 left[name] += 1
                 continue
             key, team = (MATCH_TOTAL[name], None) if name in MATCH_TOTAL else (TEAM_KEY[mm["what"]], mm["team"])
-            fancy.append(_fancy(ev, key, team, p[0], p[1]["over"], p[1]["under"], "premium"))
+            fancy.append(_fancy(ev, key, team, p[0], p[1]["over"], p[1]["under"], "premium", PREMIUM))
         else:
             left[name] += 1
     return rows, fancy, left
 
 
-def _fancy(ev: dict, key: str, team: str | None, line: float, over, under, rules: str, **extra) -> dict:
+def _fancy(ev: dict, key: str, team: str | None, line: float, over, under, rules: str, source: str, **extra) -> dict:
     f = {"match": ev["common"]["match"], "home": ev["home"], "away": ev["away"], "start_utc": ev["common"]["start_utc"], "key": key,
-         "scope": "team" if team else "match", "team": team, "line": line, "over": over, "under": under, "source": SOURCE, "kind": "bookmaker", "rules": RULES[rules]}
+         "scope": "team" if team else "match", "team": team, "line": line, "over": over, "under": under, "source": source, "kind": "bookmaker", "rules": RULES[rules]}
     f.update(extra)
     return f
 
@@ -206,7 +206,7 @@ def _fancy(ev: dict, key: str, team: str | None, line: float, over, under, rules
 def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict], list[dict], Counter]:
     """(player rows, fancy lines, a count left out) of one event's session markets. Yes at Ly is "over Ly - 0.5", No at Ln is "under Ln - 0.5"."""
     rows, fancy, left = [], [], Counter()
-    common = ev["common"]
+    common = {**ev["common"], "source": FANCY}
     for cat in data or []:
         catname = (cat.get("categoryDetails") or {}).get("catName")
         if catname not in ("Fancy Market", "Player Performance Market"):
@@ -225,7 +225,7 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
             if not (ov or un):
                 left[name] += 1
                 continue
-            gk = f"{SOURCE}:{ev['id']}:{m.get('marketId')}"
+            gk = f"{FANCY}:{ev['id']}:{m.get('marketId')}"
             clean = re.sub(r"\s+", " ", name)
             if catname == "Player Performance Market":  # "H Brook": runs + 20 per wicket + 10 per catch + 25 per stumping, Yes / No like any session market
                 for side, v in (("over", ov), ("under", un)):
@@ -253,10 +253,10 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
                 continue
             extra = {"bat_first": True} if rules == "fancy_side" else {}
             if ov and un and ov[0] == un[0]:
-                fancy.append(_fancy(ev, key, team, ov[0], ov[1], un[1], rules, **extra))
+                fancy.append(_fancy(ev, key, team, ov[0], ov[1], un[1], rules, FANCY, **extra))
             else:  # a gap between the two lines: each side stands alone on its own line
                 for line, price, side in [(ov[0], ov[1], "over")] * bool(ov) + [(un[0], un[1], "under")] * bool(un):
-                    fancy.append(_fancy(ev, key, team, line, price if side == "over" else None, price if side == "under" else None, rules, **extra))
+                    fancy.append(_fancy(ev, key, team, line, price if side == "over" else None, price if side == "under" else None, rules, FANCY, **extra))
     return rows, fancy, left
 
 
@@ -268,7 +268,7 @@ def _event(stub: dict, sr: tuple[int | None, str], fetched_at: str) -> dict | No
     start = event_start(stub.get("eventDateTime"))
     female = gender_hint(home, away, comp)
     return {"id": str(stub["eventId"]), "home": home, "away": away, "sr": sr[0],
-            "common": dict(source=SOURCE, source_type="bookmaker", event_id=str(stub["eventId"]), match=f"{home} vs {away}", team_a=home, team_b=away,
+            "common": dict(source_type="bookmaker", event_id=str(stub["eventId"]), match=f"{home} vs {away}", team_a=home, team_b=away,
                            gender_hint=female, competition=comp, start_utc=start, in_play=False, fetched_at=fetched_at)}
 
 

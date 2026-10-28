@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BOOK_LOGOS, bookLogo } from "./books";
+import { BOOK_LOGOS, bookLogo, bookVariant } from "./books";
 
 describe("book logos", () => {
   it("every listed logo is a file in site/public", () => {
@@ -12,5 +12,13 @@ describe("book logos", () => {
     expect(bookLogo("LeoVegas")).toBe(BOOK_LOGOS.leovegas);
     expect(bookLogo("bet365")).toBe(BOOK_LOGOS.bet365);
     expect(bookLogo("nobody")).toBeUndefined();
+  });
+});
+
+describe("a book's feeds", () => {
+  it("share the book's logo and name their feed", () => {
+    expect(bookLogo("FairWin247 Premium")).toBe(BOOK_LOGOS.fairwin247);
+    expect(bookLogo("FairWin247 Fancy")).toBe(BOOK_LOGOS.fairwin247);
+    expect([bookVariant("FairWin247 Premium"), bookVariant("FairWin247 fancy"), bookVariant("bet365")]).toEqual(["Premium", "fancy", ""]);
   });
 });
