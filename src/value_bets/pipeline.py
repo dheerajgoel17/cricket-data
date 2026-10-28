@@ -166,6 +166,25 @@ def pull_odds(stamp):
     return status, rows, raws
 
 
+PERFORMANCE = re.compile(r"player performance|performance points|fantasy", re.I)
+
+
+def performance_markets(raws: dict) -> dict[str, list[str]]:
+    """The "player performance" (fantasy points) market names each source offered and no adapter reads yet, by source: what an adapter listed as left out, and the Book A mirror's group names.
+    The run's log prints them, so a source that offers the market shows itself in the next committed output."""
+    out: dict[str, list[str]] = {}
+    for src, raw in raws.items():
+        seen: set[str] = set()
+        if isinstance(raw, dict):
+            for book in (raw.get("books") or {}).values():
+                seen |= {n for n in (book.get("left_out") or {}) if PERFORMANCE.search(n)}
+            for m in raw.get("matches", []):
+                seen |= {g for q in m.get("quotes", []) if PERFORMANCE.search(g := q.get("group_name") or "")}
+        if seen:
+            out[src] = sorted(seen)[:8]
+    return out
+
+
 # ---------------------------------------------------------------- event + name resolution
 def load_fixtures():
     p = config.DATA_REPO / "data" / "fixtures" / "upcoming.csv"
@@ -353,6 +372,9 @@ def run():
     if n_inns_ms:
         log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")
 
+    pm = performance_markets(raws)
+    if pm:
+        log(f"player performance markets not read yet: {pm}")
     book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")) + fancy.adapter_fancy(raws))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
     n_inn = sum(1 for r in rows if r.get("inn"))
