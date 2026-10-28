@@ -46,6 +46,7 @@ def _compact(m: dict) -> dict:
                   for i in m["innings"] for p, v in i["bat"].items()]
     out["bowl"] = [(p, i["no"], i["opp"], i["team"], v["w"], v["rc"], v["bb"])
                    for i in m["innings"] for p, v in i["bowl"].items()]
+    out["fld"] = [(p, i["no"], i["opp"], i["team"], v["ct"], v["st"]) for i in m["innings"] for p, v in i["fld"].items()]
     out["xi"] = m.get("xi", [])
     out["xq"] = m.get("xq", 0)
     out["parts"] = [(t["a"], t["b"], i["no"], t["open"], t["w"], t["runs"], t["balls"], t["ra"], t["rb"], t["x"], t["kd"])
@@ -140,7 +141,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
-             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
+             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
         registry: dict[str, str] = {}
         for p in d.get("players", []):
             stat["rows"] += 1
@@ -162,6 +163,8 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
                 m["bat"].append((pid, 0, p["team"], p["opponent"], 0, n("runs"), n("balls"), n("fours"), n("sixes"), -1, -1, -1))
             if n("balls_bowled"):
                 m["bowl"].append((pid, 0, p["team"], p["opponent"], n("wickets"), n("runs_conceded"), n("balls_bowled")))
+            if n("catches") or n("stumpings"):
+                m["fld"].append((pid, 0, p["team"], p["opponent"], n("catches"), n("stumpings")))
         sides: dict[str, int] = {}
         for p in d.get("players", []):
             sides[p.get("team", "")] = sides.get(p.get("team", ""), 0) + 1
@@ -193,6 +196,8 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     c = _compact(parsed)
     for k in ("first", "q", "mc", "ts", "ho", "inn", "bat", "bowl", "parts"):
         m[k] = c[k]
+    if c["fld"]:  # the deliveries' own fielding credits; else the scraped totals stay
+        m["fld"] = c["fld"]
     stat["with_deliveries"] += 1
 
 
@@ -280,6 +285,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
 MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "xq")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
+FLD_KEYS = ("p", "m", "i", "t", "q", "ct", "st")
 XI_KEYS = ("p", "m")
 PART_KEYS = ("a", "b", "m", "i", "o", "w", "r", "n", "ra", "rb", "x", "kd")
 
@@ -313,6 +319,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             m["inn"] = [[fix(i[0]), fix(i[1]), *i[2:]] for i in m["inn"]]
             m["bat"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m["bat"]]
             m["bowl"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m["bowl"]]
+            m["fld"] = [(r[0], r[1], fix(r[2]), fix(r[3])) + r[4:] for r in m.get("fld", [])]
         for t in m["teams"]:
             tkeys.add((t, m["gender"]))
         vkeys.add(m["venue"] or "?")
@@ -356,7 +363,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
     pids = sorted({r[0] for m in ms for r in m["bat"]} | {r[0] for m in ms for r in m["bowl"]})
     pix = {p: i for i, p in enumerate(pids)}
 
-    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "pt": defaultdict(list), "xi": defaultdict(list)})
+    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "fld": defaultdict(list), "pt": defaultdict(list), "xi": defaultdict(list)})
 
     def shard_of(pid: str) -> int:
         try:
@@ -381,6 +388,9 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             touch(pid, m, T(r[2]))
             S = shards[shard_of(pid)]["bowl"]
             _push(S, BOWL_KEYS, (pix[pid], mi, r[1], T(r[2]), T(r[3]), r[4], r[5], r[6]))
+        for r in m.get("fld", []):
+            if r[0] in pix:  # a fielder who neither batted nor bowled has no player entry: his credits are left out
+                _push(shards[shard_of(r[0])]["fld"], FLD_KEYS, (pix[r[0]], mi, r[1], T(r[2]), T(r[3]), r[4], r[5]))
         for r in m["parts"]:
             a_, b_ = pix.get(r[0]), pix.get(r[1])
             if a_ is None or b_ is None:

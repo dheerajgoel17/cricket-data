@@ -45,14 +45,15 @@ export async function playerReport(store, pidx, q) {
   const def = STATS[q.stat];
   if (!def) throw new Error(`unknown stat ${q.stat}`);
   const all = await store.playerRows(pidx);
-  const base = def.side === "bat" ? all.bat : all.bowl;
+  const base = def.side === "bat" ? all.bat : def.side === "bowl" ? all.bowl : store.pointsRows(all);
+  const unit = def.side === "bat" ? "innings" : def.side === "bowl" ? "spells" : "matches";
   const notes = [];
   let fmt = q.fmt;
   if (fmt == null) {
     fmt = dominantFormat(base);
-    if (fmt != null) notes.push(`No format given, using ${FORMATS[fmt]} (the format with most of this player's ${def.side === "bat" ? "innings" : "spells"}). Formats are never mixed.`);
+    if (fmt != null) notes.push(`No format given, using ${FORMATS[fmt]} (the format with most of this player's ${unit}). Formats are never mixed.`);
   }
-  if (fmt == null) return { ok: false, error: `No ${def.side === "bat" ? "batting" : "bowling"} data for this player.` };
+  if (fmt == null) return { ok: false, error: `No ${def.side === "bat" ? "batting" : def.side === "bowl" ? "bowling" : "match"} data for this player.` };
   const f = { ...(q.filters || {}), fmt };
   const { rows: kept, dropped } = applyFilters(base, f, store);
   assertSingleFormat(kept);
@@ -112,7 +113,7 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
   for (const [t, sp] of span) if (curTeam == null || sp[1] > span.get(curTeam)[1]) curTeam = t;
   if (curTeam != null && daysBetween(span.get(curTeam)[1], newest) <= 120) span.get(curTeam)[1] = newest;
   const byMatch = new Map();
-  const auxKey = def.side === "bat" ? "b" : "n";
+  const auxKey = def.side === "bowl" ? "n" : "b";
   for (const r of (aggregate ? aggregateByMatch(rows, [def.key, auxKey]) : rows)) byMatch.set(r.m, r);
   const M = store.M;
   const entries = [];
@@ -140,7 +141,9 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
         // in the named XI but never batted / bowled: player bets are VOID (stake returned); not named at all: DNP
         // XI not recorded reliably for this match (xq = 0): neither DNP nor VOID can be claimed, so it is unknown (n/a) and kept out of every count
         const unknown = M.xq ? M.xq[m] === 0 : false;
-        entries.push({ m, date: M.d[m], opp, value: null, void: !unknown && !!xi?.has(m), unknown, venue: M.v[m] });
+        const named = !unknown && !!xi?.has(m);
+        if (def.zeroIfNamed && named) entries.push({ m, date: M.d[m], opp, value: 0, aux: 0, pv: M.pv[m], venue: M.v[m] }); // a points stat: in the XI and no runs, wickets or catches is 0 points, not a void
+        else entries.push({ m, date: M.d[m], opp, value: null, void: named, unknown, venue: M.v[m] });
       } else entries.push({ m, date: M.d[m], opp, value: hit[def.key], aux: hit[auxKey], pos: hit.o || null, pv: M.pv[m], venue: M.v[m] });
       break;
     }
@@ -155,7 +158,7 @@ export function buildChart(store, base, rows, def, f, fmt, { line, side = "over"
     return { n, label: n ? `Last ${n}` : "All", fixtures: w.length, played: vals.length, dnp: w.filter((e) => e.value == null && !e.void && !e.unknown).length, voided: w.filter((e) => e.void).length, unknown: w.filter((e) => e.unknown).length, hits: k ?? null,
       pHit: p ?? null, avg: sm.mean, median: sm.median, fair: side === "over" ? sm.fairOver : sm.fairUnder };
   });
-  return { entries, windows, line, side, auxLabel: def.side === "bat" ? "Balls faced" : "Balls bowled" };
+  return { entries, windows, line, side, auxLabel: def.side === "bowl" ? "Balls bowled" : "Balls faced" };
 }
 
 
@@ -171,7 +174,7 @@ export function correlated(rows, stat, line, side = "over") {
   const hit = rows.filter(main);
   if (hit.length < 5 || !rows.length) return null;
   const out = [];
-  for (const [st, lines] of CORR[def.side]) {
+  for (const [st, lines] of CORR[def.side] || []) {
     if (st === stat) continue;
     const k = STATS[st].key;
     for (const l of lines) {

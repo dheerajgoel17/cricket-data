@@ -94,11 +94,35 @@ export class Store {
       if (w.p[k] !== pidx) continue;
       bowl.push(this._row(w.m[k], w.t[k], { i: w.i[k], t: w.t[k], opp: w.q[k], w: w.w[k], c: w.c[k], n: w.n[k] }));
     }
+    const fld = [];
+    const f = d.fld || {};
+    for (let k = 0; k < (f.p?.length || 0); k++) {
+      if (f.p[k] !== pidx) continue;
+      fld.push(this._row(f.m[k], f.t[k], { i: f.i[k], t: f.t[k], opp: f.q[k], ct: f.ct[k], st: f.st[k] }));
+    }
     const xi = new Set();
     const x = d.xi || {};
     for (let k = 0; k < (x.p?.length || 0); k++) if (x.p[k] === pidx) xi.add(x.m[k]);
     const ord = (x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : x.m - y.m || x.i - y.i);
-    return { bat: bat.sort(ord), bowl: bowl.sort(ord), xi };
+    return { bat: bat.sort(ord), bowl: bowl.sort(ord), fld: fld.sort(ord), xi };
+  }
+
+  /**
+   * One row per match from his batting, bowling and fielding rows (the rows a points stat is read from): `pts` = runs + 20 per wicket + 10 per catch + 25 per stumping,
+   * with `r`, `w`, `ct`, `st` and, as the chart's second figure, balls faced (`b`). A match he only fielded in still has a row.
+   */
+  pointsRows(all) {
+    const by = new Map();
+    const slot = (r) => {
+      let x = by.get(r.m);
+      if (!x) { x = this._row(r.m, r.t, { t: r.t, opp: r.opp, r: 0, b: 0, w: 0, n: 0, ct: 0, st: 0, o: null }); x.ti = null; by.set(r.m, x); }
+      return x;
+    };
+    for (const r of all.bat || []) { const x = slot(r); x.r += r.r; x.b += r.b; if (x.o == null) x.o = r.o; }
+    for (const r of all.bowl || []) { const x = slot(r); x.w += r.w; x.n += r.n; }
+    for (const r of all.fld || []) { const x = slot(r); x.ct += r.ct; x.st += r.st; }
+    for (const x of by.values()) x.pts = x.r + 20 * x.w + 10 * x.ct + 25 * x.st;
+    return [...by.values()].sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : x.m - y.m));
   }
 
   /** Partnerships between two players (any order), oldest first. */

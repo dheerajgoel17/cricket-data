@@ -17,7 +17,7 @@ from collections import defaultdict
 from .adapters import feede, feedf, feedk
 from .util import parse_ts
 
-STAT ={"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets"}
+STAT ={"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets", "player_points": "points"}
 PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
 PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}  # published under the book's own name; the key names the feed it came through
 
@@ -73,9 +73,9 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
         g["_books"][(r["source"], r.get("source_type"))][side] = round(float(back), 3)
     lines = []
     for g in groups.values():
-        books = [{"source": names.get(s, s), "kind": k, "over": sides["over"], "under": sides["under"]}
+        books = [{"source": names.get(s, s), "kind": k, "over": sides["over"], "under": sides.get("under")}
                  for (s, k), sides in sorted(g.pop("_books").items(), key=lambda kv: kv[0])
-                 if "over" in sides and "under" in sides]  # a one-sided price is not a line the player page can show
+                 if "over" in sides]  # a book quoting only the over (an exchange's Yes, whose No sits on another line) still shows its over price; one with no over has nothing the player page shows
         if books:
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x.get("inn", 0), x["line"]))

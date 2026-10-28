@@ -34,14 +34,20 @@ def test_two_sources_are_listed_separately_and_alt_lines_are_separate_entries():
     assert out[1]["books"][0]["over"] == 2.4
 
 
-def test_one_sided_unmatched_in_play_and_unknown_markets_are_dropped():
-    rows = [row(),  # over only: no under price
-            row(player_id=None, line=1.5), row(player_id=None, line=1.5, side="under"),  # player not matched to the registry
+def test_unmatched_in_play_and_unknown_markets_are_dropped_and_an_under_alone_is_not_a_line():
+    rows = [row(player_id=None, line=1.5), row(player_id=None, line=1.5, side="under"),  # player not matched to the registry
             row(in_play=True, line=30.5), row(in_play=True, line=30.5, side="under"),
             row(market_type="batter_milestone", line=49.5), row(market_type="batter_milestone", line=49.5, side="under"),
             row(fmt=None, line=9.5), row(fmt=None, line=9.5, side="under"),
-            row(line=5.5, back=None), row(line=5.5, side="under")]
+            row(line=5.5, back=None), row(line=5.5, side="under"),  # no over price: nothing the player page shows
+            row(line=12.5, side="under", back=1.8)]
     assert book_lines(rows, "t")["lines"] == []
+
+
+def test_a_book_quoting_only_the_over_is_kept_with_no_under_and_player_performance_is_the_points_stat():
+    """An exchange's session Yes (over Ly - 0.5) and No (under Ln - 0.5) sit on different lines, so a line can have an over price and no under."""
+    out = book_lines([row(), row(line=33.5, market_type="player_points", back=2.0), row(line=31.5, market_type="player_points", side="under", back=1.87)], "t")["lines"]
+    assert [(x["stat"], x["line"], x["books"][0]["over"], x["books"][0]["under"]) for x in out] == [("points", 33.5, 2.0, None), ("runs", 17.5, 1.85, None)]  # the 31.5 under has no over beside it: dropped
 
 
 def test_multi_day_is_called_test_and_each_stat_maps():

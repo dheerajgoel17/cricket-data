@@ -1,5 +1,5 @@
 import synth
-from synth import D, doc, pid, scripted
+from synth import D, doc, pid, scripted, to_overs
 
 from cricket_site.parse import parse_match, qualifies
 
@@ -126,3 +126,18 @@ def test_squad_quality_flags_unreliable_xi_lists():
     assert squad_quality([11]) == 0 and squad_quality([]) == 0                                              # list missing
     assert squad_quality([11, 8]) == 0 and squad_quality([15, 11]) == 0                                    # half a scorecard / a whole squad
     assert squad_quality([10, 10], lo=10) == 1 and squad_quality([9, 11], lo=10) == 0                       # scraped squads are stricter
+
+
+def test_fielding_credits_catches_stumpings_and_a_caught_and_bowled_go_to_the_fielding_side():
+    w = lambda out, kind, *names: [{"player_out": out, "kind": kind, "fielders": [{"name": n} for n in names]}]  # noqa: E731
+    ds = [D("A1", "A2", runs=1), D("A1", "A2", wickets=w("A1", "caught", "C1")), D("A2", "A3", wickets=w("A2", "stumped", "C2")),
+          D("A3", "A4", bowl="B1", wickets=w("A3", "caught and bowled", "B1")), D("A4", "A5", bowl="B1", wickets=[{"player_out": "A4", "kind": "caught and bowled"}]),
+          D("A5", "A6", wickets=w("A5", "caught", "C1")), D("A6", "A7", wickets=w("A6", "run out", "C2")), D("A7", "A8", wickets=[{"player_out": "A7", "kind": "retired hurt"}])]
+    inn = {"team": "X", "overs": to_overs(ds + [D("A8", "A9") for _ in range(120)], ["B1"])}
+    other = scripted("Y", ["C1", "C2", "C3"], {"C1": dict(runs=0), "C2": dict(runs=0), "C3": dict(runs=0)}, ["B1"], pad_to=120)
+    m = parse_match("f1", doc("2024-01-01", ("X", "Y"), [inn, other], xi_extra={"Y": ["C1", "C2", "C3"]}))  # the fielders are named in the registry
+    fld = {r["pid"]: r for r in m["fld"]}
+    assert (fld[pid("C1")]["ct"], fld[pid("C1")]["st"]) == (2, 0)  # two catches
+    assert (fld[pid("C2")]["ct"], fld[pid("C2")]["st"]) == (0, 1)  # a stumping; the run out gives him nothing
+    assert (fld[pid("B1")]["ct"], fld[pid("B1")]["st"]) == (2, 0)  # a caught and bowled, with or without the fielder listed, is the bowler's catch
+    assert {r["team"] for r in m["fld"]} == {"Y"} and {r["opp"] for r in m["fld"]} == {"X"} and {r["inn"] for r in m["fld"]} == {1}

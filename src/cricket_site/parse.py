@@ -73,7 +73,7 @@ def parse_match(mid: str, doc: dict) -> dict | None:
         "days": len(dates), "toss_winner": toss.get("winner", ""), "toss_decision": toss.get("decision", ""),
         "pom": list(info.get("player_of_match") or []),
     }
-    innings, bat, bowl, parts = [], [], [], []
+    innings, bat, bowl, fld, parts = [], [], [], [], []
     k = 0
     for inn in doc.get("innings", []):
         if inn.get("super_over"):
@@ -90,10 +90,12 @@ def parse_match(mid: str, doc: dict) -> dict | None:
             bat.append({"pid": p, "inn": k, "team": team, "opp": opp, **b})
         for p, b in r["bowl"].items():
             bowl.append({"pid": p, "inn": k, "team": opp, "opp": team, **b})
+        for p, b in r["fld"].items():
+            fld.append({"pid": p, "inn": k, "team": opp, "opp": team, **b})
         for pt in r["parts"]:
             parts.append({"inn": k, **pt})
     m["innings"] = innings
-    m["bat"], m["bowl"], m["parts"] = bat, bowl, parts
+    m["bat"], m["bowl"], m["fld"], m["parts"] = bat, bowl, fld, parts
     # the named playing XI (registry ids): in the XI but never batting / bowling means player bets on that stat are void
     m["xi"] = [people[n] for names in (info.get("players") or {}).values() for n in names if people.get(n)]
     m["xq"] = squad_quality([len(v) for v in (info.get("players") or {}).values()])
@@ -106,6 +108,7 @@ def _parse_innings(inn: dict, people: dict) -> dict:
     pid = lambda n: people.get(n) or ""  # noqa: E731 - unknown registry ids are dropped by the exporter
     B: dict[str, dict] = {}
     W: dict[str, dict] = {}
+    F: dict[str, dict] = {}  # fielding credits: catches (a caught-and-bowled is the bowler's) and stumpings
     order: list[str] = []
     parts: list[dict] = []
     runs = wkts = legal = 0
@@ -161,6 +164,11 @@ def _parse_innings(inn: dict, people: dict) -> dict:
                         seg = None
                     continue
                 wkts += 1
+                if kind in ("caught", "caught and bowled", "stumped"):
+                    names = [f["name"] for f in wk.get("fielders") or [] if f.get("name")] or ([bw] if kind == "caught and bowled" else [])
+                    for nm in names[:1]:
+                        c = F.setdefault(nm, {"ct": 0, "st": 0})
+                        c["st" if kind == "stumped" else "ct"] += 1
                 if out in B:
                     B[out]["k"] = kind_code(kind)
                 if kind in BOWLER_WICKETS:
@@ -172,7 +180,7 @@ def _parse_innings(inn: dict, people: dict) -> dict:
         ho = max(ho, orun)
     if seg is not None:
         parts.append(_close(seg, pid, None, 0))
-    return {"bat": {pid(p): v for p, v in B.items() if pid(p)}, "bowl": {pid(p): v for p, v in W.items() if pid(p)},
+    return {"bat": {pid(p): v for p, v in B.items() if pid(p)}, "bowl": {pid(p): v for p, v in W.items() if pid(p)}, "fld": {pid(p): v for p, v in F.items() if pid(p)},
             "parts": [p for p in parts if p], "runs": runs, "wkts": wkts, "balls": legal, "ho": ho,
             "order": [pid(p) for p in order]}
 
