@@ -247,10 +247,10 @@ function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: 
             <p className="-mt-tight text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
           ))}
 
+          <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
+              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
           <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
             <ChartBars entries={shown} line={line} side={side} height={300} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
-            <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
-              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
             <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
           </div>
         </section>
