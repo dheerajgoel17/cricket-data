@@ -60,7 +60,7 @@ export const fixtureState = (f: any, live?: string): "live" | "final" | "upcomin
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
   const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 4 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, 6 * 24 * 3600e3, now))) && inBooks(f));
   const window = active.length >= 3 ? 36 * 3600e3 : 96 * 3600e3;
-  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, window, now));
+  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, f.fmt === "Test" ? Math.max(window, 96 * 3600e3) : window, now)); // a Test ends days after it began: its day and a half starts at the end, so it keeps 4 days from the start
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 
