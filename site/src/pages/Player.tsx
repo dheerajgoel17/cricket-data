@@ -200,7 +200,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
 type Next = NonNullable<ReturnType<typeof useNextMatch>>;
 
 /** The next-match card: who and when, and how he has done on the line on the chart at that ground and against that side (the games on the chart, filters applied: a ground can sit far from his form). Shown until the match starts, for every stat. */
-function NextMatch({ next, entries, line, side }: { next: Next; entries: any[]; line: number; side: string }) {
+function NextMatch({ next, entries, line, side, q, navigateWith }: { next: Next; entries: any[]; line: number; side: string; q: Record<string, string>; navigateWith: (p: Record<string, unknown>) => void }) {
   const rate = (rows: any[]) => windowRate(rows, 0, line, side);
   const here = next.ground ? rate(entries.filter((e: any) => venueStem(e.venueName) === venueStem(next.ground))) : null;
   const versus = next.opp ? rate(entries.filter((e: any) => norm(e.opp) === norm(next.opp))) : null;
@@ -215,17 +215,18 @@ function NextMatch({ next, entries, line, side }: { next: Next; entries: any[]; 
         {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
       </div>
       {stat(`At ${next.ground.split(",")[0]}`, here)}{stat(`Vs ${next.opp}`, versus)}
+      <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div>
     </div>
   );
 }
 
-/** Quick filters for the chart: only games against his next opponent, only games at its ground. They are filters like the ones in the sheet (same URL keys), so they sit with them. */
+/** Quick filters for the chart, inside the next-match card: only games against his next opponent, only games at its ground (the same URL keys as the sheet's filters). */
 function NextFilters({ next, q, navigateWith }: { next: Next; q: Record<string, string>; navigateWith: (p: Record<string, unknown>) => void }) {
   const chips: [string, string, string][] = [];
   if (next.opp) chips.push(["opp", next.opp, `vs ${next.opp}`]);
   if (next.known) chips.push(["venue", next.known, `At ${next.ground.split(",")[0]}`]);
   return <>{chips.map(([k, v, label]) => { const on = q[k] === v; return (
-    <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>{label}</Button>); })}</>;
+    <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}</>;
 }
 
 function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope }: any) {
@@ -257,7 +258,7 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope }: 
 
   return (
     <div className="flex flex-col gap-section">
-      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side }} /> : null}
+      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side, q, navigateWith }} /> : null}
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
         <section className="flex flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
@@ -331,7 +332,6 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope }: 
       <section className="flex flex-col gap-stack">
         <div className="flex flex-wrap items-center gap-snug">
           <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters{active.length ? ` · ${active.length}` : ""}</Button>
-          {next ? <NextFilters {...{ next, q, navigateWith }} /> : null}
           {active.length ? active.map(([k, v]: [string, unknown], i: number) => <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-footnote font-normal">{k ? <b className="mr-tight font-semibold">{k}</b> : null}{String(v)}</Badge>)
             : <span className="text-callout text-muted-foreground">All matches</span>}
           {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
