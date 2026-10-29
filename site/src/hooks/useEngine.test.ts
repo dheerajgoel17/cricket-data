@@ -16,6 +16,17 @@ describe("fixtureState", () => {
   });
 });
 
+describe("a Test between days", () => {
+  it("is still on when the schedule says Completed with no result, and over once it has a result", () => {
+    const now = Date.parse("2026-10-29T05:00:00Z");
+    const test = { start: "2026-10-27T08:30Z", fmt: "Test", status: "Completed", result: "" };
+    expect(fixtureState(test, undefined, now)).toBe("live");
+    expect(fixtureState({ ...test, result: "AUS won by 5 wkts" }, undefined, now)).toBe("final");
+    expect(fixtureState({ ...test, start: "2026-10-20T08:30Z" }, undefined, now)).toBe("final"); // a week on, it is long over
+    expect(fixtureState({ ...test, fmt: "T20" }, undefined, now)).toBe("final");
+  });
+});
+
 describe("shownFixtures", () => {
   const done = (a: string, start: string) => f(start, { a, status: "Completed" });
   const up = (a: string, start: string) => f(a === "" ? start : start, { a });

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { liveBlurb, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
+import { fixtureState } from "@/hooks/useEngine";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamBadge, usePreloadTeams } from "./badges";
@@ -50,7 +51,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const clockLive = timed && ms <= 0 && ms > -4 * 3600e3;
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final" || (!match && f.status === "Completed");
+  const final = match?.status === "final" || (!match && fixtureState(f) === "final");
   const live = !final && (hasScore || clockLive);
   const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;

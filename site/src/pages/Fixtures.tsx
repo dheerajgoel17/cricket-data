@@ -17,7 +17,7 @@ import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/fo
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { fixtureBooks } from "@/engine/lines.js";
-import { useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
+import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
@@ -58,7 +58,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const { match } = useLiveMatch(f);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final" || (!match && f.status === "Completed");
+  const final = match?.status === "final" || (!match && fixtureState(f) === "final");
   const on = !final && (hasScore || clock.tone === "live");
   const blurb = liveBlurb(match) || (final ? f.result || "" : "");
   const team = (name: string, ix: number) => {
