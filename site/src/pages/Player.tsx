@@ -139,7 +139,8 @@ function PlayerScreen({ idx }: { idx: number }) {
     venue: q.venue || null,
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
-  const nextMatch = useNextMatch(lines.data, store.P.id[idx], idx, FORMATS[fmtVal], team);
+  const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
+  const nextMatch = useNextMatch(lines.data, store.P.id[idx], idx, FORMATS[fmtVal], team, lastGame);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
   const share = () => { track("share", { kind: "player" }); const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
@@ -165,30 +166,33 @@ function PlayerScreen({ idx }: { idx: number }) {
  * His next match, while it has not started: from the books' lines for him in this format (the side they file him under, their start) else, with none priced, the schedule's next match
  * of his team in this format. The opponent and ground are the schedule's spelling (which the data knows). Null when there is none.
  */
-function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string) {
+function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string, lastGame?: any) {
   const { store } = useData();
   const fixtures = useFixtures();
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
     const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
     let match: string, start: string, competition: string, club = "", row: any;
+    // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
+    let lastSide = "";
+    if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = norm(x) === norm(lastGame.opp) ? y : x; }
     if (priced) {
       match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
       row = fx.find((f: any) => sameFixture({ match, start_utc: start }, f));
     } else {
       const women = store.P.g[idx] === 1;
-      row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (norm(f.a) === norm(team) || norm(f.b) === norm(team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
+      row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (norm(f.a) === norm(lastSide || team) || norm(f.b) === norm(lastSide || team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
       if (!row) return null;
       match = `${row.a} vs ${row.b}`; start = fixtureStart(row).toISOString(); competition = row.series || "";
     }
     const [a, b] = String(match).split(/\s+vs\s+/i);
     const other = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
-    const oppRaw = other(club) || other(team); // the book's side first: a club player's profile team is often his country
+    const oppRaw = other(club) || other(lastSide) || other(team); // the book's side first: a club player's profile team is often his country
     const opp = [row?.a, row?.b].find((t) => t && norm(t) === norm(oppRaw)) || oppRaw;
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
     return { match, start, competition, opp, ground, known };
-  }, [doc, pid, idx, fmt, team, fixtures.data, store]);
+  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, store]);
 }
 
 type Next = NonNullable<ReturnType<typeof useNextMatch>>;
