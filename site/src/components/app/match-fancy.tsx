@@ -30,7 +30,8 @@ export const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["f
   ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"], ["highest_over", "Top over"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
 const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"], ["top_batter", "Top batter"]];
 const WINDOWS = [5, 10, 20, 30];
-const HERE_MIN = 3; // fewest matches at the ground worth saying anything about
+const HERE_MIN = 3;
+const GROUND_MIN = 3; // fewest matches at the ground the overview rows say anything about // fewest matches at the ground worth saying anything about
 const DIFFERS = 0.3; // how far (as a share of matches) the ground's hit rate must sit from the teams' form to be called out
 const EASE = [0.22, 1, 0.36, 1] as const;
 // the engine is plain JS: give its results the loose shape this view reads
@@ -44,7 +45,7 @@ const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
 /** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line. */
-export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, liveMatch }: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; liveMatch?: any }) {
+export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, liveMatch, ground }: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; liveMatch?: any; ground?: number[] }) {
   if (!ms.length || !doc) return [];
   const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
     const all = byLine(fancyLines(doc, fxInfo, k, teamName));
@@ -61,7 +62,10 @@ export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, l
     const src = (l: BookLine | undefined, sd: "over" | "under") => (l && l[sd] != null ? l.books.find((x) => x[sd] === l[sd])?.source : undefined);
     const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
     const rep = run(b.line);
-    return [{ key: k, label: label(k), line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, soFar, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+    // the same line scored on the matches at the ground alone: how the market has gone there (a ground can sit far from the sides' form)
+    const gs = ground && ground.length >= GROUND_MIN ? (scope < 0 ? report(store, ground, k, b.line) : teamReport(store, ground, scope, k, b.line)).summary : null;
+    const at = gs && gs.n >= GROUND_MIN ? { n: gs.n, over: gs.over, under: gs.under, side: gs.under > gs.over ? "under" : "over" } : null;
+    return [{ key: k, label: label(k), line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, soFar, at, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
   });
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
 }
@@ -73,6 +77,7 @@ export function OverviewRow({ r, onOpen, active, sub }: { r: any; onOpen: () => 
       className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
     <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
+                          {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-semibold", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
                           <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
@@ -125,7 +130,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // every market the books price, scored on the same matches and ranked by the better side's edge (like the props list ranks by hit rate)
-  const overview = useMemo(() => buildOverview({ store, doc: doc.data, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys, label: marketLabel, liveMatch }), [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch]); // eslint-disable-line react-hooks/exhaustive-deps
+  const overview = useMemo(() => buildOverview({ store, doc: doc.data, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys, label: marketLabel, liveMatch, ground: venueIdx.length ? hereMatches(10) : undefined }), [doc.data, ms, keys, fxInfo, team, scope, store, liveMatch, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => (!key || key === "top_batter" ? [] : byLine(fancyLines(doc.data, fxInfo, key, team?.[0] ?? null))), [doc.data, fxInfo, key, team]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps

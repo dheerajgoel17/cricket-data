@@ -334,3 +334,12 @@ def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp
     assert [r["start"] for r in B._unscheduled_priced(vb, test, now=now)] == ["2026-11-10T03:30Z"]  # day 2 is the schedule's Test
     t20 = [{**test[0], "fmt": "T20"}]
     assert [r["start"] for r in B._unscheduled_priced(vb, t20, now=now)] == ["2026-10-29T03:30Z", "2026-11-10T03:30Z"]  # a T20 a day apart is another match
+
+
+def test_a_match_named_by_its_sides_joins_the_series_of_its_siblings():
+    rows = [{"start": "2026-10-27T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "Afghanistan vs Zimbabwe in UAE 2026"},
+            {"start": "2026-11-01T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "AFG vs ZIM"},
+            {"start": "2026-11-01T14:30Z", "a": "Oman", "b": "Nepal", "series": "OMN vs NEP"},                      # no sibling: stays as it is
+            {"start": "2027-03-01T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "AFG vs ZIM"}]            # months away: another series
+    B._name_series(rows)
+    assert [r["series"] for r in rows] == ["Afghanistan vs Zimbabwe in UAE 2026", "Afghanistan vs Zimbabwe in UAE 2026", "OMN vs NEP", "AFG vs ZIM"]

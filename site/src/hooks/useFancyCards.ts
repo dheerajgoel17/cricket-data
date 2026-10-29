@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fancyFor, fixtureBooks } from "@/engine/lines.js";
-import { MATCH_MARKETS, selectMatches } from "@/engine/markets.js";
+import { MATCH_MARKETS, selectMatches, venueIndices } from "@/engine/markets.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { fixtureStart } from "@/lib/format";
-import { usePricedFixtures } from "@/hooks/useEngine";
+import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
+import { useLiveDoc } from "@/hooks/useLive";
+import { liveForFixture } from "@/engine/live.js";
 import { MATCH_KEYS, buildOverview } from "@/components/app/match-fancy";
 
 const WINDOW = 20; // the sides' last matches the lines are scored on
@@ -19,7 +22,10 @@ const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as a
  */
 export function useFancyCards() {
   const { store } = useData();
-  const { fixtures, ready, doc } = usePricedFixtures();
+  const { fixtures: all, ready, doc } = usePricedFixtures();
+  const live = useLiveDoc();
+  // a finished match has nothing left to bet on: fancy lists the matches in play and to come (a finished match keeps its own page and its archive)
+  const fixtures = useMemo(() => all.filter((f: any) => fixtureState(f, liveForFixture(live.data, f)?.status) !== "final"), [all, live.data]);
   const ids = fixtures.map((f: any) => f.id || `${f.a}${f.b}${f.start}`).join("|");
   const q = useQuery({
     queryKey: ["fancy-cards", doc?.generated_at_utc ?? "", ids],
@@ -31,8 +37,10 @@ export function useFancyCards() {
         const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
         const fmtIdx = FORMATS.indexOf(f.fmt);
         const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
+        const venue = (venueIndices as (s: any, n: string) => number[])(store, f.venue);
+        const ground = venue.length ? (selectMatches(store, { fmt: fmtIdx, gender: f.gender === "female" ? 1 : 0, venue, lastN: 10 }) as number[]) : undefined; // the last ten matches at this ground
         const keys = MATCH_KEYS.filter(([k]) => fancyFor(doc, fx, k).length > 0);
-        out.push({ f, ms, rows: buildOverview({ store, doc, fxInfo: fx, ms, scope: -1, teamName: null, keys, label: (k) => (MATCH_MARKETS as any)[k]?.label ?? k }) });
+        out.push({ f, ms, rows: buildOverview({ store, doc, fxInfo: fx, ms, scope: -1, teamName: null, keys, label: (k) => (MATCH_MARKETS as any)[k]?.label ?? k, ground }) });
         await yieldToMain();
       }
       return out;

@@ -162,6 +162,7 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
             </span>
             <span className="grid justify-items-end gap-hair">
               <span className={cn("text-footnote font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}{(win === "h2h" || win === "ven") && r[win].played ? ` · ${r[win].played}` : ""}</span></span>
+              {win !== "ven" && r.ven?.played >= 2 && <span className={cn("text-caption tabular-nums", (r.ven.p ?? 0) >= 0.75 ? "font-semibold text-primary" : (r.ven.p ?? 1) <= 0.25 ? "font-semibold text-miss" : "text-muted-foreground")} title={r.venue}>At {String(r.venue).split(",")[0]} {pct(r.ven.p)} · {r.ven.hits}/{r.ven.played}</span>}
               {bars && <Spark r={r} />}
             </span>
           </ItemActions>
