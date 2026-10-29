@@ -13,5 +13,15 @@
   "edge": 0.0589,
   "start_utc": "2026-10-29T14:30:00Z",
   "alerted_at": "2026-10-28T15:05:10.363304+00:00"
+ },
+ "male|India|New Zealand|2026-10-30|batter_fours||Abhishek Sharma under 2.5|2.5|under": {
+  "edge": 0.0625,
+  "start_utc": "2026-10-30T07:00:00Z",
+  "alerted_at": "2026-10-29T10:18:58.622435+00:00"
+ },
+ "male|India|New Zealand|2026-10-30|batter_runs||Daryl Mitchell under 25.5|25.5|under": {
+  "edge": 0.0506,
+  "start_utc": "2026-10-30T07:00:00Z",
+  "alerted_at": "2026-10-29T10:18:58.622435+00:00"
  }
 }
