@@ -20,6 +20,7 @@ import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
 import { localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { venueStem } from "@/engine/markets.js";
@@ -140,7 +141,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
-  const share = () => { const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
+  const share = () => { track("share", { kind: "player" }); const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
   const loading = lines.isLoading || res.isLoading || !res.data;
 
   return (
@@ -189,7 +190,7 @@ function NextMatch({ book, team, q, navigateWith, entries, line, side }: any) {
       {stat(`At ${ground.split(",")[0]}`, here)}{stat(`Vs ${opp}`, versus)}
       {chips.length ? <div className="flex flex-wrap gap-snug">
         {chips.map(([k, v, label]) => { const on = q[k] === v; return (
-          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => navigateWith({ [k]: on ? "" : v })}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}
+          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}
       </div> : null}
     </div>
   );

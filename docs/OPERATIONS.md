@@ -69,3 +69,6 @@ Feed G's book answers GitHub's US servers with 403, so its read runs on a small 
 4. When the runner shows Idle, set the repository variable `FEEDG_INDIA_RUNNER` to `on` (Settings, Secrets and variables, Actions, Variables). Set it back to anything else to switch the job off. Until it is `on` the job is skipped, not queued.
 5. Run "Feed G (India runner)" once by hand and check that `value_bets/state/feedg_latest.json` is committed; the next value-bets run then lists Feed G as ok.
 The book may also refuse a cloud server's address: then the manual run fails with 403 and the server can be deleted. Nothing else depends on it.
+
+## Analytics
+The site counts page views and a few button taps with Vercel Web Analytics (`@vercel/analytics`, MIT, free tier, no cookies, no personal data, so no consent banner). The script is added in `site/src/main.tsx`; events go through `site/src/lib/analytics.ts` (`player_filter`, `share`, `books_open`, `fancy_market`). To read it, turn on **Analytics** once in the project's dashboard (Project, Analytics, Enable); nothing is collected until then. Events with properties need the Pro plan to be filtered in the dashboard; the free plan counts page views and shows custom events as totals.
