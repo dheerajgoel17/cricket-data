@@ -23,6 +23,8 @@ import { setTitle } from "@/lib/title";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
+import { useLiveDoc } from "@/hooks/useLive";
+import { liveForFixture } from "@/engine/live.js";
 import { venueStem } from "@/engine/markets.js";
 import { norm } from "@/lib/hot-lines";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
@@ -169,6 +171,7 @@ function PlayerScreen({ idx }: { idx: number }) {
 function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string, lastGame?: any) {
   const { store } = useData();
   const fixtures = useFixtures();
+  const live = useLiveDoc();
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
     const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
@@ -176,6 +179,11 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
     const booked = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.team && l.start_utc).sort((x: any, y: any) => Date.parse(y.start_utc) - Date.parse(x.start_utc))[0]; // the club the books file him under now, even for a match that has begun: the data may not have his club's games yet
+    // he is playing now: the match the books filed him under has begun and is not over (the live feed's word, else the first hours after the start): there is no "next" match to show
+    if (booked && Date.parse(booked.start_utc) <= now) {
+      const [h, w] = String(booked.match).split(/\s+vs\s+/i), st = liveForFixture(live.data, { a: h, b: w, start: booked.start_utc })?.status;
+      if (st === "live" || (!st && now - Date.parse(booked.start_utc) < (fmt === "Test" ? 6 * 24 : 5) * 3600e3)) return null;
+    }
     if (booked) lastSide = booked.team;
     else if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = norm(x) === norm(lastGame.opp) ? y : x; }
     if (priced) {
@@ -194,7 +202,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
     return { match, start, competition, opp, ground, known };
-  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, store]);
+  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, store]);
 }
 
 type Next = NonNullable<ReturnType<typeof useNextMatch>>;
