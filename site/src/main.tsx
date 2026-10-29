@@ -11,10 +11,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { reloadOnce } from "@/components/app/error-boundary";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { reportError } from "@/lib/analytics";
 
 const client = new QueryClient({ defaultOptions: { queries: { staleTime: 5 * 60_000, refetchOnWindowFocus: false, retry: 1 } } });
 prefetchFeeds(client, location.pathname);
-window.addEventListener("vite:preloadError", (e) => { e.preventDefault(); reloadOnce(); }); // a script of an older deploy is gone: the new deploy has the page, so reload once
+window.addEventListener("vite:preloadError", (e) => { e.preventDefault(); reportError("chunk"); reloadOnce(); });
+window.addEventListener("error", (e) => reportError("script", e.error ?? e.message));
+window.addEventListener("unhandledrejection", (e) => reportError("promise", e.reason)); // a script of an older deploy is gone: the new deploy has the page, so reload once
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -26,6 +30,7 @@ createRoot(document.getElementById("root")!).render(
           </BrowserRouter>
           <Toaster />
           <Analytics />
+          <SpeedInsights />
         </TooltipProvider>
       </MotionConfig>
     </QueryClientProvider>
