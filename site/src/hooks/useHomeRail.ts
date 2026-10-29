@@ -28,6 +28,8 @@ function useGaveUp(ms: number, done: boolean): boolean {
  */
 /** How many games without props the rail adds after the ones with props. */
 const NO_PROPS_LIMIT = 24;
+/** How many finished matches the rail keeps after the live and coming ones, however many of those there are. */
+const FINISHED_KEPT = 3;
 
 export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
   const { fixtures: fx, ready: haveFixtures } = usePricedFixtures();
@@ -38,8 +40,12 @@ export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
   const ready = haveFixtures && (settled || railLate) && (haveLive || liveLate);
   const fixtures = useMemo(() => {
     if (!ready) return [];
-    const ranked = rankFixtures(fx, homeTeam(), (f) => fixtureState(f, liveForFixture(live.data, f)?.status), rail);
-    return [...ranked.filter((f) => !f.noProps).slice(0, limit), ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
+    const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
+    const ranked = rankFixtures(fx, homeTeam(), stateOf, rail);
+    const priced = ranked.filter((f) => !f.noProps);
+    // the finished matches have their own places, after the live and coming ones: with many matches lined up they would be cut off the end, so a few are kept whatever the limit
+    const done = priced.filter((f) => stateOf(f) === "final").slice(0, FINISHED_KEPT), going = priced.filter((f) => stateOf(f) !== "final").slice(0, limit);
+    return [...going, ...done, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
   }, [ready, fx, live.data, rail, limit]);
   return { ready, fixtures };
 }
