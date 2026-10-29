@@ -51,7 +51,9 @@ const startedSince = (f: any, ms: number, now: number) => (f.start.length > 10 ?
 export const upcomingOnly = (fx: any[], now = Date.now()) => fx.filter((f) => startedSince(f, 4 * 3600e3, now));
 
 /** A fixture's state: the live feed's word for it when it has one, else what the schedule file says (a match that has dropped off the source's page is stored as Completed). */
-export const fixtureState = (f: any, live?: string): "live" | "final" | "upcoming" => (live === "live" || live === "final" ? live : f.status === "Completed" ? "final" : f.status === "Live" ? "live" : "upcoming");
+/** A multi-day match the schedule calls "Completed" at the close of a day, with no result yet, is still on: a finished Test has its result ("won by", "drawn") in the row. */
+const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, 6 * 24 * 3600e3, now);
+export const fixtureState = (f: any, live?: string, now = Date.now()): "live" | "final" | "upcoming" => (live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : "upcoming");
 
 /**
  * What the home list keeps. Upcoming matches, matches in the first 4 hours and matches being played (up to 6 days, for a Test) that the books price; and finished matches,
