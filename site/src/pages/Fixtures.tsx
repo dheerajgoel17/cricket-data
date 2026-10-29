@@ -59,7 +59,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
   const final = match?.status === "final" || (!match && fixtureState(f) === "final");
-  const on = !final && (hasScore || clock.tone === "live");
+  const delayed = !final && !hasScore && match?.status === "upcoming" && clock.tone === "live"; // its time has passed but the live feed says it has not started: delayed, not in play
+  const on = !final && !delayed && (hasScore || clock.tone === "live");
   const blurb = liveBlurb(match) || (final ? f.result || "" : "");
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
@@ -71,7 +72,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
       <div className="flex items-center gap-snug">
         <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", on ? "text-miss" : "text-muted-foreground")}>
-          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : clock.label}
+          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
@@ -90,7 +91,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
           <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
           <div className="grid justify-items-end gap-hair text-right">
             <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
-            <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{clock.value}</b>
+            <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : clock.value}</b>
           </div>
         </div>
       )}
