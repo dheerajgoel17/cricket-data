@@ -60,7 +60,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const hasScore = scores.some((s) => s?.display);
   const final = match?.status === "final" || (!match && fixtureState(f) === "final");
   const delayed = !final && !hasScore && match?.status === "upcoming" && clock.tone === "live"; // its time has passed but the live feed says it has not started: delayed, not in play
-  const on = !final && !delayed && (hasScore || clock.tone === "live");
+  const on = !final && !delayed && (hasScore || clock.tone === "live" || fixtureState(f, match?.status) === "live");
   const blurb = liveBlurb(match) || (final ? f.result || "" : "");
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
