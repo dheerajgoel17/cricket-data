@@ -72,3 +72,6 @@ The book may also refuse a cloud server's address: then the manual run fails wit
 
 ## Analytics
 The site counts page views and a few button taps with Vercel Web Analytics (`@vercel/analytics`, MIT, free tier, no cookies, no personal data, so no consent banner). The script is added in `site/src/main.tsx`; events go through `site/src/lib/analytics.ts` (`player_filter`, `share`, `books_open`, `fancy_market`). To read it, turn on **Analytics** once in the project's dashboard (Project, Analytics, Enable); nothing is collected until then. Events with properties need the Pro plan to be filtered in the dashboard; the free plan counts page views and shows custom events as totals.
+
+**Errors and speed.** Page errors are counted as events named by kind: `error_chunk` (a script of an older deploy was gone; the page reloads itself), `error_render` (a page threw, the Reload button showed), `error_script` and `error_promise` (anything else), at most five per page load, so the totals read on the free plan (the message and page go along as properties, readable on Pro). Loading speed (Core Web Vitals per page) comes from Vercel Speed Insights (`@vercel/speed-insights`, Apache-2.0, free tier): turn on **Speed Insights** in the same project dashboard. Watch for a rise in `error_chunk` right after a deploy (normal, small) and any `error_render` (a bug).
+

@@ -1,11 +1,12 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { reportError } from "@/lib/analytics";
 
 /** A page that throws (or whose script is gone after a deploy) shows a way back instead of a blank screen; a script that is gone reloads once by itself, since the new deploy has it. */
 export class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch(e: Error, _info: ErrorInfo) { if (/dynamically imported module|Importing a module script failed|ChunkLoadError/i.test(String(e?.message))) reloadOnce(); }
+  componentDidCatch(e: Error, _info: ErrorInfo) { reportError("render", e); if (/dynamically imported module|Importing a module script failed|ChunkLoadError/i.test(String(e?.message))) reloadOnce(); }
   render() {
     if (!this.state.failed) return this.props.children;
     return (
