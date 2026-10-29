@@ -18,6 +18,7 @@ import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
 import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
@@ -161,7 +162,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     const opp = scope >= 0 ? (a === scope ? b : a) : -1;
     return { date: d, text: scope >= 0 ? `v ${abbr(store.teamName(opp, true))}` : `${abbr(store.teamName(a, true))} v ${abbr(store.teamName(b, true))}` };
   }), [ms, store, scope]);
-  const open = (k: string) => { set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
+  const open = (k: string) => { track("fancy_market", { market: k }); set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
 
   return (
     <div className="flex min-w-0 flex-col gap-stack">

@@ -10,6 +10,7 @@ import { prefetchFeeds } from "@/lib/queries";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { reloadOnce } from "@/components/app/error-boundary";
+import { Analytics } from "@vercel/analytics/react";
 
 const client = new QueryClient({ defaultOptions: { queries: { staleTime: 5 * 60_000, refetchOnWindowFocus: false, retry: 1 } } });
 prefetchFeeds(client, location.pathname);
@@ -24,6 +25,7 @@ createRoot(document.getElementById("root")!).render(
             <DataProvider><App /></DataProvider>
           </BrowserRouter>
           <Toaster />
+          <Analytics />
         </TooltipProvider>
       </MotionConfig>
     </QueryClientProvider>

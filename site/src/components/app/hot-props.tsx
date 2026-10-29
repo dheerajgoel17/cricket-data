@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useId, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { Link } from "react-router-dom";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -128,7 +129,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
         </span>
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-white/10"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}>
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
             {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
         )}
