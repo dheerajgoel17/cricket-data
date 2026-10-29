@@ -58,6 +58,10 @@ describe("shownFixtures", () => {
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "SAvAus", fmt: "Test", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["SAvAus", "m1", "m2", "m3"]);
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "T20", fmt: "T20", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["m1", "m2", "m3"]);
   });
+  it("keeps a match whose start has passed with no play yet (a delay) for 12 hours, then lets it go", () => {
+    expect(shownFixtures([f("2026-10-29T01:00Z", { a: "Delayed" })], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(1); // 8 hours late
+    expect(shownFixtures([f("2026-10-28T09:00Z", { a: "Gone" })], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(0); // a day late
+  });
   it("keeps a match being played for as long as it runs (a Test) and drops an old unscored one", () => {
     const now = at("2026-10-29T09:00:00Z");
     expect(shownFixtures([f("2026-10-27T04:00Z", { a: "Test", live: "live" })], state, () => true, now)).toHaveLength(1);
