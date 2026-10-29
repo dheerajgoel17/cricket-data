@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -25,11 +26,13 @@ export function ValueBars({ values, line, labels }: { values: number[]; line: nu
   const reduce = useReducedMotion();
   const top = Math.max(line * 1.25, ...values, 1);
   const each = !!labels && labels.length === values.length && values.length <= LABELLED;
+  const [pick, setPick] = useState<number | null>(null); // with more bars than fit labels, a tap (or hover) on a bar says which match it is
+  const picked = !each && pick != null && labels?.[pick] ? { l: labels[pick], v: values[pick] } : null;
   return (
     <div className="flex flex-col gap-tight" role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
       <div className="relative flex h-28 items-end gap-tight">
         {values.map((v, i) => (
-          <motion.span key={`${i}-${v}`} title={labels?.[i] ? `${labels[i].date} ${labels[i].text}: ${v}` : String(v)} className={cn("min-w-0 flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
+          <motion.span key={`${i}-${v}`} onClick={() => setPick(i)} onMouseEnter={() => setPick(i)} title={labels?.[i] ? `${labels[i].date} ${labels[i].text}: ${v}` : String(v)} className={cn("min-w-0 flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
             style={{ height: `${Math.max((v / top) * 100, 4)}%` }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} />
         ))}
         <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ duration: 0.3 }}>
@@ -41,7 +44,8 @@ export function ValueBars({ values, line, labels }: { values: number[]; line: nu
           {labels!.map((l, i) => <span key={i} className="grid min-w-0 flex-1"><span className="truncate tabular-nums">{values[i]}</span><span className="truncate">{l.text}</span><span className="truncate tabular-nums">{l.date}</span></span>)}
         </div>
       ) : (
-        <div className="flex justify-between text-caption text-muted-foreground"><span>{labels?.[0] ? `Oldest · ${labels[0].date}` : "Oldest"}</span><span>{labels?.length ? `${labels[labels.length - 1].date} · Latest` : "Latest"}</span></div>
+        picked ? <div className="flex justify-between gap-snug text-footnote"><span className="min-w-0 truncate font-semibold">{picked.l.text}</span><span className="shrink-0 tabular-nums text-muted-foreground">{picked.l.date} · <b className={cn("font-semibold", picked.v > line ? "text-primary" : picked.v < line ? "text-miss" : "text-foreground")}>{picked.v}</b></span></div>
+        : <div className="flex justify-between text-caption text-muted-foreground"><span>{labels?.[0] ? `Oldest · ${labels[0].date}` : "Oldest"}</span><span>{labels?.length ? `${labels[labels.length - 1].date} · Latest` : "Latest"}</span></div>
       )}
     </div>
   );

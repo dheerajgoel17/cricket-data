@@ -608,6 +608,22 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     return out
 
 
+_SHORT_SERIES = re.compile(r"^[A-Za-z0-9]{2,5} vs [A-Za-z0-9]{2,5}$")
+
+
+def _name_series(rows: list[dict]) -> None:
+    """The schedule names a match's series by its two sides ("AFG vs ZIM") when the page it came from has no series title. Such a match belongs to the series its siblings (the same two
+    sides, within 30 days) carry ("Afghanistan vs Zimbabwe in UAE 2026"), so it sits in the same chip, not a chip of its own."""
+    named = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), r["series"]) for r in rows if r.get("series") and not _SHORT_SERIES.match(r["series"])]
+    for r in rows:
+        if not _SHORT_SERIES.match(r.get("series") or ""):
+            continue
+        pair, mins = frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"])
+        near = [(abs(m - mins), name) for k, m, name in named if k == pair and abs(m - mins) <= 30 * 24 * 60]
+        if near:
+            r["series"] = min(near)[1]
+
+
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
@@ -623,6 +639,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                 rows.append({"start": r["start_utc"], "fmt": r["format"], "gender": r["gender"], "a": r["team_a"],
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
                              "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
+    _name_series(rows)
     rows += _unscheduled_priced(vb_dir, rows)
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}

@@ -159,16 +159,23 @@ function PlayerScreen({ idx }: { idx: number }) {
   );
 }
 
-function NextMatch({ book, team, q, navigateWith }: any) {
+function NextMatch({ book, team, q, navigateWith, entries, line, side }: any) {
   const { store } = useData();
   const fixtures = useFixtures();
   const [a, b] = String(book.match).split(/\s+vs\s+/i);
-  const side = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
-  const oppRaw = side(book.team) || side(team); // the book's side first: a club player's profile team is often his country
+  const other = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
+  const oppRaw = other(book.team) || other(team); // the book's side first: a club player's profile team is often his country
   const fx = (fixtures.data || []).find((f: any) => sameFixture({ match: book.match, start_utc: book.start_utc }, f));
   const opp = [fx?.a, fx?.b].find((t) => t && norm(t) === norm(oppRaw)) || oppRaw; // the schedule's spelling of the side, which the data knows
   const ground = String(fx?.venue || "");
   const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
+  // how he has done on this line at the ground and against this side (the games on the chart, filters applied): a ground can be far from his form
+  const rate = (rows: any[]) => windowRate(rows, 0, line, side);
+  const here = ground ? rate(entries.filter((e: any) => venueStem(e.venueName) === venueStem(ground))) : null;
+  const versus = opp ? rate(entries.filter((e: any) => norm(e.opp) === norm(opp))) : null;
+  const stat = (label: string, r: any) => r && r.played >= 1 ? (
+    <div key={label} className="flex items-baseline justify-between gap-snug text-callout"><span className="min-w-0 truncate text-muted-foreground">{label}</span>
+      <span className="shrink-0 tabular-nums"><b className={cn("font-semibold", (r.p ?? 0) >= 0.75 ? "text-primary" : (r.p ?? 1) <= 0.25 ? "text-miss" : "text-foreground")}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b> <span className="text-muted-foreground">{r.hits} of {r.played} {side} {line}</span></span></div>) : null;
   const chips: [string, string, string][] = [];
   if (opp) chips.push(["opp", opp, `vs ${opp}`]);
   if (known) chips.push(["venue", known, `At ${ground.split(",")[0]}`]);
@@ -179,6 +186,7 @@ function NextMatch({ book, team, q, navigateWith }: any) {
         <span className="text-body font-semibold">{opp ? `vs ${opp}` : book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}</span>
         {ground ? <span className="text-callout text-muted-foreground">{ground}{book.competition ? ` · ${book.competition}` : ""}</span> : null}
       </div>
+      {stat(`At ${ground.split(",")[0]}`, here)}{stat(`Vs ${opp}`, versus)}
       {chips.length ? <div className="flex flex-wrap gap-snug">
         {chips.map(([k, v, label]) => { const on = q[k] === v; return (
           <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => navigateWith({ [k]: on ? "" : v })}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}
@@ -216,7 +224,7 @@ function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: 
 
   return (
     <div className="flex flex-col gap-section">
-      {book ? <NextMatch {...{ book, team, q, navigateWith }} /> : null}
+      {book ? <NextMatch {...{ book, team, q, navigateWith, entries, line, side }} /> : null}
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
         <section className="flex flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
