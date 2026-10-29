@@ -54,7 +54,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const final = match?.status === "final" || (!match && fixtureState(f) === "final");
   // the live feed says the match has not started although its time has passed (rain, a late toss): it is delayed, not in play
   const delayed = !final && !hasScore && match?.status === "upcoming" && ms <= 0 && ms > -24 * 3600e3;
-  const live = !final && !delayed && (hasScore || clockLive);
+  const live = !final && !delayed && (hasScore || clockLive || fixtureState(f, match?.status) === "live"); // a Test between days has no clock and may have no score on the feed, but it is still on
   const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back

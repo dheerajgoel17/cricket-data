@@ -18,7 +18,7 @@ import { FORMATS, fmtIndex } from "@/engine/util.js";
 import { barState, windowRate, windowRates } from "@/engine/windows.js";
 import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
-import { localWhen, num, odds, pc, shortDate } from "@/lib/format";
+import { fixtureStart, localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -139,6 +139,7 @@ function PlayerScreen({ idx }: { idx: number }) {
     venue: q.venue || null,
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
+  const nextMatch = useNextMatch(lines.data, store.P.id[idx], idx, FORMATS[fmtVal], team);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
   const share = () => { track("share", { kind: "player" }); const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
@@ -154,49 +155,74 @@ function PlayerScreen({ idx }: { idx: number }) {
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       {loading ? <PlayerSkeleton />
-        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, team, res: res.data, q, book, bookDefault, navigateWith, scope }} />
+        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, next: nextMatch, res: res.data, q, book, bookDefault, navigateWith, scope }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
     </div>
   );
 }
 
-function NextMatch({ book, team, q, navigateWith, entries, line, side }: any) {
+/**
+ * His next match, while it has not started: from the books' lines for him in this format (the side they file him under, their start) else, with none priced, the schedule's next match
+ * of his team in this format. The opponent and ground are the schedule's spelling (which the data knows). Null when there is none.
+ */
+function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string) {
   const { store } = useData();
   const fixtures = useFixtures();
-  const [a, b] = String(book.match).split(/\s+vs\s+/i);
-  const other = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
-  const oppRaw = other(book.team) || other(team); // the book's side first: a club player's profile team is often his country
-  const fx = (fixtures.data || []).find((f: any) => sameFixture({ match: book.match, start_utc: book.start_utc }, f));
-  const opp = [fx?.a, fx?.b].find((t) => t && norm(t) === norm(oppRaw)) || oppRaw; // the schedule's spelling of the side, which the data knows
-  const ground = String(fx?.venue || "");
-  const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
-  // how he has done on this line at the ground and against this side (the games on the chart, filters applied): a ground can be far from his form
+  return useMemo(() => {
+    const now = Date.now(), fx = fixtures.data || [];
+    const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
+    let match: string, start: string, competition: string, club = "", row: any;
+    if (priced) {
+      match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
+      row = fx.find((f: any) => sameFixture({ match, start_utc: start }, f));
+    } else {
+      const women = store.P.g[idx] === 1;
+      row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (norm(f.a) === norm(team) || norm(f.b) === norm(team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
+      if (!row) return null;
+      match = `${row.a} vs ${row.b}`; start = fixtureStart(row).toISOString(); competition = row.series || "";
+    }
+    const [a, b] = String(match).split(/\s+vs\s+/i);
+    const other = (t: string) => (norm(t) === norm(a) ? b : norm(t) === norm(b) ? a : "");
+    const oppRaw = other(club) || other(team); // the book's side first: a club player's profile team is often his country
+    const opp = [row?.a, row?.b].find((t) => t && norm(t) === norm(oppRaw)) || oppRaw;
+    const ground = String(row?.venue || "");
+    const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
+    return { match, start, competition, opp, ground, known };
+  }, [doc, pid, idx, fmt, team, fixtures.data, store]);
+}
+
+type Next = NonNullable<ReturnType<typeof useNextMatch>>;
+
+/** The next-match card: who and when, and how he has done on the line on the chart at that ground and against that side (the games on the chart, filters applied: a ground can sit far from his form). Shown until the match starts, for every stat. */
+function NextMatch({ next, entries, line, side }: { next: Next; entries: any[]; line: number; side: string }) {
   const rate = (rows: any[]) => windowRate(rows, 0, line, side);
-  const here = ground ? rate(entries.filter((e: any) => venueStem(e.venueName) === venueStem(ground))) : null;
-  const versus = opp ? rate(entries.filter((e: any) => norm(e.opp) === norm(opp))) : null;
+  const here = next.ground ? rate(entries.filter((e: any) => venueStem(e.venueName) === venueStem(next.ground))) : null;
+  const versus = next.opp ? rate(entries.filter((e: any) => norm(e.opp) === norm(next.opp))) : null;
   const stat = (label: string, r: any) => r && r.played >= 1 ? (
     <div key={label} className="flex items-baseline justify-between gap-snug text-callout"><span className="min-w-0 truncate text-muted-foreground">{label}</span>
       <span className="shrink-0 tabular-nums"><b className={cn("font-semibold", (r.p ?? 0) >= 0.75 ? "text-primary" : (r.p ?? 1) <= 0.25 ? "text-miss" : "text-foreground")}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b> <span className="text-muted-foreground">{r.hits} of {r.played} {side} {line}</span></span></div>) : null;
-  const chips: [string, string, string][] = [];
-  if (opp) chips.push(["opp", opp, `vs ${opp}`]);
-  if (known) chips.push(["venue", known, `At ${ground.split(",")[0]}`]);
   return (
     <div className={cn("grid gap-snug p-inset", CARD)}>
       <div className="grid gap-hair">
         <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">Next match</span>
-        <span className="text-body font-semibold">{opp ? `vs ${opp}` : book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}</span>
-        {ground ? <span className="text-callout text-muted-foreground">{ground}{book.competition ? ` · ${book.competition}` : ""}</span> : null}
+        <span className="text-body font-semibold">{next.opp ? `vs ${next.opp}` : next.match} · {localWhen(next.start)}</span>
+        {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
       </div>
-      {stat(`At ${ground.split(",")[0]}`, here)}{stat(`Vs ${opp}`, versus)}
-      {chips.length ? <div className="flex flex-wrap gap-snug">
-        {chips.map(([k, v, label]) => { const on = q[k] === v; return (
-          <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>{on ? `${label} ✓` : `Only ${label}`}</Button>); })}
-      </div> : null}
+      {stat(`At ${next.ground.split(",")[0]}`, here)}{stat(`Vs ${next.opp}`, versus)}
     </div>
   );
 }
 
-function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: any) {
+/** Quick filters for the chart: only games against his next opponent, only games at its ground. They are filters like the ones in the sheet (same URL keys), so they sit with them. */
+function NextFilters({ next, q, navigateWith }: { next: Next; q: Record<string, string>; navigateWith: (p: Record<string, unknown>) => void }) {
+  const chips: [string, string, string][] = [];
+  if (next.opp) chips.push(["opp", next.opp, `vs ${next.opp}`]);
+  if (next.known) chips.push(["venue", next.known, `At ${next.ground.split(",")[0]}`]);
+  return <>{chips.map(([k, v, label]) => { const on = q[k] === v; return (
+    <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on} onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>{label}</Button>); })}</>;
+}
+
+function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope }: any) {
   const { store } = useData();
   const c = res.chart;
   const entries: any[] = c ? c.entries : [];
@@ -225,7 +251,7 @@ function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: 
 
   return (
     <div className="flex flex-col gap-section">
-      {book ? <NextMatch {...{ book, team, q, navigateWith, entries, line, side }} /> : null}
+      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side }} /> : null}
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
         <section className="flex flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
@@ -299,6 +325,7 @@ function Loaded({ name, team, res, q, book, bookDefault, navigateWith, scope }: 
       <section className="flex flex-col gap-stack">
         <div className="flex flex-wrap items-center gap-snug">
           <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters{active.length ? ` · ${active.length}` : ""}</Button>
+          {next ? <NextFilters {...{ next, q, navigateWith }} /> : null}
           {active.length ? active.map(([k, v]: [string, unknown], i: number) => <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-footnote font-normal">{k ? <b className="mr-tight font-semibold">{k}</b> : null}{String(v)}</Badge>)
             : <span className="text-callout text-muted-foreground">All matches</span>}
           {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
