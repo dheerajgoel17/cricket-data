@@ -175,7 +175,9 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     let match: string, start: string, competition: string, club = "", row: any;
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
-    if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = norm(x) === norm(lastGame.opp) ? y : x; }
+    const booked = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.team && l.start_utc).sort((x: any, y: any) => Date.parse(y.start_utc) - Date.parse(x.start_utc))[0]; // the club the books file him under now, even for a match that has begun: the data may not have his club's games yet
+    if (booked) lastSide = booked.team;
+    else if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = norm(x) === norm(lastGame.opp) ? y : x; }
     if (priced) {
       match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
       row = fx.find((f: any) => sameFixture({ match, start_utc: start }, f));
