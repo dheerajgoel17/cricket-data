@@ -1,9 +1,65 @@
 {
- "afghanistan_enumerated_at": "2026-10-28T09:48:22",
+ "afghanistan_enumerated_at": "2026-10-29T10:07:24",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
    "key": "2021-11-27-Oman-Namibia"
+  },
+  {
+   "canonical_id": "1197757",
+   "key": "2020-01-01-Auckland-Canterbury"
+  },
+  {
+   "canonical_id": "1197758",
+   "key": "2020-01-01-Wellington-Northern Districts"
+  },
+  {
+   "canonical_id": "1197755",
+   "key": "2019-12-30-Auckland-Wellington"
+  },
+  {
+   "canonical_id": "1197756",
+   "key": "2019-12-30-Otago-Canterbury"
+  },
+  {
+   "canonical_id": "1197754",
+   "key": "2019-12-29-Otago-Northern Districts"
+  },
+  {
+   "canonical_id": "1197753",
+   "key": "2019-12-28-Central Districts-Auckland"
+  },
+  {
+   "canonical_id": "1197752",
+   "key": "2019-12-27-Wellington-Central Districts"
+  },
+  {
+   "canonical_id": "1197751",
+   "key": "2019-12-23-Canterbury-Central Districts"
+  },
+  {
+   "canonical_id": "1197750",
+   "key": "2019-12-22-Auckland-Northern Districts"
+  },
+  {
+   "canonical_id": "1197749",
+   "key": "2019-12-21-Otago-Wellington"
+  },
+  {
+   "canonical_id": "1197742",
+   "key": "2019-12-15-Otago-Auckland"
+  },
+  {
+   "canonical_id": "1197743",
+   "key": "2019-12-15-Canterbury-Wellington"
+  },
+  {
+   "canonical_id": "1197741",
+   "key": "2019-12-14-Central Districts-Northern Districts"
+  },
+  {
+   "canonical_id": "1197742",
+   "key": "2019-12-14-Auckland-Otago"
   }
  ],
  "batch_size": 30,
@@ -2186,6 +2242,138 @@
    "key": "2021-11-21-Western Australia-Tasmania",
    "match_id": "crex-tas-vs-waca-12th-match-sheffield-shield-2021-22-match-updates-BZU",
    "saved_at": "2026-10-28T09:56:28"
+  },
+  {
+   "crex_url": "/cricket-live-score/oma-vs-usa-6th-match-cricket-world-cup-league-2-2019-23-match-updates-AN0",
+   "key": "2021-09-20-Oman-United States of America",
+   "match_id": "crex-oma-vs-usa-6th-match-cricket-world-cup-league-2-2019-23-match-updates-AN0",
+   "saved_at": "2026-10-29T10:07:31"
+  },
+  {
+   "crex_url": "/cricket-live-score/nep-vs-usa-4th-match-cricket-world-cup-league-2-2019-23-match-updates-AMY",
+   "key": "2021-09-17-Nepal-United States of America",
+   "match_id": "crex-nep-vs-usa-4th-match-cricket-world-cup-league-2-2019-23-match-updates-AMY",
+   "saved_at": "2026-10-29T10:07:44"
+  },
+  {
+   "crex_url": "/cricket-live-score/leic-vs-som-19th-match-county-championship-2021-match-updates-99V",
+   "key": "2021-04-22-Leicestershire-Somerset",
+   "match_id": "crex-leic-vs-som-19th-match-county-championship-2021-match-updates-99V",
+   "saved_at": "2026-10-29T10:08:04"
+  },
+  {
+   "crex_url": "/cricket-live-score/vic-vs-waca-21st-match-sheffield-shield-2020-21-match-updates-GT1",
+   "key": "2021-03-25-Western Australia-Victoria",
+   "match_id": "crex-vic-vs-waca-21st-match-sheffield-shield-2020-21-match-updates-GT1",
+   "saved_at": "2026-10-29T10:08:16"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
+   "key": "2021-03-20-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
+   "saved_at": "2026-10-29T10:08:28"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Z",
+   "key": "2021-03-10-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Z",
+   "saved_at": "2026-10-29T10:08:41"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-zim-1st-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Y",
+   "key": "2021-03-02-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-1st-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Y",
+   "saved_at": "2026-10-29T10:08:54"
+  },
+  {
+   "crex_url": "/cricket-live-score/lio-vs-war-3rd-match-csa-t20-challenge-2021-match-updates-8TR",
+   "key": "2021-02-20-Warriors-Lions",
+   "match_id": "crex-lio-vs-war-3rd-match-csa-t20-challenge-2021-match-updates-8TR",
+   "saved_at": "2026-10-29T10:09:17"
+  },
+  {
+   "crex_url": "/cricket-live-score/bihr-vs-raj-4th-quater-final-syed-mushtaq-ali-trophy-2021-match-updates-8NY",
+   "key": "2021-01-27-Rajasthan-Bihar",
+   "match_id": "crex-bihr-vs-raj-4th-quater-final-syed-mushtaq-ali-trophy-2021-match-updates-8NY",
+   "saved_at": "2026-10-29T10:09:29"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
+   "key": "2021-01-26-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
+   "saved_at": "2026-10-29T10:09:42"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
+   "key": "2021-01-24-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
+   "saved_at": "2026-10-29T10:09:55"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
+   "key": "2021-01-21-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
+   "saved_at": "2026-10-29T10:10:08"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EP",
+   "key": "2020-03-10-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EP",
+   "saved_at": "2026-10-29T10:11:16"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-wi-only-test-afghanistan-vs-west-indies-in-india-2019-match-updates-9F2",
+   "key": "2019-11-27-Afghanistan-West Indies",
+   "match_id": "crex-afg-vs-wi-only-test-afghanistan-vs-west-indies-in-india-2019-match-updates-9F2",
+   "saved_at": "2026-10-29T10:12:35"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
+   "key": "2019-11-09-Afghanistan-West Indies",
+   "match_id": "crex-afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
+   "saved_at": "2026-10-29T10:14:03"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
+   "key": "2019-11-06-Afghanistan-West Indies",
+   "match_id": "crex-afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
+   "saved_at": "2026-10-29T10:14:21"
+  },
+  {
+   "crex_url": "/cricket-live-score/ban-w-vs-pak-w-2nd-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPR",
+   "key": "2019-11-04-Pakistan-Bangladesh",
+   "match_id": "crex-ban-w-vs-pak-w-2nd-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPR",
+   "saved_at": "2026-10-29T10:14:35"
+  },
+  {
+   "crex_url": "/cricket-live-score/ban-w-vs-pak-w-1st-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPQ",
+   "key": "2019-11-02-Pakistan-Bangladesh",
+   "match_id": "crex-ban-w-vs-pak-w-1st-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPQ",
+   "saved_at": "2026-10-29T10:14:47"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
+   "key": "2019-09-21-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
+   "saved_at": "2026-10-29T10:15:10"
+  },
+  {
+   "crex_url": "/cricket-live-score/nam-vs-usa-4th-match-cricket-world-cup-league-2-2019-23-match-updates-AMA",
+   "key": "2019-09-20-United States of America-Namibia",
+   "match_id": "crex-nam-vs-usa-4th-match-cricket-world-cup-league-2-2019-23-match-updates-AMA",
+   "saved_at": "2026-10-29T10:15:22"
+  },
+  {
+   "crex_url": "/cricket-live-score/nots-vs-warks-50th-match-county-championship-division-one-2019-match-updates-E2O",
+   "key": "2019-09-16-Nottinghamshire-Warwickshire",
+   "match_id": "crex-nots-vs-warks-50th-match-county-championship-division-one-2019-match-updates-E2O",
+   "saved_at": "2026-10-29T10:15:40"
+  },
+  {
+   "crex_url": "/cricket-live-score/ham-vs-sur-46th-match-county-championship-division-one-2019-match-updates-E2K",
+   "key": "2019-09-10-Hampshire-Surrey",
+   "match_id": "crex-ham-vs-sur-46th-match-county-championship-division-one-2019-match-updates-E2K",
+   "saved_at": "2026-10-29T10:15:58"
   }
  ],
  "failed": [],
@@ -4811,1270 +4999,379 @@
    "checked_at": "2026-10-28T09:57:45",
    "key": "2021-11-05-Mumbai-Services",
    "reason": "rendered 1 candidate page(s) for 2021-11-05; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-11-04-Puducherry-Punjab",
+   "reason": "no Source A match within a day of 2021-11-04 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-11-04-Jharkhand-Rajasthan",
+   "reason": "no Source A match within a day of 2021-11-04 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-11-04-Andhra-Jammu  Kashmir",
+   "reason": "no Source A match within a day of 2021-11-04 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-11-04-Nagaland-Manipur",
+   "reason": "no Source A match within a day of 2021-11-04 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-10-27-South Australia-Western Australia",
+   "reason": "no Source A match within a day of 2021-10-27 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:07:24",
+   "key": "2021-10-27-Queensland-Tasmania",
+   "reason": "no Source A match within a day of 2021-10-27 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [
+    "9B9"
+   ],
+   "checked_at": "2026-10-29T10:07:51",
+   "key": "2021-06-03-Nottinghamshire-Essex",
+   "reason": "rendered 1 candidate page(s) for 2021-06-03; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:08:59",
+   "key": "2021-02-25-South Australia-Western Australia",
+   "reason": "no Source A match within a day of 2021-02-25 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:09:04",
+   "key": "2021-02-25-Victoria-New South Wales",
+   "reason": "no Source A match within a day of 2021-02-25 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:13",
+   "key": "2021-01-19-Goa-Vidarbha",
+   "reason": "no Source A match within a day of 2021-01-19 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:18",
+   "key": "2021-01-19-Arunachal Pradesh-Chandigarh",
+   "reason": "no Source A match within a day of 2021-01-19 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:23",
+   "key": "2021-01-18-Uttar Pradesh-Karnataka",
+   "reason": "no Source A match within a day of 2021-01-18 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:28",
+   "key": "2021-01-15-Services-Rajasthan",
+   "reason": "no Source A match within a day of 2021-01-15 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:33",
+   "key": "2021-01-14-Uttar Pradesh-Jammu  Kashmir",
+   "reason": "no Source A match within a day of 2021-01-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:38",
+   "key": "2021-01-13-Mumbai-Kerala",
+   "reason": "no Source A match within a day of 2021-01-13 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:43",
+   "key": "2021-01-12-Bengal-Jharkhand",
+   "reason": "no Source A match within a day of 2021-01-12 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:48",
+   "key": "2021-01-12-Hyderabad (India)-Odisha",
+   "reason": "no Source A match within a day of 2021-01-12 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:54",
+   "key": "2020-11-08-Victoria-Western Australia",
+   "reason": "no Source A match within a day of 2020-11-08 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:10:59",
+   "key": "2020-08-29-Central Sparks-Northern Diamonds",
+   "reason": "no Source A match within a day of 2020-08-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:04",
+   "key": "2020-08-29-Thunder-Lightning",
+   "reason": "no Source A match within a day of 2020-08-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:21",
+   "key": "2020-03-08-Afghanistan-Ireland",
+   "reason": "afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EO is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:26",
+   "key": "2020-03-06-Afghanistan-Ireland",
+   "reason": "afg-vs-ire-1st-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EN is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:31",
+   "key": "2019-12-15-Central Districts-Northern Districts",
+   "reason": "no Source A match within a day of 2019-12-15 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:36",
+   "key": "2019-12-14-Otago-Northern Districts",
+   "reason": "no Source A match within a day of 2019-12-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:41",
+   "key": "2019-12-14-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2019-12-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:46",
+   "key": "2019-12-13-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2019-12-13 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:51",
+   "key": "2019-12-13-Wellington-Otago",
+   "reason": "no Source A match within a day of 2019-12-13 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:11:56",
+   "key": "2019-12-13-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2019-12-13 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:01",
+   "key": "2019-12-07-Queensland-New South Wales",
+   "reason": "no Source A match within a day of 2019-12-07 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:06",
+   "key": "2019-11-29-Rajasthan-Tamil Nadu",
+   "reason": "no Source A match within a day of 2019-11-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:11",
+   "key": "2019-11-29-Western Australia-South Australia",
+   "reason": "no Source A match within a day of 2019-11-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:16",
+   "key": "2019-11-29-New South Wales-Victoria",
+   "reason": "no Source A match within a day of 2019-11-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:21",
+   "key": "2019-11-29-Tasmania-Queensland",
+   "reason": "no Source A match within a day of 2019-11-29 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:40",
+   "key": "2019-11-21-Baroda-Rajasthan",
+   "reason": "no Source A match within a day of 2019-11-21 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:45",
+   "key": "2019-11-21-Punjab-Jharkhand",
+   "reason": "no Source A match within a day of 2019-11-21 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:50",
+   "key": "2019-11-18-Delhi-Odisha",
+   "reason": "no Source A match within a day of 2019-11-18 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:12:55",
+   "key": "2019-11-17-Hyderabad (India)-Chhattisgarh",
+   "reason": "no Source A match within a day of 2019-11-17 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:00",
+   "key": "2019-11-17-Gujarat-Jharkhand",
+   "reason": "no Source A match within a day of 2019-11-17 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:05",
+   "key": "2019-11-14-Delhi-Jammu  Kashmir",
+   "reason": "no Source A match within a day of 2019-11-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:10",
+   "key": "2019-11-14-Uttar Pradesh-Rajasthan",
+   "reason": "no Source A match within a day of 2019-11-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:15",
+   "key": "2019-11-14-Odisha-Saurashtra",
+   "reason": "no Source A match within a day of 2019-11-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:20",
+   "key": "2019-11-12-Gujarat-Nagaland",
+   "reason": "no Source A match within a day of 2019-11-12 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:25",
+   "key": "2019-11-11-Jharkhand-Jammu  Kashmir",
+   "reason": "no Source A match within a day of 2019-11-11 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:30",
+   "key": "2019-11-11-Andhra-Karnataka",
+   "reason": "no Source A match within a day of 2019-11-11 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:35",
+   "key": "2019-11-11-New South Wales-Western Australia",
+   "reason": "no Source A match within a day of 2019-11-11 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:40",
+   "key": "2019-11-11-South Australia-Tasmania",
+   "reason": "no Source A match within a day of 2019-11-11 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:45",
+   "key": "2019-11-09-Assam-Madhya Pradesh",
+   "reason": "no Source A match within a day of 2019-11-09 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:13:50",
+   "key": "2019-11-09-Maharashtra-Chandigarh",
+   "reason": "no Source A match within a day of 2019-11-09 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:14:08",
+   "key": "2019-11-08-Chandigarh-Himachal Pradesh",
+   "reason": "no Source A match within a day of 2019-11-08 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:14:52",
+   "key": "2019-10-31-Victoria-Tasmania",
+   "reason": "no Source A match within a day of 2019-10-31 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:14:57",
+   "key": "2019-10-10-Western Australia-Tasmania",
+   "reason": "no Source A match within a day of 2019-10-10 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:15:27",
+   "key": "2019-09-20-Afghanistan-Zimbabwe",
+   "reason": "afg-vs-zim-5th-match-bangladesh-tri-series-2019-match-updates-7PU is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:15:45",
+   "key": "2019-09-14-Afghanistan-Zimbabwe",
+   "reason": "afg-vs-zim-2nd-match-bangladesh-tri-series-2019-match-updates-7PR is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:03",
+   "key": "2019-09-08-Australia-West Indies",
+   "reason": "no Source A match within a day of 2019-09-08 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:08",
+   "key": "2019-09-05-Afghanistan-Bangladesh",
+   "reason": "afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-only-test-2019-match-updates-96C is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:13",
+   "key": "2019-08-18-Hampshire-Surrey",
+   "reason": "no Source A match within a day of 2019-08-18 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:18",
+   "key": "2019-07-14-Somerset-Devon",
+   "reason": "no Source A match within a day of 2019-07-14 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:23",
+   "key": "2019-07-13-Middlesex-Glamorgan",
+   "reason": "no Source A match within a day of 2019-07-13 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:28",
+   "key": "2019-07-06-Hampshire-Warwickshire",
+   "reason": "no Source A match within a day of 2019-07-06 with plausible teams (sitemap covers 1987-01-07..2026-10-26)"
+  },
+  {
+   "checked": [
+    "LB"
+   ],
+   "checked_at": "2026-10-29T10:16:36",
+   "key": "2019-06-30-Glamorgan-Worcestershire",
+   "reason": "rendered 1 candidate page(s) for 2019-06-30; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-10-29T10:16:41",
+   "key": "2019-06-29-Afghanistan-Pakistan",
+   "reason": "afg-vs-pak-36th-match-world-cup-2019-match-updates-L8 is no longer in the Source A sitemap"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Puducherry",
-   "team_b": "Punjab"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jharkhand",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Andhra",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Nagaland",
-   "team_b": "Manipur"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-10-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "South Australia",
-   "team_b": "Western Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-10-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Queensland",
-   "team_b": "Tasmania"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-09-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Oman",
-   "team_b": "United States of America"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-09-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Nepal",
-   "team_b": "United States of America"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-06-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Essex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-04-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Leicestershire",
-   "team_b": "Somerset"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-03-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Western Australia",
-   "team_b": "Victoria"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
-   "date": "2021-03-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Z",
-   "date": "2021-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-zim-1st-test-afghanistan-v-zimbabwe-in-uae-2021-match-updates-92Y",
-   "date": "2021-03-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-02-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "South Australia",
-   "team_b": "Western Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-02-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Victoria",
-   "team_b": "New South Wales"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-02-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Rajasthan",
-   "team_b": "Bihar"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
-   "date": "2021-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
-   "date": "2021-01-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
-   "date": "2021-01-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Goa",
-   "team_b": "Vidarbha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Arunachal Pradesh",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Uttar Pradesh",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Services",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Uttar Pradesh",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Mumbai",
-   "team_b": "Kerala"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Bengal",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2021-01-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Hyderabad (India)",
-   "team_b": "Odisha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2020-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Victoria",
-   "team_b": "Western Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2020-08-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Central Sparks",
-   "team_b": "Northern Diamonds"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2020-08-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Thunder",
-   "team_b": "Lightning"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EP",
-   "date": "2020-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EO",
-   "date": "2020-03-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-1st-t20-afghanistan-v-ireland-in-india-2020-match-updates-9EN",
-   "date": "2020-03-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2020-01-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2020-01-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-12-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Queensland",
-   "team_b": "New South Wales"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Rajasthan",
-   "team_b": "Tamil Nadu"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Western Australia",
-   "team_b": "South Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "New South Wales",
-   "team_b": "Victoria"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Tasmania",
-   "team_b": "Queensland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-wi-only-test-afghanistan-vs-west-indies-in-india-2019-match-updates-9F2",
-   "date": "2019-11-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Baroda",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Punjab",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Delhi",
-   "team_b": "Odisha"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Hyderabad (India)",
-   "team_b": "Chhattisgarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Gujarat",
-   "team_b": "Jharkhand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Delhi",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Uttar Pradesh",
-   "team_b": "Rajasthan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Odisha",
-   "team_b": "Saurashtra"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Gujarat",
-   "team_b": "Nagaland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Jharkhand",
-   "team_b": "Jammu  Kashmir"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Andhra",
-   "team_b": "Karnataka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "New South Wales",
-   "team_b": "Western Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "South Australia",
-   "team_b": "Tasmania"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Assam",
-   "team_b": "Madhya Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Maharashtra",
-   "team_b": "Chandigarh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
-   "date": "2019-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Chandigarh",
-   "team_b": "Himachal Pradesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
-   "date": "2019-11-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-11-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-10-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Victoria",
-   "team_b": "Tasmania"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-10-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Western Australia",
-   "team_b": "Tasmania"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
-   "date": "2019-09-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-09-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "United States of America",
-   "team_b": "Namibia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-zim-5th-match-bangladesh-tri-series-2019-match-updates-7PU",
-   "date": "2019-09-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-09-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Warwickshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-match-bangladesh-tri-series-2019-match-updates-7PR",
-   "date": "2019-09-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-09-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Hampshire",
-   "team_b": "Surrey"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-09-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ban-only-test-afghanistan-tour-of-bangladesh-only-test-2019-match-updates-96C",
-   "date": "2019-09-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-08-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Hampshire",
-   "team_b": "Surrey"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-07-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Somerset",
-   "team_b": "Devon"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-07-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Middlesex",
-   "team_b": "Glamorgan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-07-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Hampshire",
-   "team_b": "Warwickshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2019-06-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Glamorgan",
-   "team_b": "Worcestershire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-pak-36th-match-world-cup-2019-match-updates-L8",
-   "date": "2019-06-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Pakistan"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_withheld",
