@@ -342,6 +342,8 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     assert "<loc>https://example.test/venue/0</loc>" in sm
     robots = (tmp_path / "public" / "robots.txt").read_text()
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
+    assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")
+    assert "User-agent: Twitterbot\nAllow: /" in robots
 
 
 def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp_path):

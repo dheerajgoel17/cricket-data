@@ -8,7 +8,6 @@ export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
 const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 const when = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? "" : d.toLocaleString("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC", hour12: false }) + " UTC"; };
-const whenShort = (iso) => { const d = new Date(iso); return Number.isNaN(+d) ? "" : d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC", hour12: false }); };
 const abbr = (n) => { const w = String(n || "").replace(/\(W\)/i, "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join("") : (w[0] || "?")).slice(0, 3).toUpperCase(); };
 const biggerPhoto = (urls) => (urls || []).map((u) => u.replace(/([?&]width=)\d+/, "$1800"));
 
@@ -46,13 +45,11 @@ export function cardFields(q, data) {
         f.match = row.match;
         f.fmt = row.fmt || "";
         f.opp = otherSide(row.match, f.team);
-        f.start = row.start_utc || "";
-        f.when = row.start_utc ? whenShort(row.start_utc) : "";
       }
-      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b.over > 1).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source) })));
+      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b.over > 1).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source), source: b.source })));
       const best = prices.sort((x, y) => y.over - x.over)[0];
       if (best) {
-        f.price = best.over; f.book = best.book; f.books = prices.length;
+        f.price = best.over; f.book = best.book; f.source = best.source; f.books = prices.length;
         if (best.under > 1) { f.under = best.under; f.market = overProb(best.over, best.under); }
       }
       f.teamPhotos = teamLogos(data.photos, f.team);
@@ -91,8 +88,8 @@ async function asImage(loadImage, buf) {
   try { return await loadImage(buf); } catch { return null; }
 }
 
-/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` / `teamLogo` / `oppLogo` are image bytes or null. */
-export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = null, fonts = {} } = {}) {
+/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` / `teamLogo` / `oppLogo` / `bookLogo` are image bytes or null. */
+export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = null, bookLogo = null, fonts = {} } = {}) {
   const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
   if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
   if (fonts.regular) GlobalFonts.registerFromPath(fonts.regular, "CardRegular");
@@ -107,8 +104,9 @@ export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = n
   const img = await asImage(loadImage, photo);
   const teamImg = await asImage(loadImage, teamLogo);
   const oppImg = await asImage(loadImage, oppLogo);
+  const bookImg = await asImage(loadImage, bookLogo);
 
-  if (f.kind === "prop") drawProp(g, f, { img, teamImg, oppImg, text, bold, reg });
+  if (f.kind === "prop") drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg });
   else if (f.kind === "fixture" || f.kind === "venue") drawPlain(g, f, { text, bold, reg });
   else drawPlayer(g, f, { img, text, bold, reg });
   drawBrand(g, text, bold);
@@ -150,8 +148,9 @@ function drawPlayer(g, f, { img, text, bold, reg }) {
   text("Stats, form and listed lines", 72, 400, 36, "#ffffff", reg, "left", 620);
 }
 
-function drawProp(g, f, { img, teamImg, oppImg, text, bold, reg }) {
+function drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg }) {
   drawPortrait(g, f, img, text, bold);
+  drawBookTip(g, f, bookImg, text, bold);
   const left = 72, max = 620;
   text(f.name, left, 88, 52, "#ffffff", bold, "left", max);
   text(f.team, left, 126, 24, MUTED, reg, "left", max);
@@ -166,23 +165,24 @@ function drawProp(g, f, { img, teamImg, oppImg, text, bold, reg }) {
     ? [{ k: "Last", v: String(last), tone: last > f.line ? "up" : last < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
     : [{ k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }, { k: "Price", v: f.price ? f.price.toFixed(2) : "–", tone: "up" }];
   cols.forEach((c, i) => drawMetric(g, c, left + i * 150, y1, text, bold, reg, 140));
-  drawGauge(g, f, hit, text, bold, reg, 640, 286);
+  drawGauge(g, f, hit, text, bold, 640, 286);
 
   const y2 = 360;
-  const opp = f.opp ? `vs ${abbr(f.opp)}${f.when ? ` · ${f.when}` : ""}` : (f.match || "");
+  const opp = f.opp ? `vs ${abbr(f.opp)}` : (f.match || "");
   const row2 = [
     hit != null ? { k: "Hit rate", v: `${Math.round(hit * 100)}%`, tone: hit >= 0.6 ? "up" : hit < 0.4 ? "down" : "" } : { k: "Format", v: f.fmt || "—" },
-    last != null || hit != null ? { k: "Format", v: f.fmt || "—" } : { k: "Listed", v: f.book || "—" },
+    last != null || hit != null ? { k: "Format", v: f.fmt || "—" } : { k: "Listed", v: f.book || "—", img: bookImg },
     { k: "Opponent", v: opp || "—" },
   ];
   row2.forEach((c, i) => drawMetric(g, c, left + i * 150, y2, text, bold, reg, i === 2 ? 280 : 140));
 
   if (last != null) drawLastBar(g, f, last, text, bold, reg, left, 448);
-  if (f.price) drawPriceChip(g, f, text, bold, 1128, 548);
+  if (f.price) drawPriceChip(g, f, bookImg, text, bold, 1128, 548);
 }
 
-function drawMetric(g, { k, v, tone }, x, y, text, bold, reg, max = 160) {
+function drawMetric(g, { k, v, tone, img }, x, y, text, bold, reg, max = 160) {
   text(String(k).toUpperCase(), x, y, 16, MUTED, reg, "left", max);
+  if (img) { mark(g, img, x, y + 22, Math.min(max, 120), 26); return; }
   const color = tone === "up" ? GREEN : tone === "down" ? RED : "#ffffff";
   if (tone === "up" || tone === "down") {
     g.fillStyle = color;
@@ -196,7 +196,7 @@ function drawMetric(g, { k, v, tone }, x, y, text, bold, reg, max = 160) {
   }
 }
 
-function drawGauge(g, f, hit, text, bold, reg, cx, cy) {
+function drawGauge(g, f, hit, text, bold, cx, cy) {
   const r = 54, p = hit != null ? Math.max(0, Math.min(1, hit)) : (f.market != null ? Math.max(0, Math.min(1, f.market)) : 0.75);
   const tone = hit != null ? (p >= 0.6 ? GREEN : p < 0.4 ? RED : "#f5a524") : GREEN;
   const start = Math.PI * 0.75, span = Math.PI * 1.5;
@@ -206,7 +206,6 @@ function drawGauge(g, f, hit, text, bold, reg, cx, cy) {
   g.beginPath(); g.arc(cx, cy, r, start, start + span * p); g.stroke();
   if (f.price) text(f.price.toFixed(2), cx, cy + 8, 28, "#ffffff", bold, "center", 100);
   else if (hit != null) text(`${Math.round(hit * 100)}%`, cx, cy + 8, 28, "#ffffff", bold, "center", 100);
-  text(f.book || "Listed", cx, cy + 78, 16, MUTED, reg, "center", 120);
 }
 
 function drawMatchup(g, f, teamImg, oppImg, text, bold, x, y) {
@@ -218,14 +217,28 @@ function drawMatchup(g, f, teamImg, oppImg, text, bold, x, y) {
 
 function logo(g, img, letters, cx, cy, r, text, bold) {
   g.save();
-  g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.closePath(); g.clip();
-  g.fillStyle = "#1c1c1e"; g.fillRect(cx - r, cy - r, r * 2, r * 2);
+  g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.closePath();
+  g.fillStyle = "#ffffff"; g.fill();
+  g.clip();
   if (img) {
-    const s = Math.max((r * 2) / img.width, (r * 2) / img.height), w = img.width * s, h = img.height * s;
-    g.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+    const pad = r * 0.18, box = (r - pad) * 2;
+    const s = Math.min(box / img.width, box / img.height), w = img.width * s, h = img.height * s;
+    g.drawImage(img, cx - w / 2, cy - r + pad, w, h); // sit at the tip of the circle so a crest is not cropped
   } else text(letters, cx, cy + 8, 18, GREEN, bold, "center", r * 2 - 8);
   g.restore();
   g.strokeStyle = HAIR; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+}
+
+/** The book's own mark, top-right, inside the ~64 px inset X's 2:1 crop leaves. */
+function drawBookTip(g, f, bookImg, text, bold) {
+  const right = 1136, y = 36;
+  if (bookImg) mark(g, bookImg, right, y, 180, 40, "right");
+  else if (f.book) text(f.book, right, y + 28, 22, "#ffffff", bold, "right", 200);
+}
+
+function mark(g, img, x, y, maxW, maxH, align = "left") {
+  const s = Math.min(maxW / img.width, maxH / img.height), w = img.width * s, h = img.height * s;
+  g.drawImage(img, align === "right" ? x - w : x, y + (maxH - h) / 2, w, h);
 }
 
 function drawPortrait(g, f, img, text, bold) {
@@ -245,13 +258,15 @@ function drawPortrait(g, f, img, text, bold) {
   g.fillStyle = bot; g.fillRect(x, 500, w, 130);
 }
 
-function drawPriceChip(g, f, text, bold, right, y) {
-  const label = `${f.price.toFixed(2)}  ${f.book}`;
+function drawPriceChip(g, f, bookImg, text, bold, right, y) {
+  const price = f.price.toFixed(2);
   g.font = `22px ${bold}`;
-  const w = g.measureText(label).width + 36, h = 40, x = right - w;
+  const tw = g.measureText(price).width, markW = bookImg ? Math.min(110, bookImg.width * (22 / bookImg.height)) + 12 : 0;
+  const w = tw + markW + 36, h = 40, x = right - w;
   g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, y, w, h, h / 2); g.fill();
   g.strokeStyle = HAIR; g.lineWidth = 1; g.stroke();
-  text(label, x + w / 2, y + 28, 22, "#ffffff", bold, "center", w - 16);
+  text(price, x + 18, y + 28, 22, "#ffffff", bold, "left", tw + 8);
+  if (bookImg) mark(g, bookImg, x + w - 16, y + 9, 110, 22, "right");
 }
 
 function drawLastBar(g, f, last, text, bold, reg, x, y) {

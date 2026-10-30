@@ -16,7 +16,8 @@ const data = {
 
 test("a prop card has the player, the line, and the best over price with its book; the numbers come only from the data", () => {
   const f = cardFields({ p: "0", stat: "runs", line: "24.5" }, data);
-  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", 2, "England vs India", "India", "T20", "Batter"]);
+  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.source, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", "smarkets", 2, "England vs India", "India", "T20", "Batter"]);
+  assert.equal(f.when, undefined); // kickoff time stays off the picture
   assert.equal(f.last.value, 41);
   assert.equal(f.hit.p, 0.62);
   assert.match(cardText(f).title, /^Harry Brook: runs over 24\.5 at 1\.90$/);
@@ -40,6 +41,16 @@ test("every kind of card draws a JPEG small enough for link previews, with or wi
   }
 });
 
+test("a prop card draws the book's own mark from public/books", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const bookLogo = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/books/bet365.svg"));
+  const img = await renderCard(cardFields({ p: "0", stat: "runs", line: "24.5" }, data), { bookLogo });
+  assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+  assert.ok(img.length < 300 * 1024);
+});
+
 test("share paths name the player, his stat and line, or a fixture, and nothing else", () => {
   assert.deepEqual(parseShare("player/12/runs/24.5"), { card: { p: "12", stat: "runs", line: "24.5" }, page: "/player/12?stat=runs&line=24.5" });
   assert.deepEqual(parseShare("player/12"), { card: { p: "12" }, page: "/player/12" });
@@ -53,6 +64,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/player/12/runs/24.5.jpg?v=4");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v5/player/12/runs/24.5.jpg");
+  assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });

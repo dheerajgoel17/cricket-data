@@ -20,9 +20,9 @@ const { default: share } = await import("../api/share.js");
 const server = createServer(async (req, rsp) => {
   const u = new URL(req.url, "http://localhost");
   const res = { setHeader: (k, v) => rsp.setHeader(k, v), end: (b) => rsp.end(b), set statusCode(v) { rsp.statusCode = v; }, get statusCode() { return rsp.statusCode; } };
-  if (u.pathname.startsWith("/share/")) return share({ query: { path: u.pathname.slice(7) }, headers: req.headers }, res);
-  if (u.pathname.startsWith("/card/")) return og({ query: { path: u.pathname.slice(6) }, headers: req.headers }, res);
-  if (u.pathname === "/api/og") return og({ query: Object.fromEntries(u.searchParams), headers: req.headers }, res);
+  if (u.pathname.startsWith("/share/")) return share({ query: { path: u.pathname.slice(7) }, headers: req.headers, method: req.method }, res);
+  if (u.pathname.startsWith("/card/")) return og({ query: { path: u.pathname.slice(6) }, headers: req.headers, method: req.method }, res);
+  if (u.pathname === "/api/og") return og({ query: Object.fromEntries(u.searchParams), headers: req.headers, method: req.method }, res);
   rsp.statusCode = 404; rsp.end();
 });
 await new Promise((r) => server.listen(0, r));
@@ -31,7 +31,6 @@ test.after(() => server.close());
 
 test("a shared prop link gives the tags a preview needs, no redirect a crawler would follow, and a card image under 300 KB", async () => {
   const html = await (await fetch(`${base}/share/player/0/runs/24.5`)).text();
-  assert.doesNotMatch(html, /http-equiv="refresh"/i);
   assert.match(html, /<title>Harry Brook: runs over 24\.5 at 1\.83 \| Fancy\.cash<\/title>/);
   assert.match(html, /og:description" content="[^"]*listed 1\.83 at bet365 in England vs India/);
   assert.match(html, /og:image:type" content="image\/jpeg"/);
@@ -40,11 +39,14 @@ test("a shared prop link gives the tags a preview needs, no redirect a crawler w
   assert.match(html, /og:image:alt" content="Harry Brook: runs over 24\.5 at 1\.83"/);
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.match(html, /theme-color" content="#27da8e"/);
-  assert.match(html, /rel="image_src" href="[^"]*\/card\/player\/0\/runs\/24\.5\.jpg\?v=4"/);
+  assert.doesNotMatch(html, /location\.replace|http-equiv="refresh"/i);
+  assert.match(html, /<img src="[^"]*\/card\/v5\/player\/0\/runs\/24\.5\.jpg"/);
+  assert.match(html, /rel="image_src" href="[^"]*\/card\/v5\/player\/0\/runs\/24\.5\.jpg"/);
+  assert.match(html, /rel="canonical" href="[^"]*\/share\/player\/0\/runs\/24\.5"/);
   assert.ok(html.length < 32 * 1024); // Slack only reads the first 32 KB of the page
   assert.match(html, /og:url" content="[^"]*\/share\/player\/0\/runs\/24\.5"/);
   const image = /og:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&");
-  assert.match(image, /\/card\/player\/0\/runs\/24\.5\.jpg\?v=4$/); // file-like path plus a cache-bust so Twitter drops a stale picture
+  assert.match(image, /\/card\/v5\/player\/0\/runs\/24\.5\.jpg$/); // version in the path: X ignores ?v= when it has cached a failed picture
   assert.equal(/twitter:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&"), image);
   const r = await fetch(`${base}${new URL(image).pathname}${new URL(image).search}`);
   const buf = Buffer.from(await r.arrayBuffer());
@@ -59,7 +61,7 @@ test("a shared prop link gives the tags a preview needs, no redirect a crawler w
 test("a fixture link works the same way, and an unknown one goes to the home page", async () => {
   const html = await (await fetch(`${base}/share/fixture/2026-10-29-a-v-b`)).text();
   assert.match(html, /<title>A v B: stats, props/);
-  assert.match(html, /og:image" content="[^"]*\/card\/fixture\/2026-10-29-a-v-b\.jpg\?v=4"/);
+  assert.match(html, /og:image" content="[^"]*\/card\/v5\/fixture\/2026-10-29-a-v-b\.jpg"/);
   const r = await fetch(`${base}/share/fixture/nope`, { redirect: "manual" });
   assert.equal(r.status, 302);
   assert.equal(r.headers.get("location"), "/");
@@ -74,4 +76,9 @@ test("vercel.json sends /share and /card to the functions before the catch-all, 
   assert.ok(spa.includes("_vercel") || spa === "/(.*)");
   const r = await fetch(`${base}/api/og?p=0`);
   assert.equal(r.headers.get("content-type"), "image/jpeg");
+  const head = await fetch(`${base}/card/v5/player/0/runs/24.5.jpg`, { method: "HEAD" });
+  assert.equal(head.status, 200);
+  assert.equal(head.headers.get("content-type"), "image/jpeg");
+  const miss = await fetch(`${base}/card/v5/player/999.jpg`);
+  assert.equal(miss.headers.get("content-type"), "image/jpeg"); // never PNG from a .jpg URL: X drops a type mismatch
 });
