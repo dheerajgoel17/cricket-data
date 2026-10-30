@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
@@ -60,7 +59,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
+      transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
         <div className="flex h-full flex-col gap-snug p-inset">
@@ -97,22 +96,33 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   );
 }
 
-/** Series chips (shadcn ToggleGroup) over a shadcn Carousel (embla: swipe, drag, snap; arrows from md) of FixtureCards. */
+/** Compact match chip: overlapping crests, short names, kick-off. Tapping one filters the prop table when `onPick` is set. */
+export function MatchChip({ f, active, onPick }: { f: any; active?: boolean; onPick?: (id: string | null) => void }) {
+  const when = fixtureStart(f), timed = hasTime(f);
+  const inner = (
+    <>
+      <span className="flex">
+        <TeamBadge name={f.a} size="xs" eager className="ring-2 ring-background" />
+        <TeamBadge name={f.b} size="xs" eager className="-ml-tight ring-2 ring-background" />
+      </span>
+      <span className="grid min-w-0 leading-tight">
+        <span className="truncate text-caption font-semibold">{abbr(f.a)} v {abbr(f.b)}</span>
+        <span className="truncate text-caption text-muted-foreground">{timed ? localTime(when) : dayLabel(dayKey(f))}</span>
+      </span>
+    </>
+  );
+  const cls = cn("flex h-control shrink-0 items-center gap-tight rounded-[var(--chip-radius)] px-snug ring-1 transition-colors",
+    active ? "bg-card ring-primary" : "bg-card ring-hairline hover:bg-surface-hover");
+  if (onPick && f.id) {
+    return <button type="button" aria-pressed={!!active} className={cls} onClick={() => onPick(active ? null : f.id)}>{inner}</button>;
+  }
+  return <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className={cls}>{inner}</Link>;
+}
+
+/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). Phones and tablets only; desktop match chips live on the prop table. */
 export function FixtureRail({ fx }: { fx: any[] }) {
   usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
   const [sel, setSel] = useState("all");
-  const [api, setApi] = useState<CarouselApi>();
-  const [edge, setEdge] = useState({ l: false, r: true });
-  const [moving, setMoving] = useState(false); // edge blur shows only while the row is being dragged or is still gliding
-  useEffect(() => {
-    if (!api) return;
-    const upd = () => setEdge({ l: api.canScrollPrev(), r: api.canScrollNext() });
-    upd();
-    let idle: ReturnType<typeof setTimeout>;
-    const move = () => { upd(); setMoving(true); clearTimeout(idle); idle = setTimeout(() => setMoving(false), 160); }; // off ~160 ms after the last movement
-    api.on("select", upd).on("reInit", upd).on("scroll", move).on("pointerDown", move);
-    return () => { clearTimeout(idle); api.off("select", upd).off("reInit", upd).off("scroll", move).off("pointerDown", move); };
-  }, [api]);
   const chips = useMemo(() => {
     const c = new Map<string, number>();
     fx.forEach((f) => c.set(seriesName(f), (c.get(seriesName(f)) || 0) + 1));
@@ -121,22 +131,21 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
   return (
-    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="flex flex-col gap-stack" aria-label="Upcoming matches">
+    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="flex flex-col gap-stack lg:hidden" aria-label="Upcoming matches">
       <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
         items={[["all", <>All <span className="ml-1.5 text-footnote text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-footnote text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
-      <Carousel key={sel} setApi={setApi} opts={{ align: "start", dragFree: true, containScroll: "trimSnaps" }}>
-        <CarouselContent className="-ml-3">
-          {shown.map((f, i) => <CarouselItem key={`${f.id}${f.a}${f.b}`} className="basis-[82%] pl-3 sm:basis-(--fixture-card)"><FixtureCard f={f} i={i} /></CarouselItem>)}
-        </CarouselContent>
-        {/* edge fades: blurred, masked strips that appear only on the side that still has cards to scroll to */}
-        {(["l", "r"] as const).map((side) => (
-          <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 z-10 w-14 bg-scrim backdrop-blur-md transition-opacity duration-300 ease-out",
-            side === "l" ? "left-0 [mask-image:linear-gradient(to_right,#000,transparent)] [-webkit-mask-image:linear-gradient(to_right,#000,transparent)]" : "right-0 [mask-image:linear-gradient(to_left,#000,transparent)] [-webkit-mask-image:linear-gradient(to_left,#000,transparent)]",
-            moving && edge[side] ? "opacity-100" : "opacity-0")} />
+      <div
+        key={sel}
+        role="list"
+        aria-label="Match cards"
+        className="-mx-gutter flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden"
+      >
+        {shown.map((f, i) => (
+          <div key={`${f.id}${f.a}${f.b}`} role="listitem" className="w-[min(82%,var(--fixture-card))] shrink-0 snap-start">
+            <FixtureCard f={f} i={i} />
+          </div>
         ))}
-        <CarouselPrevious className="left-2 hidden md:inline-flex" />
-        <CarouselNext className="right-2 hidden md:inline-flex" />
-      </Carousel>
+      </div>
     </motion.section>
   );
 }

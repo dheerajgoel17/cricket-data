@@ -72,9 +72,25 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
 
 const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
 
-/** The player's lines that are still open (the match has not started more than `graceMs` ago) for this stat and format, in every scope. */
+/** The player's lines that are still open (the match has not started more than `graceMs` ago) in this format, every stat and scope. */
+function openPlayerLines(doc, pid, fmt, now, graceMs) {
+  return (doc?.lines || []).filter((l) => l.pid === pid && l.fmt === fmt && l.books?.length && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
+}
+
+/** The player's lines that are still open for this stat and format, in every scope. */
 function openLines(doc, pid, stat, fmt, now, graceMs) {
-  return (doc?.lines || []).filter((l) => l.pid === pid && l.stat === stat && l.fmt === fmt && l.books?.length && (!l.start_utc || Date.parse(l.start_utc) > now - graceMs));
+  return openPlayerLines(doc, pid, fmt, now, graceMs).filter((l) => l.stat === stat);
+}
+
+/**
+ * Stats a book prices for this player in this format, on the same match `bookLinesFor` picks. Empty when none
+ * (the player page then hides the prop-category chips instead of offering a median line as if it were listed).
+ */
+export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
+  const all = openPlayerLines(doc, pid, fmt, now, graceMs);
+  if (!all.length) return [];
+  const first = Math.min(...all.map(startOf));
+  return [...new Set(all.filter((l) => startOf(l) === first).map((l) => l.stat))];
 }
 
 /**

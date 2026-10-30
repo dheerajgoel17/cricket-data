@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useId, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
-import { Link } from "react-router-dom";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,7 @@ import { BookBadge } from "./book-badge";
 import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
+import { MatchChip } from "./fixture-card";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "ven" | "l5" | "l10";
@@ -130,7 +131,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
-            {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+            {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
         )}
       </div>
@@ -174,9 +175,77 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
   );
 }
 
+function RateCell({ p, n }: { p: number | null; n?: number }) {
+  return <span className={cn("font-semibold tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-normal text-muted-foreground"> · {n}</span> : null}</span>;
+}
+
+function ColHead({ id, label, win, onWin, align, className }: { id?: Win; label: string; win: Win; onWin: (w: Win) => void; align?: "right"; className?: string }) {
+  const active = !!id && win === id;
+  const cls = cn("px-snug py-tight text-left text-caption font-medium uppercase tracking-wider whitespace-nowrap", align === "right" && "text-right", active ? "text-foreground" : "text-muted-foreground", className);
+  if (!id) return <th className={cls}>{label}</th>;
+  return (
+    <th className={cls}>
+      <button type="button" className="inline-flex items-center gap-hair" onClick={() => onWin(id)}>
+        {label}{active ? <ChevronDownIcon className="size-3" aria-hidden /> : <ChevronUpDownIcon className="size-3 opacity-40" aria-hidden />}
+      </button>
+    </th>
+  );
+}
+
+/** Desktop prop table: one row per priced line, cricket windows as columns (year / H2H / ground), not a copy of another sport's sheet. */
+export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Row[]; win: Win; onWin: (w: Win) => void; bars: boolean; soFarOf: (r: Row) => SoFar | null; outOf: (r: Row) => boolean }) {
+  const nav = useNavigate();
+  const year = WINS[0][1];
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[44rem] text-callout">
+        <thead>
+          <tr className="border-b border-hairline">
+            <ColHead label="Lines" win={win} onWin={onWin} className="pl-[calc(var(--control)+var(--spacing-snug)*2)]" />
+            {bars ? <ColHead id="l10" label="L10 chart" win={win} onWin={onWin} /> : null}
+            <ColHead label="Odds" win={win} onWin={onWin} />
+            <ColHead id="season" label={year} win={win} onWin={onWin} />
+            <ColHead id="h2h" label="H2H" win={win} onWin={onWin} />
+            <ColHead id="ven" label="Ground" win={win} onWin={onWin} />
+            <ColHead label="Edge" win={win} onWin={onWin} align="right" />
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const soFar = soFarOf(r), out = outOf(r);
+            const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`;
+            const ground = String(r.venue || "").split(",")[0];
+            return (
+              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} tabIndex={0} role="link"
+                className={cn("cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover", out && "opacity-60")}
+                onClick={() => nav(to)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nav(to); } }}>
+                <td className="px-snug py-snug">
+                  <span className="flex items-center gap-snug">
+                    <PlayerBadge idx={r.idx} size="sm" className="size-control" />
+                    <span className="grid min-w-0">
+                      <span className="flex min-w-0 items-center gap-tight text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="truncate text-callout text-muted-foreground">O {r.line} {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "")}> · {soFar.v}{soFar.verdict ? ` ${VERDICT[soFar.verdict]}` : " so far"}</span>}</span>
+                      {r.quotes.length > 1 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+                    </span>
+                  </span>
+                </td>
+                {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
+                <td className="px-snug py-snug font-semibold tabular-nums">{odds(r.over)}</td>
+                <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
+                <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
+                <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
+                <td className={cn("px-snug py-snug text-right font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, start, archive }: { teams?: [string, string]; start?: string; archive?: any } = {}) {
+export function HotProps({ teams, start, archive, heading }: { teams?: [string, string]; start?: string; archive?: any; heading?: string } = {}) {
   const [day, setDay] = useState("0");
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start }, { a: teams![0], b: teams![1], start }); // this match: the same two sides and the same start, not the series' next game
@@ -200,6 +269,18 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   const [win, setWin] = useState<Win>("l10");
   const [bars, setBars] = useState(true);
   const [team, setTeam] = useState("all");
+  const [matchKey, setMatchKey] = useState("all");
+  const matchChips = useMemo(() => {
+    const m = new Map<string, { id: string; a: string; b: string; start: string }>();
+    for (const r of data || []) {
+      const id = `${r.match}|${r.start}`;
+      if (m.has(id)) continue;
+      const [a, b] = String(r.match).split(/\s+vs\s+/i);
+      m.set(id, { id, a: a || r.team, b: b || r.opp, start: r.start });
+    }
+    return [...m.values()];
+  }, [data]);
+  const pick = matchChips.some((c) => c.id === matchKey) ? matchKey : "all";
   const tabs = useMemo(() => {
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
@@ -207,20 +288,28 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
   const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
-  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, live.data]);
+  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day) && (pick === "all" || `${r.match}|${r.start}` === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, live.data, pick]);
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
+      {heading ? <h1 className="hidden text-display font-bold tracking-tight lg:block">{heading}</h1> : null}
+      {!teams && matchChips.length > 0 && (
+        <div className="hidden gap-tight overflow-x-auto [scrollbar-width:none] lg:flex [&::-webkit-scrollbar]:hidden" role="toolbar" aria-label="Matches">
+          <button type="button" aria-pressed={pick === "all"} onClick={() => setMatchKey("all")}
+            className={cn("flex h-control shrink-0 items-center rounded-[var(--chip-radius)] px-snug text-caption font-semibold ring-1", pick === "all" ? "bg-card ring-primary" : "bg-card ring-hairline hover:bg-surface-hover")}>All</button>
+          {matchChips.map((f) => <MatchChip key={f.id} f={f} active={pick === f.id} onPick={(id) => setMatchKey(id || "all")} />)}
+        </div>
+      )}
       {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
       <div className="flex items-center gap-snug">
         <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
         <Sheet>
           <SheetTrigger asChild>
             <button type="button" aria-label="Filters" className="relative flex h-control shrink-0 items-center gap-tight rounded-[var(--chip-radius)] bg-card px-3 text-callout font-medium transition-colors active:bg-accent">
-              <SlidersHorizontal className="size-4" />{wl}
+              <AdjustmentsHorizontalIcon className="size-4" />{wl}
               {dirty && <span aria-hidden className="absolute -right-0.5 -top-0.5 size-3 rounded-full bg-primary ring-2 ring-background" />}
             </button>
           </SheetTrigger>
@@ -249,11 +338,16 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
       </div>
       <AnimatedHeight>
         {waiting ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
-          <ul className="-mx-gutter">
-            <AnimatePresence mode="popLayout" initial={false}>
-              {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
-            </AnimatePresence>
-          </ul>
+          <>
+            <ul className="-mx-gutter lg:hidden">
+              <AnimatePresence mode="popLayout" initial={false}>
+                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+              </AnimatePresence>
+            </ul>
+            <div className="hidden lg:block">
+              <PropTable rows={rows} win={win} onWin={setWin} bars={bars} soFarOf={soFarOf} outOf={outOf} />
+            </div>
+          </>
         )}
       </AnimatedHeight>
     </section>
