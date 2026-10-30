@@ -129,6 +129,7 @@ jobs:
         working-directory: site
         run: |
           npx --yes vercel@latest deploy --prod --yes --force --token "$VERCEL_TOKEN" \
+            --build-env "DATA_WRAP_KEY=$DATA_WRAP_KEY" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY"
       - name: Deploy preview (pull requests from this repository)
         id: preview
@@ -138,6 +139,7 @@ jobs:
         working-directory: site
         run: |
           URL=$(npx --yes vercel@latest deploy --yes --force --token "$VERCEL_TOKEN" \
+            --build-env "DATA_WRAP_KEY=$DATA_WRAP_KEY" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY" | tail -n 1)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "### Preview: $URL" >> "$GITHUB_STEP_SUMMARY"

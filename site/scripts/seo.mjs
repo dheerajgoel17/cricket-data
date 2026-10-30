@@ -1,6 +1,7 @@
 // After `vite build`: gives the pages search engines should find their own HTML (title, description, canonical link, share tags, structured data and a short
 // text body that the app replaces on load), so a crawler or a link preview sees the page without running the app. Static pages, the upcoming fixtures and the
 // biggest players, teams and competitions of the sitemap. Every other path still gets the app's shell (dist/index.html), which sets its tags in the browser.
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -61,7 +62,7 @@ export function pages({ site, index, fixtures, sitemap }) {
     if (!seg) continue;
     out.push([seg, { title: r.title, description: r.description, url: abs(`/${seg}`), image, noindex: !!r.noindex, jsonld: site ? [crumbs(site, [[BRAND, "/"], [r.title, `/${seg}`]])] : [] }]);
   }
-  for (const f of fixtures) {
+  for (const f of Array.isArray(fixtures) ? fixtures : []) {
     const name = `${f.a} v ${f.b}`, path = `/fixture/${f.id}`;
     const title = `${name}: player props, hit rates and book lines`;
     const when = f.start ? new Date(f.start).toUTCString().replace(/ GMT$/, " UTC") : "";
@@ -95,9 +96,32 @@ export function siteOf(dist, env = process.env.SITE_URL) {
   return existsSync(f) ? /<loc>(https?:\/\/[^/<]+)/.exec(readFileSync(f, "utf8"))?.[1] ?? "" : "";
 }
 
-export function build(dist, site = siteOf(dist)) {
+/** Same XOR-SHA256 wrap as src/cricket_site/wrap.py / site/src/engine/wrap.js, sync so the Vite build can read wrapped fixtures.json. */
+export function unwrapJson(doc, secret) {
+  if (!doc || doc.v !== 1 || !doc.ct || !doc.iv || !secret) return doc;
+  const key = createHash("sha256").update(secret, "utf8").digest();
+  const iv = Buffer.from(doc.iv, "base64"), ct = Buffer.from(doc.ct, "base64");
+  const ks = Buffer.alloc(ct.length);
+  for (let i = 0, off = 0; off < ct.length; i++) {
+    const ctr = Buffer.alloc(4); ctr.writeUInt32BE(i);
+    const block = createHash("sha256").update(Buffer.concat([key, iv, ctr])).digest();
+    const n = Math.min(32, ct.length - off);
+    block.copy(ks, off, 0, n); off += n;
+  }
+  const raw = Buffer.alloc(ct.length);
+  for (let i = 0; i < ct.length; i++) raw[i] = ct[i] ^ ks[i];
+  return JSON.parse(raw.toString("utf8"));
+}
+
+export function build(dist, site = siteOf(dist), secret = process.env.DATA_WRAP_KEY) {
   const tpl = readFileSync(join(dist, "index.html"), "utf8");
-  const read = (f, d) => { try { return JSON.parse(readFileSync(join(dist, f), "utf8")); } catch { return d; } };
+  const read = (f, d) => {
+    try {
+      const doc = JSON.parse(readFileSync(join(dist, f), "utf8"));
+      const out = unwrapJson(doc, secret);
+      return (out && out.v === 1 && out.ct) ? d : out; // still wrapped (no key): skip rather than crash the deploy
+    } catch { return d; }
+  };
   const sm = existsSync(join(dist, "sitemap.xml")) ? [...readFileSync(join(dist, "sitemap.xml"), "utf8").matchAll(/<loc>[^<]*?(\/[^<]*)<\/loc>/g)].map((x) => x[1]) : [];
   const list = pages({ site, index: read("data/index.json", {}), fixtures: read("data/fixtures.json", []), sitemap: sm.map((p) => p.replace(/^https?:\/\/[^/]+/, "")) });
   for (const [path, page] of list) {
