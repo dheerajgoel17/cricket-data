@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronLeft, Minus, Plus } from "lucide-react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
+import { LineStepper } from "@/components/app/line-stepper";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
@@ -69,7 +70,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   return (
     <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className="flex items-center gap-snug">
         <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", on ? "text-miss" : "text-muted-foreground")}>
           {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : clock.label}
@@ -108,11 +109,7 @@ function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: numbe
     <div className="flex min-w-0 flex-col gap-snug">
       <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
       <div className="flex items-center gap-tight">
-        <div className="flex h-control shrink-0 items-center rounded-[var(--chip-radius)] bg-card">
-          <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => step(-0.5)}><Minus /></Button>
-          <span className="min-w-[4.5rem] text-center text-callout font-semibold tabular-nums">O {line}</span>
-          <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => step(0.5)}><Plus /></Button>
-        </div>
+        <LineStepper value={line} label="O" min={0} onStep={step} />
         <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0" />
       </div>
       {hit !== undefined && <PillGroup segmented layoutId="fx-hit" label="Minimum hit rate" value={hit} onChange={(v) => setQ({ hit: v })} items={HITS.map(([v, l]) => [String(v), l])} />}

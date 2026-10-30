@@ -42,7 +42,7 @@ export function CompetitionsPage() {
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
-      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-[#151515]"><span className="grid size-9 place-items-center rounded-lg bg-secondary text-xs font-extrabold text-primary">{caps(store.events[e])}</span><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
+      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-accent"><span className="grid size-9 place-items-center rounded-lg bg-secondary text-xs font-extrabold text-primary">{caps(store.events[e])}</span><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
     </div>
   );
 }

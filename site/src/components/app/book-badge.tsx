@@ -9,7 +9,7 @@ const broken = new Set<string>(); // logo files that failed to load: every other
 export function BookBadge({ source, className }: { source: string; className?: string }) {
   const name = bookName(source), src = bookLogo(source);
   const [failed, setFailed] = useState(() => !!src && broken.has(src));
-  if (!src || failed) return <span data-book={source} className={cn("inline-block whitespace-nowrap rounded-full bg-white/10 px-tight align-middle text-footnote font-medium leading-snug text-foreground/80", className)}>{name}</span>;
+  if (!src || failed) return <span data-book={source} className={cn("inline-block whitespace-nowrap rounded-full bg-hairline px-tight align-middle text-footnote font-medium leading-snug text-foreground/80", className)}>{name}</span>;
   const variant = bookVariant(source);
   const img = <img data-book={source} src={src} alt={name} loading="lazy" decoding="async" onError={() => { broken.add(src); setFailed(true); }} className={cn("inline-block h-3 w-auto max-w-16 align-middle", className)} />;
   return variant ? <span className="inline-flex items-center gap-hair align-middle">{img}<span aria-hidden className="text-caption font-medium text-muted-foreground">{variant}</span></span> : img;

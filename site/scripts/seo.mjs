@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta } from "../src/lib/seo.js";
+import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta, shareMetas } from "../src/lib/seo.js";
 import { cardPath } from "../src/engine/card-path.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -15,22 +15,15 @@ const LIMITS = { player: 300, team: 150, league: 100, venue: 150 };
 /** The head tags of one page. `url` is absolute when SITE_URL is known; without it there is no canonical link or absolute image. */
 export function headTags({ title, description, url = "", image = "", type = "website", noindex = false, jsonld = [], ogUrl = "" }) {
   const t = fullTitle(title);
+  const share = shareMetas({ title: t, description, url: ogUrl || url, image, alt: t });
+  if (type && type !== "website") share[0] = ["property", "og:type", type];
   return [
     `<title>${esc(t)}</title>`,
     `<meta name="description" content="${esc(description)}" />`,
     `<meta name="robots" content="${noindex ? "noindex, follow" : "index, follow, max-image-preview:large"}" />`,
     url ? `<link rel="canonical" href="${esc(url)}" />` : "",
-    `<meta property="og:type" content="${type}" />`,
-    `<meta property="og:site_name" content="${BRAND}" />`,
-    `<meta property="og:locale" content="en" />`,
-    `<meta property="og:title" content="${esc(t)}" />`,
-    `<meta property="og:description" content="${esc(description)}" />`,
-    (ogUrl || url) ? `<meta property="og:url" content="${esc(ogUrl || url)}" />` : "",
-    image ? `<meta property="og:image" content="${esc(image)}" /><meta property="og:image:secure_url" content="${esc(image)}" /><meta property="og:image:type" content="${/\.jpe?g(\?|$)/i.test(image) ? "image/jpeg" : "image/png"}" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />` : "",
-    `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="twitter:title" content="${esc(t)}" />`,
-    `<meta name="twitter:description" content="${esc(description)}" />`,
-    image ? `<meta name="twitter:image" content="${esc(image)}" /><meta name="twitter:image:alt" content="${esc(t)}" />` : "",
+    ...share.map(([attr, key, value]) => `<meta ${attr}="${key}" content="${esc(value)}" />`),
+    image ? `<link rel="image_src" href="${esc(image)}" />` : "",
     ...jsonld.map(ld),
   ].filter(Boolean).join("\n    ");
 }

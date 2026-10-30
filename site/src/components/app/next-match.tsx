@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BookBadge } from "./book-badge";
 import { TeamBadge } from "./badges";
 
-const CARD = "rounded-2xl bg-card ring-1 ring-white/5";
+const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
 
 export type NextMatchInfo = {
@@ -68,7 +68,7 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
       </div>
       {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
-      <div className="grid gap-hair border-t border-white/5 pt-snug">
+      <div className="grid gap-hair border-t border-hairline pt-snug">
         <div className="flex flex-wrap items-baseline justify-between gap-snug">
           <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
           {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
@@ -87,7 +87,7 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
         ) : null}
       </div>
 
-      <div className="grid gap-tight border-t border-white/5 pt-snug">
+      <div className="grid gap-tight border-t border-hairline pt-snug">
         {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
         {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
         <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>

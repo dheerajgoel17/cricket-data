@@ -20,10 +20,10 @@ export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
 /** Player grid: header row and player rows with the game cells. */
 export function GridSkeleton({ rows = 9 }: { rows?: number }) {
   return (
-    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
-      <div className="flex items-center gap-snug border-b border-white/10 px-3 py-snug"><Skeleton className="h-3 w-14" /><Skeleton className="ml-auto h-3 w-6" />{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-8 w-9" />)}</div>
+    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
+      <div className="flex items-center gap-snug border-b border-hairline px-3 py-snug"><Skeleton className="h-3 w-14" /><Skeleton className="ml-auto h-3 w-6" />{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-8 w-9" />)}</div>
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="flex items-center gap-snug border-b border-white/5 px-3 py-tight last:border-0" style={{ opacity: 1 - i * 0.07 }}>
+        <div key={i} className="flex items-center gap-snug border-b border-hairline px-3 py-tight last:border-0" style={{ opacity: 1 - i * 0.07 }}>
           <Skeleton className="size-5 rounded-full" /><Skeleton className="h-3.5 w-24" /><Skeleton className="ml-auto h-3.5 w-8" />{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-6 w-9 rounded-md" />)}
         </div>
       ))}
@@ -34,8 +34,8 @@ export function GridSkeleton({ rows = 9 }: { rows?: number }) {
 /** Grouped list of label / value rows (markets). */
 export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
-      {Array.from({ length: rows }, (_, i) => <div key={i} className="flex items-center gap-snug border-b border-white/5 px-inset py-snug last:border-0"><Skeleton className="h-3.5 w-36" /><Skeleton className="ml-auto h-3.5 w-10" /><Skeleton className="h-3.5 w-10" /></div>)}
+    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
+      {Array.from({ length: rows }, (_, i) => <div key={i} className="flex items-center gap-snug border-b border-hairline px-inset py-snug last:border-0"><Skeleton className="h-3.5 w-36" /><Skeleton className="ml-auto h-3.5 w-10" /><Skeleton className="h-3.5 w-10" /></div>)}
     </div>
   );
 }
@@ -59,7 +59,7 @@ export function FancySkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-stack">
       <RowsSkeleton rows={3} />
-      <div className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-white/5">
+      <div className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
         <Skeleton className="h-5 w-40" />
         <div className="flex items-end gap-group"><Skeleton className="h-10 w-20" /><Skeleton className="h-6 w-16" /><Skeleton className="h-6 w-24" /></div>
         <Skeleton className="h-28 w-full" />
@@ -104,12 +104,12 @@ export function PlayerSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-section">
       <div className="flex flex-col gap-stack">
-        <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-white/5">
+        <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
           <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
           <Skeleton className="size-20 rounded-full" />
         </div>
         <div className="flex items-center justify-between gap-snug"><Skeleton className="h-control w-40 rounded-full" /><Skeleton className="h-control w-36 rounded-full" /></div>
-        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-white/5"><Skeleton className="h-[300px] w-full" /><Skeleton className="h-control w-full rounded-full" /></div>
+        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline"><Skeleton className="h-[300px] w-full" /><Skeleton className="h-control w-full rounded-full" /></div>
       </div>
       <div className="flex flex-col gap-snug"><Skeleton className="h-6 w-44" /><ListSkeleton rows={3} /></div>
     </div>

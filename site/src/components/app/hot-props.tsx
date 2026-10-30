@@ -128,7 +128,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
           <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} {odds(top.over)}{top.underAt && <> · U {top.underAt.line} {odds(top.underAt.price)}</>}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {rest.length > 0 && (
-          <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-white/10"
+          <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
             {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
@@ -147,7 +147,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
 export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
   const books = r.quotes.length > 1; // 2+ books price him: each shows its own line and price below, so the main line's price is not said twice
   return (
-    <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-hairline last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
       <Item asChild size="sm" className={cn("min-h-row gap-y-hair rounded-none border-0 px-gutter py-snug transition-colors active:bg-card", out && "opacity-60")}>
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}>
@@ -225,7 +225,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
-            <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-white/25" />
+            <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />
             <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
               <SheetTitle className="text-title font-bold tracking-tight">Filters</SheetTitle>
               <SheetClose className="text-body font-semibold text-primary active:opacity-50">Done</SheetClose>
@@ -242,7 +242,7 @@ export function HotProps({ teams, start, archive }: { teams?: [string, string]; 
                 <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Day</span>
                   <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={[["0", "Today"], ["1", "Tomorrow"]]} /></div>
               )}
-              <label className="flex min-h-control items-center justify-between gap-stack rounded-xl bg-white/[0.06] px-3 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
+              <label className="flex min-h-control items-center justify-between gap-stack rounded-xl bg-surface-hover px-3 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
             </div>
           </SheetContent>
         </Sheet>

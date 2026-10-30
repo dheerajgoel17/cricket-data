@@ -1,25 +1,21 @@
 "use client"
 
-import {
-  CircleCheckIcon,
-  InfoIcon,
-  Loader2Icon,
-  OctagonXIcon,
-  TriangleAlertIcon,
-} from "lucide-react"
+import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { useTheme } from "@/components/layout/ThemeProvider"
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { resolved } = useTheme()
   return (
     <Sonner
-      theme="dark"
+      theme={resolved}
       className="toaster group"
       icons={{
-        success: <CircleCheckIcon className="size-4" />,
-        info: <InfoIcon className="size-4" />,
-        warning: <TriangleAlertIcon className="size-4" />,
-        error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
+        success: <CheckCircleIcon className="size-4" />,
+        info: <InformationCircleIcon className="size-4" />,
+        warning: <ExclamationTriangleIcon className="size-4" />,
+        error: <XCircleIcon className="size-4" />,
+        loading: <ArrowPathIcon className="size-4 animate-spin" />,
       }}
       style={
         {

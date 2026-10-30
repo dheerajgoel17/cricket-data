@@ -16,13 +16,13 @@ const ICON: Record<string, [string, string]> = {
   "/": [calendarOutline, calendar], "/props": [statsChartOutline, statsChart], "/fancy": [diceOutline, dice],
 };
 
-/** Phones only. Fixed to the bottom; the page keeps clear of it with `--tabbar-h` (see Shell). */
+/** Phones and tablets (below lg). Fixed to the bottom; the page keeps clear of it with `--tabbar-h` (see Shell). */
 export function IosTabBar() {
   const { pathname } = useLocation();
   const nav = useNavigate();
   const current = TAB_NAV.find((t) => t.match(pathname))?.to ?? "";
   return (
-    <div className="fixed inset-x-0 bottom-0 z-60 md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-60 lg:hidden">
       <ion-tab-bar translucent selected-tab={current} aria-label="Sections">
         {TAB_NAV.map(({ to, label }) => {
           const on = to === current, [outline, filled] = ICON[to] ?? ICON["/"];

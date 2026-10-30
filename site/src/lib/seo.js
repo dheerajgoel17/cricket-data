@@ -2,6 +2,49 @@
 export const BRAND = "Fancy.cash";
 export const TAGLINE = "Free cricket stats, player props and ground info";
 export const DEFAULT_DESC = "Free cricket stats and player props: hit rates over any line, fair decimal prices, listed lines side by side, partnerships, fancy markets and ground stats. Built on open ball-by-ball data.";
+export const THEME = "#27da8e";
+export const CARD_W = 1200;
+export const CARD_H = 630; // 1.91:1 — Facebook, LinkedIn, WhatsApp, Discord, Slack, Telegram, iMessage. X's 2:1 large card crops ~15 px top and bottom.
+
+/** Clip a description so Facebook (~155) and X (~200) do not truncate mid-word; Discord still has room. */
+export function clipDesc(s, n = 180) {
+  const t = String(s || "").replace(/\s+/g, " ").trim();
+  if (t.length <= n) return t;
+  const cut = t.slice(0, n - 1);
+  const i = cut.lastIndexOf(" ");
+  return `${(i > 80 ? cut.slice(0, i) : cut).replace(/[.,;:–-]+$/, "")}…`;
+}
+
+/**
+ * Tags every link-preview crawler reads (Facebook, Instagram, WhatsApp, Messenger, X, LinkedIn, Slack, Discord, Telegram, iMessage, Pinterest, Reddit, Teams).
+ * `url` is the address the preview should stay on (the /share page for a player, fixture or ground). `image` is an absolute https JPEG 1200×630.
+ * @returns {Array<["name"|"property", string, string]>}
+ */
+export function shareMetas({ title, description, url = "", image = "", alt = "" }) {
+  const t = String(title || BRAND), d = clipDesc(description), a = String(alt || t);
+  const jpeg = /\.jpe?g(\?|$)/i.test(image);
+  const out = [
+    ["property", "og:type", "website"],
+    ["property", "og:site_name", BRAND],
+    ["property", "og:locale", "en"],
+    ["property", "og:title", t],
+    ["property", "og:description", d],
+    url ? ["property", "og:url", url] : null,
+    image ? ["property", "og:image", image] : null,
+    image ? ["property", "og:image:secure_url", image] : null,
+    image ? ["property", "og:image:type", jpeg ? "image/jpeg" : "image/png"] : null,
+    image ? ["property", "og:image:width", String(CARD_W)] : null,
+    image ? ["property", "og:image:height", String(CARD_H)] : null,
+    image ? ["property", "og:image:alt", a] : null,
+    ["name", "twitter:card", "summary_large_image"],
+    ["name", "twitter:title", t],
+    ["name", "twitter:description", d],
+    image ? ["name", "twitter:image", image] : null,
+    image ? ["name", "twitter:image:alt", a] : null,
+    ["name", "theme-color", THEME],
+  ].filter(Boolean);
+  return out;
+}
 
 /** Pages with a fixed title and description, by their first path segment ("" is the home page). `noindex` pages are kept out of search results. */
 export const ROUTES = {

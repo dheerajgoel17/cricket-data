@@ -35,22 +35,31 @@ test("a shared prop link gives the tags a preview needs, no redirect a crawler w
   assert.match(html, /<title>Harry Brook: runs over 24\.5 at 1\.83 \| Fancy\.cash<\/title>/);
   assert.match(html, /og:description" content="[^"]*listed 1\.83 at bet365 in England vs India/);
   assert.match(html, /og:image:type" content="image\/jpeg"/);
+  assert.match(html, /og:image:width" content="1200"/);
+  assert.match(html, /og:image:height" content="630"/);
+  assert.match(html, /og:image:alt" content="Harry Brook: runs over 24\.5 at 1\.83"/);
+  assert.match(html, /twitter:card" content="summary_large_image"/);
+  assert.match(html, /theme-color" content="#27da8e"/);
+  assert.match(html, /rel="image_src" href="[^"]*\/card\/player\/0\/runs\/24\.5\.jpg\?v=4"/);
+  assert.ok(html.length < 32 * 1024); // Slack only reads the first 32 KB of the page
   assert.match(html, /og:url" content="[^"]*\/share\/player\/0\/runs\/24\.5"/);
   const image = /og:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&");
-  assert.match(image, /\/card\/player\/0\/runs\/24\.5\.jpg\?v=3$/); // file-like path plus a cache-bust so Twitter drops a stale picture
+  assert.match(image, /\/card\/player\/0\/runs\/24\.5\.jpg\?v=4$/); // file-like path plus a cache-bust so Twitter drops a stale picture
   assert.equal(/twitter:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&"), image);
   const r = await fetch(`${base}${new URL(image).pathname}${new URL(image).search}`);
   const buf = Buffer.from(await r.arrayBuffer());
   assert.equal(r.status, 200);
   assert.equal(r.headers.get("content-type"), "image/jpeg");
+  assert.equal(r.headers.get("access-control-allow-origin"), "*");
+  assert.match(r.headers.get("content-disposition") || "", /inline/);
   assert.deepEqual([...buf.subarray(0, 3)], [0xff, 0xd8, 0xff]);
-  assert.ok(buf.length < 300 * 1024);
+  assert.ok(buf.length < 300 * 1024); // WhatsApp large preview drops heavier pictures
 });
 
 test("a fixture link works the same way, and an unknown one goes to the home page", async () => {
   const html = await (await fetch(`${base}/share/fixture/2026-10-29-a-v-b`)).text();
   assert.match(html, /<title>A v B: stats, props/);
-  assert.match(html, /og:image" content="[^"]*\/card\/fixture\/2026-10-29-a-v-b\.jpg\?v=3"/);
+  assert.match(html, /og:image" content="[^"]*\/card\/fixture\/2026-10-29-a-v-b\.jpg\?v=4"/);
   const r = await fetch(`${base}/share/fixture/nope`, { redirect: "manual" });
   assert.equal(r.status, 302);
   assert.equal(r.headers.get("location"), "/");

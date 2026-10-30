@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "motion/react";
-import { ChevronLeft, Minus, Plus, Share2, SlidersHorizontal } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { AdjustmentsHorizontalIcon, ChevronLeftIcon, InformationCircleIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,12 +37,15 @@ import { sharePlayerUrl } from "@/lib/share";
 import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
+import { LineStepper } from "@/components/app/line-stepper";
+import { OutcomeDonut } from "@/components/app/viz";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side", "Test innings"]); // those are on screen already (the Scope switch for the last)
 const band = (p: number | null) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo");
 const bandText = { hi: "text-primary", mid: "text-amber", lo: "text-miss", "": "" } as const;
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
-const CARD = "rounded-2xl bg-card ring-1 ring-white/5";
+const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
 
 /** The URL's query string as it is right now (the chart keeps line / side in the URL with replaceState, so the router's copy can be stale). */
 const liveQ = () => Object.fromEntries(new URLSearchParams(location.search));
@@ -87,7 +90,7 @@ function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: str
   const teamIx = store.P.tm[idx];
   return (
     <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeft className="size-5" strokeWidth={2.4} />Back</button>
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className="flex items-center gap-snug">
         <PlayerPhoto idx={idx} className="size-20 shrink-0 rounded-full bg-secondary" />
         <div className="grid min-w-0 flex-1 gap-tight">
@@ -97,7 +100,7 @@ function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: str
         </div>
         <div className="flex shrink-0 flex-col items-center gap-tight">
           <StarButton kind="player" idx={idx} />
-          <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><Share2 className="size-5" /></motion.button>
+          <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><ShareIcon className="size-5" /></motion.button>
         </div>
       </div>
     </section>
@@ -219,7 +222,13 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
   const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [logCount, setLogCount] = useState(30);
+  const tabRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
   const keep = (patch: Record<string, unknown>) => { const next = new URLSearchParams(location.search); for (const [k, v] of Object.entries(patch)) { if (v === "" || v == null) next.delete(k); else next.set(k, String(v)); } history.replaceState(null, "", `${location.pathname}?${next}`); };
+  const switchTab = (t: string) => {
+    setTab(t); keep({ tab: t });
+    requestAnimationFrame(() => tabRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }));
+  };
 
   const ws = entries.length ? windowRates(entries, line, side) : [];
   const cur = ws.find((w: any) => w.n === win) || ws[ws.length - 1];
@@ -234,11 +243,21 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
   const logs = [...entries].reverse();
   const stepLine = (d: number) => { const v = Math.max(0.5, Math.round((line + d) * 100) / 100); setLine(v); keep({ line: v, side }); };
   const pickLine = (v: number) => { setLine(v); keep({ line: v, side }); };
+  const mix = { hit: 0, miss: 0, push: 0, out: 0 };
+  for (const e of shown) {
+    const s = barState(e, line, side);
+    if (s === "hit") mix.hit += 1; else if (s === "miss") mix.miss += 1; else if (s === "push") mix.push += 1; else mix.out += 1;
+  }
+  const mixSlices = [
+    { key: "hit", n: mix.hit, color: "var(--primary)" }, { key: "miss", n: mix.miss, color: "var(--miss)" },
+    { key: "push", n: mix.push, color: "var(--amber)" }, { key: "out", n: mix.out, color: "var(--dnp)" },
+  ].filter((s) => s.n > 0);
 
   return (
     <div className="flex flex-col gap-section">
       {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side, book, statLabel: res.statLabel, fmt }} /> : null}
       {next && (next.opp || next.known) ? <div className="-mt-tight flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
+      <div className="flex flex-col gap-section lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:items-start">
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
         <section className="flex flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
@@ -250,16 +269,14 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
               <Metric k="Prop" v={res.statLabel} />
               <Metric k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
             </div>
-            <Gauge p={cur.p} caption={`${cur.label} hit`} />
+            {mixSlices.length >= 3
+              ? <OutcomeDonut caption={`${cur.label} mix`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={mixSlices} />
+              : <Gauge p={cur.p} caption={`${cur.label} hit`} />}
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-snug">
             <PillGroup segmented layoutId="pl-side" label="Side" value={side} onChange={(v) => { setSide(v); keep({ line, side: v }); }} items={[["over", "Over"], ["under", "Under"]]} />
-            <div className="flex h-control items-center rounded-[var(--chip-radius)] bg-card">
-              <Button variant="ghost" size="icon" aria-label="Lower the line" className="size-control rounded-full" onClick={() => stepLine(-0.5)}><Minus /></Button>
-              <span className="min-w-[5rem] text-center text-callout font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
-              <Button variant="ghost" size="icon" aria-label="Raise the line" className="size-control rounded-full" onClick={() => stepLine(0.5)}><Plus /></Button>
-            </div>
+            <LineStepper value={line} label={side === "over" ? "O" : "U"} onStep={stepLine} />
           </div>
           {book && (bookAt ? (
             <p className="-mt-tight text-callout text-muted-foreground">
@@ -279,17 +296,40 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
       )}
 
       {book && cur && (
-        <section className="flex flex-col gap-snug">
-          <div className="grid gap-hair">
-            <h2 className="text-title font-bold tracking-tight">Bookmaker lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}</h2>
-            <p className="text-footnote text-muted-foreground">{book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}{book.competition ? ` · ${book.competition}` : ""}. Decimal prices, over / under. Tap a line to put it on the chart.{bookDefault ? " The chart opened on the main line." : ""}</p>
+        <section className="flex flex-col gap-snug lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
+          <div className="flex items-baseline justify-between gap-snug">
+            <h2 className="flex items-center gap-tight text-title font-bold tracking-tight">
+              Lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="text-muted-foreground" aria-label="About these lines"
+                    title="Decimal over/under. Tap a line to put it on the chart. Market is the over chance with the margin off. Hit is how often he has cleared it on the chart.">
+                    <InformationCircleIcon className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-56 text-callout">Decimal over / under. Tap a line for the chart. Market: over chance with the margin off. Hit: how often he has cleared it on the chart.{bookDefault ? " Opened on the main line." : ""}</TooltipContent>
+              </Tooltip>
+            </h2>
+            {edge != null ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className={cn("text-callout font-semibold tabular-nums", edge >= 0 ? "text-primary" : "text-miss")} title={`Best price ${odds(bestPrice)}`}>
+                    {edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-56 text-callout">Edge at this line. Best price {odds(bestPrice)}. His {cur.label} hit rate pulled toward the market.</TooltipContent>
+              </Tooltip>
+            ) : null}
           </div>
+          <p className="truncate text-footnote text-muted-foreground" title={[book.match, book.start_utc ? localWhen(book.start_utc) : "", book.competition].filter(Boolean).join(" · ")}>
+            {book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}
+          </p>
           <ul className={cn("overflow-hidden", CARD)}>
             {book.lines.map((l: any) => {
               const hist = windowRate(entries, cur.n, l.line, "over");
               const bestO = Math.max(0, ...l.books.map((b: any) => b.over || 0)), bestU = Math.max(0, ...l.books.map((b: any) => b.under || 0)); // with several books, the best price of each side stands out
               return (
-                <li key={l.line} className="border-t border-white/5 first:border-t-0">
+                <li key={l.line} className="border-t border-hairline first:border-t-0">
                   <button type="button" onClick={() => pickLine(l.line)} aria-label={`Use line ${l.line}`}
                     className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
                     <span className="grid min-w-0 gap-hair">
@@ -297,21 +337,21 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
                       {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><BookBadge source={b.source} /> <span className={cn(l.books.length > 1 && b.over === bestO && "font-semibold text-primary")}>{odds(b.over)}</span> / <span className={cn(l.books.length > 1 && b.under === bestU && "font-semibold text-primary")}>{odds(b.under)}</span></span>)}
                     </span>
                     <span className="grid justify-items-end gap-hair text-right">
-                      <span className="text-footnote text-muted-foreground">Market <b className="font-semibold tabular-nums text-foreground">{l.prob == null ? "–" : pc(l.prob)}</b></span>
-                      <span className="text-footnote text-muted-foreground">Hit {cur.label} <b className="font-semibold tabular-nums text-foreground">{hist.p == null ? "–" : pc(hist.p)}</b></span>
+                      <span className="text-footnote text-muted-foreground" title="Over chance with each book's margin removed">Mkt <b className="font-semibold tabular-nums text-foreground">{l.prob == null ? "–" : pc(l.prob)}</b></span>
+                      <span className="text-footnote text-muted-foreground" title={`How often he has gone over this line in the ${scope ? "innings" : "games"} on the chart`}>{cur.label} <b className="font-semibold tabular-nums text-foreground">{hist.p == null ? "–" : pc(hist.p)}</b></span>
                     </span>
                   </button>
                 </li>
               );
             })}
           </ul>
-          <p className="text-footnote text-muted-foreground">Market is the chance of the over once each book's margin is removed. Hit rate is how often he has gone over that line in the {scope ? "innings" : "games"} on the chart.{edge != null ? ` At ${line}: best price ${odds(bestPrice)}, edge ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}% (his ${cur.label} hit rate pulled toward the market's chance).` : ""}</p>
         </section>
       )}
+      </div>
 
       <section className="flex flex-col gap-stack">
         <div className="flex flex-wrap items-center gap-snug">
-          <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters{active.length ? ` · ${active.length}` : ""}</Button>
+          <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><AdjustmentsHorizontalIcon />Filters{active.length ? ` · ${active.length}` : ""}</Button>
           {active.length ? active.map(([k, v]: [string, unknown], i: number) => <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-footnote font-normal">{k ? <b className="mr-tight font-semibold">{k}</b> : null}{String(v)}</Badge>)
             : <span className="text-callout text-muted-foreground">All matches</span>}
           {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
@@ -323,7 +363,8 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
           <p className="text-footnote text-muted-foreground">{res.freshness}</p>
         </div>
 
-        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={(t) => { setTab(t); keep({ tab: t }); }} items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} />
+        <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
+        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={switchTab} items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} />
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
             {tab === "lines" && (
@@ -344,7 +385,7 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
                   {logs.slice(0, logCount).map((e, i) => {
                     const s = barState(e, line, side) as string;
                     return (
-                      <li key={i} className="border-t border-white/5 first:border-t-0">
+                      <li key={i} className="border-t border-hairline first:border-t-0">
                         <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent">
                           <TeamBadge name={e.opp} size="sm" />
                           <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-semibold">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
@@ -360,6 +401,7 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
             {tab === "splits" && <SplitTables splits={res.splits} />}
           </motion.div>
         </AnimatedHeight>
+        </div>
       </section>
 
       <Sheet open={!!game} onOpenChange={(o) => !o && setGame(null)}>
@@ -367,7 +409,7 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
           {game && <><SheetHeader><SheetTitle>{name} · {shortDate(game.e.date)}</SheetTitle><SheetDescription className="sr-only">Game details</SheetDescription></SheetHeader>
             <div className="px-gutter pb-section">{[["Date", game.e.date], ["Opponent", game.e.opp], game.e.venueName ? ["Venue", game.e.venueName] : null,
               [res.statLabel, game.e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[game.s] : String(game.e.value)],
-              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between gap-snug border-b border-white/10 py-snug text-body last:border-b-0"><span className="text-muted-foreground">{k}</span><b className="text-right font-semibold">{v}</b></div>)}</div></>}
+              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between gap-snug border-b border-hairline py-snug text-body last:border-b-0"><span className="text-muted-foreground">{k}</span><b className="text-right font-semibold">{v}</b></div>)}</div></>}
         </SheetContent>
       </Sheet>
 

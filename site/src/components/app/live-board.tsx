@@ -200,7 +200,7 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
                 </thead>
                 <tbody>
                   {inn.batters.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-white/5">
+                    <tr key={p.id || p.name} className="border-t border-hairline">
                       <td className="py-snug pr-snug">
                         <Who name={p.name} team={p.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
                         {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
@@ -214,14 +214,14 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
                     </tr>
                   ))}
                   {inn.extras && (
-                    <tr className="border-t border-white/5 text-muted-foreground">
+                    <tr className="border-t border-hairline text-muted-foreground">
                       <td className="py-snug">Extras</td>
                       <Num className="font-medium text-foreground">{inn.extras.total}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
                     </tr>
                   )}
                   {inn.runs != null && (
-                    <tr className="border-t border-white/10">
+                    <tr className="border-t border-hairline">
                       <td className="py-snug font-medium">Total</td>
                       <Num className="font-medium text-foreground">{inn.runs}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
@@ -255,7 +255,7 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
                 </thead>
                 <tbody>
                   {inn.bowlers.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-white/5">
+                    <tr key={p.id || p.name} className="border-t border-hairline">
                       <td className="py-snug pr-snug"><Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" /></td>
                       <Num>{fmtOv(p.overs)}</Num>
                       <Num>{p.maidens ?? 0}</Num>
@@ -285,7 +285,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
   return (
     <Accordion type="multiple" className="w-full">
       {!!card.length && (
-        <AccordionItem value="scorecard" className="border-white/10">
+        <AccordionItem value="scorecard" className="border-hairline">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <span className="flex min-w-0 flex-1 items-center gap-snug">
               <span className="truncate text-body font-semibold">Scorecard</span>
@@ -298,7 +298,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
         </AccordionItem>
       )}
       {showForm && (
-        <AccordionItem value="form" className="border-white/10">
+        <AccordionItem value="form" className="border-hairline">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <FormHeadline teams={teams} fmt={fmt} />
           </AccordionTrigger>

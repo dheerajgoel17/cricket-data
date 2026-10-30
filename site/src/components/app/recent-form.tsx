@@ -49,7 +49,7 @@ function FormGames({ games, store }: { games: any[]; store: any }) {
   return (
     <ul>
       {[...games].reverse().map((g) => (
-        <li key={g.m} className="flex items-center gap-snug border-t border-white/5 py-snug">
+        <li key={g.m} className="flex items-center gap-snug border-t border-hairline py-snug">
           <span className={cn("grid size-7 shrink-0 place-items-center rounded-md text-footnote font-bold", CHIP[g.result])}>{g.result}</span>
           <div className="min-w-0 flex-1">
             <div className="truncate text-callout font-medium">vs <Link to={`/team/${g.opp}`} className="hover:underline">{store.teamName(g.opp)}</Link></div>
