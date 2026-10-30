@@ -1,45 +1,45 @@
 {
- "generated_at_utc": "2026-10-30T10:18:15Z",
- "generated_at_ist": "2026-10-30 15:48 IST",
- "runtime_secs": 88.0,
+ "generated_at_utc": "2026-10-30T16:45:34Z",
+ "generated_at_ist": "2026-10-30 22:15 IST",
+ "runtime_secs": 166.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-10-30",
-  "commit": "419b19595b"
+  "commit": "dbc551fcd3"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1237,
-   "secs": 0.2
+   "rows": 1343,
+   "secs": 1.0
   },
   "smarkets": {
    "status": "ok",
-   "rows": 544,
-   "secs": 2.5
+   "rows": 672,
+   "secs": 2.7
   },
   "feedk": {
    "status": "ok",
-   "rows": 45,
-   "secs": 4.7
+   "rows": 195,
+   "secs": 22.4
   },
   "feedg": {
    "status": "ok",
-   "rows": 32,
-   "secs": 18.6
-  },
-  "feede": {
-   "status": "ok",
-   "rows": 492,
-   "secs": 35.4
+   "rows": 48,
+   "secs": 29.2
   },
   "feedf": {
    "status": "ok",
-   "rows": 308,
-   "secs": 48.5
+   "rows": 340,
+   "secs": 44.9
+  },
+  "feede": {
+   "status": "ok",
+   "rows": 844,
+   "secs": 53.8
   }
  },
- "snapshot": "odds_20261030T101815Z.jsonl.gz",
+ "snapshot": "odds_20261030T164534Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 24.0,
@@ -104,47 +104,47 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 11,
-  "rows_in_window": 1701,
-  "selections_with_model": 801,
-  "selections_with_market_fair": 884,
-  "markets_in_window": 150,
-  "value_bets": 1,
+  "events_in_window": 20,
+  "rows_in_window": 2253,
+  "selections_with_model": 1156,
+  "selections_with_market_fair": 1160,
+  "markets_in_window": 221,
+  "value_bets": 0,
   "dropped_by_filter": {
-   "odds_range": 7,
-   "model_market_gap": 421,
-   "loose_name_match": 3,
+   "odds_range": 6,
+   "model_market_gap": 545,
+   "loose_name_match": 4,
    "small_sample": 4,
-   "model_only_no_market": 160,
+   "model_only_no_market": 222,
    "policy_min_edge": 1,
    "policy_max_odds": 2,
    "model_disagrees": 2
   },
   "suspect_edges": 0,
-  "innings_milestones_unmodelled": 0,
+  "innings_milestones_unmodelled": 8,
   "model_vs_market": {
    "top_bowler_team": {
-    "n_prices": 33,
-    "mean_model_p": 0.091,
-    "mean_market_p": 0.091,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.438,
-    "corr": 0.664
+    "n_prices": 32,
+    "mean_model_p": 0.093,
+    "mean_market_p": 0.094,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.456,
+    "corr": 0.671
    },
    "batter_runs": {
-    "n_prices": 200,
+    "n_prices": 362,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.88,
-    "corr": 0.061
+    "mean_abs_logit_diff": 0.73,
+    "corr": 0.28
    },
    "batter_sixes": {
     "n_prices": 32,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.362,
+    "mean_abs_logit_diff": 0.359,
     "corr": 0.929
    },
    "batter_fours": {
@@ -152,111 +152,60 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.396,
-    "corr": 0.227
+    "mean_abs_logit_diff": 0.394,
+    "corr": 0.238
    },
    "bowler_wickets": {
     "n_prices": 34,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.428,
-    "corr": 0.858
+    "mean_abs_logit_diff": 0.419,
+    "corr": 0.866
    },
    "batter_milestone": {
-    "n_prices": 365,
-    "mean_model_p": 0.434,
-    "mean_market_p": 0.456,
-    "mean_logit_diff_model_minus_market": -0.167,
-    "mean_abs_logit_diff": 1.53,
-    "corr": 0.973
+    "n_prices": 563,
+    "mean_model_p": 0.457,
+    "mean_market_p": 0.471,
+    "mean_logit_diff_model_minus_market": -0.108,
+    "mean_abs_logit_diff": 1.327,
+    "corr": 0.979
    },
    "bowler_milestone": {
     "n_prices": 85,
     "mean_model_p": 0.225,
-    "mean_market_p": 0.281,
-    "mean_logit_diff_model_minus_market": -0.543,
-    "mean_abs_logit_diff": 0.553,
+    "mean_market_p": 0.28,
+    "mean_logit_diff_model_minus_market": -0.531,
+    "mean_abs_logit_diff": 0.542,
     "corr": 0.986
    },
    "top_batter_team": {
     "n_prices": 59,
-    "mean_model_p": 0.027,
+    "mean_model_p": 0.028,
     "mean_market_p": 0.055,
-    "mean_logit_diff_model_minus_market": 0.001,
-    "mean_abs_logit_diff": 0.992,
-    "corr": 0.784
+    "mean_logit_diff_model_minus_market": -0.003,
+    "mean_abs_logit_diff": 0.949,
+    "corr": 0.765
    },
    "top_batter_match": {
     "n_prices": 34,
-    "mean_model_p": 0.011,
+    "mean_model_p": 0.01,
     "mean_market_p": 0.029,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 1.354,
-    "corr": 0.603
+    "mean_abs_logit_diff": 1.374,
+    "corr": 0.567
    },
    "top_bowler_match": {
     "n_prices": 23,
-    "mean_model_p": 0.038,
+    "mean_model_p": 0.037,
     "mean_market_p": 0.043,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.767,
-    "corr": 0.467
+    "mean_abs_logit_diff": 0.775,
+    "corr": 0.458
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|costa del sol|pak l care badalona|2026-10-30",
-   "start_ist": "2026-10-30 16:00 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Abu Dhabi|Ajman|2026-10-30",
-   "start_ist": "2026-10-30 18:00 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Abu Dhabi",
-    "Ajman"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Brampton Blazers|Vancouver Guardians|2026-10-30",
-   "start_ist": "2026-10-30 19:30 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Brampton Blazers",
-    "Vancouver Guardians"
-   ],
-   "sources": [
-    "feedf_p",
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Dubai|Emirates Blues|2026-10-30",
-   "start_ist": "2026-10-30 22:00 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Dubai",
-    "Emirates Blues"
-   ],
-   "sources": [
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Canterbury|Wellington Firebirds|2026-10-30",
    "start_ist": "2026-10-31 03:00 IST",
@@ -268,6 +217,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_f",
     "feedf_p",
     "feedg_f",
     "moviodds_bet365",
@@ -285,7 +235,9 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_f",
     "feedf_p",
+    "feedg_f",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -294,11 +246,23 @@
    "event": "male|Montreal Warriors|Toronto Kings|2026-10-30",
    "start_ist": "2026-10-31 04:30 IST",
    "format": "T20",
-   "format_source": "name",
+   "format_source": "fixtures",
    "teams_matched": [
     "Montreal Warriors",
     "Toronto Kings"
    ],
+   "sources": [
+    "feedf_p",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|assam|chandigarh|2026-10-31",
+   "start_ist": "2026-10-31 09:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
    "sources": [
     "smarkets"
    ]
@@ -335,6 +299,90 @@
    ]
   },
   {
+   "event": "male|Netherlands|United Arab Emirates|2026-10-31",
+   "start_ist": "2026-10-31 11:00 IST",
+   "format": "ODI",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Netherlands",
+    "United Arab Emirates"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedf_p",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|jammu and kashmir|karnataka|2026-10-31",
+   "start_ist": "2026-10-31 11:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Kenya|Papua New Guinea|2026-10-31",
+   "start_ist": "2026-10-31 12:15 IST",
+   "format": "ODI",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Kenya",
+    "Papua New Guinea"
+   ],
+   "sources": [
+    "feede_lb",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Jersey|Qatar|2026-10-31",
+   "start_ist": "2026-10-31 12:15 IST",
+   "format": "ODI",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Jersey",
+    "Qatar"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedf_p",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Chitwan Rhinos|Lumbini Lions|2026-10-31",
+   "start_ist": "2026-10-31 12:15 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Chitwan Rhinos",
+    "Lumbini Lions"
+   ],
+   "sources": [
+    "feede_lb",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Ireland|Namibia|2026-10-31",
+   "start_ist": "2026-10-31 12:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "Ireland",
+    "Namibia"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|Pakistan|Sri Lanka|2026-10-31",
    "start_ist": "2026-10-31 13:30 IST",
    "format": "ODI",
@@ -345,10 +393,19 @@
    ],
    "sources": [
     "feede_lb",
-    "feedf_f",
-    "feedf_p",
     "feedg_f",
+    "feedk_leoal",
     "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|bengal|goa|2026-10-31",
+   "start_ist": "2026-10-31 13:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
     "smarkets"
    ]
   },
@@ -368,90 +425,125 @@
     "moviodds_bet365",
     "smarkets"
    ]
-  }
- ],
- "value_bets": [
+  },
   {
-   "event_key": "female|Adelaide Strikers Women|Melbourne Stars Women|2026-10-31",
-   "match": "Adelaide Strikers vs Melbourne Stars",
-   "start_utc": "2026-10-31T04:40:00Z",
-   "start_ist": "2026-10-31 10:10 IST",
+   "event": "male|Australia|South Africa|2026-10-31",
+   "start_ist": "2026-10-31 14:00 IST",
+   "format": "MULTI",
+   "format_source": "name",
+   "teams_matched": [
+    "Australia",
+    "South Africa"
+   ],
+   "sources": [
+    "feedk_leoal"
+   ]
+  },
+  {
+   "event": "male|Eastern Storm|Garden Route Badgers|2026-10-31",
+   "start_ist": "2026-10-31 16:30 IST",
    "format": "T20",
-   "gender": "female",
-   "market_type": "batter_runs",
-   "market": "Rhys McKenna - Over/Under 14.5 Runs",
-   "team_scope": "",
-   "selection": "Rhys McKenna under 14.5",
-   "player_matched_as": "Rhys McKenna",
-   "line": 14.5,
-   "side": "under",
-   "best_odds": 1.83,
-   "best_source": "feede_lb",
-   "effective_odds_after_commission": 1.83,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "fair_odds": 1.729,
-   "fair_prob": 0.5785,
-   "model_prob": 0.6301,
-   "market_prob": 0.5362,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0586,
-   "edge_pct": 5.86,
-   "kelly_quarter_stake_pct": 1.76,
-   "confidence": "medium",
-   "why": "Model 63% vs market 54% for under 14.5 runs; form 13.8 runs/inn recency-weighted T20 (n_eff 18.5; last 5: 13, 0, 23, 55, 2), bats in 88% of games played; at Karen Rolton Oval, Adelaide, South Australia: 3 inns avg 6.3",
-   "notes": "2 market source(s) for fair price; model 0.630 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules",
-   "model_detail": {
-    "n_eff": 18.5,
-    "expected": 15.2,
-    "nb_alpha": 1.213,
-    "p_bats_or_bowls": 0.876,
-    "venue_matched": "karen rolton oval",
-    "context_terms": [
-     "p_bat",
-     "h2h_runs"
-    ]
-   },
-   "rain_risk": null,
-   "weather": null
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Eastern Storm",
+    "Garden Route Badgers"
+   ],
+   "sources": [
+    "feede_lb",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|chhattisgarh|maharashtra|2026-10-31",
+   "start_ist": "2026-10-31 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Biratnagar Kings|Sudurpaschim Royals|2026-10-31",
+   "start_ist": "2026-10-31 16:45 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Biratnagar Kings",
+    "Sudurpaschim Royals"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Warriors|Western Province|2026-10-31",
+   "start_ist": "2026-10-31 21:30 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Warriors",
+    "Western Province"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedk_leoal",
+    "moviodds_bet365",
+    "smarkets"
+   ]
   }
  ],
+ "value_bets": [],
  "suspect_not_alerted": [],
  "unmatched_teams": [
-  "Costa Del Sol (male)",
-  "Eagles (male)",
+  "Assam (W) (female)",
+  "Bengal (W) (female)",
+  "Chandigarh (W) (female)",
+  "Chhattisgarh (W) (female)",
+  "Goa (W) (female)",
   "Hayleys Group A (male)",
   "Hnb A (male)",
-  "MID West Rhinos (male)",
-  "Madrid United (male)",
-  "Mountaineers (male)",
-  "Pak L Care Badalona (male)",
-  "Sporting Alfas (male)"
+  "Jammu And Kashmir (W) (female)",
+  "Karnataka (W) (female)",
+  "Maharashtra (W) (female)"
  ],
  "unmatched_players_in_window": [
   "A Mushangwe",
   "A Wikman",
   "AM King",
+  "Aasif Sheikh",
+  "Adam Kruger",
   "Agha Salman",
   "Alana King",
+  "Ali Nadeem",
+  "Andrew Rasemene",
   "Anesu Catherine Mushangwe",
   "Annie Wikman",
+  "Anubhav Jawla",
+  "Asakhe Tsaka",
   "B Mooney",
   "BL Mooney",
   "Beth Mooney",
+  "Bongile Mfunelwa",
   "C Dean",
   "C Leeson",
   "CL Tryon",
   "Carly Leeson",
   "Charlie Dean",
   "Chloe Tryon",
+  "Chris Lynn",
   "E Wilson",
   "Ella Wilson",
   "Emma De Broughe",
+  "Enathi Khitshini",
+  "Ethan Frosler",
   "F Kemp",
   "F Sana",
   "Fatima Sana",
   "Freya Kemp",
+  "Gideon Peters",
+  "Gurnek Johal Singh",
   "Henry Cullen-Hieatt",
   "Henry Shipley",
   "IY McKeon",
@@ -459,7 +551,8 @@
   "Ines Mackeon",
   "Jack Wright",
   "Jaskaran Sandhu",
-  "K Mendis",
+  "Jason Raubenheimer",
+  "Jiveshan Pillay",
   "Kamindu Mendis",
   "Katene Clarke",
   "Kusal Mendis",
@@ -473,32 +566,48 @@
   "MD Shanaka",
   "ME Bouchier",
   "ME Clark",
-  "ML Schutt",
   "Maggie Clark",
   "Maia Bouchier",
+  "Matthew Boast",
   "Matthew Buchanan Rowe",
+  "Max O Dowd",
+  "Mekyle Pillay",
+  "Merrick Brett",
+  "Michael Kruiskamp",
   "Michael Sclanders",
+  "Modiri Litheko",
+  "Muhammad Ahsan Ali Khan",
+  "Muhammad Manack",
+  "Muhammad Rohid",
+  "Muhammad Zeeshan",
   "N Stalenburg",
   "Naomi Stalenberg",
-  "O Porter",
   "Olivia Porter",
   "PVD Chameera",
+  "Rakep Patel",
   "Razaullah",
+  "Ross Coetzee",
   "S Ecclestone",
   "S Moqim",
   "S Morgan",
   "SFM Devine",
   "Samuel Morgan",
+  "Sello Valintine Kitime",
+  "Sharad Lumba",
+  "Shaveer Khan",
+  "Sinalo Gobeni",
   "Sophie Devine",
   "Sophie Ecclestone",
   "Sophie Reid",
-  "Srikar Bharat",
   "T Davidge",
   "T Vlaeminck",
   "TM McGrath",
   "Tahlia McGrath",
   "Tayla Vlaeminck",
-  "Z Samuel",
+  "Tejender Singh",
+  "Tladi Bokako",
+  "Tyrece Karelse",
+  "Waco Bassick",
   "Zoe Samuel"
  ],
  "model_backtest": {
@@ -624,18 +733,20 @@
   }
  },
  "log": [
-  "[15:48 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[15:48 IST] history: 23725 matches, last 2026-10-30, players 426419",
-  "[15:49 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1237, 'secs': 0.2}",
-  "[15:49 IST] source smarkets: {'status': 'ok', 'rows': 544, 'secs': 2.5}",
-  "[15:49 IST] source feedk: {'status': 'ok', 'rows': 45, 'secs': 4.7}",
-  "[15:49 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 18.6}",
-  "[15:49 IST] source feede: {'status': 'ok', 'rows': 492, 'secs': 35.4}",
-  "[15:49 IST] source feedf: {'status': 'ok', 'rows': 308, 'secs': 48.5}",
-  "[15:49 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[15:49 IST] 62 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[15:49 IST] book lines: 265 player lines from 6 source(s)",
-  "[15:49 IST] weather: forecasts for 10 events, 0 failed",
-  "[15:49 IST] prop model: 984 prop selections modelled, 268 milestone ladder prices anchored to O/U"
+  "[22:15 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:15 IST] history: 23747 matches, last 2026-10-30, players 426862",
+  "[22:16 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1343, 'secs': 1.0}",
+  "[22:16 IST] source smarkets: {'status': 'ok', 'rows': 672, 'secs': 2.7}",
+  "[22:16 IST] source feedk: {'status': 'ok', 'rows': 195, 'secs': 22.4}",
+  "[22:16 IST] source feedg: {'status': 'ok', 'rows': 48, 'secs': 29.2}",
+  "[22:16 IST] source feedf: {'status': 'ok', 'rows': 340, 'secs': 44.9}",
+  "[22:16 IST] source feede: {'status': 'ok', 'rows': 844, 'secs': 53.8}",
+  "[22:16 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:16 IST] 96 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[22:16 IST] 8 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[22:16 IST] book lines: 349 player lines from 6 source(s)",
+  "[22:16 IST] 4 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[22:18 IST] weather: forecasts for 16 events, 0 failed",
+  "[22:18 IST] prop model: 1362 prop selections modelled, 267 milestone ladder prices anchored to O/U"
  ]
 }
