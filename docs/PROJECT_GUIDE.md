@@ -71,7 +71,7 @@ snapshot built into the site. Details: [VALUE_BETS.md](VALUE_BETS.md), [MODEL_BA
 1. `parse.py` parses each Base ball-by-ball JSON into batting rows (position = order of first appearance at the crease; runs/balls/4s/6s; dismissal kind), bowling spells
    (wickets exclude run outs/retired; runs conceded = batter runs + wides + no-balls + penalty), partnerships (pair, wicket no., runs, balls, who was out), and per-innings market
    aggregates (fours, sixes, 30s, 50s, 100s, 10+, single-digits, ducks, highest over, most conceded, top score, top-scorer ids). Super overs ignored. `qualifies()` implements the void rules.
-2. `build.py` merges provisional matches (deduped against the zip), infers hosts (home/away), assigns integer ids, shards player data into 64 files and writes JSON.
+2. `build.py` merges provisional matches (deduped against the zip), infers hosts (home/away), assigns integer ids, shards player data into 64 files and writes JSON. A scraped batting/bowling/fielding row that names no side is skipped (empty team used to `KeyError` and sink the Vercel data build).
 3. `crex_assets.py` matches Source A sitemap names to Base players (conservative: surname + first initial; ambiguous names skipped) and teams (with a small alias table).
 4. `identity.py` builds the player-identity table from the photo map, the books' names and a hand-checked file (see 5.7); its links also feed the photo map and the scraped-name linker.
 5. `assets_sync.py` copies images into our own Supabase Storage (see 5.6).

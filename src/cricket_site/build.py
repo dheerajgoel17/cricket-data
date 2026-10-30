@@ -164,9 +164,9 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
                 continue
             m["aliases"].append((pid, p.get("player", "")))
             n = _int_getter(p)
-            if n("balls") or n("runs"):
+            if (n("balls") or n("runs")) and p.get("team") and p.get("opponent"):  # a row with no side cannot be filed (assemble used to KeyError on "")
                 m["bat"].append((pid, 0, p["team"], p["opponent"], 0, n("runs"), n("balls"), n("fours"), n("sixes"), -1, -1, -1))
-            if n("balls_bowled"):
+            if n("balls_bowled") and p.get("team") and p.get("opponent"):
                 m["bowl"].append((pid, 0, p["team"], p["opponent"], n("wickets"), n("runs_conceded"), n("balls_bowled")))
             if (n("catches") or n("stumpings")) and p.get("team") and p.get("opponent"):  # a row with no side cannot be filed
                 m["fld"].append((pid, 0, p["team"], p["opponent"], n("catches"), n("stumpings")))
@@ -457,14 +457,22 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
                         + [pix[p] for p in i[16] if p in pix] for i in m["inn"]])
         for r in m["bat"]:
             pid = r[0]
-            touch(pid, m, T(r[2]))
+            try:
+                team, opp = T(r[2]), T(r[3])
+            except KeyError:  # empty or unknown side (scraped totals): skip the row, never sink the build
+                continue
+            touch(pid, m, team)
             S = shards[shard_of(pid)]["bat"]
-            _push(S, BAT_KEYS, (pix[pid], mi, r[1], T(r[2]), T(r[3]), r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11]))
+            _push(S, BAT_KEYS, (pix[pid], mi, r[1], team, opp, r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11]))
         for r in m["bowl"]:
             pid = r[0]
-            touch(pid, m, T(r[2]))
+            try:
+                team, opp = T(r[2]), T(r[3])
+            except KeyError:  # empty or unknown side: skip the row, never sink the build
+                continue
+            touch(pid, m, team)
             S = shards[shard_of(pid)]["bowl"]
-            _push(S, BOWL_KEYS, (pix[pid], mi, r[1], T(r[2]), T(r[3]), r[4], r[5], r[6]))
+            _push(S, BOWL_KEYS, (pix[pid], mi, r[1], team, opp, r[4], r[5], r[6]))
         for r in m.get("fld", []):
             if r[0] in pix and r[2] and r[3]:  # a fielder who neither batted nor bowled has no player entry (his credits are left out), and a row must name both sides
                 try:

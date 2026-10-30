@@ -129,13 +129,17 @@ def test_a_scraped_players_catches_and_stumpings_are_kept_and_a_row_with_no_side
     z, data, out, _ = _out(tmp_path)
     bro = synth.pid(synth.BROOK)
     pl = [{"player": "Harry Brook", "player_id": bro, "team": "Alpha", "opponent": "Beta", "runs": "10", "balls": "8", "catches": "2", "stumpings": "1"},
-          {"player": "Harry Brook", "player_id": bro, "team": "", "opponent": "", "runs": "0", "balls": "0", "catches": "1"}]  # a scraped row naming no side
+          {"player": "Harry Brook", "player_id": bro, "team": "", "opponent": "", "runs": "0", "balls": "0", "catches": "1"},  # fielding, no side
+          {"player": "Harry Brook", "player_id": bro, "team": "", "opponent": "", "runs": "5", "balls": "6"}]  # batting, no side: used to KeyError in assemble
     (data / "provisional" / "crex-new.json").write_text(json.dumps(_prov("crex-new", "2025-06-01", "Alpha", "Beta", pl)))
     B.build(z, data, out, None, workers=1)  # used to be a KeyError on the empty side
     M, IX = _load(out)
     m, brook = M["id"].index("prov-new"), IX["players"]["id"].index(bro)
-    sh = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())["fld"]
+    shard = json.loads((out / "p" / f"{int(bro, 16) % IX['nshard']:02d}.json").read_text())
+    sh = shard["fld"]
     assert [(sh["ct"][k], sh["st"][k]) for k in range(len(sh["p"])) if sh["p"][k] == brook and sh["m"][k] == m] == [(2, 1)]
+    bat = shard["bat"]
+    assert [bat["r"][k] for k in range(len(bat["p"])) if bat["p"][k] == brook and bat["m"][k] == m] == [10]
 
 
 def test_event_host_parses_tour_events():
