@@ -166,7 +166,11 @@ def pull_odds(stamp):
             msg = f"{type(e).__name__}: {e}"
             code = getattr(e, "code", None)
             if code in (403, 451):
-                msg = f"blocked (HTTP {code}) - likely geo/bot protection from this box's US IP"
+                detail = (getattr(e, "reason", None) or str(e)).strip()
+                if detail and detail.lower() not in ("forbidden", "blocked"):
+                    msg = f"HTTP {code}: {detail[:120]}"
+                else:
+                    msg = f"blocked (HTTP {code}) - likely geo/bot protection from this box's US IP"
             return mod.NAME, {"status": "error", "reason": msg[:300], "secs": round(time.time() - t, 1)}, [], None
 
     mods = adapters()

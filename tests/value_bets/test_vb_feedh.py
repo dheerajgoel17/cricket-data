@@ -233,6 +233,31 @@ def test_a_laptop_never_calls_the_book(monkeypatch):
     assert called == []
 
 
+class _Body:
+    def __init__(self, text):
+        self._raw = text.encode()
+
+    def read(self):
+        return self._raw
+
+    def close(self):
+        pass
+
+
+def test_a_relay_403_keeps_the_worker_body(monkeypatch):
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("FEEDH_RELAY", "https://relay.invalid/api/relay")
+    monkeypatch.setenv("FEEDH_RELAY_KEY", "k-1")
+
+    def fake(url, retries=1, **kw):
+        raise urllib.error.HTTPError(url, 403, "Forbidden", {}, _Body("host not allowed"))
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    with pytest.raises(urllib.error.HTTPError) as ei:
+        feedh.request("https://book.example/x")
+    assert ei.value.code == 403 and ei.value.reason == "host not allowed"
+
+
 def test_github_actions_never_calls_the_book_directly(monkeypatch):
     monkeypatch.setenv("GITHUB_ACTIONS", "true")
     monkeypatch.setenv("FEEDH_URL", "https://book.example/sports")

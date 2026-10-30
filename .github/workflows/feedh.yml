@@ -1,0 +1,54 @@
+name: Feed H probe
+
+# Dispatch only: pull Dafabet through the Mumbai Worker, no other books, nothing committed.
+# A pull request never runs this (the repository is public). GitHub US runners only; the book is reached via the relay.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: feedh-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      FEEDH_URL: ${{ secrets.FEEDH_URL }}
+      FEEDH_NAME: ${{ secrets.FEEDH_NAME }}
+      FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+      FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
+      FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+      FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Ping the relay
+        run: |
+          python - <<'PY'
+          import os, urllib.error, urllib.request
+          addr = (os.environ.get("FEEDH_RELAY") or os.environ.get("FEEDG_RELAY") or "").strip()
+          key = (os.environ.get("FEEDH_RELAY_KEY") or os.environ.get("FEEDG_RELAY_KEY") or "").strip()
+          if not addr.startswith("https://") or not key:
+              print("relay unset")
+              raise SystemExit(1)
+          req = urllib.request.Request(addr, headers={"x-relay-key": key})
+          try:
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  code, body = r.status, r.read()[:80]
+          except urllib.error.HTTPError as e:
+              code, body = e.code, e.read()[:80]
+          text = body.decode("utf-8", "replace").strip()
+          print(f"empty-u HTTP {code} body={text[:80]!r}")
+          PY
+      - name: Feed H only
+        run: |
+          python -m value_bets.adapters.feedh | tee "$GITHUB_STEP_SUMMARY"
