@@ -50,7 +50,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "private, max-age=120"
+          "value": "private, no-store"
         },
         {
           "key": "X-Robots-Tag",

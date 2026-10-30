@@ -1,4 +1,4 @@
-// XOR-SHA256 unwrap for identity/index/fixtures JSON that assets_sync wrapped at deploy.
+// XOR-SHA256 unwrap for the small JSON files (identity, fixtures, photos, lines) wrapped at deploy.
 // The key comes from /api/gate, never from the JS bundle. Plain JSON (tests, local builds) is returned as-is.
 const te = new TextEncoder();
 
@@ -13,17 +13,25 @@ function b64(s) {
   return out;
 }
 
+function blockAt(key, iv, i) {
+  const ctr = new Uint8Array(4);
+  new DataView(ctr.buffer).setUint32(0, i);
+  const block = new Uint8Array(key.length + iv.length + 4);
+  block.set(key, 0); block.set(iv, key.length); block.set(ctr, key.length + iv.length);
+  return block;
+}
+
 async function stream(key, iv, n) {
   const out = new Uint8Array(n);
-  let off = 0, i = 0;
-  const ctr = new Uint8Array(4);
-  while (off < n) {
-    new DataView(ctr.buffer).setUint32(0, i);
-    const block = new Uint8Array(key.length + iv.length + 4);
-    block.set(key, 0); block.set(iv, key.length); block.set(ctr, key.length + iv.length);
-    const h = await sha256(block);
-    out.set(h.subarray(0, Math.min(32, n - off)), off);
-    off += 32; i += 1;
+  const blocks = Math.ceil(n / 32);
+  const BATCH = 64;
+  for (let start = 0; start < blocks; start += BATCH) {
+    const end = Math.min(start + BATCH, blocks);
+    const hashes = await Promise.all(Array.from({ length: end - start }, (_, k) => sha256(blockAt(key, iv, start + k))));
+    hashes.forEach((h, k) => {
+      const off = (start + k) * 32;
+      out.set(h.subarray(0, Math.min(32, n - off)), off);
+    });
   }
   return out;
 }
