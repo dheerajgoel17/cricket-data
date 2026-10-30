@@ -43,6 +43,10 @@ env:
   FEEDG_API: ${{ secrets.FEEDG_API }}
   FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
   FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+  FEEDH_URL: ${{ secrets.FEEDH_URL }}
+  FEEDH_NAME: ${{ secrets.FEEDH_NAME }}
+  FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+  FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
 
 permissions:
   contents: write

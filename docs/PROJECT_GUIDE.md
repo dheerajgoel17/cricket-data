@@ -16,7 +16,7 @@ Two products in one repo, both **100% free to run**:
 ### Non-negotiable rules
 * **Free only**: no paid services as hard dependencies. Optional keys (xAI Grok / Gemini for the chat parser) degrade gracefully to a built-in parser.
 * **Decimal odds only** (never American/fractional). Player props and fancy markets only; no match-winner focus.
-* **Props are never deleted.** Once a fixture has arrived and the books have priced it, its props stay: `value_bets/archive/` keeps every match's lines for good and the fixture page falls back to it (`docs/VALUE_BETS.md`, `docs/SITE.md`). The home list may stop showing a finished match; no job may delete or trim the archive.
+* **Props are never deleted.** Once a fixture has arrived and the books have priced it, its props stay: `value_bets/archive/` keeps every match's lines for good (and Feed H's full market catalogue: every open market of a fetched match, mapped or not) and the fixture page falls back to it (`docs/VALUE_BETS.md`, `docs/SITE.md`). The home list may stop showing a finished match; no job may delete or trim the archive.
 * **Exchange rules**: T20/ODI summary markets void unless 80% of overs are bowled in both innings (Hundred 80/100 balls; T10 48/60; 60-over 288/360); Tests void unless a result or 300 (5-day) / 200 (4-day) overs;
   30s = 30-49, 50s = 50-99, 100s = 100+; double-digit = 10+; single-digit = 1-9 (ducks excluded); team markets count only the team batting first; retired hurt is not a wicket;
   penalty runs count; super overs ignored; **a player named in the XI who never batted (bowled) has his batting (bowling) bets void**: the chart shows VOID (named in `xi`, no row) vs DNP (not in the XI), both excluded from hit rates.
