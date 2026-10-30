@@ -105,6 +105,15 @@ def on_runner() -> bool:
     return os.environ.get("GITHUB_ACTIONS") == "true"
 
 
+def _http_body(err: urllib.error.HTTPError) -> str:
+    """The Worker/book body on a 4xx (``host not allowed``, ``forbidden``), else empty. ``HTTPError.read`` is one-shot."""
+    try:
+        raw = err.read() if err.fp is not None else b""
+        return raw.decode("utf-8", "replace").strip()[:80]
+    except Exception:
+        return ""
+
+
 def request(url: str):
     """One GET through the Mumbai relay. Direct only for test hosts. A laptop never reaches a real book."""
     if not on_runner() and not lab(url):
@@ -114,7 +123,10 @@ def request(url: str):
         if lab(url):
             return http_json(url, retries=0)[0]
         raise Skip("FEEDH_RELAY not set (never call the book directly)")
-    return http_json(f"{rl[0]}?u={urllib.parse.quote(url, safe='')}", headers={"x-relay-key": rl[1]}, retries=0)[0]
+    try:
+        return http_json(f"{rl[0]}?u={urllib.parse.quote(url, safe='')}", headers={"x-relay-key": rl[1]}, retries=0)[0]
+    except urllib.error.HTTPError as e:
+        raise urllib.error.HTTPError(e.url, e.code, _http_body(e) or e.reason, e.hdrs, None) from e
 
 
 def flip(name: str) -> str:
@@ -421,3 +433,27 @@ def fetch(fetched_at: str):
             info["catalogue"] += len(cat)
             info["left_out"].update(left)
     return rows, {"books": {s["NAME"]: {**info, "left_out": dict(info["left_out"])}}, "fancy": fancy, "catalogue": catalogue}
+
+
+if __name__ == "__main__":
+    from ..util import now_utc
+
+    stamp = iso(now_utc())
+    try:
+        rows, raw = fetch(stamp)
+    except Skip as e:
+        print(f"feedh skipped: {e}")
+        raise SystemExit(1) from None
+    except urllib.error.HTTPError as e:
+        print(f"feedh HTTP {e.code}: {e.reason}")
+        raise SystemExit(1) from None
+    book = next(iter((raw.get("books") or {}).values()), {})
+    print(
+        "feedh ok"
+        f" listed={book.get('listed')}"
+        f" events={book.get('events')}"
+        f" rows={len(rows)}"
+        f" fancy={book.get('fancy')}"
+        f" catalogue={book.get('catalogue')}"
+        f" stopped={book.get('stopped')}"
+    )
