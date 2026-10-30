@@ -1,0 +1,113 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { track } from "@/lib/analytics";
+import { bookQuotes } from "@/engine/lines.js";
+import { nextMatchRates } from "@/engine/next-match.js";
+import { localWhen, odds } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { BookBadge } from "./book-badge";
+import { TeamBadge } from "./badges";
+
+const CARD = "rounded-2xl bg-card ring-1 ring-white/5";
+const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
+
+export type NextMatchInfo = {
+  match: string;
+  start: string;
+  competition: string;
+  team?: string;
+  opp: string;
+  ground: string;
+  known?: string;
+};
+
+/** One context row: hit rate, n, fair decimal odds on the line the chart is on. */
+function RateRow({ label, r, side, line }: { label: string; r: { p: number | null; hits: number; played: number; fair: number | null }; side: string; line: number }) {
+  if (r.played < 1) {
+    return (
+      <div className="flex items-baseline justify-between gap-snug text-callout">
+        <span className="min-w-0 truncate text-muted-foreground">{label}</span>
+        <span className="text-muted-foreground">no sample</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-baseline justify-between gap-snug text-callout">
+      <span className="min-w-0 truncate text-muted-foreground">{label}</span>
+      <span className="shrink-0 tabular-nums">
+        <b className={cn("font-semibold", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
+        {" "}<span className="text-muted-foreground">{r.hits} of {r.played}</span>
+        {" "}<span className="text-muted-foreground" title={`fair ${side} ${line}`}>fair {odds(r.fair)}</span>
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Next match on the player page: who and when, the books' prices on this line, and how he has gone over/under it at that ground and against that side
+ * (the games on the chart, this format, filters applied).
+ */
+export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
+  next: NextMatchInfo; entries: any[]; line: number; side: string; book?: any; statLabel: string; fmt?: string;
+}) {
+  const { here, versus } = nextMatchRates(entries, next, line, side);
+  const bookAt = book?.lines?.find((l: any) => l.line === line) || null;
+  const quotes = bookQuotes(bookAt ? [bookAt] : []);
+  const best = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
+  const ground = next.ground.split(",")[0];
+  return (
+    <div className={cn("grid gap-snug p-inset", CARD)}>
+      <div className="flex items-start justify-between gap-snug">
+        <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">Next match</span>
+        <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>
+      </div>
+      <div className="flex min-w-0 items-center gap-snug">
+        {next.team ? <><TeamBadge name={next.team} size="sm" eager /><span className="text-footnote text-muted-foreground">vs</span></> : null}
+        {next.opp ? <><TeamBadge name={next.opp} size="sm" eager /><span className="min-w-0 truncate text-body font-semibold">{next.opp}</span></>
+          : <span className="min-w-0 truncate text-body font-semibold">{next.match}</span>}
+      </div>
+      {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
+
+      <div className="grid gap-hair border-t border-white/5 pt-snug">
+        <div className="flex flex-wrap items-baseline justify-between gap-snug">
+          <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
+          {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
+        </div>
+        {quotes.length ? (
+          <div className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
+            {quotes.map((q) => (
+              <span key={q.source} className="whitespace-nowrap">
+                <BookBadge source={q.source} /> <b className="font-semibold tabular-nums text-foreground">{odds(q.over)}</b>
+                {q.under != null ? <> / {odds(q.under)}</> : null}
+              </span>
+            ))}
+          </div>
+        ) : book?.main && book.main.line !== line ? (
+          <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
+        ) : null}
+      </div>
+
+      <div className="grid gap-tight border-t border-white/5 pt-snug">
+        {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
+        {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
+        <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games he played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
+      </div>
+    </div>
+  );
+}
+
+/** Quick filters: only games against his next opponent, only games at its ground (the same URL keys as the sheet). */
+export function NextFilters({ next, q, navigateWith }: { next: NextMatchInfo; q: Record<string, string>; navigateWith: (p: Record<string, unknown>) => void }) {
+  const chips: [string, string, string][] = [];
+  if (next.opp) chips.push(["opp", next.opp, `vs ${next.opp}`]);
+  if (next.known) chips.push(["venue", next.known, `At ${next.ground.split(",")[0]}`]);
+  return <>{chips.map(([k, v, label]) => {
+    const on = q[k] === v;
+    return (
+      <Button key={k} variant={on ? "default" : "secondary"} className="h-control rounded-full px-snug text-callout" aria-pressed={on}
+        onClick={() => { track("player_filter", { kind: k, on: on ? 0 : 1 }); navigateWith({ [k]: on ? "" : v }); }}>
+        {on ? `${label} ✓` : `Only ${label}`}
+      </Button>
+    );
+  })}</>;
+}
