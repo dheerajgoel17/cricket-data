@@ -19,6 +19,7 @@
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
     "@fontsource/bebas-neue": "^5.3.0",
+    "@heroicons/react": "^2.2.0",
     "@ionic/core": "9.0.9",
     "@napi-rs/canvas": "^1.0.13",
     "@phosphor-icons/react": "^2.1.10",

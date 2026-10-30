@@ -1,8 +1,10 @@
 import { track as send } from "@vercel/analytics";
+import { track as gaTrack } from "./ga";
 
-/** A named event with a few small string or number properties (what was tapped, never who). The page views are counted by the analytics script itself; a failure here never reaches the page. */
+/** A named event with a few small string or number properties (what was tapped, never who). Sent to the host analytics and to GA when the tag is on. A failure here never reaches the page. */
 export function track(name: string, props?: Record<string, string | number>) {
   try { send(name, props); } catch { /* blocked or offline: nothing to do */ }
+  try { gaTrack(name, props); } catch { /* no tag */ }
 }
 
 let sent = 0;

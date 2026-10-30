@@ -333,12 +333,13 @@ def test_a_priced_player_who_could_not_be_linked_goes_to_the_review_list_and_a_s
 
 
 def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_off_the_api(tmp_path):
-    A = {"pids": [], "pstat": {}, "ms": [], "events": [], "team_ix": {}}
+    A = {"pids": [], "pstat": {}, "ms": [{"venue": "Ground", "event": "", "teams": []} for _ in range(8)], "events": [], "team_ix": {}, "venues": ["Ground"]}
     out = tmp_path / "public" / "data"
     out.mkdir(parents=True)
     n = B.build_sitemap(out, A, {}, "https://example.test/", [{"id": "2026-10-29-afghanistan-v-zimbabwe"}])
     sm = (tmp_path / "public" / "sitemap.xml").read_text()
     assert "<loc>https://example.test/fixture/2026-10-29-afghanistan-v-zimbabwe</loc><lastmod>" in sm and n == len(sm.split("<url>")) - 1
+    assert "<loc>https://example.test/venue/0</loc>" in sm
     robots = (tmp_path / "public" / "robots.txt").read_text()
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
 

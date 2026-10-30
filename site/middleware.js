@@ -1,7 +1,9 @@
-// Edge: block known scrapers on /data and /api, and require the gate cookie for /data JSON (except meta.json).
+// Edge: block known scrapers on /data and /api, require the gate cookie for /data JSON (except meta.json),
+// and send link-preview crawlers the share HTML (so WhatsApp/Twitter see the card without running the app).
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
+const CRAWLER = /twitterbot|facebookexternalhit|facebot|whatsapp|telegrambot|slackbot|linkedinbot|discordbot|pinterest|skypeuripreview|embedly|quora link preview|redditbot|vkshare|tumblr|bitlybot|flipboard|iframely|opengraph/i;
 
-export const config = { matcher: ["/data/:path*", "/api/:path*"] };
+export const config = { matcher: ["/data/:path*", "/api/:path*", "/player/:path*", "/fixture/:path*", "/venue/:path*"] };
 
 async function hmacHex(secret, msg) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
@@ -21,6 +23,11 @@ export default async function middleware(req) {
   const url = new URL(req.url);
   const path = url.pathname;
   const ua = req.headers.get("user-agent") || "";
+  if (CRAWLER.test(ua) && /^(?:\/player\/|\/fixture\/|\/venue\/)/.test(path)) {
+    const dest = new URL("/api/share", url.origin);
+    dest.searchParams.set("path", path.replace(/^\//, ""));
+    return fetch(dest, { headers: req.headers });
+  }
   if (path === "/api/gate") return;
   if (!ua || BOT.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;

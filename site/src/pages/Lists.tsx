@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { dayKey, dayLabel, fixtureStart, localTime } from "@/lib/format";
@@ -15,7 +15,7 @@ import { RowsSkeleton } from "@/components/app/skeletons";
 
 /** Player props: the hot props of every priced match, with the day switch and filters the component carries. */
 export function PropsPage() {
-  setTitle("Cricket player props: hit rates and book lines");
+  setTitle("Cricket player props: hit rates and listed lines");
   return (
     <div className="flex flex-col gap-section">
       <h1 className="text-title font-bold tracking-tight">Player props</h1>
@@ -73,7 +73,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           ) : <p className="border-t border-white/10 px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug px-inset pb-inset pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
-            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRight className="size-4" aria-hidden /></span>
+            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
           </Link>
         </div>
       </Card>

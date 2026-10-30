@@ -66,17 +66,34 @@ export class Resolver {
 
   _candidates(sur) {
     const exact = this.bySurname.get(sur);
-    if (exact) return exact.map((i) => [i, 0]);
-    if (sur.length < 3) return [];
-    const max = sur.length >= 8 ? 2 : 1;
-    if (!this.fuzzyKeys) this.fuzzyKeys = [...this.bySurname.keys()];
     const out = [];
+    if (exact) for (const i of exact) out.push([i, 0]);
+    if (sur.length < 3) return out;
+    if (!this.fuzzyKeys) this.fuzzyKeys = [...this.bySurname.keys()];
     for (const k of this.fuzzyKeys) {
+      if (k === sur) continue;
+      // short fragments ("sha") match prefixes (Sharma, Shah) instead of one-edit neighbours only
+      if (k.startsWith(sur) || (sur.startsWith(k) && k.length >= 4)) {
+        for (const i of this.bySurname.get(k)) out.push([i, Math.min(1.2, Math.abs(k.length - sur.length) * 0.2)]);
+        continue;
+      }
+      if (sur.length < 4) continue;
+      const max = sur.length >= 8 ? 2 : 1;
       if (Math.abs(k.length - sur.length) > max) continue;
       const d = lev(k, sur, max);
       if (d <= max) for (const i of this.bySurname.get(k)) out.push([i, d]);
     }
     return out;
+  }
+
+  _bias(i, opts, givenOk) {
+    const P = this.s.P;
+    let sc = Math.min(givenOk ? 7 : 1.5, Math.log2(1 + P.n[i]) * (givenOk ? 0.75 : 0.2));
+    if (P.last[i] >= this._cutoff()) sc += 1.2;
+    if (opts.gender != null) sc += P.g[i] === opts.gender ? 1.5 : -6;
+    if (opts.team != null && P.tm[i] === opts.team) sc += 3;
+    if (opts.fmt != null && (P.fm[i] >> opts.fmt) & 1) sc += 1;
+    return sc;
   }
 
   /**
@@ -88,6 +105,12 @@ export class Resolver {
     if (!toks.length) return [];
     const P = this.s.P;
     const seen = new Map();
+    const put = (i, sc, surWords, givenOk) => {
+      sc += this._bias(i, opts, givenOk);
+      const prev = seen.get(i);
+      if (!prev || prev.score < sc) seen.set(i, { idx: i, name: P.nm[i], score: Math.round(sc * 100) / 100, team: P.tm[i], last: P.last[i], surnameLen: surWords });
+    };
+    const qn = norm(text);
     // the surname is the last token, or the last two when the data uses particles ("van der Merwe", "de Kock")
     const tries = [[toks.slice(-1).join(" "), toks.slice(0, -1)]];
     if (toks.length >= 2) tries.push([toks.slice(-2).join(" "), toks.slice(0, -2)]);
@@ -95,30 +118,43 @@ export class Resolver {
     for (const [sur, givenToks] of tries) {
       for (const [i, d] of this._candidates(sur)) {
         const inf = this.info[i];
-        let sc = 10 - d * 3;
+        let sc = 10 - d * 3, givenOk = !givenToks[0];
         const g = givenToks[0];
         if (g) {
           if (inf.initials) {
             const g0 = g[0], joined = givenToks.map((x) => x[0]).join("");
-            if (inf.initials[0] === g0) sc += (g.length === 1 || inf.initials === joined) ? 3 : 2;
-            else if (inf.initials.includes(g0)) sc += 2; // Chamari vs AC Jayangani
+            if (inf.initials[0] === g0) { sc += (g.length === 1 || inf.initials === joined) ? 3 : 2; givenOk = true; }
+            else if (inf.initials.includes(g0)) { sc += 2; givenOk = true; } // Chamari vs AC Jayangani
             else sc -= 5;
-          }
-          else if (inf.given) sc += inf.given === norm(givenToks.join(" ")) ? 4 : inf.given.startsWith(g) || g.startsWith(inf.given.split(" ")[0]) ? 2.5 : lev(inf.given.split(" ")[0], g, 1) <= 1 ? 1 : -4;
-          else sc -= 1;
+          } else if (inf.given) {
+            const hit = inf.given === norm(givenToks.join(" ")) ? 4 : inf.given.startsWith(g) || g.startsWith(inf.given.split(" ")[0]) ? 2.5 : lev(inf.given.split(" ")[0], g, 1) <= 1 ? 1 : -4;
+            sc += hit; givenOk = hit > 0;
+          } else sc -= 1;
           const al = this.s.index.aliases?.[i];
-          if (al && al.some((a) => norm(a) === norm(text))) sc += 5;
+          if (al && al.some((a) => norm(a) === qn)) { sc += 5; givenOk = true; }
         }
-        if (inf.full === norm(text)) sc += 2;
-        if (opts.gender != null) sc += P.g[i] === opts.gender ? 1.5 : -6;
-        if (opts.team != null && P.tm[i] === opts.team) sc += 3;
-        if (opts.fmt != null && (P.fm[i] >> opts.fmt) & 1) sc += 1;
-        sc += Math.min(7, Math.log2(1 + P.n[i]) * 0.75); // busier careers win ties ("Rohit Sharma" = RG Sharma, not a club namesake)
-        const recent = P.last[i] >= this._cutoff();
-        if (recent) sc += 1.2;
-        const prev = seen.get(i);
-        if (!prev || prev.score < sc) seen.set(i, { idx: i, name: P.nm[i], score: Math.round(sc * 100) / 100, team: P.tm[i], last: P.last[i], surnameLen: sur.split(" ").length });
+        if (inf.full === qn) sc += 2;
+        put(i, sc, sur.split(" ").length, givenOk);
       }
+    }
+    // given-name and in-order word starts ("abhishek", "abhishek sha") so a first name is enough
+    const aliases = this.s.index.aliases || {};
+    for (let i = 0; i < this.info.length; i++) {
+      const bags = [this.info[i].full, ...(aliases[i] || []).map(norm)];
+      let best = 0;
+      for (const nm of bags) {
+        const nt = nm.split(" ").filter(Boolean);
+        const used = new Set();
+        let ok = true, bonus = 0;
+        for (const q of toks) {
+          const j = nt.findIndex((w, k) => !used.has(k) && (w === q || (q.length >= 2 && w.startsWith(q))));
+          if (j < 0) { ok = false; break; }
+          used.add(j);
+          bonus += nt[j] === q ? 2 : 1;
+        }
+        if (ok) best = Math.max(best, 8 + bonus + (toks.length > 1 ? 4 : 0) + (toks.length === nt.length ? 2 : 0));
+      }
+      if (best) put(i, best, toks.length, true);
     }
     return [...seen.values()].sort((a, b) => b.score - a.score).slice(0, limit);
   }
@@ -159,20 +195,24 @@ export class Resolver {
     return best && best.score >= 5 ? best : null;
   }
 
-  venue(text) {
-    const q = norm(text).replace(/\b(stadium|ground|cricket|oval)\b/g, (m) => m);
-    const toks = q.split(" ").filter((t) => t.length > 1 && !["the", "at", "in"].includes(t));
-    if (!toks.length) return null;
-    let best = null;
+  venues(text, limit = 5) {
+    const toks = norm(text).split(" ").filter((t) => t.length > 1 && !["the", "at", "in"].includes(t));
+    if (!toks.length) return [];
+    const out = [];
     for (let i = 0; i < this.venueNorm.length; i++) {
-      const v = this.venueNorm[i];
+      const v = this.venueNorm[i], words = v.split(" ");
       let hit = 0;
-      for (const t of toks) if (v.includes(t) || v.split(" ").some((w) => w.length > 3 && lev(w, t, 1) <= 1)) hit++;
-      if (hit < toks.length) continue;
-      const sc = hit * 10 + Math.log10(1 + this.venueCount[i]) - v.length * 0.01;
-      if (!best || sc > best.score) best = { idx: i, name: this.s.venues[i], score: sc };
+      for (const t of toks) {
+        if (v.includes(t) || words.some((w) => w.startsWith(t) && t.length >= 2) || words.some((w) => w.length > 3 && lev(w, t, 1) <= 1)) hit++;
+      }
+      if (!hit || (toks.length > 1 && hit < toks.length)) continue;
+      out.push({ idx: i, name: this.s.venues[i], score: hit * 10 + Math.log10(1 + this.venueCount[i]) - v.length * 0.01 });
     }
-    return best;
+    return out.sort((a, b) => b.score - a.score).slice(0, limit);
+  }
+
+  venue(text) {
+    return this.venues(text, 1)[0] || null;
   }
 
   /** Competition names → event indices (regex alias or substring). */

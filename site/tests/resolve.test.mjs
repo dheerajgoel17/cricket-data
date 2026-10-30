@@ -26,3 +26,23 @@ test("Athapaththu (playing name) resolves to AC Jayangani, not a namesake", asyn
   assert.equal(rz.player("Athapaththu", { gender: 1 })?.name, "AC Jayangani");
   assert.equal(rz.player("Jayangani", { gender: 1 })?.name, "AC Jayangani");
 });
+
+test("a given name and a short surname prefix beat a popular Shah", async () => {
+  const extra = structuredClone(data);
+  extra["index.json"].players = {
+    id: ["aa", "bb", "cc", "dd"],
+    nm: ["Abhishek Sharma", "OA Shah", "KH Abe", "Naseem Shah"],
+    g: [0, 0, 0, 0], last: ["2026-10-20", "2026-10-20", "2024-01-01", "2026-10-20"],
+    n: [40, 200, 80, 160], tm: [1, 1, 1, 1], fm: [1, 1, 1, 1],
+  };
+  extra["index.json"].aliases = {};
+  extra["index.json"].venues = ["Sharjah Cricket Stadium, Sharjah", "Eden Park, Auckland", "Lord's, London"];
+  extra["matches.json"].v = [0];
+  const rz = new Resolver(await createStore({ fetchJson: async (p) => structuredClone(extra[p]) }));
+  const given = rz.players("abhishek", {}, 5).map((p) => p.name);
+  assert.equal(given[0], "Abhishek Sharma");
+  assert.ok(!given.includes("KH Abe"));
+  assert.equal(rz.players("abhishek sha", {}, 3)[0].name, "Abhishek Sharma");
+  assert.equal(rz.venues("sharjah", 3)[0].name, "Sharjah Cricket Stadium, Sharjah");
+  assert.equal(rz.venues("eden park", 3)[0].name, "Eden Park, Auckland");
+});

@@ -2,11 +2,11 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { MATCH_MARKETS, marketReport, selectMatches } from "@/engine/markets.js";
+import { MATCH_MARKETS, marketReport, selectMatches, venueIndices } from "@/engine/markets.js";
 import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
@@ -42,7 +42,7 @@ export function CompetitionsPage() {
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
-      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-[#151515]"><span className="grid size-9 place-items-center rounded-lg bg-secondary text-xs font-extrabold text-primary">{caps(store.events[e])}</span><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRight className="size-4 text-muted-foreground" /></Link>)}</Panel>
+      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-[#151515]"><span className="grid size-9 place-items-center rounded-lg bg-secondary text-xs font-extrabold text-primary">{caps(store.events[e])}</span><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
     </div>
   );
 }
@@ -102,8 +102,19 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const gstat = (STATS as any)[q.gstat] ? q.gstat : "sixes", gline = q.gline !== undefined && q.gline !== "" ? Number(q.gline) : 0.5;
   const grid = useQuery({ queryKey: ["team-grid", idx, fmtName, gstat], enabled: isTeam, queryFn: () => collectGrid(store, idx, fmtName, gstat) });
   const { data: fixtures } = useFixtures();
-  const nextFx = isTeam ? (fixtures || []).find((f) => (f.a_ix === idx || f.b_ix === idx) && (f.start.length > 10 ? Date.parse(f.start) > Date.now() : f.start >= new Date().toISOString().slice(0, 10))) : null;
-  setTitle(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length) ? (isTeam ? `${store.teamName(idx)}: stats and player grid` : `${store.venues[idx]}: venue stats`) : isTeam ? "Team stats and player grid" : "Venue stats");
+  const ground = useMemo(() => {
+    if (isTeam || idx < 0 || idx >= store.venues.length) return null;
+    const fc = FORMATS.map(() => 0);
+    for (let m = 0; m < store.n; m++) if (store.M.v[m] === idx) fc[store.M.f[m]]++;
+    return { total: fc.reduce((a, b) => a + b, 0), by: FORMATS.map((f, i) => (fc[i] ? `${fc[i]} ${f}` : "")).filter(Boolean) };
+  }, [store, idx, isTeam]);
+  const nextFx = useMemo(() => {
+    const list = fixtures || [];
+    const soon = (f: { start: string }) => (f.start.length > 10 ? Date.parse(f.start) > Date.now() : f.start >= new Date().toISOString().slice(0, 10));
+    if (isTeam) return list.find((f) => (f.a_ix === idx || f.b_ix === idx) && soon(f)) || null;
+    return list.find((f) => venueIndices(store, f.venue).includes(idx) && soon(f)) || null;
+  }, [fixtures, isTeam, idx, store]);
+  setTitle(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length) ? (isTeam ? `${store.teamName(idx)}: stats and player grid` : `${store.venues[idx]}: ground stats`) : isTeam ? "Team stats and player grid" : "Ground stats");
   if (!(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length))) return <EmptyNote>Unknown {kind}.</EmptyNote>;
   const form = (
     <LiveForm onValues={(v) => setQ({ ...v })} className="mb-3">
@@ -120,8 +131,8 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   return (
     <div>
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
-      <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : "Venue"}
-        meta={[`${fmtName} markets`, isTeam ? "team markets use the side batting first" : "match markets"]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
+      <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : (ground ? `${ground.total} matches` : "Ground")}
+        meta={isTeam ? [`${fmtName} markets`, "team markets use the side batting first"] : [fmtName, ...(ground?.by || [])]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
       {nextFx ? <div className="my-3"><NextMatch f={nextFx} /></div> : null}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
@@ -132,7 +143,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}</TabsContent>
       </PillTabs>
-      {isTeam && <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{label} {fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.</Muted></Card>}
+      <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{isTeam ? `${label} ${fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.` : `${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted></Card>
       <Link to="/teams" className="sr-only">Teams</Link>
     </div>
   );

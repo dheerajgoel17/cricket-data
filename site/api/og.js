@@ -25,13 +25,25 @@ export default async function handler(req, res) {
   try {
     const q = req.query || {};
     const f = cardFields(q.path != null ? cardQuery(q.path) : q, loadData()); // /card/<path>.jpg (vercel.json) or the plain query
-    if (!f) { res.statusCode = 302; res.setHeader("Location", "/og.png"); res.setHeader("Cache-Control", "public, s-maxage=3600"); return res.end(); }
+    if (!f) {
+      const png = readFileSync(join(process.cwd(), "public/og.png"));
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, s-maxage=3600");
+      return res.end(png);
+    }
     const img = await renderCard(f, { photo: f.photos ? await firstPhoto(f.photos) : null, fonts: { bold: join(process.cwd(), FONTS.bold), regular: join(process.cwd(), FONTS.regular) } });
     res.statusCode = 200;
     res.setHeader("Content-Type", "image/jpeg");
     res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
     res.end(img);
   } catch {
-    res.statusCode = 302; res.setHeader("Location", "/og.png"); res.setHeader("Cache-Control", "public, s-maxage=60"); res.end(); // never a broken picture in a preview
+    try {
+      const png = readFileSync(join(process.cwd(), "public/og.png"));
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, s-maxage=60");
+      return res.end(png);
+    } catch { res.statusCode = 500; return res.end(); }
   }
 }

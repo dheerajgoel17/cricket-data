@@ -5,22 +5,24 @@ import { ROUTES, fullTitle, pageMeta } from "../src/lib/seo.js";
 
 const TPL = "<html><head><!--seo-head--></head><body><div id=\"root\"><!--seo-body--></div></body></html>";
 const fx = [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", status: "Upcoming" }];
-const index = { players: { nm: ["A Name", "Harry Brook"] }, teams: [{ n: "India", g: 0 }, { n: "India", g: 1 }], events: ["Global T20 Canada 2026"] };
+const index = { players: { nm: ["A Name", "Harry Brook"] }, teams: [{ n: "India", g: 0 }, { n: "India", g: 1 }], events: ["Global T20 Canada 2026"], venues: ["Sharjah Cricket Stadium, Sharjah"] };
 const SITE = "https://fancy.cash";
 
 test("titles carry the brand once, and a page that names itself gets a description built from the name", () => {
   assert.equal(fullTitle("About"), "About | Fancy.cash");
   assert.equal(fullTitle("Fancy.cash: free cricket"), "Fancy.cash: free cricket");
-  assert.match(pageMeta("/player/1", "Harry Brook: stats, hit rates and form | Fancy.cash").description, /^Harry Brook: hit rates over any line/);
+  assert.match(pageMeta("/player/1", "Harry Brook: stats, hit rates and form | Fancy.cash").description, /^Harry Brook: hit rates over any line, recent form and listed lines/);
   assert.equal(pageMeta("/about", "x").description, ROUTES.about.description);
   assert.equal(pageMeta("/saved", "Saved").noindex, true);
 });
 
 test("every page gets its own title, description, canonical link and structured data", () => {
-  const list = pages({ site: SITE, index, fixtures: fx, sitemap: ["/", "/player/1", "/team/1", "/league/0", "/player/9"] });
+  const list = pages({ site: SITE, index, fixtures: fx, sitemap: ["/", "/player/1", "/team/1", "/league/0", "/player/9", "/venue/0"] });
   const by = Object.fromEntries(list);
   const f = render(TPL, by["fixture/2026-10-29-afghanistan-v-zimbabwe"]);
-  assert.match(f, /<title>Afghanistan v Zimbabwe: player props, hit rates and book lines \| Fancy.cash<\/title>/);
+  assert.match(f, /<title>Afghanistan v Zimbabwe: stats, props and listed lines \| Fancy.cash<\/title>/);
+  assert.match(f, /og:url" content="https:\/\/fancy.cash\/share\/fixture\/2026-10-29-afghanistan-v-zimbabwe"/);
+  assert.match(f, /og:image:type" content="image\/jpeg"/);
   assert.match(f, /rel="canonical" href="https:\/\/fancy.cash\/fixture\/2026-10-29-afghanistan-v-zimbabwe"/);
   assert.match(f, /"@type":"SportsEvent"/);
   assert.match(f, /Sharjah Cricket Stadium/);
@@ -28,6 +30,7 @@ test("every page gets its own title, description, canonical link and structured 
   assert.match(render(TPL, by["player/1"]), /<title>Harry Brook: stats, hit rates and form/);
   assert.match(render(TPL, by["team/1"]), /India Women: stats and player grid/); // the women's side keeps its name
   assert.ok(by["league/0"] && !by["player/9"]); // a player the data does not know gets no page
+  assert.match(render(TPL, by["venue/0"]), /<title>Sharjah Cricket Stadium, Sharjah: ground stats/);
   assert.match(render(TPL, by.saved), /noindex, follow/);
 });
 
