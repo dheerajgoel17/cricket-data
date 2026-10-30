@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cardFields, cardPath, cardQuery, cardText, renderCard } from "../src/engine/card.js";
+import { cardFields, cardPath, cardQuery, cardText, propForm, renderCard } from "../src/engine/card.js";
 import { parseShare } from "../api/share.js";
 
 const data = {
@@ -11,15 +11,22 @@ const data = {
     { pid: "aaaa1111", stat: "runs", line: 30.5, match: "England vs India", books: [{ source: "bet365", over: 2.4 }] },
   ] },
   fixtures: [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", series: "Afghanistan vs Zimbabwe in UAE 2026" }],
-  form: { aaaa1111: { last: { value: 41, date: "25 Oct", vs: "India" }, hit: { p: 0.62, n: 10 } } },
+  form: { aaaa1111: {
+    last: { value: 25, date: "25 Oct", vs: "India" },
+    hit: { p: 0.6, n: 5 },
+    l5: { p: 0.6, played: 5, hits: 3, mean: 18 },
+    last5: [{ value: 10 }, { value: 20 }, { value: 5 }, { value: 30 }, { value: 25 }],
+  } },
 };
 
 test("a prop card has the player, the line, and the best over price with its book; the numbers come only from the data", () => {
   const f = cardFields({ p: "0", stat: "runs", line: "24.5" }, data);
   assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.source, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", "smarkets", 2, "England vs India", "India", "T20", "Batter"]);
   assert.equal(f.when, undefined); // kickoff time stays off the picture
-  assert.equal(f.last.value, 41);
-  assert.equal(f.hit.p, 0.62);
+  assert.equal(f.last.value, 25);
+  assert.equal(f.hit.p, 0.6);
+  assert.equal(f.l5.mean, 18);
+  assert.equal(f.last5.length, 5);
   assert.match(cardText(f).title, /^Harry Brook: runs over 24\.5 at 1\.90$/);
   assert.match(cardText(f).description, /listed 1\.90 at Smarkets in England vs India/);
 });
@@ -50,12 +57,38 @@ test("every kind of card draws a JPEG small enough for link previews, with or wi
   }
 });
 
+test("L5 mean, hit rate and last innings are the last five played values vs the line, counted by windowRate", () => {
+  // 10, 20, 5, 30, 25 vs 16.5 over: hits 20/30/25 = 3/5, mean (10+20+5+30+25)/5 = 18, last = 25
+  const f = propForm(
+    [{ value: 10, date: "2026-09-01", opp: "A" }, { value: 20, date: "2026-09-08", opp: "B" }, { value: null, date: "2026-09-15", opp: "C" },
+      { value: 5, date: "2026-09-22", opp: "D" }, { value: 30, date: "2026-10-01", opp: "E" }, { value: 25, date: "2026-10-25", opp: "India" }],
+    16.5,
+  );
+  assert.equal(f.l5.played, 5);
+  assert.equal(f.l5.hits, 3);
+  assert.equal(f.l5.p, 0.6);
+  assert.equal(f.l5.mean, 18);
+  assert.equal(f.last.value, 25);
+  assert.equal(f.last.vs, "India");
+  assert.deepEqual(f.last5.map((e) => e.value), [10, 20, 5, 30, 25]);
+});
+
 test("a prop card draws the book's own mark from public/books", async () => {
   const { readFileSync } = await import("node:fs");
   const { dirname, join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
   const bookLogo = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/books/bet365.svg"));
   const img = await renderCard(cardFields({ p: "0", stat: "runs", line: "24.5" }, data), { bookLogo });
+  assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff]);
+  assert.ok(img.length < 300 * 1024);
+});
+
+test("a prop card draws the site mark from public/icon-192.png", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const brandLogo = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/icon-192.png"));
+  const img = await renderCard(cardFields({ p: "0", stat: "runs", line: "24.5" }, data), { brandLogo });
   assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff]);
   assert.ok(img.length < 300 * 1024);
 });
@@ -73,7 +106,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v6/player/12/runs/24.5.jpg");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v7/player/12/runs/24.5.jpg");
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });

@@ -1,4 +1,4 @@
-export const CARD_V = "6"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
+export const CARD_V = "7"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
 
 /** The card's address as a file path. Version is in the path (not ?v=): X ignores query strings when it caches a failed picture. */
 export function cardPath(q) {
