@@ -1,12 +1,7 @@
 {
- "male|India|New Zealand|2026-10-30|batter_fours||Abhishek Sharma under 2.5|2.5|under": {
-  "edge": 0.0625,
-  "start_utc": "2026-10-30T07:00:00Z",
-  "alerted_at": "2026-10-29T10:18:58.622435+00:00"
- },
- "male|India|New Zealand|2026-10-30|batter_runs||Daryl Mitchell under 25.5|25.5|under": {
-  "edge": 0.0506,
-  "start_utc": "2026-10-30T07:00:00Z",
-  "alerted_at": "2026-10-29T10:18:58.622435+00:00"
+ "female|Adelaide Strikers Women|Melbourne Stars Women|2026-10-31|batter_runs||Rhys McKenna under 14.5|14.5|under": {
+  "edge": 0.0586,
+  "start_utc": "2026-10-31T04:40:00Z",
+  "alerted_at": "2026-10-30T10:19:43.003342+00:00"
  }
 }
