@@ -12,7 +12,11 @@ const call = async (req, fetchImpl) => {
 };
 const answer = (status, text, type = "application/json") => async () => new Response(text, { status, headers: { "content-type": type } });
 
-test.beforeEach(() => { process.env.RELAY_KEY = "k-123"; process.env.RELAY_ALLOW = "book.example, hub.example"; });
+test.beforeEach(() => {
+  process.env.RELAY_KEY = "k-123";
+  process.env.RELAY_ALLOW = "book.example, hub.example";
+  delete process.env.RELAY_ALLOW_EXTRA;
+});
 
 test("the key and the host list are the only way in: no key, a wrong key, an unlisted host and a non-https address are refused before anything is fetched", async () => {
   let fetched = 0;
@@ -47,4 +51,10 @@ test("a POST carries its body and content type to the book", async () => {
 test("allowed() and same() compare as they should", () => {
   assert.ok(allowed("a.b.example", "b.example") && allowed("b.example", "b.example") && !allowed("xb.example", "b.example") && !allowed("b.example", ""));
   assert.ok(same("abc", "abc") && !same("abc", "abd") && !same("abc", "ab"));
+});
+
+test("RELAY_ALLOW_EXTRA admits a host that is not on RELAY_ALLOW", async () => {
+  process.env.RELAY_ALLOW_EXTRA = "other.example";
+  assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://api.other.example/x" } }, answer(200, "{}"))).code, 200);
+  assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://evil.example/x" } }, answer(200, "{}"))).code, 403);
 });

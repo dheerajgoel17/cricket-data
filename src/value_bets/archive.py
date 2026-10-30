@@ -3,7 +3,9 @@
 ``book_lines.json`` carries a match for a day and a half after it starts and is then let go. The archive keeps the match's props for good, so a link to
 the fixture keeps showing them, and the files are the start of a historical record. A file only grows: a later pull adds the lines it did not have, and
 changes the price of a line already there only inside the last ``CLOSE`` before the start (the closing prices), so an hourly run does not rewrite every
-file. The file name is the fixture id the site uses (``start date`` + team slugs, from the schedule when it lists the match).
+file. Feed H also files ``catalogue``: every open market of a fetched match (mapped or not) as compact rows of name, player, line and both decimal
+prices, so a later mapping can be pointed at a market we already stored. An empty catalogue is not written, so older files are not rewritten just to
+add the key. The file name is the fixture id the site uses (``start date`` + team slugs, from the schedule when it lists the match).
 
 Once a match is over its file also gets ``results``: ``[{pid, stat, value}]``, what each priced player actually did, as the site's live route settled it
 (``settle``). They are only ever added, never changed, so an old fixture page needs neither the live feed nor any name matching to show how its lines went.
@@ -32,7 +34,7 @@ from .util import parse_ts
 
 CLOSE = dt.timedelta(hours=3)  # prices are refreshed inside this window before the start: the last pull is the closing price
 SAME = 14 * 3600  # seconds: books and the schedule disagree on kick-off by hours
-KINDS = ("events", "lines", "fancy")
+KINDS = ("events", "lines", "fancy", "catalogue")
 SHARED = ("match", "competition", "start_utc")  # carried once per file, not on every line
 
 
@@ -74,7 +76,7 @@ def group(book: dict) -> list[dict]:
             g = next((g for g in out if g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME), None)
             if g is None:
                 g = {"k": k, "start": st, "match": x.get("match") or f"{a} vs {b}", "start_utc": x["start_utc"], "competition": x.get("competition"),
-                     "events": [], "lines": [], "fancy": []}
+                     **{kind: [] for kind in KINDS}}
                 out.append(g)
             elif not g["competition"] and x.get("competition"):
                 g["competition"] = x["competition"]
@@ -108,11 +110,13 @@ KEY = {
     "lines": lambda x: (x["pid"], x["stat"], x.get("inn", 0), x["line"]),
     "events": lambda x: (x.get("match"), x.get("start_utc")),
     "fancy": lambda x: (x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind")),
+    "catalogue": lambda x: (x.get("name"), x.get("player") or "", x.get("team") or "", x.get("line") or 0, x.get("source") or ""),
 }
 ORDER = {
     "lines": lambda x: (x.get("player") or "", x["stat"], x.get("inn", 0), x["line"]),
     "events": lambda x: (x.get("match") or "", x.get("start_utc") or ""),
     "fancy": lambda x: (x.get("key") or "", x.get("scope") or "", x.get("team") or "", x.get("inn", 0), x.get("line") or 0, x.get("source") or ""),
+    "catalogue": lambda x: (x.get("name") or "", x.get("player") or "", x.get("team") or "", x.get("line") or 0, x.get("source") or ""),
 }
 
 
@@ -169,6 +173,8 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
                "first_seen": (old or {}).get("first_seen") or now.strftime("%Y-%m-%dT%H:%M:%SZ"),
                **{k: _merge(k, (old or {}).get(k, []), [_slim(x) if k == "lines" else x for x in g[k]], refresh) for k in KINDS},
                **({"results": old["results"]} if (old or {}).get("results") else {})}  # stored by ``settle``, never touched here
+        if not new.get("catalogue") and not (old or {}).get("catalogue"):
+            new.pop("catalogue", None)  # do not rewrite every older file just to add an empty key
         if old is not None and {k: v for k, v in new.items() if k != "updated"} == {k: v for k, v in old.items() if k != "updated"}:
             continue
         new["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")

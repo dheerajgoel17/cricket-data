@@ -11,14 +11,26 @@ import traceback
 from collections import defaultdict
 
 from . import archive, booklines, config, fancy, history, store, strategy, weather
-from .adapters import betfair, feede, feedf, feedg, feedk, matchbook, moviodds, oddsapi, polymarket, smarkets
+from .adapters import (
+    betfair,
+    feede,
+    feedf,
+    feedg,
+    feedh,
+    feedk,
+    matchbook,
+    moviodds,
+    oddsapi,
+    polymarket,
+    smarkets,
+)
 from .models import PlayerModel
 from .names import PlayerResolver, TeamResolver, norm_team
 from .pricing import devig, edge, effective_odds, exchange_mid, kelly_pct, logit
 from .props_live import PropEngine
 from .util import iso, ist, now_utc, parse_ts
 
-ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede, feedf, feedg]
+ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede, feedf, feedg, feedh]
 
 
 def adapters():
@@ -771,7 +783,8 @@ def run():
         prev_book = None
     try:  # every match's props are kept for good; this must never stop the run
         fx_of = {(r.get("match"), r.get("start_utc")): clusters[r["event_key"]]["fixture"] for r in rows if (clusters.get(r.get("event_key")) or {}).get("fixture")}
-        wrote, bad = archive.update(config.ARCHIVE, book, now, fx_of, fixtures)
+        cat = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("catalogue") or []]
+        wrote, bad = archive.update(config.ARCHIVE, {**book, "catalogue": cat} if cat else book, now, fx_of, fixtures)
         log(f"archive: {len(wrote)} match file(s) written" + (f", {len(bad)} unreadable and left as they are" if bad else ""))
     except Exception as e:
         log(f"archive failed: {e!r}")

@@ -78,6 +78,21 @@ def test_an_unchanged_pull_writes_nothing_and_a_pull_without_the_match_deletes_n
     assert update(tmp_path, book([line()]), at(21), None, SCHED)[0] == []
     assert update(tmp_path, book(), at(22, 28), None, SCHED)[0] == [] and update(tmp_path, {}, at(23, 28))[0] == []
     assert p.read_text() == before
+    assert "catalogue" not in read(tmp_path)
+
+
+def test_a_catalogue_row_is_filed_and_an_empty_one_does_not_rewrite_older_files(tmp_path):
+    cat = {"match": "New Zealand vs India", "home": "New Zealand", "away": "India", "start_utc": START,
+           "name": "Total runs for over 1 in 1st inning - New Zealand", "player": None, "team": None, "line": 6.5,
+           "over": 1.65, "under": 2.1, "mapped": None, "source": "feedh_d", "kind": "bookmaker"}
+    update(tmp_path, {**book([line()]), "catalogue": [cat]}, at(20), None, SCHED)
+    d = read(tmp_path)
+    assert d["catalogue"][0]["name"].startswith("Total runs") and d["catalogue"][0]["line"] == 6.5
+    before = (tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json").read_text()
+    assert update(tmp_path, {**book([line()]), "catalogue": [cat]}, at(21), None, SCHED)[0] == []
+    assert (tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json").read_text() == before
+    assert update(tmp_path, book([line()]), at(22), None, SCHED)[0] == []  # a later pull without a catalogue does not take the old one away
+    assert read(tmp_path)["catalogue"][0]["line"] == 6.5
 
 
 def test_the_feed_key_is_published_under_the_books_name(tmp_path):
