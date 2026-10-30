@@ -1,10 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { liveForFixture } from "@/engine/live.js";
 import { fixtureStart, localTime } from "@/lib/format";
+import { countPhases, phaseOf, pickHomePhase } from "@/lib/home-phase";
 import { setTitle } from "@/lib/title";
+import { useQ } from "@/components/app/forms";
+import { HomePhaseBar } from "@/components/app/home-phase-bar";
+import { fixtureState } from "@/hooks/useEngine";
 import { useHomeRail } from "@/hooks/useHomeRail";
+import { useLiveDoc } from "@/hooks/useLive";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
 import { HotHome } from "@/components/app/hot-home";
@@ -15,10 +21,18 @@ export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
   // matches in play first, then the ones to come, finished ones last; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
   const { ready, fixtures } = useHomeRail();
+  const live = useLiveDoc();
+  const [q, setQ] = useQ();
+  const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
+  const priced = useMemo(() => fixtures.filter((f) => !f.noProps), [fixtures]);
+  const counts = useMemo(() => countPhases(priced, (f) => phaseOf(stateOf(f))), [priced, live.data]);
+  const phase = pickHomePhase(counts, q.view);
+  const shown = fixtures.filter((f) => (f.noProps ? phase === "pre" : phaseOf(stateOf(f)) === phase));
   return (
-    <div className="flex flex-col gap-section">
-      <div className="lg:hidden">{ready ? <FixtureRail fx={fixtures} /> : <RailSkeleton />}</div>
-      <HotHome />
+    <div className="flex flex-col gap-section pb-[calc(var(--control)+var(--space-section))]">
+      {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
+      <HotHome phase={phase} />
+      <HomePhaseBar value={phase} counts={counts} onChange={(p) => setQ({ view: p })} />
     </div>
   );
 }
