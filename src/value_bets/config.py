@@ -44,7 +44,7 @@ DEFAULTS = {
     "SNAPSHOT_KEEP_DAYS": 45,
     "SNAPSHOT_MAX_MB": 1500,
     "HTTP_TIMEOUT": 25,
-    "SOURCE_TIMEOUT": 90,          # per-adapter wall clock
+    "SOURCE_TIMEOUT": 120,         # per-adapter wall clock
     "MC_SIMS": 20000,
     "ODDSAPI_MIN_INTERVAL_HOURS": 8.0,
     "ODDSAPI_MONTHLY_CREDIT_CAP": 150,
@@ -55,25 +55,25 @@ DEFAULTS = {
     "FEEDK_SPACING_SECS": 2.0,     # Feed K (adapters/feedk.py, on whenever FEEDK_URL and FEEDK_BOOKS are set): seconds between its requests
     "FEEDK_MAX_EVENTS": 10,        # ... event pages fetched per book per run
     "FEEDK_MIN_OFFERS": 4,         # ... only events with at least this many offers (the others carry no player markets)
-    "FEEDK_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDK_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days; WINDOW_HOURS still 24 for alerts)
     "FEEDK_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDE_SPACING_SECS": 2.0,     # Feed E (adapters/feede.py, on whenever FEEDE_BOOKS is set): seconds between its requests
     "FEEDE_MAX_EVENTS": 24,        # ... event pages fetched per book per run
-    "FEEDE_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDE_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
     "FEEDE_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDF_SPACING_SECS": 2.0,     # Feed F (adapters/feedf.py, on whenever the FEEDF_* variables are set): seconds between its requests
     "FEEDF_MAX_EVENTS": 12,        # ... matches read per run (two calls each)
-    "FEEDF_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDF_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
     "FEEDF_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDG_SPACING_SECS": 2.0,     # Feed G (adapters/feedg.py, on whenever FEEDG_NAME and FEEDG_API are set): seconds between its requests
     "FEEDG_MAX_EVENTS": 12,        # ... matches read per run (a catalogue call and an odds call each)
-    "FEEDG_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
+    "FEEDG_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
     "FEEDG_STATE_MAX_HOURS": 3.0,  # ... how old the India runner's last read may be when GitHub's own servers are refused (state/feedg_latest.json)
     "FEEDG_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDH_SPACING_SECS": 2.0,     # Feed H (adapters/feedh.py, on whenever FEEDH_URL and FEEDH_NAME are set): seconds between its requests
-    "FEEDH_MAX_EVENTS": 12,        # ... event pages fetched per run
-    "FEEDH_HORIZON_HOURS": 72.0,   # ... only matches starting within this many hours
-    "FEEDH_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDH_MAX_EVENTS": 20,        # ... event pages fetched per run
+    "FEEDH_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
+    "FEEDH_BUDGET_SECS": 90.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

@@ -2,9 +2,9 @@
 
 The book and its host are deployment configuration, never code (docs/OPERATIONS.md): ``FEEDH_URL`` is the sportsbook root and
 ``FEEDH_NAME`` is the name its prices are published under. Unset, the source is skipped. It never runs on a laptop: ``fetch`` raises
-``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it always goes through the Mumbai relay
+``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it always goes through the Cloudflare Worker relay
 (``FEEDH_RELAY`` or Feed G's pair); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing and a
-few event pages per run, ``FEEDH_SPACING_SECS`` apart, one attempt each, and an HTTP error ends the run.
+few event pages per run, ``FEEDH_SPACING_SECS`` apart, one attempt each, and an HTTP error ends that page (a 429 ends the run).
 
 Rows are the player markets the other books already map: "Batsman Runs / Sixes / Fours - Last, First" and "Bowler Wickets - Last, First"
 over/unders, "Player Performance - Last, First" (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; the book's
@@ -315,6 +315,29 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
     return rows, fancy, catalogue, left
 
 
+def _walk(nodes):
+    """Listing items, flattening nested ``events`` so a competition node is not treated as a match."""
+    for ev in nodes or []:
+        if not isinstance(ev, dict):
+            continue
+        kids = ev.get("events")
+        if isinstance(kids, list) and kids:
+            yield from _walk(kids)
+        else:
+            yield ev
+
+
+def _path_id(ev) -> int | str | None:
+    """The deepest competition id on a game, else the node id when this listing row is a path (no opponents). Never the sport id."""
+    ids = [p.get("id") for p in (ev.get("eventPaths") or []) if isinstance(p, dict) and p.get("id") and p.get("id") != CRIC]
+    if ids:
+        return ids[-1]
+    if ev.get("opponents") or (ev.get("eventType") or "").upper() == "GAME":
+        return None
+    eid = ev.get("id")
+    return eid if eid and eid != CRIC else None
+
+
 def fetch(fetched_at: str):
     s = settings()
     if not s:
@@ -334,36 +357,67 @@ def fetch(fetched_at: str):
     listing = pace.get(f"{base}/xapi/rest/events?" + _qs(eventPathIds=str(CRIC), includeMarkets="false", maxMarketPerEvent=0))
     if not isinstance(listing, list):
         raise Skip("events listing was not a list")
-    evs = []
-    for ev in listing:
-        if (ev.get("sportCode") or "") != "CRIC":
+    paths, games, seen = [], [], set()
+    for ev in _walk(listing):
+        if (ev.get("sportCode") or "") not in ("", "CRIC"):
+            continue
+        if SKIP_PATH.search(" ".join(p.get("name") or "" for p in (ev.get("eventPaths") or []))):
+            continue
+        pid = _path_id(ev)
+        if pid and pid not in seen:
+            seen.add(pid)
+            paths.append(pid)
             continue
         st = parse_ts(ev.get("eventDate"))
         if not st or st <= now or st > horizon:
             continue
-        if SKIP_PATH.search(" ".join(p.get("name") or "" for p in (ev.get("eventPaths") or []))):
-            continue
-        evs.append((st, ev))
-    evs.sort(key=lambda x: x[0])
-    for _, stub in evs[:config.get("FEEDH_MAX_EVENTS")]:
+        eid = ev.get("id")
+        if eid and eid != CRIC and eid not in seen:
+            seen.add(eid)
+            games.append(eid)
+    info["listed"] = len(paths) + len(games)
+    budget = config.get("FEEDH_MAX_EVENTS")
+    targets = [("path", x) for x in paths] + [("event", x) for x in games]
+
+    def pull(kind, eid):
+        extra = {"includeMarkets": "true", ("eventPathIds" if kind == "path" else "eventIds"): str(eid)}
+        return pace.get(f"{base}/xapi/rest/events?" + _qs(**extra))
+
+    for kind, eid in targets[:budget]:
         if time.monotonic() > deadline:
             info["stopped"] = "time budget"
             break
         try:
-            got = pace.get(f"{base}/xapi/rest/events?" + _qs(eventIds=str(stub["id"]), includeMarkets="true"))
+            got = pull(kind, eid)
         except urllib.error.HTTPError as e:
-            info["stopped"] = f"HTTP {e.code}"
-            break
-        full = got[0] if isinstance(got, list) and got else None
-        if not full:
-            continue
-        r, fx, cat, left = parse_event(full, SOURCE, fetched_at)
-        rows += r
-        fancy += fx
-        catalogue += cat
-        info["events"] += 1
-        info["rows"] += len(r)
-        info["fancy"] += len(fx)
-        info["catalogue"] += len(cat)
-        info["left_out"].update(left)
+            if e.code == 429:
+                info["stopped"] = "HTTP 429"
+                break
+            if kind == "event" and e.code == 400:
+                try:
+                    got = pull("path", eid)
+                except urllib.error.HTTPError as e2:
+                    info["stopped"] = f"HTTP {e2.code}"
+                    if e2.code == 429:
+                        break
+                    continue
+            else:
+                info["stopped"] = f"HTTP {e.code}"
+                continue
+        items = got if isinstance(got, list) else []
+        for full in items:
+            st = parse_ts(full.get("eventDate"))
+            if st and (st <= now or st > horizon):
+                continue
+            r, fx, cat, left = parse_event(full, SOURCE, fetched_at)
+            if not r and not fx and not cat:
+                continue
+            rows += r
+            fancy += fx
+            catalogue += cat
+            info["events"] += 1
+            info["rows"] += len(r)
+            info["fancy"] += len(fx)
+            info["catalogue"] += len(cat)
+            info["left_out"].update(left)
     return rows, {"books": {s["NAME"]: {**info, "left_out": dict(info["left_out"])}}, "fancy": fancy, "catalogue": catalogue}

@@ -8,7 +8,7 @@
   FEEDK_URL          the root of the shared sportsbook feed behind Feed K      FEEDK_BOOKS   its books, "id=Name,id=Name" (account id, published name)
   FEEDE_BOOKS        Feed E's books, "id=Name@root,id=Name@root" (short id, published name, feed root)
   FEEDH_URL          Feed H's sportsbook root      FEEDH_NAME   the name its prices are published under
-  FEEDH_RELAY        Mumbai relay (or reuse FEEDG_RELAY); Feed H never runs on a laptop
+  FEEDH_RELAY        Cloudflare Worker relay (or reuse FEEDG_RELAY); Feed H never runs on a laptop
   SRC_B_BASE, SRC_C_BASE, SRC_D_BASE, SRC_E_BASE   the optional scrapers / key-gated APIs that are not enabled by default
 
 Set them as repository variables for the workflows, as deployment variables for the site, and in a git-ignored env file locally (docs/OPERATIONS.md).

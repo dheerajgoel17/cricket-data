@@ -1,0 +1,8 @@
+{
+  "name": "feed-relay",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "placement": { "region": "aws:ap-south-1" },
+  "observability": { "enabled": true, "traces": { "enabled": true } }
+}

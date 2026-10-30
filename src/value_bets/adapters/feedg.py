@@ -53,7 +53,7 @@ def settings() -> dict[str, str]:
 
 
 def relay() -> tuple[str, str] | None:
-    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the relay (relay/api/relay.js, which runs in Mumbai)."""
+    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the relay (relay/worker.js, Cloudflare Worker placed near Mumbai)."""
     addr, key = os.environ.get("FEEDG_RELAY", "").strip(), os.environ.get("FEEDG_RELAY_KEY", "").strip()
     return (addr, key) if addr.startswith("https://") and key else None
 

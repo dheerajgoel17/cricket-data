@@ -52,7 +52,7 @@ A priced match stays on the site for **24 hours after kick-off (6 days for a Tes
 
 | Job | When | What it is |
 |---|---|---|
-| Odds / book lines | Hourly **09:00–23:00 IST** (`value-bets.yml` `30 3-17 * * *` UTC). Feed G's India runner ~20 minutes before that. | Closing pre-match player props and fancy only. Every adapter and `book_lines` drop `in_play`. After the first ball the next pull would empty the match; `carry_started` copies yesterday's closing prices for 40 h (T20/ODI) / 6 days (Test), and a Test's morning restamp of `start_utc` is merged onto the first morning so the file is not three SA vs AUS clones. |
+| Odds / book lines | Hourly **09:00–23:00 IST** (`value-bets.yml` `30 3-17 * * *` UTC). Feed G's India runner ~20 minutes before that. | Closing pre-match player props and fancy only, for matches starting in the next **7 days** when a book has prices (`FEED*_HORIZON_HOURS`). Value-bet alerts still use the 24 h window. Every adapter and `book_lines` drop `in_play`. After the first ball the next pull would empty the match; `carry_started` copies yesterday's closing prices for 40 h (T20/ODI) / 6 days (Test), and a Test's morning restamp of `start_utc` is merged onto the first morning so the file is not three SA vs AUS clones. |
 | Live scores / so-far / Cleared | `/api/live`, ~15 s, Source A pages, **books-priced matches only** | The in-play layer we do have: team scores, player so-far, and every priced line settled on the server. |
 | Archive results | Same hourly value-bets job, `--results` against `/api/live` | Finished numbers stored on the match's archive file. |
 | Fixtures scrape | Every 30 minutes (`scraper-update.yml` `7,37 * * * *`) | `upcoming.csv` for the rail and `/api/live` gap rows. |
