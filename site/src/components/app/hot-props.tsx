@@ -20,7 +20,9 @@ import { barState, windowRate } from "@/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
+import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotLines, hotOrder, matchChipId, norm, pool, sameMatch } from "@/lib/hot-lines";
+import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { odds } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -245,7 +247,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
 }
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, start, fmt, archive, heading }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string } = {}) {
+export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string; phase?: HomePhase } = {}) {
   const [day, setDay] = useState("0");
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: teams![0], b: teams![1], start, fmt }); // this match: the same two sides, a Test on any of its days, not the series' next game
@@ -254,10 +256,11 @@ export function HotProps({ teams, start, fmt, archive, heading }: { teams?: [str
   const onFixture = !!teams;
   const data = useMemo(() => (all || []).filter((r) => {
     if (onFixture) return true; // a fixture's own page shows every line it has, whatever the match's age: props are never taken away
+    if (phase && lineHomePhase(r, live.data) !== phase) return false;
     if (Date.parse(r.start) > Date.now() - keepMsFor(r.fmt)) return true;
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
     return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt })?.status === "live";
-  }), [all, live.data, onFixture]);
+  }), [all, live.data, onFixture, phase]);
   const { identity } = useData();
   // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`
   // shows those first and reads the card itself only as the fallback.
@@ -337,7 +340,7 @@ export function HotProps({ teams, start, fmt, archive, heading }: { teams?: [str
         </Sheet>
       </div>
       <AnimatedHeight>
-        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="p-6 text-callout text-muted-foreground">No rows in this window. Open Filters to widen it.</p> : (
+        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="px-inset py-stack text-callout text-muted-foreground">{phase ? EMPTY_PHASE[phase] : "No rows in this window. Open Filters to widen it."}</p> : (
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>

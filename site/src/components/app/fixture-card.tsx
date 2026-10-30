@@ -119,7 +119,7 @@ export function MatchChip({ f, active, onPick }: { f: any; active?: boolean; onP
   return <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className={cls}>{inner}</Link>;
 }
 
-/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). Phones and tablets only; desktop match chips live on the prop table. */
+/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). The home phase bar (In play / Pre-match / Resulted) picks which cards sit here. */
 export function FixtureRail({ fx }: { fx: any[] }) {
   usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
   const [sel, setSel] = useState("all");
@@ -131,7 +131,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
   return (
-    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="flex flex-col gap-stack lg:hidden" aria-label="Upcoming matches">
+    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="flex flex-col gap-stack" aria-label="Matches">
       <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
         items={[["all", <>All <span className="ml-1.5 text-footnote text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-footnote text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
       <div
