@@ -25,6 +25,7 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | Playing name vs registry surname (Chamari Athapaththu / AC Jayangani) | the same player | `player_aliases.csv` plus `SURNAME_ALIAS`; live matching uses ids first |
 | Afghanistan men's matches (Base withholds them) | kept as scraped, used in Match Fancy when they qualify | `q === 1` (innings from balls, or from the scorecard totals). Totals-only rows stay out so missing fours are not shown as 0 |
 | A women's T20 of the same country name | its own team index | men and women are never mixed; Match Fancy also passes `gender` |
+| Test at close of play (stumps / lunch / tea) | still live, with scores and the session line | the source's status 2 without a result is a day break, not the end; `/api/live` keeps it for 6 days |
 | First-class (MDM) | not included | not a Test |
 
 ## Known gaps

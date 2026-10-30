@@ -1,6 +1,6 @@
 // GET /api/live -> {asOf, source, matches[]}. Source A only, cached ~15 s.
 // The schedule page lists live and upcoming games with their match URLs and scores (Source A caches it ~5 min); only matches the books price are kept.
-// A finished match drops off that page soon after the end; a priced one that began in the last 40 h is then read from its own match page (the path is in our schedule file).
+// A finished match drops off that page soon after the end; a priced one that began in the last 40 h (6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
 // and the match-scorecard page (getSC4) adds every innings. All three are HTML pages ($LIVE_SOURCE_BASE robots Allow); we never hit $LIVE_SOURCE_BASE/api.
 // Each match also carries `lines`: where every line the books priced for it stands (value, state, Cleared / Missed / Push, Not in XI), settled here with the identity table

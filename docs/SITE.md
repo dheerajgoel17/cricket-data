@@ -75,7 +75,7 @@ The player page (`/player/<idx>`) is `site/src/pages/Player.tsx`: a sticky app b
 ## Known limits (be aware before betting)
 * Provisional matches carry player totals (no batting order, dismissals or fall of wickets). They feed player props. Match Fancy uses a scraped match only when it **qualified** (`q = 1`: innings from ball-by-ball, or from the scorecard totals with 80% of overs). Totals-only rows stay out, so missing fours are never shown as 0. Highest over / most conceded need deliveries; a scrape without them is omitted from those two markets. The sample label says when scraped matches are included, and through which date.
 * Fixtures only cover what the free schedule scrape and the odds sources list; men's domestic fixtures can be missing.
-* Live scores lag up to about 20 seconds and come from the unofficial Source A pages. A player with no row yet is not "0 so far" (they may not have batted). "So far" is not a result until the match is final.
+* Live scores lag up to about 20 seconds and come from the unofficial Source A pages. A player with no row yet is not "0 so far" (they may not have batted). "So far" is not a result until the match is final. A Test at stumps stays on the live feed (scores plus "Stumps" / "Close of play"); it is not treated as finished until there is a result.
 * Small samples are common: every answer shows `n` and a 90% interval for the hit rate. Fair odds have no margin and ignore form, pitch and XIs.
 
 ## Run it locally
