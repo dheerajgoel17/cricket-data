@@ -36,7 +36,8 @@ export function useFancyCards() {
       for (const f of fixtures.filter((x: any) => !x.noProps && fixtureBooks(doc, x).fancy)) {
         const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
         const fmtIdx = FORMATS.indexOf(f.fmt);
-        const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
+        const g = f.gender === "female" ? 1 : 0;
+        const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, gender: g, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
         const venue = (venueIndices as (s: any, n: string) => number[])(store, f.venue);
         const ground = venue.length ? (selectMatches(store, { fmt: fmtIdx, gender: f.gender === "female" ? 1 : 0, venue, lastN: 10 }) as number[]) : undefined; // the last ten matches at this ground
         const keys = MATCH_KEYS.filter(([k]) => fancyFor(doc, fx, k).length > 0);

@@ -24,7 +24,7 @@ from pathlib import Path
 
 from . import identity
 from .crex_doc import balls_doc
-from .parse import FORMAT_NAMES, KINDS, parse_match, squad_quality
+from .parse import FORMAT_NAMES, KINDS, parse_match, qualifies, squad_quality
 
 NSHARD = 64
 SCHEMA = 1
@@ -176,6 +176,8 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
         m["xq"] = squad_quality(list(sides.values()), lo=10)  # scraped squads: stricter, a side with 1-2 players is a failed scrape
         if mid in deliveries:
             _with_deliveries(m, d, fmt, deliveries[mid], registry, stat)
+        elif m["bat"]:
+            _inn_from_totals(m, d, fmt, stat)
         out.append(m)
         stat["matches"] += 1
         seen.setdefault(key, []).append(-1)
@@ -205,6 +207,75 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     if c["fld"]:  # the deliveries' own fielding credits; else the scraped totals stay
         m["fld"] = c["fld"]
     stat["with_deliveries"] += 1
+
+
+def _batting_first(d: dict) -> str:
+    tw, dec = (d.get("toss_winner") or "").strip(), (d.get("toss_decision") or "").lower()
+    a, b = d.get("team_a", ""), d.get("team_b", "")
+    if not tw or not dec:
+        return a
+    if "bat" in dec:
+        return tw
+    return b if _norm_team(tw) == _norm_team(a) else a
+
+
+def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
+    """Innings aggregates from the scraped scorecard when ball-by-ball is missing.
+
+    Match fours / sixes / runs and the 80% void rule can be read off player totals. Highest over and
+    most conceded cannot: they stay 0 and the engine must not treat those zeros as results.
+    """
+    teams = [d.get("team_a", ""), d.get("team_b", "")]
+    if not all(teams):
+        return
+    n = _int_getter
+    side = {t: {"runs": 0, "balls": 0, "f4": 0, "f6": 0, "scores": [], "bowl_wkts": 0, "bowl_balls": 0, "bowl_rc": 0, "tops": []} for t in teams}
+    for p in d.get("players", []):
+        t = p.get("team", "")
+        if t not in side:
+            continue
+        get = n(p)
+        r, b, f4, f6 = get("runs"), get("balls"), get("fours"), get("sixes")
+        if r or b:
+            s = side[t]
+            s["runs"] += r
+            s["balls"] += b
+            s["f4"] += f4
+            s["f6"] += f6
+            s["scores"].append(r)
+            pid = p.get("player_id") or ""
+            if pid:
+                s["tops"].append((pid, r))
+        side[t]["bowl_wkts"] += get("wickets")
+        side[t]["bowl_balls"] += get("balls_bowled")
+        side[t]["bowl_rc"] += get("runs_conceded")
+    inns = []
+    for t in teams:
+        o = teams[1] if t == teams[0] else teams[0]
+        sc = side[t]["scores"]
+        if not sc and not side[t]["runs"]:
+            continue
+        balls = side[o]["bowl_balls"] or side[t]["balls"]
+        ts = max(sc) if sc else 0
+        inns.append({
+            "team": t, "opp": o, "runs": side[t]["runs"], "wkts": side[o]["bowl_wkts"], "balls": balls,
+            "f4": side[t]["f4"], "f6": side[t]["f6"],
+            "n30": sum(30 <= x < 50 for x in sc), "n50": sum(50 <= x < 100 for x in sc),
+            "n100": sum(x >= 100 for x in sc), "n10": sum(x >= 10 for x in sc),
+            "nsd": sum(1 <= x <= 9 for x in sc), "nduck": 0,
+            "ho": 0, "mc": 0, "ts": ts,
+            "tops": [pid for pid, r in side[t]["tops"] if r == ts and ts > 0],
+        })
+    if len(inns) < 2:
+        return
+    first = _batting_first(d)
+    inns.sort(key=lambda i: 0 if _norm_team(i["team"]) == _norm_team(first) else 1)
+    m["first"] = inns[0]["team"]
+    m["ts"] = max(i["ts"] for i in inns)
+    m["inn"] = [[i["team"], i["opp"], i["runs"], i["wkts"], i["balls"], i["f4"], i["f6"], i["n30"], i["n50"],
+                 i["n100"], i["n10"], i["nsd"], i["nduck"], i["ho"], i["mc"], i["ts"], i["tops"]] for i in inns]
+    m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"]})
+    stat["with_totals_innings"] = stat.get("with_totals_innings", 0) + 1
 
 
 # ------------------------------------------------------------------ assembly

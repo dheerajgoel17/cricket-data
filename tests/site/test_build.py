@@ -99,6 +99,32 @@ def test_provisional_matches_feed_player_rows_but_not_match_markets(tmp_path):
     assert "prov-dup" not in M["id"]
 
 
+def test_a_complete_scorecard_without_balls_still_qualifies_for_match_fours(tmp_path):
+    """Afghanistan men's games never land in Base: the scorecard totals must still feed Match Fancy."""
+    z, data, out, _ = _out(tmp_path)
+
+    def side(team, opp, fours, pid0):
+        bat = {"player": f"{team} bat", "player_id": pid0, "team": team, "opponent": opp,
+               "runs": "40", "balls": "30", "fours": str(fours), "sixes": "1"}
+        bowl = {"player": f"{team} bowl", "player_id": f"{int(pid0, 16) + 1:08x}", "team": team, "opponent": opp,
+                "runs": "0", "balls": "0", "wickets": "2", "balls_bowled": "120", "runs_conceded": "50"}
+        rest = [{"player": f"{team} {i}", "player_id": f"{int(pid0, 16) + 2 + i:08x}", "team": team, "opponent": opp,
+                 "runs": "0", "balls": "0"} for i in range(9)]
+        return [bat, bowl, *rest]
+
+    pl = side("Alpha", "Beta", 8, "11111111") + side("Beta", "Alpha", 5, "22222222")
+    d = _prov("crex-afg-zim", "2026-10-29", "Alpha", "Beta", pl, status="cricsheet_withheld",
+              toss_winner="Beta", toss_decision="field")
+    (data / "provisional" / f"{d['match_id']}.json").write_text(json.dumps(d))
+    B.build(z, data, out, None, workers=1)
+    M, _ = _load(out)
+    m = M["id"].index("prov-afg-zim")
+    assert M["pv"][m] == 1 and M["q"][m] == 1
+    inn = M["inn"][m]
+    assert len(inn) == 2 and sum(i[4] for i in inn) == 13  # f4
+    assert inn[0][1] == 40  # Alpha batted first (Beta fielded)
+
+
 def test_a_scraped_players_catches_and_stumpings_are_kept_and_a_row_with_no_side_is_skipped_not_fatal(tmp_path):
     z, data, out, _ = _out(tmp_path)
     bro = synth.pid(synth.BROOK)

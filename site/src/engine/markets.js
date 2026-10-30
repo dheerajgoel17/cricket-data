@@ -19,8 +19,8 @@ export const MATCH_MARKETS = {
   match_double_digits: { label: "Double-digit scores (10+)", get: (s, m) => sum(s.M.inn[m], I10) },
   match_single_digits: { label: "Single-digit scores (1-9, no ducks)", get: (s, m) => sum(s.M.inn[m], ISD) },
   match_ducks: { label: "Ducks", get: (s, m) => sum(s.M.inn[m], IDK) },
-  highest_over: { label: "Highest single over (runs)", get: (s, m) => s.M.ho[m] },
-  max_conceded: { label: "Most runs conceded by a bowler", get: (s, m) => s.M.mc[m] },
+  highest_over: { label: "Highest single over (runs)", get: (s, m) => (s.M.pv[m] && !s.M.ho[m] ? null : s.M.ho[m]) },
+  max_conceded: { label: "Most runs conceded by a bowler", get: (s, m) => (s.M.pv[m] && !s.M.mc[m] ? null : s.M.mc[m]) },
   top_score: { label: "Top batter's score", get: (s, m) => s.M.ts[m] },
 };
 
@@ -55,13 +55,17 @@ export const ALL_MARKETS = { ...MATCH_MARKETS, ...TEAM_MARKETS };
 /**
  * Matches that pass the filters AND are valid for summary markets (exchange void rules, see rules.js).
  * filters: { fmt (required), gender, team, opp, venue, since, until, intl, event[], lastN, teamFirst (only matches the team batted first) }
+ *
+ * A scraped match (`pv`) is kept when it qualified (`q === 1`): Afghanistan men's games never land in Base,
+ * so dropping every provisional row made Match Fancy stop at the last Base game of the other side.
+ * Totals-only scrapes stay out (`q` is -1) so empty innings are never read as zero fours.
  */
 export function selectMatches(store, f) {
   const M = store.M;
   const out = [];
   const venues = f.venue == null ? null : Array.isArray(f.venue) ? f.venue : [f.venue];
   for (let m = 0; m < store.n; m++) {
-    if (M.f[m] !== f.fmt || M.pv[m] || M.q[m] !== 1) continue;
+    if (M.f[m] !== f.fmt || M.q[m] !== 1) continue;
     if (f.gender != null && M.g[m] !== f.gender) continue;
     if (f.since && M.d[m] < f.since) continue;
     if (f.until && M.d[m] > f.until) continue;
@@ -96,7 +100,7 @@ export const venueStem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bas
 
 export function marketReport(store, ms, key, line = null) {
   const def = ALL_MARKETS[key];
-  const values = ms.map((m) => def.get(store, m));
+  const values = ms.map((m) => def.get(store, m)).filter((v) => v != null);
   const sum_ = summarize(values, line);
   const lines = key === "match_runs" || key === "team_runs" ? ladderAround(sum_.median, 10) : suggestLines(values, 1, 5);
   return { key, label: def.label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };
