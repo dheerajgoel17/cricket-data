@@ -139,14 +139,13 @@
   :root {
     --gutter: 1.5rem;
     --fixture-card: 20rem;
-    --space-section: 2.5rem;
-    --content-max: 72rem;
+    --space-section: 1.5rem;
+    --content-max: 100%;
   }
 }
 @media (min-width: 1440px) {
   :root {
     --fixture-card: 22rem;
-    --content-max: 86rem;
   }
 }
 

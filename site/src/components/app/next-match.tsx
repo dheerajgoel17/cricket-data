@@ -19,6 +19,8 @@ export type NextMatchInfo = {
   opp: string;
   ground: string;
   known?: string;
+  /** True when a book has a line for this player on this match (any stat). */
+  priced?: boolean;
 };
 
 /** One context row: hit rate, n, fair decimal odds on the line the chart is on. */
@@ -68,30 +70,36 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
       </div>
       {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
-      <div className="grid gap-hair border-t border-hairline pt-snug">
-        <div className="flex flex-wrap items-baseline justify-between gap-snug">
-          <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
-          {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
-        </div>
-        {quotes.length ? (
-          <div className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
-            {quotes.map((q) => (
-              <span key={q.source} className="whitespace-nowrap">
-                <BookBadge source={q.source} /> <b className="font-semibold tabular-nums text-foreground">{odds(q.over)}</b>
-                {q.under != null ? <> / {odds(q.under)}</> : null}
-              </span>
-            ))}
+      {book ? (
+        <>
+          <div className="grid gap-hair border-t border-hairline pt-snug">
+            <div className="flex flex-wrap items-baseline justify-between gap-snug">
+              <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
+              {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
+            </div>
+            {quotes.length ? (
+              <div className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
+                {quotes.map((q) => (
+                  <span key={q.source} className="whitespace-nowrap">
+                    <BookBadge source={q.source} /> <b className="font-semibold tabular-nums text-foreground">{odds(q.over)}</b>
+                    {q.under != null ? <> / {odds(q.under)}</> : null}
+                  </span>
+                ))}
+              </div>
+            ) : book.main && book.main.line !== line ? (
+              <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
+            ) : null}
           </div>
-        ) : book?.main && book.main.line !== line ? (
-          <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
-        ) : null}
-      </div>
 
-      <div className="grid gap-tight border-t border-hairline pt-snug">
-        {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
-        {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
-        <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
-      </div>
+          <div className="grid gap-tight border-t border-hairline pt-snug">
+            {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
+            {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
+            <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
+          </div>
+        </>
+      ) : (
+        <p className="border-t border-hairline pt-snug text-callout text-muted-foreground">No props live yet</p>
+      )}
     </div>
   );
 }

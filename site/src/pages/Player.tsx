@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor, sameFixture, teamKey } from "@/engine/lines.js";
+import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, sameFixture, teamKey } from "@/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
@@ -121,20 +121,24 @@ function PlayerScreen({ idx }: { idx: number }) {
   };
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1);
-  const stat = q.stat || "runs";
+  const askedStat = q.stat || "";
   setTitle(`${store.playerName(idx)}: stats, hit rates and form`);
 
   const lines = useQuery(linesQuery);
-  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, store.P.id[idx], stat) ?? "") : -1; // a link with no format opens where a book has a line out
+  const pid = store.P.id[idx];
+  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
+  const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal]) : [];
+  const statItems = STAT_OPTIONS.filter(([k]) => pricedStats.includes(k));
+  const stat = pricedStats.includes(askedStat) ? askedStat : (pricedStats[0] || askedStat || "runs"); // only a listed prop, else the URL / runs for the form chart with no chips
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
   // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
   const testBat = FORMATS[fmtVal] === "Test" && (STATS as any)[stat]?.side === "bat";
-  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal]) : [];
+  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, pid, stat, FORMATS[fmtVal]) : [];
   const asked = q.scope === undefined || q.scope === "" ? null : Number(q.scope);
   const scope = !testBat ? 0 : asked != null && [0, 1, 2].includes(asked) ? asked : priced.length && !priced.includes(0) ? priced[0] : 0;
-  const book = lines.data ? bookLinesFor(lines.data, store.P.id[idx], stat, FORMATS[fmtVal], undefined, undefined, scope) : null;
+  const book = lines.data ? bookLinesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, undefined, scope) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
   const plan = {
     kind: "player_prop", stat, line: q.line !== undefined && q.line !== "" ? Number(q.line) : bookDefault ? book.main.line : null, side: q.side || "over",
@@ -145,7 +149,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
   const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
-  const nextMatch = useNextMatch(lines.data, store.P.id[idx], idx, FORMATS[fmtVal], team, lastGame);
+  const nextMatch = useNextMatch(lines.data, pid, idx, FORMATS[fmtVal], team, lastGame);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
   const share = () => { track("share", { kind: "player" }); const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
@@ -154,9 +158,11 @@ function PlayerScreen({ idx }: { idx: number }) {
   return (
     <div className="flex flex-col gap-stack">
       <PlayerHeader {...{ idx, name, team, fmts, share }} />
-      <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
-        <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={STAT_OPTIONS} />
-      </div>
+      {statItems.length > 0 ? (
+        <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
+          <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={statItems} />
+        </div>
+      ) : null}
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
@@ -177,7 +183,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
   const live = useLiveDoc();
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
-    const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
+    const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.books?.length && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
     let match: string, start: string, competition: string, club = "", row: any;
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
@@ -207,7 +213,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const mine = listed(mineRaw);
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
-    return { match, start, competition, team: mine, opp, ground, known };
+    return { match, start, competition, team: mine, opp, ground, known, priced: !!priced };
   }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, store]);
 }
 
@@ -255,7 +261,7 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
 
   return (
     <div className="flex flex-col gap-section">
-      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side, book, statLabel: res.statLabel, fmt }} /> : null}
+      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt }} /> : null}
       {next && (next.opp || next.known) ? <div className="-mt-tight flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
       <div className="flex flex-col gap-section lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:items-start">
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (

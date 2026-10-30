@@ -18,8 +18,8 @@ export function PropsPage() {
   setTitle("Cricket player props: hit rates and listed lines");
   return (
     <div className="flex flex-col gap-section">
-      <h1 className="text-title font-bold tracking-tight">Player props</h1>
-      <HotProps />
+      <h1 className="text-title font-bold tracking-tight lg:hidden">Player props</h1>
+      <HotProps heading="Player props" />
     </div>
   );
 }

@@ -17,7 +17,7 @@ export function HomePage() {
   const { ready, fixtures } = useHomeRail();
   return (
     <div className="flex flex-col gap-section">
-      {ready ? <FixtureRail fx={fixtures} /> : <RailSkeleton />}
+      <div className="lg:hidden">{ready ? <FixtureRail fx={fixtures} /> : <RailSkeleton />}</div>
       <HotHome />
     </div>
   );

@@ -9,7 +9,7 @@ vi.mock("@/lib/feeds", () => ({ loadLines: () => feeds.lines.promise, loadLive: 
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: { loadFixtures: () => feeds.fixtures.promise, teams: [] }, rz: {}, identity: {} }) }));
 
 import { LIVE_CACHE_MS, saveLive } from "@/lib/live-cache";
-import { LIVE_WAIT_MS, RAIL_WAIT_MS, useHomeRail } from "./useHomeRail";
+import { JUST_ENDED_MS, LIVE_WAIT_MS, RAIL_WAIT_MS, keepFinished, useHomeRail } from "./useHomeRail";
 import { usePricedFixtures } from "./useEngine";
 import { useLiveDoc } from "./useLive";
 
@@ -41,6 +41,23 @@ beforeEach(() => {
   localStorage.clear();
 });
 afterEach(() => { vi.useRealTimers(); });
+
+describe("keepFinished", () => {
+  const at = (h: number) => ({ a: `m${h}`, start: new Date(NOW + h * 3600e3).toISOString() });
+  it("puts a match that just ended first, and keeps every finished game (no count cap)", () => {
+    const older = [at(-20), at(-18), at(-16)];
+    const wbbl = at(-2);
+    expect(keepFinished([...older, wbbl], NOW).map((f) => f.a)).toEqual(["m-2", "m-20", "m-18", "m-16"]);
+  });
+  it("shows every just-ended match ahead of older ones, and keeps the older ones too", () => {
+    expect(keepFinished([at(-20), at(-1), at(-2)], NOW).map((f) => f.a)).toEqual(["m-1", "m-2", "m-20"]);
+    expect(keepFinished([at(-20), at(-18), at(-16), at(-14)], NOW).map((f) => f.a)).toEqual(["m-20", "m-18", "m-16", "m-14"]);
+  });
+  it("treats a match as older 8 hours after it began, and still keeps it", () => {
+    const older = [at(-20), at(-18), at(-16)];
+    expect(keepFinished([...older, at(-JUST_ENDED_MS / 3600e3 - 1)], NOW).map((f) => f.a)).toEqual(["m-20", "m-18", "m-16", "m-9"]);
+  });
+});
 
 describe("useHomeRail", () => {
   it("shows nothing while the bookmaker lines are out, rather than the whole unpriced schedule", async () => {

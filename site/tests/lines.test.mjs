@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -40,6 +40,14 @@ test("only this player, stat and format; none at all gives null", () => {
   assert.equal(bookLinesFor(doc, "ab12", "runs", "Test", NOW), null);
   assert.equal(bookLinesFor({ lines: [] }, "ab12", "runs", "T20", NOW), null);
   assert.equal(bookLinesFor(null, "ab12", "runs", "T20", NOW), null);
+});
+
+test("bookStatsFor lists the stats priced on the nearest match, not a later one or a line with no books", () => {
+  const doc = { lines: [L(17.5, 1.85, 1.95), L(1.5, 1.9, 1.9, { stat: "sixes" }), L(0.5, 1.9, 1.9, { stat: "wickets", start_utc: "2026-10-29T07:00:00Z" }),
+    L(2.5, 1.9, 1.9, { stat: "fours", books: [] }), L(9.5, 1.9, 1.9, { pid: "zz99", stat: "balls" })] };
+  assert.deepEqual([...bookStatsFor(doc, "ab12", "T20", NOW)].sort(), ["runs", "sixes"]);
+  assert.deepEqual(bookStatsFor(doc, "ab12", "ODI", NOW), []);
+  assert.deepEqual(bookStatsFor(null, "ab12", "T20", NOW), []);
 });
 
 test("bookFormatFor names the format the books price a player in, the soonest match and the asked stat first", () => {

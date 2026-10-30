@@ -28,8 +28,18 @@ function useGaveUp(ms: number, done: boolean): boolean {
  */
 /** How many games without props the rail adds after the ones with props. */
 const NO_PROPS_LIMIT = 24;
-/** How many finished matches the rail keeps after the live and coming ones, however many of those there are. */
-const FINISHED_KEPT = 3;
+/** A match that began in this window (a T20 that just ended) sits at the front of the finished group. */
+export const JUST_ENDED_MS = 8 * 3600e3;
+
+/**
+ * Finished matches the rail still shows: every priced Final `shownFixtures` kept (no count cap). Just-ended games
+ * lead the group so a club or women's T20 is not buried behind older internationals the moment it goes Final.
+ */
+export function keepFinished(finished: any[], now = Date.now()): any[] {
+  const just = finished.filter((f) => Date.parse(f.start) > now - JUST_ENDED_MS);
+  const older = finished.filter((f) => Date.parse(f.start) <= now - JUST_ENDED_MS);
+  return [...just, ...older];
+}
 
 export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
   const { fixtures: fx, ready: haveFixtures } = usePricedFixtures();
@@ -43,8 +53,8 @@ export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
     const ranked = rankFixtures(fx, homeTeam(), stateOf, rail);
     const priced = ranked.filter((f) => !f.noProps);
-    // the finished matches have their own places, after the live and coming ones: with many matches lined up they would be cut off the end, so a few are kept whatever the limit
-    const done = priced.filter((f) => stateOf(f) === "final").slice(0, FINISHED_KEPT), going = priced.filter((f) => stateOf(f) !== "final").slice(0, limit);
+    // finished matches have their own places after the live and coming ones: with many matches lined up they would be cut off the `limit`, so they are appended in full
+    const done = keepFinished(priced.filter((f) => stateOf(f) === "final")), going = priced.filter((f) => stateOf(f) !== "final").slice(0, limit);
     return [...going, ...done, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
   }, [ready, fx, live.data, rail, limit]);
   return { ready, fixtures };
