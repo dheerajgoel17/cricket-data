@@ -111,6 +111,20 @@ def test_hundred_is_its_own_format_and_first_class_is_ignored():
     assert synth.make_dataset()[1]["t20"][0]["id"] == "t20_00"
 
 
+def test_t10_and_60_over_are_their_own_formats_and_void_at_80_percent():
+    inn = scripted("X", ["A", "B"], {"A": dict(runs=1), "B": dict(runs=0)}, ["Z"], pad_to=60)
+    t10 = parse_match("t10", doc("2024-08-01", ("X", "Y"), [inn], mtype="T20", overs=10, event="Abu Dhabi T10"))
+    assert t10["fmt"] == 4
+    o60 = parse_match("o60", doc("2024-08-01", ("X", "Y"), [inn], mtype="ODI", overs=60, event="60-over Cup"))
+    assert o60["fmt"] == 5
+    full = lambda n: {"balls": n}  # noqa: E731
+    short_t10 = {"fmt": 4, "overs": 10, "bpo": 6, "innings": [full(48), full(47)], "res": 0, "days": 1}
+    assert qualifies({"fmt": 4, "overs": 10, "bpo": 6, "innings": [full(48), full(48)], "res": 0, "days": 1}) == 1
+    assert qualifies(short_t10) == 0  # 47 < 80% of 60
+    assert qualifies({"fmt": 5, "overs": 60, "bpo": 6, "innings": [full(288), full(288)], "res": 0, "days": 1}) == 1
+    assert qualifies({"fmt": 5, "overs": 60, "bpo": 6, "innings": [full(288), full(287)], "res": 0, "days": 1}) == 0
+
+
 def test_playing_xi_includes_players_who_never_reached_the_crease():
     st = {"A": dict(runs=5, out=True), "B": dict(runs=0, out=False), "C": dict(runs=0, out=False)}
     a = scripted("X", ["A", "B", "C"], st, ["Z"], pad_to=60)

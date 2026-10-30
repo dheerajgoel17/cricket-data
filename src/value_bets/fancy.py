@@ -10,9 +10,31 @@ markets (``site/src/engine/markets.js``). Back prices only; nothing here prices 
 """
 from __future__ import annotations
 
+import re
+
 from .util import iso, parse_ts
 
 SOURCE = "moviodds_bet365"
+
+
+def _fmt(m: dict) -> str | None:
+    """Format from the book's own league name. T10 is not T20; 60-over is not ODI; a T20 in a Test series cannot price the Test."""
+    t = f"{m.get('league') or ''} {m.get('home') or ''} {m.get('away') or ''}".lower()
+    if re.search(r"\bt10\b", t) or ("10 over" in t and "t20" not in t):
+        return "T10"
+    if "the hundred" in t or "100 balls" in t or "100-ball" in t:
+        return "Hundred"
+    if re.search(r"\b60[- ]overs?\b", t):
+        return "O60"
+    if re.search(r"\b40[- ]overs?\b", t):
+        return "O40"
+    if re.search(r"\btest\b", t) or "first class" in t or "first-class" in t:
+        return "Test"
+    if "t20" in t or "twenty20" in t:
+        return "T20"
+    if "odi" in t or "one day" in t or "one-day" in t or "50 over" in t or "list a" in t:
+        return "ODI"
+    return None
 
 # group name -> (engine market key, scope) for groups whose quotes carry the side in `label` (or `side`) and the line in `handicap`
 MATCH_GROUPS = {"Total Match Runs": "match_runs", "Most Runs in a Single Over": "highest_over", "1st Innings Score": "first_innings_runs"}
@@ -62,6 +84,7 @@ def match_fancy(raw: dict | None) -> list[dict]:
             continue
         name = f"{m['home']} vs {m['away']}"
         start = iso(parse_ts(m["kickoff_utc"])) if m.get("kickoff_utc") else None
+        fmt = _fmt(m)
         pairs: dict[tuple, dict] = {}
         for q in m.get("quotes", []):
             g = (q.get("group_name") or "").strip()
@@ -81,6 +104,7 @@ def match_fancy(raw: dict | None) -> list[dict]:
             pairs.setdefault((key, scope, team, line), {})[side] = round(price, 3)
         for (key, scope, team, line), px in pairs.items():
             if "over" in px and "under" in px:  # a one-sided price is not a line
-                out.append({"match": name, "home": m["home"], "away": m["away"], "start_utc": start, "key": key, "scope": scope, "team": team,
+                out.append({"match": name, "home": m["home"], "away": m["away"], "start_utc": start, "fmt": fmt,
+                            "competition": m.get("league") or None, "key": key, "scope": scope, "team": team,
                             "line": line, "over": px["over"], "under": px["under"], "source": SOURCE, "kind": "bookmaker"})
     return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x["line"]))

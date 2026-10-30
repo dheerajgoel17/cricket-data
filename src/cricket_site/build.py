@@ -131,11 +131,16 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
             prov_runs = sum(int(p.get("runs") or 0) for p in d.get("players", []))
             if any(r == -1 or r is None or not prov_runs or r == prov_runs for r in seen[key]):
                 continue
-        fmt = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2}.get(d.get("match_type", ""))
+        fmt = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2, "T10": 4}.get(d.get("match_type", ""))
         if fmt is None:
             continue
-        if "hundred" in (d.get("event") or "").lower():
+        event = (d.get("event") or "").lower()
+        if "hundred" in event:
             fmt = 3  # The Hundred is its own format: never feed it into T20
+        elif "t10" in event:
+            fmt = 4
+        elif "60 over" in event or "60-over" in event:
+            fmt = 5
         mid = d["match_id"]
         m = {"id": mid, "date": d["date"], "fmt": fmt, "gender": g, "intl": 1 if d.get("team_type") == "international" else 0,
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
@@ -183,7 +188,8 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     Gives it innings, batting order, partnerships, extras-style aggregates and a valid ``q`` like a Base
     match. Skipped (the match stays totals-only) if the deliveries do not form two innings of this fixture.
     """
-    info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20"}[fmt],
+    info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20", 4: "T10", 5: "ODI"}[fmt],
+            "overs": {4: 10, 5: 60}.get(fmt, 0),
             "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
             "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
     try:

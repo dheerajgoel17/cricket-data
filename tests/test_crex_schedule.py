@@ -34,6 +34,8 @@ def test_format_labels():
     f = cs.format_of
     assert [f("T20I"), f("T20"), f("ODI"), f("One Day"), f("List A"), f("Youth ODI"), f("Test"), f("First Class"), f("First Class Only"), f("")] == \
         ["T20", "T20", "ODI", "ODI", "ODI", "ODI", "Test", "FC", "FC", ""]
+    assert f("T10") == "T10" and f("10 overs") == "T10" and f("T20") != "T10"
+    assert f("60 overs") == "O60" and f("The Hundred") == "Hundred"
 
 
 def test_garbage_pages_yield_nothing_instead_of_raising():

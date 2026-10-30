@@ -20,7 +20,8 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | Player retired / long inactive | later fixtures not blamed on him | same 120-day rule |
 | Two matches between the same sides on consecutive days | both kept | a scraped game one day off a Base game is a duplicate only if the batter-run totals match |
 | Same fixture in Base and scraped | Base wins | deduped on teams + date (+/-1 day) |
-| The Hundred | its own format | never mixed with T20 |
+| The Hundred / T10 / 60-over | their own formats | never mixed with T20 or ODI |
+| A T20 in a Test series (e.g. Afghanistan vs Zimbabwe) | format on the line vs the fixture | a Test's 6-day book window must not take the T20's fancy |
 | First-class (MDM) | not included | not a Test |
 
 ## Known gaps

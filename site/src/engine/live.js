@@ -104,9 +104,12 @@ export function wantsCard(match, now = Date.now()) {
 /** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
 export function formatOf(label) {
   const t = String(label || "").toLowerCase();
-  if (t.includes("hundred")) return "Hundred";
+  if (/\bt10\b/.test(t) || (/\b10[- ]overs?\b/.test(t) && !/t20/.test(t))) return "T10";
+  if (t.includes("hundred") || (/\b100\b/.test(t) && /ball/.test(t))) return "Hundred";
+  if (/\b60[- ]overs?\b/.test(t)) return "O60";
+  if (/\b40[- ]overs?\b/.test(t)) return "O40";
   if (/\bt20/.test(t)) return "T20";
-  if (/\bodi\b|list a|one[ -]day/.test(t)) return "ODI";
+  if (/\bodi\b|list a|one[ -]day|50[- ]over/.test(t)) return "ODI";
   if (/\btest\b|first[ -]class|multi[ -]day/.test(t)) return "Test";
   return "";
 }
@@ -610,8 +613,8 @@ export function liveStat(player, stat) {
   return player[k];
 }
 
-const MAX_OVERS = { T20: 20, ODI: 50 };
-const SPELL_BALLS = { T20: 24, ODI: 60 };
+const MAX_OVERS = { T20: 20, ODI: 50, T10: 10, O60: 60 };
+const SPELL_BALLS = { T20: 24, ODI: 60, T10: 12, O60: 72 };
 
 /** Has this side's innings ended? All out, its overs used, the other side now batting, or the match over. */
 function inningsOver(match, team) {
@@ -630,7 +633,7 @@ function inningsOver(match, team) {
 export function liveState(match, player, stat) {
   if (!match || !player) return "live";
   if (match.status === "final") return "final";
-  if (!["T20", "ODI", "Hundred"].includes(match.fmt)) return "live";
+  if (!["T20", "ODI", "Hundred", "T10", "O60"].includes(match.fmt)) return "live";
   if (BAT_STATS.has(stat)) return player.out ? "out" : inningsOver(match, player.team) ? "final" : "live";
   if (BOWL_STATS.has(stat)) {
     const quota = SPELL_BALLS[match.fmt];
