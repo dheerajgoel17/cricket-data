@@ -31,7 +31,7 @@
     },
     "api/og.js": {
       "maxDuration": 15,
-      "includeFiles": "{public/data/*.json,public/books/*,node_modules/@fontsource/barlow-condensed/files/*.woff}"
+      "includeFiles": "{public/data/*.json,public/data/p/*.json,public/books/*,public/icon-192.png,node_modules/@fontsource/barlow-condensed/files/*.woff}"
     },
     "api/share.js": {
       "maxDuration": 10,

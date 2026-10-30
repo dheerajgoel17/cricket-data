@@ -3,6 +3,7 @@
 import { STATS } from "./rules.js";
 import { bookFormatFor, bookLinesFor, bookName, overProb, teamKey } from "./lines.js";
 import { playerPhotos, teamLogos } from "../lib/photos.js";
+import { windowRate } from "./windows.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 
 const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
@@ -23,6 +24,33 @@ function otherSide(match, team) {
 
 const ROLE = { bat: "Batter", bowl: "Bowler", all: "All-rounder" };
 const LISTED_STATS = ["runs", "wickets", "fours", "sixes"];
+
+const dateShort = (d) => {
+  const x = new Date(`${String(d || "").slice(0, 10)}T00:00:00Z`);
+  return Number.isNaN(+x) ? "" : x.toLocaleString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+};
+const fmtAvg = (n) => (Math.abs(n - Math.round(n)) < 0.05 ? String(Math.round(n)) : n.toFixed(1));
+
+/**
+ * Last five played innings vs the line (L5 mean, hit rate, last innings). `rows` are oldest → newest
+ * `{ value, date, opp }`; DNP / VOID (`value == null`) never count. Numbers come from the rows, never invented.
+ */
+export function propForm(rows, line, teamName) {
+  const entries = (rows || []).filter((r) => r && r.value != null && Number.isFinite(Number(r.value))).map((r) => ({
+    value: Number(r.value),
+    date: r.date,
+    opp: typeof teamName === "function" ? teamName(r.opp) : (r.vs || r.opp || ""),
+  }));
+  if (!entries.length || !Number.isFinite(Number(line))) return {};
+  const l5 = windowRate(entries, 5, Number(line));
+  const last = entries[entries.length - 1];
+  return {
+    l5,
+    hit: l5.p != null ? { p: l5.p, n: l5.played } : undefined,
+    last: last ? { value: last.value, date: dateShort(last.date), vs: last.opp } : undefined,
+    last5: entries.slice(-5).map((e) => ({ value: e.value, date: dateShort(e.date), vs: e.opp })),
+  };
+}
 
 /** The line the books hang for this player (soonest match, runs first) so a /share/player/<idx> URL is not an empty name card. */
 function listedLine(pid, doc) {
@@ -51,9 +79,9 @@ export function cardFields(q, data) {
       const listed = listedLine(pid, data.lines); // a player URL with no line still shows his booked prop, not an empty name card
       if (listed) { stat = listed.stat; line = listed.line; }
     }
-    const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)) };
+    const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)), idx };
     if (f.kind === "prop") {
-      f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";
+      f.statKey = stat; f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";
       const hits = (data.lines?.lines || []).filter((l) => l.pid === pid && l.stat === stat && Math.abs(l.line - line) < 0.01);
       const row = hits[0];
       if (row?.team) f.team = row.team;
@@ -104,8 +132,8 @@ async function asImage(loadImage, buf) {
   try { return await loadImage(buf); } catch { return null; }
 }
 
-/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` / `teamLogo` / `oppLogo` / `bookLogo` are image bytes or null. */
-export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = null, bookLogo = null, fonts = {} } = {}) {
+/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` / `teamLogo` / `oppLogo` / `bookLogo` / `brandLogo` are image bytes or null. */
+export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = null, bookLogo = null, brandLogo = null, fonts = {} } = {}) {
   const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
   if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
   if (fonts.regular) GlobalFonts.registerFromPath(fonts.regular, "CardRegular");
@@ -121,11 +149,12 @@ export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = n
   const teamImg = await asImage(loadImage, teamLogo);
   const oppImg = await asImage(loadImage, oppLogo);
   const bookImg = await asImage(loadImage, bookLogo);
+  const brandImg = await asImage(loadImage, brandLogo);
 
   if (f.kind === "prop") drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg });
   else if (f.kind === "fixture" || f.kind === "venue") drawPlain(g, f, { text, bold, reg });
   else drawPlayer(g, f, { img, text, bold, reg });
-  drawBrand(g, text, bold);
+  drawBrand(g, text, bold, brandImg);
   return jpegUnder(c);
 }
 
@@ -166,7 +195,6 @@ function drawPlayer(g, f, { img, text, bold, reg }) {
 
 function drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg }) {
   drawPortrait(g, f, img, text, bold);
-  drawBookTip(g, f, bookImg, text, bold);
   const left = 72, max = 620;
   text(f.name, left, 88, 52, "#ffffff", bold, "left", max);
   text(f.team, left, 126, 24, MUTED, reg, "left", max);
@@ -174,12 +202,15 @@ function drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg }) {
   if (sub) text(sub, left, 154, 20, MUTED, reg, "left", max);
   drawMatchup(g, f, teamImg, oppImg, text, bold, left, 172);
 
+  const avg = f.l5 && Number.isFinite(Number(f.l5.mean)) ? Number(f.l5.mean) : null;
   const last = f.last && Number.isFinite(Number(f.last.value)) ? Number(f.last.value) : null;
-  const hit = f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null;
+  const hit = f.l5 && Number.isFinite(Number(f.l5.p)) ? Number(f.l5.p) : (f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null);
   const y1 = 250;
-  const cols = last != null
-    ? [{ k: "Last", v: String(last), tone: last > f.line ? "up" : last < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
-    : [{ k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }, { k: "Price", v: f.price ? f.price.toFixed(2) : "–", tone: "up" }];
+  const cols = avg != null
+    ? [{ k: "L5", v: fmtAvg(avg), tone: avg > f.line ? "up" : avg < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
+    : last != null
+      ? [{ k: "Last", v: String(last), tone: last > f.line ? "up" : last < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
+      : [{ k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }, { k: "Price", v: f.price ? f.price.toFixed(2) : "–", tone: "up" }];
   cols.forEach((c, i) => drawMetric(g, c, left + i * 150, y1, text, bold, reg, 140));
   drawGauge(g, f, hit, text, bold, 640, 286);
 
@@ -192,7 +223,7 @@ function drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg }) {
   ];
   row2.forEach((c, i) => drawMetric(g, c, left + i * 150, y2, text, bold, reg, i === 2 ? 280 : 140));
 
-  if (last != null) drawLastBar(g, f, last, text, bold, reg, left, 448);
+  if ((f.last5 && f.last5.length) || last != null) drawLast5(g, f, last, text, bold, reg, left, 430);
   if (f.price) drawPriceChip(g, f, bookImg, text, bold, 1128, 548);
 }
 
@@ -285,28 +316,46 @@ function drawPriceChip(g, f, bookImg, text, bold, right, y) {
   if (bookImg) mark(g, bookImg, x + w - 16, y + 9, 110, 22, "right");
 }
 
-function drawLastBar(g, f, last, text, bold, reg, x, y) {
-  const max = Math.max(last, f.line, 1) * 1.15;
-  const h = 70, w = 64, fill = Math.max(6, (last / max) * h), lineY = y + h - (f.line / max) * h;
-  const over = last > f.line;
-  g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, y, w, h, 8); g.fill();
-  g.fillStyle = over ? GREEN : RED;
-  g.beginPath(); g.roundRect(x, y + h - fill, w, fill, 8); g.fill();
+/** Last five played innings vs the line. */
+function drawLast5(g, f, last, text, bold, reg, x, y) {
+  const bars = (f.last5 && f.last5.length ? f.last5 : [{ value: last }]).slice(-5);
+  const vals = bars.map((b) => Number(b.value)).filter(Number.isFinite);
+  if (!vals.length) return;
+  const max = Math.max(f.line, ...vals, 1) * 1.15;
+  const w = 32, gap = 7, h = 64;
+  const total = bars.length * w + (bars.length - 1) * gap;
+  const lineY = y + h - (f.line / max) * h;
+  bars.forEach((b, i) => {
+    const v = Number(b.value);
+    if (!Number.isFinite(v)) return;
+    const bx = x + i * (w + gap);
+    const fill = Math.max(4, (v / max) * h);
+    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(bx, y, w, h, 6); g.fill();
+    g.fillStyle = v === f.line ? "#f5a524" : v > f.line ? GREEN : RED;
+    g.beginPath(); g.roundRect(bx, y + h - fill, w, fill, 6); g.fill();
+  });
   g.strokeStyle = "#ffffff"; g.lineWidth = 2; g.setLineDash([4, 4]);
-  g.beginPath(); g.moveTo(x - 4, lineY); g.lineTo(x + w + 48, lineY); g.stroke(); g.setLineDash([]);
-  text(String(f.line), x + w + 10, lineY + 6, 16, MUTED, reg);
-  text(String(last), x + w / 2, y + h - fill - 8, 18, "#ffffff", bold, "center", w);
-  const cap = [f.last?.date, f.last?.vs ? `@${abbr(f.last.vs)}` : (f.opp ? `@${abbr(f.opp)}` : "")].filter(Boolean).join(" ");
-  if (cap) text(cap, x, y + h + 22, 16, MUTED, reg, "left", 280);
+  g.beginPath(); g.moveTo(x - 4, lineY); g.lineTo(x + total + 8, lineY); g.stroke(); g.setLineDash([]);
+  text(String(f.line), x + total + 12, lineY + 6, 16, MUTED, reg);
 }
 
-function drawBrand(g, text, bold) {
-  g.save(); g.translate(72, 548); g.scale(0.68, 0.68);
-  const mark = g.createLinearGradient(0, 0, 64, 64); mark.addColorStop(0, "#3cf0a6"); mark.addColorStop(1, "#1fb877");
-  g.fillStyle = mark; g.beginPath(); g.roundRect(0, 0, 64, 64, 15); g.fill();
-  g.fillStyle = BG;
-  for (const [x, y, w, h] of [[17, 14, 10, 37], [17, 14, 25, 10], [17, 29.5, 18, 10]]) { g.beginPath(); g.roundRect(x, y, w, h, 5); g.fill(); }
-  g.beginPath(); g.arc(48.5, 19, 6, 0, Math.PI * 2); g.fill(); g.restore();
-  text("Fancy", 128, 592, 34, "#ffffff", bold); const fw = (g.font = `34px ${bold}`, g.measureText("Fancy").width);
-  text(".", 128 + fw, 592, 34, GREEN, bold); text("cash", 128 + fw + 10, 592, 34, "#ffffff", bold);
+/** Fancy.cash mark + wordmark, top-right, inside the ~64 px inset X's 2:1 crop leaves. The book's mark stays on the price chip. */
+function drawBrand(g, text, bold, brandImg) {
+  const size = 48, right = 1136, y = 36, x = right - size;
+  if (brandImg) mark(g, brandImg, x, y, size, size);
+  else {
+    g.save(); g.translate(x, y); g.scale(size / 64, size / 64);
+    const markFill = g.createLinearGradient(0, 0, 64, 64); markFill.addColorStop(0, "#3cf0a6"); markFill.addColorStop(1, "#1fb877");
+    g.fillStyle = markFill; g.beginPath(); g.roundRect(0, 0, 64, 64, 15); g.fill();
+    g.fillStyle = "#0f0f0f";
+    for (const [bx, by, w, h] of [[17, 14, 10, 37], [17, 14, 25, 10], [17, 29.5, 18, 10]]) { g.beginPath(); g.roundRect(bx, by, w, h, 5); g.fill(); }
+    g.beginPath(); g.arc(48.5, 19, 6, 0, Math.PI * 2); g.fill(); g.restore();
+  }
+  const ty = y + 34, sizeT = 28;
+  g.font = `${sizeT}px ${bold}`;
+  const cw = g.measureText("cash").width, dw = 8, fw = g.measureText("Fancy").width;
+  const tx = x - 14 - cw - dw - fw;
+  text("Fancy", tx, ty, sizeT, "#ffffff", bold);
+  text(".", tx + fw, ty, sizeT, GREEN, bold);
+  text("cash", tx + fw + dw, ty, sizeT, "#ffffff", bold);
 }
