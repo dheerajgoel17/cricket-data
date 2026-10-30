@@ -677,11 +677,16 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
 
 
 def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | None = None) -> list[dict]:
-    """Stop-gap fixture rows for archived matches (not yet started) that the schedule has no row for: same two sides within 14 hours."""
+    """Stop-gap fixture rows for archived matches the schedule has no row for: an upcoming game, or a priced Test still in the 6-day window.
+
+    The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
+    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match.
+    """
     if not vb_dir:
         return []
     now = now or datetime.now(timezone.utc)
-    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] == "Test" else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
+    now_min = now.timestamp() // 60
+    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
@@ -691,15 +696,27 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             mins = _minutes(start)
         except (ValueError, KeyError, TypeError, OSError):
             continue
-        if d.get("fixture") or mins < now.timestamp() // 60 - 6 * 60:
-            continue
         pair = frozenset((_norm_team(a), _norm_team(b)))
         if any(pair == k and abs(mins - m) < w for k, m, w in held):
             continue
-        fmt = next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
+        fx = d.get("fixture") or {}
+        fmt = fx.get("fmt") or next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
+        keep_min = 6 * 24 * 60 if fmt in ("Test", "FC") else 24 * 60
+        if mins > now_min:
+            if fx:
+                continue  # already linked to a schedule row; the upcoming stop-gap is only for a match the page has not reached yet
+        elif mins < now_min - keep_min:
+            continue
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
-        out.append({"start": start[:16] + "Z", "fmt": fmt, "gender": "female" if women else "male", "a": a.strip(), "b": b.strip(), "venue": "",
-                    "series": "", "status": "Upcoming", "result": "", "source": "books"})
+        if mins > now_min:
+            status = "Upcoming"
+        elif fmt in ("Test", "FC") or not (fx.get("result") or "").strip():
+            status = "Live"
+        else:
+            status = "Completed"
+        out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
+                    "a": fx.get("a") or a.strip(), "b": fx.get("b") or b.strip(), "venue": fx.get("venue") or "",
+                    "series": fx.get("series") or "", "status": status, "result": fx.get("result") or "", "source": "books"})
     return out
 
 

@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
+  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
 import { identityIndex } from "../src/engine/identity.js";
 
@@ -103,12 +103,30 @@ test("isSessionLine / isResultLine: stumps is a day break, won-by is the end", (
   assert.equal(isSessionLine("Close of play"), true);
   assert.equal(isSessionLine("Lunch"), true);
   assert.equal(isSessionLine("Tea"), true);
+  assert.equal(isSessionLine("Rain Delay"), true);
+  assert.equal(isSessionLine("Match paused due to bad weather"), true);
+  assert.equal(isSessionLine("Match delayed by bad light"), true);
+  assert.equal(isSessionLine("Team Break"), true);
   assert.equal(isResultLine("South Africa won by 5 wickets"), true);
   assert.equal(isResultLine("Match Drawn"), true);
   assert.equal(isResultLine("Stumps - Day 3"), false);
   assert.equal(isResultLine("Close of play"), false);
+  assert.equal(isResultLine("Rain Delay"), false);
   assert.equal(matchWindow("Test"), TEST_WINDOW_MS);
   assert.ok(matchWindow("T20") < TEST_WINDOW_MS);
+});
+
+test("sessionLabel: the source's badge, not a Live pulse", () => {
+  assert.equal(sessionLabel("Stumps - Day 4"), "Stumps");
+  assert.equal(sessionLabel("Close of play"), "Stumps");
+  assert.equal(sessionLabel("Lunch"), "Lunch");
+  assert.equal(sessionLabel("Innings Break"), "Innings break");
+  assert.equal(sessionLabel("Rain Delay"), "Rain delay");
+  assert.equal(sessionLabel("Match paused due to bad weather"), "Weather");
+  assert.equal(sessionLabel("Match delayed by bad light"), "Bad light");
+  assert.equal(sessionLabel("Team Break"), "Team break");
+  assert.equal(sessionLabel("Match Paused"), "Paused");
+  assert.equal(sessionLabel("IND need 12 runs"), "");
 });
 
 test("scoreLabel keeps both Test innings; a one-innings total is runs/wkts", () => {
@@ -761,6 +779,7 @@ test("a Test at close of play stays live with its scores and the session line, n
   }] }));
   assert.equal(stumps.status, "live");
   assert.equal(stumps.fmt, "Test");
+  assert.equal(stumps.session, "Stumps");
   assert.equal(liveBlurb(stumps), "Stumps - Day 3");
   assert.equal(teamScore(stumps, "South Africa").display, "308/6 (76.0 ov)");
   const [silent] = parseSchedule(pageHtml({ [FIXTURE]: [{
@@ -774,13 +793,31 @@ test("a Test at close of play stays live with its scores and the session line, n
     comment1: "Stumps - Day 3", B: "",
   } }));
   assert.equal(page.status, "live");
+  assert.equal(page.session, "Stumps");
   assert.equal(liveBlurb(page), "Stumps - Day 3");
   const row = { id: "x", status: "live", fmt: "Test", start: "2026-10-27T08:30:00.000Z", summary: "", teams: [{ name: "South Africa", abbr: "SA" }, { name: "Australia", abbr: "AUS" }] };
   const blank = parseMatchPage(pageHtml({ [LIVE]: { team1_f_n: "South Africa", team2_f_n: "Australia", status: 2, inning: 1, score1: "308-6", over1: "(76.0)" } }));
   const built = buildMatch(row, blank, null);
   assert.equal(built.status, "live", "status 2 with no result is close of play, not the end");
+  assert.equal(built.session, "Stumps");
   assert.equal(liveBlurb(built), "Close of play");
   assert.equal(teamScore(built, "South Africa").display, "308/6 (76.0 ov)");
+  const [rain] = parseSchedule(pageHtml({ [FIXTURE]: [{
+    team1: "South Africa", team2: "Australia", s1: "329-10", o1: "90.0", t: Date.parse("2026-10-27T08:30:00Z"),
+    status: 2, statusText: "Rain Delay", fo: "Test", mf: "14SA", winningTeam: -1, w: -1,
+  }] }));
+  assert.equal(rain.status, "live");
+  assert.equal(rain.session, "Rain delay");
+  const home = parseSchedule(pageHtml({ [FIXTURE]: [{
+    team1: "South Africa", team2: "Australia", s1: "329-10", o1: "90.0", s2: "429-10", o2: "120.0",
+    t: Date.parse("2026-10-27T08:30:00Z"), status: 2, statusText: "Stumps", fo: "Test", mf: "10MS",
+    link: "/cricket-live-score/aus-vs-sa-3rd-test", winningTeam: -1, w: -1,
+  }] }));
+  const sched = parseSchedule(pageHtml({ [FIXTURE]: [{ team1: "Pakistan", team2: "Sri Lanka", t: Date.parse("2026-10-31T08:00:00Z"), status: 0, fo: "ODI", mf: "14PK" }] }));
+  const merged = mergeSchedule(home, sched);
+  assert.equal(merged.map((m) => m.id).join(","), "10MS,14PK");
+  assert.equal(merged[0].status, "live");
+  assert.equal(merged[0].session, "Stumps");
 });
 
 test("unlistedRows keeps a Test through the day break, and pricedLive matches a later day's book start", () => {
