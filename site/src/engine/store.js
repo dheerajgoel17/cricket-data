@@ -4,6 +4,7 @@ import { teamInningNo } from "./filters.js";
 import { norm } from "./util.js";
 import { unwrap } from "./wrap.js";
 
+/** @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, wrapKey?: string }} [opts] */
 export async function createStore({ base = "data/", fetchJson, wrapKey } = {}) {
   const get = fetchJson || (async (p) => {
     const r = await fetch(base + p, { credentials: "same-origin" });
