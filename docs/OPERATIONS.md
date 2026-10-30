@@ -16,7 +16,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
 | `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
-| `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate cookie). Do not paste it into the repo |
+| `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build and `/api/live` at runtime; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate header + live wrap). `value-bets.yml` uses it to unwrap `/api/live` when storing results. Do not paste it into the repo |
 | `VITE_GA_MEASUREMENT_ID` | GitHub secret | GA4 measurement id (`G-…`) | inlined at the Vercel build (`site.yml` `--build-env`). Empty or unset: no Google tag. Never commit the id |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; and the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset) |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
@@ -33,7 +33,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 
 Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link` must be deleted (it holds an OIDC token).
 
-**Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files (not `index.json` / `matches.json` / shards: those are too big to decrypt on a phone) and the Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). A 403 on `/data` is `no-store` so a first-request cookie race is not cached as "Data not found". This is a speed bump, not a secret from a real browser.
+**Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files (not `index.json` / `matches.json` / shards: those are too big to decrypt on a phone) and `/api/live` wraps the same way, so a Network-tab response is `{v, iv, ct}` rather than scores. `/api/gate` puts the key in the `X-Cd-K` header, not the JSON body. The Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). A 403 on `/data` is `no-store` so a first-request cookie race is not cached as "Data not found". The hourly archive job unwraps `/api/live` with the same secret. This is a speed bump, not a secret from a real browser: the page still has to unwrap to draw numbers.
 
 ## Routine tasks
 **Rotate the xAI key**: console.x.ai -> API Keys -> create new, delete old; then `cd site && printf '%s' "$NEW" | npx vercel env add XAI_API_KEY production --sensitive --yes` (or the dashboard), then redeploy (`npx vercel deploy --prod --yes`).

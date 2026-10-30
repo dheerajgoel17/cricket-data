@@ -2,12 +2,19 @@
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
 import { isFixtureId } from "@/engine/lines.js";
 import { saveLive } from "@/lib/live-cache";
+import { readJson } from "@/lib/wrap-key";
 
 const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out";
 const CONFIG = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/config";
 const ARCHIVE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/archive";
 
-async function bundled(file: string): Promise<any | null> { try { return await (await fetch(`/data/${file}`)).json(); } catch { return null; } }
+async function bundled(file: string): Promise<any | null> {
+  try {
+    const r = await fetch(`/data/${file}`, { credentials: "same-origin", cache: "no-store" });
+    if (!r.ok) return null;
+    return await readJson(r);
+  } catch { return null; }
+}
 async function live(file: string, ms: number): Promise<any | null> {
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
   try { const r = await fetch(`${RAW}/${file}`, { cache: "no-cache", signal: ctl.signal }); return r.ok ? await r.json() : null; } catch { return null; } finally { clearTimeout(t); }
@@ -52,8 +59,8 @@ export async function loadProps(): Promise<{ snap: any | null; live: boolean }> 
 /** Live scores + player so-far from /api/live (Source A schedule, match and scorecard pages, ~15 s). Null if the route is down. */
 export async function loadLive(): Promise<any | null> {
   try {
-    const r = await fetch("/api/live", { headers: { accept: "application/json" } });
-    const body = r.ok ? await r.json() : null;
+    const r = await fetch("/api/live", { credentials: "same-origin", headers: { accept: "application/json" } });
+    const body = r.ok ? await readJson(r) : null;
     saveLive(body);
     return body;
   } catch { return null; }

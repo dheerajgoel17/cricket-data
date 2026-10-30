@@ -1,4 +1,4 @@
-// GET /api/live -> {asOf, source, matches[]}. Source A only, cached ~15 s.
+// GET /api/live -> {asOf, source, matches[]} (wrapped with DATA_WRAP_KEY when set). Source A only, cached ~15 s.
 // The schedule page lists live and upcoming games with their match URLs and scores (Source A caches it ~5 min); only matches the books price are kept.
 // A finished match drops off that page soon after the end; a priced one that began in the last 40 h (6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
@@ -9,6 +9,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows, wantsCard } from "../src/engine/live.js";
 import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
+import { wire } from "../src/engine/wrap.js";
 
 const BOOKS = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 const SCHEDULE_FILE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer lists
@@ -93,14 +94,19 @@ async function snapshot() {
   return inflight;
 }
 
+async function send(res, status, body) {
+  const out = await wire(body, process.env.DATA_WRAP_KEY);
+  return res.status(status).json(out);
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", `public, s-maxage=${LIVE_TTL_MS / 1000}, stale-while-revalidate=45`);
   if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
   try {
-    return res.status(200).json(await snapshot());
+    return send(res, 200, await snapshot());
   } catch (e) {
-    if (memo.body) return res.status(200).json({ ...memo.body, stale: true });
+    if (memo.body) return send(res, 200, { ...memo.body, stale: true });
     const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
-    return res.status(502).json({ error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });
+    return send(res, 502, { error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });
   }
 }

@@ -260,6 +260,23 @@ def test_the_command_reads_the_route_twice_and_a_route_that_is_down_costs_nothin
         main(["--results"])
 
 
+def test_a_wrapped_live_body_is_read_with_the_wrap_key(tmp_path, monkeypatch, capsys):
+    from cricket_site.wrap import wrap
+    monkeypatch.setattr(arch.config, "ARCHIVE", tmp_path)
+    filed(tmp_path)
+    plain = {"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}
+    body = tmp_path / "live.json"
+    body.write_text(json.dumps(wrap(plain, "ci-test-key")))
+    monkeypatch.setenv("DATA_WRAP_KEY", "ci-test-key")
+    assert main(["--results", str(body)], sleep=lambda *_: None) == 0
+    assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "value": 31}]
+    capsys.readouterr()
+    monkeypatch.delenv("DATA_WRAP_KEY", raising=False)
+    body.write_text(json.dumps(wrap(plain, "ci-test-key")))
+    assert main(["--results", str(body)], sleep=lambda *_: None) == 0
+    assert "::warning::" in capsys.readouterr().out, "ciphertext without a key is not stored as a result"
+
+
 # ---- a Test's first-innings lines are lines of their own
 
 def test_a_first_innings_line_is_not_the_match_total_line_of_the_same_player_stat_and_number(tmp_path):

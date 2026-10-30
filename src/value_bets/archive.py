@@ -18,10 +18,13 @@ import argparse
 import csv
 import datetime as dt
 import json
+import os
 import re
 import time
 import urllib.request
 from pathlib import Path
+
+from cricket_site.wrap import unwrap as unwrap_data
 
 from . import config
 from .booklines import public
@@ -278,13 +281,22 @@ def settle(root: Path, bodies: list[dict], now: dt.datetime) -> tuple[list[str],
     return written, bad
 
 
+def _plain(doc):
+    """Unwrap a live body when DATA_WRAP_KEY is set; a still-wrapped dict has no matches list."""
+    secret = os.environ.get("DATA_WRAP_KEY", "").strip()
+    out = unwrap_data(doc, secret)
+    if isinstance(out, dict) and out.get("v") == 1 and "ct" in out:
+        raise ValueError("wrapped live body")
+    return out
+
+
 def _read_body(src: str) -> dict:
     """The live route's body from a URL or a file."""
     if re.match(r"https?://", src):
         req = urllib.request.Request(src, headers={"user-agent": "cricket-props-hub-archive/1", "accept": "application/json"})
         with urllib.request.urlopen(req, timeout=30) as r:
-            return json.load(r)
-    return json.loads(Path(src).read_text(encoding="utf-8"))
+            return _plain(json.load(r))
+    return _plain(json.loads(Path(src).read_text(encoding="utf-8")))
 
 
 def main(argv: list[str] | None = None, sleep=time.sleep) -> int:

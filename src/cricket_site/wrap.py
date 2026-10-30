@@ -1,9 +1,9 @@
-"""XOR-SHA256 wrap for the smaller site JSON files so a bare GET of /data/*.json is not usable JSON.
+"""XOR-SHA256 wrap for the smaller site JSON files and the live API body so a Network-tab preview is not usable JSON.
 
-The browser unwraps after ``/api/gate`` hands it the key (stdlib only: hashlib, no extra package).
+The browser unwraps after ``/api/gate`` hands it the key as ``X-Cd-K`` (stdlib only: hashlib, no extra package).
 This is a speed bump, not a secret: anyone who can run the site can recover the bytes. Matches, the player
 index and player shards stay plaintext (too large to unwrap on a phone) and are blocked by the cookie gate + scraper UA list.
-Set DATA_WRAP_KEY in GitHub (build) and Vercel (gate); without it this is a no-op.
+Set DATA_WRAP_KEY in GitHub (build) and Vercel (gate / live); without it this is a no-op.
 """
 from __future__ import annotations
 
@@ -43,6 +43,8 @@ def wrap(obj, secret: str) -> dict:
 
 def unwrap(doc, secret: str):
     if not isinstance(doc, dict) or doc.get("v") != 1 or "ct" not in doc or "iv" not in doc:
+        return doc
+    if not secret:
         return doc
     iv, ct = base64.b64decode(doc["iv"]), base64.b64decode(doc["ct"])
     raw = bytes(a ^ b for a, b in zip(ct, _stream(_key(secret), iv, len(ct)), strict=True))
