@@ -33,6 +33,15 @@ test("a line the books do not price has no price, a player alone is a player car
   assert.match(cardText(cardFields({ f: "2026-10-29-afghanistan-v-zimbabwe" }, data)).description, /Sharjah Cricket Stadium/);
 });
 
+test("a player URL with no stat still draws his booked line, so the picture is not an empty name card", () => {
+  const future = { ...data, lines: { lines: data.lines.lines.map((l) => ({ ...l, start_utc: "2026-11-02T14:30Z" })) } };
+  const f = cardFields({ p: "0" }, future);
+  assert.equal(f.kind, "prop");
+  assert.equal(f.stat, "Runs");
+  assert.equal(f.line, 24.5);
+  assert.equal(f.price, 1.9);
+});
+
 test("every kind of card draws a JPEG small enough for link previews, with or without a photo", async () => {
   for (const q of [{ p: "0", stat: "runs", line: "24.5" }, { p: "1" }, { f: "2026-10-29-afghanistan-v-zimbabwe" }, { v: "0" }]) {
     const img = await renderCard(cardFields(q, data));
@@ -64,7 +73,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v5/player/12/runs/24.5.jpg");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v6/player/12/runs/24.5.jpg");
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });

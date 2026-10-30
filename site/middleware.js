@@ -6,6 +6,15 @@ export const CRAWLER = /twitterbot|facebookexternalhit|facebot|whatsapp|telegram
 
 export const config = { matcher: ["/data/:path*", "/api/:path*", "/player/:path*", "/fixture/:path*", "/venue/:path*"] };
 
+/** `/player/12?stat=runs&line=24.5` -> `player/12/runs/24.5` so a copied player-page URL still draws the prop, not an empty name card. */
+export function crawlerSharePath(url) {
+  const path = url.pathname.replace(/^\//, "");
+  const stat = url.searchParams.get("stat");
+  const line = url.searchParams.get("line");
+  if (/^player\/\d+$/.test(path) && stat && Number.isFinite(Number(line))) return `${path}/${stat}/${line}`;
+  return path;
+}
+
 async function hmacHex(secret, msg) {
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(msg));
@@ -26,7 +35,7 @@ export default async function middleware(req) {
   const ua = req.headers.get("user-agent") || "";
   if (CRAWLER.test(ua) && /^(?:\/player\/|\/fixture\/|\/venue\/)/.test(path)) {
     const dest = new URL("/api/share", url.origin);
-    dest.searchParams.set("path", path.replace(/^\//, ""));
+    dest.searchParams.set("path", crawlerSharePath(url));
     return fetch(dest, { headers: req.headers });
   }
   if (path === "/api/gate") return;
