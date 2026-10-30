@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byShard, dayOffset, hotLines, hotOrder, norm, pool, sameMatch } from "./hot-lines";
+import { byShard, dayOffset, hotDay, hotLines, hotOrder, matchChipId, norm, pool, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -15,6 +15,23 @@ describe("dayOffset", () => {
     expect(dayOffset(iso(29, 23, 55), NOW)).toBe(1);
     expect(dayOffset(iso(30, 9), NOW)).toBe(-1);
     expect(dayOffset(iso(27, 20), NOW)).toBe(-1);
+  });
+});
+
+describe("hotDay", () => {
+  it("puts a Test that started days ago on today's list while it is still in the 6-day window", () => {
+    expect(hotDay(iso(25, 8), "Test", NOW)).toBe(0);
+    expect(hotDay(iso(21, 8), "Test", NOW)).toBe(-1); // 7 days ago
+    expect(hotDay(iso(27, 20), "T20", NOW)).toBe(0); // last night, still inside 24 h
+    expect(hotDay(iso(27, 4), "T20", NOW)).toBe(-1); // 32 h ago
+    expect(hotDay(iso(29, 9), "Test", NOW)).toBe(1);
+  });
+});
+
+describe("matchChipId", () => {
+  it("groups a Test's day-by-day book starts as one chip and keeps a T20's own kick-off", () => {
+    expect(matchChipId("South Africa vs Australia", iso(27, 8), "Test")).toBe(matchChipId("Australia vs South Africa", iso(30, 8), "Test"));
+    expect(matchChipId("India vs New Zealand", iso(28, 12), "T20")).not.toBe(matchChipId("India vs New Zealand", iso(30, 12), "T20"));
   });
 });
 
@@ -35,6 +52,12 @@ describe("hotLines", () => {
     expect(pids(hotLines(lines, { day: 0 }, NOW))).toEqual(["a", "b", "h"]);
     expect(pids(hotLines(lines, { day: 1 }, NOW))).toEqual(["c"]);
   });
+  it("keeps a Test on today's list through later days, and a T20 only for 24 hours", () => {
+    const test = line("t", "South Africa vs Australia", iso(25, 8), { fmt: "Test" });
+    const lateT20 = line("y", "Chile vs Peru", iso(27, 20));
+    expect(pids(hotLines([...lines, test, lateT20], { day: 0 }, NOW))).toEqual(["a", "b", "h", "t", "y"]);
+    expect(pids(hotLines([test], { day: 1 }, NOW))).toEqual([]);
+  });
   it("is never the whole book, however many days it holds (the home used to score every upcoming line)", () => {
     const many = Array.from({ length: 50 }, (_, i) => line(`p${i}`, "X vs Y", iso(29 + (i % 20), 9)));
     expect(hotLines(many, { day: 0 }, NOW)).toHaveLength(0);
@@ -42,8 +65,10 @@ describe("hotLines", () => {
   });
   it("takes a fixture page's own two sides, in either order and with (W) ignored", () => {
     const ls = [line("a", "India vs Pakistan", iso(28, 19)), line("b", "Pakistan vs India", iso(29, 10)), line("c", "India Women vs Pakistan Women", iso(28, 5)), line("d", "India vs Nepal", iso(28, 19)), line("x", "India vs Pakistan", iso(20, 19))];
-    expect(pids(hotLines(ls, { teams: ["India", "Pakistan"], archive: false }, NOW))).toEqual(["a", "b", "c"]); // the old x is past the age window
+    expect(pids(hotLines(ls, { teams: ["India", "Pakistan"], archive: false }, NOW))).toEqual(["a", "b", "c"]); // the old x is past the 24 h keep
     expect(pids(hotLines(ls, { teams: ["India", "Pakistan"], archive: true }, NOW))).toEqual(["a", "b", "c", "x"]); // an archived match is read whatever its age
+    const testLs = [line("t1", "South Africa vs Australia", iso(25, 8), { fmt: "Test" }), line("t2", "South Africa vs Australia", iso(20, 8), { fmt: "Test" })];
+    expect(pids(hotLines(testLs, { teams: ["South Africa", "Australia"], archive: false }, NOW))).toEqual(["t1"]); // day 4 of the Test, not a week-old one
   });
 });
 

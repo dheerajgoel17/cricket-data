@@ -7,7 +7,7 @@ export function useLiveDoc() {
   return useQuery(liveQuery);
 }
 
-export function useLiveMatch(fixture: { a?: string; b?: string; start?: string } | null | undefined) {
+export function useLiveMatch(fixture: { a?: string; b?: string; start?: string; fmt?: string } | null | undefined) {
   const q = useLiveDoc();
   const lines = useQuery(linesQuery);
   const books = bookFixtures(lines.data);

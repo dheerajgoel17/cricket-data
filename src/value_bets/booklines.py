@@ -82,7 +82,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
     return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}
 
 
-LIVE_KEEP = dt.timedelta(hours=40)  # a limited-overs match is over well inside this; the site shows a finished match and its props for a day and a half
+LIVE_KEEP = dt.timedelta(hours=40)  # buffer past the site's 24 h keep so a late pull still has the closing line
 TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
 
 
@@ -90,14 +90,44 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
     """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
     the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
     and has no rows of a kind in this pull keeps the previous pull's rows of that kind: the last pre-match prices. Upcoming matches are never
-    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one)."""
+    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one).
+
+    A Test is one match: books restamp ``start_utc`` each morning, so rows of the same pair within ``TEST_KEEP`` keep the earliest start
+    (the first morning) and merge by player / stat / inn / line. A first-innings line is not dropped when a later day's pull only has the match total.
+    """
     if not prev:
         return book
-    test_matches = {(x.get("match"), x.get("start_utc")) for x in prev.get("lines", []) if x.get("fmt") == "Test"}
+    kinds = ("events", "lines", "fancy")
+
+    def rows_of(src: dict) -> list:
+        return [x for kind in kinds for x in src.get(kind) or []]
+
+    test_names = {x.get("match") for x in rows_of(prev) + rows_of(book) if x.get("fmt") == "Test"}
+    stamp = {}
+    for m in test_names:
+        best = None
+        for x in rows_of(prev) + rows_of(book):
+            if x.get("match") != m:
+                continue
+            st = parse_ts(x.get("start_utc"))
+            if st and (best is None or st < best[0]):
+                best = (st, x.get("start_utc"))
+        if best:
+            stamp[m] = best[1]
+
+    def restamp(row: dict) -> dict:
+        row = dict(row)
+        m = row.get("match")
+        if m in stamp and stamp[m]:
+            row["start_utc"] = stamp[m]
+        return row
+
+    def is_test(row: dict) -> bool:
+        return row.get("fmt") == "Test" or row.get("match") in test_names
 
     def alive(row: dict) -> bool:
         st = parse_ts(row.get("start_utc"))
-        keep = TEST_KEEP if (row.get("match"), row.get("start_utc")) in test_matches else LIVE_KEEP
+        keep = TEST_KEEP if is_test(row) else LIVE_KEEP
         return bool(st) and st <= now < st + keep
 
     def order(x: dict):
@@ -105,10 +135,23 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
         return (x.get("start_utc") or "", x.get("match") or "", x.get("player") or "", x.get("stat") or x.get("key") or "", x.get("team") or "", x.get("inn", 0),
                 line if isinstance(line, (int, float)) else 0.0)
 
+    def line_key(x: dict):
+        return (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0), x.get("line"))
+
     out = dict(book)
-    for kind in ("events", "lines", "fancy"):
-        have = {(x.get("match"), x.get("start_utc")) for x in book.get(kind, [])}
-        old = [x for x in prev.get(kind, []) if (x.get("match"), x.get("start_utc")) not in have and alive(x)]
-        if old:
-            out[kind] = sorted([*book.get(kind, []), *old], key=order)
+    for kind in kinds:
+        new_rows = [restamp(x) for x in book.get(kind) or []]
+        if kind == "lines":
+            have = {line_key(x) if is_test(x) else (x.get("match"), x.get("start_utc")) for x in new_rows}
+        else:
+            have = {x.get("match") if is_test(x) else (x.get("match"), x.get("start_utc")) for x in new_rows}
+        old = []
+        for x in prev.get(kind) or []:
+            y = restamp(x)
+            if not alive(y):
+                continue
+            k = (line_key(y) if is_test(y) else (y.get("match"), y.get("start_utc"))) if kind == "lines" else (y.get("match") if is_test(y) else (y.get("match"), y.get("start_utc")))
+            if k not in have:
+                old.append(y)
+        out[kind] = sorted([*new_rows, *old], key=order)
     return public(out)

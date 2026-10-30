@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { bookFixtures, fixtureInBooks, liveForFixture } from "@/engine/live.js";
-import { archiveFixture, fixtureBooks, teamKey, withArchive } from "@/engine/lines.js";
+import { archiveFixture, fixtureBooks, keepMsFor, teamKey, withArchive } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { useData } from "@/lib/data";
 import { loadArchive } from "@/lib/feeds";
@@ -52,17 +52,20 @@ export const upcomingOnly = (fx: any[], now = Date.now()) => fx.filter((f) => st
 
 /** A fixture's state: the live feed's word for it when it has one, else what the schedule file says (a match that has dropped off the source's page is stored as Completed). */
 /** A multi-day match the schedule calls "Completed" at the close of a day, with no result yet, is still on: a finished Test has its result ("won by", "drawn") in the row. */
-const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, 6 * 24 * 3600e3, now);
+const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, keepMsFor(f.fmt), now);
 export const fixtureState = (f: any, live?: string, now = Date.now()): "live" | "final" | "upcoming" => (live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : "upcoming");
+
+/** Display-only extra: on a quiet day, finished limited-overs matches stay up to 4 days so the rail is not bare. Priced keep is `keepMsFor` (24 h / 6 days). */
+const QUIET_FILL_MS = 96 * 3600e3;
 
 /**
  * What the home list keeps. Upcoming matches, matches in the first 12 hours (a delay can be long) and matches being played (up to 6 days, for a Test) that the books price; and finished matches,
- * priced or not: for 24 hours from the start, and while fewer than 3 matches are lined up, up to 4 days, so the page never goes bare.
+ * priced or not: 24 hours from the start (6 days for a Test), and while fewer than 3 matches are lined up, up to 4 days, so the page never goes bare.
  */
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
-  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, 6 * 24 * 3600e3, now))) && inBooks(f));
-  const window = active.length >= 3 ? 24 * 3600e3 : 96 * 3600e3;
-  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, f.fmt === "Test" ? Math.max(window, 96 * 3600e3) : window, now)); // a Test ends days after it began: its day and a half starts at the end, so it keeps 4 days from the start
+  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
+  const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
+  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 

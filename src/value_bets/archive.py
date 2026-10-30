@@ -49,8 +49,8 @@ SAME_SIDE = {"aucklandaces": "auckland", "canterburykings": "canterbury", "welli
 
 
 def team_key(n: str) -> str:
-    """The site's ``teamKey``: case, "(W)" / "Women" and punctuation ignored, and a side the books and the schedule name differently is one key (``SAME_SIDE`` in site/src/engine/util.js)."""
-    k = re.sub(r"[^a-z0-9]", "", re.sub(r"\(w\)|women'?s?", "", str(n or "").lower()))
+    """The site's ``teamKey``: case, "(W)" / "Women" / a trailing W, and punctuation ignored, and a side the books and the schedule name differently is one key (``SAME_SIDE`` in site/src/engine/util.js)."""
+    k = re.sub(r"[^a-z0-9]", "", re.sub(r"\(w\)|women'?s?|\sw$", "", str(n or "").lower()))
     return SAME_SIDE.get(k, k)
 
 

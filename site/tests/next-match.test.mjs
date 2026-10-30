@@ -60,14 +60,15 @@ test("pickPricedMatch keeps a just-finished T20 (5 h after the start) and prefer
   assert.equal(pickPricedMatch({ lines: [done] }, "ck", "ODI", now), null);
 });
 
-test("matchPhase: the live feed's word wins; otherwise the first 5 h after a T20 start are still in play", () => {
+test("matchPhase: the live feed's word wins; otherwise the keep window after a T20 start is still in play", () => {
   const start = "2026-10-30T08:10:00Z";
   const now = Date.parse("2026-10-30T13:00:00Z"); // 4 h 50 min after the start
   assert.equal(matchPhase(start, Date.parse("2026-10-30T07:00:00Z"), undefined, "T20"), "upcoming");
   assert.equal(matchPhase(start, now, "live", "T20"), "live");
   assert.equal(matchPhase(start, now, "final", "T20"), "final");
-  assert.equal(matchPhase(start, now, undefined, "T20"), "live", "no feed yet, still inside 5 h");
-  assert.equal(matchPhase(start, Date.parse("2026-10-30T14:00:00Z"), undefined, "T20"), "final", "past 5 h with no feed: finished");
+  assert.equal(matchPhase(start, now, undefined, "T20"), "live", "no feed yet, still inside 24 h");
+  assert.equal(matchPhase(start, Date.parse("2026-10-30T14:00:00Z"), undefined, "T20"), "live", "5 h 50 min is still inside 24 h");
+  assert.equal(matchPhase(start, Date.parse("2026-10-31T09:10:00Z"), undefined, "T20"), "final", "past 24 h with no feed: finished");
 });
 
 test("nextMatchRates: every miss is 0% with no fair over price; a 100% under is fair 1.00", () => {

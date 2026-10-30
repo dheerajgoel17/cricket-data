@@ -57,7 +57,7 @@ describe("shownFixtures", () => {
     const mix = [done("Fin", "2026-10-27T07:00Z"), up("priced", "2026-10-27T15:00Z"), up("unpriced", "2026-10-27T16:00Z")];
     expect(ids(shownFixtures(mix, state, (x) => x.a !== "unpriced" && x.a !== "Fin", now))).toEqual(["priced", "Fin"].sort((p, q) => (p === "Fin" ? -1 : 1) - (q === "Fin" ? -1 : 1)));
   });
-  it("keeps a finished Test for 4 days from its start, since it ends days after it began", () => {
+  it("keeps a finished Test for 6 days from its start, since it ends days after it began", () => {
     const now = at("2026-10-29T09:00:00Z"); // 2 days and a bit after the start
     const lined = [f("2026-10-29T10:00Z", { a: "m1" }), f("2026-10-29T11:00Z", { a: "m2" }), f("2026-10-29T14:00Z", { a: "m3" })];
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "SAvAus", fmt: "Test", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["SAvAus", "m1", "m2", "m3"]);
@@ -69,7 +69,7 @@ describe("shownFixtures", () => {
   });
   it("keeps a match being played for as long as it runs (a Test) and drops an old unscored one", () => {
     const now = at("2026-10-29T09:00:00Z");
-    expect(shownFixtures([f("2026-10-27T04:00Z", { a: "Test", live: "live" })], state, () => true, now)).toHaveLength(1);
+    expect(shownFixtures([f("2026-10-27T04:00Z", { a: "Test", fmt: "Test", live: "live" })], state, () => true, now)).toHaveLength(1);
     expect(shownFixtures([f("2026-10-27T04:00Z", { a: "Gone" })], state, () => true, now)).toHaveLength(0);
   });
 });

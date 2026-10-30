@@ -196,9 +196,9 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     else if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = teamKey(x) === teamKey(lastGame.opp) ? y : x; }
     if (priced) {
       match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
-      row = fx.find((f: any) => sameFixture({ match, start_utc: start }, f));
+      row = fx.find((f: any) => sameFixture({ match, start_utc: start, fmt }, f));
       const [h, w] = String(match).split(/\s+vs\s+/i);
-      phase = matchPhase(start, now, liveForFixture(live.data, { a: h, b: w, start })?.status, fmt);
+      phase = matchPhase(start, now, liveForFixture(live.data, { a: h, b: w, start, fmt })?.status, fmt);
     } else {
       const women = store.P.g[idx] === 1;
       row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (teamKey(f.a) === teamKey(lastSide || team) || teamKey(f.b) === teamKey(lastSide || team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
@@ -262,9 +262,11 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
   ].filter((s) => s.n > 0);
 
   const [ha, hb] = String(next?.match || "").split(/\s+vs\s+/i);
-  const liveMatch = next ? liveForFixture(live.data, { a: next.team || ha, b: next.opp || hb, start: next.start }) : null;
-  const asLine = book ? { pid, player: name, team: book.team, stat, line, inn: book.inn } : null;
-  const standing = book && next?.priced && asLine ? lineStanding(liveMatch, asLine, identity) : null;
+  const liveMatch = next ? liveForFixture(live.data, { a: next.team || ha, b: next.opp || hb, start: next.start, fmt }) : null;
+  const asLine = book ? { pid, player: name, book_name: book.book_name, team: book.team, stat, line, inn: book.inn } : null;
+  const lastE = entries[entries.length - 1];
+  const settled = lastE && next && teamKey(lastE.opp) === teamKey(next.opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(next.start).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
+  const standing = book && next?.priced && asLine ? lineStanding(liveMatch, asLine, identity, { stored: book.result, settled }) : null;
   const out = !!(book && next?.priced && asLine && lineNotIn(liveMatch, asLine, identity));
 
   return (

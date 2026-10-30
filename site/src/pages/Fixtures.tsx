@@ -12,7 +12,7 @@ import { STATS } from "@/engine/rules.js";
 import { FORMATS } from "@/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { liveBlurb, teamScore } from "@/engine/live.js";
+import { clockLiveMs, liveBlurb, teamScore } from "@/engine/live.js";
 import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
@@ -43,11 +43,11 @@ const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
 
 /** Where the match is in time: label (Upcoming / Live / Completed) and the ticking value, from the shared 1 s clock. */
-function useMatchClock(when: Date, timed: boolean) {
+function useMatchClock(when: Date, timed: boolean, fmt?: string) {
   const now = useNow(1000), ms = when.getTime() - now;
   if (!timed) return { label: "Upcoming", value: "Time TBC", tone: "" };
   if (ms > 0) return { label: "Upcoming", value: formatCountdown(ms), tone: "" };
-  if (ms > -4 * 3600e3) return { label: "Live", value: formatElapsed(-ms), tone: "live" };
+  if (ms > -clockLiveMs(fmt)) return { label: "Live", value: formatElapsed(-ms), tone: "live" };
   return { label: "Completed", value: "", tone: "" };
 }
 
@@ -55,7 +55,7 @@ function useMatchClock(when: Date, timed: boolean) {
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
-  const clock = useMatchClock(when, timed);
+  const clock = useMatchClock(when, timed, f.fmt);
   const { match } = useLiveMatch(f);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
@@ -166,7 +166,7 @@ export function FixturePage() {
           <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
-          {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} archive={archived ? doc : undefined} />}
+          {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} fmt={fx.fmt} archive={archived ? doc : undefined} />}
           {tab === "grid" && (
             <>
               <FilterBar {...{ stat, line, games, setQ }} />

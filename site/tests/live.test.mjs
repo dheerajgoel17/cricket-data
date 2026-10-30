@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, formatOf, buildMatch, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
 import { identityIndex } from "../src/engine/identity.js";
@@ -168,7 +168,7 @@ test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not 
   assert.equal(wantsCard(row("upcoming", "2026-10-27T06:30:00Z"), now), true);
   assert.equal(wantsCard(row("upcoming", "2026-10-27T09:00:00Z"), now), false);
   assert.equal(wantsCard(row("upcoming", "2026-10-26T07:00:00Z"), now), false); // long gone, never scored
-  assert.equal(wantsCard(row("final", "2026-10-27T05:00:00Z"), now), true, "a finished match keeps its scorecard for a day and a half");
+  assert.equal(wantsCard(row("final", "2026-10-27T05:00:00Z"), now), true, "a finished match keeps its scorecard for 24 hours");
   assert.equal(wantsCard(row("final", "2026-10-25T05:00:00Z"), now), false);
 });
 
@@ -584,7 +584,7 @@ test("unlistedRows: a priced match that began and is not on the schedule page co
     { match: "India vs New Zealand", start_utc: "2026-10-27T07:00:00Z" }, { match: "Namibia vs Ireland", start_utc: "2026-10-27T07:30:00Z" }, { match: "South Africa vs Australia", start_utc: "2026-10-24T08:30:00Z" }] });
   const listed = [{ id: "n", start: "2026-10-27T07:00:00.000Z", teams: [{ name: "New Zealand" }, { name: "India" }] }];
   const rows = unlistedRows(listed, books, sched, "https://src.test", now);
-  assert.deepEqual(rows.map((r) => r.id), ["pak-vs-sl-5th-odi"], "NZ v India is listed; Afghanistan v Zimbabwe has not begun; no schedule row for Namibia; the old one is past 40 hours");
+  assert.deepEqual(rows.map((r) => r.id), ["pak-vs-sl-5th-odi"], "NZ v India is listed; Afghanistan v Zimbabwe has not begun; no schedule row for Namibia; the old one has no schedule row");
   const [r] = rows;
   assert.deepEqual([r.status, r.fmt, r.start, r.url], ["live", "ODI", "2026-10-27T08:00:00.000Z", "https://src.test/cricket-live-score/pak-vs-sl-5th-odi"]);
   assert.deepEqual(r.teams.map((t) => t.name), ["Pakistan", "Sri Lanka"]);
@@ -802,6 +802,20 @@ test("unlistedRows keeps a Test through the day break, and pricedLive matches a 
   const t20 = { ...listed, fmt: "T20" };
   assert.equal(pricedLive([t20], day4).length, 0, "a T20 three days off is a different match");
   assert.equal(wantsCard({ status: "final", fmt: "Test", start: "2026-10-27T08:30:00Z" }, now), true, "a finished Test keeps its scorecard through the 6-day window");
+  const liveMatch = { ...fromDay1[0], fmt: "Test", start: "2026-10-27T08:30:00.000Z", teams: [{ name: "South Africa" }, { name: "Australia" }] };
+  assert.equal(liveForFixture({ matches: [liveMatch] }, { a: "South Africa", b: "Australia", start: "2026-10-30T08:30:00Z" })?.id, "aus-vs-sa-3rd-test", "a day-4 book start still finds the Test when the fixture has no fmt");
+  assert.equal(clockLiveMs("Test"), TEST_WINDOW_MS);
+  assert.equal(clockLiveMs("T20"), 4 * 3600e3);
+  assert.equal(keepGapRow({ status: "live" }, null), true, "a live Test that dropped off the schedule stays even if its page was not read");
+  assert.equal(keepGapRow({ status: "final" }, null), false);
+  assert.equal(keepGapRow({ status: "final" }, { status: "final" }), true);
+  const finals = Array.from({ length: 20 }, (_, i) => ({ id: `f${i}`, status: "final", url: `/f${i}`, start: "2026-10-29T08:00:00Z", fmt: "T20" }));
+  const gapLive = { id: "sa-aus", status: "live", url: "/sa-aus", start: "2026-10-27T08:30:00Z", fmt: "Test" };
+  const fetched = cardFetchList([gapLive, ...finals], 12, now);
+  assert.equal(fetched[0].id, "sa-aus");
+  assert.equal(fetched.filter((m) => m.status === "live").length, 1);
+  const manyLive = Array.from({ length: 15 }, (_, i) => ({ id: `l${i}`, status: "live", url: `/l${i}`, start: "2026-10-30T08:00:00Z", fmt: "T20" }));
+  assert.equal(cardFetchList([...finals, ...manyLive], 12, now).length, 15, "every live match is fetched, even past the finished-match cap");
 });
 
 // --- a Test's first- and second-innings lines: read off the innings of the player's own side, not the match total ---
@@ -848,6 +862,23 @@ test("settleLines: an innings that has not happened, or that he did not bat in, 
   assert.deepEqual(settleLines(m, [L(2, "tz", "Tanzid Hasan", "Bangladesh"), L(1, "bw", "Kraigg Brathwaite", "West Indies"), L(1, "ld", "Litton Das", "Bangladesh")], TEST_IDN), [],
     "Bangladesh have batted once; West Indies not at all; Litton Das is yet to bat (his bet is void if he never does)");
   assert.deepEqual(settleLines(testMatch([]), [L(1, "tz", "Tanzid Hasan", "Bangladesh")], TEST_IDN), [], "no card at all");
+});
+
+test("settleLines: the identity table finds a player the books name differently (Knott-style id link)", () => {
+  const idn = identityIndex({ v: 1, s: { d7ff1adc: "37H" } });
+  const m = { status: "live", fmt: "T20", start: "2026-10-30T08:10:00.000Z", teams: [{ name: "Brisbane Heat Women" }, { name: "Sydney Sixers Women" }],
+    players: [{ id: "37H", name: "Charli Knott", team: "Brisbane Heat Women", runs: 22, balls: 18, fours: 3, sixes: 0, out: false }] };
+  const line = { pid: "d7ff1adc", player: "V Knott", book_name: "CR Knott", team: "Brisbane Heat Women", fmt: "T20", stat: "runs", line: 19.5,
+    match: "Brisbane Heat Women vs Sydney Sixers Women", start_utc: "2026-10-30T08:10:00Z" };
+  assert.deepEqual(settleLines(m, [line]).map((x) => x.pid), [], "no table: the printed name is not the card's");
+  assert.deepEqual(settleLines(m, [line], idn).map((x) => [x.pid, x.value, x.verdict]), [["d7ff1adc", 22, "cleared"]]);
+});
+
+test("liveStat points: runs + 20 wickets + 10 catches + 25 stumpings; missing fielding is not 0", () => {
+  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1 }, "points"), null);
+  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 0, stumpings: 0 }, "points"), 33);
+  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 2, stumpings: 1 }, "points"), 78);
+  assert.equal(liveStat({ name: "P", catches: 1, stumpings: 0 }, "points"), null, "no batting or bowling row is not 0 points");
 });
 
 test("lineStanding: a server entry is found by the innings of its line, so a first-innings number is never read as the match total's", () => {

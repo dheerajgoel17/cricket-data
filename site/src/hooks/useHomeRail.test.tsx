@@ -47,7 +47,7 @@ describe("keepFinished", () => {
   it("keeps a finished T20 for 24 hours, newest first", () => {
     expect(keepFinished([at(-20), at(-2), at(-16)], NOW).map((f) => f.a)).toEqual(["m-2", "m-16", "m-20"]);
   });
-  it("drops a T20 after 24 hours, and keeps a Test for 4 days", () => {
+  it("drops a T20 after 24 hours, and keeps a Test for 6 days", () => {
     expect(FINISHED_KEEP_MS).toBe(24 * 3600e3);
     expect(keepFinished([at(-20), at(-25), at(-2)], NOW).map((f) => f.a)).toEqual(["m-2", "m-20"]);
     expect(keepFinished([at(-48, { a: "Test", fmt: "Test" }), at(-25)], NOW).map((f) => f.a)).toEqual(["Test"]);

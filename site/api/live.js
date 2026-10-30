@@ -1,13 +1,13 @@
 // GET /api/live -> {asOf, source, matches[]} (wrapped with DATA_WRAP_KEY when set). Source A only, cached ~15 s.
 // The schedule page lists live and upcoming games with their match URLs and scores (Source A caches it ~5 min); only matches the books price are kept.
-// A finished match drops off that page soon after the end; a priced one that began in the last 40 h (6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
+// A finished match drops off that page soon after the end; a priced one that began in the keep window (24 h, 6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
 // and the match-scorecard page (getSC4) adds every innings. All three are HTML pages ($LIVE_SOURCE_BASE robots Allow); we never hit $LIVE_SOURCE_BASE/api.
 // Each match also carries `lines`: where every line the books priced for it stands (value, state, Cleared / Missed / Push, Not in XI), settled here with the identity table
 // so the browser does no matching of its own. While a match is on that is "so far"; a "final" state in a finished match is its result (the archive job stores those).
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { bookFixtures, buildMatch, cardPageUrl, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows, wantsCard } from "../src/engine/live.js";
+import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "../src/engine/live.js";
 import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
 import { wire } from "../src/engine/wrap.js";
 
@@ -75,8 +75,7 @@ async function snapshot() {
     const gaps = unlistedRows(listed, books, parseFixtureCsv(ours), base());
     const rows = [...listed, ...gaps];
     const pages = new Map();
-    const rank = { live: 0, upcoming: 1, final: 2 }; // the cap goes to matches in play first, finished ones last
-    await Promise.allSettled(rows.filter((m) => m.url && wantsCard(m)).sort((a, b) => rank[a.status] - rank[b.status]).slice(0, MAX_CARDS).map(async (m) => {
+    await Promise.allSettled(cardFetchList(rows, MAX_CARDS).map(async (m) => {
       const kept = finals.get(m.url);
       if (kept && Date.now() - kept.t < FINAL_TTL_MS) return void pages.set(m, kept.pages);
       const [live, card] = await Promise.all([getHtml(m.url).catch(() => ""), getHtml(cardPageUrl(m.url)).catch(() => "")]);
@@ -84,9 +83,9 @@ async function snapshot() {
       pages.set(m, got);
       if (got.live && (got.live.status === "final" || m.status === "final")) finals.set(m.url, { t: Date.now(), pages: got });
     }));
-    // the public body names no source: match URLs stay on the server. A match the schedule no longer lists is kept only if its own page was read.
+    // the public body names no source: match URLs stay on the server. A match the schedule no longer lists is kept when its own page was read, or while it is still live.
     // and each match carries where its priced lines stand (the books' player lines, settled with the identity table)
-    const matches = rows.filter((m) => !gaps.includes(m) || pages.get(m)?.live).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) }; });
+    const matches = rows.filter((m) => !gaps.includes(m) || keepGapRow(m, pages.get(m)?.live)).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) }; });
     const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, linked: idn.size, matches };
     memo = { t: Date.now(), body };
     return body;

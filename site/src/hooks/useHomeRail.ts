@@ -4,6 +4,7 @@ import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useRail } from "@/hooks/useRail";
 import { liveForFixture } from "@/engine/live.js";
+import { keepMsFor } from "@/engine/lines.js";
 import { arrangeFixtures, homeTeam, rankFixtures } from "@/lib/priority";
 
 /** How long the rail waits for its published settings and for the first live scores before it paints with what it has (the viewer sees the skeleton meanwhile). */
@@ -28,15 +29,14 @@ function useGaveUp(ms: number, done: boolean): boolean {
  */
 /** How many games without props the rail adds after the ones with props. */
 const NO_PROPS_LIMIT = 24;
-/** A limited-overs Final stays on the rail this long after it started (a Test keeps 4 days). */
+/** A limited-overs Final stays on the rail this long after it started (a Test keeps 6 days). */
 export const FINISHED_KEEP_MS = 24 * 3600e3;
 
 /**
- * Finished matches the rail still shows: 24 hours from the start (4 days for a Test). Newest first.
+ * Finished matches the rail still shows: 24 hours from the start (6 days for a Test). Newest first.
  */
 export function keepFinished(finished: any[], now = Date.now()): any[] {
-  const ms = (f: any) => (f.fmt === "Test" || f.fmt === "FC" ? 96 * 3600e3 : FINISHED_KEEP_MS);
-  return finished.filter((f) => Date.parse(f.start) > now - ms(f)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+  return finished.filter((f) => Date.parse(f.start) > now - keepMsFor(f.fmt)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
 }
 
 export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -26,6 +26,11 @@ test("main line is the one priced closest to evens", () => {
   assert.equal(r.main.line, 17.5);
   assert.deepEqual(r.lines.map((x) => x.line), [12.5, 17.5, 22.5]);
   assert.equal(r.match, "India vs NZ");
+  assert.equal(r.result, null);
+  assert.equal(r.book_name, "");
+  const stored = bookLinesFor({ lines: [L(17.5, 1.85, 1.95, { result: 21, book_name: "C Knott" })] }, "ab12", "runs", "T20", NOW);
+  assert.equal(stored.result, 21);
+  assert.equal(stored.book_name, "C Knott");
 });
 
 test("a tie in how close to evens goes to the lower line", () => {
@@ -73,6 +78,11 @@ test("the nearest upcoming match wins; a match that started long ago is ignored"
 test("keepMsFor is 24 hours, 6 days for a Test; the player page's window still has a match that started a few hours ago", () => {
   assert.equal(keepMsFor("T20"), BOOK_KEEP_MS);
   assert.equal(keepMsFor("Test"), TEST_KEEP_MS);
+  assert.equal(keepMsFor("FC"), TEST_KEEP_MS);
+  assert.equal(sameMatchWindow("T20"), BOOK_WINDOW_MS);
+  assert.equal(sameMatchWindow("Test"), TEST_KEEP_MS);
+  assert.equal(sameMatchWindowFor("T20", "Test"), TEST_KEEP_MS, "either side a Test is the 6-day window");
+  assert.equal(sameMatchWindowFor("", "T20"), BOOK_WINDOW_MS);
   assert.equal(BOOK_KEEP_MS, 24 * 3600e3);
   assert.equal(TEST_KEEP_MS, 6 * 24 * 3600e3);
   const started = L(17.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" }); // 5 h before NOW: the 3-hour default lets it go
@@ -306,6 +316,9 @@ test("a Test is the same match on any of its days (books price it day by day), a
   const test = { a: "Bangladesh", b: "West Indies", start: "2026-10-28T03:30Z", fmt: "Test" };
   assert.equal(sameFixture(line, test), true);
   assert.equal(sameFixture(line, { ...test, fmt: "T20" }), false);
+  assert.equal(sameFixture({ ...line, fmt: "Test" }, { a: "Bangladesh", b: "West Indies", start: "2026-10-28T03:30Z" }), true, "the line's fmt is enough when the fixture page did not pass one");
+  assert.equal(sameFixture({ match: "South Africa vs Australia", start_utc: "2026-10-30T08:30:00Z", fmt: "Test" }, { a: "South Africa", b: "Australia", start: "2026-10-27T08:30Z" }), true, "day-4 book start, day-1 fixture, fmt on the line");
+  assert.equal(sameFixture({ match: "South Africa vs Australia", start_utc: "2026-10-30T08:30:00Z" }, { a: "South Africa", b: "Australia", start: "2026-10-27T08:30Z", fmt: "Test" }), true, "fmt on the fixture is enough");
   assert.equal(sameFixture({ ...line, start_utc: "2026-11-10T03:30:00Z" }, test), false, "a different match of the series, a week or more later");
   assert.equal(fancyFor({ fancy: [{ key: "match_fours", scope: "match", home: "Bangladesh", away: "West Indies", start_utc: "2026-10-29T03:30:00Z", line: 20.5, over: 1.9, under: 1.9, source: "x" }] }, { a: "Bangladesh", b: "West Indies", fmt: "Test", startMs: Date.parse("2026-10-28T03:30:00Z") }, "match_fours").length, 1);
 });

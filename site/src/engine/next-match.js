@@ -17,15 +17,15 @@ export function pickPricedMatch(doc, pid, fmt, now = Date.now()) {
 }
 
 /**
- * upcoming / live / final for the player-page match card. The live feed's word wins; with none, the first hours after
- * the start (5 h T20, 6 days Test) still count as in play, then it is treated as finished.
+ * upcoming / live / final for the player-page match card. The live feed's word wins; with none, the keep window
+ * (24 h T20, 6 days Test) still counts as in play, then it is treated as finished.
  */
 export function matchPhase(startUtc, now, status, fmt) {
   const startMs = Date.parse(startUtc);
   if (status === "live") return "live";
   if (status === "final") return "final";
   if (!(startMs <= now)) return "upcoming";
-  return now - startMs < (fmt === "Test" ? 6 * 24 * 3600e3 : 5 * 3600e3) ? "live" : "final";
+  return now - startMs < keepMsFor(fmt) ? "live" : "final";
 }
 
 /** The games on the chart that were at this ground (the first comma-part of the name: "Allan Border Field, Brisbane" = "Allan Border Field"). */

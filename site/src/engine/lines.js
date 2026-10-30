@@ -8,7 +8,13 @@ export const bookName = (src) => BOOK_NAMES[src] || src;
 /** How long the player page and Hot props keep a limited-overs match after it starts (24 hours). A Test stays 6 days so a match in play is not dropped. */
 export const BOOK_KEEP_MS = 24 * 3600e3;
 export const TEST_KEEP_MS = 6 * 24 * 3600e3;
-export const keepMsFor = (fmt) => (fmt === "Test" ? TEST_KEEP_MS : BOOK_KEEP_MS);
+export const keepMsFor = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS : BOOK_KEEP_MS);
+
+/** How far a book's start may be from a fixture's or the live feed's: 14 h, but a Test is priced day by day so any day of it is the same match. */
+export const BOOK_WINDOW_MS = 14 * 3600e3;
+export const sameMatchWindow = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS : BOOK_WINDOW_MS);
+/** The 6-day Test window if either side is a Test / FC; otherwise the limited-overs 14 h window. */
+export const sameMatchWindowFor = (...fmts) => sameMatchWindow(fmts.some((f) => f === "Test" || f === "FC") ? "Test" : fmts.find(Boolean) || "");
 
 /** The market's no-vig probability of the over, from one book's two prices (null if either is missing). */
 export function overProb(over, under) {
@@ -72,7 +78,7 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
   const ref = here[0];
   const scored = mine.filter((l) => l.prob != null), withOver = mine.filter((l) => l.books.some((b) => b.over > 1)); // a line is "the" line by its over: an under-only line (an exchange's No) is never the main one while an over is priced
   const main = (scored.length ? scored : withOver.length ? withOver : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
-  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, team: ref.team, inn, lines: mine, main }; // `team`: the side the book files him under for this match (his profile team can be his country)
+  return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, team: ref.team, inn, result: ref.result ?? null, book_name: ref.book_name || "", lines: mine, main }; // `team`: the side the book files him under; `book_name`: the spelling the books print; `result`: the archive file's stored number when this line has one
 }
 
 const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
@@ -126,9 +132,8 @@ export const teamKey = (n) => {
   return SAME_SIDE[k] || k;
 };
 
-const BOOK_WINDOW_MS = 14 * 3600e3;
 /** How far a book's start may be from a fixture's: 14 h, but a Test is priced day by day (each day's list carries that day's start), so any day of it is the same match. */
-export const bookWindow = (fixture) => (fixture?.fmt === "Test" ? 6 * 86400e3 : BOOK_WINDOW_MS);
+export const bookWindow = (fixture) => sameMatchWindow(fixture?.fmt);
 
 function startMs(fixture) {
   if (Number.isFinite(fixture?.startMs)) return fixture.startMs;
@@ -174,7 +179,7 @@ export function sameFixture(line, fixture, doc) {
   if (lf && ff && lf !== ff) return false;
   const t = startMs(fixture), u = line?.start_utc ? Date.parse(line.start_utc) : NaN;
   if (!Number.isFinite(t) || !Number.isFinite(u)) return true;
-  return Math.abs(t - u) < bookWindow(fixture);
+  return Math.abs(t - u) < sameMatchWindowFor(ff, lf);
 }
 
 /** Which bookmaker sections this fixture can show. `props` = two-sided player lines; `fancy` = match/team totals. */
@@ -232,7 +237,7 @@ export function archiveFixture(entry, teamIx, now = Date.now()) {
   const [pa, pb] = String(entry.match || "").split(/\s+vs\s+/i);
   const f = entry.fixture || { start: entry.start_utc, fmt: entry.lines?.[0]?.fmt || "", gender: /\(w\)|women/i.test(entry.match || "") ? "female" : "male", a: pa, b: pb, venue: "", series: entry.competition || "" };
   const age = now - Date.parse(f.start);
-  return { ...f, id: entry.id, a_ix: teamIx?.(f.a, f.gender) ?? -1, b_ix: teamIx?.(f.b, f.gender) ?? -1, status: age > (f.fmt === "Test" ? 6 * 86400e3 : 12 * 3600e3) ? "Completed" : "", result: "", source: "archive" };
+  return { ...f, id: entry.id, a_ix: teamIx?.(f.a, f.gender) ?? -1, b_ix: teamIx?.(f.b, f.gender) ?? -1, status: age > keepMsFor(f.fmt) ? "Completed" : "", result: "", source: "archive" };
 }
 
 /**
