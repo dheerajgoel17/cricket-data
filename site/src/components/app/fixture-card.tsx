@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
+import { clockLiveMs, liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { fixtureState } from "@/hooks/useEngine";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
@@ -47,7 +47,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const now = useNow(30000);
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const { match } = useLiveMatch(f);
-  const clockLive = timed && ms <= 0 && ms > -4 * 3600e3;
+  const clockLive = timed && ms <= 0 && ms > -clockLiveMs(f.fmt);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const hasScore = scores.some((s) => s?.display);
   const final = match?.status === "final" || (!match && fixtureState(f) === "final");
@@ -76,7 +76,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
                   <TeamBadge name={t} size="md" eager />
                   <span className={cn("truncate text-body font-semibold", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
                 </div>
-                {hasScore ? <LiveScore s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
+                {hasScore || live ? <LiveScore s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
                     {timed && <span className="text-callout font-semibold tabular-nums">{localTime(when)}</span>}

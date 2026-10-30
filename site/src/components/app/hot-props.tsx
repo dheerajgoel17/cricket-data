@@ -20,7 +20,7 @@ import { barState, windowRate } from "@/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
-import { byShard, dayOffset, hotLines, hotOrder, norm, pool, sameMatch } from "@/lib/hot-lines";
+import { byShard, hotDay, hotLines, hotOrder, matchChipId, norm, pool, sameMatch } from "@/lib/hot-lines";
 import { odds } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -84,13 +84,13 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         const l5 = windowRate(entries, 5, main.line), l10 = windowRate(entries, 10, main.line);
         const season = windowRate(entries.filter((e) => String(e.date).startsWith(year)), 0, main.line);
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
-        const venue = String((fixtures.data || []).find((f: any) => sameFixture({ match: b.match }, f) && Math.abs(Date.parse(f.start) - Date.parse(b.start_utc)) < 14 * 3600e3)?.venue || "");
+        const venue = String((fixtures.data || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f))?.venue || "");
         const ven = windowRate(venue ? entries.filter((e) => venueStem(e.venueName) === venueStem(venue)) : [], 0, main.line); // his games at the match's ground (the data spells a ground several ways)
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: dayOffset(b.start_utc), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -245,10 +245,10 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
 }
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, start, archive, heading }: { teams?: [string, string]; start?: string; archive?: any; heading?: string } = {}) {
+export function HotProps({ teams, start, fmt, archive, heading }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string } = {}) {
   const [day, setDay] = useState("0");
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
-  const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start }, { a: teams![0], b: teams![1], start }); // this match: the same two sides and the same start, not the series' next game
+  const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: teams![0], b: teams![1], start, fmt }); // this match: the same two sides, a Test on any of its days, not the series' next game
   const live = useLiveDoc();
   // a match stays 24 hours after the start (6 days for a Test), and while the live feed still lists it as being played
   const onFixture = !!teams;
@@ -256,12 +256,12 @@ export function HotProps({ teams, start, archive, heading }: { teams?: [string, 
     if (onFixture) return true; // a fixture's own page shows every line it has, whatever the match's age: props are never taken away
     if (Date.parse(r.start) > Date.now() - keepMsFor(r.fmt)) return true;
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return liveForFixture(live.data, { a, b, start: r.start })?.status === "live";
+    return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt })?.status === "live";
   }), [all, live.data, onFixture]);
   const { identity } = useData();
   // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`
   // shows those first and reads the card itself only as the fallback.
-  const matchOf = (r: Row) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start }); };
+  const matchOf = (r: Row) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt }); };
   const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: Row): SoFar | null => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
@@ -273,10 +273,10 @@ export function HotProps({ teams, start, archive, heading }: { teams?: [string, 
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string }>();
     for (const r of data || []) {
-      const id = `${r.match}|${r.start}`;
-      if (m.has(id)) continue;
+      const id = matchChipId(r.match, r.start, r.fmt);
       const [a, b] = String(r.match).split(/\s+vs\s+/i);
-      m.set(id, { id, a: a || r.team, b: b || r.opp, start: r.start });
+      const prev = m.get(id);
+      if (!prev || Date.parse(r.start) < Date.parse(prev.start)) m.set(id, { id, a: a || r.team, b: b || r.opp, start: r.start });
     }
     return [...m.values()];
   }, [data]);
@@ -288,8 +288,8 @@ export function HotProps({ teams, start, archive, heading }: { teams?: [string, 
   const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
-  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day) && (pick === "all" || `${r.match}|${r.start}` === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, live.data, pick]);
+  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, fmt, live.data, pick]);
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet

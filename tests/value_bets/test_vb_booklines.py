@@ -152,6 +152,18 @@ def test_a_multi_day_match_is_kept_across_days():
     assert carry_started(doc(), None, NOW) == doc()
 
 
+def test_a_test_is_one_match_when_the_books_restamp_the_start():
+    prev = doc(("SA vs Aus", "2026-10-27T08:30:00Z", "Test"))
+    prev["lines"] = [{**prev["lines"][0], "pid": "rk", "inn": 1, "line": 44.5}, {**prev["lines"][0], "pid": "rk"}]
+    new = doc(("SA vs Aus", "2026-10-30T08:30:00Z", "Test"))
+    new["lines"][0] = {**new["lines"][0], "pid": "rk"}
+    out = carry_started(new, prev, dt.datetime(2026, 10, 30, 10, 0, tzinfo=dt.timezone.utc))
+    assert {x["start_utc"] for x in out["lines"]} == {"2026-10-27T08:30:00Z"}
+    assert {x["start_utc"] for x in out["events"]} == {"2026-10-27T08:30:00Z"}
+    assert len(out["events"]) == 1
+    assert sorted(x.get("inn", 0) for x in out["lines"]) == [0, 1]
+
+
 def test_rows_carried_over_from_an_older_pull_are_published_under_the_book_name_too():
     prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "T20"))
     prev["lines"][0]["books"] = [{"source": "moviodds_bet365", "kind": "bookmaker", "over": 1.8, "under": 1.9}]

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Which book lines the Hot props score, and in what order the player files they need are fetched. Pure, so it is tested without the page.
 
+import { keepMsFor } from "@/engine/lines.js";
+
 export const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
 export const sameMatch = (match: string, [a, b]: [string, string]) => { const [x, y] = String(match).split(/\s+vs\s+/i); const s = new Set([norm(x), norm(y)]); return s.has(norm(a)) && s.has(norm(b)); };
 
@@ -12,7 +14,23 @@ export function dayOffset(iso: string, now = Date.now()): number {
   return n === 0 || n === 1 ? n : -1;
 }
 
-const AGE_MS = 40 * 3600e3; // a fixture page's match stays for 40 h after its start (the page itself keeps it as long as it is on)
+/**
+ * Which day's Hot props list a priced line belongs on. Today and tomorrow follow the viewer's calendar; a match that has already started and is still
+ * in the keep window (24 h, 6 days for a Test — books restamp a Test each morning) is today's, so day 4 of a Test is not dropped because its first start was Tuesday.
+ */
+export function hotDay(iso: string, fmt?: string, now = Date.now()): number {
+  const off = dayOffset(iso, now);
+  if (off === 0 || off === 1) return off;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) && t <= now && t > now - keepMsFor(fmt) ? 0 : -1;
+}
+
+/** One chip per match: a Test's day-by-day book starts share a chip; a limited-overs line keeps its own kick-off. */
+export function matchChipId(match: string, start: string, fmt?: string): string {
+  const [a, b] = String(match).split(/\s+vs\s+/i);
+  const pair = [norm(a), norm(b)].sort().join("|");
+  return fmt === "Test" || fmt === "FC" ? `${pair}|${fmt}` : `${pair}|${start}`;
+}
 
 export type HotScope =
   | { day: number }                                            // the home: the lines of one local day
@@ -24,8 +42,8 @@ export type HotScope =
  */
 export function hotLines(lines: any[], scope: HotScope, now = Date.now()): any[] {
   const priced = (l: any) => l.start_utc && l.books?.length;
-  if ("teams" in scope) return lines.filter((l) => priced(l) && sameMatch(l.match, scope.teams) && (scope.archive || Date.parse(l.start_utc) > now - AGE_MS));
-  return lines.filter((l) => priced(l) && dayOffset(l.start_utc, now) === scope.day);
+  if ("teams" in scope) return lines.filter((l) => priced(l) && sameMatch(l.match, scope.teams) && (scope.archive || Date.parse(l.start_utc) > now - keepMsFor(l.fmt)));
+  return lines.filter((l) => priced(l) && hotDay(l.start_utc, l.fmt, now) === scope.day);
 }
 
 /** What orders a Hot props row: whether its match is in play now, the hit rate over the window shown, the edge. */

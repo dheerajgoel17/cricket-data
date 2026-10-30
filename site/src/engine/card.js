@@ -1,7 +1,7 @@
 // The share card of a page (1200x630): what a link preview shows. `cardFields` picks the words and numbers from the data files (never from a model), `renderCard` draws them.
 // Used by api/og.js (the image) and api/share.js (the page a link preview reads). Plain ESM; the drawing library is loaded only when a card is drawn.
 import { STATS } from "./rules.js";
-import { bookFormatFor, bookLinesFor, bookName, overProb, teamKey } from "./lines.js";
+import { bookFormatFor, bookLinesFor, bookName, keepMsFor, overProb, teamKey } from "./lines.js";
 import { playerPhotos, teamLogos } from "../lib/photos.js";
 import { windowRate } from "./windows.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
@@ -55,9 +55,9 @@ export function propForm(rows, line, teamName) {
 /** The line the books hang for this player (soonest match, runs first) so a /share/player/<idx> URL is not an empty name card. */
 function listedLine(pid, doc) {
   for (const stat of LISTED_STATS) {
-    const fmt = bookFormatFor(doc, pid, stat);
+    const fmt = bookFormatFor(doc, pid, stat, undefined, keepMsFor("Test"));
     if (!fmt) continue;
-    const b = bookLinesFor(doc, pid, stat, fmt);
+    const b = bookLinesFor(doc, pid, stat, fmt, undefined, keepMsFor(fmt));
     if (b?.main && Number.isFinite(b.main.line)) return { stat, line: b.main.line };
   }
   return null;

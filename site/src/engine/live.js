@@ -1,17 +1,26 @@
 // Live score snapshots from Source A: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { NO_IDENTITY } from "./identity.js";
+import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, sameMatchWindow, sameMatchWindowFor } from "./lines.js";
 import { SAME_SIDE, norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
-const WINDOW_MS = 36 * 3600e3;
-export const BOOK_WINDOW_MS = 14 * 3600e3;
+export const BOOK_WINDOW_MS = LINE_BOOK_WINDOW;
 /** A Test is priced and played over several days; the books keep it for 6 days and so must the live feed. */
-export const TEST_WINDOW_MS = 6 * 86400e3;
-const LOOKBACK_MS = 40 * 3600e3; // a limited-overs match drops off the schedule page soon after it ends
+export const TEST_WINDOW_MS = TEST_KEEP_MS;
 
 export function matchWindow(fmt) {
-  return fmt === "Test" ? TEST_WINDOW_MS : BOOK_WINDOW_MS;
+  return sameMatchWindow(fmt);
+}
+
+/** How long the fixture header treats a started match as live on the clock: 4 hours, 6 days for a Test. */
+export function clockLiveMs(fmt) {
+  return fmt === "Test" || fmt === "FC" ? TEST_WINDOW_MS : 4 * 3600e3;
+}
+
+/** An unlisted match is kept when its own page was read, or while it is still being played so a failed page does not hide a Test. */
+export function keepGapRow(m, parsed) {
+  return !!(parsed || m?.status === "live");
 }
 
 /** Lunch, tea, stumps, close of play — a session break, not the end of the match. */
@@ -121,8 +130,16 @@ export function liveCard(match) {
 export function wantsCard(match, now = Date.now()) {
   if (match?.status === "live") return true;
   const t = match?.start ? Date.parse(match.start) : NaN;
-  if (match?.status === "final") return Number.isFinite(t) && now - t < (match.fmt === "Test" ? TEST_WINDOW_MS : WINDOW_MS); // a finished match keeps its scorecard: the props on it are decided by those numbers
+  if (match?.status === "final") return Number.isFinite(t) && now - t < keepMsFor(match.fmt); // a finished match keeps its scorecard: the props on it are decided by those numbers
   return match?.status === "upcoming" && Number.isFinite(t) && t - now < 90 * 60e3 && now - t < BOOK_WINDOW_MS;
+}
+
+/** Live matches always get a page fetch; finished/upcoming ones fill the remaining slots up to `max`. */
+export function cardFetchList(rows, max = 12, now = Date.now()) {
+  const rank = { live: 0, upcoming: 1, final: 2 };
+  const need = (rows || []).filter((m) => m.url && wantsCard(m, now)).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
+  const live = need.filter((m) => m.status === "live");
+  return live.concat(need.filter((m) => m.status !== "live")).slice(0, Math.max(max, live.length));
 }
 
 /** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
@@ -145,7 +162,9 @@ export function bookFixtures(doc) {
     const [a, b] = String(l.match).split(/\s+vs\s+/i);
     if (!b || !l.start_utc) continue;
     const k = `${l.match}|${l.start_utc}`;
-    if (!seen.has(k)) seen.set(k, { a: teamKey(a), b: teamKey(b), t: Date.parse(l.start_utc) });
+    const cur = seen.get(k), fmt = l.fmt || "";
+    if (!cur) seen.set(k, { a: teamKey(a), b: teamKey(b), t: Date.parse(l.start_utc), fmt });
+    else if (!cur.fmt && fmt) cur.fmt = fmt;
   }
   return [...seen.values()];
 }
@@ -154,7 +173,7 @@ export function fixtureInBooks(books, fixture) {
   if (!books?.length || !fixture) return false;
   const a = teamKey(fixture.a), b = teamKey(fixture.b), t = fixture.start ? Date.parse(fixture.start) : NaN;
   if (!a || !b) return false;
-  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < (fixture.fmt === "Test" ? 6 * 86400e3 : BOOK_WINDOW_MS)));
+  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < sameMatchWindowFor(fixture.fmt, m.fmt)));
 }
 
 /** A comma-separated file with quoted fields (`"a,b"`, `""` for a quote) as one object per row, keyed by the header line. */
@@ -177,7 +196,7 @@ export function parseFixtureCsv(text) {
 }
 
 /**
- * Priced matches that began in the last 40 hours (6 days for a Test) and are not on the source's schedule page. The page lists live and upcoming games only, so a finished
+ * Priced matches that began in the keep window (24 hours, 6 days for a Test) and are not on the source's schedule page. The page lists live and upcoming games only, so a finished
  * match drops off it soon after the end and its scorecard with it, though the match page itself is still served. A Test at close of play is treated the same way. The rows
  * come from our own schedule file (team names, start and the match page's own path), so that page can still be read and the props on the match settled from the real numbers.
  */
@@ -187,14 +206,13 @@ export function unlistedRows(listed, books, schedule, base = "", now = Date.now(
     if (!Number.isFinite(b.t) || b.t > now) continue;
     const there = (listed || []).some((m) => {
       const n = (m.teams || []).map((x) => teamKey(x.name));
-      return n.includes(b.a) && n.includes(b.b) && (!m.start || Math.abs(Date.parse(m.start) - b.t) < matchWindow(m.fmt));
+      return n.includes(b.a) && n.includes(b.b) && (!m.start || Math.abs(Date.parse(m.start) - b.t) < sameMatchWindowFor(m.fmt, b.fmt));
     });
     if (there) continue;
-    const f = (schedule || []).find((r) => r.url && r.start_utc && Math.abs(Date.parse(r.start_utc) - b.t) < matchWindow(r.format)
+    const f = (schedule || []).find((r) => r.url && r.start_utc && Math.abs(Date.parse(r.start_utc) - b.t) < sameMatchWindowFor(r.format, b.fmt)
       && ((teamKey(r.team_a) === b.a && teamKey(r.team_b) === b.b) || (teamKey(r.team_a) === b.b && teamKey(r.team_b) === b.a)));
     if (!f || out.some((m) => m.id === f.match_id)) continue;
-    const lookback = f.format === "Test" ? TEST_WINDOW_MS : LOOKBACK_MS;
-    if (now - b.t > lookback) continue;
+    if (now - b.t > keepMsFor(f.format || b.fmt)) continue;
     // "Completed" in our file is a guess when it has no result line (a Test that has dropped off the source's page is still being played): only the match page then calls it over
     const result = f.result || "";
     const betweenDays = f.format === "Test" && f.status === "Completed" && !result;
@@ -210,8 +228,7 @@ export function pricedLive(matches, books) {
   return (matches || []).filter((m) => {
     const names = (m.teams || []).map((x) => teamKey(x.name));
     const t = m.start ? Date.parse(m.start) : NaN;
-    const win = matchWindow(m.fmt);
-    return books.some((b) => names.includes(b.a) && names.includes(b.b) && (!Number.isFinite(t) || Math.abs(t - b.t) < win));
+    return books.some((b) => names.includes(b.a) && names.includes(b.b) && (!Number.isFinite(t) || Math.abs(t - b.t) < sameMatchWindowFor(m.fmt, b.fmt)));
   });
 }
 
@@ -558,7 +575,7 @@ export function liveForFixture(doc, fixture) {
     const names = (m.teams || []).map((x) => teamKey(x.name));
     if (!(names.includes(a) && names.includes(b))) continue;
     if (!Number.isFinite(t) || !m.start) { if (m.status === "live") return m; fallback = fallback || m; continue; }
-    if (Math.abs(Date.parse(m.start) - t) < (fixture.fmt === "Test" ? TEST_WINDOW_MS : WINDOW_MS)) return m;
+    if (Math.abs(Date.parse(m.start) - t) < sameMatchWindowFor(fixture.fmt, m.fmt)) return m;
     if (m.status === "live") fallback = fallback || m;
   }
   return fallback;
@@ -662,8 +679,15 @@ export function liveBoard(match) {
 
 const STAT_FIELD = { runs: "runs", balls: "balls", fours: "fours", sixes: "sixes", wickets: "wickets", runs_conceded: "conceded", balls_bowled: "ballsBowled" };
 
+/** Live so-far for a priced line. Points need the card's catches and stumpings; missing fielding is not scored as 0. */
 export function liveStat(player, stat) {
   if (!player) return null;
+  if (stat === "points") {
+    if (player.catches == null || player.stumpings == null) return null;
+    const r = player.runs, w = player.wickets;
+    if (r == null && w == null) return null;
+    return (r || 0) + 20 * (w || 0) + 10 * player.catches + 25 * player.stumpings;
+  }
   const k = STAT_FIELD[stat];
   if (!k || player[k] == null) return null;
   return player[k];
@@ -745,13 +769,12 @@ function readLine(match, l, idn) {
 export function settleLines(match, lines, idn = NO_IDENTITY) {
   const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
   const t = match?.start ? Date.parse(match.start) : NaN;
-  const win = matchWindow(match?.fmt);
   const out = [];
   if (sides.size !== 2) return out;
   for (const l of lines || []) {
     const [a, b] = String(l.match).split(/\s+vs\s+/i);
     if (!b || !l.pid || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) continue;
-    if (Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= win) continue;
+    if (Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= sameMatchWindowFor(match?.fmt, l.fmt)) continue;
     const got = readLine(match, l, idn);
     if (got) out.push({ pid: l.pid, stat: l.stat, line: l.line, ...(l.inn ? { inn: l.inn } : {}), ...got });
   }

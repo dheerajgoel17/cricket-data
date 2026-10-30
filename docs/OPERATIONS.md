@@ -35,6 +35,9 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 
 **Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files (not `index.json` / `matches.json` / shards: those are too big to decrypt on a phone) and `/api/live` wraps the same way, so a Network-tab response is `{v, iv, ct}` rather than scores. `/api/gate` puts the key in the `X-Cd-K` header, not the JSON body. The Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). A 403 on `/data` is `no-store` so a first-request cookie race is not cached as "Data not found". The hourly archive job unwraps `/api/live` with the same secret. This is a speed bump, not a secret from a real browser: the page still has to unwrap to draw numbers.
 
+## Cadence (odds vs scores)
+Job times, what is shown, and Test innings 0/1/2 rules: [SITE.md — Cadence and what we show](SITE.md#cadence-and-what-we-show). Short version: odds are hourly 09:00–23:00 IST **pre-match only** (no in-play prices); `/api/live` is ~15 s scores and so-far for books-priced matches; a priced match stays 24 hours after kick-off (6 days for a Test) as one match with the closing line plus live so-far. Do not add a 15 s odds route: `docs/VALUE_BETS.md` parked that on 2026-10-28.
+
 ## Routine tasks
 **Rotate the xAI key**: console.x.ai -> API Keys -> create new, delete old; then `cd site && printf '%s' "$NEW" | npx vercel env add XAI_API_KEY production --sensitive --yes` (or the dashboard), then redeploy (`npx vercel deploy --prod --yes`).
 **Change the LLM model**: set `XAI_MODEL` (names from `GET https://api.x.ai/v1/models`) and redeploy.

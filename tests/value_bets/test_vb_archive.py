@@ -106,7 +106,8 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
                                                          "2026-10-27T07:00Z,x,S,T20,male,Côte d'Ivoire,India A,V,Upcoming,,\n")
     (f,) = build_fixtures(tmp_path, None, {})
     assert f["id"] == fixture_id("2026-10-27T07:00Z", "Côte d'Ivoire", "India A")
-    assert team_key("India (W)") == team_key("India Women") == "india"
+    assert team_key("India (W)") == team_key("India Women") == team_key("India W") == "india"
+    assert team_key("Brisbane Heat W") == team_key("Brisbane Heat Women") == "brisbaneheat"
     assert team_key("Auckland Aces") == team_key("Auckland") and team_key("Northern Districts") == team_key("Northern Brave")
 
 
