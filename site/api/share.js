@@ -1,7 +1,7 @@
 // GET /share/player/<idx>[/<stat>/<line>]  or  /share/fixture/<id>  or  /share/venue/<idx>
 // (vercel.json rewrites to /api/share?path=...) -> a tiny page link previews read:
-// the title, description and the dynamic card. People who open it are sent on to the real page by a script: no meta refresh,
-// which some link-preview crawlers follow and then read the real page's tags instead.
+// the title, description and the dynamic card. The JPEG is in the body too (tap it for the real page).
+// No meta-refresh and no location.replace: crawlers that run scripts would follow those and then read the app shell.
 import { cardFields, cardPath, cardText } from "../src/engine/card.js";
 import { shareMetas } from "../src/lib/seo.js";
 import { loadData } from "./og.js";
@@ -39,7 +39,9 @@ export default function handler(req, res) {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
   res.end(`<!doctype html><html lang="en"><head><meta charset="utf-8" /><title>${esc(title)}</title>
-<meta name="description" content="${esc(text.description)}" /><meta name="robots" content="noindex, follow" /><link rel="canonical" href="${esc(page)}" />
+<meta name="description" content="${esc(text.description)}" /><meta name="robots" content="noindex, follow, max-image-preview:large" /><link rel="canonical" href="${esc(share)}" />
 ${tags}<link rel="image_src" href="${esc(image)}" />
-</head><body><p><a href="${esc(page)}">${esc(text.title)}</a></p><script>location.replace(${JSON.stringify(page)})</script></body></html>`);
+</head><body style="margin:0;background:#0f0f0f">
+<a href="${esc(page)}"><img src="${esc(image)}" width="1200" height="630" alt="${esc(text.title)}" style="width:100%;max-width:1200px;height:auto;display:block" /></a>
+</body></html>`);
 }
