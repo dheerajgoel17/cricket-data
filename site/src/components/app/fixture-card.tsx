@@ -138,7 +138,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
         key={sel}
         role="list"
         aria-label="Match cards"
-        className="-mx-gutter flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden"
+        className="-mx-gutter flex snap-x snap-mandatory gap-snug overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden"
       >
         {shown.map((f, i) => (
           <div key={`${f.id}${f.a}${f.b}`} role="listitem" className="w-[min(82%,var(--fixture-card))] shrink-0 snap-start">
