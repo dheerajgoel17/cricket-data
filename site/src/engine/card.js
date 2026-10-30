@@ -1,7 +1,7 @@
 // The share card of a page (1200x630): what a link preview shows. `cardFields` picks the words and numbers from the data files (never from a model), `renderCard` draws them.
 // Used by api/og.js (the image) and api/share.js (the page a link preview reads). Plain ESM; the drawing library is loaded only when a card is drawn.
 import { STATS } from "./rules.js";
-import { bookName, overProb, teamKey } from "./lines.js";
+import { bookFormatFor, bookLinesFor, bookName, overProb, teamKey } from "./lines.js";
 import { playerPhotos, teamLogos } from "../lib/photos.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 
@@ -22,6 +22,18 @@ function otherSide(match, team) {
 }
 
 const ROLE = { bat: "Batter", bowl: "Bowler", all: "All-rounder" };
+const LISTED_STATS = ["runs", "wickets", "fours", "sixes"];
+
+/** The line the books hang for this player (soonest match, runs first) so a /share/player/<idx> URL is not an empty name card. */
+function listedLine(pid, doc) {
+  for (const stat of LISTED_STATS) {
+    const fmt = bookFormatFor(doc, pid, stat);
+    if (!fmt) continue;
+    const b = bookLinesFor(doc, pid, stat, fmt);
+    if (b?.main && Number.isFinite(b.main.line)) return { stat, line: b.main.line };
+  }
+  return null;
+}
 
 /**
  * The fields of a card from the query: `p` (player index) with optional `stat` and `line` for a prop, or `f` (fixture id).
@@ -34,7 +46,11 @@ export function cardFields(q, data) {
     const name = P?.nm?.[idx];
     if (!name) return null;
     const pid = P.id[idx], indexTeam = data.index.teams?.[P.tm?.[idx]]?.n || "";
-    const stat = STATS[q.stat] ? q.stat : null, line = num(q.line);
+    let stat = STATS[q.stat] ? q.stat : null, line = num(q.line);
+    if (stat == null || line == null) {
+      const listed = listedLine(pid, data.lines); // a player URL with no line still shows his booked prop, not an empty name card
+      if (listed) { stat = listed.stat; line = listed.line; }
+    }
     const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)) };
     if (f.kind === "prop") {
       f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";

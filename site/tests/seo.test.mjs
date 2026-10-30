@@ -22,7 +22,7 @@ test("share tags cover Facebook, X, LinkedIn, WhatsApp, Discord and Slack: image
   assert.equal(THEME, "#27da8e");
   assert.ok(clipDesc("a".repeat(50)).length === 50);
   assert.ok(clipDesc("word ".repeat(80)).length <= 180);
-  const tags = shareMetas({ title: "Harry Brook: runs over 24.5 at 1.90 | Fancy.cash", description: "Harry Brook (England), runs over 24.5, listed 1.90 at Smarkets in England vs India. Hit rates and form on Fancy.cash.", url: "https://fancy.cash/share/player/0/runs/24.5", image: "https://fancy.cash/card/v5/player/0/runs/24.5.jpg", alt: "Harry Brook: runs over 24.5 at 1.90" });
+  const tags = shareMetas({ title: "Harry Brook: runs over 24.5 at 1.90 | Fancy.cash", description: "Harry Brook (England), runs over 24.5, listed 1.90 at Smarkets in England vs India. Hit rates and form on Fancy.cash.", url: "https://fancy.cash/share/player/0/runs/24.5", image: "https://fancy.cash/card/v6/player/0/runs/24.5.jpg", alt: "Harry Brook: runs over 24.5 at 1.90" });
   const get = (k) => tags.find((t) => t[1] === k)?.[2];
   assert.equal(get("og:image:width"), "1200");
   assert.equal(get("og:image:height"), "630");
