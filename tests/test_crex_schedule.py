@@ -65,6 +65,20 @@ def test_merge_keeps_far_future_rows_but_lets_the_schedule_replace_the_near_term
     assert _merge_fixtures([], path) == []
 
 
+def test_a_test_at_stumps_stays_live_and_home_rows_win_over_the_schedule_page():
+    stumps = item(status=2, formats="Test", team1="South Africa", team2="Australia", result="",
+                  link="/cricket-live-score/aus-vs-sa-3rd-test-x-10MS")
+    assert cs.parse_schedule(page([stumps]))[0]["status"] == "Live"
+    home = [cs.parse_schedule(page([stumps]))[0]]
+    sched = [cs.parse_schedule(page([item(status=0, team1="Pakistan", team2="Sri Lanka",
+                                           link="/cricket-live-score/pak-vs-sl-x-1")]))[0]]
+    merged = cs.merge_rows(home, sched)
+    assert [r["team_a"] for r in merged] == ["South Africa", "Pakistan"]
+    dropped = cs.parse_schedule(page([stumps]))[0]
+    again = {**dropped, "status": "Upcoming", "venue": ""}
+    assert cs.merge_rows([again], [dropped])[0]["status"] == "Live"
+
+
 def test_a_match_that_has_dropped_off_the_page_is_kept_for_three_days_as_completed(tmp_path):
     import csv
 
@@ -82,6 +96,35 @@ def test_a_match_that_has_dropped_off_the_page_is_kept_for_three_days_as_complet
     fresh = [row("2026-10-27T05:00Z", "Still", "Listed", "Live"), row("2026-10-28T08:30Z", "India Women", "Zimbabwe Women")]
     merged = _merge_fixtures(fresh, path, datetime(2026, 10, 27, 12, 0))
     assert [(r["team_a"], r["status"]) for r in merged] == [("Still", "Live"), ("New Zealand", "Completed"), ("India Women", "Upcoming")]  # 5 days ago is gone
+
+
+def test_a_dropped_test_is_kept_live_for_six_days_without_a_result(tmp_path):
+    import csv
+
+    from cricket_data.cli import _merge_fixtures
+    from cricket_data.fixtures import FIELDS
+
+    def row(start, a, b, status="Upcoming", fmt="T20", result=""):
+        return {**{k: "" for k in FIELDS}, "start_utc": start, "match_id": f"{a}-{b}", "team_a": a, "team_b": b,
+                "status": status, "format": fmt, "result": result}
+
+    path = tmp_path / "upcoming.csv"
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDS, lineterminator="\n")
+        w.writeheader()
+        w.writerows([row("2026-10-27T08:30Z", "South Africa", "Australia", "Live", "Test"),
+                     row("2026-10-22T07:00Z", "Old", "Test", "Live", "Test")])
+    fresh = [row("2026-10-30T07:00Z", "India", "New Zealand")]
+    merged = _merge_fixtures(fresh, path, datetime(2026, 10, 30, 12, 0))
+    by = {r["team_a"]: r["status"] for r in merged}
+    assert by["South Africa"] == "Live" and "Old" not in by  # day 4 of the Test is kept; 8 days ago is gone
+    done = [row("2026-10-27T08:30Z", "South Africa", "Australia", "Live", "Test", "South Africa won by 5 wickets")]
+    with path.open("w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=FIELDS, lineterminator="\n")
+        w.writeheader()
+        w.writerows(done)
+    over = _merge_fixtures(fresh, path, datetime(2026, 10, 30, 12, 0))
+    assert [r["status"] for r in over if r["team_a"] == "South Africa"] == ["Completed"]
 
 
 def test_a_finished_match_is_completed_with_its_result_line():

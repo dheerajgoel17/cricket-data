@@ -272,10 +272,19 @@ def _merge_fixtures(fresh: list[dict], path: Path, now_dt: datetime | None = Non
     seen = {(r["start_utc"][:10], frozenset((r["team_a"], r["team_b"]))) for r in fresh}
     key = lambda r: (r["start_utc"][:10], frozenset((r["team_a"], r["team_b"])))  # noqa: E731
     keep = [r for r in old if key(r) not in seen]
-    # A match that has started and is no longer on the page has finished: keep it for 3 days as Completed, so the site can show the result
-    # (the page drops a match soon after the end; the site keeps it for a day at least).
-    since = (now_dt - timedelta(days=3)).strftime("%Y-%m-%dT%H:%MZ")
-    done = [{**r, "status": "Completed"} for r in held if since < r["start_utc"] <= now and key(r) not in seen]
+    # A match that has started and is no longer on the page: limited-overs stay 3 days as Completed (the page drops a match soon after
+    # the end). A Test/FC stays 6 days; without a result line it is still being played (stumps), so it stays Live.
+    done = []
+    for r in held:
+        days = 6 if r.get("format") in ("Test", "FC") else 3
+        since = (now_dt - timedelta(days=days)).strftime("%Y-%m-%dT%H:%MZ")
+        if not (since < r["start_utc"] <= now) or key(r) in seen:
+            continue
+        result = (r.get("result") or "").strip()
+        if r.get("format") in ("Test", "FC") and not result:
+            done.append({**r, "status": "Live"})
+        else:
+            done.append({**r, "status": "Completed"})
     return sorted(fresh + keep + done, key=lambda r: (r["start_utc"], r["match_id"]))
 
 

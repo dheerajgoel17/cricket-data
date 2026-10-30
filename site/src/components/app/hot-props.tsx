@@ -274,12 +274,12 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
   const [team, setTeam] = useState("all");
   const [matchKey, setMatchKey] = useState("all");
   const matchChips = useMemo(() => {
-    const m = new Map<string, { id: string; a: string; b: string; start: string }>();
+    const m = new Map<string, { id: string; a: string; b: string; start: string; fmt?: string }>();
     for (const r of data || []) {
       const id = matchChipId(r.match, r.start, r.fmt);
       const [a, b] = String(r.match).split(/\s+vs\s+/i);
       const prev = m.get(id);
-      if (!prev || Date.parse(r.start) < Date.parse(prev.start)) m.set(id, { id, a: a || r.team, b: b || r.opp, start: r.start });
+      if (!prev || Date.parse(r.start) < Date.parse(prev.start)) m.set(id, { id, a: a || r.team, b: b || r.opp, start: r.start, fmt: r.fmt });
     }
     return [...m.values()];
   }, [data]);

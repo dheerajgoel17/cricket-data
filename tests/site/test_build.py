@@ -370,6 +370,28 @@ def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp
     assert [r["start"] for r in B._unscheduled_priced(vb, t20, now=now)] == ["2026-10-29T03:30Z", "2026-11-10T03:30Z"]  # a T20 a day apart is another match
 
 
+def test_a_priced_test_the_schedule_dropped_comes_back_from_its_archive(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    (arc / "2026-10-27-south-africa-v-australia.json").write_text(json.dumps({
+        "match": "South Africa vs Australia", "start_utc": "2026-10-27T08:30:00Z",
+        "fixture": {"id": "2026-10-27-south-africa-v-australia", "start": "2026-10-27T08:30Z", "fmt": "Test",
+                    "gender": "male", "a": "South Africa", "b": "Australia", "venue": "Newlands, Cape Town",
+                    "series": "Australia tour of South Africa 2026"},
+        "lines": [{"fmt": "Test"}],
+    }))
+    now = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
+    got = B._unscheduled_priced(vb, [], now=now)
+    assert [(r["a"], r["status"], r["venue"], r["series"]) for r in got] == [
+        ("South Africa", "Live", "Newlands, Cape Town", "Australia tour of South Africa 2026")]
+    listed = [{"start": "2026-10-27T08:30Z", "fmt": "Test", "a": "South Africa", "b": "Australia"}]
+    assert B._unscheduled_priced(vb, listed, now=now) == []
+
+
 def test_a_match_named_by_its_sides_joins_the_series_of_its_siblings():
     rows = [{"start": "2026-10-27T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "Afghanistan vs Zimbabwe in UAE 2026"},
             {"start": "2026-11-01T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "AFG vs ZIM"},

@@ -1,9 +1,10 @@
-"""Upcoming and live fixtures from Source A's own schedule page (`the schedule page`).
+"""Upcoming and live fixtures from Source A's home list and schedule page.
 
-The page is rendered on the server and embeds its data (``the source's data host/fixture/getFixture``) in the same ``app-root-state`` block the
-scorecards use: the next ~20 matches in time order with the real start time, format, venue, series, teams and live status. Unlike the sitemap
-approach in ``fixtures.py`` (which only finds candidate pages and can surface stale or placeholder ones), this is Source A's actual schedule.
-Run hourly it gives the site an accurate "today / tomorrow" list across internationals, leagues and domestic cricket.
+The home list still shows a Test at stumps after the schedule page has dropped it (that page is live and upcoming only). Both pages embed
+``the source's data host/fixture/getFixture`` in the same ``app-root-state`` block the scorecards use: start time, format, venue, series,
+teams and live status. Unlike the sitemap approach in ``fixtures.py`` (which only finds candidate pages and can surface stale or placeholder
+ones), this is Source A's actual board. Run hourly it gives the site an accurate "today / tomorrow" list across internationals, leagues and
+domestic cricket.
 """
 from __future__ import annotations
 
@@ -53,30 +54,78 @@ def parse_schedule(html: str) -> list[dict]:
     return rows_from(items)
 
 
+def status_of(x: dict, fmt: str) -> str:
+    """Source A: 0 not started, 1 in play, 2 finished — except a Test/FC at close of play (2, no result) is still on."""
+    if x.get("status") == 1:
+        return "Live"
+    result = x.get("result") or ""
+    if result or (x.get("status") == 2 and fmt not in ("Test", "FC")):
+        return "Completed"
+    if x.get("status") == 2:
+        return "Live"
+    return "Upcoming"
+
+
 def rows_from(items: list) -> list[dict]:
     rows = []
     for x in items:
         if not x.get("t") or not x.get("team1") or not x.get("team2"):
             continue
         link = x.get("link") or ""
+        fmt = format_of(x.get("formats") or x.get("fo"))
         rows.append({
             "start_utc": datetime.fromtimestamp(x["t"] / 1000, timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
             "match_id": (link.rsplit("/", 1)[-1] if link else str(x.get("id", ""))),
             "series": x.get("n", ""),
-            "format": format_of(x.get("formats") or x.get("fo")),
+            "format": fmt,
             "gender": "male" if x.get("g") == 1 else "female",  # Source A: g=1 men, g=0 women (India Women have g=0)
             "team_a": x["team1"], "team_b": x["team2"], "venue": x.get("venue", ""),
-            "status": "Live" if x.get("status") == 1 else "Completed" if x.get("status") == 2 or x.get("result") else "Upcoming",
+            "status": status_of(x, fmt),
             "result": x.get("result") or "",
             "url": rel(link),  # host-relative: committed data names no host
         })
     return sorted(rows, key=lambda r: (r["start_utc"], r["match_id"]))
 
 
-def fetch_schedule(timeout: int = 40) -> list[dict]:
-    req = urllib.request.Request(f"{host('LIVE_SOURCE_BASE')}/schedule", headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36"})
+def merge_rows(*groups: list) -> list[dict]:
+    """Union of home and schedule rows. Same match_id: prefer Live, then a row that still has a venue."""
+    out: dict[str, dict] = {}
+
+    def rank(r: dict) -> tuple:
+        return (1 if r.get("status") == "Live" else 0, 1 if r.get("venue") else 0, 1 if r.get("result") else 0)
+
+    for rows in groups:
+        for r in rows or []:
+            k = r.get("match_id") or ""
+            if not k:
+                continue
+            prev = out.get(k)
+            if prev is None or rank(r) >= rank(prev):
+                out[k] = r
+    return sorted(out.values(), key=lambda r: (r["start_utc"], r["match_id"]))
+
+
+def _fetch(path: str, timeout: int = 40) -> str:
+    req = urllib.request.Request(
+        f"{host('LIVE_SOURCE_BASE')}{path}",
+        headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36"},
+    )
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        return parse_schedule(r.read().decode("utf-8", "replace"))
+        return r.read().decode("utf-8", "replace")
+
+
+def fetch_schedule(timeout: int = 40) -> list[dict]:
+    """Home (a Test at stumps still sits here) union the schedule page (upcoming + the next ~20)."""
+    home = sched = []
+    try:
+        home = parse_schedule(_fetch("/", timeout))
+    except Exception:  # noqa: BLE001  one page that will not load must not cost the other
+        pass
+    try:
+        sched = parse_schedule(_fetch("/schedule", timeout))
+    except Exception:  # noqa: BLE001
+        pass
+    return merge_rows(home, sched)
 
 
 _CARDS_JS = """() => {
@@ -136,9 +185,11 @@ def fetch_schedule_paged(days: int = 5, max_pages: int = 12, now: datetime | Non
                 page.wait_for_function("f => { const a = document.querySelector('a.match-card-wrapper'); return a && !a.href.endsWith(f); }", arg=first, timeout=10000)
         finally:
             page.close()
-    rows = {r["match_id"]: r for r in cards}
-    rows.update({r["match_id"]: r for r in parse_schedule(html)})  # the page's own first 20 carry the venue
-    return sorted(rows.values(), key=lambda r: (r["start_utc"], r["match_id"]))
+    try:
+        front = parse_schedule(_fetch("/"))
+    except Exception:  # noqa: BLE001  the schedule pages are enough if home will not load
+        front = []
+    return merge_rows(cards, parse_schedule(html), front)  # home still lists a Test at stumps; first 20 carry the venue
 
 
 def fill_venues(rows: list[dict], held: list[dict], fetcher=None, cap: int = 30) -> int:

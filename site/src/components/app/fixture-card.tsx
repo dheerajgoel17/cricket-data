@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { clockLiveMs, liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
+import { clockLiveMs, liveBlurb, scoreLabel, sessionLabel, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { fixtureState } from "@/hooks/useEngine";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
@@ -54,7 +54,9 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   // the live feed says the match has not started although its time has passed (rain, a late toss): it is delayed, not in play
   const delayed = !final && !hasScore && match?.status === "upcoming" && ms <= 0 && ms > -24 * 3600e3;
   const live = !final && !delayed && (hasScore || clockLive || fixtureState(f, match?.status) === "live"); // a Test between days is still on: scores and "Close of play" come from the live feed
-  const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const blurb = liveBlurb(match);
+  const session = sessionLabel(blurb) || match?.session || "";
+  const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
   return (
@@ -64,7 +66,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
-            {live ? <span className="inline-flex items-center gap-tight font-semibold uppercase tracking-wider text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</span>}
+            {session ? <span className="font-semibold uppercase tracking-wider text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight font-semibold uppercase tracking-wider text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
             {city(f.venue) && <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
@@ -99,6 +101,9 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
 /** Compact match chip: overlapping crests, short names, kick-off. Tapping one filters the prop table when `onPick` is set. */
 export function MatchChip({ f, active, onPick }: { f: any; active?: boolean; onPick?: (id: string | null) => void }) {
   const when = fixtureStart(f), timed = hasTime(f);
+  const { match } = useLiveMatch(f);
+  const session = sessionLabel(liveBlurb(match)) || match?.session || "";
+  const sub = session || (match?.status === "live" ? "Live" : timed ? localTime(when) : dayLabel(dayKey(f)));
   const inner = (
     <>
       <span className="flex">
@@ -107,7 +112,7 @@ export function MatchChip({ f, active, onPick }: { f: any; active?: boolean; onP
       </span>
       <span className="grid min-w-0 leading-tight">
         <span className="truncate text-caption font-semibold">{abbr(f.a)} v {abbr(f.b)}</span>
-        <span className="truncate text-caption text-muted-foreground">{timed ? localTime(when) : dayLabel(dayKey(f))}</span>
+        <span className={cn("truncate text-caption", session || match?.status === "live" ? "font-semibold text-destructive" : "text-muted-foreground")}>{sub}</span>
       </span>
     </>
   );

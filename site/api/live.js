@@ -1,13 +1,13 @@
 // GET /api/live -> {asOf, source, matches[]} (wrapped with DATA_WRAP_KEY when set). Source A only, cached ~15 s.
-// The schedule page lists live and upcoming games with their match URLs and scores (Source A caches it ~5 min); only matches the books price are kept.
-// A finished match drops off that page soon after the end; a priced one that began in the keep window (24 h, 6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
+// The source's home list still shows a Test at stumps after the schedule page (live and upcoming only, cached ~5 min) has dropped it; both pages give match URLs and scores. Only matches the books price are kept.
+// A finished match drops off those pages soon after the end; a priced one that began in the keep window (24 h, 6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
 // and the match-scorecard page (getSC4) adds every innings. All three are HTML pages ($LIVE_SOURCE_BASE robots Allow); we never hit $LIVE_SOURCE_BASE/api.
 // Each match also carries `lines`: where every line the books priced for it stands (value, state, Cleared / Missed / Push, Not in XI), settled here with the identity table
 // so the browser does no matching of its own. While a match is on that is "so far"; a "final" state in a finished match is its result (the archive job stores those).
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "../src/engine/live.js";
+import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, mergeSchedule, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "../src/engine/live.js";
 import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
 import { wire } from "../src/engine/wrap.js";
 
@@ -70,8 +70,14 @@ async function snapshot() {
   if (memo.body && now - memo.t < LIVE_TTL_MS) return memo.body;
   if (inflight) return inflight;
   inflight = (async () => {
-    const [booksDoc, schedule, ours, idn] = await Promise.all([getJson(BOOKS).catch(() => ({})), getHtml(`${base()}/schedule`), getText(SCHEDULE_FILE).catch(() => ""), loadIdentity()]);
-    const books = bookFixtures(booksDoc), listed = pricedLive(parseSchedule(schedule, base()), books);
+    const [booksDoc, homeHtml, schedule, ours, idn] = await Promise.all([
+      getJson(BOOKS).catch(() => ({})),
+      getHtml(`${base()}/`).catch(() => ""),
+      getHtml(`${base()}/schedule`),
+      getText(SCHEDULE_FILE).catch(() => ""),
+      loadIdentity(),
+    ]);
+    const books = bookFixtures(booksDoc), listed = pricedLive(mergeSchedule(parseSchedule(homeHtml, base()), parseSchedule(schedule, base())), books);
     const gaps = unlistedRows(listed, books, parseFixtureCsv(ours), base());
     const rows = [...listed, ...gaps];
     const pages = new Map();
