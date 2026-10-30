@@ -44,6 +44,29 @@ test("markup in a name cannot break out of the tags, and a template without the 
   assert.throws(() => render("<html></html>", { title: "x", description: "y" }), /seo markers/);
 });
 
+test("wrapped fixtures.json is unwrapped for SEO, and a wrap with no key does not crash the Vercel build", async () => {
+  const { build, unwrapJson } = await import("../scripts/seo.mjs");
+  const { wrap } = await import("../src/engine/wrap.js");
+  const { mkdtempSync, mkdirSync, writeFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const d = mkdtempSync(join(tmpdir(), "seo-wrap-"));
+  mkdirSync(join(d, "data"));
+  writeFileSync(join(d, "index.html"), TPL);
+  const wrapped = await wrap(fx, "ci-test-key");
+  writeFileSync(join(d, "data/fixtures.json"), JSON.stringify(wrapped));
+  writeFileSync(join(d, "data/index.json"), JSON.stringify(index));
+  assert.deepEqual(unwrapJson(wrapped, "ci-test-key"), fx);
+  const n = build(d, SITE, "ci-test-key");
+  assert.ok(n > Object.keys(ROUTES).length, "fixture pages are written after unwrap");
+  const d2 = mkdtempSync(join(tmpdir(), "seo-wrap2-"));
+  mkdirSync(join(d2, "data"));
+  writeFileSync(join(d2, "index.html"), TPL);
+  writeFileSync(join(d2, "data/fixtures.json"), JSON.stringify(wrapped));
+  writeFileSync(join(d2, "data/index.json"), JSON.stringify(index));
+  assert.equal(build(d2, SITE, ""), Object.keys(ROUTES).length, "no key: skip wrapped fixtures rather than throw");
+});
+
 test("the site address is SITE_URL, else the one in the sitemap the data build wrote", async () => {
   const { siteOf } = await import("../scripts/seo.mjs");
   const { mkdtempSync, writeFileSync } = await import("node:fs");
