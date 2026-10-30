@@ -14,12 +14,15 @@
       "destination": "/api/og?path=:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|_vercel/).*)",
       "destination": "/"
     }
   ],
   "functions": {
     "api/gate.js": {
+      "maxDuration": 5
+    },
+    "api/geo.js": {
       "maxDuration": 5
     },
     "api/live.js": {

@@ -31,6 +31,11 @@ export function cardFields(q, data) {
     }
     return f;
   }
+  const vidx = num(q.v);
+  if (vidx != null) {
+    const name = data.index?.venues?.[vidx];
+    return name ? { kind: "venue", name } : null;
+  }
   const fx = (data.fixtures || []).find((x) => x.id === q.f);
   return fx ? { kind: "fixture", a: fx.a, b: fx.b, venue: fx.venue || "", series: fx.series || "", when: when(fx.start) } : null;
 }
@@ -38,9 +43,10 @@ export function cardFields(q, data) {
 /** The title and description of the page that carries the card (what a link preview prints under the picture). */
 export function cardText(f, brand = "Fancy.cash") {
   if (!f) return null;
-  if (f.kind === "prop") return { title: `${f.name}: over ${f.line} ${f.stat.toLowerCase()}${f.price ? ` at ${f.price.toFixed(2)}` : ""}`, description: `${f.name}${f.team ? ` (${f.team})` : ""}, over ${f.line} ${f.stat.toLowerCase()}${f.price ? `, best price ${f.price.toFixed(2)} at ${f.book}` : ""}${f.match ? ` in ${f.match}` : ""}. Hit rates, fair price and every book's line on ${brand}.` };
-  if (f.kind === "player") return { title: `${f.name}: stats, hit rates and form`, description: `${f.name}${f.team ? ` (${f.team})` : ""}: hit rates over any line, recent form and every bookmaker's prop price on ${brand}.` };
-  return { title: `${f.a} v ${f.b}: player props, hit rates and book lines`, description: `${f.a} v ${f.b}${f.when ? `, ${f.when}` : ""}${f.venue ? `, ${f.venue}` : ""}: player props, hit rates, fair prices and every bookmaker's line on ${brand}.` };
+  if (f.kind === "prop") return { title: `${f.name}: ${f.stat.toLowerCase()} over ${f.line}${f.price ? ` at ${f.price.toFixed(2)}` : ""}`, description: `${f.name}${f.team ? ` (${f.team})` : ""}, ${f.stat.toLowerCase()} over ${f.line}${f.price ? `, listed ${f.price.toFixed(2)} at ${f.book}` : ""}${f.match ? ` in ${f.match}` : ""}. Hit rates and form on ${brand}.` };
+  if (f.kind === "player") return { title: `${f.name}: stats, hit rates and form`, description: `${f.name}${f.team ? ` (${f.team})` : ""}: hit rates over any line, recent form and listed lines on ${brand}.` };
+  if (f.kind === "venue") return { title: `${f.name}: ground stats`, description: `Runs, sixes, fours and match totals at ${f.name}. Free cricket ground stats on ${brand}.` };
+  return { title: `${f.a} v ${f.b}: stats, props and listed lines`, description: `${f.a} v ${f.b}${f.when ? `, ${f.when}` : ""}${f.venue ? `, ${f.venue}` : ""}: player stats, hit rates and listed lines on ${brand}.` };
 }
 
 const GREEN = "#27da8e";
@@ -66,12 +72,17 @@ export async function renderCard(f, { photo = null, fonts = {} } = {}) {
     g.fillStyle = GREEN; g.beginPath(); g.roundRect(x, y, w, size + 24, (size + 24) / 2); g.fill();
     text(s, x + 22, y + size + 4, size, "#0f0f0f"); return w;
   };
-  if (f.kind === "fixture") {
-    text(f.series || "Cricket", 70, 120, 34, "#a6a6a6", reg, "left", 1060);
-    text(f.a, 70, 270, 110, "#ffffff", bold, "left", 1060);
-    text("v", 70, 360, 60, GREEN);
-    text(f.b, 70, 470, 110, "#ffffff", bold, "left", 1060);
-    text([f.when, f.venue].filter(Boolean).join("  ·  "), 70, 540, 32, "#a6a6a6", reg, "left", 1060);
+  if (f.kind === "fixture" || f.kind === "venue") {
+    text(f.kind === "venue" ? "Ground stats" : (f.series || "Cricket"), 70, 120, 34, "#a6a6a6", reg, "left", 1060);
+    if (f.kind === "venue") {
+      text(f.name, 70, 320, 72, "#ffffff", bold, "left", 1060);
+      text("Runs, sixes, fours and match totals", 70, 420, 36, "#a6a6a6", reg, "left", 1060);
+    } else {
+      text(f.a, 70, 270, 110, "#ffffff", bold, "left", 1060);
+      text("v", 70, 360, 60, GREEN);
+      text(f.b, 70, 470, 110, "#ffffff", bold, "left", 1060);
+      text([f.when, f.venue].filter(Boolean).join("  ·  "), 70, 540, 32, "#a6a6a6", reg, "left", 1060);
+    }
   } else {
     let img = null;
     if (photo) { try { img = await loadImage(photo); } catch { img = null; } }
@@ -90,7 +101,7 @@ export async function renderCard(f, { photo = null, fonts = {} } = {}) {
       text(f.stat, x, 475, 44, "#ffffff", reg, "left", w);
       if (f.price) { const cw = chip(`${f.price.toFixed(2)}  ${f.book}`, x, 505, 32); if (f.books > 1) text(`+${f.books - 1} more`, x + cw + 20, 545, 28, "#a6a6a6", reg); }
     } else {
-      text("Hit rates, form and book lines", x, 400, 52, "#ffffff", reg, "left", w);
+      text("Stats, form and listed lines", x, 400, 52, "#ffffff", reg, "left", w);
     }
   }
   // brand mark and name, bottom right
@@ -105,16 +116,21 @@ export async function renderCard(f, { photo = null, fonts = {} } = {}) {
   return c.toBuffer("image/jpeg", 86);
 }
 
+export const CARD_V = "3"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
+
 /** The card's address as a file path (some link-preview crawlers only trust an image URL that looks like a file): /card/player/12/runs/24.5.jpg, /card/fixture/<id>.jpg. */
 export function cardPath(q) {
-  if (q.p != null) return `/card/player/${q.p}${q.stat && q.line != null ? `/${encodeURIComponent(q.stat)}/${q.line}` : ""}.jpg`;
-  return q.f ? `/card/fixture/${encodeURIComponent(q.f)}.jpg` : "/og.png";
+  const v = `?v=${CARD_V}`;
+  if (q.p != null) return `/card/player/${q.p}${q.stat && q.line != null ? `/${encodeURIComponent(q.stat)}/${q.line}` : ""}.jpg${v}`;
+  if (q.v != null) return `/card/venue/${q.v}.jpg${v}`;
+  return q.f ? `/card/fixture/${encodeURIComponent(q.f)}.jpg${v}` : `/og.png${v}`;
 }
 
 /** The inverse: "player/12/runs/24.5.jpg" -> the query `cardFields` takes; {} for anything else. */
 export function cardQuery(path) {
-  const seg = String(path || "").replace(/^\/?card\//, "").replace(/\.jpg$/i, "").split("/").filter(Boolean).map((x) => decodeURIComponent(x));
+  const seg = String(path || "").replace(/\?.*$/, "").replace(/^\/?card\//, "").replace(/\.jpg$/i, "").split("/").filter(Boolean).map((x) => decodeURIComponent(x));
   if (seg[0] === "player" && /^\d+$/.test(seg[1] || "")) return seg[2] && seg[3] ? { p: seg[1], stat: seg[2], line: seg[3] } : { p: seg[1] };
+  if (seg[0] === "venue" && /^\d+$/.test(seg[1] || "")) return { v: seg[1] };
   if (seg[0] === "fixture" && seg[1]) return { f: seg[1] };
   return {};
 }

@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, Search, X } from "lucide-react";
+import { ChevronRightIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { RULES } from "@/engine/rules.js";
@@ -28,11 +28,11 @@ const TOOLS: [string, string, string, string][] = [["trends", "Player trends", "
   ["teams", "Team & venue stats", "Match totals, fancy markets and player grids.", ""], ["pair", "Partnerships", "Who gets out first for any pair of batters.", ""],
   ["competitions", "Competitions", "Markets, teams and results for every league and series.", ""], ["glossary", "Cricket stats explained", "What every market and rule means.", ""]];
 export function ToolsPage() {
-  setTitle("Free cricket betting tools");
+  setTitle("Free cricket stats tools");
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Tools"]]} />
-      <PageTitle sub="Professional-grade cricket props analysis, completely free: no login, no paywall.">Free cricket betting tools</PageTitle>
+      <PageTitle sub="Cricket stats, player props and listed lines, completely free: no login, no paywall.">Free cricket stats tools</PageTitle>
       <div className="flex flex-wrap gap-2">{["100% free", "No registration", "Ball-by-ball data"].map((x) => <Badge key={x} variant="secondary" className="rounded-full px-3 py-1 font-normal">{x}</Badge>)}</div>
       <div className="mt-4 grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
         {TOOLS.map(([r, t, d, b], i) => (
@@ -77,9 +77,9 @@ export function OddsPage() {
 
 // ------------------------------------------------------------------ glossary
 const GLOSS: [string, string, string, string][] = [
-  ["Hit rate", "Basic", "Betting", "Share of games where the stat cleared the line (over: strictly more than the line). Pushes on whole-number lines are void."],
-  ["Fair decimal price", "Basic", "Betting", "1 ÷ hit rate. The price at which the historical rate breaks even, with no bookmaker margin."],
-  ["Line", "Basic", "Betting", "The threshold in a prop, e.g. sixes over 0.5 or runs over 24.5."],
+  ["Hit rate", "Basic", "Prices", "Share of games where the stat cleared the line (over: strictly more than the line). Pushes on whole-number lines are void."],
+  ["Fair decimal price", "Basic", "Prices", "1 ÷ hit rate. The price at which the historical rate breaks even, with no bookmaker margin."],
+  ["Line", "Basic", "Prices", "The threshold in a prop, e.g. sixes over 0.5 or runs over 24.5."],
   ["DNP", "Basic", "Form", "Did not play: the team had a fixture but the player was not in the playing XI. Shown on charts, left out of hit rates."],
   ["VOID (did not bat / bowl)", "Intermediate", "Rules", "Named in the playing XI but never reached the crease (or never bowled): bets on that player's batting (or bowling) stats are void and the stake is returned. Left out of hit rates."],
   ["30s", "Basic", "Markets", "Innings of 30-49 runs. Counted per match as a fancy market."],
@@ -94,9 +94,9 @@ const GLOSS: [string, string, string, string][] = [
   ["Retired hurt", "Basic", "Rules", "Not a wicket. Penalty runs count. Super overs are ignored."],
   ["Batting position", "Intermediate", "Form", "Order in which a batter first appears at the crease (openers are 1 and 2)."],
   ["Home / away / neutral", "Intermediate", "Form", "Inferred from the series name, the venue's host nation and who plays there most; the base data has no home flag."],
-  ["Correlated props", "Advanced", "Betting", "How often a player's other props clear when a given prop clears, versus his normal rate."],
-  ["Overround", "Advanced", "Betting", "The sum of implied probabilities above 100%: the bookmaker's margin."],
-  ["Kelly stake", "Advanced", "Betting", "Stake sized from your edge: (p × price - 1) ÷ (price - 1). Quarter Kelly is the usual cautious fraction."],
+  ["Correlated props", "Advanced", "Prices", "How often a player's other props clear when a given prop clears, versus his normal rate."],
+  ["Overround", "Advanced", "Prices", "The sum of implied probabilities above 100%: the bookmaker's margin."],
+  ["Kelly stake", "Advanced", "Prices", "Stake sized from your edge: (p × price - 1) ÷ (price - 1). Quarter Kelly is the usual cautious fraction."],
   ["Provisional matches", "Intermediate", "Data", "Scraped scorecards covering the gap until the base data is updated: player totals only, so no partnerships or batting order."],
 ];
 export function GlossaryPage() {
@@ -178,9 +178,9 @@ export function PlayersPage() {
     <div className="flex flex-col gap-stack">
       <h1 className="text-title font-bold tracking-tight">Players</h1>
       <InputGroup className="h-control rounded-[10px] border-0 bg-white/10">
-        <InputGroupAddon><Search /></InputGroupAddon>
+        <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
         <InputGroupInput type="search" autoFocus placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
-        {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><X /></InputGroupButton></InputGroupAddon>}
+        {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><XMarkIcon className="size-4" /></InputGroupButton></InputGroupAddon>}
       </InputGroup>
       {t.length < 2 ? <p className="text-callout text-muted-foreground">Type at least two letters.</p>
         : !rows.length ? <p className="text-callout text-muted-foreground">No player matches “{t}”.</p> : (
@@ -194,7 +194,7 @@ export function PlayersPage() {
                       <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
                       <ItemDescription className="truncate text-callout text-muted-foreground">{store.teamName(p.team)} · {FORMATS.filter((_: string, i: number) => (store.P.fm[p.idx] >> i) & 1).join(" ")}{p.last ? ` · last ${p.last}` : ""}</ItemDescription>
                     </ItemContent>
-                    <ItemActions className="gap-tight text-footnote tabular-nums text-muted-foreground">{store.P.n[p.idx]} inns<ChevronRight className="size-4" aria-hidden /></ItemActions>
+                    <ItemActions className="gap-tight text-footnote tabular-nums text-muted-foreground">{store.P.n[p.idx]} inns<ChevronRightIcon className="size-4" aria-hidden /></ItemActions>
                   </Link>
                 </Item>
               </li>
@@ -211,11 +211,13 @@ export function TeamsPage() {
   const [q, setQ] = useQ();
   const tab = q.tab === "venues" ? "venues" : "teams";
   const [text, setText] = useState(q.q || "");
-  const rows = useMemo(() => {
+  const rows = useMemo((): [string, number, number][] => {
+    const t = text.trim();
+    if (tab === "venues" && t.length >= 2) return rz.venues(t, 60).map((v: { name: string; idx: number }) => [v.name, v.idx, rz.venueCount[v.idx]] as [string, number, number]);
     const counts = tab === "teams" ? rz.teamCount : rz.venueCount;
     const names: string[] = tab === "teams" ? store.teams.map((_: any, i: number) => store.teamName(i)) : store.venues;
-    const t = text.trim().toLowerCase();
-    return names.map((n, i) => [n, i] as [string, number]).filter(([n]) => !t || n.toLowerCase().includes(t)).sort((a, b) => counts[b[1]] - counts[a[1]]).slice(0, 60).map(([n, i]) => [n, i, counts[i]] as [string, number, number]);
+    const q = t.toLowerCase();
+    return names.map((n, i) => [n, i] as [string, number]).filter(([n]) => !q || n.toLowerCase().includes(q)).sort((a, b) => counts[b[1]] - counts[a[1]]).slice(0, 60).map(([n, i]) => [n, i, counts[i]] as [string, number, number]);
   }, [tab, text, store, rz]);
   return (
     <div>

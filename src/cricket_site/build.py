@@ -649,6 +649,9 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
         for t in m["teams"]:
             tcnt[(t, m["gender"])] += 1
     urls += [f"{base}/team/{A['team_ix'][k]}" for k, c in tcnt.most_common(800) if c >= 10]
+    vix = {v: i for i, v in enumerate(A.get("venues") or [])}
+    vcnt = Counter(m.get("venue") or "?" for m in A.get("ms") or [])
+    urls += [f"{base}/venue/{vix[v]}" for v, c in vcnt.most_common(400) if c >= 8 and v in vix]
     urls += [f"{base}/fixture/{f['id']}" for f in fixtures or []]
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     body = "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls)

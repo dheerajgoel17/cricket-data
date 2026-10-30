@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shareFixtureUrl, sharePlayerUrl } from "./share";
+import { shareFixtureUrl, sharePlayerUrl, shareVenueUrl } from "./share";
 
 describe("share links", () => {
   it("name the player, and his stat and line when there is one", () => {
@@ -8,4 +8,5 @@ describe("share links", () => {
     expect(sharePlayerUrl("https://x.test", 12, "runs", null)).toBe("https://x.test/share/player/12");
   });
   it("name a fixture by its id", () => expect(shareFixtureUrl("https://x.test", "2026-10-29-afghanistan-v-zimbabwe")).toBe("https://x.test/share/fixture/2026-10-29-afghanistan-v-zimbabwe"));
+  it("name a ground by its index", () => expect(shareVenueUrl("https://x.test/", 4)).toBe("https://x.test/share/venue/4"));
 });

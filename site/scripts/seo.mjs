@@ -10,10 +10,10 @@ import { cardPath } from "../src/engine/card.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
-const LIMITS = { player: 300, team: 150, league: 100 };
+const LIMITS = { player: 300, team: 150, league: 100, venue: 150 };
 
 /** The head tags of one page. `url` is absolute when SITE_URL is known; without it there is no canonical link or absolute image. */
-export function headTags({ title, description, url = "", image = "", type = "website", noindex = false, jsonld = [] }) {
+export function headTags({ title, description, url = "", image = "", type = "website", noindex = false, jsonld = [], ogUrl = "" }) {
   const t = fullTitle(title);
   return [
     `<title>${esc(t)}</title>`,
@@ -25,12 +25,12 @@ export function headTags({ title, description, url = "", image = "", type = "web
     `<meta property="og:locale" content="en" />`,
     `<meta property="og:title" content="${esc(t)}" />`,
     `<meta property="og:description" content="${esc(description)}" />`,
-    url ? `<meta property="og:url" content="${esc(url)}" />` : "",
-    image ? `<meta property="og:image" content="${esc(image)}" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />` : "",
+    (ogUrl || url) ? `<meta property="og:url" content="${esc(ogUrl || url)}" />` : "",
+    image ? `<meta property="og:image" content="${esc(image)}" /><meta property="og:image:secure_url" content="${esc(image)}" /><meta property="og:image:type" content="${/\.jpe?g(\?|$)/i.test(image) ? "image/jpeg" : "image/png"}" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />` : "",
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(t)}" />`,
     `<meta name="twitter:description" content="${esc(description)}" />`,
-    image ? `<meta name="twitter:image" content="${esc(image)}" />` : "",
+    image ? `<meta name="twitter:image" content="${esc(image)}" /><meta name="twitter:image:alt" content="${esc(t)}" />` : "",
     ...jsonld.map(ld),
   ].filter(Boolean).join("\n    ");
 }
@@ -64,25 +64,26 @@ export function pages({ site, index, fixtures, sitemap }) {
   }
   for (const f of Array.isArray(fixtures) ? fixtures : []) {
     const name = `${f.a} v ${f.b}`, path = `/fixture/${f.id}`;
-    const title = `${name}: player props, hit rates and book lines`;
+    const title = `${name}: stats, props and listed lines`;
     const when = f.start ? new Date(f.start).toUTCString().replace(/ GMT$/, " UTC") : "";
     const { description } = pageMeta(path, title);
-    out.push([`fixture/${f.id}`, { title, description: `${description}${f.venue ? ` ${f.venue}.` : ""}${when ? ` ${when}.` : ""}`, url: abs(path), image: site ? `${site}${cardPath({ f: f.id })}` : "", h1: title,
+    out.push([`fixture/${f.id}`, { title, description: `${description}${f.venue ? ` ${f.venue}.` : ""}${when ? ` ${when}.` : ""}`, url: abs(path), ogUrl: abs(`/share/fixture/${f.id}`), image: site ? `${site}${cardPath({ f: f.id })}` : "", h1: title,
       jsonld: [{ "@context": "https://schema.org", "@type": "SportsEvent", name, sport: "Cricket", startDate: f.start || undefined, url: abs(path) || undefined,
         location: f.venue ? { "@type": "Place", name: f.venue } : undefined, homeTeam: { "@type": "SportsTeam", name: f.a }, awayTeam: { "@type": "SportsTeam", name: f.b },
         eventStatus: f.status === "Completed" ? "https://schema.org/EventCompleted" : "https://schema.org/EventScheduled" }, ...(site ? [crumbs(site, [[BRAND, "/"], [name, path]])] : [])] }]);
   }
-  const names = { player: index?.players?.nm || [], team: (index?.teams || []).map((t) => (t.g ? `${t.n} Women` : t.n)), league: index?.events || [] };
-  const seen = { player: 0, team: 0, league: 0 };
+  const names = { player: index?.players?.nm || [], team: (index?.teams || []).map((t) => (t.g ? `${t.n} Women` : t.n)), league: index?.events || [], venue: index?.venues || [] };
+  const seen = { player: 0, team: 0, league: 0, venue: 0 };
   for (const p of sitemap) {
-    const m = /^\/(player|team|league)\/(\d+)$/.exec(p);
+    const m = /^\/(player|team|league|venue)\/(\d+)$/.exec(p);
     if (!m || seen[m[1]] >= LIMITS[m[1]]) continue;
     const name = names[m[1]][Number(m[2])];
     if (!name) continue;
     seen[m[1]]++;
-    const title = { player: `${name}: stats, hit rates and form`, team: `${name}: stats and player grid`, league: `${name}: team tables, totals and top scores` }[m[1]];
-    const ldType = { player: { "@type": "Person", jobTitle: "Cricketer" }, team: { "@type": "SportsTeam", sport: "Cricket" }, league: { "@type": "SportsOrganization", sport: "Cricket" } }[m[1]];
-    out.push([`${m[1]}/${m[2]}`, { title, description: pageMeta(p, title).description, url: abs(p), image: m[1] === "player" && site ? `${site}${cardPath({ p: m[2] })}` : image, h1: title,
+    const title = { player: `${name}: stats, hit rates and form`, team: `${name}: stats and player grid`, league: `${name}: team tables, totals and top scores`, venue: `${name}: ground stats` }[m[1]];
+    const ldType = { player: { "@type": "Person", jobTitle: "Cricketer" }, team: { "@type": "SportsTeam", sport: "Cricket" }, league: { "@type": "SportsOrganization", sport: "Cricket" }, venue: { "@type": "Place" } }[m[1]];
+    const card = m[1] === "player" ? { p: m[2] } : m[1] === "venue" ? { v: m[2] } : null;
+    out.push([`${m[1]}/${m[2]}`, { title, description: pageMeta(p, title).description, url: abs(p), ogUrl: (m[1] === "player" || m[1] === "venue") ? abs(`/share/${m[1]}/${m[2]}`) : "", image: card && site ? `${site}${cardPath(card)}` : image, h1: title,
       jsonld: [{ "@context": "https://schema.org", ...ldType, name, url: abs(p) || undefined }, ...(site ? [crumbs(site, [[BRAND, "/"], [name, p]])] : [])] }]);
   }
   return out;

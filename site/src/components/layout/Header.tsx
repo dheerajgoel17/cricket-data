@@ -1,7 +1,8 @@
 import { useId } from "react";
 import { Link } from "react-router-dom";
 import { BRAND } from "@/lib/brand";
-import { Bookmark, BookOpen, Info, Search, Wrench } from "lucide-react";
+import { Bookmark, BookOpen, Info, Wrench } from "lucide-react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSaved } from "@/lib/saved";
@@ -64,7 +65,7 @@ export function Header() {
         <Brand />
         <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[560px] md:flex-1" />
         <div className="ml-auto flex shrink-0 items-center gap-snug">
-          <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-black/15 md:hidden"><Search className="size-4" /></button>
+          <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-black/15 md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
           <Profile />
         </div>
       </div>
