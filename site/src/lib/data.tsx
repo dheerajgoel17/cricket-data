@@ -39,7 +39,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     let live = true;
     (async () => {
       try {
-        const g = await gate();
+        const g = (await gate()) as { k?: string };
         const store = await createStore({ base: "/data/", wrapKey: g.k });
         const [photos, identity] = await Promise.all([
           loadJson("/data/photos.json", g.k).then((p) => (p || {}) as Photos),
