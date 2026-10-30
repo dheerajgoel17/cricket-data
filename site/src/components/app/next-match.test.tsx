@@ -39,4 +39,13 @@ describe("NextMatch", () => {
     render(<NextMatch next={next} entries={here} line={17.5} side="over" book={other} statLabel="Runs" fmt="T20" />);
     expect(screen.getByText(/Books price 14.5 on this match, not 17.5/)).toBeInTheDocument();
   });
+
+  it("still shows venue and opponent rates when no book has a line, and says no sample when they have never played there", () => {
+    const entries = [{ value: 30, venueName: "SCG", opp: "Sydney Sixers" }];
+    render(<NextMatch next={next} entries={entries} line={17.5} side="over" book={null} statLabel="Wickets" fmt="ODI" />);
+    expect(screen.queryByText("bet365")).not.toBeInTheDocument();
+    expect(screen.getByText("no sample")).toBeInTheDocument(); // never at Allan Border Field
+    expect(screen.getByText("1 of 1")).toBeInTheDocument();
+    expect(screen.getByText(/In ODI/)).toBeInTheDocument();
+  });
 });

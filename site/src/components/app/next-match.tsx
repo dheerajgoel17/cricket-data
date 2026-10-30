@@ -90,7 +90,7 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
       <div className="grid gap-tight border-t border-white/5 pt-snug">
         {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
         {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
-        <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games he played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
+        <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
       </div>
     </div>
   );

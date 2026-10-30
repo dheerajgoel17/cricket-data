@@ -39,3 +39,24 @@ test("nextMatchRates: a ground with no counted innings is played 0, not a 0% hit
   assert.equal(here.p, null);
   assert.equal(here.fair, null);
 });
+
+test("nextMatchRates: men's sides, the under, and a bowling line use the same rules", () => {
+  const rows = [e(2, { venueName: "Eden Park", opp: "India" }), e(4, { venueName: "Eden Park, Auckland", opp: "India" }), e(1, { venueName: "MCG", opp: "Australia" })];
+  const { here, versus } = nextMatchRates(rows, { ground: "Eden Park, Auckland", opp: "India" }, 2.5, "under");
+  assert.equal(here.played, 2);
+  assert.equal(here.hits, 1); // 2 is under 2.5, 4 is not
+  assert.equal(versus.played, 2);
+  assert.equal(versus.hits, 1);
+  assert.equal(here.fair, 2); // 1 / 0.5
+});
+
+test("nextMatchRates: every miss is 0% with no fair over price; a 100% under is fair 1.00", () => {
+  const rows = [e(10, { venueName: "Lords", opp: "Australia" }), e(12, { venueName: "Lords", opp: "Australia" })];
+  const over = nextMatchRates(rows, { ground: "Lords", opp: "Australia" }, 20.5, "over");
+  assert.equal(over.here.hits, 0);
+  assert.equal(over.here.p, 0);
+  assert.equal(over.here.fair, null);
+  const under = nextMatchRates(rows, { ground: "Lords", opp: "Australia" }, 20.5, "under");
+  assert.equal(under.here.hits, 2);
+  assert.equal(under.here.fair, 1);
+});
