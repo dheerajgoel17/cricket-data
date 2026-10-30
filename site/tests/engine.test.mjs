@@ -154,3 +154,29 @@ test("venueIndices finds a ground under every spelling the data holds, and nothi
   assert.deepEqual(venueIndices(store, ""), []);
   assert.deepEqual(venueIndices(store, undefined), []);
 });
+
+test("Match Fancy includes a withheld T20 that qualified, not women's matches, and not a totals-only scrape", () => {
+  // Zimbabwe men (0) last Base T20 is 6 Sep; Afghanistan men never appear in Base; the Oct Sharjah T20s are scraped.
+  const ZIM_M = 0, ZIM_W = 1, AFG_M = 2, IND_W = 3, SA_M = 4;
+  const inn = (f4) => [[0, 140, 6, 120, f4, 5, 0, 0, 0, 0, 0, 0, 12, 20, 40]];
+  const M = {
+    f:  [0, 0, 0, 0],
+    g:  [0, 1, 0, 0],
+    pv: [0, 0, 1, 1],
+    q:  [1, 1, 1, -1],
+    d:  ["2026-09-06", "2026-10-20", "2026-10-27", "2026-10-29"],
+    a:  [ZIM_M, ZIM_W, AFG_M, AFG_M],
+    b:  [SA_M, IND_W, ZIM_M, ZIM_M],
+    i:  [1, 1, 1, 1], e: [0, 0, 0, 0], v: [0, 0, 1, 1], fi: [0, 0, 0, -1],
+    inn: [inn(12), inn(20), inn(18), []],
+    ho: [16, 18, 20, 0], mc: [30, 32, 40, 0],
+  };
+  const store = { n: 4, M, teams: [{ n: "Zimbabwe", g: 0 }, { n: "Zimbabwe", g: 1 }, { n: "Afghanistan", g: 0 }, { n: "India", g: 1 }, { n: "South Africa", g: 0 }], venues: ["Windhoek", "Sharjah"] };
+  const zimMen = selectMatches(store, { fmt: 0, gender: 0, team: ZIM_M, lastN: 20 });
+  assert.deepEqual(zimMen, [0, 2], "6 Sep Base + 27 Oct withheld; not the 20 Oct women's game and not the totals-only 29 Oct scrape");
+  const afgMen = selectMatches(store, { fmt: 0, gender: 0, team: AFG_M, lastN: 20 });
+  assert.deepEqual(afgMen, [2]);
+  const sample = [...new Set([...zimMen, ...afgMen])].sort((a, b) => a - b);
+  assert.deepEqual(marketReport(store, sample, "match_fours").values, [12, 18]);
+  assert.equal(store.M.d[sample[sample.length - 1]], "2026-10-27");
+});

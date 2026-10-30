@@ -23,6 +23,8 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | The Hundred / T10 / 60-over | their own formats | never mixed with T20 or ODI |
 | A T20 in a Test series (e.g. Afghanistan vs Zimbabwe) | format on the line vs the fixture | a Test's 6-day book window must not take the T20's fancy |
 | Playing name vs registry surname (Chamari Athapaththu / AC Jayangani) | the same player | `player_aliases.csv` plus `SURNAME_ALIAS`; live matching uses ids first |
+| Afghanistan men's matches (Base withholds them) | kept as scraped, used in Match Fancy when they qualify | `q === 1` (innings from balls, or from the scorecard totals). Totals-only rows stay out so missing fours are not shown as 0 |
+| A women's T20 of the same country name | its own team index | men and women are never mixed; Match Fancy also passes `gender` |
 | First-class (MDM) | not included | not a Test |
 
 ## Known gaps
