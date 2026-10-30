@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
-import { liveBlurb, teamScore } from "@/engine/live.js";
+import { liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { fixtureState } from "@/hooks/useEngine";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
@@ -28,7 +28,7 @@ export function LiveScore({ s, size = "md", className }: { s: { display?: string
   if (!s?.display) {
     return <span className={cn("shrink-0 text-muted-foreground", size === "lg" ? "text-callout" : "text-footnote", className)}>Yet to bat</span>;
   }
-  const total = s.runs != null && s.wkts != null ? `${s.runs}/${s.wkts}` : String(s.runs ?? String(s.display).replace(/\s*\(.*$/, ""));
+  const total = scoreLabel(s);
   return (
     <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
       <span className={cn("font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body font-semibold")}>{total}</span>
@@ -54,7 +54,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const final = match?.status === "final" || (!match && fixtureState(f) === "final");
   // the live feed says the match has not started although its time has passed (rain, a late toss): it is delayed, not in play
   const delayed = !final && !hasScore && match?.status === "upcoming" && ms <= 0 && ms > -24 * 3600e3;
-  const live = !final && !delayed && (hasScore || clockLive || fixtureState(f, match?.status) === "live"); // a Test between days has no clock and may have no score on the feed, but it is still on
+  const live = !final && !delayed && (hasScore || clockLive || fixtureState(f, match?.status) === "live"); // a Test between days is still on: scores and "Close of play" come from the live feed
   const status = liveBlurb(match) || (final ? f.result || "Match completed" : live ? "Match in progress" : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
