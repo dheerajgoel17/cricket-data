@@ -577,7 +577,10 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
     body = "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls)
     root = out.parent
     (root / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + body + "</urlset>", encoding="utf-8")
-    (root / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
+    (root / "robots.txt").write_text(
+        f"User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /data/\nSitemap: {base}/sitemap.xml\n",
+        encoding="utf-8",
+    )
     return len(urls)
 
 

@@ -103,7 +103,7 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js` + `api/live.
    PRs touching the site build and test only.
 4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.
 
-Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI).
+Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI). `/data` is cookie-gated when `DATA_WRAP_KEY` is set; browsers get the cookie from `/api/gate` with no prompt.
 
 ## Player identity
 Live numbers, the "Not in XI" mark and the photos all need to know that "V Suryavanshi" (our history), "Vaibhav Sooryavanshi" (the live source) and whatever the books print are one player. `identity.json` links them by id (our id -> the live source's player id, plus the names the books use), built with the site data and read by the browser next to `photos.json`. `livePlayer` and `notInXI` use the id when the table has one and fall back to the name rules otherwise. The builder, the review list of priced players it could not link, and the hand-checked file `data/mappings/player_identity.csv` are described in `PROJECT_GUIDE.md` 5.7.

@@ -2,6 +2,7 @@
 
 Thanks for helping! Ground rules: **keep it free to run** (no paid services, no secrets; see
 [docs/ZERO_COST.md](docs/ZERO_COST.md)) and **respect data terms** (no scrapers for sites that forbid it).
+Software contributions are source-available under [LICENSE](LICENSE); a competing hosted service is not a permitted purpose.
 
 ## Setup (VS Code, JetBrains, anything)
 ```bash

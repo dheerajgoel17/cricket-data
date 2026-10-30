@@ -19,6 +19,9 @@
     }
   ],
   "functions": {
+    "api/gate.js": {
+      "maxDuration": 5
+    },
     "api/live.js": {
       "maxDuration": 20,
       "includeFiles": "public/data/identity.json"
@@ -34,11 +37,24 @@
   },
   "headers": [
     {
+      "source": "/data/meta.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60"
+        }
+      ]
+    },
+    {
       "source": "/data/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "private, max-age=120"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, nosnippet"
         }
       ]
     },

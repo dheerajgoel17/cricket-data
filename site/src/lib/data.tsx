@@ -1,17 +1,34 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { createStore } from "@/engine/store.js";
 import { Resolver } from "@/engine/resolve.js";
+import { unwrap } from "@/engine/wrap.js";
 import { identityIndex } from "@/engine/identity.js";
-import { loadPhotos, type Photos } from "@/lib/assets";
+import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex> }
 const Ctx = createContext<Data | null>(null);
 
+async function gate() {
+  try {
+    const r = await fetch("/api/gate", { credentials: "same-origin" });
+    if (!r.ok) return {};
+    return await r.json();
+  } catch { return {}; }
+}
+
+async function loadJson(url: string, key?: string) {
+  try {
+    const r = await fetch(url, { credentials: "same-origin" });
+    if (!r.ok) return null;
+    return await unwrap(await r.json(), key);
+  } catch { return null; }
+}
+
 /** The player-identity table (our id <-> the live source's id, the books' names); a missing file just means nobody is linked and names decide. */
-async function loadIdentity(base: string) {
-  try { return identityIndex(await (await fetch(`${base}identity.json`)).json()); } catch { return identityIndex(null); }
+async function loadIdentity(base: string, key?: string) {
+  return identityIndex(await loadJson(`${base}identity.json`, key));
 }
 
 /** Loads the generated data files once (matches, players index, photos map, identity table) and shares the engine objects with every page. */
@@ -22,8 +39,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
     let live = true;
     (async () => {
       try {
-        const store = await createStore({ base: "/data/" });
-        const [photos, identity] = await Promise.all([loadPhotos("/data/"), loadIdentity("/data/")]);
+        const g = await gate();
+        const store = await createStore({ base: "/data/", wrapKey: g.k });
+        const [photos, identity] = await Promise.all([
+          loadJson("/data/photos.json", g.k).then((p) => (p || {}) as Photos),
+          loadIdentity("/data/", g.k),
+        ]);
         if (live) setData({ store, rz: new Resolver(store), photos, identity });
       } catch (e) { if (live) setError((e as Error).message); }
     })();

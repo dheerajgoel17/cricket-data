@@ -24,6 +24,7 @@ Two products in one repo, both **100% free to run**:
 * **Never mix formats**: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**, first-class (`MDM`) is excluded.
 * **Show freshness** on every page: newest Base match date + whether provisional games are included.
 * **Never print or commit secrets** (`scripts/check_public_safe.py` runs in CI and also bans hosted-service hostnames (Vercel, Supabase and Workers subdomains), absolute home paths and `.env*` files).
+* **Software is source-available** (Functional Source License, [LICENSE](../LICENSE)); match files under `data/` stay CC BY-SA. A competing hosted props/fancy service is not a permitted purpose. Feeds and keys stay in GitHub secrets, not the tree.
 
 ## 2. Repository map
 ```

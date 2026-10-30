@@ -1,7 +1,9 @@
 # Cricket Data
 
-A free, open cricket dataset. Matches and per-player performance for **23,000+ matches since 2001**:
+A free cricket dataset. Matches and per-player performance for **23,000+ matches since 2001**:
 men's and women's, internationals and leagues. Updated daily, including the latest games.
+
+Match files under `data/` are [CC BY-SA 4.0](DATA_LICENSE.md). The software is source-available ([LICENSE](LICENSE)): read it, run it for yourself, send patches. A competing hosted props or fancy-markets service is not a permitted purpose.
 
 ## What's inside
 

@@ -12,6 +12,6 @@ If you use or redistribute this data you must:
 3. Indicate whether you changed it. This project reshapes ball-by-ball records into per-match and per-player
    summaries and adds computed columns (e.g. `points`).
 
-The source code (`src/`, `tests/`, scripts, workflows) is MIT licensed; see `LICENSE`.
+The source code (`src/`, `tests/`, scripts, workflows, `site/`) is source-available under the Functional Source License; see `LICENSE`.
 Data in `data/provisional/` comes from contributor-supplied sources and is temporary: it is deleted once
 Base publishes the match.
