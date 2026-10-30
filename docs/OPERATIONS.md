@@ -17,6 +17,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
 | `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
 | `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate cookie). Do not paste it into the repo |
+| `VITE_GA_MEASUREMENT_ID` | GitHub secret | GA4 measurement id (`G-…`) | inlined at the Vercel build (`site.yml` `--build-env`). Empty or unset: no Google tag. Never commit the id |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; and the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset) |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
@@ -75,6 +76,8 @@ The book may also refuse a cloud server's address: then the manual run fails wit
 
 ## Analytics
 The site counts page views and a few button taps with Vercel Web Analytics (`@vercel/analytics`, MIT, free tier, no cookies, no personal data, so no consent banner). The script is added in `site/src/main.tsx`; events go through `site/src/lib/analytics.ts` (`player_filter`, `share`, `books_open`, `fancy_market`). To read it, turn on **Analytics** once in the project's dashboard (Project, Analytics, Enable); nothing is collected until then. Events with properties need the Pro plan to be filtered in the dashboard; the free plan counts page views and shows custom events as totals.
+
+Google Analytics 4 loads the same way when `VITE_GA_MEASUREMENT_ID` is set (`site/src/lib/ga.ts`): no cookie banner, ads cookies denied, IP anonymised, SPA `page_view` from `App`. The measurement id is a GitHub secret, inlined at build; it is never in source. Without the secret the tag is not injected.
 
 **Errors and speed.** Page errors are counted as events named by kind: `error_chunk` (a script of an older deploy was gone; the page reloads itself), `error_render` (a page threw, the Reload button showed), `error_script` and `error_promise` (anything else), at most five per page load, so the totals read on the free plan (the message and page go along as properties, readable on Pro). Loading speed (Core Web Vitals per page) comes from Vercel Speed Insights (`@vercel/speed-insights`, Apache-2.0, free tier): turn on **Speed Insights** in the same project dashboard. Watch for a rise in `error_chunk` right after a deploy (normal, small) and any `error_render` (a bug).
 

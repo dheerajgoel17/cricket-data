@@ -1,7 +1,7 @@
 // Live score snapshots from Source A: the schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { NO_IDENTITY } from "./identity.js";
-import { SAME_SIDE, norm } from "./util.js";
+import { SAME_SIDE, norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
 const WINDOW_MS = 36 * 3600e3;
@@ -21,11 +21,16 @@ export function namesMatch(a, b) {
   const ta = norm(a).split(" ").filter(Boolean), tb = norm(b).split(" ").filter(Boolean);
   if (!ta.length || !tb.length) return false;
   if (ta.join(" ") === tb.join(" ")) return true;
-  if (ta[ta.length - 1] !== tb[tb.length - 1]) return false;
+  const sa = ta[ta.length - 1], sb = tb[tb.length - 1];
+  if (!surnamesEq(sa, sb)) return false;
   const init = (toks) => toks.slice(0, -1).map((t) => t[0]).join("");
   const ia = init(ta), ib = init(tb);
   if (!ia || !ib) return (ta[0][0] || "") === (tb[0][0] || "");
-  return ia[0] === ib[0];
+  if (ia[0] === ib[0]) return true;
+  // playing name vs registry surname (Chamari / AC Jayangani): a later initial may be the playing given
+  if (sa === sb) return false;
+  const blob = (toks) => toks.slice(0, -1).map((t) => (t.length <= 4 ? t : t[0])).join("");
+  return blob(ta).includes(ib[0]) || blob(tb).includes(ia[0]);
 }
 
 export function oversToBalls(o) {

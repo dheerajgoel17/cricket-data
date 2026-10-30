@@ -18,6 +18,14 @@ export function canonFmt(f) {
   return FORMATS.includes(s) ? s : s;
 }
 
+/** Playing name vs registry surname (Chamari Athapaththu is AC Jayangani). */
+export const SURNAME_ALIAS = {
+  athapaththu: ["jayangani"],
+  jayangani: ["athapaththu"],
+};
+
+export const surnamesEq = (a, b) => a === b || (SURNAME_ALIAS[a] || []).includes(b);
+
 /** A side the books and the schedule name differently ("Auckland Aces" / "Auckland"), reduced to one team key. Kept equal to `SAME_SIDE` in src/value_bets/archive.py. */
 export const SAME_SIDE = { aucklandaces: "auckland", canterburykings: "canterbury", wellingtonfirebirds: "wellington", otagovolts: "otago", northerndistricts: "northernbrave" };
 
