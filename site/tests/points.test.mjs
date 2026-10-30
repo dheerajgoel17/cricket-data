@@ -16,7 +16,7 @@ const same = (v) => Array(N).fill(v);
 const data = {
   "meta.json": { schema: 1, built_at: "2026-10-28T00:00Z", matches: N, players: 1, newest_base: "2026-10-20", provisional_matches: 0, newest_provisional: "", provisional_included: false },
   "index.json": { players: { id: ["00000001"], nm: ["T Allrounder"], g: [0], last: ["2026-10-20"], n: [4], tm: [0], fm: [1] }, aliases: {}, teams: TEAMS, venues: ["Ground"], events: ["Series"],
-    hosts: ["Alpha"], kinds: [""], formats: ["T20", "ODI", "Test", "Hundred"], nshard: 1 },
+    hosts: ["Alpha"], kinds: [""], formats: ["T20", "ODI", "Test", "Hundred", "T10", "O60"], nshard: 1 },
   "matches.json": { id: ["a", "b", "c", "d", "e"], d: ["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05"], f: same(0), g: same(0), i: same(1), e: same(0), v: same(0), a: same(0), b: same(1),
     w: same(0), r: same(0), o: same(20), dy: same(1), h: same(0), fi: same(0), pv: same(0), q: same(1), ho: same(0), mc: same(0), ts: same(0), xq: same(1), inn: same([[0, 150], [1, 140]]) },
   "p/00.json": {

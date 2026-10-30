@@ -1,4 +1,4 @@
-from value_bets.fancy import match_fancy
+from value_bets.fancy import _fmt, match_fancy
 
 
 def q(group, **kw):
@@ -30,3 +30,15 @@ def test_pairs_over_and_under_into_lines_keyed_like_the_site_markets():
 
 def test_empty_or_missing_feed_is_fine():
     assert match_fancy(None) == [] and match_fancy({}) == []
+
+
+def test_fmt_from_the_books_league_so_a_t20_cannot_price_a_test():
+    assert _fmt({"league": "T20 Internationals", "home": "Afghanistan", "away": "Zimbabwe"}) == "T20"
+    assert _fmt({"league": "Test Matches", "home": "Afghanistan", "away": "Zimbabwe"}) == "Test"
+    assert _fmt({"league": "Abu Dhabi T10", "home": "A", "away": "B"}) == "T10"
+    raw = {"matches": [{"home": "Afghanistan", "away": "Zimbabwe", "kickoff_utc": "2026-10-24T14:30:00Z", "in_play": False,
+                        "league": "T20 Internationals", "quotes": [
+                            q("Total Match Runs", label="Over", handicap="320.5", odds_dec=1.83),
+                            q("Total Match Runs", label="Under", handicap="320.5", odds_dec=1.83)]}]}
+    out = match_fancy(raw)
+    assert out[0]["fmt"] == "T20" and out[0]["competition"] == "T20 Internationals"

@@ -19,7 +19,7 @@ const BAT = [{ m: 0, i: 1, r: 40 }, { m: 0, i: 3, r: 10 }, { m: 1, i: 2, r: 15 }
 const data = {
   "meta.json": { schema: 1, built_at: "2026-10-28T00:00Z", matches: 3, players: 1, newest_base: "2026-10-20", provisional_matches: 0, newest_provisional: "", provisional_included: false },
   "index.json": { players: { id: ["00000001"], nm: ["T Batter"], g: [0], last: ["2026-10-20"], n: [3], tm: [0], fm: [4] }, aliases: {}, teams: TEAMS, venues: ["Ground"], events: ["Series"],
-    hosts: ["Alpha"], kinds: [""], formats: ["T20", "ODI", "Test", "Hundred"], nshard: 1 },
+    hosts: ["Alpha"], kinds: [""], formats: ["T20", "ODI", "Test", "Hundred", "T10", "O60"], nshard: 1 },
   "matches.json": { id: ["t0", "t1", "t2"], d: ["2026-10-01", "2026-10-08", "2026-10-15"], f: [2, 2, 2], g: [0, 0, 0], i: [1, 1, 1], e: [0, 0, 0], v: [0, 0, 0], a: [0, 0, 0], b: [1, 1, 1],
     w: [0, 0, 0], r: [0, 0, 0], o: [90, 90, 90], dy: [5, 5, 5], h: [0, 0, 0], fi: [0, 1, 0], pv: [0, 0, 0], q: [1, 1, 1], ho: [0, 0, 0], mc: [0, 0, 0], ts: [0, 0, 0], xq: [1, 1, 1], inn: INN },
   "p/00.json": { bat: { p: BAT.map(() => 0), m: col(BAT, "m"), i: col(BAT, "i"), t: BAT.map(() => 0), q: BAT.map(() => 1), o: BAT.map(() => 1), r: col(BAT, "r"), b: BAT.map((r) => r.r * 2),

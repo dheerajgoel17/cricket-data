@@ -48,11 +48,11 @@ data/fixtures, value_bets ┘                                                   
   Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`).
 
 ## Settlement rules and definitions
-* T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100.
+* T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100; T10 48 of 60; 60-over 288 of 360.
   Tests: void unless there is a result, or 300 overs (5-day) / 200 overs (4-day) were bowled. Void matches are left out of match/team markets.
 * 30s = 30-49, 50s = 50-99, 100s = 100+, double-digit = 10+, single-digit = 1-9 (ducks excluded). Team markets count only the team batting first.
 * Retired hurt is not a wicket. Penalty runs count. Runs conceded = batter runs + wides + no-balls + penalty (as in `data/players`). Super overs are ignored.
-* Formats: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**. First-class (`MDM`) is not included.
+* Formats: T20 = T20 + T20I, ODI = ODI + 50-over List A, Test = Tests only, **The Hundred / T10 / 60-over are their own formats**. A T20 in a Test series must not price the Test. First-class (`MDM`) is not included.
 * Fair decimal odds = 1 / hit rate on the filtered sample (pushes on whole-number lines are void). Decimal odds only.
 * Home/away/neutral is *inferred*, because Base has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
   `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.

@@ -289,6 +289,26 @@ test("a Test is the same match on any of its days (books price it day by day), a
   assert.equal(fancyFor({ fancy: [{ key: "match_fours", scope: "match", home: "Bangladesh", away: "West Indies", start_utc: "2026-10-29T03:30:00Z", line: 20.5, over: 1.9, under: 1.9, source: "x" }] }, { a: "Bangladesh", b: "West Indies", fmt: "Test", startMs: Date.parse("2026-10-28T03:30:00Z") }, "match_fours").length, 1);
 });
 
+test("a T20 in an Afghanistan Test series does not price the Test (the Test's 6-day window would otherwise take it)", () => {
+  const testFx = { a: "Afghanistan", b: "Zimbabwe", start: "2026-10-20T04:00Z", fmt: "Test", startMs: Date.parse("2026-10-20T04:00:00Z") };
+  const t20Fx = { a: "Afghanistan", b: "Zimbabwe", start: "2026-10-24T14:30Z", fmt: "T20", startMs: Date.parse("2026-10-24T14:30:00Z") };
+  const t20 = { match: "Afghanistan vs Zimbabwe", home: "Afghanistan", away: "Zimbabwe", start_utc: "2026-10-24T14:30:00Z",
+    competition: "T20 Internationals", key: "match_sixes", scope: "match", team: null, line: 11.5, over: 1.83, under: 1.83, source: "x", fmt: "T20" };
+  const testLine = { ...t20, fmt: "Test", competition: "Test Matches", start_utc: "2026-10-20T04:00:00Z", key: "match_fours", line: 40.5 };
+  assert.equal(sameFixture(t20, testFx), false, "T20 fancy must not attach to the Test four days earlier");
+  assert.equal(sameFixture(t20, t20Fx), true);
+  assert.equal(sameFixture(testLine, testFx), true);
+  assert.deepEqual(fancyFor({ fancy: [t20] }, testFx, "match_sixes"), []);
+  assert.deepEqual(fancyFor({ fancy: [t20] }, t20Fx, "match_sixes").map((x) => x.line), [11.5]);
+  const fromComp = { ...t20 }; delete fromComp.fmt;
+  assert.equal(sameFixture(fromComp, testFx), false, "competition text T20 Internationals is enough when the row has no fmt");
+  const bare = { match: "Afghanistan vs Zimbabwe", home: "Afghanistan", away: "Zimbabwe", start_utc: "2026-10-24T14:30:00Z",
+    key: "match_sixes", scope: "match", team: null, line: 11.5, over: 1.9, under: 1.9, source: "x" };
+  const doc = { fancy: [bare], lines: [{ match: "Afghanistan vs Zimbabwe", start_utc: "2026-10-24T14:30:00Z", fmt: "T20", pid: "ab12" }] };
+  assert.equal(sameFixture(bare, testFx, doc), false, "a T20 player-prop on the same kick-off tags the fancy");
+  assert.equal(sameFixture(bare, t20Fx, doc), true);
+});
+
 test("an exchange's No on its own line is quoted beside its Yes, and an under-only line is never the main one", async () => {
   const { bookQuotes, bookLinesFor } = await import("../src/engine/lines.js");
   const fw = (line, over, under) => ({ line, books: [{ source: "FairWin247 Fancy", over, under }] });

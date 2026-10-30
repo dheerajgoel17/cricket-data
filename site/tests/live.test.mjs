@@ -94,7 +94,7 @@ test("liveBlurb shows the source's status line, not a bare Live", () => {
 });
 
 test("formatOf maps the source's format labels to the site's formats", () => {
-  for (const [label, fmt] of [["T20I", "T20"], ["T20", "T20"], ["ODI", "ODI"], ["List A", "ODI"], ["Youth ODI", "ODI"], ["One Day", "ODI"], ["Test", "Test"], ["First Class", "Test"], ["Multi Day", "Test"], ["The Hundred", "Hundred"], ["", ""]]) {
+  for (const [label, fmt] of [["T20I", "T20"], ["T20", "T20"], ["ODI", "ODI"], ["List A", "ODI"], ["Youth ODI", "ODI"], ["One Day", "ODI"], ["Test", "Test"], ["First Class", "Test"], ["Multi Day", "Test"], ["The Hundred", "Hundred"], ["T10", "T10"], ["10 overs", "T10"], ["60 overs", "O60"], ["", ""]]) {
     assert.equal(formatOf(label), fmt, label);
   }
 });

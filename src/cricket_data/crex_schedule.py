@@ -21,17 +21,23 @@ _STATE = re.compile(r'<script id="app-root-state"[^>]*>(.*?)</script>', re.S)
 
 
 def format_of(text: str) -> str:
-    """Source A format label -> T20 / ODI / Test / Hundred / FC (first-class, not part of the site's stats) / ''."""
+    """Source A format label -> T20 / ODI / Test / Hundred / T10 / O60 / O40 / FC. Never collapse T10 into T20 or 60-over into ODI."""
     t = (text or "").lower()
-    if "100" in t and "ball" in t:
+    if re.search(r"\bt10\b", t) or ("10 over" in t and "t20" not in t):
+        return "T10"
+    if ("100" in t and "ball" in t) or "the hundred" in t:
         return "Hundred"
+    if re.search(r"\b60[- ]overs?\b", t):
+        return "O60"
+    if re.search(r"\b40[- ]overs?\b", t):
+        return "O40"
     if "t20" in t:
         return "T20"
     if "first class" in t or "four day" in t or "multi" in t:
         return "FC"
     if t == "test" or t.endswith(" test") or "test" in t.split():
         return "Test"
-    if "odi" in t or "one day" in t or "list a" in t:
+    if "odi" in t or "one day" in t or "list a" in t or "50 over" in t:
         return "ODI"
     return ""
 
