@@ -16,6 +16,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
 | `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
+| `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build; `site.yml` injects it into the Vercel deploy (gate cookie). Do not paste it into the repo |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; and the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset) |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
@@ -30,6 +31,8 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 **Source hosts live in the environment, never in the tree.** No tracked file names a data source's host (`scripts/check_public_safe.py` fails on it, comparing hashes so the script lists none), and committed data stores host-relative links. Locally put the same names in a git-ignored `site/.env.local` (the dev server loads it into the API handlers) or export them before running Python. Tests use placeholder hosts (`tests/conftest.py`, `site/tests/*`).
 
 Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link` must be deleted (it holds an OIDC token).
+
+**Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files and the Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). This is a speed bump, not a secret from a real browser.
 
 ## Routine tasks
 **Rotate the xAI key**: console.x.ai -> API Keys -> create new, delete old; then `cd site && printf '%s' "$NEW" | npx vercel env add XAI_API_KEY production --sensitive --yes` (or the dashboard), then redeploy (`npx vercel deploy --prod --yes`).

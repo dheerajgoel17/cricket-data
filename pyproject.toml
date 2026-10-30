@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Free, self-updating open cricket dataset: daily Base ingest, per-player performance, provisional-data reconciliation."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "FSL-1.1-APv2" }
 authors = [{ name = "Cricket Data maintainers", email = "dheerajgoeldsuperdude@gmail.com" }]
 dependencies = []
 
