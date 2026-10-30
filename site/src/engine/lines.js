@@ -5,6 +5,11 @@ import { SAME_SIDE, canonFmt } from "./util.js";
 export const BOOK_NAMES = { bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
 export const bookName = (src) => BOOK_NAMES[src] || src;
 
+/** How long the player page and Hot props keep a limited-overs match after it starts (24 hours). A Test stays 6 days so a match in play is not dropped. */
+export const BOOK_KEEP_MS = 24 * 3600e3;
+export const TEST_KEEP_MS = 6 * 24 * 3600e3;
+export const keepMsFor = (fmt) => (fmt === "Test" ? TEST_KEEP_MS : BOOK_KEEP_MS);
+
 /** The market's no-vig probability of the over, from one book's two prices (null if either is missing). */
 export function overProb(over, under) {
   if (!(over > 1) || !(under > 1)) return null;

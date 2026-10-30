@@ -49,4 +49,19 @@ describe("NextMatch", () => {
     expect(screen.getByText("No props live yet")).toBeInTheDocument();
     expect(screen.getByText("Sydney Sixers Women")).toBeInTheDocument();
   });
+
+  it("keeps the listed line after the match and says whether it cleared", () => {
+    render(<NextMatch next={{ ...next, phase: "final", priced: true }} entries={here} line={17.5} side="over" book={book} statLabel="Runs" fmt="T20"
+      standing={{ v: 31, state: "final", verdict: "cleared" }} />);
+    expect(screen.getByText("This match")).toBeInTheDocument();
+    expect(screen.getByText(/O 17.5/)).toBeInTheDocument();
+    expect(screen.getByText(/31 final/)).toBeInTheDocument();
+    expect(screen.getByText(/Cleared/)).toBeInTheDocument();
+    expect(screen.queryByText("No props live yet")).not.toBeInTheDocument();
+  });
+
+  it("says Not in XI when the settled line rules her out", () => {
+    render(<NextMatch next={{ ...next, phase: "final", priced: true }} entries={here} line={17.5} side="over" book={book} statLabel="Runs" fmt="T20" out />);
+    expect(screen.getByText("Not in XI")).toBeInTheDocument();
+  });
 });

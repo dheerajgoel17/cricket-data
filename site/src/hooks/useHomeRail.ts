@@ -4,7 +4,7 @@ import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useRail } from "@/hooks/useRail";
 import { liveForFixture } from "@/engine/live.js";
-import { homeTeam, rankFixtures } from "@/lib/priority";
+import { arrangeFixtures, homeTeam, rankFixtures } from "@/lib/priority";
 
 /** How long the rail waits for its published settings and for the first live scores before it paints with what it has (the viewer sees the skeleton meanwhile). */
 export const RAIL_WAIT_MS = 800, LIVE_WAIT_MS = 1200;
@@ -21,24 +21,22 @@ function useGaveUp(ms: number, done: boolean): boolean {
 }
 
 /**
- * The fixtures the home rail shows, in order: matches in play first, then the ones to come, then finished ones (`rankFixtures`). Nothing (`ready` false: the page shows a skeleton)
+ * The fixtures the home rail shows, in series clusters (`arrangeFixtures`): matches in play, then the rest of today, then later. Nothing (`ready` false: the page shows a skeleton)
  * until the schedule and the bookmaker lines are in, so the list is never the unpriced schedule that the priced one then replaces. The live state is what puts a match first, so
  * the first paint also has it: at once from the last /api/live body kept on the device (`live-cache.ts`), else after a short wait (the same for the rail settings). A fresh body that
  * changes a match's state (it has gone live, or ended) re-sorts the rail; one that changes nothing leaves the order as it was.
  */
 /** How many games without props the rail adds after the ones with props. */
 const NO_PROPS_LIMIT = 24;
-/** A match that began in this window (a T20 that just ended) sits at the front of the finished group. */
-export const JUST_ENDED_MS = 8 * 3600e3;
+/** A limited-overs Final stays on the rail this long after it started (a Test keeps 4 days). */
+export const FINISHED_KEEP_MS = 24 * 3600e3;
 
 /**
- * Finished matches the rail still shows: every priced Final `shownFixtures` kept (no count cap). Just-ended games
- * lead the group so a club or women's T20 is not buried behind older internationals the moment it goes Final.
+ * Finished matches the rail still shows: 24 hours from the start (4 days for a Test). Newest first.
  */
 export function keepFinished(finished: any[], now = Date.now()): any[] {
-  const just = finished.filter((f) => Date.parse(f.start) > now - JUST_ENDED_MS);
-  const older = finished.filter((f) => Date.parse(f.start) <= now - JUST_ENDED_MS);
-  return [...just, ...older];
+  const ms = (f: any) => (f.fmt === "Test" || f.fmt === "FC" ? 96 * 3600e3 : FINISHED_KEEP_MS);
+  return finished.filter((f) => Date.parse(f.start) > now - ms(f)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
 }
 
 export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
@@ -53,9 +51,11 @@ export function useHomeRail(limit = 14): { ready: boolean; fixtures: any[] } {
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
     const ranked = rankFixtures(fx, homeTeam(), stateOf, rail);
     const priced = ranked.filter((f) => !f.noProps);
-    // finished matches have their own places after the live and coming ones: with many matches lined up they would be cut off the `limit`, so they are appended in full
-    const done = keepFinished(priced.filter((f) => stateOf(f) === "final")), going = priced.filter((f) => stateOf(f) !== "final").slice(0, limit);
-    return [...going, ...done, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
+    const arranged = arrangeFixtures(keepFinished(priced.filter((f) => stateOf(f) === "final")).concat(priced.filter((f) => stateOf(f) !== "final")), stateOf, homeTeam(), rail);
+    const upcoming = arranged.filter((f) => stateOf(f) === "upcoming");
+    const cap = new Set(upcoming.slice(0, limit));
+    const shown = arranged.filter((f) => stateOf(f) !== "upcoming" || cap.has(f));
+    return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
   }, [ready, fx, live.data, rail, limit]);
   return { ready, fixtures };
 }

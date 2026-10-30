@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { atGround, nextMatchRates, vsSide } from "../src/engine/next-match.js";
+import { atGround, matchPhase, nextMatchRates, pickPricedMatch, vsSide } from "../src/engine/next-match.js";
 
 const e = (value, extra = {}) => ({ value, ...extra });
 
@@ -48,6 +48,26 @@ test("nextMatchRates: men's sides, the under, and a bowling line use the same ru
   assert.equal(versus.played, 2);
   assert.equal(versus.hits, 1);
   assert.equal(here.fair, 2); // 1 / 0.5
+});
+
+test("pickPricedMatch keeps a just-finished T20 (5 h after the start) and prefers it over a later unpriced-looking next game", () => {
+  const now = Date.parse("2026-10-30T13:00:00Z");
+  const done = { pid: "ck", stat: "runs", fmt: "T20", line: 22.5, match: "Brisbane Heat Women vs Sydney Sixers Women",
+    start_utc: "2026-10-30T08:10:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 1.83, under: 1.83 }] };
+  const later = { ...done, match: "Brisbane Heat Women vs Melbourne Stars Women", start_utc: "2026-11-01T08:10:00Z", books: [] };
+  assert.equal(pickPricedMatch({ lines: [done, later] }, "ck", "T20", now).match, "Brisbane Heat Women vs Sydney Sixers Women");
+  assert.equal(pickPricedMatch({ lines: [done] }, "ck", "T20", Date.parse("2026-10-31T09:10:00Z")), null, "25 h after the start it is gone");
+  assert.equal(pickPricedMatch({ lines: [done] }, "ck", "ODI", now), null);
+});
+
+test("matchPhase: the live feed's word wins; otherwise the first 5 h after a T20 start are still in play", () => {
+  const start = "2026-10-30T08:10:00Z";
+  const now = Date.parse("2026-10-30T13:00:00Z"); // 4 h 50 min after the start
+  assert.equal(matchPhase(start, Date.parse("2026-10-30T07:00:00Z"), undefined, "T20"), "upcoming");
+  assert.equal(matchPhase(start, now, "live", "T20"), "live");
+  assert.equal(matchPhase(start, now, "final", "T20"), "final");
+  assert.equal(matchPhase(start, now, undefined, "T20"), "live", "no feed yet, still inside 5 h");
+  assert.equal(matchPhase(start, Date.parse("2026-10-30T14:00:00Z"), undefined, "T20"), "final", "past 5 h with no feed: finished");
 });
 
 test("nextMatchRates: every miss is 0% with no fair over price; a 100% under is fair 1.00", () => {

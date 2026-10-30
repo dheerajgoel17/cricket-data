@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
-import { SCOPE_LABEL, bookLinesFor, bookQuotes, lineScope, sameFixture } from "@/engine/lines.js";
+import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
 import { sideEdge } from "@/engine/stats.js";
@@ -73,7 +73,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
       const score = async (l: any) => {
         const idx = store.P.id.indexOf(l.pid);
         const inn = lineScope(l);
-        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : 40 * 3600e3, inn);
+        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null }, split_by: [] }, { playerIdx: idx });
@@ -250,13 +250,13 @@ export function HotProps({ teams, start, archive, heading }: { teams?: [string, 
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start }, { a: teams![0], b: teams![1], start }); // this match: the same two sides and the same start, not the series' next game
   const live = useLiveDoc();
-  // a match stays for 3 hours after the start, and for as long as the live feed still lists it as being played (an ODI or a Test runs far longer)
+  // a match stays 24 hours after the start (6 days for a Test), and while the live feed still lists it as being played
   const onFixture = !!teams;
   const data = useMemo(() => (all || []).filter((r) => {
     if (onFixture) return true; // a fixture's own page shows every line it has, whatever the match's age: props are never taken away
-    if (Date.parse(r.start) > Date.now() - 3 * 3600e3 || r.settled != null) return true;
+    if (Date.parse(r.start) > Date.now() - keepMsFor(r.fmt)) return true;
     const [a, b] = String(r.match).split(/\s+vs\s+/i);
-    return ["live", "final"].includes(liveForFixture(live.data, { a, b, start: r.start })?.status ?? ""); // a finished match keeps its props with their results
+    return liveForFixture(live.data, { a, b, start: r.start })?.status === "live";
   }), [all, live.data, onFixture]);
   const { identity } = useData();
   // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`

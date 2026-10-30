@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { DEFAULT_RAIL, fixtureScore, homeTeam, rankFixtures, sanitizeRail } from "./priority";
+import { DEFAULT_RAIL, arrangeFixtures, fixtureScore, homeTeam, rankFixtures, sanitizeRail } from "./priority";
 
 const fx = (a: string, b: string, extra: Record<string, unknown> = {}) => ({ a, b, fmt: "ODI", gender: "male", series: "", ...extra });
 // today's list, in the order the schedule gives it
@@ -30,6 +30,22 @@ describe("fixture order", () => {
     expect(order("pakistan")[0]).toBe("Pakistan v Sri Lanka");
     expect(order("australia")[0]).toBe("South Africa v Australia");
     expect(order(null).slice(0, 2)).toEqual(["South Africa v Australia", "New Zealand v India"]); // nobody's team: by standing alone
+  });
+  it("keeps a series together: today's result sits next to that series' next game, not behind every other upcoming card", () => {
+    const now = Date.parse("2026-10-30T12:00:00Z");
+    const heat = fx("Brisbane Heat Women", "Sydney Sixers Women", { series: "WBBL 2026", start: "2026-10-30T08:10:00Z" });
+    const strikers = fx("Adelaide Strikers Women", "Melbourne Stars Women", { series: "WBBL 2026", start: "2026-10-31T08:10:00Z" });
+    const india = fx("India", "New Zealand", { series: "IND vs NZ 2026", start: "2026-11-01T00:00:00Z" });
+    const stateOf = (f: any) => (f.a.startsWith("Brisbane") ? "final" : "upcoming");
+    expect(arrangeFixtures([india, strikers, heat], stateOf, null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["India", "Brisbane Heat Women", "Adelaide Strikers Women"]);
+  });
+  it("puts a series in play ahead of other series, and today's remaining game ahead of a finished one in the same series", () => {
+    const now = Date.parse("2026-10-30T12:00:00Z");
+    const live = fx("South Africa", "Australia", { series: "AUS vs SA 2026", start: "2026-10-27T08:00:00Z", fmt: "Test" });
+    const next = fx("Brampton Blazers", "Vancouver Guardians", { series: "Global T20 2026", start: "2026-10-30T14:00:00Z" });
+    const done = fx("Montreal Warriors", "Toronto Nationals", { series: "Global T20 2026", start: "2026-10-30T08:00:00Z" });
+    const stateOf = (f: any) => (f.a === "South Africa" ? "live" : f.a === "Brampton Blazers" ? "upcoming" : "final");
+    expect(arrangeFixtures([done, next, live], stateOf, null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["South Africa", "Brampton Blazers", "Montreal Warriors"]);
   });
   it("puts every match in play first, then the ones to come, then finished ones, and keeps the start order on a tie", () => {
     expect(order("india", (f: any) => (f.a === "New Zealand" ? "final" : "upcoming")).at(-1)).toBe("New Zealand v India");
