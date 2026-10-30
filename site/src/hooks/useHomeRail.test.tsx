@@ -9,7 +9,7 @@ vi.mock("@/lib/feeds", () => ({ loadLines: () => feeds.lines.promise, loadLive: 
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: { loadFixtures: () => feeds.fixtures.promise, teams: [] }, rz: {}, identity: {} }) }));
 
 import { LIVE_CACHE_MS, saveLive } from "@/lib/live-cache";
-import { JUST_ENDED_MS, LIVE_WAIT_MS, RAIL_WAIT_MS, keepFinished, useHomeRail } from "./useHomeRail";
+import { FINISHED_KEEP_MS, LIVE_WAIT_MS, RAIL_WAIT_MS, keepFinished, useHomeRail } from "./useHomeRail";
 import { usePricedFixtures } from "./useEngine";
 import { useLiveDoc } from "./useLive";
 
@@ -43,19 +43,14 @@ beforeEach(() => {
 afterEach(() => { vi.useRealTimers(); });
 
 describe("keepFinished", () => {
-  const at = (h: number) => ({ a: `m${h}`, start: new Date(NOW + h * 3600e3).toISOString() });
-  it("puts a match that just ended first, and keeps every finished game (no count cap)", () => {
-    const older = [at(-20), at(-18), at(-16)];
-    const wbbl = at(-2);
-    expect(keepFinished([...older, wbbl], NOW).map((f) => f.a)).toEqual(["m-2", "m-20", "m-18", "m-16"]);
+  const at = (h: number, extra: Record<string, unknown> = {}) => ({ a: `m${h}`, start: new Date(NOW + h * 3600e3).toISOString(), fmt: "T20", ...extra });
+  it("keeps a finished T20 for 24 hours, newest first", () => {
+    expect(keepFinished([at(-20), at(-2), at(-16)], NOW).map((f) => f.a)).toEqual(["m-2", "m-16", "m-20"]);
   });
-  it("shows every just-ended match ahead of older ones, and keeps the older ones too", () => {
-    expect(keepFinished([at(-20), at(-1), at(-2)], NOW).map((f) => f.a)).toEqual(["m-1", "m-2", "m-20"]);
-    expect(keepFinished([at(-20), at(-18), at(-16), at(-14)], NOW).map((f) => f.a)).toEqual(["m-20", "m-18", "m-16", "m-14"]);
-  });
-  it("treats a match as older 8 hours after it began, and still keeps it", () => {
-    const older = [at(-20), at(-18), at(-16)];
-    expect(keepFinished([...older, at(-JUST_ENDED_MS / 3600e3 - 1)], NOW).map((f) => f.a)).toEqual(["m-20", "m-18", "m-16", "m-9"]);
+  it("drops a T20 after 24 hours, and keeps a Test for 4 days", () => {
+    expect(FINISHED_KEEP_MS).toBe(24 * 3600e3);
+    expect(keepFinished([at(-20), at(-25), at(-2)], NOW).map((f) => f.a)).toEqual(["m-2", "m-20"]);
+    expect(keepFinished([at(-48, { a: "Test", fmt: "Test" }), at(-25)], NOW).map((f) => f.a)).toEqual(["Test"]);
   });
 });
 

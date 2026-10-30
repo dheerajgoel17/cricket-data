@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SCOPE_LABEL, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
+import { BOOK_KEEP_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, teamKey, withArchive } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -68,6 +68,19 @@ test("the nearest upcoming match wins; a match that started long ago is ignored"
   assert.equal(r.match, "sooner");
   assert.equal(r.lines.length, 1);
   assert.equal(bookLinesFor({ lines: [L(5.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" })] }, "ab12", "runs", "T20", NOW), null);
+});
+
+test("keepMsFor is 24 hours, 6 days for a Test; the player page's window still has a match that started a few hours ago", () => {
+  assert.equal(keepMsFor("T20"), BOOK_KEEP_MS);
+  assert.equal(keepMsFor("Test"), TEST_KEEP_MS);
+  assert.equal(BOOK_KEEP_MS, 24 * 3600e3);
+  assert.equal(TEST_KEEP_MS, 6 * 24 * 3600e3);
+  const started = L(17.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" }); // 5 h before NOW: the 3-hour default lets it go
+  assert.equal(bookLinesFor({ lines: [started] }, "ab12", "runs", "T20", NOW), null);
+  assert.equal(bookLinesFor({ lines: [started] }, "ab12", "runs", "T20", NOW, BOOK_KEEP_MS).main.line, 17.5);
+  assert.deepEqual(bookStatsFor({ lines: [started] }, "ab12", "T20", NOW, BOOK_KEEP_MS), ["runs"]);
+  const stale = L(17.5, 1.85, 1.95, { start_utc: "2026-10-25T00:00:00Z" }); // 53 h before NOW: past the 24-hour keep
+  assert.equal(bookLinesFor({ lines: [stale] }, "ab12", "runs", "T20", NOW, BOOK_KEEP_MS), null);
 });
 
 test("book names are readable, unknown sources are shown as-is", () => {

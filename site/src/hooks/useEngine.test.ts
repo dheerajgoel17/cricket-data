@@ -31,10 +31,15 @@ describe("shownFixtures", () => {
   const done = (a: string, start: string) => f(start, { a, status: "Completed" });
   const up = (a: string, start: string) => f(a === "" ? start : start, { a });
 
-  it("keeps a completed match for at least a day, even with plenty of matches lined up", () => {
-    const now = at("2026-10-28T09:00:00Z"); // a T20 that began at 07:00 the day before: 26 hours on
+  it("keeps a completed match for 24 hours, even with plenty of matches lined up", () => {
+    const now = at("2026-10-28T06:00:00Z"); // a T20 that began at 07:00 the day before: 23 hours on
     const busy = [done("IndiaNZ", "2026-10-27T07:00Z"), up("m1", "2026-10-28T08:00Z"), up("m2", "2026-10-28T11:00Z"), up("m3", "2026-10-28T14:00Z")];
     expect(ids(shownFixtures(busy, state, () => true, now))).toEqual(["IndiaNZ", "m1", "m2", "m3"]);
+  });
+  it("lets it go after 24 hours once three or more matches are lined up", () => {
+    const now = at("2026-10-28T08:00:00Z"); // 25 hours on
+    const busy = [done("IndiaNZ", "2026-10-27T07:00Z"), up("m1", "2026-10-28T09:00Z"), up("m2", "2026-10-28T11:00Z"), up("m3", "2026-10-28T14:00Z")];
+    expect(ids(shownFixtures(busy, state, () => true, now))).toEqual(["m1", "m2", "m3"]);
   });
   it("lets it go after a day and a half once three or more matches are lined up", () => {
     const now = at("2026-10-29T09:00:00Z"); // 50 hours on

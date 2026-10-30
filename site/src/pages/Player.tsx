@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SCOPE_LABEL, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, sameFixture, teamKey } from "@/engine/lines.js";
+import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, teamKey } from "@/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
 import { SPLITS } from "@/engine/props.js";
 import { STATS } from "@/engine/rules.js";
@@ -24,8 +24,9 @@ import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
-import { liveForFixture } from "@/engine/live.js";
+import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
 import { venueStem } from "@/engine/markets.js";
+import { matchPhase, pickPricedMatch } from "@/engine/next-match.js";
 import { NextFilters, NextMatch } from "@/components/app/next-match";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
@@ -126,19 +127,20 @@ function PlayerScreen({ idx }: { idx: number }) {
 
   const lines = useQuery(linesQuery);
   const pid = store.P.id[idx];
-  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat) ?? "") : -1; // a link with no format opens where a book has a line out
+  const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
-  const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal]) : [];
+  const keep = keepMsFor(FORMATS[fmtVal]);
+  const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep) : [];
   const statItems = STAT_OPTIONS.filter(([k]) => pricedStats.includes(k));
   const stat = pricedStats.includes(askedStat) ? askedStat : (pricedStats[0] || askedStat || "runs"); // only a listed prop, else the URL / runs for the form chart with no chips
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
   // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
   const testBat = FORMATS[fmtVal] === "Test" && (STATS as any)[stat]?.side === "bat";
-  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, pid, stat, FORMATS[fmtVal]) : [];
+  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep) : [];
   const asked = q.scope === undefined || q.scope === "" ? null : Number(q.scope);
   const scope = !testBat ? 0 : asked != null && [0, 1, 2].includes(asked) ? asked : priced.length && !priced.includes(0) ? priced[0] : 0;
-  const book = lines.data ? bookLinesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, undefined, scope) : null;
+  const book = lines.data ? bookLinesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep, scope) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
   const plan = {
     kind: "player_prop", stat, line: q.line !== undefined && q.line !== "" ? Number(q.line) : bookDefault ? book.main.line : null, side: q.side || "over",
@@ -167,15 +169,17 @@ function PlayerScreen({ idx }: { idx: number }) {
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       {loading ? <PlayerSkeleton />
-        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, next: nextMatch, res: res.data, q, book, bookDefault, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
+        : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, bookDefault, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
     </div>
   );
 }
 
 /**
- * His next match, while it has not started: from the books' lines for him in this format (the side they file him under, their start) else, with none priced, the schedule's next match
- * of his team in this format. The opponent and ground are the schedule's spelling (which the data knows). Null when there is none.
+ * The match the player page should show: the nearest booked line still in the keep window (upcoming, in play, or just
+ * finished), else the schedule's next unpriced match of his team in this format. The opponent and ground are the
+ * schedule's spelling. Null when there is none. A finished listed match is not replaced by the next unpriced one while
+ * Hot props still has it.
  */
 function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string, lastGame?: any) {
   const { store } = useData();
@@ -183,21 +187,18 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
   const live = useLiveDoc();
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
-    const priced = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.books?.length && l.start_utc && Date.parse(l.start_utc) > now).sort((x: any, y: any) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
-    let match: string, start: string, competition: string, club = "", row: any;
+    const priced = pickPricedMatch(doc, pid, fmt, now);
+    let match: string, start: string, competition: string, club = "", row: any, phase: "upcoming" | "live" | "final" = "upcoming";
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
     const booked = (doc?.lines || []).filter((l: any) => l.pid === pid && l.fmt === fmt && l.team && l.start_utc).sort((x: any, y: any) => Date.parse(y.start_utc) - Date.parse(x.start_utc))[0]; // the club the books file him under now, even for a match that has begun: the data may not have his club's games yet
-    // he is playing now: the match the books filed him under has begun and is not over (the live feed's word, else the first hours after the start): there is no "next" match to show
-    if (booked && Date.parse(booked.start_utc) <= now) {
-      const [h, w] = String(booked.match).split(/\s+vs\s+/i), st = liveForFixture(live.data, { a: h, b: w, start: booked.start_utc })?.status;
-      if (st === "live" || (!st && now - Date.parse(booked.start_utc) < (fmt === "Test" ? 6 * 24 : 5) * 3600e3)) return null;
-    }
     if (booked) lastSide = booked.team;
     else if (lastGame?.m != null) { const x = store.teamName(store.M.a[lastGame.m], true), y = store.teamName(store.M.b[lastGame.m], true); lastSide = teamKey(x) === teamKey(lastGame.opp) ? y : x; }
     if (priced) {
       match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
       row = fx.find((f: any) => sameFixture({ match, start_utc: start }, f));
+      const [h, w] = String(match).split(/\s+vs\s+/i);
+      phase = matchPhase(start, now, liveForFixture(live.data, { a: h, b: w, start })?.status, fmt);
     } else {
       const women = store.P.g[idx] === 1;
       row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (teamKey(f.a) === teamKey(lastSide || team) || teamKey(f.b) === teamKey(lastSide || team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
@@ -213,12 +214,13 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const mine = listed(mineRaw);
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
-    return { match, start, competition, team: mine, opp, ground, known, priced: !!priced };
+    return { match, start, competition, team: mine, opp, ground, known, priced: !!priced, phase };
   }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, store]);
 }
 
-function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {
-  const { store } = useData();
+function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {
+  const { store, identity } = useData();
+  const live = useLiveDoc();
   const c = res.chart;
   const entries: any[] = c ? c.entries : [];
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
@@ -259,9 +261,15 @@ function Loaded({ name, next, res, q, book, bookDefault, navigateWith, scope, fm
     { key: "push", n: mix.push, color: "var(--amber)" }, { key: "out", n: mix.out, color: "var(--dnp)" },
   ].filter((s) => s.n > 0);
 
+  const [ha, hb] = String(next?.match || "").split(/\s+vs\s+/i);
+  const liveMatch = next ? liveForFixture(live.data, { a: next.team || ha, b: next.opp || hb, start: next.start }) : null;
+  const asLine = book ? { pid, player: name, team: book.team, stat, line, inn: book.inn } : null;
+  const standing = book && next?.priced && asLine ? lineStanding(liveMatch, asLine, identity) : null;
+  const out = !!(book && next?.priced && asLine && lineNotIn(liveMatch, asLine, identity));
+
   return (
     <div className="flex flex-col gap-section">
-      {next && Date.parse(next.start) > Date.now() && entries.length > 0 ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt }} /> : null}
+      {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
       {next && (next.opp || next.known) ? <div className="-mt-tight flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
       <div className="flex flex-col gap-section lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:items-start">
       {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (

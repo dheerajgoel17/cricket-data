@@ -5,11 +5,13 @@ import { nextMatchRates } from "@/engine/next-match.js";
 import { localWhen, odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
 import { TeamBadge } from "./badges";
 
 const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
+const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const;
 
 export type NextMatchInfo = {
   match: string;
@@ -21,7 +23,11 @@ export type NextMatchInfo = {
   known?: string;
   /** True when a book has a line for this player on this match (any stat). */
   priced?: boolean;
+  /** upcoming until the start; live while in play; final once the live feed (or the clock) says it is over. */
+  phase?: "upcoming" | "live" | "final";
 };
+
+export type LineSoFar = { v: number; state: string; verdict: "cleared" | "missed" | "push" | null };
 
 /** One context row: hit rate, n, fair decimal odds on the line the chart is on. */
 function RateRow({ label, r, side, line }: { label: string; r: { p: number | null; hits: number; played: number; fair: number | null }; side: string; line: number }) {
@@ -47,26 +53,29 @@ function RateRow({ label, r, side, line }: { label: string; r: { p: number | nul
 
 /**
  * Next match on the player page: who and when, the books' prices on this line, and how he has gone over/under it at that ground and against that side
- * (the games on the chart, this format, filters applied).
+ * (the games on the chart, this format, filters applied). A match that has started or just finished stays here with the listed line and whether it cleared.
  */
-export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
+export function NextMatch({ next, entries, line, side, book, statLabel, fmt, standing, out }: {
   next: NextMatchInfo; entries: any[]; line: number; side: string; book?: any; statLabel: string; fmt?: string;
+  standing?: LineSoFar | null; out?: boolean;
 }) {
   const { here, versus } = nextMatchRates(entries, next, line, side);
   const bookAt = book?.lines?.find((l: any) => l.line === line) || null;
   const quotes = bookQuotes(bookAt ? [bookAt] : []);
   const best = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
   const ground = next.ground.split(",")[0];
+  const heading = next.phase && next.phase !== "upcoming" ? "This match" : "Next match";
   return (
-    <div className={cn("grid gap-snug p-inset", CARD)}>
+    <div className={cn("grid gap-snug p-inset", CARD, out && "opacity-60")}>
       <div className="flex items-start justify-between gap-snug">
-        <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">Next match</span>
+        <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">{heading}</span>
         <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>
       </div>
       <div className="flex min-w-0 items-center gap-snug">
         {next.team ? <><TeamBadge name={next.team} size="sm" eager /><span className="text-footnote text-muted-foreground">vs</span></> : null}
         {next.opp ? <><TeamBadge name={next.opp} size="sm" eager /><span className="min-w-0 truncate text-body font-semibold">{next.opp}</span></>
           : <span className="min-w-0 truncate text-body font-semibold">{next.match}</span>}
+        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge> : null}
       </div>
       {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
@@ -74,7 +83,13 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt }: {
         <>
           <div className="grid gap-hair border-t border-hairline pt-snug">
             <div className="flex flex-wrap items-baseline justify-between gap-snug">
-              <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
+              <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
+                {standing != null && (
+                  <span className={cn("font-medium tabular-nums", standing.verdict === "cleared" ? "text-primary" : standing.verdict === "missed" ? "text-miss" : "text-muted-foreground")}>
+                    {" "}· {standing.v} {standing.state === "live" ? "so far" : standing.state}{standing.verdict ? <> · {VERDICT[standing.verdict]}</> : null}
+                  </span>
+                )}
+              </span>
               {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
             </div>
             {quotes.length ? (

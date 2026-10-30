@@ -82,3 +82,48 @@ export function fixtureScore(f: any, home: string | null, cfg: RailConfig = DEFA
 export function rankFixtures(fx: any[], home: string | null, stateOf: (f: any) => RailState = () => "upcoming", cfg: RailConfig = DEFAULT_RAIL): any[] {
   return fx.map((f, i) => ({ f, i, t: cfg.tiers.indexOf(stateOf(f)), s: fixtureScore(f, home, cfg) })).sort((x, y) => x.t - y.t || y.s - x.s || x.i - y.i).map((x) => x.f);
 }
+
+/** Series name when the schedule has one, else this pair of sides (unlabelled games do not clump). */
+export const seriesKey = (f: any) => String(f.series || "").trim() || `${f.a}\tv${f.b}`;
+
+/**
+ * Home-rail order: series sit together. In a series, matches in play, then the rest of today (still to come, then
+ * finished, newest first), then later games. Series with a match in play lead; among the rest, the soonest start.
+ * A just-finished T20 then stays next to that series' next game instead of falling behind every other upcoming card.
+ */
+export function arrangeFixtures(fx: any[], stateOf: (f: any) => RailState, home: string | null, cfg: RailConfig = DEFAULT_RAIL, now = Date.now()): any[] {
+  const groups = new Map<string, any[]>();
+  for (const f of fx) {
+    const k = seriesKey(f);
+    const g = groups.get(k);
+    if (g) g.push(f); else groups.set(k, [f]);
+  }
+  const startMs = (f: any) => Date.parse(f.start) || 0;
+  const today = new Date(now).toDateString();
+  const isToday = (f: any) => new Date(startMs(f)).toDateString() === today;
+  const band = (f: any) => {
+    const st = stateOf(f);
+    if (st === "live") return 0;
+    if (st === "upcoming" && isToday(f)) return 1;
+    if (st === "final") return 2;
+    return 3;
+  };
+  const sortGroup = (fs: any[]) => [...fs].sort((a, b) => {
+    const d = band(a) - band(b);
+    if (d) return d;
+    return band(a) === 2 ? startMs(b) - startMs(a) : startMs(a) - startMs(b);
+  });
+  const groupRank = (fs: any[]) => {
+    const live = fs.filter((f) => stateOf(f) === "live");
+    const best = Math.max(0, ...fs.map((f) => fixtureScore(f, home, cfg)));
+    if (live.length) return [0, -Math.max(...live.map((f) => fixtureScore(f, home, cfg)))];
+    const soon = fs.filter((f) => stateOf(f) === "upcoming");
+    if (soon.length) return [1, -best, Math.min(...soon.map(startMs))];
+    return [2, -best];
+  };
+  return [...groups.values()].sort((a, b) => {
+    const ra = groupRank(a), rb = groupRank(b);
+    for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return ra[i] - rb[i];
+    return 0;
+  }).flatMap(sortGroup);
+}
