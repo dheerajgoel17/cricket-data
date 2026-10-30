@@ -1,5 +1,5 @@
 // GET /api/gate -> {ok, k?}. Sets a short-lived cookie the Edge middleware checks before serving /data/*.
-// Returns the wrap key so the browser can unwrap identity/index JSON. Scraper UAs are refused. No key in the bundle.
+// Returns the wrap key so the browser can unwrap the small JSON files. Scraper UAs are refused. No key in the bundle.
 import crypto from "node:crypto";
 
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;

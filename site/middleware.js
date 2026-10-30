@@ -22,10 +22,10 @@ export default async function middleware(req) {
   const path = url.pathname;
   const ua = req.headers.get("user-agent") || "";
   if (path === "/api/gate") return;
-  if (!ua || BOT.test(ua)) return new Response("no", { status: 403 });
+  if (!ua || BOT.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
   if (!secret) return;
   if (await cookieOk(secret, req.headers.get("cookie"))) return;
-  return new Response("no", { status: 403 });
+  return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
 }

@@ -1,8 +1,8 @@
 """XOR-SHA256 wrap for the smaller site JSON files so a bare GET of /data/*.json is not usable JSON.
 
 The browser unwraps after ``/api/gate`` hands it the key (stdlib only: hashlib, no extra package).
-This is a speed bump, not a secret: anyone who can run the site can recover the bytes. Matches and player
-shards stay plaintext (too large to unwrap on a phone) and are blocked by the cookie gate + scraper UA list.
+This is a speed bump, not a secret: anyone who can run the site can recover the bytes. Matches, the player
+index and player shards stay plaintext (too large to unwrap on a phone) and are blocked by the cookie gate + scraper UA list.
 Set DATA_WRAP_KEY in GitHub (build) and Vercel (gate); without it this is a no-op.
 """
 from __future__ import annotations
@@ -15,8 +15,10 @@ import os
 import secrets
 from pathlib import Path
 
-SKIP = {"meta.json", "matches.json", "crex_index.json"}
-MAX_BYTES = 2_000_000
+# First-paint files stay plaintext: the browser would otherwise SHA-256 every 32 bytes of index.json
+# (~1 MB → tens of thousands of awaits) and phones show "Data not found". Cookie gate still blocks scrapers.
+SKIP = {"meta.json", "matches.json", "index.json", "crex_index.json"}
+MAX_BYTES = 200_000
 
 
 def _key(secret: str) -> bytes:

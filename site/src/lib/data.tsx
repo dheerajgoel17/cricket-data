@@ -12,7 +12,7 @@ const Ctx = createContext<Data | null>(null);
 
 async function gate() {
   try {
-    const r = await fetch("/api/gate", { credentials: "same-origin" });
+    const r = await fetch("/api/gate", { credentials: "same-origin", cache: "no-store" });
     if (!r.ok) return {};
     return await r.json();
   } catch { return {}; }
@@ -20,7 +20,7 @@ async function gate() {
 
 async function loadJson(url: string, key?: string) {
   try {
-    const r = await fetch(url, { credentials: "same-origin" });
+    const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
     if (!r.ok) return null;
     return await unwrap(await r.json(), key);
   } catch { return null; }
@@ -31,26 +31,52 @@ async function loadIdentity(base: string, key?: string) {
   return identityIndex(await loadJson(`${base}identity.json`, key));
 }
 
+async function boot(): Promise<Data> {
+  const g = (await gate()) as { k?: string };
+  const store = await createStore({ base: "/data/", wrapKey: g.k });
+  if (!store?.P?.id?.length) throw new Error("index.json: empty");
+  const [photos, identity] = await Promise.all([
+    loadJson("/data/photos.json", g.k).then((p) => (p || {}) as Photos),
+    loadIdentity("/data/", g.k),
+  ]);
+  return { store, rz: new Resolver(store), photos, identity };
+}
+
+const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
+
 /** Loads the generated data files once (matches, players index, photos map, identity table) and shares the engine objects with every page. */
 export function DataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
   useEffect(() => {
     let live = true;
+    setError(null);
+    setData(null);
     (async () => {
       try {
-        const g = (await gate()) as { k?: string };
-        const store = await createStore({ base: "/data/", wrapKey: g.k });
-        const [photos, identity] = await Promise.all([
-          loadJson("/data/photos.json", g.k).then((p) => (p || {}) as Photos),
-          loadIdentity("/data/", g.k),
-        ]);
-        if (live) setData({ store, rz: new Resolver(store), photos, identity });
+        let out: Data;
+        try { out = await boot(); }
+        catch (e) {
+          if (!retryable(e)) throw e;
+          await new Promise((r) => setTimeout(r, 80)); // the gate cookie is sometimes not on the next request yet
+          out = await boot();
+        }
+        if (live) setData(out);
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };
-  }, []);
-  if (error) return <div className="m-8 rounded-lg border border-destructive p-6"><h2 className="text-xl font-medium">Data not found</h2><p className="mt-2 text-muted-foreground">Could not load the data files ({error}). Run the site build first: see docs/SITE.md.</p></div>;
+  }, [tick]);
+  if (error) {
+    const local = typeof location !== "undefined" && /localhost|127\.0\.0\.1/.test(location.hostname);
+    return (
+      <div className="m-8 rounded-lg border border-destructive p-6">
+        <h2 className="text-xl font-medium">Data not found</h2>
+        <p className="mt-2 text-muted-foreground">Could not load the data files ({error}).{local ? " Run the site build first: see docs/SITE.md." : " Refresh, or try again in a moment."}</p>
+        <button type="button" className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" onClick={() => setTick((n) => n + 1)}>Try again</button>
+      </div>
+    );
+  }
   if (!data) return <AppSkeleton />;
   return <Ctx.Provider value={data}>{children}</Ctx.Provider>;
 }

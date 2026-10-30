@@ -15,3 +15,8 @@ test("wrap then unwrap round-trips", async () => {
   assert.deepEqual(await unwrap(w, "ci-test-key"), doc);
   await assert.rejects(() => unwrap(w, "wrong"));
 });
+
+test("batched unwrap round-trips more than one SHA block", async () => {
+  const doc = { n: 0, s: "x".repeat(4000), a: [1, 2, 3] };
+  assert.deepEqual(await unwrap(await wrap(doc, "ci-test-key"), "ci-test-key"), doc);
+});

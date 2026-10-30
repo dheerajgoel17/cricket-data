@@ -33,7 +33,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 
 Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link` must be deleted (it holds an OIDC token).
 
-**Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files and the Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). This is a speed bump, not a secret from a real browser.
+**Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files (not `index.json` / `matches.json` / shards: those are too big to decrypt on a phone) and the Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). A 403 on `/data` is `no-store` so a first-request cookie race is not cached as "Data not found". This is a speed bump, not a secret from a real browser.
 
 ## Routine tasks
 **Rotate the xAI key**: console.x.ai -> API Keys -> create new, delete old; then `cd site && printf '%s' "$NEW" | npx vercel env add XAI_API_KEY production --sensitive --yes` (or the dashboard), then redeploy (`npx vercel deploy --prod --yes`).
