@@ -6,7 +6,7 @@ def q(group, **kw):
 
 
 RAW = {"matches": [
-    {"home": "New Zealand", "away": "India", "kickoff_utc": "2026-10-27T07:00:00Z", "in_play": False, "quotes": [
+    {"home": "New Zealand", "away": "India", "league": "T20 Internationals", "kickoff_utc": "2026-10-27T07:00:00Z", "in_play": False, "quotes": [
         q("Total Match Runs", label="Over", handicap="384.5", odds_dec=1.8333), q("Total Match Runs", label="Under", handicap="384.5", odds_dec=1.8333),
         q("Match Totals", label="19.5", handicap="19.5", side="Over", line="Sixes", odds_dec=1.9), q("Match Totals", label="19.5", handicap="19.5", side="Under", line="Sixes", odds_dec=1.85),
         q("Match Totals", label="50.5", handicap="50.5", side="Over", line="Boundaries", odds_dec=1.8),  # under missing: dropped
@@ -26,7 +26,17 @@ def test_pairs_over_and_under_into_lines_keyed_like_the_site_markets():
     assert got == {("match_runs", "match", None, 384.5): (1.833, 1.833), ("match_sixes", "match", None, 19.5): (1.9, 1.85),
                    ("team_total_sixes", "team", "New Zealand", 9.5): (2.1, 1.667), ("top_score", "match", None, 72.5): (1.83, 1.83)}
     assert {x["match"] for x in out} == {"New Zealand vs India"} and out[0]["start_utc"] == "2026-10-27T07:00:00Z" and out[0]["source"] == "moviodds_bet365"
+    assert {x["fmt"] for x in out} == {"T20"} and {x["competition"] for x in out} == {"T20 Internationals"}
 
 
 def test_empty_or_missing_feed_is_fine():
     assert match_fancy(None) == [] and match_fancy({}) == []
+
+
+def test_t10_and_hundred_and_60_over_are_not_collapsed_into_t20_or_odi():
+    from value_bets.fancy import _fmt
+    assert _fmt({"league": "Abu Dhabi T10"}) == "T10"
+    assert _fmt({"league": "The Hundred Men's Competition"}) == "Hundred"
+    assert _fmt({"league": "60 Over Challenge"}) == "O60"
+    assert _fmt({"league": "T20 Internationals"}) == "T20"
+    assert _fmt({"league": "One Day Cup"}) == "ODI"

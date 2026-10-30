@@ -19,7 +19,7 @@ Two products in one repo, both **100% free to run**:
 * **Exchange rules**: T20/ODI summary markets void unless 80% of overs are bowled in both innings (Hundred 80/100 balls); Tests void unless a result or 300 (5-day) / 200 (4-day) overs;
   30s = 30-49, 50s = 50-99, 100s = 100+; double-digit = 10+; single-digit = 1-9 (ducks excluded); team markets count only the team batting first; retired hurt is not a wicket;
   penalty runs count; super overs ignored; **a player named in the XI who never batted (bowled) has his batting (bowling) bets void**: the chart shows VOID (named in `xi`, no row) vs DNP (not in the XI), both excluded from hit rates.
-* **Never mix formats**: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**, first-class (`MDM`) is excluded.
+* **Never mix formats**: T20 = T20 + T20I, ODI = ODI + 50-over List A, Test = Tests only, **The Hundred, T10 and 60-over are their own formats**, first-class (`MDM`) is excluded from stats (fixtures still carry `FC` so a T20 cannot price it).
 * **Show freshness** on every page: newest Cricsheet match date + whether provisional games are included.
 * **Never print or commit secrets** (`scripts/check_public_safe.py` runs in CI and also bans hosted-service hostnames (Vercel, Supabase and Workers subdomains), absolute home paths and `.env*` files).
 
@@ -76,7 +76,8 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 | file | content |
 |---|---|
 | `meta.json` | schema, build time, counts, `newest_cricsheet`, `provisional_matches`, `newest_provisional`, `provisional_included` |
-| `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred"], `nshard` |
+| `index.json` | `players` {id,nm,g,last,n,tm,fm(format bitmask)}, `aliases`, `teams` [{n,g}], `venues`, `events`, `hosts`, `kinds`, `formats` ["T20","ODI","Test","Hundred","T10","O60"], `nshard` |
+| `identity.json` | `{p, fx}` playing names → Cricsheet id (from `player_aliases.csv` + CREX + DB) and upcoming fixtures with format. Synced to Postgres `player_names` / `fixture_identity`. |
 | `matches.json` | per match: `id d(date) f(format idx) g(0 male/1 female) i(intl) e(event idx) v(venue idx) a b(team idx) w(winner idx/-1) r(result 0 win,1 tie,2 none,3 draw) o(overs) dy(days) h(host: idx into hosts, -1 neutral, -2 unknown) fi(team idx batting first/-1) pv(provisional) q(valid for summary markets 1/0, -1 unknown) ho mc ts` and `inn` = per innings `[team, runs, wkts, balls, f4, f6, n30, n50, n100, n10, nsd, nduck, highest_over, most_conceded, top_score, ...topScorerPlayerIdx]` |
 | `p/NN.json` | player shard (player id mod 64): `bat` {p m i t q o r b f s k tb mt}, `bowl` {p m i t q w c n}, `xi` {p m} (player named in the match's playing XI); `matches.json` also has `xq` (1 = the named XI is reliable), `pt` partnerships {a b m i o w r n ra rb x kd} stored under the lower player index |
 | `fixtures.json` | upcoming fixtures from `data/fixtures/upcoming.csv` (refreshed every scraper run from **CREX's own schedule page**, `src/cricket_data/crex_schedule.py`: the next ~20 matches with real times, format, venue; far-future tours are kept until they pass) only (the bookmaker feed is odds-only: never a fixture or start-time source, as books serve different regions), with stable `id` (`date-team-v-team`) and team idx |
@@ -110,8 +111,12 @@ Team logos / player photos come from CREX's public sitemaps + image CDN (`cricke
 The browser tries **our own copy first** (5.6). Images belong to their owners: check terms before commercial use.
 
 ### 5.6 Our own store (Supabase, free plan; project `cricket-props-hub`, ref `fgqcuvtpguuoxgwcgqyw`, region ap-south-1)
-Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write) + public Storage bucket `avatars` (200 KB, png/webp/jpeg). `assets_sync.py` runs in the Site workflow
-(resumable, `SYNC_LIMIT` per run, polite). Schema: `supabase/migrations/`. If CREX disappears, the stored copies and id maps keep the site working.
+Postgres `assets`, `crex_players`, `crex_teams`, `player_names`, `fixture_identity` (public read, service-key write) + public Storage bucket `avatars` (200 KB, png/webp/jpeg). `assets_sync.py` runs in the Site workflow
+(resumable, `SYNC_LIMIT` per run, polite) and upserts identity rows so a new alias is live on the next hourly deploy. Schema: `supabase/migrations/`. If CREX disappears, the stored copies and id maps keep the site working.
+
+### 5.7 Who is who (player names and fixtures)
+Scorecards, books and CREX use playing names ("Athapaththu"); Cricsheet uses registry names ("AC Jayangani"). Ids first; names only as the fallback.
+Hand-checked rows live in `data/mappings/player_aliases.csv`. The builder writes `identity.json`; hourly sync merges any extra names from Postgres `player_names` and upserts both `player_names` and `fixture_identity` (format included, so a T20 in a Test series cannot price the Test). Fix a bad link with a CSV line (or a DB row), not another name rule. Lookups: `src/cricket_site/identity.py`, `site/src/engine/identity.js`.
 
 ## 6. Workflows (`.github/workflows`)
 | workflow | trigger | what it does | secrets / vars |
@@ -122,7 +127,7 @@ Postgres `assets`, `crex_players`, `crex_teams` (public read, service-key write)
 | `balls-update.yml` | every 2 h | CREX ball-by-ball for recent matches Cricsheet lacks (`data/balls/`), prune the ones it now has | none |
 | `weekly-heal.yml` | Sun 06:15 | full re-sync / healing | none |
 | `value-bets.yml` | hourly 03:30-17:30 UTC, weekly refit | odds -> value bets, commits `value_bets/out` | optional odds keys |
-| `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
+| `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`, `DATA_WRAP_KEY`, `VITE_GA_MEASUREMENT_ID`; vars `SITE_URL`, `SUPABASE_URL` |
 | `auto-merge-scraper-fixes.yml` | workflow_run | merges `scraper-fix` PRs that only touch scraper files | none |
 
 ## 7. Local development
@@ -150,6 +155,7 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * Player data sharded by `int(id,16) % 64`; partnerships live in the shard of the **lower** player index (pair lookups need only one shard).
 * Home/away is **inferred** (tour name "X tour of Y", venue history, venue_geo country, majority host). Unknown hosts are excluded from home/away filters.
 * `check_public_safe.py` fails on Vercel/Supabase hostnames in tracked files: pass URLs through repo variables, never write them in tracked files. Generated `sitemap.xml`/`robots.txt` are gitignored for that reason.
+* `/data/*` is cookie-gated (except `meta.json`) and scraper UAs are refused; smaller JSON files can be wrap-encoded when `DATA_WRAP_KEY` is set. This slows casual scrapers; it is not a secret.
 * YAML in workflows: an unquoted `: ` inside a `run:` one-liner breaks the whole file (GitHub reports only "workflow file issue"). Lint with `actionlint`.
 * Cache key `site-dl4-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.

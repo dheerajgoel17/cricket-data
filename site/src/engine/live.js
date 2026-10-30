@@ -1,6 +1,6 @@
 // Live score snapshots from ESPN's public cricket JSON (header + match summary).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
-import { norm } from "./util.js";
+import { norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
 const WINDOW_MS = 36 * 3600e3;
@@ -19,7 +19,7 @@ export function namesMatch(a, b) {
   const ta = norm(a).split(" ").filter(Boolean), tb = norm(b).split(" ").filter(Boolean);
   if (!ta.length || !tb.length) return false;
   if (ta.join(" ") === tb.join(" ")) return true;
-  if (ta[ta.length - 1] !== tb[tb.length - 1]) return false;
+  if (ta[ta.length - 1] !== tb[tb.length - 1] && !surnamesEq(ta[ta.length - 1], tb[tb.length - 1])) return false;
   const init = (toks) => toks.slice(0, -1).map((t) => t[0]).join("");
   const ia = init(ta), ib = init(tb);
   if (!ia || !ib) return (ta[0][0] || "") === (tb[0][0] || "");
@@ -52,9 +52,12 @@ export function parseScore(s) {
 
 function fmtOf(ev, cls = {}) {
   const t = `${ev?.eventType || ""} ${cls.eventType || ""} ${cls.generalClassCard || ""} ${cls.name || ""}`.toLowerCase();
-  if ((/\b100\b/.test(t) && /ball|hundred/.test(t)) || t.includes("hundred")) return "Hundred";
+  if (/\bt10\b/.test(t) || (/\b10[- ]overs?\b/.test(t) && !/t20/.test(t))) return "T10";
+  if ((/\b100\b/.test(t) && /ball|hundred/.test(t)) || /\bthe hundred\b/.test(t)) return "Hundred";
+  if (/\b60[- ]overs?\b/.test(t)) return "O60";
+  if (/\b40[- ]overs?\b/.test(t)) return "O40";
   if (/\bt20\b/.test(t)) return "T20";
-  if (/\bodi\b/.test(t) || t.includes("list a") || t.includes("one-day") || t.includes("one day")) return "ODI";
+  if (/\bodi\b/.test(t) || t.includes("list a") || t.includes("one-day") || t.includes("one day") || /\b50[- ]over/.test(t)) return "ODI";
   if (t.includes("first-class") || t.includes("first class") || /\btest\b/.test(t)) return "Test";
   return "";
 }

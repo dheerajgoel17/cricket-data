@@ -13,6 +13,7 @@ PATTERNS = {
     "AWS access key": re.compile(r"AKIA[0-9A-Z]{16}"),
     "GitHub token": re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}"),
     "generic secret assignment": re.compile(r"(?i)(api[_-]?key|secret|passwd|password|token)\s*[:=]\s*['\"][A-Za-z0-9_\-/+=]{16,}['\"]"),
+    "GA measurement id": re.compile(r"\bG-[A-Z0-9]{10}\b"),
     "absolute home path": re.compile(r"(/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|C:\\Users\\[A-Za-z0-9._-]+)"),
     "cloud account id / worker url": re.compile(r"[a-z0-9-]+\.workers\.dev|\.supabase\.co|\.vercel\.app"),
 }

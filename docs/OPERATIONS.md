@@ -16,6 +16,8 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
 | `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
+| `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build; `site.yml` injects it into the Vercel deploy (gate cookie). Do not also paste it into the repo |
+| `VITE_GA_MEASUREMENT_ID` | GitHub secret | GA4 Admin -> Data streams -> Measurement ID | `site.yml` passes it as a Vite build env on deploy; the site skips GA if unset |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
@@ -32,6 +34,9 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 **Force a site refresh now**: Actions -> Site -> Run workflow (optionally `sync_limit`).
 **First image backfill**: run Site with `sync_limit=6000` once; afterwards hourly runs only add new ids.
 **Add a column/table in Supabase**: add a migration file in `supabase/migrations/` and apply it (Supabase MCP `apply_migration` or SQL editor); keep RLS on and reads public, writes service-only.
+**Wrong player on a scorecard click**: add `raw_name,team,player_id` to `data/mappings/player_aliases.csv` (or a row in `player_names`); the next site build/sync picks it up. Do not add another surname heuristic.
+**Google Analytics**: loads on its own (no cookie prompt). Ads cookies are denied. The measurement id is the GitHub secret `VITE_GA_MEASUREMENT_ID` (never committed). The `/api/gate` cookie is strictly necessary to serve `/data` and is not prompted.
+**Anti-scrape**: set `DATA_WRAP_KEY` as a GitHub secret (`openssl rand -hex 32`); the Site workflow wraps identity/index/fixtures and injects the same value into the Vercel deploy for the gate cookie. Without it, JSON stays plain and `/data` is not cookie-gated. `meta.json` stays readable for health checks. This slows `curl`/Scrapy; it is not a secret from a real browser.
 **Cricsheet looks stale**: expected for a few days; the scraper's provisional matches cover the gap. A `data-stale` issue opens if canonical data is > 3 days old; the Site workflow warns only if both sources are old.
 **Scraper broke (CREX layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
 **A workflow shows "workflow file issue"**: YAML error. `pip install actionlint-py && actionlint .github/workflows/*.yml`.
@@ -41,7 +46,7 @@ Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link
 ## Health checks
 * Site: `/data/meta.json` (`built_at`, `newest_cricsheet`, `newest_provisional`), `/sitemap.xml`, a deep link like `/player/<idx>`.
 * API: `POST /api/ask {"question":"..."}` returns a plan (503 = no key; 429 = rate limit; 502 = provider error: client falls back).
-* Supabase: `select count(*) from assets;` should approach ~5.5k after the backfill.
+* Supabase: `select count(*) from assets;` should approach ~5.5k after the backfill; `player_names` grows with aliases.
 * CI: all four checks on PRs (`build`, `site-js`, `test (3.10)`, `test (3.12)`).
 
 ## Cost and limits

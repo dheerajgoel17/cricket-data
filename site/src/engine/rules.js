@@ -1,12 +1,12 @@
 // Betting-exchange settlement rules used across the site (kept in one place so the UI can print them).
 export const RULES = [
-  "T20 summary markets are void unless at least 80% of the scheduled overs (96 balls) were bowled in BOTH innings; ODI likewise (240 of 300 balls); The Hundred 80 of 100.",
+  "T20 summary markets are void unless at least 80% of the scheduled overs (96 balls) were bowled in BOTH innings; ODI likewise (240 of 300 balls); The Hundred 80 of 100; T10 48 of 60; 60-over 288 of 360.",
   "Tests: summary markets are void unless there is a result, or at least 300 overs (5-day) / 200 overs (4-day) were bowled.",
   "30s = scores of 30-49, 50s = 50-99, 100s = 100+. Double-digit = 10+. Single-digit = 1-9 (ducks are not single-digit).",
   "Team-specific markets count only the team batting first.",
   "Retired hurt is not a wicket. Penalty runs count. Super overs are ignored.",
   "A player named in the XI who never reaches the crease (or never bowls) has his bat (or bowl) bets voided: shown as VOID and left out of hit rates. Not in the XI at all = DNP.",
-  "Formats are never mixed: T20 form never feeds ODI or Test numbers. T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, The Hundred is its own format; first-class cricket is not included.",
+  "Formats are never mixed: T20 form never feeds ODI, Test, T10 or Hundred numbers. T20 = T20 + T20I, ODI = ODI + 50-over List A, Test = Tests only, The Hundred / T10 / 60-over are their own formats; first-class cricket is not included.",
 ];
 
 export const STATS = {

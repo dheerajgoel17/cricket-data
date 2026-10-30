@@ -2,6 +2,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { playerIdFor } from "@/engine/identity.js";
 import { ballsToOvers, liveBoard, liveCard, namesMatch } from "@/engine/live.js";
 import { FormHeadline, RecentForm, recentForms } from "@/components/app/recent-form";
 import { playerPhotos } from "@/lib/assets";
@@ -19,14 +20,23 @@ function shortName(n: string) {
 }
 
 function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
-  const { rz } = useData();
+  const { rz, store, identity } = useData();
   const teamIdx = sides?.find(([n]) => n === team)?.[1];
+  const genderTeam = teamIdx != null && teamIdx >= 0 ? teamIdx : sides?.find(([, i]) => i >= 0)?.[1];
+  const gender = genderTeam != null && genderTeam >= 0 ? store.genderOfTeam(genderTeam) : undefined;
   return useMemo(() => {
-    const hits = rz.players(name, teamIdx != null && teamIdx >= 0 ? { team: teamIdx } : {}, 2) as { idx: number; score: number }[];
-    if (!hits.length) return null;
-    if (hits.length === 1 || hits[0].score >= (hits[1]?.score ?? 0) + 3) return hits[0].idx;
-    return hits[0].idx;
-  }, [rz, name, teamIdx]);
+    const pid = playerIdFor(identity, name, { gender, team });
+    if (pid) {
+      const i = store.P.id.indexOf(pid);
+      if (i >= 0 && (gender == null || store.P.g[i] === gender)) return i;
+    }
+    const opts: { team?: number; gender?: number } = {};
+    if (teamIdx != null && teamIdx >= 0) opts.team = teamIdx;
+    if (gender != null) opts.gender = gender;
+    const hits = rz.players(name, opts, 5) as { idx: number; score: number }[];
+    const pick = gender == null ? hits[0] : hits.find((h) => store.P.g[h.idx] === gender);
+    return pick ? pick.idx : null;
+  }, [rz, store, identity, name, team, teamIdx, gender]);
 }
 
 const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;

@@ -11,7 +11,8 @@ const FILLER = new Set(("a an the of in on at for to is are was were will would 
   "bowl bowling chase chasing opening open opener openers together partnership partnerships stand stands gets goes go out wicket " +
   "team teams total totals sides side").split(" "));
 
-const FORMAT_WORDS = { t20: "T20", t20i: "T20", t20is: "T20", t20s: "T20", odi: "ODI", odis: "ODI", test: "Test", tests: "Test", hundred: "Hundred" };
+const FORMAT_WORDS = { t20: "T20", t20i: "T20", t20is: "T20", t20s: "T20", odi: "ODI", odis: "ODI", test: "Test", tests: "Test",
+  hundred: "Hundred", t10: "T10", o60: "O60" };
 const MARKET_WORDS = [
   [/\b(team total|team score|innings total|first innings (total|score))\b/, "team_runs"],
   [/\b(highest|biggest|most expensive) over\b/, "highest_over"],

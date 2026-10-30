@@ -23,6 +23,9 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from .crex_doc import balls_doc
+from .identity import from_aliases as id_aliases
+from .identity import from_crex, from_csv, from_fixtures, merge_players
+from .identity import write as write_identity
 from .parse import FORMAT_NAMES, KINDS, parse_match, squad_quality
 
 NSHARD = 64
@@ -95,6 +98,20 @@ def fold_name(s: str) -> str:
     return fold(s)
 
 
+def load_name_aliases(data_dir: Path) -> dict[str, set[str]]:
+    """Playing names from data/mappings/player_aliases.csv (married names, scorecard surnames) keyed by Cricsheet id."""
+    p = data_dir / "mappings" / "player_aliases.csv"
+    out: dict[str, set[str]] = defaultdict(set)
+    if not p.exists():
+        return out
+    with p.open(encoding="utf-8", newline="") as fh:
+        for r in csv.DictReader(fh):
+            pid, nm = (r.get("player_id") or "").strip(), (r.get("raw_name") or "").strip()
+            if pid and nm:
+                out[pid].add(nm)
+    return out
+
+
 def _int_getter(row: dict):
     return lambda k: int(row.get(k) or 0)
 
@@ -129,11 +146,16 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
             prov_runs = sum(int(p.get("runs") or 0) for p in d.get("players", []))
             if any(r == -1 or r is None or not prov_runs or r == prov_runs for r in seen[key]):
                 continue
-        fmt = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2}.get(d.get("match_type", ""))
+        fmt = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2, "T10": 4}.get(d.get("match_type", ""))
         if fmt is None:
             continue
-        if "hundred" in (d.get("event") or "").lower():
+        ev = (d.get("event") or "").lower()
+        if "hundred" in ev or d.get("balls_per_over") == 5:
             fmt = 3  # The Hundred is its own format: never feed it into T20
+        elif fmt in (0, 4) and (d.get("overs") == 10 or "t10" in ev):
+            fmt = 4
+        elif fmt == 1 and (d.get("overs") == 60 or "60 over" in ev or "60-over" in ev):
+            fmt = 5
         mid = d["match_id"]
         m = {"id": mid, "date": d["date"], "fmt": fmt, "gender": g, "intl": 1 if d.get("team_type") == "international" else 0,
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
@@ -179,9 +201,15 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     Gives it innings, batting order, partnerships, extras-style aggregates and a valid ``q`` like a Cricsheet
     match. Skipped (the match stays totals-only) if the deliveries do not form two innings of this fixture.
     """
-    info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20"}[fmt],
+    info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20", 4: "T20", 5: "ODI"}[fmt],
             "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
             "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
+    if fmt == 3:
+        info["balls_per_over"], info["overs"] = 5, 20
+    elif fmt == 4:
+        info["overs"] = 10
+    elif fmt == 5:
+        info["overs"] = 60
     try:
         parsed = parse_match(m["id"], balls_doc(rows, info))
     except (KeyError, ValueError) as exc:  # malformed stored rows: keep the totals-only match, never sink the build
@@ -547,7 +575,8 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str) -> i
     body = "".join(f"<url><loc>{u}</loc></url>" for u in urls)
     root = out.parent
     (root / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + body + "</urlset>", encoding="utf-8")
-    (root / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
+    (root / "robots.txt").write_text(
+        f"User-agent: *\nAllow: /\nDisallow: /data/\nDisallow: /api/\nSitemap: {base}/sitemap.xml\n", encoding="utf-8")
     return len(urls)
 
 
@@ -625,6 +654,8 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
+    for pid, nms in load_name_aliases(data_dir).items():
+        A["aliases"][pid].update(nms)
     newest = max((m["date"] for m in canonical), default="")
     newest_prov = max((m["date"] for m in prov), default="")
     meta = write(out, A, names, {
@@ -634,6 +665,9 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     fx = build_fixtures(data_dir, vb_dir, A["team_ix"])
     (out / "fixtures.json").write_text(json.dumps(fx, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    write_identity(out / "identity.json", merge_players(
+        from_csv(data_dir, A["pstat"]), from_crex(cx.get("index"), A["pstat"]),
+        id_aliases(A["aliases"], names, A["pstat"])), from_fixtures(fx))
     build_sitemap(out, A, names, site_url)
     if photos:
         keep = set(A["pids"])

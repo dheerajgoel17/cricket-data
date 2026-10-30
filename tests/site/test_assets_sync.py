@@ -15,13 +15,16 @@ class FakeDB:
 
     def __call__(self, method, url, key, data=None, headers=None, timeout=60):
         assert key == "service-key"
-        if method == "GET" and "/rest/v1/assets" in url:
-            return 200, "application/json", json.dumps(self.assets).encode()
+        if method == "GET" and "/rest/v1/" in url:
+            table = url.split("/rest/v1/", 1)[1].split("?", 1)[0]
+            if table == "assets":
+                return 200, "application/json", json.dumps(self.assets).encode()
+            return 200, "application/json", json.dumps(self.tables.get(table, [])).encode()
         if method == "POST" and "/storage/v1/object/avatars/" in url:
             self.objects[url.split("/avatars/")[1]] = (data, headers["Content-Type"])
             return 200, "", b"{}"
         if method == "POST" and "/rest/v1/" in url:
-            self.tables.setdefault(url.rsplit("/", 1)[1], []).extend(json.loads(data))
+            self.tables.setdefault(url.rsplit("/", 1)[1].split("?", 1)[0], []).extend(json.loads(data))
             return 201, "", b""
         raise AssertionError(url)
 
@@ -114,6 +117,18 @@ def test_request_headers_fit_both_key_styles(monkeypatch):
     assert "mozilla" not in seen["user-agent"].lower()  # Supabase refuses secret keys from browser-like clients
     s._req("GET", BASE + "/rest/v1/assets", "eyJlegacy.jwt.key")
     assert seen["authorization"] == "Bearer eyJlegacy.jwt.key"
+
+
+def test_sync_merges_db_player_names_into_identity_json(tmp_path):
+    photos = write_photos(tmp_path)
+    ident = tmp_path / "identity.json"
+    ident.write_text(json.dumps({"p": [{"f": "athapaththu", "r": "Athapaththu", "id": "ac56b5a7", "g": 1, "t": "sri lanka", "src": "csv"}], "fx": []}))
+    db = FakeDB()
+    db.tables["player_names"] = [{"folded": "chamari", "raw": "Chamari", "cricsheet_id": "ac56b5a7", "gender": 1, "team": "", "source": "db"}]
+    s.sync(photos, None, BASE, "service-key", limit=0, pause=0, http=db, fetch=fake_fetch({}), identity_path=str(ident))
+    out = json.load(open(ident))
+    assert {r["f"] for r in out["p"]} == {"athapaththu", "chamari"}
+    assert any(r.get("folded") == "athapaththu" for r in db.tables["player_names"])
 
 
 def test_describe_key_never_reveals_the_key():

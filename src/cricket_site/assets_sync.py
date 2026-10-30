@@ -19,6 +19,7 @@ import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 CREX_CDN = "https://cricketvectors.akamaized.net"
 UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"  # for CREX
@@ -52,6 +53,17 @@ def describe_key(key: str) -> str:
         except (ValueError, UnicodeDecodeError):
             return "a malformed JWT"
     return f"an unrecognised format (length {len(key)}, expected sb_secret_... or a JWT starting eyJ)"
+
+
+def fetch_rows(base: str, key: str, table: str, select: str, http=_req) -> list[dict]:
+    out, start = [], 0
+    while True:
+        _, _, body = http("GET", f"{base}/rest/v1/{table}?select={select}&limit=1000&offset={start}", key)
+        rows = json.loads(body)
+        out.extend(rows)
+        if len(rows) < 1000:
+            return out
+        start += 1000
 
 
 def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
@@ -96,8 +108,29 @@ def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None
              {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates,return=minimal"})
 
 
+def sync_identity(path: str, base: str, key: str, http=_req) -> dict:
+    from . import identity as ident
+    doc = {"p": [], "fx": []}
+    if os.path.exists(path):
+        try:
+            doc = json.load(open(path, encoding="utf-8"))
+        except ValueError:
+            doc = {"p": [], "fx": []}
+    extra = []
+    try:
+        extra = fetch_rows(base, key, "player_names", "folded,raw,cricsheet_id,gender,team,source", http)
+    except (urllib.error.URLError, OSError, ValueError):
+        extra = []
+    players = ident.merge_players(doc.get("p") or [], ident.from_db_players(extra))
+    fixtures = doc.get("fx") or []
+    ident.write(Path(path), players, fixtures)
+    upsert(base, key, "player_names", ident.db_players(players), http)
+    upsert(base, key, "fixture_identity", ident.db_fixtures(fixtures), http)
+    return {"players": len(players), "fixtures": len(fixtures), "from_db": len(extra)}
+
+
 def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: int = 1500, pause: float = 0.05,
-         http=_req, fetch=None, workers: int = 6) -> dict:
+         http=_req, fetch=None, workers: int = 6, identity_path: str | None = None) -> dict:
     ph = json.load(open(photos_path, encoding="utf-8"))
     want = {"player": sorted({v[2:] for v in ph.get("p", {}).values() if v.startswith("c:")}),
             "team": sorted(set(ph.get("t", {}).values()))}
@@ -147,6 +180,8 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
     ph["base"] = f"{base}/storage/v1/object/public/avatars"
     ph["s"] = {"p": sorted(have.get("player", set())), "t": sorted(have.get("team", set()))}
     json.dump(ph, open(photos_path, "w", encoding="utf-8"), separators=(",", ":"))
+    if identity_path:
+        stats["identity"] = sync_identity(identity_path, base, key, http)
     return stats
 
 
@@ -154,6 +189,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--photos", required=True)
     ap.add_argument("--index", default="")
+    ap.add_argument("--identity", default="")
     ap.add_argument("--url", default=os.environ.get("SUPABASE_URL", ""))
     ap.add_argument("--limit", type=int, default=int(os.environ.get("SYNC_LIMIT", "1500")))
     a = ap.parse_args(argv)
@@ -162,7 +198,7 @@ def main(argv: list[str] | None = None) -> int:
         print("assets_sync: SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping")
         return 0
     try:
-        print(json.dumps(sync(a.photos, a.index or None, a.url.rstrip("/"), key, a.limit)))
+        print(json.dumps(sync(a.photos, a.index or None, a.url.rstrip("/"), key, a.limit, identity_path=a.identity or None)))
     except (urllib.error.URLError, OSError, ValueError) as exc:
         detail = ""
         if isinstance(exc, urllib.error.HTTPError):

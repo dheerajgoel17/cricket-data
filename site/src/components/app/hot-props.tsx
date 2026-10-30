@@ -110,7 +110,7 @@ function PropRow({ r, win, wl, bars, i, soFar }: { r: Row; win: Win; wl: string;
 
 
 /** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams }: { teams?: [string, string] } = {}) {
+export function HotProps({ teams, fmt }: { teams?: [string, string]; fmt?: string } = {}) {
   const { data, isLoading } = useHotRows();
   const live = useLiveDoc();
   const soFarOf = (r: Row) => {
@@ -128,9 +128,9 @@ export function HotProps({ teams }: { teams?: [string, string] } = {}) {
   }, [data]);
   const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
-  const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team]);
-  const priced = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) : true)), [data, teams]);
+  const rows = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (!fmt || r.fmt === fmt) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
+    .sort((x, y) => (y[win].p ?? 0) - (x[win].p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1)).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, fmt]);
+  const priced = useMemo(() => (data || []).filter((r) => (teams ? sameMatch(r.match, teams) && (!fmt || r.fmt === fmt) : true)), [data, teams, fmt]);
   if (!isLoading && !priced.length) return null;
   return (
     <section aria-label="Hot player props today" className="flex flex-col gap-stack">

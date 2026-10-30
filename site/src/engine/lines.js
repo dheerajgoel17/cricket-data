@@ -1,5 +1,6 @@
 // Bookmaker / exchange lines for a player (value_bets/out/book_lines.json): which line is "the" line and how the market prices it.
 // All prices are decimal back prices as published; nothing here is computed by a model. Pure functions, unit-tested.
+import { canonFmt } from "./util.js";
 
 export const BOOK_NAMES = { moviodds_bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
 export const bookName = (src) => BOOK_NAMES[src] || src;
@@ -46,41 +47,63 @@ function startMs(fixture) {
   return fixture?.start ? Date.parse(fixture.start) : NaN;
 }
 
-/** Same two sides, starts within 14 h. Player lines use `match`; fancy uses home/away. */
-function sameFixture(line, fixture) {
+function fmtFromText(t) {
+  const s = String(t || "").toLowerCase();
+  if (/\bt10\b/.test(s) || (/\b10[- ]overs?\b/.test(s) && !/t20/.test(s))) return "T10";
+  if (/\bthe hundred\b|\b100[- ]?balls?\b/.test(s)) return "Hundred";
+  if (/\b60[- ]overs?\b/.test(s)) return "O60";
+  if (/\b40[- ]overs?\b/.test(s)) return "O40";
+  if (/\btest\b|first class|first-class/.test(s)) return "Test";
+  if (/\bt20\b|twenty20/.test(s)) return "T20";
+  if (/\bodi\b|one-day|one day|list a|50[- ]over/.test(s)) return "ODI";
+  return "";
+}
+
+function sidesOf(line) {
+  if (line?.home && line?.away) return [teamKey(line.home), teamKey(line.away)];
+  const [p, q] = String(line?.match || "").split(/\s+vs\s+/i);
+  return q ? [teamKey(p), teamKey(q)] : ["", ""];
+}
+
+/** Format on the line, or inferred from competition text / a player-prop on the same kick-off (fancy rows did not always carry fmt). */
+export function lineFmt(line, doc) {
+  if (line?.fmt) return canonFmt(line.fmt);
+  const fromText = fmtFromText(`${line?.competition || ""} ${line?.league || ""} ${line?.match || ""}`);
+  if (fromText) return fromText;
+  const start = line?.start_utc, [home] = sidesOf(line);
+  if (!start || !home) return "";
+  const peer = (doc?.lines || []).find((l) => l.fmt && l.start_utc === start && sidesOf(l).includes(home));
+  return peer ? canonFmt(peer.fmt) : "";
+}
+
+/** Same two sides, same format, starts within 14 h. Missing times or a format clash never match — a T20 in a Test series must not price the Test. */
+function sameFixture(line, fixture, doc) {
   const a = teamKey(fixture?.a), b = teamKey(fixture?.b);
   if (!a || !b) return false;
-  let x = "", y = "";
-  if (line?.home && line?.away) { x = teamKey(line.home); y = teamKey(line.away); }
-  else {
-    const [p, q] = String(line?.match || "").split(/\s+vs\s+/i);
-    if (!q) return false;
-    x = teamKey(p); y = teamKey(q);
-  }
-  if (!((x === a && y === b) || (x === b && y === a))) return false;
+  const [x, y] = sidesOf(line);
+  if (!x || !y || !((x === a && y === b) || (x === b && y === a))) return false;
+  const lf = lineFmt(line, doc), ff = canonFmt(fixture?.fmt);
+  if (lf && ff && lf !== ff) return false;
   const t = startMs(fixture), u = line?.start_utc ? Date.parse(line.start_utc) : NaN;
-  if (!Number.isFinite(t) || !Number.isFinite(u)) return true;
+  if (!Number.isFinite(t) || !Number.isFinite(u)) return false;
   return Math.abs(t - u) < BOOK_WINDOW_MS;
 }
 
 /** Which bookmaker sections this fixture can show. `props` = two-sided player lines; `fancy` = match/team totals. */
 export function fixtureBooks(doc, fixture) {
-  const props = (doc?.lines || []).some((l) => l.books?.length && sameFixture(l, fixture));
-  const fancy = (doc?.fancy || []).some((l) => sameFixture(l, fixture));
+  const props = (doc?.lines || []).some((l) => l.books?.length && sameFixture(l, fixture, doc));
+  const fancy = (doc?.fancy || []).some((l) => sameFixture(l, fixture, doc));
   return { props, fancy };
 }
 
 /**
- * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams, start
- * times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for whole-match markets.
- * Returns [{ line, over, under, source }] sorted by line.
+ * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams,
+ * same format, start times within 14 h (books and the schedule disagree on kick-off). `team` picks a team-total market; omit it for
+ * whole-match markets. Returns [{ line, over, under, source }] sorted by line.
  */
 export function fancyFor(doc, fixture, key, team = null) {
-  const a = teamKey(fixture.a), b = teamKey(fixture.b);
   return (doc?.fancy || []).filter((l) => {
     if (l.key !== key || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
-    const h = teamKey(l.home), w = teamKey(l.away);
-    if (!((h === a && w === b) || (h === b && w === a))) return false;
-    return !l.start_utc || !fixture.startMs || Math.abs(Date.parse(l.start_utc) - fixture.startMs) < 14 * 3600e3;
+    return sameFixture(l, fixture, doc);
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source })).sort((x, y) => x.line - y.line);
 }

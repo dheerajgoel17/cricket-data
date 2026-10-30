@@ -47,11 +47,11 @@ data/fixtures, value_bets ┘                                                   
   Kick-off, "today / tomorrow" and countdowns stay in the **viewer's time zone** (`site/src/lib/format.ts`); ESPN's ground-local "Starts at … local time" lines are dropped.
 
 ## Settlement rules and definitions
-* T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100.
+* T20 summary markets are void unless both innings reach 80% of the scheduled balls (96 of 120); ODI likewise (240 of 300); The Hundred 80 of 100; T10 48 of 60; 60-over 288 of 360.
   Tests: void unless there is a result, or 300 overs (5-day) / 200 overs (4-day) were bowled. Void matches are left out of match/team markets.
 * 30s = 30-49, 50s = 50-99, 100s = 100+, double-digit = 10+, single-digit = 1-9 (ducks excluded). Team markets count only the team batting first.
 * Retired hurt is not a wicket. Penalty runs count. Runs conceded = batter runs + wides + no-balls + penalty (as in `data/players`). Super overs are ignored.
-* Formats: T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only, **The Hundred is its own format**. First-class (`MDM`) is not included.
+* Formats: T20 = T20 + T20I, ODI = ODI + 50-over List A, Test = Tests only, **The Hundred, T10 and 60-over are their own formats**. First-class (`MDM`) is not in the stats; fixtures still labelled `FC`. 100-ball competitions are The Hundred; 40-over (`O40`) is kept distinct from ODI when matching books.
 * Fair decimal odds = 1 / hit rate on the filtered sample (pushes on whole-number lines are void). Decimal odds only.
 * Home/away/neutral is *inferred*, because Cricsheet has no home flag: the event ("X tour of Y"), the venue's tour history, its country in
   `value_bets/mappings/venue_geo.csv`, then the team that plays at least half of the venue's internationals. Unknown hosts are left out of home/away filters.
@@ -92,7 +92,9 @@ The Vercel project root is `site/` (static `public/` + `api/ask.js` + `api/live.
    PRs touching the site build and test only.
 4. Prop Hunter reads `value_bets_latest.json` from GitHub at view time, so it stays hourly-fresh without any redeploy.
 
-Never commit tokens or API keys: the key lives only in Vercel's environment, the deploy secrets only in GitHub secrets (`scripts/check_public_safe.py` runs in CI).
+Never commit tokens or API keys. Deploy, wrap and analytics ids live in **GitHub repository secrets**; the Site workflow injects them into the Vercel build (`scripts/check_public_safe.py` runs in CI). Serverless LLM keys stay in Vercel env because they are read at request time (`XAI_API_KEY` / `GEMINI_API_KEY`).
+
+Google Analytics 4 loads automatically (page views, no ads cookies, no consent banner) when `VITE_GA_MEASUREMENT_ID` is set. The `/api/gate` cookie is strictly necessary to serve `/data` and is not prompted.
 
 ## Player photos and team logos
 Sources, in order: **CREX** (the repo already scrapes it) then **Wikidata/Wikimedia Commons**, then a flag (national sides) or initials/silhouette.
@@ -104,7 +106,7 @@ check their terms before using the site commercially, or replace the source late
 
 ## Our own copy of the images and id maps (Supabase, free plan)
 So the site keeps working if CREX changes or removes its images, `src/cricket_site/assets_sync.py` copies each player photo / team logo once into a
-public Supabase Storage bucket (`avatars`) and records it in Postgres (`assets`, `crex_players`, `crex_teams`; public read, writes only with the service key).
+public Supabase Storage bucket (`avatars`) and records it in Postgres (`assets`, `crex_players`, `crex_teams`, `player_names`, `fixture_identity`; public read, writes only with the service key).
 The Site workflow runs it hourly (resumable, at most `SYNC_LIMIT` new images per run, politely paced) and adds `base` + `s` (ids we hold) to `photos.json`;
 the browser then tries our copy first and CREX second. Setup: repository variable `SUPABASE_URL` and secret `SUPABASE_SERVICE_KEY`
 (dashboard -> Project Settings -> API Keys -> service role / secret key; never commit it). Without them the step is skipped and CREX is used directly.

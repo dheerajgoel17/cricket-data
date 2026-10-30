@@ -1,6 +1,7 @@
 // Entity resolution with typo tolerance: players, teams, venues, competitions.
 // Names in the data are Cricsheet-style ("HC Brook", "BM Duckett"); people type "Harry Brook", "duckett", "brok".
-import { norm, lev } from "./util.js";
+import { playerIdFor } from "./identity.js";
+import { norm, lev, SURNAME_ALIAS } from "./util.js";
 
 const TEAM_ABBR = {
   eng: "england", aus: "australia", ind: "india", pak: "pakistan", sa: "south africa", rsa: "south africa", nz: "new zealand",
@@ -18,13 +19,16 @@ const EVENT_ALIAS = {
 };
 
 export class Resolver {
-  constructor(store) {
+  constructor(store, identity) {
     this.s = store;
+    this.identity = identity || null;
+    this.idToIdx = new Map();
     const P = store.P;
     this.bySurname = new Map();
     this.info = [];
     this.fuzzyKeys = null;
     for (let i = 0; i < P.id.length; i++) {
+      this.idToIdx.set(P.id[i], i);
       const raw = P.nm[i];
       const toks = raw.split(/\s+/);
       let k = 0;
@@ -34,15 +38,21 @@ export class Resolver {
       const given = initials ? "" : norm(rest.slice(0, -1).join(" "));
       const sur = norm(rest.join(" ")).length ? norm(initials ? rest.join(" ") : rest[rest.length - 1]) : norm(raw);
       this.info.push({ initials: initials.toLowerCase(), given, sur, full: norm(raw) });
-      this._add(sur, i);
+      this._indexSur(sur, i);
       const last = norm(rest[rest.length - 1] || raw);
-      if (last !== sur) this._add(last, i);
+      if (last !== sur) this._indexSur(last, i);
     }
     for (const [ix, names] of Object.entries(store.index.aliases || {})) {
       for (const nm of names) {
         const t = norm(nm).split(" ");
-        this._add(t[t.length - 1], +ix);
+        this._indexSur(t[t.length - 1], +ix);
       }
+    }
+    for (const r of this.identity?.p || []) {
+      const i = this.idToIdx.get(r.id);
+      if (i == null || !r.f) continue;
+      const toks = r.f.split(" ").filter(Boolean);
+      this._indexSur(toks[toks.length - 1], i);
     }
     // activity counts for tie-breaks (venues, teams)
     this.venueCount = new Array(store.venues.length).fill(0);
@@ -57,6 +67,11 @@ export class Resolver {
     if (!key) return;
     const a = this.bySurname.get(key);
     a ? (a.includes(i) || a.push(i)) : this.bySurname.set(key, [i]);
+  }
+
+  _indexSur(sur, i) {
+    this._add(sur, i);
+    for (const al of SURNAME_ALIAS[sur] || []) this._add(al, i);
   }
 
   _candidates(sur) {
@@ -78,11 +93,21 @@ export class Resolver {
    * Rank players for a free-text name. opts: { gender (0|1), team (team idx), fmt }
    * Returns [{idx, name, score, team, last}] best first.
    */
+  _identityIdx(text, opts) {
+    const teamName = opts.team != null ? this.s.teamName(opts.team) : undefined;
+    const pid = playerIdFor(this.identity, text, { gender: opts.gender, team: teamName });
+    if (!pid) return null;
+    const i = this.idToIdx.get(pid);
+    return i == null ? null : i;
+  }
+
   players(text, opts = {}, limit = 5) {
     const toks = norm(text).split(" ").filter(Boolean);
     if (!toks.length) return [];
     const P = this.s.P;
     const seen = new Map();
+    const idHit = this._identityIdx(text, opts);
+    if (idHit != null) seen.set(idHit, { idx: idHit, name: P.nm[idHit], score: 20, team: P.tm[idHit], last: P.last[idHit], surnameLen: 1 });
     // the surname is the last token, or the last two when the data uses particles ("van der Merwe", "de Kock")
     const tries = [[toks.slice(-1).join(" "), toks.slice(0, -1)]];
     if (toks.length >= 2) tries.push([toks.slice(-2).join(" "), toks.slice(0, -2)]);

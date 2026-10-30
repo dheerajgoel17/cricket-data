@@ -15,7 +15,7 @@ export const PLAN_SCHEMA = `{
   "scope": "innings"|"match",       // "match" only for Test aggregates across both innings
   "split_by": ["opposition"|"venue"|"venue_type"|"innings"|"position"|"year"|"competition"],
   "filters": {
-    "format": "T20"|"ODI"|"Test"|"Hundred"|null,   // T20I counts as T20, List A as ODI; never combine formats
+    "format": "T20"|"ODI"|"Test"|"Hundred"|"T10"|"O60"|null,   // T20I counts as T20, 50-over List A as ODI; never combine formats
     "gender": "male"|"female"|null,
     "opposition": string|null,
     "venue_type": "home"|"away"|"neutral"|null,

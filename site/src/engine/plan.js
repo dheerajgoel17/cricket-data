@@ -9,7 +9,8 @@ import { FORMATS, fmtIndex, norm, round } from "./util.js";
 
 export const KINDS = ["player_prop", "partnership", "match_market", "top_batter", "unknown"];
 const FMT_WORDS = { t20: "T20", t20i: "T20", t20s: "T20", twenty20: "T20", it20: "T20", odi: "ODI", odis: "ODI", "one day": "ODI",
-  oneday: "ODI", "50 over": "ODI", test: "Test", tests: "Test", "test match": "Test", hundred: "Hundred", "the hundred": "Hundred", "100 ball": "Hundred" };
+  oneday: "ODI", "50 over": "ODI", test: "Test", tests: "Test", "test match": "Test", hundred: "Hundred", "the hundred": "Hundred",
+  "100 ball": "Hundred", t10: "T10", "10 over": "T10", "60 over": "O60", o60: "O60" };
 const str = (v, n = 80) => (typeof v === "string" && v.trim() ? v.trim().slice(0, n) : null);
 const num = (v) => (v === null || v === "" || v === undefined || !Number.isFinite(Number(v)) ? null : Number(v));
 const isoDate = (v) => {

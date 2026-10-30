@@ -37,7 +37,11 @@ import { Input } from "@/components/ui/input";
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
 const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`]);
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
-const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
+const fmtOf = (f: any) => {
+  const s = String(f?.fmt || "");
+  if (!s || s === "FC") return "T20";
+  return s;
+};
 
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
 
@@ -168,7 +172,7 @@ export function FixturePage() {
           <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
-          {tab === "props" && <HotProps teams={[fx.a, fx.b]} />}
+          {tab === "props" && <HotProps teams={[fx.a, fx.b]} fmt={fmt} />}
           {tab === "grid" && (
             <>
               <FilterBar {...{ stat, line, games, setQ }} />

@@ -10,11 +10,12 @@ Rules baked in here (see docs/SITE.md):
 """
 from __future__ import annotations
 
-# T20 = T20 + T20I, ODI = ODI + domestic List A, Test = Tests only (first-class "MDM" is not a Test and is left out).
-# The Hundred (T20 type, 5-ball overs) is its own format so its numbers never leak into T20.
-FORMATS = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2}
-HUNDRED = 3
-FORMAT_NAMES = ["T20", "ODI", "Test", "Hundred"]
+# T20 = T20 + T20I, ODI = ODI + 50-over List A, Test = Tests only (first-class "MDM" is not a Test and is left out).
+# The Hundred (5-ball overs), T10 and 60-over are their own formats so their numbers never leak into T20/ODI.
+FORMATS = {"T20": 0, "IT20": 0, "ODI": 1, "ODM": 1, "Test": 2, "T10": 4}
+HUNDRED, T10, O60 = 3, 4, 5
+FORMAT_NAMES = ["T20", "ODI", "Test", "Hundred", "T10", "O60"]
+INN_LEN = {0: 20, 1: 50, HUNDRED: 20, T10: 10, O60: 60}  # scheduled overs; Test (2) uses the result/overs rule instead
 BOWLER_WICKETS = {"bowled", "caught", "caught and bowled", "lbw", "stumped", "hit wicket"}
 NOT_A_WICKET = {"retired hurt", "retired not out"}
 KINDS = ["", "bowled", "caught", "caught and bowled", "lbw", "stumped", "hit wicket", "run out",
@@ -45,8 +46,19 @@ def parse_match(mid: str, doc: dict) -> dict | None:
     fmt = FORMATS.get(info.get("match_type"))
     if fmt is None:
         return None
-    if fmt == 0 and info.get("balls_per_over") == 5:
+    event = ""
+    ev = info.get("event")
+    if isinstance(ev, dict):
+        event = (ev.get("name") or "").lower()
+    else:
+        event = str(ev or "").lower()
+    overs = info.get("overs") or 0
+    if info.get("balls_per_over") == 5 or "hundred" in event:
         fmt = HUNDRED
+    elif fmt in (0, 4) and (overs == 10 or "t10" in event):
+        fmt = T10
+    elif fmt == 1 and (overs == 60 or "60 over" in event or "60-over" in event):
+        fmt = O60
     dates = info.get("dates") or []
     if not dates or not info.get("teams") or len(info["teams"]) != 2:
         return None
@@ -228,7 +240,7 @@ def qualifies(m: dict) -> int:
     """Exchange-style validity of match-summary markets (1 valid, 0 void)."""
     inns = m["innings"]
     if m["fmt"] != 2:
-        default = {0: 20, 1: 50, HUNDRED: 20}[m["fmt"]]
+        default = INN_LEN[m["fmt"]]
         overs = m["overs"] if 0 < m["overs"] <= default else default  # a few T20 files carry overs=50: use the format's own length
         sched = overs * m["bpo"]
         need = round(OVERS_QUAL * sched)

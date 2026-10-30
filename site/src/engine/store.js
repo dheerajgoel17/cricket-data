@@ -1,12 +1,13 @@
 // Loads the generated data files and joins player rows to their match. Works in the browser and in node tests:
 // pass `fetchJson(relativePath)`; the default uses fetch().
 import { norm } from "./util.js";
+import { unwrap } from "./wrap.js";
 
-export async function createStore({ base = "data/", fetchJson } = {}) {
+export async function createStore({ base = "data/", fetchJson, wrapKey } = {}) {
   const get = fetchJson || (async (p) => {
-    const r = await fetch(base + p);
+    const r = await fetch(base + p, { credentials: "same-origin" });
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
-    return r.json();
+    return await unwrap(await r.json(), wrapKey);
   });
   const [meta, index, M] = await Promise.all([get("meta.json"), get("index.json"), get("matches.json")]);
   return new Store(meta, index, M, get);

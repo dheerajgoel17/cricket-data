@@ -26,5 +26,5 @@ export const flagUrl = (name: string, w = 80) => {
 };
 
 export async function loadPhotos(base = "/data/"): Promise<Photos> {
-  try { return await (await fetch(`${base}photos.json`)).json(); } catch { return {}; }
+  try { return await (await fetch(`${base}photos.json`, { credentials: "same-origin" })).json(); } catch { return {}; }
 }

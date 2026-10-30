@@ -81,6 +81,8 @@ test("namesMatch pairs ESPN initials with full book names", () => {
   assert.equal(namesMatch("SA Engelbrecht", "Sybrand Engelbrecht"), true);
   assert.equal(namesMatch("JM Bairstow", "Joe Root"), false);
   assert.equal(namesMatch("Vikramjit Singh", "Vikramjit Singh"), true);
+  assert.equal(namesMatch("Athapaththu", "AC Jayangani"), true, "scorecard surname vs Cricsheet unique name");
+  assert.equal(namesMatch("R Athapaththu", "AC Jayangani"), false);
 });
 
 test("teamKey folds Under-19 labels", () => {

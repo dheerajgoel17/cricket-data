@@ -1,5 +1,5 @@
 // Small shared helpers (pure, no DOM).
-export const FORMATS = ["T20", "ODI", "Test", "Hundred"];
+export const FORMATS = ["T20", "ODI", "Test", "Hundred", "T10", "O60"];
 export const fmtIndex = (name) => FORMATS.findIndex((f) => f.toLowerCase() === String(name).toLowerCase());
 
 export function norm(s) {
@@ -43,4 +43,28 @@ export const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length :
 
 export function todayISO(now = new Date()) {
   return now.toISOString().slice(0, 10);
+}
+
+/** Playing-name surnames that Cricsheet still files under an older registry name (Chamari Athapaththu = AC Jayangani). */
+export const SURNAME_ALIAS = {
+  athapaththu: ["jayangani"],
+  jayangani: ["athapaththu"],
+};
+
+export const surnamesEq = (a, b) => a === b || (SURNAME_ALIAS[a] || []).includes(b);
+
+/** Site format names. The pipeline calls a multi-day match MULTI. T10/O60/O40/FC stay distinct from T20/ODI/Test. */
+export function canonFmt(f) {
+  const s = String(f || "");
+  if (!s) return "";
+  if (s === "MULTI" || /^test$/i.test(s)) return "Test";
+  const t = s.toLowerCase();
+  if (/\bt10\b/.test(t) || (/\b10[- ]overs?\b/.test(t) && !/t20/.test(t))) return "T10";
+  if (t === "hundred" || /\bthe hundred\b|\b100[- ]?balls?\b/.test(t)) return "Hundred";
+  if (/\b60[- ]overs?\b/.test(t) || t === "o60") return "O60";
+  if (/\b40[- ]overs?\b/.test(t) || t === "o40") return "O40";
+  if (/t20|twenty20/i.test(s)) return "T20";
+  if (/odi|one.?day|list a|50[- ]over/i.test(s)) return "ODI";
+  if (t === "fc" || /first.?class/.test(t)) return "FC";
+  return FORMATS.includes(s) ? s : s;
 }

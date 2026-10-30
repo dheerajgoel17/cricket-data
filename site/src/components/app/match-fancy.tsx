@@ -50,7 +50,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ }: Props) {
   const reduce = useReducedMotion();
   const doc = useQuery({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000 });
   const panelRef = useRef<HTMLDivElement>(null);
-  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, startMs: fixtureStart(fx).getTime() }), [fx]);
+  const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, start: fx.start, startMs: fixtureStart(fx).getTime(), fmt: fx.fmt }), [fx]);
   const booked = (k: string, teamName: string | null) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName).length > 0;
   const scopes = [["-1", "Match", MATCH_KEYS.some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, TEAM_KEYS.some(([k]) => booked(k, name))] as const)].filter(([, , on]) => on);
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;

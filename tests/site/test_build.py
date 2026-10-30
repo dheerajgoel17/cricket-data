@@ -28,7 +28,7 @@ def test_build_outputs_and_meta(tmp_path):
     assert meta["provisional_included"] is False
     M, IX = _load(out)
     assert IX["formats"] == FORMAT_NAMES
-    assert all((out / f).exists() for f in ("meta.json", "index.json", "matches.json", "fixtures.json", "props.json"))
+    assert all((out / f).exists() for f in ("meta.json", "index.json", "matches.json", "fixtures.json", "props.json", "identity.json"))
     # T20 summary markets: the 5-over game is void, the 10 full games are valid
     t20 = [m for m in range(len(M["id"])) if M["f"][m] == 0]
     assert sorted(M["q"][m] for m in t20) == [0] + [1] * 10
@@ -117,7 +117,7 @@ def test_committed_js_fixture_is_in_sync(tmp_path):
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     mod.generate(tmp_path)
-    for name in ("matches.json", "index.json", "expectations.json"):
+    for name in ("matches.json", "index.json", "identity.json", "expectations.json"):
         committed = root / "site" / "tests" / "fixtures" / ("data" if name != "expectations.json" else "") / name
         fresh = tmp_path / ("data" if name != "expectations.json" else "") / name
         assert committed.read_text() == fresh.read_text(), f"{name} is stale: run python scripts/make_site_fixture.py"
@@ -192,6 +192,20 @@ def test_bookmaker_feed_is_odds_only_never_a_fixture_or_start_time(tmp_path):
     fx = B.build_fixtures(tmp_path, vb, {})
     assert [(f["a"], f["start"], f["source"]) for f in fx] == [
         ("Afghanistan U19", "2026-10-23T05:00Z", "crex"), ("Afghanistan", "2026-10-23T11:30Z", "crex")]
+
+
+def test_player_aliases_csv_playing_names_land_in_the_index(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    bro = synth.pid(synth.BROOK)
+    (data / "mappings").mkdir(parents=True)
+    (data / "mappings" / "player_aliases.csv").write_text(
+        f"raw_name,team,player_id\nHarry Brook,Alpha,{bro}\n", encoding="utf-8")
+    B.build(z, data, out, None, workers=1)
+    IX = json.loads((out / "index.json").read_text())
+    idx = IX["players"]["id"].index(bro)
+    assert "Harry Brook" in (IX["aliases"].get(str(idx)) or [])
+    ident = json.loads((out / "identity.json").read_text())
+    assert any(r["id"] == bro and r["f"] == "harry brook" for r in ident["p"])
 
 
 def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_never_fails_the_build(tmp_path):

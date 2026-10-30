@@ -103,6 +103,19 @@ def test_void_rules_odi_hundred_and_test():
     assert qualifies(test) == 1  # a result always counts
 
 
+def test_t10_and_60_over_are_their_own_formats_and_void_at_80_percent():
+    inn = scripted("X", ["A", "B"], {"A": dict(runs=1), "B": dict(runs=0)}, ["Z"], pad_to=60)
+    t10 = parse_match("t10", doc("2024-08-01", ("X", "Y"), [inn], mtype="T20", overs=10))
+    assert t10["fmt"] == 4
+    o60 = parse_match("o60", doc("2024-08-01", ("X", "Y"), [inn], mtype="ODI", overs=60))
+    assert o60["fmt"] == 5
+    # T10: 80% of 10×6 = 48 balls; 60-over: 80% of 60×6 = 288
+    assert qualifies({"fmt": 4, "overs": 10, "bpo": 6, "innings": [{"balls": 48}, {"balls": 48}], "res": 0, "days": 1}) == 1
+    assert qualifies({"fmt": 4, "overs": 10, "bpo": 6, "innings": [{"balls": 48}, {"balls": 47}], "res": 0, "days": 1}) == 0
+    assert qualifies({"fmt": 5, "overs": 60, "bpo": 6, "innings": [{"balls": 288}, {"balls": 288}], "res": 0, "days": 1}) == 1
+    assert qualifies({"fmt": 5, "overs": 60, "bpo": 6, "innings": [{"balls": 288}, {"balls": 287}], "res": 0, "days": 1}) == 0
+
+
 def test_hundred_is_its_own_format_and_first_class_is_ignored():
     inn = scripted("X", ["A", "B"], {"A": dict(runs=1), "B": dict(runs=0)}, ["Z"], pad_to=100)
     d = doc("2024-08-01", ("X", "Y"), [inn], mtype="T20", bpo=5)

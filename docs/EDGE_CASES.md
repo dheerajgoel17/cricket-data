@@ -21,7 +21,10 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | Two matches between the same sides on consecutive days | both kept | a scraped game one day off a Cricsheet game is a duplicate only if the batter-run totals match |
 | Same fixture in Cricsheet and scraped | Cricsheet wins | deduped on teams + date (+/-1 day) |
 | The Hundred | its own format | never mixed with T20 |
-| First-class (MDM) | not included | not a Test |
+| T10 | its own format | never mixed with T20 (Abu Dhabi T10, etc.) |
+| 60-over | its own format (`O60`) | never mixed with 50-over ODI |
+| 40-over | fixture/book label `O40` | never mixed with ODI |
+| First-class (MDM) | not in stats; fixtures keep `FC` | not a Test |
 
 ## Known gaps
 * Whether a named 12th man / impact sub counts as "in the XI" differs between books; we treat every named player as in.

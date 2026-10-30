@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { HomePage } from "@/pages/Home";
+import { initGa, track, trackPage } from "@/lib/ga";
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
 
@@ -22,10 +23,21 @@ function LegacyHash() {
   return null;
 }
 
+function Analytics() {
+  const { pathname, search } = useLocation();
+  useEffect(() => { initGa(); }, []);
+  useEffect(() => { trackPage(pathname + search); }, [pathname, search]);
+  useEffect(() => {
+    if (pathname.startsWith("/player/")) track("player_view", { page_path: pathname });
+  }, [pathname]);
+  return null;
+}
+
 export function App() {
   return (
     <>
       <LegacyHash />
+      <Analytics />
       <Suspense fallback={<div className="p-8 text-muted-foreground" role="status">Loading…</div>}>
         <Routes>
           <Route element={<Shell />}>

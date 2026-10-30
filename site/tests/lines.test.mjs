@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bookLinesFor, bookName, fancyFor, fixtureBooks, lineProb, overProb } from "../src/engine/lines.js";
+import { bookLinesFor, bookName, fancyFor, fixtureBooks, lineFmt, lineProb, overProb } from "../src/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -77,4 +77,35 @@ test("fixtureBooks hides player-prop vs fancy sections when that match has no li
   assert.deepEqual(fixtureBooks(both, fx), { props: true, fancy: true });
   assert.deepEqual(fixtureBooks({ lines: [L(17.5, 1.85, 1.95)], fancy: [] }, fx), { props: false, fancy: false });
   assert.deepEqual(fixtureBooks(null, fx), { props: false, fancy: false });
+});
+
+test("a T20 in a Test series does not price the Test (format + start, never missing-time wildcards)", () => {
+  const t20 = { match: "Afghanistan vs Zimbabwe", home: "Afghanistan", away: "Zimbabwe", start_utc: "2026-11-01T14:30:00Z",
+    key: "match_fours", scope: "match", team: null, line: 24.5, over: 1.91, under: 1.80, source: "Ladbrokes" };
+  const t20Prop = { ...L(22.5, 1.8, 2.0), match: "Afghanistan vs Zimbabwe", start_utc: "2026-11-01T14:30:00Z", fmt: "T20" };
+  const testFx = { a: "Afghanistan", b: "Zimbabwe", start: "2026-11-05T06:00Z", fmt: "Test" };
+  const t20Fx = { a: "Afghanistan", b: "Zimbabwe", start: "2026-11-01T14:30Z", fmt: "T20" };
+  const doc = { lines: [t20Prop], fancy: [t20] };
+  assert.equal(lineFmt(t20, doc), "T20", "fancy with no fmt inherits T20 from the player-prop on the same kick-off");
+  assert.deepEqual(fixtureBooks(doc, testFx), { props: false, fancy: false });
+  assert.deepEqual(fancyFor(doc, testFx, "match_fours"), []);
+  assert.deepEqual(fixtureBooks(doc, t20Fx), { props: true, fancy: true });
+  assert.deepEqual(fancyFor(doc, t20Fx, "match_fours").map((x) => x.line), [24.5]);
+  const noStart = { ...t20, start_utc: null };
+  assert.deepEqual(fixtureBooks({ lines: [], fancy: [noStart] }, testFx), { props: false, fancy: false }, "a line with no kick-off is not every Afghanistan vs Zimbabwe match");
+  const sameNight = { a: "Afghanistan", b: "Zimbabwe", start: "2026-11-02T00:00Z", fmt: "Test" }; // 9.5 h after the T20
+  assert.deepEqual(fixtureBooks(doc, sameNight), { props: false, fancy: false }, "within 14 h is not enough when the format is Test vs T20");
+});
+
+test("T10 and 60-over lines never price a T20 or ODI fixture", () => {
+  const t10 = { match: "A vs B", home: "A", away: "B", start_utc: "2026-11-01T14:00:00Z", fmt: "T10",
+    key: "match_fours", scope: "match", line: 12.5, over: 1.9, under: 1.8 };
+  const o60 = { match: "A vs B", home: "A", away: "B", start_utc: "2026-11-01T14:00:00Z", fmt: "O60",
+    key: "match_runs", scope: "match", line: 280.5, over: 1.9, under: 1.8 };
+  const t20Fx = { a: "A", b: "B", start: "2026-11-01T14:00Z", fmt: "T20" };
+  const odiFx = { a: "A", b: "B", start: "2026-11-01T14:00Z", fmt: "ODI" };
+  const t10Fx = { a: "A", b: "B", start: "2026-11-01T14:00Z", fmt: "T10" };
+  assert.deepEqual(fancyFor({ fancy: [t10] }, t20Fx, "match_fours"), []);
+  assert.deepEqual(fancyFor({ fancy: [t10] }, t10Fx, "match_fours").map((x) => x.line), [12.5]);
+  assert.deepEqual(fancyFor({ fancy: [o60] }, odiFx, "match_runs"), []);
 });
