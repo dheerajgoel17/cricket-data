@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { CARD_V, cardPath } from "@/engine/card.js";
+import { CARD_V, cardPath } from "@/engine/card-path.js";
 import { fullTitle, pageMeta, BRAND } from "./seo.js";
 
 const meta = (attr: "name" | "property", key: string, value: string) => {
