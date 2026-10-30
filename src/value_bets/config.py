@@ -44,7 +44,7 @@ DEFAULTS = {
     "SNAPSHOT_KEEP_DAYS": 45,
     "SNAPSHOT_MAX_MB": 1500,
     "HTTP_TIMEOUT": 25,
-    "SOURCE_TIMEOUT": 120,         # per-adapter wall clock
+    "SOURCE_TIMEOUT": 300,         # wait for every adapter (Feed H's full in-horizon catalogue needs this)
     "MC_SIMS": 20000,
     "ODDSAPI_MIN_INTERVAL_HOURS": 8.0,
     "ODDSAPI_MONTHLY_CREDIT_CAP": 150,
@@ -70,10 +70,10 @@ DEFAULTS = {
     "FEEDG_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
     "FEEDG_STATE_MAX_HOURS": 3.0,  # ... how old the India runner's last read may be when GitHub's own servers are refused (state/feedg_latest.json)
     "FEEDG_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
-    "FEEDH_SPACING_SECS": 2.0,     # Feed H (adapters/feedh.py, on whenever FEEDH_URL and FEEDH_NAME are set): seconds between its requests
-    "FEEDH_MAX_EVENTS": 20,        # ... event pages fetched per run
+    "FEEDH_SPACING_SECS": 0.5,     # Feed H (adapters/feedh.py, on whenever FEEDH_URL and FEEDH_NAME are set): seconds between its requests
+    "FEEDH_MAX_EVENTS": 500,       # ... event/competition pages fetched per run (in-horizon games first, then internationals)
     "FEEDH_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
-    "FEEDH_BUDGET_SECS": 90.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDH_BUDGET_SECS": 240.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

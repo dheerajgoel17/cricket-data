@@ -3,8 +3,9 @@
 The book and its host are deployment configuration, never code (docs/OPERATIONS.md): ``FEEDH_URL`` is the sportsbook root and
 ``FEEDH_NAME`` is the name its prices are published under. Unset, the source is skipped. It never runs on a laptop: ``fetch`` raises
 ``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it always goes through the Cloudflare Worker relay
-(``FEEDH_RELAY`` or Feed G's pair); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing and a
-few event pages per run, ``FEEDH_SPACING_SECS`` apart, one attempt each, and an HTTP error ends that page (a 429 ends the run).
+(``FEEDH_RELAY`` or Feed G's pair); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing, then every
+in-horizon game and competition page (internationals first), ``FEEDH_SPACING_SECS`` apart, one attempt each; a 429 ends the run and
+``FEEDH_BUDGET_SECS`` stops new pages.
 
 Rows are the player markets the other books already map: "Batsman Runs / Sixes / Fours - Last, First" and "Bowler Wickets - Last, First"
 over/unders, "Player Performance - Last, First" (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; the book's
@@ -37,6 +38,7 @@ AUTO = True  # on whenever FEEDH_URL and FEEDH_NAME are set; no need to list it 
 SOURCE = "feedh_d"
 CRIC = 215
 SKIP_PATH = re.compile(r"virtual|simulated|electronic|\bsrl\b|long term|futures", re.I)
+INTL_PATH = re.compile(r"\binternational\b|\bworld cup\b|\basia cup\b|\btri[- ]?series\b|\btests?\b series|\bodi series\b|\bt20 series\b", re.I)
 MULTI_DAY = re.compile(r"\btests?\b|ashes|shield|first.class|championship|ranji", re.I)
 TEST = re.compile(r"\btests?\b|ashes", re.I)
 WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
@@ -350,6 +352,13 @@ def _path_id(ev) -> int | str | None:
     return eid if eid and eid != CRIC else None
 
 
+def _path_rank(ev) -> int:
+    """0 = international / series (fetch first), 1 = everything else. Club trees must not starve Pak vs SL."""
+    blob = " ".join(p.get("name") or "" for p in (ev.get("eventPaths") or []))
+    blob += " " + (ev.get("description") or ev.get("name") or "")
+    return 0 if INTL_PATH.search(blob) else 1
+
+
 def fetch(fetched_at: str):
     s = settings()
     if not s:
@@ -369,16 +378,15 @@ def fetch(fetched_at: str):
     listing = pace.get(f"{base}/xapi/rest/events?" + _qs(eventPathIds=str(CRIC), includeMarkets="false", maxMarketPerEvent=0))
     if not isinstance(listing, list):
         raise Skip("events listing was not a list")
-    paths, games, seen = [], [], set()
+    path_rank, games, seen = {}, [], set()
     for ev in _walk(listing):
         if (ev.get("sportCode") or "") not in ("", "CRIC"):
             continue
         if SKIP_PATH.search(" ".join(p.get("name") or "" for p in (ev.get("eventPaths") or []))):
             continue
         pid = _path_id(ev)
-        if pid and pid not in seen:
-            seen.add(pid)
-            paths.append(pid)
+        if pid:
+            path_rank[pid] = min(path_rank.get(pid, 9), _path_rank(ev))
             continue
         st = parse_ts(ev.get("eventDate"))
         if not st or st <= now or st > horizon:
@@ -387,15 +395,19 @@ def fetch(fetched_at: str):
         if eid and eid != CRIC and eid not in seen:
             seen.add(eid)
             games.append(eid)
+    paths = [pid for pid, _ in sorted(path_rank.items(), key=lambda kv: (kv[1], str(kv[0])))]
     info["listed"] = len(paths) + len(games)
-    budget = config.get("FEEDH_MAX_EVENTS")
-    targets = [("path", x) for x in paths] + [("event", x) for x in games]
+    cap = config.get("FEEDH_MAX_EVENTS")
+    targets = [("event", x) for x in games] + [("path", x) for x in paths]
+    if cap > 0:
+        targets = targets[:cap]
 
     def pull(kind, eid):
         extra = {"includeMarkets": "true", ("eventPathIds" if kind == "path" else "eventIds"): str(eid)}
         return pace.get(f"{base}/xapi/rest/events?" + _qs(**extra))
 
-    for kind, eid in targets[:budget]:
+    parsed = set()
+    for kind, eid in targets:
         if time.monotonic() > deadline:
             info["stopped"] = "time budget"
             break
@@ -418,12 +430,17 @@ def fetch(fetched_at: str):
                 continue
         items = got if isinstance(got, list) else []
         for full in items:
+            fid = full.get("id")
+            if fid and fid in parsed:
+                continue
             st = parse_ts(full.get("eventDate"))
             if st and (st <= now or st > horizon):
                 continue
             r, fx, cat, left = parse_event(full, SOURCE, fetched_at)
             if not r and not fx and not cat:
                 continue
+            if fid:
+                parsed.add(fid)
             rows += r
             fancy += fx
             catalogue += cat
