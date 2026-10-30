@@ -1,14 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Readable } from "node:stream";
-import handler, { allowed, same } from "../../relay/api/relay.js";
+import worker, { allowed, same } from "../../relay/worker.js";
 
+const envOf = () => ({ RELAY_KEY: process.env.RELAY_KEY, RELAY_ALLOW: process.env.RELAY_ALLOW, RELAY_ALLOW_EXTRA: process.env.RELAY_ALLOW_EXTRA });
 const call = async (req, fetchImpl) => {
-  const body = req.body ? Buffer.from(req.body) : null;
-  const r = Object.assign(Readable.from(body ? [body] : []), { headers: {}, query: {}, method: "GET", ...req, body: undefined });
-  const res = { code: 0, headers: {}, body: null, set statusCode(v) { this.code = v; }, get statusCode() { return this.code; }, setHeader(k, v) { this.headers[k] = v; }, end(b) { this.body = b; } };
-  await handler(r, res, fetchImpl);
-  return res;
+  const url = new URL("https://relay.invalid/");
+  if (req.query?.u) url.searchParams.set("u", req.query.u);
+  const headers = new Headers(req.headers || {});
+  const r = new Request(url, { method: req.method || "GET", headers, body: req.body });
+  const res = await worker.fetch(r, envOf(), { fetch: fetchImpl });
+  return { code: res.status, headers: Object.fromEntries(res.headers), body: Buffer.from(await res.arrayBuffer()) };
 };
 const answer = (status, text, type = "application/json") => async () => new Response(text, { status, headers: { "content-type": type } });
 
@@ -35,7 +36,7 @@ test("the key and the host list are the only way in: no key, a wrong key, an unl
 
 test("a listed host (and its subdomains) is fetched and answered as it came, with its status", async () => {
   const ok = await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://api.book.example/list" } }, answer(200, '{"a":1}'));
-  assert.equal(ok.code, 200); assert.equal(ok.body.toString(), '{"a":1}'); assert.match(ok.headers["Content-Type"], /json/); assert.equal(ok.headers["Cache-Control"], "no-store");
+  assert.equal(ok.code, 200); assert.equal(ok.body.toString(), '{"a":1}'); assert.match(ok.headers["content-type"], /json/); assert.equal(ok.headers["cache-control"], "no-store");
   assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://hub.example/x" } }, answer(403, "blocked", "text/html"))).code, 403, "the book's own refusal is passed on");
   assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://hub.example/x" } }, async () => { throw new Error("down"); })).code, 502);
 });
@@ -45,7 +46,7 @@ test("a POST carries its body and content type to the book", async () => {
   const f = async (u, init) => { seen = { u: String(u), init }; return new Response("[]", { status: 200 }); };
   const res = await call({ method: "POST", headers: { "x-relay-key": "k-123", "content-type": "application/x-www-form-urlencoded" }, query: { u: "https://hub.example/ws/getMarketDataNew" }, body: "market_ids[]=1&market_ids[]=2" }, f);
   assert.equal(res.code, 200);
-  assert.equal(seen.init.method, "POST"); assert.equal(seen.init.body.toString(), "market_ids[]=1&market_ids[]=2"); assert.equal(seen.init.headers["Content-Type"], "application/x-www-form-urlencoded");
+  assert.equal(seen.init.method, "POST"); assert.equal(Buffer.from(seen.init.body).toString(), "market_ids[]=1&market_ids[]=2"); assert.equal(seen.init.headers["Content-Type"], "application/x-www-form-urlencoded");
 });
 
 test("allowed() and same() compare as they should", () => {

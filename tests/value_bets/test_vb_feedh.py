@@ -139,6 +139,50 @@ def test_fetch_lists_then_reads_a_few_events(monkeypatch):
     assert {x["key"] for x in fancy.adapter_fancy({"feedh": raw})} == {x["key"] for x in raw["fancy"]}
 
 
+def test_a_competition_node_is_fetched_as_a_path_not_an_event(monkeypatch):
+    monkeypatch.setenv("FEEDH_URL", ROOT)
+    monkeypatch.setenv("FEEDH_NAME", "Dafabet")
+    monkeypatch.setenv("CV_FEEDH_SPACING_SECS", "0")
+    path = {"id": 22908454, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "International"}]}
+    calls = []
+
+    def fake(url, retries=1, **kw):
+        calls.append(url)
+        if "includeMarkets=false" in url:
+            return [path], {}
+        return [event(MARKETS)], {}
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    rows, raw = feedh.fetch(STAMP)
+    assert len(rows) > 0
+    assert "eventPathIds=22908454" in calls[1]
+    assert "eventIds=" not in calls[1]
+    assert raw["books"]["Dafabet"]["events"] == 1
+
+
+def test_a_400_on_an_event_id_retries_the_same_id_as_a_path(monkeypatch):
+    monkeypatch.setenv("FEEDH_URL", ROOT)
+    monkeypatch.setenv("FEEDH_NAME", "Dafabet")
+    monkeypatch.setenv("CV_FEEDH_SPACING_SECS", "0")
+    stub = event([])
+    calls = []
+
+    def fake(url, retries=1, **kw):
+        calls.append(url)
+        if "includeMarkets=false" in url:
+            return [stub], {}
+        if "eventIds=" in url:
+            raise urllib.error.HTTPError(url, 400, "x", {}, None)
+        return [event(MARKETS)], {}
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    rows, raw = feedh.fetch(STAMP)
+    assert len(rows) > 0
+    assert any("eventIds=44628333" in u for u in calls)
+    assert any("eventPathIds=44628333" in u for u in calls)
+    assert raw["books"]["Dafabet"].get("stopped") is None
+
+
 def test_a_429_stops_the_book_for_the_run(monkeypatch):
     monkeypatch.setenv("FEEDH_URL", ROOT)
     monkeypatch.setenv("FEEDH_NAME", "Dafabet")

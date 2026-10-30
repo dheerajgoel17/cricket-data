@@ -151,7 +151,15 @@ def pull_odds(stamp):
         t = time.time()
         try:
             r, raw = mod.fetch(stamp)
-            return mod.NAME, {"status": "ok", "rows": len(r), "secs": round(time.time() - t, 1)}, r, raw
+            extra = {}
+            if isinstance(raw, dict):
+                for b in (raw.get("books") or {}).values():
+                    if isinstance(b, dict):
+                        if b.get("stopped"):
+                            extra["stopped"] = b["stopped"]
+                        if b.get("events") is not None:
+                            extra["events"] = b["events"]
+            return mod.NAME, {"status": "ok", "rows": len(r), "secs": round(time.time() - t, 1), **extra}, r, raw
         except getattr(mod, "Skip", ()) as e:
             return mod.NAME, {"status": "skipped", "reason": str(e)}, [], None
         except Exception as e:
@@ -829,6 +837,8 @@ def render_md(res, alerts):
     L.append("## Sources")
     for k, v in res["sources"].items():
         L.append(f"- **{k}**: {v.get('status')}" + (f", {v.get('rows')} prices" if v.get("rows") is not None else "")
+                 + (f", {v.get('events')} events" if v.get("events") is not None else "")
+                 + (f", stopped {v.get('stopped')}" if v.get("stopped") else "")
                  + (f" - {v.get('reason')}" if v.get("reason") else ""))
     s = res["stats"]
     L += ["", f"Matches starting in next {res['settings']['WINDOW_HOURS']:.0f}h: **{s['events_in_window']}**, "
