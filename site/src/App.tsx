@@ -4,6 +4,7 @@ import { Shell } from "@/components/layout/Shell";
 import { AppSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
+import { initGa, track, trackPage } from "@/lib/ga";
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
 
@@ -24,10 +25,21 @@ function LegacyHash() {
   return null;
 }
 
+function Analytics() {
+  const { pathname, search } = useLocation();
+  useEffect(() => { initGa(); }, []);
+  useEffect(() => { trackPage(pathname + search); }, [pathname, search]);
+  useEffect(() => {
+    if (pathname.startsWith("/player/")) track("player_view", { page_path: pathname });
+  }, [pathname]);
+  return null;
+}
+
 export function App() {
   return (
     <>
       <LegacyHash />
+      <Analytics />
       <ErrorBoundary><Suspense fallback={<AppSkeleton />}>
         <Routes>
           <Route element={<Shell />}>

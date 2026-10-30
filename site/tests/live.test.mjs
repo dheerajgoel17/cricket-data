@@ -80,6 +80,9 @@ test("namesMatch pairs initials with full book names", () => {
   assert.equal(namesMatch("SA Engelbrecht", "Sybrand Engelbrecht"), true);
   assert.equal(namesMatch("JM Bairstow", "Joe Root"), false);
   assert.equal(namesMatch("Vikramjit Singh", "Vikramjit Singh"), true);
+  assert.equal(namesMatch("AC Jayangani", "Chamari Athapaththu"), true);
+  assert.equal(namesMatch("C Athapaththu", "AC Jayangani"), true);
+  assert.equal(namesMatch("R Athapaththu", "AC Jayangani"), false);
 });
 
 test("teamKey folds Under-19 labels", () => {

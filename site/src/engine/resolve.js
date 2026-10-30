@@ -1,6 +1,6 @@
 // Entity resolution with typo tolerance: players, teams, venues, competitions.
 // Names in the data are Base-style ("HC Brook", "BM Duckett"); people type "Harry Brook", "duckett", "brok".
-import { norm, lev } from "./util.js";
+import { norm, lev, SURNAME_ALIAS } from "./util.js";
 
 const TEAM_ABBR = {
   eng: "england", aus: "australia", ind: "india", pak: "pakistan", sa: "south africa", rsa: "south africa", nz: "new zealand",
@@ -34,14 +34,14 @@ export class Resolver {
       const given = initials ? "" : norm(rest.slice(0, -1).join(" "));
       const sur = norm(rest.join(" ")).length ? norm(initials ? rest.join(" ") : rest[rest.length - 1]) : norm(raw);
       this.info.push({ initials: initials.toLowerCase(), given, sur, full: norm(raw) });
-      this._add(sur, i);
+      this._indexSur(sur, i);
       const last = norm(rest[rest.length - 1] || raw);
-      if (last !== sur) this._add(last, i);
+      if (last !== sur) this._indexSur(last, i);
     }
     for (const [ix, names] of Object.entries(store.index.aliases || {})) {
       for (const nm of names) {
         const t = norm(nm).split(" ");
-        this._add(t[t.length - 1], +ix);
+        this._indexSur(t[t.length - 1], +ix);
       }
     }
     // activity counts for tie-breaks (venues, teams)
@@ -57,6 +57,11 @@ export class Resolver {
     if (!key) return;
     const a = this.bySurname.get(key);
     a ? (a.includes(i) || a.push(i)) : this.bySurname.set(key, [i]);
+  }
+
+  _indexSur(sur, i) {
+    this._add(sur, i);
+    for (const al of SURNAME_ALIAS[sur] || []) this._add(al, i);
   }
 
   _candidates(sur) {
@@ -93,7 +98,12 @@ export class Resolver {
         let sc = 10 - d * 3;
         const g = givenToks[0];
         if (g) {
-          if (inf.initials) sc += inf.initials[0] === g[0] ? (g.length === 1 || inf.initials === givenToks.map((x) => x[0]).join("") ? 3 : 2) : -5;
+          if (inf.initials) {
+            const g0 = g[0], joined = givenToks.map((x) => x[0]).join("");
+            if (inf.initials[0] === g0) sc += (g.length === 1 || inf.initials === joined) ? 3 : 2;
+            else if (inf.initials.includes(g0)) sc += 2; // Chamari vs AC Jayangani
+            else sc -= 5;
+          }
           else if (inf.given) sc += inf.given === norm(givenToks.join(" ")) ? 4 : inf.given.startsWith(g) || g.startsWith(inf.given.split(" ")[0]) ? 2.5 : lev(inf.given.split(" ")[0], g, 1) <= 1 ? 1 : -4;
           else sc -= 1;
           const al = this.s.index.aliases?.[i];

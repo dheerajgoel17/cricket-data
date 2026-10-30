@@ -1,8 +1,17 @@
 import json
+from pathlib import Path
 
 from cricket_data.cli import main
 from cricket_data.models import MatchRecord, PlayerPerf
-from cricket_data.registry import build_rosters, freshness, iter_combined, link_players, minted_id, resolve
+from cricket_data.registry import (
+    build_rosters,
+    freshness,
+    iter_combined,
+    link_players,
+    load_aliases,
+    minted_id,
+    resolve,
+)
 from cricket_data.store import Store
 
 
@@ -28,6 +37,13 @@ def _prov(store, date="2026-10-20", mid="crex-eng-vs-pak", teams=("Pakistan", "E
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(d))
     return p
+
+
+def test_committed_aliases_resolve_athapaththu():
+    store = Store(Path(__file__).resolve().parents[1] / "data")
+    aliases = load_aliases(store)
+    assert resolve("Chamari Athapaththu", "Hobart Hurricanes Women", {}, aliases) == ("ac56b5a7", "alias", "")
+    assert resolve("Athapaththu", "Sri Lanka", {}, aliases)[0] == "ac56b5a7"
 
 
 def test_resolve_initials_and_ambiguity():
