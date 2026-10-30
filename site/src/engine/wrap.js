@@ -1,5 +1,5 @@
-// XOR-SHA256 unwrap for the small JSON files (identity, fixtures, photos, lines) wrapped at deploy.
-// The key comes from /api/gate, never from the JS bundle. Plain JSON (tests, local builds) is returned as-is.
+// XOR-SHA256 unwrap for the small JSON files (identity, fixtures, photos, lines) and /api/live.
+// The key comes from /api/gate as X-Cd-K, never from the JS bundle. Plain JSON (tests, local builds) is returned as-is.
 const te = new TextEncoder();
 
 async function sha256(buf) {
@@ -54,6 +54,12 @@ export async function wrap(obj, secret, ivBytes) {
   const ct = new Uint8Array(raw.length);
   for (let i = 0; i < raw.length; i++) ct[i] = raw[i] ^ ks[i];
   return { v: 1, iv: b64enc(iv), ct: b64enc(ct) };
+}
+
+/** Wrap `obj` when a key is set, else leave it as JSON (local builds, tests). */
+export async function wire(obj, secret) {
+  const s = String(secret || "").trim();
+  return s ? wrap(obj, s) : obj;
 }
 
 export async function unwrap(doc, secret) {

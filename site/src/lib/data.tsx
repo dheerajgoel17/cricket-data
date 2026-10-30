@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { createStore } from "@/engine/store.js";
 import { Resolver } from "@/engine/resolve.js";
-import { unwrap } from "@/engine/wrap.js";
 import { identityIndex } from "@/engine/identity.js";
+import { gateKey, readJson, setWrapKey } from "@/lib/wrap-key";
 import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
@@ -10,34 +10,27 @@ import { AppSkeleton } from "@/components/app/skeletons";
 export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex> }
 const Ctx = createContext<Data | null>(null);
 
-async function gate() {
-  try {
-    const r = await fetch("/api/gate", { credentials: "same-origin", cache: "no-store" });
-    if (!r.ok) return {};
-    return await r.json();
-  } catch { return {}; }
-}
-
-async function loadJson(url: string, key?: string) {
+async function loadJson(url: string) {
   try {
     const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
     if (!r.ok) return null;
-    return await unwrap(await r.json(), key);
+    return await readJson(r);
   } catch { return null; }
 }
 
 /** The player-identity table (our id <-> the live source's id, the books' names); a missing file just means nobody is linked and names decide. */
-async function loadIdentity(base: string, key?: string) {
-  return identityIndex(await loadJson(`${base}identity.json`, key));
+async function loadIdentity(base: string) {
+  return identityIndex(await loadJson(`${base}identity.json`));
 }
 
 async function boot(): Promise<Data> {
-  const g = (await gate()) as { k?: string };
-  const store = await createStore({ base: "/data/", wrapKey: g.k });
+  const k = await gateKey();
+  setWrapKey(k);
+  const store = await createStore({ base: "/data/", wrapKey: k });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
   const [photos, identity] = await Promise.all([
-    loadJson("/data/photos.json", g.k).then((p) => (p || {}) as Photos),
-    loadIdentity("/data/", g.k),
+    loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
+    loadIdentity("/data/"),
   ]);
   return { store, rz: new Resolver(store), photos, identity };
 }

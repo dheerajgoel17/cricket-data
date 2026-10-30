@@ -1,5 +1,5 @@
-// GET /api/gate -> {ok, k?}. Sets a short-lived cookie the Edge middleware checks before serving /data/*.
-// Returns the wrap key so the browser can unwrap the small JSON files. Scraper UAs are refused. No key in the bundle.
+// GET /api/gate -> {ok}. Sets a short-lived cookie the Edge middleware checks before serving /data/*.
+// The wrap key is an `X-Cd-K` header (not JSON), so a Network-tab response preview is not the secret. Scraper UAs are refused. No key in the bundle.
 import crypto from "node:crypto";
 
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
@@ -39,6 +39,8 @@ export default async function handler(req, res) {
     const token = sign(secret, Math.floor(Date.now() / 1000) + 12 * 3600);
     const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
     res.setHeader("Set-Cookie", `cdg=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=43200${secure}`);
+    res.setHeader("X-Cd-K", secret);
+    res.setHeader("Access-Control-Expose-Headers", "X-Cd-K");
   }
-  return res.status(200).json({ ok: true, k: secret || undefined });
+  return res.status(200).json({ ok: true });
 }

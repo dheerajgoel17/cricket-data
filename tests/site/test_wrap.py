@@ -14,3 +14,4 @@ def test_wrap_roundtrip_and_skips_matches_json(tmp_path):
     assert "matches.json" not in done and "meta.json" not in done and "index.json" not in done
     wrapped = __import__("json").loads((tmp_path / "identity.json").read_text())
     assert wrapped["v"] == 1 and unwrap(wrapped, secret) == {"p": [], "fx": []}
+    assert unwrap(wrapped, "") is wrapped, "no key: leave the ciphertext, do not throw"

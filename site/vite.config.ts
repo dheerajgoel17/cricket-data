@@ -12,7 +12,7 @@ function devApi(): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const name = /^\/api\/([a-z]+)$/.exec((req.url || "").split("?")[0] || "")?.[1];
-        const load = name === "live" ? () => import("./api/live.js") : null;
+        const load = name === "live" ? () => import("./api/live.js") : name === "gate" ? () => import("./api/gate.js") : null;
         if (!load) return next();
         const { default: handler } = await load();
         let raw = "";
