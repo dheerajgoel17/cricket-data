@@ -5,17 +5,20 @@ import { parseShare } from "../api/share.js";
 
 const data = {
   index: { players: { id: ["aaaa1111", "bbbb2222"], nm: ["Harry Brook", "Rashid Khan"], tm: [0, 1] }, teams: [{ n: "England", g: 0 }, { n: "Afghanistan", g: 0 }], venues: ["Sharjah Cricket Stadium, Sharjah"] },
-  photos: { p: { aaaa1111: "c:1IG" } },
+  photos: { p: { aaaa1111: "c:1IG" }, t: { england: "1", india: "2" } },
   lines: { lines: [
-    { pid: "aaaa1111", stat: "runs", line: 24.5, match: "England vs India", books: [{ source: "bet365", over: 1.83 }, { source: "smarkets", over: 1.9 }] },
+    { pid: "aaaa1111", player: "Harry Brook", team: "England", fmt: "T20", stat: "runs", line: 24.5, match: "England vs India", start_utc: "2026-10-29T14:30Z", books: [{ source: "bet365", over: 1.83, under: 1.90 }, { source: "smarkets", over: 1.9, under: 1.85 }] },
     { pid: "aaaa1111", stat: "runs", line: 30.5, match: "England vs India", books: [{ source: "bet365", over: 2.4 }] },
   ] },
   fixtures: [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", series: "Afghanistan vs Zimbabwe in UAE 2026" }],
+  form: { aaaa1111: { last: { value: 41, date: "25 Oct", vs: "India" }, hit: { p: 0.62, n: 10 } } },
 };
 
 test("a prop card has the player, the line, and the best over price with its book; the numbers come only from the data", () => {
   const f = cardFields({ p: "0", stat: "runs", line: "24.5" }, data);
-  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.books, f.match], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", 2, "England vs India"]);
+  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", 2, "England vs India", "India", "T20", "Batter"]);
+  assert.equal(f.last.value, 41);
+  assert.equal(f.hit.p, 0.62);
   assert.match(cardText(f).title, /^Harry Brook: runs over 24\.5 at 1\.90$/);
   assert.match(cardText(f).description, /listed 1\.90 at Smarkets in England vs India/);
 });
@@ -50,6 +53,6 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/player/12/runs/24.5.jpg?v=3");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/player/12/runs/24.5.jpg?v=4");
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });

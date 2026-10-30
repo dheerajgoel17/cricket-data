@@ -2,6 +2,22 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark" />
+    <script>
+      (function () {
+        var t = "dark";
+        try {
+          var s = localStorage.getItem("fc-theme");
+          if (s === "light" || s === "dark") t = s;
+          else if (s === "system") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        } catch (e) {}
+        document.documentElement.classList.toggle("dark", t === "dark");
+        if (document.body) document.body.classList.toggle("dark", t === "dark");
+        document.documentElement.style.colorScheme = t;
+        var m = document.querySelector('meta[name="color-scheme"]');
+        if (m) m.setAttribute("content", t);
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <!--seo-head-->
     <meta name="theme-color" content="#27da8e" />
@@ -11,7 +27,6 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="application-name" content="Fancy.cash" />
     <meta name="apple-mobile-web-app-title" content="Fancy.cash" />
-    <meta name="color-scheme" content="dark" />
   </head>
   <body>
     <div id="root"><!--seo-body--></div>

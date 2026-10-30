@@ -3,6 +3,7 @@
 // the title, description and the dynamic card. People who open it are sent on to the real page by a script: no meta refresh,
 // which some link-preview crawlers follow and then read the real page's tags instead.
 import { cardFields, cardPath, cardText } from "../src/engine/card.js";
+import { shareMetas } from "../src/lib/seo.js";
 import { loadData } from "./og.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -32,17 +33,13 @@ export default function handler(req, res) {
   const share = `${origin}/share/${String(req.query.path || "").replace(/^\/+/, "")}`;
   const image = `${origin}${cardPath(parsed.card)}`;
   const title = `${text.title} | Fancy.cash`;
-  const jpeg = image.includes(".jpg");
+  const tags = shareMetas({ title, description: text.description, url: share, image, alt: text.title })
+    .map(([attr, key, value]) => `<meta ${attr}="${key}" content="${esc(value)}" />`).join("");
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
   res.end(`<!doctype html><html lang="en"><head><meta charset="utf-8" /><title>${esc(title)}</title>
 <meta name="description" content="${esc(text.description)}" /><meta name="robots" content="noindex, follow" /><link rel="canonical" href="${esc(page)}" />
-<meta property="og:type" content="website" /><meta property="og:site_name" content="Fancy.cash" /><meta property="og:locale" content="en" />
-<meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(text.description)}" />
-<meta property="og:url" content="${esc(share)}" /><meta property="og:image" content="${esc(image)}" /><meta property="og:image:secure_url" content="${esc(image)}" />
-<meta property="og:image:type" content="${jpeg ? "image/jpeg" : "image/png"}" /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" />
-<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content="${esc(title)}" /><meta name="twitter:description" content="${esc(text.description)}" />
-<meta name="twitter:image" content="${esc(image)}" /><meta name="twitter:image:alt" content="${esc(text.title)}" />
+${tags}<link rel="image_src" href="${esc(image)}" />
 </head><body><p><a href="${esc(page)}">${esc(text.title)}</a></p><script>location.replace(${JSON.stringify(page)})</script></body></html>`);
 }

@@ -177,16 +177,16 @@ export function PlayersPage() {
   return (
     <div className="flex flex-col gap-stack">
       <h1 className="text-title font-bold tracking-tight">Players</h1>
-      <InputGroup className="h-control rounded-[10px] border-0 bg-white/10">
+      <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
         <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
         <InputGroupInput type="search" autoFocus placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
         {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><XMarkIcon className="size-4" /></InputGroupButton></InputGroupAddon>}
       </InputGroup>
       {t.length < 2 ? <p className="text-callout text-muted-foreground">Type at least two letters.</p>
         : !rows.length ? <p className="text-callout text-muted-foreground">No player matches “{t}”.</p> : (
-          <ul className="overflow-hidden rounded-2xl bg-card ring-1 ring-white/5">
+          <ul className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
             {rows.map((p: any) => (
-              <li key={p.idx} className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-white/10 last:after:hidden">
+              <li key={p.idx} className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-hairline last:after:hidden">
                 <Item asChild size="sm" className="min-h-row rounded-none border-0 px-gutter py-snug transition-colors active:bg-accent">
                   <Link to={`/player/${p.idx}`}>
                     <ItemMedia><PlayerBadge idx={p.idx} size="md" className="size-control" /></ItemMedia>

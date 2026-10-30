@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { headTags, pages, render } from "../scripts/seo.mjs";
-import { ROUTES, fullTitle, pageMeta } from "../src/lib/seo.js";
+import { ROUTES, fullTitle, pageMeta, clipDesc, shareMetas, THEME, CARD_W, CARD_H } from "../src/lib/seo.js";
 
 const TPL = "<html><head><!--seo-head--></head><body><div id=\"root\"><!--seo-body--></div></body></html>";
 const fx = [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", status: "Upcoming" }];
@@ -14,6 +14,24 @@ test("titles carry the brand once, and a page that names itself gets a descripti
   assert.match(pageMeta("/player/1", "Harry Brook: stats, hit rates and form | Fancy.cash").description, /^Harry Brook: hit rates over any line, recent form and listed lines/);
   assert.equal(pageMeta("/about", "x").description, ROUTES.about.description);
   assert.equal(pageMeta("/saved", "Saved").noindex, true);
+});
+
+test("share tags cover Facebook, X, LinkedIn, WhatsApp, Discord and Slack: image size, alt, large-card, theme colour", () => {
+  assert.equal(CARD_W, 1200);
+  assert.equal(CARD_H, 630);
+  assert.equal(THEME, "#27da8e");
+  assert.ok(clipDesc("a".repeat(50)).length === 50);
+  assert.ok(clipDesc("word ".repeat(80)).length <= 180);
+  const tags = shareMetas({ title: "Harry Brook: runs over 24.5 at 1.90 | Fancy.cash", description: "Harry Brook (England), runs over 24.5, listed 1.90 at Smarkets in England vs India. Hit rates and form on Fancy.cash.", url: "https://fancy.cash/share/player/0/runs/24.5", image: "https://fancy.cash/card/player/0/runs/24.5.jpg?v=4", alt: "Harry Brook: runs over 24.5 at 1.90" });
+  const get = (k) => tags.find((t) => t[1] === k)?.[2];
+  assert.equal(get("og:image:width"), "1200");
+  assert.equal(get("og:image:height"), "630");
+  assert.equal(get("og:image:type"), "image/jpeg");
+  assert.equal(get("og:image:alt"), "Harry Brook: runs over 24.5 at 1.90");
+  assert.equal(get("twitter:card"), "summary_large_image");
+  assert.equal(get("twitter:image"), get("og:image"));
+  assert.equal(get("theme-color"), THEME);
+  assert.ok(get("og:description").length <= 180);
 });
 
 test("every page gets its own title, description, canonical link and structured data", () => {

@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { liveBlurb, scoreLabel, teamScore } from "@/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { fixtureState } from "@/hooks/useEngine";
@@ -62,7 +62,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -3 }} whileTap={{ scale: 0.985 }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <Card className="h-full gap-0 rounded-2xl border-0 bg-white/[0.03] py-0 shadow-none ring-1 ring-white/[0.06] transition-colors group-hover:bg-white/[0.06]">
+      <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
             {live ? <span className="inline-flex items-center gap-tight font-semibold uppercase tracking-wider text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</span>}
@@ -88,7 +88,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
           </div>
           <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
             <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
-            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
+            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
           </div>
         </div>
       </Card>
@@ -130,7 +130,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
         </CarouselContent>
         {/* edge fades: blurred, masked strips that appear only on the side that still has cards to scroll to */}
         {(["l", "r"] as const).map((side) => (
-          <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 z-10 w-14 bg-black/40 backdrop-blur-md transition-opacity duration-300 ease-out",
+          <div key={side} aria-hidden className={cn("pointer-events-none absolute inset-y-0 z-10 w-14 bg-scrim backdrop-blur-md transition-opacity duration-300 ease-out",
             side === "l" ? "left-0 [mask-image:linear-gradient(to_right,#000,transparent)] [-webkit-mask-image:linear-gradient(to_right,#000,transparent)]" : "right-0 [mask-image:linear-gradient(to_left,#000,transparent)] [-webkit-mask-image:linear-gradient(to_left,#000,transparent)]",
             moving && edge[side] ? "opacity-100" : "opacity-0")} />
         ))}

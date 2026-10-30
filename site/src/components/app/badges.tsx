@@ -20,7 +20,7 @@ function Img({ urls, alt, fallback, className, eager }: { urls: string[]; alt: s
   if (!url) return <>{fallback}</>;
   return (
     <>
-      {!ready && <span aria-hidden className="absolute inset-0 animate-pulse bg-white/[0.07]" />}
+      {!ready && <span aria-hidden className="absolute inset-0 animate-pulse bg-hairline" />}
       <img ref={(el) => { if (el?.complete && el.naturalWidth && !ready) { loaded.add(url); setReady(true); } }} src={url} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async"
         className={cn(className, "transition-opacity duration-200", ready ? "opacity-100" : "opacity-0")} onLoad={() => { loaded.add(url); setReady(true); }} onError={() => setI((n) => n + 1)} />
     </>

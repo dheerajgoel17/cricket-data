@@ -1,7 +1,8 @@
 // Edge: block known scrapers on /data and /api, require the gate cookie for /data JSON (except meta.json),
 // and send link-preview crawlers the share HTML (so WhatsApp/Twitter see the card without running the app).
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
-const CRAWLER = /twitterbot|facebookexternalhit|facebot|whatsapp|telegrambot|slackbot|linkedinbot|discordbot|pinterest|skypeuripreview|embedly|quora link preview|redditbot|vkshare|tumblr|bitlybot|flipboard|iframely|opengraph/i;
+// Link-preview fetchers (not search indexers): they get the share HTML so they never have to run the app.
+export const CRAWLER = /twitterbot|facebookexternalhit|facebot|whatsapp|telegrambot|slackbot|linkedinbot|discordbot|pinterest|skypeuripreview|embedly|quora link preview|redditbot|vkshare|tumblr|bitlybot|flipboard|iframely|opengraph|microsoftpreview|cardyb|bridgy|mastodon|summaly|viber|line\//i;
 
 export const config = { matcher: ["/data/:path*", "/api/:path*", "/player/:path*", "/fixture/:path*", "/venue/:path*"] };
 

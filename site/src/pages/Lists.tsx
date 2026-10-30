@@ -50,7 +50,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
   const to = (fm?: string) => `/fixture/${f.id}?tab=fancy${fm ? `&fm=${fm}` : ""}`;
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Card className="h-full gap-0 overflow-hidden rounded-2xl border-0 bg-white/[0.03] py-0 shadow-none ring-1 ring-white/[0.06]">
+      <Card className="h-full gap-0 overflow-hidden rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline">
         <div className="flex h-full flex-col gap-snug pt-inset">
           <Link to={to()} className="flex flex-col gap-snug px-inset outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
@@ -67,10 +67,10 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
             </div>
           </Link>
           {rows.length ? (
-            <ul className="border-t border-white/10">
-              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-white/5 first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
+            <ul className="border-t border-hairline">
+              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
             </ul>
-          ) : <p className="border-t border-white/10 px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
+          ) : <p className="border-t border-hairline px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug px-inset pb-inset pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
             <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>

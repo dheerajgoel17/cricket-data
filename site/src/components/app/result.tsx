@@ -6,9 +6,11 @@ import { Card } from "@/components/ui/card";
 import { odds, num, pc } from "@/lib/format";
 import { Chips, DataTable, Muted, OddsText, Panel, StatGridCards, StatTile } from "./page";
 import { ChartBars } from "./chart";
+import { RateHeatStrip } from "./viz";
+import { rateClass } from "@/lib/heat";
+import { cn } from "@/lib/utils";
 
-const band = (p: number | null) => (p == null ? "" : p >= 0.6 ? "text-primary" : p >= 0.4 ? "text-amber" : "text-destructive");
-export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={`rounded-md bg-muted px-2 py-0.5 font-semibold ${band(p)}`}>{pc(p)}</span>);
+export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-2 py-0.5 font-semibold", rateClass(p))}>{pc(p)}</span>);
 
 export const LadderTable = ({ ladder, label = "Line" }: { ladder: any[]; label?: string }) => (
   <DataTable columns={[label, "Over %", "Fair over", "Under %", "Fair under", "n"]}
@@ -25,6 +27,7 @@ export function SplitTables({ splits, title = (k: string) => k }: { splits: Reco
           <AccordionItem key={kind} value={kind}>
             <AccordionTrigger><span className="flex flex-1 items-center gap-2">Split by {title(kind).replace("_", " ")} <Badge variant="secondary">{rows.length}</Badge></span></AccordionTrigger>
             <AccordionContent className="overflow-x-auto">
+              <RateHeatStrip rows={rows} title={`Hit rate by ${title(kind).replace("_", " ")}`} />
               <DataTable columns={[title(kind).replace("_", " "), "n", "Median", "Mean", "Over %", "Fair over"]} rows={rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), <HitCell p={x.pOver} />, <OddsText>{odds(x.fairOver)}</OddsText>])} />
             </AccordionContent>
           </AccordionItem>

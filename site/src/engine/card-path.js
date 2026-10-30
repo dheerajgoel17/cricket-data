@@ -1,4 +1,4 @@
-export const CARD_V = "3"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
+export const CARD_V = "4"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
 
 /** The card's address as a file path (some link-preview crawlers only trust an image URL that looks like a file): /card/player/12/runs/24.5.jpg, /card/fixture/<id>.jpg. */
 export function cardPath(q) {

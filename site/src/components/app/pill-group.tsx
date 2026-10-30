@@ -14,7 +14,13 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
 }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => { ref.current?.querySelector<HTMLElement>('[data-state="on"]')?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" }); }, [value, reduce]);
+  // scroll the overflowing row only — scrollIntoView on the chip was dragging the page up to the chart
+  useEffect(() => {
+    const root = ref.current, el = root?.querySelector<HTMLElement>('[data-state="on"]');
+    if (!root || !el) return;
+    const r = el.getBoundingClientRect(), c = root.getBoundingClientRect();
+    root.scrollTo({ left: root.scrollLeft + (r.left - c.left) - (c.width - r.width) / 2, behavior: reduce ? "auto" : "smooth" });
+  }, [value, reduce]);
   return (
     <ToggleGroup ref={ref} type="single" value={value} onValueChange={(v) => v && onChange(v)} variant="outline" spacing={segmented ? 0 : 2} aria-label={label}
       className={cn("justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", segmented ? "h-control w-fit max-w-full rounded-[var(--chip-radius)] bg-card p-0.5" : "h-auto w-full gap-tight bg-transparent", className)}>
