@@ -183,6 +183,69 @@ def test_a_400_on_an_event_id_retries_the_same_id_as_a_path(monkeypatch):
     assert raw["books"]["Dafabet"].get("stopped") is None
 
 
+def test_an_in_horizon_game_is_fetched_before_a_club_path(monkeypatch):
+    monkeypatch.setenv("FEEDH_URL", ROOT)
+    monkeypatch.setenv("FEEDH_NAME", "Dafabet")
+    monkeypatch.setenv("CV_FEEDH_SPACING_SECS", "0")
+    monkeypatch.setenv("CV_FEEDH_MAX_EVENTS", "1")
+    club = {"id": 1001, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "Grade"}]}
+    game = event([])
+    calls = []
+
+    def fake(url, retries=1, **kw):
+        calls.append(url)
+        if "includeMarkets=false" in url:
+            return [club, game], {}
+        return [event(MARKETS)], {}
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    feedh.fetch(STAMP)
+    assert any("eventIds=44628333" in u for u in calls)
+    assert not any("eventPathIds=1001" in u for u in calls)
+
+
+def test_international_paths_are_fetched_before_club_paths(monkeypatch):
+    monkeypatch.setenv("FEEDH_URL", ROOT)
+    monkeypatch.setenv("FEEDH_NAME", "Dafabet")
+    monkeypatch.setenv("CV_FEEDH_SPACING_SECS", "0")
+    monkeypatch.setenv("CV_FEEDH_MAX_EVENTS", "1")
+    club = {"id": 1001, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "Grade"}]}
+    intl = {"id": 22908454, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "International"}]}
+    calls = []
+
+    def fake(url, retries=1, **kw):
+        calls.append(url)
+        if "includeMarkets=false" in url:
+            return [club, intl], {}
+        return [event(MARKETS)], {}
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    feedh.fetch(STAMP)
+    assert "eventPathIds=22908454" in calls[1]
+    assert not any("eventPathIds=1001" in u for u in calls)
+
+
+def test_every_listed_page_is_fetched_when_the_cap_allows(monkeypatch):
+    monkeypatch.setenv("FEEDH_URL", ROOT)
+    monkeypatch.setenv("FEEDH_NAME", "Dafabet")
+    monkeypatch.setenv("CV_FEEDH_SPACING_SECS", "0")
+    a = {"id": 11, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "International"}]}
+    b = {"id": 22, "sportCode": "CRIC", "eventPaths": [{"name": "Cricket"}, {"name": "Grade"}]}
+    calls = []
+
+    def fake(url, retries=1, **kw):
+        calls.append(url)
+        if "includeMarkets=false" in url:
+            return [a, b], {}
+        eid = 11 if "eventPathIds=11" in url else 22
+        return [event(MARKETS, id=eid)], {}
+
+    monkeypatch.setattr(feedh, "http_json", fake)
+    _, raw = feedh.fetch(STAMP)
+    assert raw["books"]["Dafabet"]["events"] == 2
+    assert any("eventPathIds=11" in u for u in calls) and any("eventPathIds=22" in u for u in calls)
+
+
 def test_a_429_stops_the_book_for_the_run(monkeypatch):
     monkeypatch.setenv("FEEDH_URL", ROOT)
     monkeypatch.setenv("FEEDH_NAME", "Dafabet")

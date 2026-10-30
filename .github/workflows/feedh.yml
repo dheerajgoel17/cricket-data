@@ -15,7 +15,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     env:
       FEEDH_URL: ${{ secrets.FEEDH_URL }}
       FEEDH_NAME: ${{ secrets.FEEDH_NAME }}
