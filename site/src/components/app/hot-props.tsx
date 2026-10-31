@@ -1,31 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useId, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useId, useMemo, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Switch } from "@/components/ui/switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
-import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
+import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { MarketTape } from "./market-tape";
 import { StandingMark, Tick } from "./tick";
-import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@/engine/lines.js";
-import { runPlan } from "@/engine/plan.js";
-import { STATS } from "@/engine/rules.js";
-import { sideEdge } from "@/engine/stats.js";
-import { fmtIndex } from "@/engine/util.js";
-import { venueStem } from "@/engine/markets.js";
-import { barState, windowRate } from "@/engine/windows.js";
+import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cricket/engine/lines.js";
+import { runPlan } from "@cricket/engine/plan.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { sideEdge } from "@cricket/engine/stats.js";
+import { fmtIndex } from "@cricket/engine/util.js";
+import { venueStem } from "@cricket/engine/markets.js";
+import { barState, windowRate } from "@cricket/engine/windows.js";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
-import { odds, shortVenue } from "@/lib/format";
+import { abbr, odds, shortVenue } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,6 +34,13 @@ import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
 import { MatchChip } from "./fixture-card";
+import { ActiveChip } from "./chip";
+import { ScreenerFilters } from "./screener-filters";
+import { PropStar } from "./star";
+import { PlayerName } from "./player-name";
+import { PlayerAvatar } from "./portrait";
+import { DEFAULTS, activeFilters, clearFilter, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
+import { propKey } from "@/lib/saved";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "ven" | "l5" | "l10";
@@ -47,21 +52,21 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
-interface Row { day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
  * year's, vs today's opponent, and the edge of the best over price: the hit rate of the window shown pulled toward the market's no-vig chance (`sideEdge`, `engine/stats.js`).
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
-export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
+export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
   const { store, rz } = useData();
   const qc = useQueryClient();
   const lines = useQuery(linesQuery);
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
     queryKey: key,
     enabled: !!doc.data && !fixtures.isLoading,
@@ -81,7 +86,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
-        const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null }, split_by: [] }, { playerIdx: idx });
+        const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: inns === "all" ? null : inns }, split_by: [] }, { playerIdx: idx });
         const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
         if (!entries.length) return;
         const [a, c] = String(b.match).split(/\s+vs\s+/i);
@@ -95,7 +100,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -141,7 +146,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
       </div>
       {open && (
         <table id={id} className="w-full max-w-sm text-left">
-          <thead><tr className="text-caption uppercase tracking-wider"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
+          <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
           <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
@@ -153,19 +158,18 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-hairline last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Item asChild size="sm" className={cn("min-h-row gap-y-hair rounded-none border-0 px-gutter py-snug transition-colors active:bg-card", out && "opacity-60")}>
+      <Item asChild size="sm" className={cn("min-h-row gap-y-hair rounded-none border-0 py-snug pl-gutter pr-[calc(var(--gutter)+var(--control))] transition-colors active:bg-card", out && "opacity-60")}>
         <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}>
-          <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
+          <ItemMedia><PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
-            <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
+            <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
             <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!r.quotes.length && <> · <Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
           </ItemContent>
           <ItemActions className="self-start items-center gap-tight">
             <span className="grid justify-items-end text-right">
-              <span className="text-caption font-semibold tracking-wider text-muted-foreground">EDGE</span>
-              <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+              <span className="label-cap text-footnote text-muted-foreground">Edge</span>
+              <span className={cn("font-condensed text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
-            <ChevronRightIcon className="size-4 text-muted-foreground" aria-hidden />
           </ItemActions>
           {r.quotes.length > 0 && <BookQuotes quotes={r.quotes} className="basis-full pl-[calc(var(--control)+var(--spacing-snug))]" />}
           <div className="flex basis-full items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
@@ -177,17 +181,18 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
           </div>
         </Link>
       </Item>
+      <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
     </motion.li>
   );
 }
 
 function RateCell({ p, n }: { p: number | null; n?: number }) {
-  return <span className={cn("font-semibold tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-normal text-muted-foreground"> · {n}</span> : null}</span>;
+  return <span className={cn("font-condensed text-body font-medium tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-normal text-muted-foreground"> · {n}</span> : null}</span>;
 }
 
 function ColHead({ id, label, win, onWin, align, className }: { id?: Win; label: string; win: Win; onWin: (w: Win) => void; align?: "right"; className?: string }) {
   const active = !!id && win === id;
-  const cls = cn("px-snug py-tight text-left text-caption font-medium uppercase tracking-wider whitespace-nowrap", align === "right" && "text-right", active ? "text-foreground" : "text-muted-foreground", className);
+  const cls = cn("px-snug py-tight text-left label-cap text-footnote whitespace-nowrap", align === "right" && "text-right", active ? "text-foreground" : "text-muted-foreground", className);
   if (!id) return <th className={cls}>{label}</th>;
   return (
     <th className={cls}>
@@ -214,6 +219,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
             <ColHead id="h2h" label="H2H" win={win} onWin={onWin} />
             <ColHead id="ven" label="Ground" win={win} onWin={onWin} />
             <ColHead label="Edge" win={win} onWin={onWin} align="right" />
+            <th className="w-10"><span className="sr-only">Watchlist</span></th>
           </tr>
         </thead>
         <tbody>
@@ -227,20 +233,21 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                 onClick={() => nav(to)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nav(to); } }}>
                 <td className="px-snug py-snug">
                   <span className="flex items-center gap-snug">
-                    <PlayerBadge idx={r.idx} size="sm" className="size-control" />
+                    <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="flex min-w-0 items-center gap-tight text-body font-semibold leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="truncate text-callout text-muted-foreground">O {r.line} {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
                     </span>
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-semibold tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick></td>
+                <td className="px-snug py-snug font-condensed text-body font-medium tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick></td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</td>
+                <td className={cn("px-snug py-snug text-right font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</td>
+                <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
           })}
@@ -251,9 +258,17 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
 }
 
 /** "Hot player props" for the selected day's matches (today by default, any of the next 10 days from Filters), in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string; phase?: HomePhase } = {}) {
-  const [day, setDay] = useState("0");
-  const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
+export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string; phase?: HomePhase; syncUrl?: boolean } = {}) {
+  // The screener's filters: in the URL on the Props page (a link or a refresh restores the view, and going to a player and back keeps it), plain state elsewhere (home, a fixture's own page).
+  const [params, setParams] = useSearchParams();
+  const [local, setLocal] = useState<Screener>(DEFAULTS);
+  const urlState = !!syncUrl && !teams;
+  const paramText = params.toString();
+  const sc = useMemo(() => (urlState ? parseScreener(new URLSearchParams(paramText)) : local), [urlState, paramText, local]);
+  const update = useCallback((patch: Partial<Screener>) => { const next = { ...sc, ...patch }; if (urlState) setParams(screenerParams(next), { replace: true }); else setLocal(next); }, [sc, urlState, setParams]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const { day, stat, win, bars, team } = sc;
+  const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day), sc.inns);
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: teams![0], b: teams![1], start, fmt }); // this match: the same two sides, a Test on any of its days, not the series' next game
   const live = useLiveDoc();
   // a match stays 24 hours after the start (6 days for a Test), and while the live feed still lists it as being played
@@ -272,11 +287,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
   const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: Row): SoFar | null => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
-  const [stat, setStat] = useState("all");
-  const [win, setWin] = useState<Win>("l10");
-  const [bars, setBars] = useState(true);
-  const [team, setTeam] = useState("all");
-  const [matchKey, setMatchKey] = useState("all");
+  const matchKey = sc.match;
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string; fmt?: string }>();
     for (const r of data || []) {
@@ -292,11 +303,19 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
     const have = new Set((data || []).map((r) => r.stat));
     return [["all", "All props"], ...Object.entries(STATS).filter(([k]) => have.has(k)).map(([k, v]: any) => [k, v.label])] as [string, string][];
   }, [data]);
-  const dirty = win !== "l10" || (teams ? team !== "all" : day !== "0") || !bars;
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
-  const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
-    .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, fmt, live.data, pick]);
+  const scored = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" }))
+    .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need),
+  [data, stat, win, need, day, teams, start, fmt, live.data, pick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rows = useMemo(() => order(narrow(scored, sc), sc).slice(0, MAX_ROWS), [scored, sc]);
+  // what the filter view may offer: the values the day's rows really have
+  const dayRows = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : r.day === Number(day))), [data, teams, day, start]); // eslint-disable-line react-hooks/exhaustive-deps
+  const choices = useMemo(() => ({
+    days: teams ? [] : hotDayLabels(), matches: teams ? [] : matchChips.map((c) => ({ id: c.id, label: `${abbr(c.a)} v ${abbr(c.b)}` })),
+    teams: options(dayRows as any, "team"), formats: options(dayRows as any, "fmt"), comps: options(dayRows as any, "comp"), winLabel: Object.fromEntries(WINS.map(([k, l]) => [k, l])),
+  }), [dayRows, teams, matchChips]);
+  const active = activeFilters(sc, { day: (d) => hotDayLabels().find(([k]) => k === d)?.[1] ?? d, match: (id) => choices.matches.find((m) => m.id === id)?.label ?? id });
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
   const tapeRows = useMemo(() => (data || []).map((r) => {
     const s = soFarOf(r);
@@ -307,53 +326,41 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
       {heading ? <h1 className="hidden text-display font-bold tracking-tight lg:block">{heading}</h1> : null}
-      {!waiting ? <MarketTape rows={tapeRows} /> : null}
+      {!waiting ? <div className="hidden lg:block"><MarketTape rows={tapeRows} /></div> : null}
+      {urlState && !isLoading && (
+        <PillGroup layoutId="hot-day" label="Day" value={day} onChange={(v) => update({ day: v, match: "all" })} items={hotDayLabels()} className="min-w-0" />
+      )}
       {!teams && matchChips.length > 0 && (
         <PillGroup
           layoutId="hot-match"
           label="Matches"
           value={pick}
-          onChange={setMatchKey}
-          className="hidden lg:flex w-auto max-w-full"
+          onChange={(v) => update({ match: v })}
+          className="w-auto max-w-full"
           itemClassName="h-auto min-h-control whitespace-normal px-snug py-tight"
           items={[["all", "All"], ...matchChips.map((f) => [f.id, <MatchChip key={f.id} f={f} />] as [string, ReactNode])]}
         />
       )}
-      {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
+      <div className={cn("flex flex-col gap-snug", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
+      {/* one chip row for the prop type, plus a Filters button (count of active filters on it) that opens the filter view: full screen on a phone, a right drawer from lg */}
       <div className="flex items-center gap-snug">
-        <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button type="button" variant="secondary" size="sm" aria-label="Filters" className="relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />{wl}
-              {dirty && <span aria-hidden className="absolute -right-hair -top-hair size-tight rounded-full bg-primary ring-2 ring-background" />}
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
-            <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />
-            <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
-              <SheetTitle className="text-title font-bold tracking-tight">Filters</SheetTitle>
-              <SheetClose className="text-body font-semibold text-primary active:opacity-50">Done</SheetClose>
-            </SheetHeader>
-            <SheetDescription className="sr-only">Hit-rate window, {teams ? "team" : "day"} and form charts</SheetDescription>
-            <div className="grid gap-group pt-group">
-              <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Hit-rate window</span>
-                <PillGroup segmented layoutId="hot-window" label="Hit-rate window" value={win} onChange={(v) => setWin(v as Win)} items={WINS.map(([k, l]) => [k, l])} /></div>
-              {teams ? (
-                <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Team</span>
-                  <PillGroup segmented layoutId="hot-team" label="Team" value={team} onChange={setTeam}
-                    items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-tight"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} /></div>
-              ) : (
-                <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Day</span>
-                  <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={hotDayLabels()} /></div>
-              )}
-              <label className="flex min-h-control items-center justify-between gap-stack rounded-xl bg-surface-hover px-3 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+        <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+          className={cn("relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none", urlState && "hidden lg:inline-flex")}>
+          <AdjustmentsHorizontalIcon className="size-4" />{wl}
+          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
+        </Button>
       </div>
+      {active.length > 0 && (
+        <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+          {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
+          <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+        </div>
+      )}
+      </div>
+      <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={sc} onApply={(s) => update({ ...s, stat: sc.stat === s.stat ? sc.stat : s.stat })} choices={choices} />
       <AnimatedHeight>
-        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="px-inset py-stack text-callout text-muted-foreground">{phase ? EMPTY_PHASE[phase] : "No rows in this window. Open Filters to widen it."}</p> : (
+        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="px-inset py-stack text-callout text-muted-foreground">{phase ? EMPTY_PHASE[phase] : active.length ? <>No props match these filters. <button type="button" className="font-semibold text-primary underline-offset-2 hover:underline" onClick={() => update(clearFilter(sc, "all"))}>Clear filters</button> to see all of them.</> : "No rows in this window. Open Filters to widen it."}</p> : (
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>
@@ -361,11 +368,20 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
               </AnimatePresence>
             </ul>
             <div className="hidden lg:block">
-              <PropTable rows={rows} win={win} onWin={setWin} bars={bars} soFarOf={soFarOf} outOf={outOf} />
+              <PropTable rows={rows} win={win} onWin={(w) => update({ win: w })} bars={bars} soFarOf={soFarOf} outOf={outOf} />
             </div>
           </>
         )}
       </AnimatedHeight>
+      {/* on a phone the rows come first and the tape follows them (it used to push the first prop below the fold) */}
+      {!waiting ? <div className="lg:hidden"><MarketTape rows={tapeRows} /></div> : null}
+      {urlState && (
+        <button type="button" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+          className="fixed right-gutter bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+var(--space-stack))] z-50 grid size-(--fab) place-items-center rounded-full bg-primary text-primary-foreground shadow-(--shadow-fab) outline-none transition-transform focus-visible:ring-2 focus-visible:ring-ring active:scale-95 lg:hidden">
+          <AdjustmentsHorizontalIcon className="size-6" />
+          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-5 place-items-center rounded-full bg-foreground px-hair text-caption font-bold text-background">{active.length}</span>}
+        </button>
+      )}
     </section>
   );
 }

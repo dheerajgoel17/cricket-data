@@ -4,12 +4,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[] }));
+const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[], filters: [] as any[] }));
 vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null }));
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: env.store, rz: {}, identity: {} }) }));
-vi.mock("@/engine/plan.js", () => ({
+vi.mock("@cricket/engine/plan.js", () => ({
   runPlan: async (_s: any, _r: any, _p: any, hints: any) => {
     env.plans.push(hints.playerIdx);
+    env.filters.push(_p.filters);
     try { await env.store.shard(env.store.shardOf(hints.playerIdx)); } catch (e: any) { return { ok: false, error: `Could not run that query: ${e.message}` }; } // as the engine does for a player file that will not load
     return { ok: true, chart: { entries: Array.from({ length: 10 }, (_, k) => ({ value: 10 + k * 3, date: `2026-0${(k % 9) + 1}-10`, opp: "Somebody" })) }, summary: { pOver: 0.6, n: 10 } };
   },
@@ -36,10 +37,10 @@ function fakeStore(players: number, nshard: number) {
   };
 }
 
-function run(day = 0, teams?: [string, string]) {
+function run(day = 0, teams?: [string, string], inns: "all" | "first" | "second" = "all") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: { children: ReactNode }) => createElement(QueryClientProvider, { client }, children);
-  return renderHook((p: { day: number }) => useHotRows(undefined, teams, p.day), { wrapper, initialProps: { day } });
+  return renderHook((p: { day: number }) => useHotRows(undefined, teams, p.day, inns), { wrapper, initialProps: { day } });
 }
 const flush = () => act(async () => { await vi.advanceTimersByTimeAsync(0); });
 const settle = () => act(async () => { await vi.advanceTimersByTimeAsync(2000); });
@@ -48,6 +49,7 @@ const landAll = () => { for (let n = 0; n < 12; n++) env.store.land(n); };
 beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ["setTimeout", "clearTimeout", "Date"] });
   env.plans = [];
+  env.filters = [];
   // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines scored only when that day is asked
   env.store = fakeStore(60, 12);
   env.doc = { generated_at_utc: "2026-10-28T05:00:00Z", events: [], fancy: [], lines: [
@@ -57,6 +59,25 @@ beforeEach(() => {
   ] };
 });
 afterEach(() => { vi.useRealTimers(); });
+
+describe("useHotRows batting innings", () => {
+  it("scores from all games by default, and only from games his side batted first or chased when asked", async () => {
+    let r = run(0);
+    await flush(); landAll(); await settle();
+    expect(env.filters.every((f) => f.innings === null)).toBe(true);
+    r.unmount();
+    env.filters = []; env.plans = []; env.store = fakeStore(60, 12);
+    r = run(0, undefined, "first");
+    await flush(); landAll(); await settle();
+    expect(env.filters).toHaveLength(36);
+    expect(env.filters.every((f) => f.innings === "first" && f.format === "T20")).toBe(true);
+    r.unmount();
+    env.filters = []; env.store = fakeStore(60, 12);
+    r = run(0, undefined, "second");
+    await flush(); landAll(); await settle();
+    expect(env.filters.every((f) => f.innings === "second")).toBe(true);
+  });
+});
 
 describe("useHotRows", () => {
   it("asks for the player files the selected day's lines need, several at once (not one after the other)", async () => {

@@ -1,5 +1,5 @@
 // Wrap key for the small JSON files and /api/live. Comes from /api/gate as the X-Cd-K header (never from the JS bundle).
-import { isWrapped, unwrap } from "@/engine/wrap.js";
+import { isWrapped, unwrap } from "@cricket/engine/wrap.js";
 
 let key: string | undefined;
 

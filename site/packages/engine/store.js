@@ -152,7 +152,9 @@ export class Store {
 
   freshness() {
     const me = this.meta;
-    return { newestBase: me.newest_base, provisionalIncluded: !!me.provisional_included,
+    // the base data's newest date: `newest_base`, or an older build's `newest_<source>` key (never print "undefined" when neither is there)
+    const base = me.newest_base ?? Object.entries(me).find(([k, v]) => /^newest_/.test(k) && !/provisional/.test(k) && typeof v === "string")?.[1] ?? null;
+    return { newestBase: base, provisionalIncluded: !!me.provisional_included,
       provisionalMatches: me.provisional_matches || 0, newestProvisional: me.newest_provisional || null,
       builtAt: me.built_at };
   }

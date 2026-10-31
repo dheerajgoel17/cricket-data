@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { teamKey } from "@/engine/live.js";
+import { teamKey } from "@cricket/engine/live.js";
 
 // Which fixtures lead the home rail: matches in play first, then those starting within 24 hours, then later games up to 10 days, then finished ones; inside each group the viewer's own team first, then
 // by how big the match is (the two sides' standing), with a lift for the viewer's own part of the world and for the big tournaments and leagues. No account: the

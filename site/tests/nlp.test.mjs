@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { loadFixture } from "./helpers.mjs";
-import { parseQuestion } from "../src/engine/nl.js";
-import { runPlan, sanitizePlan } from "../src/engine/plan.js";
+import { parseQuestion } from "@cricket/engine/nl.js";
+import { runPlan, sanitizePlan } from "@cricket/engine/plan.js";
 
 test("names resolve despite typos and ball-by-ball-style initials", async () => {
   const { rz, store } = await loadFixture();

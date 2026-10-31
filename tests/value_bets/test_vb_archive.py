@@ -127,7 +127,7 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
 
 
 def test_same_side_is_the_sites():
-    src = (Path(__file__).resolve().parents[2] / "site" / "src" / "engine" / "util.js").read_text()
+    src = (Path(__file__).resolve().parents[2] / "site" / "packages" / "engine" / "util.js").read_text()
     js = dict(re.findall(r'(\w+): "(\w+)"', re.search(r"SAME_SIDE = \{(.*?)\}", src).group(1)))
     assert js == arch.SAME_SIDE
 

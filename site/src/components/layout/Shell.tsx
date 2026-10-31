@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { Header } from "./Header";
@@ -14,7 +15,7 @@ function AppSidebar() {
     <Sidebar collapsible="icon" aria-label="Main" className="top-header h-[calc(100svh-var(--header-h))] border-0 [&_[data-sidebar=sidebar]]:bg-sidebar [&_[data-sidebar=sidebar]]:ring-1 [&_[data-sidebar=sidebar]]:ring-hairline">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">Play</SidebarGroupLabel>
+          <SidebarGroupLabel className="label-cap text-footnote text-muted-foreground">Play</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
@@ -28,7 +29,7 @@ function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">More</SidebarGroupLabel>
+          <SidebarGroupLabel className="label-cap text-footnote text-muted-foreground">More</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {MORE_NAV.map(([label, to]) => (
@@ -51,6 +52,8 @@ function AppSidebar() {
 export function Shell() {
   const { pathname } = useLocation();
   useMetaSync(pathname);
+  // A new page starts at the top. The router keeps the old scroll position, so opening a player from the middle of a long list used to land half-way down the player page.
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] lg:pb-0">
       <div className="sticky top-0 z-50"><Header /></div>

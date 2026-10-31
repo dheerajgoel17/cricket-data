@@ -69,9 +69,21 @@ def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
         start += 1000
 
 
+KITS = ("limited", "test")  # a team's two shirt pictures: the coloured limited-overs kit and the white Test one
+PLACEHOLDER_KIT = "AD"  # the source's own plain shirt, used by its pages when a team has none
+
+
+def _source_path(kind: str, cid: str) -> str:
+    """Where the source serves an image. A shirt is kept as a `team` row whose ref is "<team id>:<kit>" (no schema change)."""
+    if kind == "team" and ":" in cid:
+        team, kit = cid.split(":", 1)
+        return f"jersey/{kit}/org/{team}.png"
+    return f"{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"
+
+
 def download(kind: str, cid: str, fetch=None) -> tuple[bytes, str] | None:
     """One image from the Source A CDN, or None if it is missing / not an image / suspiciously large."""
-    url = f"{host('IMG_CDN_BASE')}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"
+    url = f"{host('IMG_CDN_BASE')}/{_source_path(kind, cid)}"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA})
         with (fetch or urllib.request.urlopen)(req, timeout=30) as r:
@@ -85,10 +97,14 @@ def download(kind: str, cid: str, fetch=None) -> tuple[bytes, str] | None:
 
 
 def upload(base: str, key: str, kind: str, cid: str, body: bytes, ct: str, http=_req) -> dict:
-    path = f"{'players' if kind == 'player' else 'teams'}/{cid}.png"
+    if kind == "team" and ":" in cid:
+        team, kit = cid.split(":", 1)
+        path = f"jerseys/{kit}/{team}.png"
+    else:
+        path = f"{'players' if kind == 'player' else 'teams'}/{cid}.png"
     http("POST", f"{base}/storage/v1/object/avatars/{path}", key, body, {"Content-Type": ct, "x-upsert": "true", "Cache-Control": "max-age=31536000"})
     return {"kind": kind, "ref": cid, "path": path, "content_type": ct, "bytes": len(body), "sha256": hashlib.sha256(body).hexdigest(),
-            "source_url": f"{host('IMG_CDN_BASE')}/{'players/org' if kind == 'player' else 'Teams'}/{cid}.png"}
+            "source_url": f"{host('IMG_CDN_BASE')}/{_source_path(kind, cid)}"}
 
 
 def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None:
@@ -100,8 +116,9 @@ def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None
 def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: int = 1500, pause: float = 0.05,
          http=_req, fetch=None, workers: int = 6) -> dict:
     ph = json.load(open(photos_path, encoding="utf-8"))
+    teams = sorted(set(ph.get("t", {}).values()))
     want = {"player": sorted({v[2:] for v in ph.get("p", {}).values() if v.startswith("c:")}),
-            "team": sorted(set(ph.get("t", {}).values()))}
+            "team": teams + [f"{t}:{k}" for t in [*teams, PLACEHOLDER_KIT] for k in KITS]}  # logos, then each team's two shirts and the plain placeholder shirt
     have = stored_ids(base, key, http)  # a bad key / unreachable project raises here, before anything is changed
     stats = {"downloaded": 0, "missing_at_crex": 0, "already": sum(len(v) for v in have.values()), "pending": 0}
     todo: list[tuple[str, str]] = []
@@ -146,7 +163,8 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
         upsert(base, key, "crex_players", [{"crex_id": c, "name": n, "cricsheet_id": p or None} for c, n, p in idx.get("players", [])], http)
         upsert(base, key, "crex_teams", [{"crex_id": c, "name": n, "folded_name": f} for c, n, f in idx.get("teams", [])], http)
     ph["base"] = f"{base}/storage/v1/object/public/avatars"
-    ph["s"] = {"p": sorted(have.get("player", set())), "t": sorted(have.get("team", set()))}
+    held_teams = have.get("team", set())
+    ph["s"] = {"p": sorted(have.get("player", set())), "t": sorted(r for r in held_teams if ":" not in r), "j": sorted(r for r in held_teams if ":" in r)}
     json.dump(ph, open(photos_path, "w", encoding="utf-8"), separators=(",", ":"))
     return stats
 

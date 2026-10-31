@@ -6,6 +6,7 @@ import { PropRow, PropTable } from "./hot-props";
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
 vi.mock("./badges", () => ({
   PlayerBadge: () => <span>pic</span>,
+  PlayerPhoto: () => <span>face</span>,
   TeamFlag: () => null,
   TeamBadge: () => null,
 }));
@@ -45,7 +46,16 @@ describe("PropTable", () => {
     const chip = screen.getByTitle("Western Australia Cricket Association Ground, Perth");
     expect(chip).toHaveTextContent("1/5 at WACA");
     expect(screen.queryByText(/Western Australia Cricket Association Ground/)).toBeNull();
-    expect(document.querySelector("[data-slot=item] svg")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Add to watchlist" })).toBeInTheDocument(); // the star sits beside the row link, never inside it
+    expect(screen.getByRole("button", { name: "Add to watchlist" }).closest("a")).toBeNull();
+  });
+
+  it("stars a prop without opening it, and the star survives a reload of the saved list", () => {
+    localStorage.clear();
+    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" bars i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "Add to watchlist" }));
+    expect(screen.getByRole("button", { name: "Remove from watchlist" })).toHaveAttribute("aria-pressed", "true");
+    expect(JSON.parse(localStorage.getItem("cph-saved") || "[]")).toContain("prop:1:runs:39.5:1");
   });
 
   it("puts the bookmaker mark on the third row of the prop card, even when only one book prices the line", () => {

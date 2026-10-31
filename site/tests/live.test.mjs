@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import {
   ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
-} from "../src/engine/live.js";
-import { identityIndex } from "../src/engine/identity.js";
+} from "@cricket/engine/live.js";
+import { identityIndex } from "@cricket/engine/identity.js";
 
 function pageHtml(payload) {
   return `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;

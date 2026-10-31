@@ -63,10 +63,11 @@ export function PlayerBadge({ idx, size = "sm", className }: { idx: number; size
 }
 
 /** The hero photo: top-aligned crop, no circle (like props.cash). */
-export function PlayerPhoto({ idx, className }: { idx: number; className?: string }) {
+/** `contain`: show the whole picture (bottom-aligned) instead of cropping it to fill the box: the source avatars are head-and-shoulders, nearly square. */
+export function PlayerPhoto({ idx, className, contain }: { idx: number; className?: string; contain?: boolean }) {
   const { store, photos } = useData();
   const urls = playerPhotos(photos, store.P.id[idx]) as string[];
-  return <div className={cn("relative grid place-items-end overflow-hidden", className)}><Img urls={urls} alt={store.playerName(idx)} className="size-full object-cover object-top" fallback={<Silhouette />} /></div>;
+  return <div className={cn("relative grid place-items-end overflow-hidden", className)}><Img urls={urls} alt={store.playerName(idx)} className={contain ? "size-full object-contain object-bottom" : "size-full object-cover object-top"} fallback={<Silhouette />} /></div>;
 }
 
 /** Preload the primary flag/logo of each team so rows that mount later show them without a shimmer. */

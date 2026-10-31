@@ -1,0 +1,8 @@
+{
+  "name": "@cricket/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The cricket analytics engine: plain ESM with no DOM (plans, props, markets, windows, lines, live, identity, cards). Shared by the web app, the serverless functions and future native apps.",
+  "exports": { "./*": "./*" }
+}

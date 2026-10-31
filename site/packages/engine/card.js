@@ -2,7 +2,7 @@
 // Used by api/og.js (the image) and api/share.js (the page a link preview reads). Plain ESM; the drawing library is loaded only when a card is drawn.
 import { STATS } from "./rules.js";
 import { bookFormatFor, bookLinesFor, bookName, keepMsFor, overProb, teamKey } from "./lines.js";
-import { playerPhotos, teamLogos } from "../lib/photos.js";
+import { playerPhotos, teamLogos } from "./photos.js";
 import { windowRate } from "./windows.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 

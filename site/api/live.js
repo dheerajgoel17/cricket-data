@@ -7,9 +7,9 @@
 // so the browser does no matching of its own. While a match is on that is "so far"; a "final" state in a finished match is its result (the archive job stores those).
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, mergeSchedule, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "../src/engine/live.js";
-import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
-import { wire } from "../src/engine/wrap.js";
+import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, mergeSchedule, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "@cricket/engine/live.js";
+import { identityIndex, NO_IDENTITY } from "@cricket/engine/identity.js";
+import { wire } from "@cricket/engine/wrap.js";
 
 const BOOKS = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 const SCHEDULE_FILE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer lists

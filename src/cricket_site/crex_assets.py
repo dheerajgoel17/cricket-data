@@ -24,6 +24,25 @@ def fold(s: str) -> str:
     return re.sub(r"[^a-z0-9 ]+", " ", "".join(c for c in s if not unicodedata.combining(c)).lower()).strip()
 
 
+_LOWER = {"van", "der", "de", "den", "du", "la", "le", "di", "da", "dos", "bin", "al", "el", "von", "ten", "te", "ul"}
+
+
+def display_name(slug_name: str) -> str:
+    """The source's lower-cased slug name ("bevon john jacobs", "quinton de kock") as a readable full name ("Bevon John Jacobs", "Quinton de Kock").
+    Particles stay lower-case after the first word and "mc" names keep their capital ("McDermott"). It is a display form only, never used to match."""
+    out = []
+    for i, t in enumerate(slug_name.split()):
+        if i and t in _LOWER:
+            out.append(t)
+        elif t.startswith("mc") and len(t) > 2:
+            out.append("Mc" + t[2:].capitalize())
+        elif t.startswith("o'") and len(t) > 2:
+            out.append("O'" + t[2:].capitalize())
+        else:
+            out.append(t.capitalize())
+    return " ".join(out)
+
+
 def parse_sitemap(xml: str, kind: str) -> list[tuple[str, str]]:
     """-> [(name tokens joined by space, crex id)], de-duplicated by id."""
     rx = _PLAYER if kind == "player" else _TEAM

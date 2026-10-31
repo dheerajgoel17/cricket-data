@@ -13,7 +13,7 @@ const FixturePage = page(() => import("@/pages/Fixtures"), "FixturePage"), Trend
 const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage"), LeaguePage = page(() => import("@/pages/Markets"), "LeaguePage");
 const PropsPage = page(() => import("@/pages/Lists"), "PropsPage"), FancyPage = page(() => import("@/pages/Lists"), "FancyPage"), PairPage = page(() => import("@/pages/Tools"), "PairPage");
 const ToolsPage = page(() => import("@/pages/Simple"), "ToolsPage"), OddsPage = page(() => import("@/pages/Simple"), "OddsPage"), GlossaryPage = page(() => import("@/pages/Simple"), "GlossaryPage");
-const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage = page(() => import("@/pages/Simple"), "SavedPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
+const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage = page(() => import("@/pages/Saved"), "SavedPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
 const PrivacyPage = page(() => import("@/pages/Legal"), "PrivacyPage"), TermsPage = page(() => import("@/pages/Legal"), "TermsPage"), DisclaimerPage = page(() => import("@/pages/Legal"), "DisclaimerPage");
 const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="team" /> })));
 const VenuePage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="venue" /> })));

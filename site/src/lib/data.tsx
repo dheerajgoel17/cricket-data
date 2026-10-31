@@ -1,13 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { createStore } from "@/engine/store.js";
-import { Resolver } from "@/engine/resolve.js";
-import { identityIndex } from "@/engine/identity.js";
+import { createStore } from "@cricket/engine/store.js";
+import { Resolver } from "@cricket/engine/resolve.js";
+import { identityIndex } from "@cricket/engine/identity.js";
 import { gateKey, readJson, setWrapKey } from "@/lib/wrap-key";
 import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex> }
+export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string> }
 const Ctx = createContext<Data | null>(null);
 
 async function loadJson(url: string) {
@@ -28,11 +28,12 @@ async function boot(): Promise<Data> {
   setWrapKey(k);
   const store = await createStore({ base: "/data/", wrapKey: k });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
-  const [photos, identity] = await Promise.all([
+  const [photos, identity, names] = await Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
     loadIdentity("/data/"),
+    loadJson("/data/names.json").then((n) => (n && typeof n === "object" ? n : {}) as Record<string, string>),
   ]);
-  return { store, rz: new Resolver(store), photos, identity };
+  return { store, rz: new Resolver(store), photos, identity, names };
 }
 
 const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
@@ -79,3 +80,6 @@ export function useData(): Data {
   if (!d) throw new Error("useData outside DataProvider");
   return d;
 }
+
+/** The data when a provider is above, else null: for small display components that must not throw in isolation (tests, previews). */
+export function useDataMaybe(): Data | null { return useContext(Ctx); }

@@ -3,11 +3,11 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cardFields, cardQuery, propForm, renderCard } from "../src/engine/card.js";
-import { dominantFormat } from "../src/engine/props.js";
-import { STATS } from "../src/engine/rules.js";
-import { createStore } from "../src/engine/store.js";
-import { fmtIndex } from "../src/engine/util.js";
+import { cardFields, cardQuery, propForm, renderCard } from "@cricket/engine/card.js";
+import { dominantFormat } from "@cricket/engine/props.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { createStore } from "@cricket/engine/store.js";
+import { fmtIndex } from "@cricket/engine/util.js";
 
 const FILES = { index: "index.json", photos: "photos.json", lines: "lines.json", fixtures: "fixtures.json" };
 const FONTS = { bold: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff", regular: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-500-normal.woff" };
@@ -16,7 +16,7 @@ const FORM_MS = 2500; // L5 from the player shard; skip it rather than miss X's 
 let cache = null;
 let storeCache = null;
 
-/** Same XOR-SHA256 wrap as src/engine/wrap.js, sync so the function can read photos.json / fixtures.json the deploy wrapped. */
+/** Same XOR-SHA256 wrap as packages/engine/wrap.js, sync so the function can read photos.json / fixtures.json the deploy wrapped. */
 function unwrapJson(doc, secret) {
   if (!doc || doc.v !== 1 || !doc.ct || !doc.iv || !secret) return doc;
   const key = createHash("sha256").update(secret, "utf8").digest();

@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { track } from "@/lib/analytics";
-import { bookQuotes } from "@/engine/lines.js";
-import { nextMatchRates } from "@/engine/next-match.js";
+import { bookQuotes } from "@cricket/engine/lines.js";
+import { nextMatchRates } from "@cricket/engine/next-match.js";
 import { localWhen, odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookBadge } from "./book-badge";
+import { OddsTable } from "./odds-table";
+import { Note } from "./note";
+import { MatchStatus } from "./match-status";
 import { TeamBadge } from "./badges";
 import { StandingMark, Tick, type Standing } from "./tick";
 
-const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
+const CARD = ""; // flat: the page is the container
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
 
 export type NextMatchInfo = {
@@ -66,10 +68,10 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
   const ground = next.ground.split(",")[0];
   const heading = next.phase && next.phase !== "upcoming" ? "This match" : "Next match";
   return (
-    <div className={cn("grid gap-snug p-inset", CARD, out && "opacity-60")}>
+    <div className={cn("grid gap-snug", CARD, out && "opacity-60")}>
       <div className="flex items-start justify-between gap-snug">
-        <span className="text-footnote font-semibold uppercase tracking-wider text-muted-foreground">{heading}</span>
-        <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>
+        <span className="label-cap text-footnote text-muted-foreground">{heading}</span>
+        {next.phase === "live" || next.phase === "final" ? <MatchStatus phase={next.phase} className="shrink-0 text-footnote" /> : <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>}
       </div>
       <div className="flex min-w-0 items-center gap-snug">
         {next.team ? <><TeamBadge name={next.team} size="sm" eager /><span className="text-footnote text-muted-foreground">vs</span></> : null}
@@ -89,14 +91,7 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
               {best > 1 ? <Tick value={best} className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</Tick> : null}
             </div>
             {quotes.length ? (
-              <div className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
-                {quotes.map((q) => (
-                  <span key={q.source} className="whitespace-nowrap">
-                    <BookBadge source={q.source} /> <Tick value={q.over} className="font-semibold tabular-nums text-foreground">{odds(q.over)}</Tick>
-                    {q.under != null ? <> / {odds(q.under)}</> : null}
-                  </span>
-                ))}
-              </div>
+              <OddsTable lines={quotes.map((q: any) => ({ line: q.line, books: [{ source: q.source, over: q.over, under: q.under, underAt: q.underAt }] }))} />
             ) : book.main && book.main.line !== line ? (
               <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
             ) : null}
@@ -105,7 +100,11 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
           <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
             {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
             {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
-            <p className="text-footnote text-muted-foreground sm:col-span-2">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
+            <Note className="sm:col-span-2" title="How to read this" items={[
+              <>Hit rate counts {fmt ? <b className="font-semibold text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
+              "Games he did not play (DNP) or that were void are left out, not counted as misses.",
+              "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin, so compare them with the listed price.",
+            ]} />
           </div>
         </>
       ) : (

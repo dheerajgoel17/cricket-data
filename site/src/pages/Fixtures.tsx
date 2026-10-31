@@ -8,15 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { STATS } from "@/engine/rules.js";
-import { FORMATS } from "@/engine/util.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { clockLiveMs, liveBlurb, teamScore } from "@/engine/live.js";
+import { clockLiveMs, liveBlurb, teamScore } from "@cricket/engine/live.js";
 import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
-import { fixtureBooks } from "@/engine/lines.js";
+import { fixtureBooks } from "@cricket/engine/lines.js";
 import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
@@ -72,7 +72,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
     <section className="flex flex-col gap-stack">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className="flex items-center gap-snug">
-        <span className={cn("text-footnote font-semibold uppercase tracking-[.14em]", on ? "text-miss" : "text-muted-foreground")}>
+        <span className={cn("label-cap text-footnote", on ? "text-miss" : "text-muted-foreground")}>
           {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>

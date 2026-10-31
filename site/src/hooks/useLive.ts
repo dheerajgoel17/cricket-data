@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { bookFixtures, fixtureInBooks, liveForFixture } from "@/engine/live.js";
+import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
 import { linesQuery, liveQuery } from "@/lib/queries";
 
 /** The /api/live body, polled every ~15 s (see `liveQuery`). */

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createStore } from "../src/engine/store.js";
-import { Resolver } from "../src/engine/resolve.js";
+import { createStore } from "@cricket/engine/store.js";
+import { Resolver } from "@cricket/engine/resolve.js";
 
 const TEAMS = [{ n: "Sri Lanka", g: 1 }, { n: "Other", g: 0 }];
 const data = {

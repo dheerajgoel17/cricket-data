@@ -1,0 +1,10 @@
+{
+  "name": "@cricket/storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Key-value storage abstraction (web localStorage now; MMKV or AsyncStorage on native) plus the pure list helpers for saved props, filter combos and recent players.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": { ".": { "types": "./index.d.ts", "default": "./index.js" } }
+}

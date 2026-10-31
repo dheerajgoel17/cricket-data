@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { loadFixture, sum } from "./helpers.mjs";
-import { runPlan } from "../src/engine/plan.js";
-import { playerReport } from "../src/engine/props.js";
-import { teamForm } from "../src/engine/form.js";
-import { MATCH_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "../src/engine/markets.js";
+import { runPlan } from "@cricket/engine/plan.js";
+import { playerReport } from "@cricket/engine/props.js";
+import { teamForm } from "@cricket/engine/form.js";
+import { MATCH_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@cricket/engine/markets.js";
 
 const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
 
@@ -156,7 +156,7 @@ test("freshness is reported on every answer", async () => {
 });
 
 test("venueIndices finds a ground under every spelling the data holds, and nothing for a different or missing one", async () => {
-  const { venueIndices } = await import("../src/engine/markets.js");
+  const { venueIndices } = await import("@cricket/engine/markets.js");
   const store = { venues: ["Sharjah Cricket Association Stadium", "Sharjah Cricket Stadium", "Sharjah Cricket Stadium, Sharjah", "Dubai International Cricket Stadium", "Sharjah Oval"] };
   assert.deepEqual(venueIndices(store, "Sharjah Cricket Stadium, Sharjah"), [0, 1, 2]);
   assert.deepEqual(venueIndices(store, "Dubai International Cricket Stadium, Dubai"), [3]);

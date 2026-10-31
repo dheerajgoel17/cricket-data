@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { bookQuotes } from "@/engine/lines.js";
+import { bookQuotes } from "@cricket/engine/lines.js";
 import { BookQuotes } from "./hot-props";
 
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined })); // no logo files: each book shows as its name, so the strip can be read as text

@@ -3,37 +3,45 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ChevronLeftIcon, InformationCircleIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ChevronLeftIcon, InformationCircleIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, teamKey } from "@/engine/lines.js";
+import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, teamKey } from "@cricket/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
-import { SPLITS } from "@/engine/props.js";
-import { STATS } from "@/engine/rules.js";
-import { sideEdge } from "@/engine/stats.js";
-import { FORMATS, fmtIndex } from "@/engine/util.js";
-import { barState, windowRate, windowRates } from "@/engine/windows.js";
+import { SPLITS } from "@cricket/engine/props.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { sideEdge } from "@cricket/engine/stats.js";
+import { FORMATS, fmtIndex } from "@cricket/engine/util.js";
+import { barState, windowRate, windowRates } from "@cricket/engine/windows.js";
 import { useData } from "@/lib/data";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { linesQuery } from "@/lib/queries";
-import { fixtureStart, localWhen, num, odds, pc, shortDate } from "@/lib/format";
+import { abbr, fixtureStart, localTime, localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
+import { pushRecentPlayer } from "@/lib/saved";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
-import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
-import { venueStem } from "@/engine/markets.js";
-import { matchPhase, pickPricedMatch } from "@/engine/next-match.js";
+import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
+import { venueStem } from "@cricket/engine/markets.js";
+import { matchPhase, pickPricedMatch } from "@cricket/engine/next-match.js";
 import { NextFilters, NextMatch } from "@/components/app/next-match";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
-import { StarButton } from "@/components/app/star";
+import { PropStar, StarButton } from "@/components/app/star";
+import { OddsTable } from "@/components/app/odds-table";
+import { AltLines } from "@/components/app/alt-lines";
+import { Note } from "@/components/app/note";
+import { MatchStatus } from "@/components/app/match-status";
+import { PlayerName } from "@/components/app/player-name";
+import { PlayerPortrait } from "@/components/app/portrait";
 import { sharePlayerUrl } from "@/lib/share";
 import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
@@ -42,23 +50,30 @@ import { LineStepper } from "@/components/app/line-stepper";
 import { OutcomeDonut } from "@/components/app/viz";
 import { Tick } from "@/components/app/tick";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side", "Test innings"]); // those are on screen already (the Scope switch for the last)
 const band = (p: number | null) => (p == null ? "" : p >= 0.6 ? "hi" : p >= 0.4 ? "mid" : "lo");
 const bandText = { hi: "text-primary", mid: "text-amber", lo: "text-miss", "": "" } as const;
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
-const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
+/** Flat sections: the page is the container (no card, ring or fill); only chips, filters and controls keep a surface. Lists are separated by hairlines. */
+const CARD = "";
 
 /** The URL's query string as it is right now (the chart keeps line / side in the URL with replaceState, so the router's copy can be stale). */
 const liveQ = () => Object.fromEntries(new URLSearchParams(location.search));
 
-function Metric({ k, v, tone }: { k: string; v: ReactNode; tone?: "up" | "down" }) {
+function Metric({ k, v, tone, className, text }: { k: string; v: ReactNode; tone?: "up" | "down"; className?: string; text?: boolean }) {
   return (
-    <div className="grid min-w-0 gap-hair">
-      <span className="text-footnote leading-tight text-muted-foreground">{k}</span>
-      <b className={cn("truncate text-metric font-bold tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
+    <div className={cn("grid min-w-0 gap-hair", className)}>
+      <span className="label-cap text-callout leading-tight text-muted-foreground">{k}</span>
+      <b className={cn(text ? "line-clamp-2 break-words text-body font-semibold leading-snug" : "break-words font-condensed text-metric font-semibold leading-none tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
     </div>
   );
+}
+
+/** A value with a small trend arrow: green up when it beats the line, red down when it does not (no arrow when there is nothing to compare). */
+function Arrow({ up, children }: { up: boolean | null; children: ReactNode }) {
+  return <span className="inline-flex items-center gap-hair">{up == null ? null : <span aria-hidden className={cn("text-footnote", up ? "text-primary" : "text-miss")}>{up ? "▲" : "▼"}</span>}{children}</span>;
 }
 
 /** Hit-rate ring: green from 60%, amber from 40%, red below. */
@@ -68,7 +83,7 @@ function Gauge({ p, caption }: { p: number | null; caption: string }) {
   const ring = (stroke: string, dash: string) => <circle cx="24" cy="24" r="19" fill="none" stroke={stroke} strokeWidth="4" strokeDasharray={dash} strokeLinecap="round" transform="rotate(135 24 24)" />;
   return (
     <div className="grid shrink-0 justify-items-center gap-hair">
-      <svg viewBox="0 0 48 48" className="size-20" role="img" aria-label={`${caption} ${p == null ? "none" : `${Math.round(arc * 100)}%`}`}>
+      <svg viewBox="0 0 48 48" className="size-16 lg:size-20" role="img" aria-label={`${caption} ${p == null ? "none" : `${Math.round(arc * 100)}%`}`}>
         {ring("var(--border)", "89.6 29.9")}<motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{ring(tone, `${(89.6 * arc).toFixed(1)} 200`)}</motion.g>
         <text x="24" y="28" textAnchor="middle" fontSize="11" fontWeight="700" fill="currentColor">{p == null ? "–" : `${Math.round(arc * 100)}%`}</text>
       </svg>
@@ -86,26 +101,24 @@ export function PlayerPage() {
 }
 
 /** Back row, then the player flat on the page (no card): photo, name, team and formats, save and share. */
-function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: string; team: string; fmts: [number, string][]; share: () => void }) {
+function PlayerHeader({ idx, name, team, kitTeam, test, fmts, share }: { idx: number; name: string; team: string; kitTeam?: string; test?: boolean; fmts: [number, string][]; share: () => void }) {
   const { store } = useData();
   const nav = useNavigate();
   const teamIx = store.P.tm[idx];
+  // Name, team and formats in two grey lines, then the team badge, star and share as round buttons; the photo stands on the rule under them (no container).
   return (
-    <section className="flex flex-col gap-stack lg:flex-row lg:items-center lg:justify-between">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40 lg:hidden"><ChevronLeftIcon className="size-5" />Back</button>
-      <div className="flex min-w-0 items-center gap-snug lg:gap-stack">
-        <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="hidden size-control shrink-0 place-items-center rounded-full bg-secondary text-primary lg:grid"><ChevronLeftIcon className="size-5" /></button>
-        <PlayerPhoto idx={idx} className="size-20 shrink-0 rounded-full bg-secondary lg:size-24" />
-        <div className="grid min-w-0 flex-1 gap-tight">
-          <h1 className="truncate text-display font-bold leading-tight tracking-tight">{name}</h1>
-          <Link to={`/team/${teamIx}`} className="flex min-w-0 items-center gap-tight text-callout text-muted-foreground active:opacity-70"><TeamBadge name={team} size="sm" /><span className="truncate">{team}</span></Link>
-          <div className="flex flex-wrap items-center gap-tight">{fmts.map(([i, f]) => <Badge key={i} variant="outline" className="px-snug py-hair text-caption font-semibold">{f}</Badge>)}</div>
+    <section className="flex items-end justify-between gap-snug border-b border-hairline">
+      <div className="grid min-w-0 flex-1 content-start gap-tight pt-stack">
+        <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="hidden size-control place-items-center rounded-full bg-secondary text-primary lg:grid"><ChevronLeftIcon className="size-5" /></button>
+        <h1 className="text-display font-bold leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
+        <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span><span className="block">{fmts.map(([, f]) => f).join(" · ")}</span></p>
+        <div className="flex items-center gap-snug py-stack">
+          <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid size-(--touch) place-items-center rounded-full bg-secondary active:opacity-70"><TeamBadge name={team} size="sm" /></Link>
+          <StarButton kind="player" idx={idx} className="size-(--touch)" />
+          <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-(--touch) cursor-pointer place-items-center rounded-full bg-secondary"><ArrowUpOnSquareIcon className="size-5" /></motion.button>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-tight lg:flex-col">
-        <StarButton kind="player" idx={idx} />
-        <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><ShareIcon className="size-5" /></motion.button>
-      </div>
+      <PlayerPortrait idx={idx} team={kitTeam} test={test} className="w-36 self-end lg:w-44" />
     </section>
   );
 }
@@ -113,7 +126,7 @@ function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: str
 function PlayerScreen({ idx }: { idx: number }) {
   const { store } = useData();
   const nav = useNavigate();
-  const name = store.playerName(idx), team = store.teamName(store.P.tm[idx]);
+  const rawName = store.playerName(idx), team = store.teamName(store.P.tm[idx]);
   const [version, setVersion] = useState(0);          // bumps when the URL changes through the router (stat, format, filters)
   const q: Record<string, string> = useMemo(() => liveQ(), [version]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { const f = () => setVersion((v) => v + 1); window.addEventListener("popstate", f); return () => window.removeEventListener("popstate", f); }, []);
@@ -125,16 +138,22 @@ function PlayerScreen({ idx }: { idx: number }) {
   const fm = store.P.fm[idx];
   const fmts = FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1);
   const askedStat = q.stat || "";
-  setTitle(`${store.playerName(idx)}: stats, hit rates and form`);
+  useEffect(() => { pushRecentPlayer(idx); }, [idx]);
 
   const lines = useQuery(linesQuery);
   const pid = store.P.id[idx];
+  // a player the data knows only by an id (eight hex digits) is shown under the name the books use for him
+  const bookName = (lines.data?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
+  const name = /^[0-9a-f]{8}$/.test(rawName) ? bookName || rawName : rawName;
+  setTitle(`${name}: stats, hit rates and form`);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
   const keep = keepMsFor(FORMATS[fmtVal]);
   const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep) : [];
-  const statItems = STAT_OPTIONS.filter(([k]) => pricedStats.includes(k));
-  const stat = pricedStats.includes(askedStat) ? askedStat : (pricedStats[0] || askedStat || "runs"); // only a listed prop, else the URL / runs for the form chart with no chips
+  // A stat asked for in the link is shown even when no book prices it for this player (its form chart, with no line from a book); it joins the chips so it can be left again.
+  const asked_ = (STATS as any)[askedStat] && !pricedStats.includes(askedStat) ? ([[askedStat, (STATS as any)[askedStat].label]] as [string, string][]) : [];
+  const statItems = [...asked_, ...STAT_OPTIONS.filter(([k]) => pricedStats.includes(k))];
+  const stat = pricedStats.includes(askedStat) || (STATS as any)[askedStat] ? askedStat : (pricedStats[0] || "runs"); // the stat in the link when it is a real one, else the first listed prop
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
   // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
@@ -161,7 +180,6 @@ function PlayerScreen({ idx }: { idx: number }) {
 
   return (
     <div className="flex flex-col gap-stack">
-      <PlayerHeader {...{ idx, name, team, fmts, share }} />
       {statItems.length > 0 ? (
         <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
           <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={statItems} />
@@ -170,6 +188,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
+      <PlayerHeader {...{ idx, name, team, fmts, share }} kitTeam={nextMatch?.team || team} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, bookDefault, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
@@ -220,7 +239,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
   }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, store]);
 }
 
-function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {
+function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {
   const { store, identity } = useData();
   const live = useLiveDoc();
   const c = res.chart;
@@ -231,6 +250,8 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
   const [tab, setTab] = useState<string>(["lines", "logs", "splits"].includes(q.tab) ? q.tab : "lines");
   const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [altOpen, setAltOpen] = useState(false);
+  const phone = useIsMobile();
   const [logCount, setLogCount] = useState(30);
   const tabRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -242,6 +263,14 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
 
   const ws = entries.length ? windowRates(entries, line, side) : [];
   const cur = ws.find((w: any) => w.n === win) || ws[ws.length - 1];
+  // every game on the chart, counted with the same bar states the chart draws (hit / miss / push; void and not-played are left out), so it agrees with the engine's headline
+  const tally = { hit: 0, miss: 0, push: 0 };
+  for (const e of entries) { const st = barState(e, line, side) as string; if (st === "hit" || st === "miss" || st === "push") tally[st] += 1; }
+  const nAll = tally.hit + tally.miss + tally.push;
+  // the engine's own summary is the authority while the line is the one it ran (so this block matches its headline and the "when it hits" table); once the line is stepped here, the tally above is used
+  const es = res.summary, sameLine = res.plan?.line === line && (res.plan?.side || "over") === side;
+  const all = sameLine && es?.n ? { hits: side === "over" ? es.over : es.under, played: es.n, p: side === "over" ? es.pOver : es.pUnder } : nAll ? { hits: tally.hit, played: nAll, p: tally.hit / nAll } : null;
+  const fr = store.freshness();
   const shown = cur ? (cur.n ? entries.slice(-cur.n) : entries) : [];
   const played = shown.filter((e) => e.value != null);
   const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
@@ -272,7 +301,7 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
   const out = !!(book && next?.priced && asLine && lineNotIn(liveMatch, asLine, identity));
 
   return (
-    <div className="flex flex-col gap-section">
+    <div className="flex flex-col gap-stack">
       {!entries.length || !cur ? (
         <>
           {next ? (
@@ -281,41 +310,65 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
               {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
             </div>
           ) : null}
-          <EmptyNote>No fixtures match these filters.</EmptyNote>
+          <div className="flex flex-col items-start gap-snug" role="status">
+            <p className="text-callout text-muted-foreground">No {res.sample?.unit || "games"} match {active.length ? `these filters (${active.map(([k, v]: [string, unknown]) => `${k ? `${k} ` : ""}${v}`).join(", ")})` : "this selection"}. Relax a filter to see a sample.</p>
+            {active.length > 0 && <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</Button>}
+          </div>
         </>
       ) : (
-      <div className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
-        <div className={cn("flex items-center justify-between gap-stack p-inset lg:col-span-12", CARD)}>
-          <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-6">
-            <Metric k={`${cur.label} avg`} v={num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)} tone={cur.p != null && (cur.mean ?? 0) > line ? "up" : undefined} />
-            <Metric k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
+      <div className="flex flex-col gap-stack lg:grid lg:grid-cols-12 lg:items-start lg:gap-section">
+        <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-stack lg:col-span-12", CARD)}>
+          <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-7">
+            <Metric k={`${cur.label} avg`} v={<Arrow up={cur.mean == null ? null : cur.mean > line}>{num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)}</Arrow>} />
+            <Metric k="Line" v={book && book.lines.length > 1
+              ? <button type="button" onClick={() => setAltOpen(true)} className="flex items-center gap-hair text-left font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring lg:pointer-events-none">{side === "over" ? "O" : "U"} {line}<span aria-hidden className="text-muted-foreground lg:hidden">›</span></button>
+              : `${side === "over" ? "O" : "U"} ${line}`} />
+            <Metric text k="Prop" v={res.statLabel} />
+            <Metric k="Hit rate" v={<Arrow up={cur.p == null ? null : cur.p >= 0.5}>{cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`}</Arrow>} />
             <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
-            <Metric k="Line" v={`${side === "over" ? "O" : "U"} ${line}`} />
-            <Metric k="Prop" v={res.statLabel} />
-            <Metric k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
+            <Metric text k="Opponent" v={next?.opp ? <span className="grid gap-hair"><span>{abbr(next.opp)}</span><MatchStatus phase={next.phase || "upcoming"} start={next.start} className="text-callout text-muted-foreground" /></span> : "–"} />
+            <Metric className="hidden lg:grid" k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
           </div>
-          {mixSlices.length >= 3
-            ? <OutcomeDonut caption={`${cur.label} mix`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={mixSlices} />
-            : <Gauge p={cur.p} caption={`${cur.label} hit`} />}
+          <div className="shrink-0 rounded-2xl border border-hairline bg-card px-snug py-snug">
+            {mixSlices.length >= 3
+              ? <OutcomeDonut caption={`${cur.label} hit rate`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={mixSlices} />
+              : <Gauge p={cur.p} caption={`${cur.label} hit rate`} />}
+          </div>
         </div>
+
         <section className={cn("flex flex-col gap-stack lg:row-start-2", book ? "lg:col-span-8" : "lg:col-span-12")}>
           <div className="flex flex-wrap items-center justify-between gap-snug">
             <PillGroup segmented layoutId="pl-side" label="Side" value={side} onChange={(v) => { setSide(v); keep({ line, side: v }); }} items={[["over", "Over"], ["under", "Under"]]} />
-            <LineStepper value={line} label={side === "over" ? "O" : "U"} onStep={stepLine} />
+            <div className="flex items-center gap-snug">
+              <LineStepper value={line} label={side === "over" ? "O" : "U"} onStep={stepLine} />
+              <PropStar idx={idx} stat={stat} line={line} fmt={fmtIndex(fmt)} className="bg-card" />
+              {book && book.lines.length > 1 && <Button type="button" variant="secondary" className="h-control rounded-full px-snug text-callout lg:hidden" onClick={() => setAltOpen(true)}>Alt lines · {book.lines.length}</Button>}
+            </div>
           </div>
-          {book && (bookAt ? (
-            <p className="text-callout text-muted-foreground">
+          <div className={cn("flex flex-col gap-snug", CARD)}>
+            <ChartBars entries={shown} line={line} side={side} height={phone ? 240 : 340} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
+            <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
+              items={ws.map((w: any) => [String(w.n), <span key={w.n} className="grid justify-items-center leading-tight"><span className="label-cap text-footnote text-muted-foreground">{w.label}</span><b className={cn("font-condensed text-body font-medium tabular-nums", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="h-auto w-full max-w-full" itemClassName="flex-1 py-tight" />
+            <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role={cur.played < 5 ? "status" : undefined}>
+              <b className="font-semibold tabular-nums">{cur.played}</b> {res.sample?.unit || "games"} counted.
+              <Popover>
+                <PopoverTrigger asChild><button type="button" aria-label="About this chart" className="ml-tight inline-grid size-5 place-items-center rounded-full align-middle text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"><InformationCircleIcon className="size-4" /></button></PopoverTrigger>
+                <PopoverContent side="top" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
+                  <span><b className="font-semibold">{res.statLabel} {side} {line}</b>{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}.</span>
+                  <span>Green cleared, red missed, grey not played. DNP / VOID fixtures are not counted{mix.out > 0 ? `: ${mix.out} void or not in the XI left out here` : ""}.</span>
+                </PopoverContent>
+              </Popover>
+              {cur.played < 5 ? ` Too few for a steady read${active.length ? ": relax a filter" : ""}.` : ""}
+              {cur.played < 5 && active.length > 0 && <> <button type="button" className="font-semibold underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></>}
+            </p>
+          </div>
+          {book && !(bookAt && next?.priced) && (bookAt ? (
+            <p className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
               {bookAt.books.map((b: any) => <span key={b.source} className="mr-snug whitespace-nowrap"><BookBadge source={b.source} /> <Tick value={b.over} className={cn("font-semibold tabular-nums", side === "over" ? "text-foreground" : "")}>{odds(b.over)}</Tick> / <Tick value={b.under} className={cn("font-semibold tabular-nums", side === "under" ? "text-foreground" : "")}>{odds(b.under)}</Tick></span>)}
             </p>
           ) : (
             <p className="text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
           ))}
-          <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
-            <ChartBars entries={shown} line={line} side={side} height={340} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
-            <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
-              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
-            <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
-          </div>
         </section>
         {next ? (
           <div className="flex flex-col gap-snug lg:col-span-5 lg:row-start-3">
@@ -324,7 +377,7 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
           </div>
         ) : null}
       {book && cur && (
-        <section className="flex flex-col gap-snug lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
+        <section className="hidden flex-col gap-snug lg:flex lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
           <div className="flex items-baseline justify-between gap-snug">
             <h2 className="flex items-center gap-tight text-title font-bold tracking-tight">
               Lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}
@@ -352,16 +405,16 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
           <p className="truncate text-footnote text-muted-foreground" title={[book.match, book.start_utc ? localWhen(book.start_utc) : "", book.competition].filter(Boolean).join(" · ")}>
             {book.match}{book.start_utc ? ` · ${localWhen(book.start_utc)}` : ""}
           </p>
-          <ul className={cn("overflow-hidden", CARD)}>
+          <ul className={cn("divide-y divide-hairline border-y border-hairline", CARD)}>
             {book.lines.map((l: any) => {
               const hist = windowRate(entries, cur.n, l.line, "over");
               const bestO = Math.max(0, ...l.books.map((b: any) => b.over || 0)), bestU = Math.max(0, ...l.books.map((b: any) => b.under || 0)); // with several books, the best price of each side stands out
               return (
                 <li key={l.line} className="border-t border-hairline first:border-t-0">
                   <button type="button" onClick={() => pickLine(l.line)} aria-label={`Use line ${l.line}`}
-                    className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
+                    className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-0 py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
                     <span className="grid min-w-0 gap-hair">
-                      <span className="text-body font-semibold">O/U {l.line}{l === book.main && <span className="ml-tight text-caption font-semibold uppercase tracking-wider text-primary">main</span>}</span>
+                      <span className="text-body font-semibold">O/U {l.line}{l === book.main && <span className="ml-tight label-cap text-footnote text-primary">main</span>}</span>
                       {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><BookBadge source={b.source} /> <Tick value={b.over} className={cn(l.books.length > 1 && b.over === bestO && "font-semibold text-primary")}>{odds(b.over)}</Tick> / <Tick value={b.under} className={cn(l.books.length > 1 && b.under === bestU && "font-semibold text-primary")}>{odds(b.under)}</Tick></span>)}
                     </span>
                     <span className="grid justify-items-end gap-hair text-right">
@@ -386,11 +439,23 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
           {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
         </div>
 
-        <div className={cn("flex flex-col gap-hair p-inset lg:col-span-12", CARD)}>
-          <h2 className="text-body font-semibold">At a glance</h2>
-          <p className="text-callout">{res.headline}</p>
-          <p className="text-footnote text-muted-foreground">{res.freshness}</p>
-        </div>
+        <section aria-label="At a glance" className={cn("grid gap-stack lg:col-span-12", CARD)}>
+          <h2 className="label-cap text-callout text-foreground/80">At a glance</h2>
+          {all && (
+            <div className="grid gap-snug">
+              <div className="grid grid-cols-3 gap-snug">
+                <div className="grid gap-hair"><span className="label-cap text-footnote text-muted-foreground">Cleared</span><span className="font-condensed text-metric font-semibold tabular-nums">{all.hits}<span className="text-body font-medium text-muted-foreground"> of {all.played}</span></span></div>
+                <div className="grid gap-hair"><span className="label-cap text-footnote text-muted-foreground">Hit rate</span><span className="font-condensed text-metric font-semibold tabular-nums">{all.p == null ? "–" : `${(all.p * 100).toFixed(1)}%`}</span></div>
+                <div className="grid gap-hair"><span className="label-cap text-footnote text-muted-foreground">Fair price</span><span className="font-condensed text-metric font-semibold tabular-nums">{all.p ? odds(1 / all.p) : "–"}</span></div>
+              </div>
+              <p className="text-callout text-muted-foreground">{name} · {fmt} {res.statLabel.toLowerCase()} {side} {line}, over all {all.played} {res.sample?.unit || "innings"} in this sample.</p>
+            </div>
+          )}
+          <Note title="Data" items={[
+            fr.newestBase ? <>Newest match in the base data: <b className="font-semibold text-foreground tabular-nums">{fr.newestBase}</b>.</> : "Base data date unknown.",
+            fr.provisionalIncluded ? <>Includes <b className="font-semibold text-foreground tabular-nums">{fr.provisionalMatches}</b> provisional (scraped) matches up to <b className="font-semibold text-foreground tabular-nums">{fr.newestProvisional}</b>.</> : "No provisional matches included.",
+          ]} />
+        </section>
 
         <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack lg:col-span-12">
         <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={switchTab} items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} />
@@ -398,9 +463,9 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
             {tab === "lines" && (
               <>
-                <div className={cn("overflow-hidden", CARD)}><LadderTable ladder={res.ladder} /></div>
+                <div className={cn("divide-y divide-hairline border-y border-hairline", CARD)}><LadderTable ladder={res.ladder} /></div>
                 {res.corr ? (
-                  <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
+                  <div className={cn("flex flex-col gap-snug", CARD)}>
                     <h3 className="text-body font-semibold">When {res.statLabel.toLowerCase()} {res.plan.side || "over"} {c?.line ?? res.line} hits</h3>
                     <p className="text-footnote text-muted-foreground">{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</p>
                     <DataTable columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
@@ -410,12 +475,12 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
             )}
             {tab === "logs" && (
               <>
-                <ul className={cn("overflow-hidden", CARD)}>
+                <ul className={cn("divide-y divide-hairline border-y border-hairline", CARD)}>
                   {logs.slice(0, logCount).map((e, i) => {
                     const s = barState(e, line, side) as string;
                     return (
                       <li key={i} className="border-t border-hairline first:border-t-0">
-                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent">
+                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-0 py-snug text-left transition-colors active:bg-accent">
                           <TeamBadge name={e.opp} size="sm" />
                           <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-semibold">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
                           <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-bold tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
@@ -432,6 +497,19 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
         </AnimatedHeight>
         </div>
       </section>
+
+      {book && cur && (
+        <Sheet open={altOpen} onOpenChange={setAltOpen}>
+          <SheetContent side="bottom" className="z-[70] mx-auto max-h-[85dvh] max-w-xl gap-0 overflow-y-auto rounded-t-3xl pb-[max(var(--space-stack),env(safe-area-inset-bottom))]">
+            <div aria-hidden className="grid justify-items-center pt-snug"><span className="h-1.5 w-10 rounded-full bg-foreground/25" /></div>
+            <SheetHeader className="pb-0"><SheetTitle className="text-title font-bold tracking-tight">Alt lines</SheetTitle><SheetDescription>{name} · {res.statLabel}{book?.match ? ` · ${book.match}` : ""}. Pick a line to chart it; prices are only those a book lists.</SheetDescription></SheetHeader>
+            <div className="px-gutter pt-snug">
+              <AltLines active={line} side={side === "over" ? "over" : "under"} onPick={(v) => { pickLine(v); setAltOpen(false); }} onStep={stepLine}
+                lines={book.lines.map((l: any) => ({ line: l.line, books: l.books, main: l === book.main, mkt: l.prob, hit: windowRate(entries, cur.n, l.line, "over").p }))} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
 
       <Sheet open={!!game} onOpenChange={(o) => !o && setGame(null)}>
         <SheetContent side="bottom" className="z-[70] mx-auto max-w-xl rounded-t-2xl">

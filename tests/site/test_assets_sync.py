@@ -60,19 +60,19 @@ def test_sync_copies_only_missing_images_and_annotates_photos_json(tmp_path):
     cdn = os.environ["IMG_CDN_BASE"]
     fetch = fake_fetch({f"{cdn}/players/org/BBB.png": img, f"{cdn}/Teams/O.png": img})
     stats = s.sync(photos, None, BASE, "service-key", limit=10, pause=0, http=db, fetch=fetch)
-    assert stats["downloaded"] == 2 and stats["already"] == 1 and stats["missing_at_crex"] == 0
+    assert stats["downloaded"] == 2 and stats["already"] == 1 and stats["missing_at_crex"] == 4  # the four shirts (India and the placeholder, two kits each) are not served in this fake
     assert set(db.objects) == {"players/BBB.png", "teams/O.png"}
     assert {r["ref"] for r in db.tables["assets"]} == {"BBB", "O"} and db.tables["assets"][0]["sha256"]
     out = json.load(open(photos))
-    assert out["base"] == f"{BASE}/storage/v1/object/public/avatars" and out["s"] == {"p": ["AAA", "BBB"], "t": ["O"]}
+    assert out["base"] == f"{BASE}/storage/v1/object/public/avatars" and out["s"] == {"p": ["AAA", "BBB"], "t": ["O"], "j": []}
 
 
 def test_sync_skips_images_crex_does_not_serve_and_respects_the_limit(tmp_path):
     photos = write_photos(tmp_path)
     db = FakeDB()
     stats = s.sync(photos, None, BASE, "service-key", limit=1, pause=0, http=db, fetch=fake_fetch({}))
-    assert stats["downloaded"] == 0 and stats["missing_at_crex"] == 1 and stats["pending"] == 2  # teams first, then players
-    assert json.load(open(photos))["s"] == {"p": [], "t": []}
+    assert stats["downloaded"] == 0 and stats["missing_at_crex"] == 1 and stats["pending"] == 6  # logos first, then the four shirts, then the two players
+    assert json.load(open(photos))["s"] == {"p": [], "t": [], "j": []}
 
 
 def test_sync_stores_the_id_maps(tmp_path):
@@ -125,3 +125,16 @@ def test_describe_key_never_reveals_the_key():
     assert "PUBLISHABLE" in s.describe_key("sb_publishable_xyz")
     assert "sb_secret_secretvalue" not in s.describe_key("sb_secret_secretvalue")
     assert "unrecognised" in s.describe_key("short")
+
+
+def test_sync_also_copies_each_teams_two_shirts_and_the_placeholder_shirt(tmp_path):
+    p = tmp_path / "photos.json"
+    p.write_text(json.dumps({"p": {}, "t": {"india": "O"}}))
+    db, img, cdn = FakeDB(), b"x" * 500, os.environ["IMG_CDN_BASE"]
+    shirts = {f"{cdn}/jersey/{k}/org/{t}.png": img for t in ("O", "AD") for k in ("limited", "test")}
+    stats = s.sync(str(p), None, BASE, "service-key", limit=50, pause=0, http=db, fetch=fake_fetch({f"{cdn}/Teams/O.png": img, **shirts}))
+    out = json.load(open(p))
+    assert set(out["s"]["j"]) == {"O:limited", "O:test", "AD:limited", "AD:test"}
+    assert out["s"]["t"] == ["O"]  # a shirt is not mistaken for a logo
+    assert stats["downloaded"] == 5
+    assert {"jerseys/limited/O.png", "jerseys/test/O.png", "jerseys/limited/AD.png", "teams/O.png"} <= set(db.objects)

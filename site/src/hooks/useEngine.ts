@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { bookFixtures, fixtureInBooks, liveForFixture } from "@/engine/live.js";
-import { archiveFixture, fixtureBooks, keepMsFor, teamKey, withArchive } from "@/engine/lines.js";
-import { runPlan } from "@/engine/plan.js";
+import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
+import { archiveFixture, fixtureBooks, keepMsFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { runPlan } from "@cricket/engine/plan.js";
 import { useData } from "@/lib/data";
 import { loadArchive } from "@/lib/feeds";
 import { linesQuery } from "@/lib/queries";

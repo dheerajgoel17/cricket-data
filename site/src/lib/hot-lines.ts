@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Which book lines the Hot props score, and in what order the player files they need are fetched. Pure, so it is tested without the page.
 
-import { keepMsFor } from "@/engine/lines.js";
+import { keepMsFor } from "@cricket/engine/lines.js";
 
 export const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
 export const sameMatch = (match: string, [a, b]: [string, string]) => { const [x, y] = String(match).split(/\s+vs\s+/i); const s = new Set([norm(x), norm(y)]); return s.has(norm(a)) && s.has(norm(b)); };

@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createStore } from "../src/engine/store.js";
-import { playerReport } from "../src/engine/props.js";
-import { STATS } from "../src/engine/rules.js";
+import { createStore } from "@cricket/engine/store.js";
+import { playerReport } from "@cricket/engine/props.js";
+import { STATS } from "@cricket/engine/rules.js";
 
 // One player over five T20s. Points = runs + 20 per wicket + 10 per catch + 25 per stumping:
 //   m0: 30 runs, 2 wickets, 1 catch, 1 stumping  -> 30 + 40 + 10 + 25 = 105

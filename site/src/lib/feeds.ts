@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
-import { isFixtureId } from "@/engine/lines.js";
+import { isFixtureId } from "@cricket/engine/lines.js";
 import { saveLive } from "@/lib/live-cache";
 import { readJson } from "@/lib/wrap-key";
 

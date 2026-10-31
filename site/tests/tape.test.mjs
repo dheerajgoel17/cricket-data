@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { HIGH_ODDS, LOW_ODDS, marketTape, quoteMove, stillNeed } from "../src/engine/tape.js";
+import { HIGH_ODDS, LOW_ODDS, marketTape, quoteMove, stillNeed } from "@cricket/engine/tape.js";
 
 test("quoteMove: line and over each sign their delta", () => {
   assert.deepEqual(quoteMove(null, { line: 24.5, over: 1.9 }), { line: 0, odds: 0 });

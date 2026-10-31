@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
-import { STATS } from "@/engine/rules.js";
-import { HIGH_ODDS, LOW_ODDS, marketTape } from "@/engine/tape.js";
-import { fmtIndex } from "@/engine/util.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { HIGH_ODDS, LOW_ODDS, marketTape } from "@cricket/engine/tape.js";
+import { fmtIndex } from "@cricket/engine/util.js";
 import { track } from "@/lib/analytics";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";

@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta, shareMetas } from "../src/lib/seo.js";
-import { cardPath } from "../src/engine/card-path.js";
+import { cardPath } from "@cricket/engine/card-path.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const ld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, "\\u003c")}</script>`;
@@ -90,7 +90,7 @@ export function siteOf(dist, env = process.env.SITE_URL) {
   return existsSync(f) ? /<loc>(https?:\/\/[^/<]+)/.exec(readFileSync(f, "utf8"))?.[1] ?? "" : "";
 }
 
-/** Same XOR-SHA256 wrap as src/cricket_site/wrap.py / site/src/engine/wrap.js, sync so the Vite build can read wrapped fixtures.json. */
+/** Same XOR-SHA256 wrap as src/cricket_site/wrap.py / site/packages/engine/wrap.js, sync so the Vite build can read wrapped fixtures.json. */
 export function unwrapJson(doc, secret) {
   if (!doc || doc.v !== 1 || !doc.ct || !doc.iv || !secret) return doc;
   const key = createHash("sha256").update(secret, "utf8").digest();

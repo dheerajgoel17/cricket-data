@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { bookName } from "@/engine/lines.js";
+import { bookName } from "@cricket/engine/lines.js";
 import { bookLogo, bookVariant } from "@/lib/books";
 import { cn } from "@/lib/utils";
 

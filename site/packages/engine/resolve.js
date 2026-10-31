@@ -160,7 +160,7 @@ export class Resolver {
   }
 
   _cutoff() {
-    const y = Number((this.s.meta.newest_base || "2026").slice(0, 4));
+    const y = Number((this.s.freshness?.().newestBase || this.s.meta.newest_base || "2026").slice(0, 4));
     return `${y - 2}-01-01`;
   }
 

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fixtureBooks } from "@/engine/lines.js";
-import { selectMatches, venueIndices } from "@/engine/markets.js";
-import { FORMATS } from "@/engine/util.js";
+import { fixtureBooks } from "@cricket/engine/lines.js";
+import { selectMatches, venueIndices } from "@cricket/engine/markets.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { fixtureStart } from "@/lib/format";
 import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
-import { fancyStanding, liveForFixture } from "@/engine/live.js";
+import { fancyStanding, liveForFixture } from "@cricket/engine/live.js";
 import { collectOverview } from "@/components/app/match-fancy";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
 
