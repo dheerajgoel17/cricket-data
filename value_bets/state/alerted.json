@@ -1,1 +1,22 @@
-{}
+{
+ "male|India|New Zealand|2026-11-01|batter_milestone||Daryl Mitchell 50+ no|49.5|under": {
+  "edge": 0.0643,
+  "start_utc": "2026-11-01T07:00:00Z",
+  "alerted_at": "2026-10-31T06:49:30.853572+00:00"
+ },
+ "male|India|New Zealand|2026-11-01|batter_fours||Abhishek Sharma under 2.5|2.5|under": {
+  "edge": 0.0574,
+  "start_utc": "2026-11-01T07:00:00Z",
+  "alerted_at": "2026-10-31T06:49:30.853572+00:00"
+ },
+ "male|Afghanistan|Zimbabwe|2026-11-01|batter_milestone||Ibrahim Zadran 50+ no|49.5|under": {
+  "edge": 0.1589,
+  "start_utc": "2026-11-01T14:30:00Z",
+  "alerted_at": "2026-10-31T06:49:30.853572+00:00"
+ },
+ "male|Afghanistan|Zimbabwe|2026-11-01|batter_runs||Ibrahim Zadran under 28.5|28.5|under": {
+  "edge": 0.076,
+  "start_utc": "2026-11-01T14:30:00Z",
+  "alerted_at": "2026-10-31T06:49:30.853572+00:00"
+ }
+}
