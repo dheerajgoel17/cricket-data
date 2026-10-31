@@ -18,7 +18,7 @@ import { FORMATS, fmtIndex } from "@cricket/engine/util.js";
 import { barState, windowRate, windowRates } from "@cricket/engine/windows.js";
 import { useData } from "@/lib/data";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { linesQuery } from "@/lib/queries";
+import { freshState, linesQuery, stateQuery } from "@/lib/queries";
 import { abbr, fixtureStart, localTime, localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { pushRecentPlayer } from "@/lib/saved";
@@ -206,6 +206,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
   const { store } = useData();
   const fixtures = useFixtures();
   const live = useLiveDoc();
+  const state = useQuery(stateQuery);
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
     const priced = pickPricedMatch(doc, pid, fmt, now);
@@ -219,7 +220,9 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
       match = priced.match; start = priced.start_utc; competition = priced.competition || ""; club = priced.team || "";
       row = fx.find((f: any) => sameFixture({ match, start_utc: start, fmt }, f));
       const [h, w] = String(match).split(/\s+vs\s+/i);
-      phase = matchPhase(start, now, liveForFixture(live.data, { a: h, b: w, start, fmt })?.status, fmt);
+      // the live feed's word first (15 s), then the match-state table (a job's, minutes old but one phase for the match), then the clock
+      const asked = { a: h, b: w, start, fmt };
+      phase = matchPhase(start, now, liveForFixture(live.data, asked)?.status ?? liveForFixture(freshState(state.data, now), asked)?.status, fmt);
     } else {
       const women = store.P.g[idx] === 1;
       row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (teamKey(f.a) === teamKey(lastSide || team) || teamKey(f.b) === teamKey(lastSide || team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];
@@ -236,7 +239,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
     return { match, start, competition, team: mine, opp, ground, known, priced: !!priced, phase };
-  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, store]);
+  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, state.data, store]);
 }
 
 function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {

@@ -2,7 +2,7 @@
 // Used by api/og.js (the image) and api/share.js (the page a link preview reads). Plain ESM; the drawing library is loaded only when a card is drawn.
 import { STATS } from "./rules.js";
 import { bookFormatFor, bookLinesFor, bookName, keepMsFor, overProb, teamKey } from "./lines.js";
-import { playerPhotos, teamLogos } from "./photos.js";
+import { playerPhotos, teamJerseys, teamLogos } from "./photos.js";
 import { windowRate } from "./windows.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 
@@ -80,6 +80,7 @@ export function cardFields(q, data) {
       if (listed) { stat = listed.stat; line = listed.line; }
     }
     const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)), idx };
+    f.kitPhotos = teamJerseys(data.photos, indexTeam, false); // a prop card below swaps in the format's kit
     if (f.kind === "prop") {
       f.statKey = stat; f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";
       const hits = (data.lines?.lines || []).filter((l) => l.pid === pid && l.stat === stat && Math.abs(l.line - line) < 0.01);
@@ -97,6 +98,7 @@ export function cardFields(q, data) {
         if (best.under > 1) { f.under = best.under; f.market = overProb(best.over, best.under); }
       }
       f.teamPhotos = teamLogos(data.photos, f.team);
+      f.kitPhotos = teamJerseys(data.photos, f.team, f.fmt === "Test");
       f.oppPhotos = f.opp ? teamLogos(data.photos, f.opp) : [];
       if (data.form?.[pid]) Object.assign(f, data.form[pid]); // last / hit, only when the caller already computed them from the data
     }
@@ -132,8 +134,8 @@ async function asImage(loadImage, buf) {
   try { return await loadImage(buf); } catch { return null; }
 }
 
-/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` / `teamLogo` / `oppLogo` / `bookLogo` / `brandLogo` are image bytes or null. */
-export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = null, bookLogo = null, brandLogo = null, fonts = {} } = {}) {
+/** Draws the card as a JPEG buffer (a fraction of the size of a PNG: link previews drop pictures over ~300 KB). `photo` (the face avatar), `jersey` (the team's shirt picture, drawn over the avatar's bottom third), `teamLogo` / `oppLogo` / `bookLogo` / `brandLogo` are image bytes or null. */
+export async function renderCard(f, { photo = null, jersey = null, teamLogo = null, oppLogo = null, bookLogo = null, brandLogo = null, fonts = {} } = {}) {
   const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
   if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
   if (fonts.regular) GlobalFonts.registerFromPath(fonts.regular, "CardRegular");
@@ -146,14 +148,15 @@ export async function renderCard(f, { photo = null, teamLogo = null, oppLogo = n
     g.fillText(t, x, y); return g.measureText(t).width;
   };
   const img = await asImage(loadImage, photo);
+  const kit = await asImage(loadImage, jersey);
   const teamImg = await asImage(loadImage, teamLogo);
   const oppImg = await asImage(loadImage, oppLogo);
   const bookImg = await asImage(loadImage, bookLogo);
   const brandImg = await asImage(loadImage, brandLogo);
 
-  if (f.kind === "prop") drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg });
+  if (f.kind === "prop") drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg });
   else if (f.kind === "fixture" || f.kind === "venue") drawPlain(g, f, { text, bold, reg });
-  else drawPlayer(g, f, { img, text, bold, reg });
+  else drawPlayer(g, f, { img, kit, text, bold, reg });
   drawBrand(g, text, bold, brandImg);
   return jpegUnder(c);
 }
@@ -186,45 +189,42 @@ function drawPlain(g, f, { text, bold, reg }) {
   }
 }
 
-function drawPlayer(g, f, { img, text, bold, reg }) {
-  drawPortrait(g, f, img, text, bold);
-  text(f.name, 72, 210, 64, "#ffffff", bold, "left", 620);
-  text(f.team, 72, 260, 28, MUTED, reg, "left", 620);
-  text("Stats, form and listed lines", 72, 400, 36, "#ffffff", reg, "left", 620);
+function drawPlayer(g, f, { img, kit, text, bold, reg }) {
+  drawKitPortrait(g, f, img, kit, text, bold);
+  text("PLAYER", 72, 150, 22, GREEN, reg, "left", 560);
+  text(f.name, 72, 232, 72, "#ffffff", bold, "left", 580);
+  text(f.team, 72, 284, 30, MUTED, reg, "left", 580);
+  text("Hit rates, form and listed lines", 72, 420, 36, "#ffffff", reg, "left", 580);
+  text("Free, with every price in decimal", 72, 468, 26, MUTED, reg, "left", 580);
 }
 
-function drawProp(g, f, { img, teamImg, oppImg, bookImg, text, bold, reg }) {
-  drawPortrait(g, f, img, text, bold);
-  const left = 72, max = 620;
-  text(f.name, left, 88, 52, "#ffffff", bold, "left", max);
-  text(f.team, left, 126, 24, MUTED, reg, "left", max);
-  const sub = [f.role, f.fmt].filter(Boolean).join("  ·  ");
-  if (sub) text(sub, left, 154, 20, MUTED, reg, "left", max);
-  drawMatchup(g, f, teamImg, oppImg, text, bold, left, 172);
+function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg }) {
+  drawKitPortrait(g, f, img, kit, text, bold);
+  const left = 72, max = 580;
+  text("PLAYER PROP", left, 92, 22, GREEN, reg, "left", max);
+  text(f.name, left, 158, 66, "#ffffff", bold, "left", max);
+  const sub = [f.team, f.role, f.fmt].filter(Boolean).join("  ·  ");
+  if (sub) text(sub, left, 198, 26, MUTED, reg, "left", max);
+  drawMatchup(g, f, teamImg, oppImg, text, bold, left, 222);
+  if (f.opp && f.when) text(f.when, left + 52 + 56 + 52 + 20, 222 + 26 + 8, 22, MUTED, reg, "left", 300);
 
   const avg = f.l5 && Number.isFinite(Number(f.l5.mean)) ? Number(f.l5.mean) : null;
   const last = f.last && Number.isFinite(Number(f.last.value)) ? Number(f.last.value) : null;
   const hit = f.l5 && Number.isFinite(Number(f.l5.p)) ? Number(f.l5.p) : (f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null);
-  const y1 = 250;
-  const cols = avg != null
-    ? [{ k: "L5", v: fmtAvg(avg), tone: avg > f.line ? "up" : avg < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
+  const cols1 = avg != null
+    ? [{ k: "L5 avg", v: fmtAvg(avg), tone: avg > f.line ? "up" : avg < f.line ? "down" : "" }, { k: "Line", v: `Over ${f.line}` }, { k: "Prop", v: f.stat }]
     : last != null
-      ? [{ k: "Last", v: String(last), tone: last > f.line ? "up" : last < f.line ? "down" : "" }, { k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }]
-      : [{ k: "Line", v: String(f.line) }, { k: "Prop", v: f.stat }, { k: "Price", v: f.price ? f.price.toFixed(2) : "–", tone: "up" }];
-  cols.forEach((c, i) => drawMetric(g, c, left + i * 150, y1, text, bold, reg, 140));
-  drawGauge(g, f, hit, text, bold, 640, 286);
-
-  const y2 = 360;
-  const opp = f.opp ? `vs ${abbr(f.opp)}` : (f.match || "");
+      ? [{ k: "Last", v: String(last), tone: last > f.line ? "up" : last < f.line ? "down" : "" }, { k: "Line", v: `Over ${f.line}` }, { k: "Prop", v: f.stat }]
+      : [{ k: "Line", v: `Over ${f.line}` }, { k: "Prop", v: f.stat }, { k: "Format", v: f.fmt || "—" }];
+  cols1.forEach((c, i) => drawMetric(g, c, left + i * 190, 336, text, bold, reg, i === 2 ? 220 : 170));
   const row2 = [
     hit != null ? { k: "Hit rate", v: `${Math.round(hit * 100)}%`, tone: hit >= 0.6 ? "up" : hit < 0.4 ? "down" : "" } : { k: "Format", v: f.fmt || "—" },
-    last != null || hit != null ? { k: "Format", v: f.fmt || "—" } : { k: "Listed", v: f.book || "—", img: bookImg },
-    { k: "Opponent", v: opp || "—" },
+    f.price ? { k: "Best price", v: f.price.toFixed(2), tone: "up" } : { k: "Listed", v: f.book || "—", img: bookImg },
+    { k: "Opponent", v: f.opp ? abbr(f.opp) : (f.match || "—") },
   ];
-  row2.forEach((c, i) => drawMetric(g, c, left + i * 150, y2, text, bold, reg, i === 2 ? 280 : 140));
+  row2.forEach((c, i) => drawMetric(g, c, left + i * 190, 428, text, bold, reg, i === 2 ? 220 : 170));
 
-  if ((f.last5 && f.last5.length) || last != null) drawLast5(g, f, last, text, bold, reg, left, 430);
-  if (f.price) drawPriceChip(g, f, bookImg, text, bold, 1128, 548);
+  if ((f.last5 && f.last5.length) || last != null) drawLast5(g, f, last, text, bold, reg, left, 522);
 }
 
 function drawMetric(g, { k, v, tone, img }, x, y, text, bold, reg, max = 160) {
@@ -288,21 +288,26 @@ function mark(g, img, x, y, maxW, maxH, align = "left") {
   g.drawImage(img, align === "right" ? x - w : x, y + (maxH - h) / 2, w, h);
 }
 
-function drawPortrait(g, f, img, text, bold) {
-  const x = 720, w = 480;
-  if (img) {
-    const s = Math.max(w / img.width, 630 / img.height), dw = img.width * s, dh = img.height * s;
-    g.drawImage(img, x + (w - dw) / 2, (630 - dh) * 0.08, dw, dh);
-  } else {
-    g.fillStyle = "#1c1c1e"; g.fillRect(x + 40, 80, 400, 470);
-    text(f.initials, x + 240, 360, 140, GREEN, bold, "center");
+/**
+ * The player standing in his team's shirt, the way the site shows him: the face avatar and the shirt are the same width and the shirt rides up over the bottom third of the avatar,
+ * so its collar hides the avatar's cut edge. Bottom-aligned on the right of the card over a soft green glow. Without a shirt it is the avatar alone; without a photo, the initials.
+ */
+function drawKitPortrait(g, f, img, kit, text, bold) {
+  const w = 500, x = 640, bottom = 630;
+  const glow = g.createRadialGradient(x + w / 2, 400, 0, x + w / 2, 400, 360);
+  glow.addColorStop(0, "rgba(39,218,142,0.22)"); glow.addColorStop(1, "rgba(39,218,142,0)");
+  g.fillStyle = glow; g.fillRect(560, 0, 640, 630);
+  if (!img) {
+    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x + 90, 150, 320, 400, 40); g.fill();
+    text(f.initials, x + 250, 400, 140, GREEN, bold, "center");
+    return;
   }
-  const fade = g.createLinearGradient(x - 30, 0, x + 200, 0);
-  fade.addColorStop(0, BG); fade.addColorStop(0.55, "rgba(15,15,15,0.55)"); fade.addColorStop(1, "rgba(15,15,15,0)");
-  g.fillStyle = fade; g.fillRect(x - 30, 0, 260, 630);
-  const bot = g.createLinearGradient(0, 500, 0, 630);
-  bot.addColorStop(0, "rgba(15,15,15,0)"); bot.addColorStop(1, "rgba(15,15,15,0.92)");
-  g.fillStyle = bot; g.fillRect(x, 500, w, 130);
+  const faceH = w * (img.height / img.width);
+  if (!kit) { g.drawImage(img, x, bottom - faceH, w, faceH); return; }
+  const kitH = w * (kit.height / kit.width), kitTop = faceH * 0.666; // the shirt covers the bottom third of the face picture
+  const total = kitTop + kitH, top = bottom - total;
+  g.drawImage(img, x, top, w, faceH);
+  g.drawImage(kit, x, top + kitTop, w, kitH);
 }
 
 function drawPriceChip(g, f, bookImg, text, bold, right, y) {

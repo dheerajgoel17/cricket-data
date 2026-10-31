@@ -84,3 +84,17 @@ Google Analytics 4 loads the same way when `VITE_GA_MEASUREMENT_ID` is set (`sit
 
 **Errors and speed.** Page errors are counted as events named by kind: `error_chunk` (a script of an older deploy was gone; the page reloads itself), `error_render` (a page threw, the Reload button showed), `error_script` and `error_promise` (anything else), at most five per page load, so the totals read on the free plan (the message and page go along as properties, readable on Pro). Loading speed (Core Web Vitals per page) comes from Vercel Speed Insights (`@vercel/speed-insights`, Apache-2.0, free tier): turn on **Speed Insights** in the same project dashboard. Watch for a rise in `error_chunk` right after a deploy (normal, small) and any `error_render` (a bug).
 
+
+## Match state (one phase per match)
+A **Cloudflare Worker** (`state/worker.js`, `state/wrangler.jsonc`, Cron Trigger every minute: GitHub's own cron slips by minutes, so it is not used for this) reads the live feed with the same code the site uses (`site/packages/engine/feed.js`) and writes `public.match_state` (migrations `supabase/migrations/20261031_match_state.sql` and `..._writer.sql`) through the database function `apply_match_state(token, upserts, phases)`: one row per match, rows the feed dropped settled by the clock (in play for the keep window, 24 h or 6 days for a Test, then final). The writer holds only the project's **public** key plus a random write token whose SHA-256 is stored in `private.match_state_writer`; the service key is not involved and the table cannot be written any other way with the public key.
+
+`site/api/state.js` serves the table in the shape of `/api/live` `matches[]`; the player page's match card uses it after the live feed and before the clock (`matchPhase`), and only while the table's last write is under 20 minutes old (`freshState`).
+
+| Name | Where | Used by |
+|---|---|---|
+| `LIVE_SOURCE_BASE`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STATE_WRITE_TOKEN` | **Cloudflare Worker secrets** (`wrangler secret put`, in `state/`) | the writer |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Vercel env (Production and Preview) | `api/state.js` (read-only) |
+
+Deploy: `cd state && npx wrangler deploy`. Rotate the write token: generate a new random string, `update private.match_state_writer set token_hash = encode(extensions.digest('<token>', 'sha256'), 'hex')`, then `wrangler secret put STATE_WRITE_TOKEN`. By hand: `STATE_WRITE_TOKEN=... node site/scripts/state-sync.mjs`, or `curl -H "x-state-key: <token>" https://match-state.<account>.workers.dev` (runs one sync now and answers `{ok, listed, settled, written}`; without the key it is a 404; also usable by an uptime monitor). Check: `select phase, count(*) from match_state group by 1;` and `select max(updated_at) from match_state;` (under two minutes old). Logs: Cloudflare dashboard, Worker `match-state`, Observability. Without the table (not configured, or stale) the site works the phase out itself, as before.
+
+**What belongs on Cloudflare rather than GitHub Actions:** anything on a clock tighter than about 15 minutes (GitHub cron is best-effort and a public repository's schedules are paused after 60 days of no activity) and anything whose source refuses GitHub's US runners (the Mumbai relay already). Heavy batch work (the Python data build, image sync) stays on GitHub.

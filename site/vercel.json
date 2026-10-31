@@ -36,6 +36,9 @@
     "api/share.js": {
       "maxDuration": 10,
       "includeFiles": "public/data/*.json"
+    },
+    "api/state.js": {
+      "maxDuration": 10
     }
   },
   "headers": [

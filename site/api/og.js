@@ -110,9 +110,9 @@ function sendJpeg(res, img) {
   res.setHeader("Content-Type", "image/jpeg");
   res.setHeader("Content-Disposition", 'inline; filename="card.jpg"');
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800");
-  res.setHeader("CDN-Cache-Control", "public, s-maxage=86400, stale-while-revalidate=604800");
-  res.setHeader("Vercel-CDN-Cache-Control", "public, s-maxage=86400, stale-while-revalidate=604800");
+  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600, stale-while-revalidate=3600");
+  res.setHeader("CDN-Cache-Control", "public, s-maxage=600, stale-while-revalidate=3600");
+  res.setHeader("Vercel-CDN-Cache-Control", "public, s-maxage=600, stale-while-revalidate=3600");
   res.setHeader("Content-Length", String(img.length));
   res.end(img);
 }
@@ -138,9 +138,9 @@ export default async function handler(req, res) {
     let f = cardFields(q.path != null ? cardQuery(q.path) : q, loadData()); // /card/<path>.jpg (vercel.json) or the plain query
     if (!f) return sendJpeg(res, await plainJpeg());
     f = await withTimeout(attachForm(f), FORM_MS, f);
-    const [photo, teamLogo, oppLogo] = await Promise.all([firstPhoto(f.photos), firstPhoto(f.teamPhotos), firstPhoto(f.oppPhotos)]);
+    const [photo, jersey, teamLogo, oppLogo] = await Promise.all([firstPhoto(f.photos), firstPhoto(f.kitPhotos), firstPhoto(f.teamPhotos), firstPhoto(f.oppPhotos)]);
     const img = await renderCard(f, {
-      photo, teamLogo, oppLogo,
+      photo, jersey, teamLogo, oppLogo,
       bookLogo: readBookMark(f.source),
       brandLogo: readBrand(),
       fonts: { bold: join(process.cwd(), FONTS.bold), regular: join(process.cwd(), FONTS.regular) },

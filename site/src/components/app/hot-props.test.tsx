@@ -5,7 +5,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[], filters: [] as any[] }));
-vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null }));
+vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null, loadState: async () => null }));
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: env.store, rz: {}, identity: {} }) }));
 vi.mock("@cricket/engine/plan.js", () => ({
   runPlan: async (_s: any, _r: any, _p: any, hints: any) => {
