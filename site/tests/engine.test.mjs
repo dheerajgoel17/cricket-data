@@ -4,7 +4,7 @@ import { loadFixture, sum } from "./helpers.mjs";
 import { runPlan } from "@cricket/engine/plan.js";
 import { playerReport } from "@cricket/engine/props.js";
 import { teamForm } from "@cricket/engine/form.js";
-import { MATCH_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters } from "@cricket/engine/markets.js";
+import { MATCH_MARKETS, marketReport, oversScore, selectMatches, teamOversReport, teamTotalReport, topBatters } from "@cricket/engine/markets.js";
 
 const BROOK_F6 = [0, 2, 1, 0, 0, 3, 1, 0, 2, 0];
 
@@ -78,6 +78,18 @@ test("a team's 2nd innings is not its match total (hand-computed)", () => {
   assert.deepEqual(teamTotalReport(store, [0, 1], 0, "team_total_runs", null, 2).values, [250], "the match where they only batted once is left out, not scored as 0");
   assert.equal(teamTotalReport(store, [0], 0, "team_total_runs", 500.5).summary.over, 1, "610 over 500.5");
   assert.equal(teamTotalReport(store, [0], 0, "team_total_runs", 500.5, 2).summary.over, 0, "250 is under 500.5");
+});
+
+test("session runs after n overs: the tape, all-out before n, rain incomplete (hand-computed)", () => {
+  const inn = (runs, wkts) => { const a = Array(19).fill(0); a[1] = runs; a[2] = wkts; return a; };
+  assert.equal(oversScore([10, 22, 31, 40, 48, 55], inn(150, 4), 6), 55);
+  assert.equal(oversScore([10, 22, 31, 40, 48, 55], inn(150, 4), 1), 10, "first over is the first checkpoint");
+  assert.equal(oversScore([10, 22, 31, 40, 48, 55], inn(80, 10), 10), 80, "all out before 10 overs: the innings total stands");
+  assert.equal(oversScore([10, 22, 31, 40], inn(40, 3), 10), null, "rain after 4 overs is unknown, not zero");
+  const store = { M: { inn: [[inn(150, 4)]], ov: [[[10, 22, 31, 40, 48, 55]]] } };
+  store.M.inn[0][0][0] = 0;
+  assert.deepEqual(teamOversReport(store, [0], 0, 6).values, [55]);
+  assert.equal(teamOversReport(store, [0], 0, 10).n, 0, "never reached 10 and not all out: left out");
 });
 
 test("match fancy: boundaries, first-innings score and a team's own innings", async () => {

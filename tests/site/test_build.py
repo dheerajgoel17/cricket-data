@@ -38,6 +38,8 @@ def test_build_outputs_and_meta(tmp_path):
         inn = M["inn"][m]
         assert sum(i[4] for i in inn) == e["fours"] and sum(i[5] for i in inn) == e["sixes"]
         assert sum(i[6] for i in inn) == e["n30"] and sum(i[7] for i in inn) == e["n50"] and M["ts"][m] == e["top"]
+        assert len(M["ov"][m]) == len(inn) and all(len(tape) == 20 for tape in M["ov"][m])  # a completed T20 over tape
+        assert all(i[15] is not None and i[16] is not None for i in inn)  # extras and run-outs from deliveries
     # an "X tour of Y" event makes Y the host, and Alpha's matches there are away
     hosts = IX["hosts"]
     m0 = byid["t20_00"]

@@ -18,11 +18,12 @@ export function Tick({ value, children, className }: { value: number | null | un
   );
 }
 
-export type Standing = { v: number; state: string; verdict: "cleared" | "missed" | "push" | null };
+export type Standing = { v: number | null; state: string; verdict: "cleared" | "missed" | "push" | null };
 
-/** So-far / final / Cleared against the booked line, flashing when the scorecard moves the number. */
+/** So-far / final / Cleared against the booked line, flashing when the scorecard moves the number. VOID is a fancy side run line that needed the side to bat first. */
 export function StandingMark({ standing, line, className }: { standing: Standing | null | undefined; line?: number; className?: string }) {
   if (!standing) return null;
+  if (standing.state === "void") return <span className={cn("rounded border border-dashed border-amber/60 px-hair text-caption text-amber", className)}>VOID</span>;
   const need = stillNeed(standing.v, line, standing.verdict);
   const tone = standing.verdict === "cleared" ? "text-primary" : standing.verdict === "missed" ? "text-miss" : "text-muted-foreground";
   return (

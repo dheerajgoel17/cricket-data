@@ -13,7 +13,7 @@ RAW = {"matches": [
         q("Team Total Match Sixes", label="9.5", handicap="9.5", side="Over", line="New Zealand", odds_dec=2.1),
         q("Team Total Match Sixes", label="9.5", handicap="9.5", side="Under", line="New Zealand", odds_dec=1.6667),
         q("Highest Individual Score", label="Over 72.5", odds_dec=1.83), q("Highest Individual Score", label="Under 72.5", odds_dec=1.83),
-        q("Total Run Outs - Match", label="Over 0.5", odds_dec=1.73),  # not an engine market: ignored
+        q("Total Run Outs - Match", label="Over 0.5", odds_dec=1.73), q("Total Run Outs - Match", label="Under 0.5", odds_dec=1.90),
         q("Total Match Runs", label="Over", handicap="3", odds_dec=1.0),  # price must be > 1
     ]},
     {"home": "A", "away": "B", "kickoff_utc": "2026-10-27T09:00:00Z", "in_play": True, "quotes": [q("Total Match Runs", label="Over", handicap="300.5", odds_dec=1.9), q("Total Match Runs", label="Under", handicap="300.5", odds_dec=1.9)]},
@@ -24,7 +24,8 @@ def test_pairs_over_and_under_into_lines_keyed_like_the_site_markets():
     out = match_fancy(RAW)
     got = {(x["key"], x["scope"], x["team"], x["line"]): (x["over"], x["under"]) for x in out}
     assert got == {("match_runs", "match", None, 384.5): (1.833, 1.833), ("match_sixes", "match", None, 19.5): (1.9, 1.85),
-                   ("team_total_sixes", "team", "New Zealand", 9.5): (2.1, 1.667), ("top_score", "match", None, 72.5): (1.83, 1.83)}
+                   ("team_total_sixes", "team", "New Zealand", 9.5): (2.1, 1.667), ("top_score", "match", None, 72.5): (1.83, 1.83),
+                   ("match_runouts", "match", None, 0.5): (1.73, 1.9)}
     assert {x["match"] for x in out} == {"New Zealand vs India"} and out[0]["start_utc"] == "2026-10-27T07:00:00Z" and out[0]["source"] == "moviodds_bet365"
 
 

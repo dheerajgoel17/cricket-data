@@ -16,9 +16,10 @@ const MARKET_WORDS = [
   [/\b(team total|team score|innings total|first innings (total|score))\b/, "team_runs"],
   [/\b(highest|biggest|most expensive) over\b/, "highest_over"],
   [/\b(most|biggest) (runs )?conceded\b|\bexpensive bowler\b/, "max_conceded"],
+  [/\bmost wickets\b/, "max_wickets"], [/\bfirst over\b/, "first_over"],
   [/\bdouble[- ]?digit/, "match_double_digits"], [/\bsingle[- ]?digit/, "match_single_digits"],
   [/\b(30s|thirties)\b/, "match_30s"], [/\b(50s|fifties|half[- ]?centuries)\b/, "match_50s"], [/\b(100s|hundreds|centuries)\b/, "match_100s"],
-  [/\bducks?\b/, "match_ducks"],
+  [/\bducks?\b/, "match_ducks"], [/\bextras\b/, "match_extras"], [/\brun[- ]?outs?\b/, "match_runouts"],
   [/\b(sixes|sixs|6s)\b/, "match_sixes"], [/\b(fours|4s)\b/, "match_fours"],
   [/\b(total runs|match total|match runs|runs in the match)\b/, "match_runs"], [/\bwickets\b/, "match_wickets"],
 ];

@@ -567,7 +567,13 @@ export function parseCardPage(html) {
   return {
     id: "", status: "live", start: "", summary: "", note: "", url: "",
     teams: teamList.slice(0, 2).map((name) => ({ name, abbr: name, batting: false, display: "", runs: null, wkts: null, overs: null })),
-    innings: shown.filter((i) => i.runs != null).map((i) => ({ n: i.n, team: i.team, headline: "Batting", fours: i.batters.reduce((a, p) => a + (p.fours || 0), 0), sixes: i.batters.reduce((a, p) => a + (p.sixes || 0), 0), runs: i.runs, wkts: i.wkts, overs: i.overs })),
+    innings: shown.filter((i) => i.runs != null).map((i) => ({
+      n: i.n, team: i.team, headline: "Batting",
+      fours: i.batters.reduce((a, p) => a + (p.fours || 0), 0), sixes: i.batters.reduce((a, p) => a + (p.sixes || 0), 0),
+      runs: i.runs, wkts: i.wkts, overs: i.overs, extras: i.extras?.total ?? null,
+      runouts: i.batters.filter((p) => p.how === 4).length,
+      maxWickets: i.bowlers.reduce((a, b) => Math.max(a, b.wickets || 0), 0),
+    })),
     players, card: shown,
   };
 }
@@ -927,26 +933,53 @@ export function lineNotIn(match, l, idn = NO_IDENTITY) {
   return notInXI(match, l.player, l.team, idn.sourceOf(l.pid), [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean));
 }
 
+function sessionSoFar(inn, n) {
+  if (!inn || !(n > 0) || inn.runs == null || inn.overs == null) return null;
+  return inn.overs <= n ? inn.runs : null; // past n the live total is no longer the session score; all out before n still has overs < n
+}
+
+function oversNof(key) {
+  if (key === "first_over") return 1;
+  const m = /^overs_(\d+)$/.exec(key || "");
+  return m ? +m[1] : 0;
+}
+
 /** So-far for a fancy market. `inn` 1 or 2 is that side's own first or second innings (a Test); 0 sums every innings they have batted. */
 export function liveMarket(match, key, team, inn = 0) {
   if (!match) return null;
   const all = match.innings || [];
   const src = team ? all.filter((i) => teamKey(i.team) === teamKey(team)) : all;
   const rows = inn > 0 ? src.slice(inn - 1, inn) : src;
-  if (!rows.length && !["top_score"].includes(key)) return null;
+  const nOvers = oversNof(key);
+  if (!rows.length && !["top_score", "max_wickets"].includes(key) && !nOvers) return null;
   const sum = (k) => rows.reduce((a, i) => a + (i[k] || 0), 0);
+  if (nOvers) {
+    const row = key === "first_over" ? (team ? src : all).find((i) => i.n === 1) : (inn > 0 ? rows[0] : src[0]);
+    return sessionSoFar(row, nOvers);
+  }
   if (key === "match_runs" || key === "team_total_runs") return sum("runs");
   if (key === "first_innings_runs") return (team ? src : all).find((i) => i.n === 1)?.runs ?? null;
   if (key === "match_sixes" || key === "team_total_sixes") return sum("sixes");
   if (key === "match_fours" || key === "team_total_fours") return sum("fours");
   if (key === "match_boundaries" || key === "team_total_boundaries") return sum("fours") + sum("sixes");
   if (key === "match_wickets" || key === "team_total_wickets") return sum("wkts");
+  if (key === "match_extras" || key === "team_total_extras") return rows.some((i) => i.extras == null) ? null : sum("extras");
+  if (key === "match_runouts" || key === "team_total_runouts") return sum("runouts");
+  if (key === "team_total_highest_over") return null; // the live card has no over tape
   if (key === "top_score") {
     const xs = (match.players || []).map((p) => p.runs).filter((x) => x != null);
     return xs.length ? Math.max(...xs) : null;
   }
+  if (key === "max_wickets") {
+    const xs = (match.players || []).map((p) => p.wickets).filter((x) => x != null);
+    return xs.length ? Math.max(...xs) : (rows.length ? Math.max(0, ...rows.map((i) => i.maxWickets || 0)) : null);
+  }
   if (key === "match_50s") return (match.players || []).filter((p) => (p.runs || 0) >= 50 && (p.runs || 0) < 100).length;
   if (key === "match_30s") return (match.players || []).filter((p) => (p.runs || 0) >= 30 && (p.runs || 0) < 50).length;
+  if (key === "match_ducks" || key === "team_total_ducks") {
+    const ps = (match.players || []).filter((p) => p.out && (p.runs || 0) === 0);
+    return team ? ps.filter((p) => teamKey(p.team) === teamKey(team)).length : ps.length;
+  }
   return null;
 }
 
@@ -958,6 +991,14 @@ export function fancyState(match, { key, team, inn = 0 } = {}) {
   if (!match) return "live";
   if (match.status === "final") return "final";
   const inns = match.innings || [];
+  const nOvers = oversNof(key);
+  if (nOvers) {
+    const src = team ? inns.filter((i) => teamKey(i.team) === teamKey(team)) : inns;
+    const row = key === "first_over" ? src.find((i) => i.n === 1) : src[(inn > 0 ? inn : 1) - 1];
+    if (!row) return "live";
+    if ((row.wkts || 0) >= 10 || (row.overs != null && row.overs >= nOvers) || inns.some((i) => i.n > row.n)) return "final";
+    return "live";
+  }
   if (inn > 0 && team) {
     const src = inns.filter((i) => teamKey(i.team) === teamKey(team));
     const row = src[inn - 1];
@@ -981,12 +1022,25 @@ export function fancyState(match, { key, team, inn = 0 } = {}) {
   return "live";
 }
 
+/** Who batted first, from the live card. Null until an innings has started. */
+function battingFirst(match) {
+  const inns = match?.innings || [];
+  const first = inns.find((i) => i.n === 1) || inns[0];
+  return first?.team || null;
+}
+
 /**
  * Where a fancy market stands on the live snapshot, `{v, state, verdict}` or null: the same shape `lineStanding` gives a player prop, from the innings totals
  * (`liveMarket`) and `lineVerdict`. Overlay this at view time from the 15 s poll; do not bake it into the scored history.
+ * A fancy side run line tagged `bat_first` (first N overs, or the full innings) voids once that side is bowling first; premium fours / sixes are not tagged and stay live for both.
  */
 export function fancyStanding(match, row) {
   if (!match || !row?.key) return null;
+  const batFirst = !!(row.batFirst ?? row.bat_first);
+  if (batFirst && row.team && !(row.inn > 0)) {
+    const first = battingFirst(match);
+    if (first && teamKey(first) !== teamKey(row.team)) return { v: null, state: "void", verdict: null };
+  }
   const v = liveMarket(match, row.key, row.team, row.inn || 0);
   if (v == null) return null;
   const state = fancyState(match, row);

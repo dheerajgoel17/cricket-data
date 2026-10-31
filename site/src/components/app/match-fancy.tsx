@@ -13,7 +13,7 @@ import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { sideEdge } from "@cricket/engine/stats.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, selectMatches, teamTotalReport, topBatters, venueIndices } from "@cricket/engine/markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
@@ -29,9 +29,12 @@ import { EmptyNote } from "./page";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
-export const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"],
-  ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"], ["highest_over", "Top over"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
-export const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"], ["top_batter", "Top batter"]];
+export const MATCH_KEYS: [string, string][] = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["first_over", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
+  ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"], ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"],
+  ["match_extras", "Extras"], ["match_runouts", "Run outs"], ["match_ducks", "Ducks"], ["highest_over", "Top over"], ["max_wickets", "Most wickets"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
+export const TEAM_KEYS: [string, string][] = [["team_total_runs", "Runs"], ["overs_1", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
+  ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"],
+  ["team_total_extras", "Extras"], ["team_total_runouts", "Run outs"], ["team_total_ducks", "Ducks"], ["team_total_highest_over", "Top over"], ["top_batter", "Top batter"]];
 const FANCY_INNS = [0, 1, 2]; // 0 = the whole match (or the side's match total); 1 / 2 = that side's own 1st / 2nd innings (a Test)
 export const fancyFm = (key: string, inn = 0) => (inn ? `${key}:${inn}` : key);
 export const parseFm = (fm: string): { key: string; inn: number } => {
@@ -48,22 +51,34 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const report = marketReport as (store: any, ms: number[], key: string, line?: number | null) => any;
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const teamReport = teamTotalReport as (store: any, ms: number[], team: number, key: string, line?: number | null, inn?: number) => any;
-const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => { line: number; over: number; under: number; source: string }[];
+const oversRep = teamOversReport as (store: any, ms: number[], team: number, n: number, line?: number | null, inn?: number) => any;
+const scoreMarket = (store: any, ms: number[], scope: number, k: string, line?: number | null, inn = 0) => {
+  const n = oversN(k);
+  if (n && scope >= 0) return oversRep(store, ms, scope, n, line, inn);
+  return scope < 0 ? report(store, ms, k, line) : teamReport(store, ms, scope, k, line, inn);
+};
+const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => { line: number; over: number; under: number; source: string; bat_first?: boolean }[];
+const batFirstBooked = (entries: { bat_first?: boolean }[], inn: number, scope: number) => inn === 0 && scope >= 0 && entries.length > 0 && entries.every((e) => e.bat_first);
+const firstInnsMs = (store: any, ms: number[], scope: number) => ms.filter((m) => store.M.fi[m] === scope);
 const innTag = (inn: number) => (inn === 1 ? "1st inns" : inn === 2 ? "2nd inns" : "");
 type BookLine = { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] };
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
-const stepOf = (key: string) => (/runs$|score$/.test(key) ? 5 : 1);
+const stepOf = (key: string) => (/runs$|score$|^overs_/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
 /** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line. `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. Live so-far is overlaid later (`fancyStanding`), not baked in here. */
 export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, ground, inn = 0, nameInLabel = false }: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; ground?: number[]; inn?: number; nameInLabel?: boolean }) {
   if (!ms.length || !doc) return [];
   const rows = keys.filter(([k]) => k !== "top_batter").flatMap(([k]) => {
-    const all = byLine(fancyLines(doc, fxInfo, k, teamName, inn));
+    const booked = fancyLines(doc, fxInfo, k, teamName, inn);
+    const all = byLine(booked);
     // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
     const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
     if (!b) return [];
-    const run = (line: number) => (scope < 0 ? report(store, ms, k, line) : teamReport(store, ms, scope, k, line, inn));
+    const batFirst = batFirstBooked(booked, inn, scope);
+    const sample = batFirst ? firstInnsMs(store, ms, scope) : ms;
+    const groundSample = batFirst && ground ? firstInnsMs(store, ground, scope) : ground;
+    const run = (line: number) => scoreMarket(store, sample, scope, k, line, inn);
     const so = lo ? run(lo.line).summary : null, su = lu ? run(lu.line).summary : null, base = so ?? su;
     if (!base || !base.n) return [];
     const eo = lo && so ? sideEdge(so.over, so.over + so.under, lineProb(lo.books), lo.over) : null;
@@ -73,10 +88,10 @@ export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, l
     const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
     const rep = run(b.line);
     // the same line scored on the matches at the ground alone: how the market has gone there (a ground can sit far from the sides' form)
-    const gs = ground && ground.length >= GROUND_MIN ? (scope < 0 ? report(store, ground, k, b.line) : teamReport(store, ground, scope, k, b.line, inn)).summary : null;
+    const gs = groundSample && groundSample.length >= GROUND_MIN ? scoreMarket(store, groundSample, scope, k, b.line, inn).summary : null;
     const at = gs && gs.n >= GROUND_MIN ? { n: gs.n, over: gs.over, under: gs.under, side: gs.under > gs.over ? "under" : "over" } : null;
     const shown = [nameInLabel && teamName ? abbr(teamName) : "", innTag(inn), label(k)].filter(Boolean).join(" · ");
-    return [{ key: k, inn, scope, team: teamName, id: fancyFm(`${scope}:${k}`, inn), label: shown, line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, at, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
+    return [{ key: k, inn, scope, team: teamName, batFirst, id: fancyFm(`${scope}:${k}`, inn), label: shown, line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks, overBook: src(lo, "over"), underBook: src(lu, "under"), side, edge: side === "over" ? eo : eu, at, last: (rep.values as number[]).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) }];
   });
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
 }
@@ -120,7 +135,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any };
 
 /**
- * Match Fancy: whole-match and team-total markets (runs, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
+ * Match Fancy: whole-match and team-total markets (runs, session overs, extras, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
  * in this format. A Test team's 1st/2nd innings total is its own row, scored on that turn only. A "Bookmaker lines" list shows every market the books
  * price, one row each in the props-list style; the market chips open any market in a detail panel with the median, a chart of every recent match against
  * the line, over / under shares and fair prices, and a tappable line ladder.
@@ -146,7 +161,6 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   const win = WINDOWS.includes(Number(q.mw)) ? Number(q.mw) : 20;
   const fmtIdx = FORMATS.indexOf(fmt);
   const marketLabel = (k: string) => (scope < 0 ? MATCH_KEYS : TEAM_KEYS).find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : ((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string);
-  const run = (k: string, line?: number | null, ms_ = ms) => (scope < 0 ? report(store, ms_, k, line) : teamReport(store, ms_, scope, k, line, inn));
 
   // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
   const venueIdx = useMemo(() => (venueIndices as (s: any, n: string) => number[])(store, fx.venue), [store, fx.venue]);
@@ -159,6 +173,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => selectMatches(store, { fmt: fmtIdx, gender, team: i, lastN: win }) as number[]);
     return [...new Set(sets.flat())].sort((a, b) => a - b);
   }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  const bookedNow = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null, inn)), [doc.data, fxInfo, key, team, inn]);
+  const batFirstNow = batFirstBooked(bookedNow, inn, scope);
+  const scoredMs = useMemo(() => (batFirstNow ? firstInnsMs(store, ms, scope) : ms), [ms, batFirstNow, store, scope]);
+  const run = (k: string, line?: number | null, ms_ = scoredMs) => scoreMarket(store, ms_, scope, k, line, inn);
 
   // every market the books price, scored on the same matches and ranked by the better side's edge (like the props list ranks by hit rate)
   const overview = useMemo(() => {
@@ -169,36 +187,36 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const book = useMemo(() => (!key || key === "top_batter" ? [] : byLine(fancyLines(doc.data, fxInfo, key, team?.[0] ?? null, inn))), [doc.data, fxInfo, key, team, inn]);
-  const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, ms, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
+  const book = useMemo(() => byLine(bookedNow), [bookedNow]);
+  const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
   const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : (book.find((l) => l.over != null && l.under != null) ?? book.find((l) => l.over != null) ?? book[0])?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
-  const liveSoFar = (key && key !== "top_batter" ? fancyStanding(liveMatch, { key, team: team?.[0] ?? null, inn, line }) : null) as Standing | null;
-  const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, ms, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
+  const liveSoFar = (key && key !== "top_batter" ? fancyStanding(liveMatch, { key, team: team?.[0] ?? null, inn, line, batFirst: batFirstNow }) : null) as Standing | null;
+  const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, scoredMs, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
   // ladder rows: the engine's lines around the median plus the bookmaker's own line(s), computed on the same matches
   const ladder = useMemo(() => {
     if (!rep) return [];
     const have = new Set(rep.ladder.map((l: any) => l.line));
     const extra = book.filter((b) => !have.has(b.line)).map((b) => run(key, b.line).summary);
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
-  }, [rep, book, store, ms, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
   // how this market has gone at the ground, set against the sample on screen: a ground can sit far from the teams' form (a small, slow one)
   const ground = useMemo(() => {
     if (!rep || key === "top_batter" || venueIdx.length === 0) return null;
-    const vms = hereMatches(10);
+    const vms = batFirstNow ? firstInnsMs(store, hereMatches(10), scope) : hereMatches(10);
     if (vms.length < HERE_MIN) return null;
     const r = run(key, line, vms).summary, n = vms.length;
     const share = (hit: number, total: number) => (total ? hit / total : 0);
     return { n, under: r.under, over: r.over, max: r.max, differs: !here && Math.abs(share(r.under, n) - share(rep.summary.under, rep.n)) >= DIFFERS };
   }, [rep, key, line, venueIdx, scope, fmtIdx, store, here]); // eslint-disable-line react-hooks/exhaustive-deps
-  // the date and the sides of each match under its bar (the values are the matches of `ms`, oldest first)
-  const barLabels = useMemo(() => ms.map((m) => {
+  // the date and the sides of each match under its bar (the values are the matches of `scoredMs`, oldest first)
+  const barLabels = useMemo(() => scoredMs.map((m) => {
     const M = store.M, a = M.a[m], b = M.b[m];
     const d = new Date(`${M.d[m]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
     const opp = scope >= 0 ? (a === scope ? b : a) : -1;
     return { date: d, text: scope >= 0 ? `v ${abbr(store.teamName(opp, true))}` : `${abbr(store.teamName(a, true))} v ${abbr(store.teamName(b, true))}` };
-  }), [ms, store, scope]);
+  }), [scoredMs, store, scope]);
   const open = (k: string) => { track("fancy_market", { market: k }); set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
 
@@ -211,7 +229,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
         )}
         <div className="flex items-center gap-snug">
           <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
-          <span className="min-w-0 truncate text-footnote text-muted-foreground">{ms.length} {fmt} matches{here ? ` at ${venueName}` : scope >= 0 ? ` of ${team?.[0]}` : ""}{ms.length ? ` · through ${new Date(`${store.M.d[ms[ms.length - 1]]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}` : ""}{ms.some((m) => store.M.pv[m]) ? " · includes scraped matches" : ""}</span>
+          <span className="min-w-0 truncate text-footnote text-muted-foreground">{scoredMs.length} {fmt} matches{here ? ` at ${venueName}` : scope >= 0 ? ` of ${team?.[0]}` : ""}{batFirstNow ? " batting first" : ""}{scoredMs.length ? ` · through ${new Date(`${store.M.d[scoredMs[scoredMs.length - 1]]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}` : ""}{scoredMs.some((m) => store.M.pv[m]) ? " · includes scraped matches" : ""}</span>
         </div>
         {venueIdx.length > 0 && (
           <PillGroup segmented layoutId="fancy-sample" label="Matches from" value={here ? "1" : "0"} onChange={(v) => set({ mv: v === "1" ? "1" : "" })}

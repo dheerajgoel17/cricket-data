@@ -68,13 +68,18 @@ def test_fancy_yes_is_over_line_minus_half_and_no_is_under_line_minus_half():
     assert (by["team_total_runs", 315.5]["over"], by["team_total_runs", 315.5]["under"]) == (2.0, None)
     assert (by["team_total_runs", 311.5]["over"], by["team_total_runs", 311.5]["under"]) == (None, 2.0)
     assert by["team_total_runs", 315.5]["team"] == "England" and by["team_total_runs", 315.5]["bat_first"] and by["team_total_runs", 315.5]["rules"] == "void_any_ball"
+    # 10 Over Run ENG 61 / 59: over 60.5 and under 58.5; fancy side run lines void if that side bowls first
+    assert (by["overs_10", 60.5]["over"], by["overs_10", 58.5]["under"], by["overs_10", 60.5]["team"]) == (2.0, 2.0, "England")
+    assert by["overs_10", 60.5]["bat_first"] and by["team_total_runs", 315.5]["bat_first"]
+    # Match 1st Over Run Adv 5 / 4: over 4.5 and under 3.5
+    assert (by["first_over", 4.5]["over"], by["first_over", 3.5]["under"]) == (2.0, 2.0)
     # match fours 50 / 47: over 49.5, under 46.5; fifties 3 / 3 at 80 / 130: one two-way line at 2.5
     assert (by["match_fours", 49.5]["over"], by["match_fours", 46.5]["under"]) == (2.0, 2.0)
     assert (by["match_50s", 2.5]["over"], by["match_50s", 2.5]["under"], by["match_50s", 2.5]["rules"]) == (1.8, 1.769, "not_voided_by_lost_balls")
     # player performance (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping): H Brook 32 / 34 at 100 / 100 is Yes at 34 (over 33.5) and No at 32 (under 31.5)
     assert [(r["player"], r["market_type"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "player_points"] == [("H Brook", "player_points", 33.5, "over", 2.0), ("H Brook", "player_points", 31.5, "under", 2.0)]
-    # not read: first-over, 10-over, wicket-fall, meter and khado markets
-    assert {"1st Wkt Meter Eng", "Match 1st Over Run Adv"} <= set(left) and "H Brook" not in left
+    # not read: wicket-fall, meter and khado markets
+    assert {"1st Wkt Meter Eng"} <= set(left) and "H Brook" not in left and "Match 1st Over Run Adv" not in left
 
 
 def test_a_suspended_or_ball_running_market_is_not_a_price():
