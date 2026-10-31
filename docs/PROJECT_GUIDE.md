@@ -92,7 +92,7 @@ Output files in `site/public/data/` (all JSON, columnar = one array per field; *
 Rebuilding is deterministic apart from timestamps. Size: ~35 MB raw, ~12 MB compressed.
 
 ### 5.2 Engine (`site/src/engine`, dependency-free ES modules; runs in browser and node)
-`identity.js` (lookups over the identity table: our id <-> the live source's id, the books' names) · `store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `props.js` (player report, DNP-aware form chart over team
+`identity.js` (lookups over the identity table: our id <-> the live source's id, the books' names) · `store.js` (load + join rows to matches; home/away; shards) · `filters.js` · `stats.js` (hit rate, Wilson interval, fair odds; pushes void) · `lines.js` (book lines; two stamps of one fixture within the 14 h / 6-day window are one match) · `props.js` (player report, DNP-aware form chart over team
 fixtures, correlated props) · `markets.js` (match/team markets, top batter) · `partnership.js` · `resolve.js` (typo-tolerant player/team/venue/competition resolution) · `plan.js` (query plans: sanitize,
 resolve, run) · `nl.js` (rule-based question parser, the LLM fallback) · `prompt.js` (LLM instruction) · `live.js` (Source A snapshot parse, name match, so-far vs line, `settleLines`: the server's per-line results) · `rules.js`, `util.js`.
 **Invariant: every number shown comes from the engine; the LLM only emits a validated plan** (`sanitizePlan` whitelists fields; see `site/tests/nlp.test.mjs`).

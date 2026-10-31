@@ -49,11 +49,12 @@ export function otherHotCount(lines: any[], day: number, now = Date.now()): numb
   }).length;
 }
 
-/** One chip per match: a Test's day-by-day book starts share a chip; a limited-overs line keeps its own kick-off. */
+/** One chip per match: a Test's day-by-day book starts share a chip; a limited-overs line groups by UTC date so two books a few minutes apart are one fixture, not two kick-offs. */
 export function matchChipId(match: string, start: string, fmt?: string): string {
   const [a, b] = String(match).split(/\s+vs\s+/i);
   const pair = [norm(a), norm(b)].sort().join("|");
-  return fmt === "Test" || fmt === "FC" ? `${pair}|${fmt}` : `${pair}|${start}`;
+  const day = String(start || "").slice(0, 10);
+  return fmt === "Test" || fmt === "FC" ? `${pair}|${fmt}` : `${pair}|${day}`;
 }
 
 export type HotScope =

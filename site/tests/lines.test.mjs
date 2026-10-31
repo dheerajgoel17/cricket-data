@@ -55,6 +55,21 @@ test("bookStatsFor lists the stats priced on the nearest match, not a later one 
   assert.deepEqual(bookStatsFor(null, "ab12", "T20", NOW), []);
 });
 
+test("two books that stamp the same fixture minutes apart are one match (a sixes line is not dropped for an earlier performance stamp)", () => {
+  // Pakistan vs Sri Lanka 31 Oct 2026: one feed at 07:30 with only player performance, another at 08:00 with sixes / runs
+  const points = L(33.5, 1.9, 1.9, { stat: "points", fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-10-31T07:30:00Z", competition: " /  / " });
+  const sixes = L(0.5, 3.0, 1.36, { stat: "sixes", fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-10-31T08:00:00Z" });
+  const runs = L(26.5, 1.85, 1.95, { stat: "runs", fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-10-31T08:00:00Z" });
+  const later = L(1.5, 1.9, 1.9, { stat: "wickets", fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-11-02T08:00:00Z" }); // the next ODI of the series
+  const now = Date.parse("2026-10-31T06:00:00Z");
+  const doc = { lines: [points, sixes, runs, later] };
+  assert.deepEqual([...bookStatsFor(doc, "ab12", "ODI", now)].sort(), ["points", "runs", "sixes"]);
+  assert.equal(bookLinesFor(doc, "ab12", "sixes", "ODI", now).main.line, 0.5);
+  const pts = bookLinesFor({ lines: [points, L(29.5, 1.83, 1.83, { stat: "points", fmt: "ODI", match: "Pakistan vs Sri Lanka", start_utc: "2026-10-31T08:00:00Z" })] }, "ab12", "points", "ODI", now);
+  assert.deepEqual(pts.lines.map((x) => x.line), [29.5, 33.5], "the same stat on both stamps is one ladder");
+  assert.equal(bookStatsFor({ lines: [points, later] }, "ab12", "ODI", now)[0], "points", "a start two days later is a different match");
+});
+
 test("bookFormatFor names the format the books price a player in, the soonest match and the asked stat first", () => {
   const doc = { lines: [L(72.5, 1.83, 1.83, { fmt: "Test", start_utc: "2026-10-27T04:30:00Z" }), L(1.5, 1.9, 1.9, { fmt: "T20", stat: "sixes", start_utc: "2026-10-27T07:00:00Z" }),
     L(9.5, 1.9, 1.9, { pid: "zz99", fmt: "ODI" })] };

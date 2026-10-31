@@ -71,17 +71,38 @@ export function bookQuotes(lines) {
 export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, inn = 0) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
   if (!all.length) return null;
-  const first = Math.min(...all.map(startOf));
-  const here = all.filter((l) => startOf(l) === first && lineScope(l) === inn);
+  const here = ofNearestMatch(all).filter((l) => lineScope(l) === inn);
   if (!here.length) return null;
-  const mine = here.map((l) => ({ line: l.line, books: l.books, prob: lineProb(l.books) })).sort((a, b) => a.line - b.line);
-  const ref = here[0];
+  const byLine = new Map();
+  for (const l of here) {
+    const g = byLine.get(l.line) || { line: l.line, books: [] };
+    g.books.push(...(l.books || []));
+    byLine.set(l.line, g);
+  }
+  const mine = [...byLine.values()].map((l) => ({ ...l, prob: lineProb(l.books) })).sort((a, b) => a.line - b.line);
+  const ref = here.reduce((a, l) => (startOf(l) < startOf(a) ? l : a));
   const scored = mine.filter((l) => l.prob != null), withOver = mine.filter((l) => l.books.some((b) => b.over > 1)); // a line is "the" line by its over: an under-only line (an exchange's No) is never the main one while an over is priced
   const main = (scored.length ? scored : withOver.length ? withOver : mine).reduce((best, l) => (best == null || Math.abs((l.prob ?? 0.5) - 0.5) < Math.abs((best.prob ?? 0.5) - 0.5) - 1e-9 ? l : best), null);
   return { match: ref.match, competition: ref.competition, start_utc: ref.start_utc, team: ref.team, inn, result: ref.result ?? null, book_name: ref.book_name || "", lines: mine, main }; // `team`: the side the book files him under; `book_name`: the spelling the books print; `result`: the archive file's stored number when this line has one
 }
 
 const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
+
+/** The nearest open line's match, plus any other of the same two sides whose start is within the book window (14 h, 6 days for a Test). Books stamp one fixture minutes apart. */
+function ofNearestMatch(lines) {
+  if (!lines.length) return [];
+  const first = Math.min(...lines.map(startOf));
+  const nearest = lines.find((l) => startOf(l) === first);
+  return lines.filter((l) => sameBookMatch(l, nearest));
+}
+
+/** Same two sides, same format, starts within the book window. Falls back to an exact start when a row has no pair of names. */
+function sameBookMatch(a, b) {
+  if (b?.home && b?.away) return sameFixture(a, { a: b.home, b: b.away, start: b.start_utc, fmt: b.fmt });
+  const [p, q] = String(b?.match || "").split(/\s+vs\s+/i);
+  if (!q) return startOf(a) === startOf(b);
+  return sameFixture(a, { a: p, b: q, start: b.start_utc, fmt: b.fmt });
+}
 
 /** The player's lines that are still open (the match has not started more than `graceMs` ago) in this format, every stat and scope. */
 function openPlayerLines(doc, pid, fmt, now, graceMs) {
@@ -100,8 +121,7 @@ function openLines(doc, pid, stat, fmt, now, graceMs) {
 export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
   const all = openPlayerLines(doc, pid, fmt, now, graceMs);
   if (!all.length) return [];
-  const first = Math.min(...all.map(startOf));
-  return [...new Set(all.filter((l) => startOf(l) === first).map((l) => l.stat))];
+  return [...new Set(ofNearestMatch(all).map((l) => l.stat))];
 }
 
 /**
@@ -111,8 +131,7 @@ export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600
 export function bookScopesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
   if (!all.length) return [];
-  const first = Math.min(...all.map(startOf));
-  return [...new Set(all.filter((l) => startOf(l) === first).map(lineScope))].sort((a, b) => a - b);
+  return [...new Set(ofNearestMatch(all).map(lineScope))].sort((a, b) => a - b);
 }
 
 /**
