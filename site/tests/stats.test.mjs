@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { fairOdds, shrunkProb, sideEdge, summarize, wilson } from "../src/engine/stats.js";
-import { assertSingleFormat } from "../src/engine/filters.js";
+import { fairOdds, shrunkProb, sideEdge, summarize, wilson } from "@cricket/engine/stats.js";
+import { assertSingleFormat } from "@cricket/engine/filters.js";
 
 test("half lines: over/under hit rates and fair decimal odds", () => {
   const s = summarize([0, 2, 1, 0, 0, 3, 1, 0, 2, 0], 0.5);
@@ -70,4 +70,12 @@ test("no edge is claimed from under ten games, with no price, or with no market 
   assert.equal(sideEdge(8, 10, null, 1.9), null);
   assert.equal(sideEdge(8, 10, 0.5, undefined), null);
   near(sideEdge(3, 5, 0.5, 2, 5) ?? NaN, (3 + 10 * 0.5) / 15 * 2 - 1); // a caller may lower the bar: 8/15 * 2 - 1 = 0.0667
+});
+
+test("data freshness: reads the base date from either meta key and never prints undefined", async () => {
+  const { Store } = await import("@cricket/engine/store.js");
+  const f = (meta) => Store.prototype.freshness.call({ meta });
+  assert.equal(f({ newest_base: "2026-10-25" }).newestBase, "2026-10-25");
+  assert.equal(f({ newest_older_build: "2026-10-24", newest_provisional: "2026-10-27" }).newestBase, "2026-10-24"); // an older build's key; the provisional date is not the base date
+  assert.equal(f({ newest_provisional: "2026-10-27" }).newestBase, null);
 });

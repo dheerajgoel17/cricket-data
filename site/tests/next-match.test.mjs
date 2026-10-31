@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { atGround, matchPhase, nextMatchRates, pickPricedMatch, vsSide } from "../src/engine/next-match.js";
+import { atGround, matchPhase, nextMatchRates, pickPricedMatch, vsSide } from "@cricket/engine/next-match.js";
 
 const e = (value, extra = {}) => ({ value, ...extra });
 

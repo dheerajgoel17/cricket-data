@@ -31,7 +31,7 @@ describe("NextMatch", () => {
     expect(screen.getByText("fair 1.88")).toBeInTheDocument();
     expect(screen.getByText("3 of 7")).toBeInTheDocument();
     expect(screen.getByText("fair 2.33")).toBeInTheDocument();
-    expect(screen.getByText(/In T20/)).toBeInTheDocument();
+    expect(screen.getByRole("note", { name: "How to read this" })).toHaveTextContent(/T20 games he played on this line/);
   });
 
   it("says when the books price a different line", () => {

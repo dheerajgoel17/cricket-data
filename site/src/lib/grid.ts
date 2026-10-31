@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { STATS } from "@/engine/rules.js";
-import { FORMATS } from "@/engine/util.js";
+import { STATS } from "@cricket/engine/rules.js";
+import { FORMATS } from "@cricket/engine/util.js";
 
 export interface Grid { fx: number[]; body: { p: number; map: Map<number, any>; xi: any; n: number }[]; def?: any }
 

@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { applyFilters, teamInningNo } from "../src/engine/filters.js";
-import { createStore } from "../src/engine/store.js";
-import { Resolver } from "../src/engine/resolve.js";
-import { playerReport } from "../src/engine/props.js";
-import { runPlan, sanitizePlan } from "../src/engine/plan.js";
+import { applyFilters, teamInningNo } from "@cricket/engine/filters.js";
+import { createStore } from "@cricket/engine/store.js";
+import { Resolver } from "@cricket/engine/resolve.js";
+import { playerReport } from "@cricket/engine/props.js";
+import { runPlan, sanitizePlan } from "@cricket/engine/plan.js";
 
 // Three Tests between Alpha (team 0) and Beta (team 1). `inn` lists each match's innings in batting order, by team.
 //   match 0: Alpha bat first   [A, B, A, B]   Batter (Alpha): 40 in innings 1, 10 in innings 3

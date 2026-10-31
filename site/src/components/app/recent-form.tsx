@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { teamForm } from "@/engine/form.js";
-import { FORMATS } from "@/engine/util.js";
+import { teamForm } from "@cricket/engine/form.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";

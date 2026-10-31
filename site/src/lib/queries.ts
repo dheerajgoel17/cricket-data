@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
-import { LIVE_TTL_MS } from "@/engine/live.js";
+import { LIVE_TTL_MS } from "@cricket/engine/live.js";
 import { loadLines, loadLive, loadRail } from "@/lib/feeds";
 import { readLive } from "@/lib/live-cache";
 

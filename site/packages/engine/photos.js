@@ -25,3 +25,16 @@ export function teamLogos(photos, name) {
   return [held(photos, "t", id) ? `${photos.base}/teams/${id}.png` : null, `${cdn()}/Teams/${id}.png`].filter(Boolean);
 }
 export const teamLogo = (photos, name) => teamLogos(photos, name)[0] ?? null;
+
+/**
+ * The team's kit picture (a shirt on its own, transparent): the player portrait is his face avatar standing in it. Two kits exist, the coloured limited-overs one
+ * and the white Test one. Our own stored copy (`s.j`) first, the source second, and the portrait works without either.
+ */
+export function teamJerseys(photos, name, test = false) {
+  const key = fold(String(name).replace(/\(w\)/i, "").replace(/\bwomen\b/i, ""));
+  const kit = test ? "test" : "limited";
+  const url = (id) => [photos?.base && photos?.s?.j?.includes(`${id}:${kit}`) ? `${photos.base}/jerseys/${kit}/${id}.png` : null, `${cdn()}/jersey/${kit}/org/${id}.png`];
+  const id = photos?.t?.[key];
+  // the team's own shirt, then the source's plain placeholder shirt (what its own pages fall back to when a team has none)
+  return [...(id ? url(id) : []), ...url("AD")].filter(Boolean);
+}

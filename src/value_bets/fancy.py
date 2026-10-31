@@ -6,7 +6,7 @@ Feed E give those). ``inn`` is part of the line's key. The Match Fancy tab score
 These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score, run-outs,
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,
 paired into a line with its over and under decimal prices, and published as ``fancy`` in ``book_lines.json``. Keys match the site's engine
-markets (``site/src/engine/markets.js``). Back prices only; nothing here prices or recommends a bet.
+markets (``site/packages/engine/markets.js``). Back prices only; nothing here prices or recommends a bet.
 """
 from __future__ import annotations
 

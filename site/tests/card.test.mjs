@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cardFields, cardPath, cardQuery, cardText, propForm, renderCard } from "../src/engine/card.js";
+import { cardFields, cardPath, cardQuery, cardText, propForm, renderCard } from "@cricket/engine/card.js";
 import { parseShare } from "../api/share.js";
 
 const data = {

@@ -49,6 +49,8 @@ export function shareMetas({ title, description, url = "", image = "", alt = "" 
 /** Pages with a fixed title and description, by their first path segment ("" is the home page). `noindex` pages are kept out of search results. */
 export const ROUTES = {
   "": { title: `${BRAND}: ${TAGLINE.toLowerCase()}`, description: DEFAULT_DESC },
+  props: { title: "Cricket player props: hit rates and listed lines", description: "Today's cricket player props ranked by hit rate: runs, wickets, fours and sixes over the listed line, with last-10 form, head-to-head and ground records and the best decimal price." },
+  fancy: { title: "Cricket fancy lines: match totals and over/unders", description: "Match totals and fancy lines for every priced cricket match, with the edge against the last ten results." },
   players: { title: "Cricket player stats and prop hit rates", description: "Search any cricketer: runs, wickets, sixes and fours hit rates over every line, recent form and listed lines." },
   teams: { title: "Cricket teams and grounds", description: "Team and ground stats: how many runs, sixes and fours fall at each venue, with team form and the player grid." },
   competitions: { title: "Cricket competitions and leagues", description: "Every league and series in the data: team tables, match totals, sixes, fours and top scores." },

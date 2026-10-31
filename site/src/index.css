@@ -1,100 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@ionic/core/css/core.css"; /* variables and utility classes only; used by the phone tab bar */
-@import "@fontsource-variable/geist";
-@import "@fontsource/barlow-condensed/400.css";
-@import "@fontsource/barlow-condensed/500.css";
-@import "@fontsource/barlow-condensed/600.css";
-@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource-variable/inter";
+@import "@fontsource/barlow-semi-condensed/400.css";
+@import "@fontsource/barlow-semi-condensed/500.css";
+@import "@fontsource/barlow-semi-condensed/600.css";
 @import "@fontsource/bebas-neue";
+@import "./tokens.generated.css"; /* colours, sizes, type scale, spacing: generated from packages/tokens/tokens.json (npm run tokens) */
 
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens: change colours here only. True-black canvas, accent #27DA8E. html.dark stays on so shadcn dark: variants match. */
+/* Design tokens live in packages/tokens/tokens.json (true-black canvas, accent #27DA8E); html.dark stays on so shadcn dark: variants match. Role names (text-body, gap-stack, control, ...) are shared with future native apps. */
 :root {
-  color-scheme: dark;
-  --radius: 0.75rem;
-  --background: #000000;
-  --foreground: #ffffff;
-  --card: #1c1c1e;
-  --card-foreground: #ffffff;
-  --popover: #2c2c2e;
-  --popover-foreground: #ffffff;
-  --primary: #27da8e;
-  --primary-foreground: #0f0f0f;
-  --secondary: #2c2c2e;
-  --secondary-foreground: #ffffff;
-  --muted: #1c1c1e;
-  --muted-foreground: #8e8e93;
-  --accent: #3a3a3c;
-  --accent-foreground: #ffffff;
-  --destructive: #ff4444;
-  --border: #2c2c2e;
-  --input: #1c1c1e;
-  --ring: #27da8e;
-  --sidebar: #000000;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #27da8e;
-  --sidebar-primary-foreground: #0f0f0f;
-  --sidebar-accent: #1c1c1e;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1c1c1e;
-  --sidebar-ring: #27da8e;
-  --hit: #27da8e;
-  --miss: #ff0000;
-  --dnp: #999999;
-  --amber: #f5a524;
-  --pill: #2c2c2e;
-  --hairline: rgba(255, 255, 255, 0.10);
-  --surface: rgba(255, 255, 255, 0.03);
-  --surface-hover: rgba(255, 255, 255, 0.06);
-  --scrim: rgba(0, 0, 0, 0.40);
   --ion-background-color: var(--background);
   --ion-text-color: var(--foreground);
-}
-/*
- * Type and spacing scales: named roles only (src/lib/design-tokens.test.ts).
- * The look is iOS-inspired (true-black, pills, glass); the sizes are a compact web scale so the
- * same CSS works on desktop and in Android/iOS browsers. Future Expo apps should reuse these
- * role names (text-body, gap-stack, control, …) and only swap the values for HIG / Material.
- */
-:root {
-  --font-sans-stack: "Geist Variable", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --body-size: 14px;
-  --header-h: 3.5rem;
-  --tabbar-h: 3.0625rem;   /* 49: the iOS tab bar; the safe area is added by the bar and by the page */
-  --tabbar-pad: 0rem;
-  --control: 2.25rem;       /* 36: tappable without iOS-native 44 */
-  --chip-radius: 999px;     /* fully rounded pills */
-  --row-min: 3.5rem;
-  --fixture-card: 80vw;     /* phone peek rail: one card is 80% of the screen so the next one shows */
-  --gutter: 0.875rem;
-  --content-max: 100%;
-  --fs-display: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);
-  --fs-display-lh: 1.15;
-  --fs-display-ls: -0.02em;
-  --fs-title: 1.125rem;
-  --fs-title-lh: 1.25;
-  --fs-title-ls: -0.015em;
-  --fs-body: 0.9375rem;
-  --fs-body-lh: 1.3;
-  --fs-callout: 0.8125rem;
-  --fs-callout-lh: 1.35;
-  --fs-footnote: 0.75rem;
-  --fs-footnote-lh: 1.3;
-  --fs-caption: 0.625rem;
-  --fs-caption-lh: 1.2;
-  --fs-metric: 1.25rem;
-  --fs-metric-lh: 1.1;
-  --fs-stat: 1.875rem;
-  --fs-stat-lh: 1;
-  --space-hair: 0.25rem;
-  --space-tight: 0.375rem;
-  --space-snug: 0.625rem;
-  --space-stack: 1rem;
-  --space-group: 1.25rem;
-  --space-section: 2rem;
-  --space-inset: 0.875rem;
 }
 @media (min-width: 768px) { :root { --gutter: 1.25rem; } }
 @media (min-width: 1024px) {
@@ -145,9 +64,17 @@
   --spacing-row: var(--row-min);
 }
 
+/* Type pairing. Props.Cash sets text in Diatype (400/500/700) and every number and label in Diatype Condensed 500 at text size; both are paid fonts, so the free stand-ins are:
+ *   Inter 400-800            names, headings, body, buttons                         (neo-grotesque, the closest free match to Diatype)
+ *   Barlow Semi Condensed    numbers (hit rates, odds, edge, stat values) and small uppercase labels (label-cap), at text size, 500-600
+ *   Bebas Neue               brand moments only (--font-brand), never data
+ * Condensed stays small (15-20 px): it is for scanning figures, not for display sizes. */
+@utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+@utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; }
+
 @theme inline {
   --font-sans: var(--font-sans-stack);
-  --font-condensed: "Barlow Condensed", "Diatype Condensed", "Arial Narrow", sans-serif;
+  --font-condensed: "Barlow Semi Condensed", "Arial Narrow", sans-serif;
   --font-brand: "Bebas Neue", Impact, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);

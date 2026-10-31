@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
-import { STATS } from "@/engine/rules.js";
+import { STATS } from "@cricket/engine/rules.js";
 import { useData } from "@/lib/data";
 import type { Grid } from "@/lib/grid";
 import { odds, pc, shortDate } from "@/lib/format";

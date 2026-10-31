@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid";
-import { stillNeed } from "@/engine/tape.js";
+import { stillNeed } from "@cricket/engine/tape.js";
 import { useTick } from "@/hooks/useTick";
 import { cn } from "@/lib/utils";
 

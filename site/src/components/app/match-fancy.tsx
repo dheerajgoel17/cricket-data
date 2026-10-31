@@ -6,15 +6,15 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
-import { fancyStanding } from "@/engine/live.js";
+import { fancyStanding } from "@cricket/engine/live.js";
 import { StandingMark, Tick, type Standing } from "./tick";
-import { fancyByLine, fancyFor, fancyHeadline, lineProb } from "@/engine/lines.js";
+import { fancyByLine, fancyFor, fancyHeadline, lineProb } from "@cricket/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
-import { sideEdge } from "@/engine/stats.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, topBatters, venueIndices } from "@/engine/markets.js";
-import { FORMATS } from "@/engine/util.js";
+import { sideEdge } from "@cricket/engine/stats.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, topBatters, venueIndices } from "@cricket/engine/markets.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
@@ -263,7 +263,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
               <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
                 {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                   <>
-                    <section className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
+                    <section className="flex flex-col gap-stack">
                       <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-semibold">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
                       {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                       <div className="flex items-end gap-group">
@@ -280,7 +280,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         {(["over", "under"] as const).map((side) => {
                           const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
                           return (
-                            <div key={side} className="flex flex-col gap-tight rounded-xl bg-background p-snug ring-1 ring-hairline">
+                            <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
                               <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
                               <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                               <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
@@ -302,7 +302,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                       {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                     </section>
 
-                    <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline" aria-label="Line ladder">
+                    <section className="overflow-hidden border-y border-hairline" aria-label="Line ladder">
                       <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
                       {ladder.map((l: any, i: number) => (
                         <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
@@ -329,7 +329,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
   const t = useMemo(() => (scope < 0 ? topList(store, ms, { scope: "match" }) : topList(store, ms, { team: scope, scope: "team" })), [store, ms, scope]);
   const max = Math.max(...t.rows.map((r: any) => r.pSole), 0.0001);
   return (
-    <section className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
+    <section className="overflow-hidden border-y border-hairline">
       <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-semibold">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
       <ul>
         {t.rows.map((r: any, i: number) => (

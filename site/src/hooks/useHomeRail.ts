@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
 import { useRail } from "@/hooks/useRail";
-import { liveForFixture } from "@/engine/live.js";
-import { keepMsFor } from "@/engine/lines.js";
+import { liveForFixture } from "@cricket/engine/live.js";
+import { keepMsFor } from "@cricket/engine/lines.js";
 import { arrangeFixtures, homeTeam, rankFixtures } from "@/lib/priority";
 
 /** How long the rail waits for its published settings and for the first live scores before it paints with what it has (the viewer sees the skeleton meanwhile). */

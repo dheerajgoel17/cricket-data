@@ -2,8 +2,8 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { sideEdge } from "@/engine/stats.js";
-import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
+import { sideEdge } from "@cricket/engine/stats.js";
+import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { useFancyCards } from "@/hooks/useFancyCards";
 import { fixtureState } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";

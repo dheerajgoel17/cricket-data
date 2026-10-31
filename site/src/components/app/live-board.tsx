@@ -2,7 +2,7 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@/engine/live.js";
+import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
 import { FormHeadline, RecentForm, recentForms } from "@/components/app/recent-form";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
@@ -123,7 +123,7 @@ function Person({ p, sides, sub }: { p: any; sides?: Side[]; sub?: ReactNode }) 
 function Stat({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="grid justify-items-end gap-hair">
-      <span className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">{k}</span>
+      <span className="label-cap text-footnote text-muted-foreground">{k}</span>
       <span className="text-callout font-semibold tabular-nums">{v}</span>
     </div>
   );
@@ -189,7 +189,7 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
             <div className="overflow-x-auto">
               <table className="w-full text-footnote">
                 <thead>
-                  <tr className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
+                  <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Batter</th>
                     <th className="px-tight py-snug text-right">R</th>
                     <th className="px-tight py-snug text-right">B</th>
@@ -244,7 +244,7 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
             <div className="overflow-x-auto">
               <table className="w-full text-footnote">
                 <thead>
-                  <tr className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">
+                  <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Bowler</th>
                     <th className="px-tight py-snug text-right">O</th>
                     <th className="px-tight py-snug text-right">M</th>
@@ -322,7 +322,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
         <div className="flex items-stretch gap-snug">
           <BatterEnd p={board.batters[0]} sides={teams} />
           <div className="grid shrink-0 content-between justify-items-center py-hair">
-            <span className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">P’ship</span>
+            <span className="label-cap text-footnote text-muted-foreground">P’ship</span>
             <span className="text-body font-bold tabular-nums leading-none">
               {board.partnership ? <>{board.partnership.runs ?? 0} <span className="text-footnote font-medium text-muted-foreground">({board.partnership.balls ?? 0})</span></> : "—"}
             </span>

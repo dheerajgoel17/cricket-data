@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isWrapped, unwrap, wire, wrap } from "../src/engine/wrap.js";
+import { isWrapped, unwrap, wire, wrap } from "@cricket/engine/wrap.js";
 
 test("plain JSON is left alone", async () => {
   const doc = { p: [], fx: [] };

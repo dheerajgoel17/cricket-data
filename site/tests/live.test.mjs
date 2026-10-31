@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import {
   ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
-} from "../src/engine/live.js";
-import { identityIndex } from "../src/engine/identity.js";
+} from "@cricket/engine/live.js";
+import { identityIndex } from "@cricket/engine/identity.js";
 
 function pageHtml(payload) {
   return `<script id="app-root-state">${JSON.stringify(payload).replace(/"/g, "&q;")}</script>`;
@@ -399,6 +399,50 @@ test("a fancy side run line tagged bat_first voids once that side is bowling fir
   assert.equal(fancyStanding(m, { key: "overs_6", team: "New Zealand", line: 40.5, bat_first: true }), null, "NZ batted first and are past 6 overs: session so-far is gone, not void");
   assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 180.5, bat_first: true }), { v: 198, state: "final", verdict: "cleared" }, "NZ batted first: fancy lambi still scores");
   assert.equal(fancyStanding({ status: "live", innings: [] }, { key: "overs_6", team: "India", line: 40.5, bat_first: true }), null, "before an innings starts, do not void yet");
+});
+
+test("a Test team's 2nd innings so-far is that side's own second turn, not the match's 4th innings number", () => {
+  const m = { innings: [
+    { n: 1, team: "West Indies", runs: 400, fours: 40, sixes: 5, wkts: 10 },
+    { n: 2, team: "Bangladesh", runs: 360, fours: 30, sixes: 4, wkts: 10 },
+    { n: 3, team: "West Indies", runs: 200, fours: 20, sixes: 2, wkts: 10 },
+    { n: 4, team: "Bangladesh", runs: 80, fours: 8, sixes: 1, wkts: 3 },
+  ], players: [] };
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh"), 440); // 360 + 80
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh", 1), 360);
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh", 2), 80);
+  assert.equal(liveMarket(m, "team_total_runs", "West Indies", 2), 200);
+});
+
+test("fancyStanding: the same so-far / Cleared / Missed a player prop gets, from the innings totals (hand-computed)", () => {
+  const m = chase();
+  assert.equal(m.fmt, "T20");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 40.5 }), { v: 42, state: "live", verdict: "cleared" }, "India 42 already past 40.5 while they bat");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 50.5 }), { v: 42, state: "live", verdict: null }, "42 of 50.5 is still to play for");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 200.5 }), { v: 198, state: "final", verdict: "missed" }, "NZ 198 all they will make, under 200.5");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 180.5 }), { v: 198, state: "final", verdict: "cleared" });
+  assert.deepEqual(fancyStanding(m, { key: "first_innings_runs", line: 180.5 }), { v: 198, state: "final", verdict: "cleared" }, "the first innings is over once India have begun");
+  assert.deepEqual(fancyStanding(m, { key: "match_runs", line: 250.5 }), { v: 240, state: "live", verdict: null }, "a whole-match total stays live until the match ends");
+  assert.equal(fancyStanding(m, { key: "team_total_runs", team: "India", inn: 2, line: 40.5 }), null, "India have not batted a second innings");
+
+  const testM = { status: "live", fmt: "Test", innings: [
+    { n: 1, team: "West Indies", runs: 400, wkts: 10 },
+    { n: 2, team: "Bangladesh", runs: 360, wkts: 10 },
+    { n: 3, team: "West Indies", runs: 200, wkts: 10 },
+    { n: 4, team: "Bangladesh", runs: 80, wkts: 3 },
+  ] };
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 135.5 }), { v: 80, state: "live", verdict: null }, "BAN's own 2nd inns, still batting, 80 of 135.5");
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 70.5 }), { v: 80, state: "live", verdict: "cleared" });
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 1, line: 350.5 }), { v: 360, state: "final", verdict: "cleared" }, "BAN's 1st inns is over once they have a 2nd");
+  assert.equal(fancyState(testM, { key: "team_total_runs", team: "Bangladesh" }), "live", "a Test match total stays live until the match ends");
+
+  const chasing = { status: "live", fmt: "Test", innings: [
+    { n: 1, team: "Bangladesh", runs: 272, wkts: 10 },
+    { n: 2, team: "West Indies", runs: 244, wkts: 10 },
+    { n: 3, team: "Bangladesh", runs: 142, wkts: 10 },
+    { n: 4, team: "West Indies", runs: 51, wkts: 1 },
+  ] };
+  assert.deepEqual(fancyStanding(chasing, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 135.5 }), { v: 142, state: "final", verdict: "cleared" }, "BAN 142 in their 2nd inns, WI now chasing: over 135.5 is done");
 });
 
 test("last wicket is the latest fall, not the last dismissed batter in batting order", () => {

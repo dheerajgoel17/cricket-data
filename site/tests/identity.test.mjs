@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { identityIndex, NO_IDENTITY } from "../src/engine/identity.js";
+import { identityIndex, NO_IDENTITY } from "@cricket/engine/identity.js";
 
 const doc = { v: 1, s: { "470f446b": "DBT", "9550470d": "YL" }, b: { "5d1e7582": ["Kusal Mendis"] } };
 

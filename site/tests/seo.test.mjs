@@ -74,7 +74,7 @@ test("markup in a name cannot break out of the tags, and a template without the 
 
 test("wrapped fixtures.json is unwrapped for SEO, and a wrap with no key does not crash the Vercel build", async () => {
   const { build, unwrapJson } = await import("../scripts/seo.mjs");
-  const { wrap } = await import("../src/engine/wrap.js");
+  const { wrap } = await import("@cricket/engine/wrap.js");
   const { mkdtempSync, mkdirSync, writeFileSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");

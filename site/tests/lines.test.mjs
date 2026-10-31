@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "../src/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -362,7 +362,7 @@ test("a T20 in an Afghanistan Test series does not price the Test (the Test's 6-
 });
 
 test("an exchange's No on its own line is quoted beside its Yes, and an under-only line is never the main one", async () => {
-  const { bookQuotes, bookLinesFor } = await import("../src/engine/lines.js");
+  const { bookQuotes, bookLinesFor } = await import("@cricket/engine/lines.js");
   const fw = (line, over, under) => ({ line, books: [{ source: "FairWin247 Fancy", over, under }] });
   const lines = [fw(41.5, null, 1.95), fw(43.5, 2.0, null)];
   const q = bookQuotes(lines);

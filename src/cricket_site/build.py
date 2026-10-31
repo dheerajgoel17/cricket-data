@@ -23,6 +23,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from . import identity
+from .crex_assets import display_name as ca_display_name
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
 
@@ -650,7 +651,7 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
     if not site_url:
         return 0
     base = site_url.rstrip("/")
-    urls = [f"{base}/{p}" for p in ("", "players", "teams", "competitions", "trends", "tools", "odds", "glossary", "features", "about", "pair")]
+    urls = [f"{base}/{p}" for p in ("", "props", "fancy", "players", "teams", "competitions", "trends", "tools", "odds", "glossary", "features", "about", "pair")]
     top = sorted(range(len(A["pids"])), key=lambda i: -A["pstat"][A["pids"][i]]["n"])[:3000]
     urls += [f"{base}/player/{i}" for i in top]
     cnt = Counter(m["event"] for m in A["ms"] if m["event"])
@@ -848,6 +849,9 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         keep = set(A["pids"])
         (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"]}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
+        # full names for wide layouts: our names are initials plus surname ("P Rathnayake"); the source lists the full name for every linked player
+        full = {pid: ca_display_name(nm) for _cid, nm, pid in cx["index"]["players"] if pid in keep and nm}
+        (out / "names.json").write_text(json.dumps(full, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "lines.json").write_text(json.dumps(build_lines(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     return meta

@@ -2,7 +2,7 @@
 // (vercel.json rewrites to /api/share?path=...) -> a tiny page link previews read:
 // the title, description and the dynamic card. The JPEG is in the body too (tap it for the real page).
 // No meta-refresh and no location.replace: crawlers that run scripts would follow those and then read the app shell.
-import { cardFields, cardPath, cardText } from "../src/engine/card.js";
+import { cardFields, cardPath, cardText } from "@cricket/engine/card.js";
 import { shareMetas } from "../src/lib/seo.js";
 import { loadData } from "./og.js";
 

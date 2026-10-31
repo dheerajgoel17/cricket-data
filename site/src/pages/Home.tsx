@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { liveForFixture } from "@/engine/live.js";
+import { liveForFixture } from "@cricket/engine/live.js";
 import { fixtureStart, localTime } from "@/lib/format";
 import { countPhases, phaseOf, pickHomePhase } from "@/lib/home-phase";
 import { setTitle } from "@/lib/title";

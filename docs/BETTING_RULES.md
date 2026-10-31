@@ -95,7 +95,7 @@ The Hundred counts balls, not overs (5-ball overs, 100 balls): 80 of 100 is the 
 
 Gaps are ranked by how much a wrong or mixed number would mislead a user. File references are where the work belongs.
 
-**A. Scope on every line (highest priority).** A Test player line is either **match total** or **first innings** (or second), and books differ. Add an innings scope to published lines, the archive key and settlement (`src/value_bets/booklines.py`, `archive.py`, `site/src/engine/live.js` `settleLines`), chart each scope against the matching data (`site/src/engine/props.js` already has an innings filter; today a Test is aggregated per match), and **never show two scopes as one line**. EDGE_CASES already lists this as a known gap.
+**A. Scope on every line (highest priority).** A Test player line is either **match total** or **first innings** (or second), and books differ. Add an innings scope to published lines, the archive key and settlement (`src/value_bets/booklines.py`, `archive.py`, `site/packages/engine/live.js` `settleLines`), chart each scope against the matching data (`site/packages/engine/props.js` already has an innings filter; today a Test is aggregated per match), and **never show two scopes as one line**. EDGE_CASES already lists this as a known gap.
 
 **B. Void policy per market kind, not one rule.** Today "named in the XI, never batted" is VOID everywhere and excluded from hit rates. That matches an over/under (void) but not a Yes/No ladder, "to hit a six" or a top-batter market, where books count it as a loss. Tag each line with a `void_policy` (`void` / `loss`) and have the hit-rate and settlement code follow it; keep the exchange rule as the default for over/unders.
 

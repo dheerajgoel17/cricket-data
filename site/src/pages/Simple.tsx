@@ -9,14 +9,13 @@ import { Input } from "@/components/ui/input";
 import { ChevronRightIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
-import { RULES } from "@/engine/rules.js";
+import { RULES } from "@cricket/engine/rules.js";
 import { useData } from "@/lib/data";
 import { localWhen, num, odds, pc, tzName } from "@/lib/format";
-import { useSaved } from "@/lib/saved";
 import { Crumbs, DataTable, EmptyNote, Muted, OddsText, PageTitle, Panel } from "@/components/app/page";
 import { Field, NativeSelect } from "@/components/app/forms";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
-import { FORMATS } from "@/engine/util.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { useQ } from "@/components/app/forms";
 import { Button } from "@/components/ui/button";
 import { setTitle } from "@/lib/title";
@@ -150,21 +149,6 @@ export function AboutPage() {
 }
 
 // ------------------------------------------------------------------ saved
-export function SavedPage() {
-  setTitle("Saved");
-  const { store } = useData();
-  const { list } = useSaved();
-  const items = list.map((k) => { const [kind, i] = k.split(":"); return kind === "player" ? { to: `/player/${i}`, name: store.playerName(+i), sub: store.teamName(store.P.tm[+i]), badge: <PlayerBadge idx={+i} /> } : { to: `/team/${i}`, name: store.teamName(+i), sub: "Team", badge: <TeamBadge name={store.teams[+i].n} /> }; });
-  return (
-    <div>
-      <Crumbs items={[["Home", "/"], ["Saved"]]} />
-      <PageTitle>Saved</PageTitle>
-      {items.length ? <Panel flat>{items.map((it) => <Link key={it.to} to={it.to} className="flex items-center gap-3 border-b px-4 py-3 last:border-b-0 hover:bg-muted">{it.badge}<span className="flex-1 font-medium">{it.name}</span><span className="text-sm text-muted-foreground">{it.sub}</span></Link>)}</Panel>
-        : <EmptyNote>Tap the star on a player or team to keep it here. Saved items live in this browser only.</EmptyNote>}
-    </div>
-  );
-}
-
 // ------------------------------------------------------------------ players search
 export function PlayersPage() {
   setTitle("Cricket player stats");

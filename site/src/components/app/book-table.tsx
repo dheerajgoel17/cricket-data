@@ -20,7 +20,7 @@ export function BookTable({ books, shown, className }: { books: Priced[]; shown:
       </button>
       {open && (
         <table id={id} className="w-full max-w-sm text-left">
-          <thead><tr className="text-caption uppercase tracking-wider"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
+          <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
           <tbody>{rest.map((b) => <tr key={b.source}><td className="py-hair"><BookBadge source={b.source} /></td><td>{odds(b.over)}</td><td>{odds(b.under)}</td></tr>)}</tbody>
         </table>
       )}

@@ -39,3 +39,14 @@ def test_match_teams_prefers_mens_and_ignores_women_only_slugs():
     teams = [{"name": "India", "g": 0}, {"name": "Mumbai Indians", "g": 0}]
     crex = [("india women", "W1"), ("india", "O"), ("mumbai indians", "F"), ("india a", "A1")]
     assert ca.match_teams(teams, crex) == {"india": "O", "mumbai indians": "F"}
+
+
+def test_display_name_makes_a_readable_full_name_from_the_slug():
+    from cricket_site.crex_assets import display_name
+
+    assert display_name("bevon john jacobs") == "Bevon John Jacobs"
+    assert display_name("quinton de kock") == "Quinton de Kock"
+    assert display_name("de kock") == "De Kock"  # a particle that starts the name keeps its capital
+    assert display_name("ben mcdermott") == "Ben McDermott"
+    assert display_name("kevin o'brien") == "Kevin O'Brien"
+    assert display_name("") == ""

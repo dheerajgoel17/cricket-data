@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { barState } from "@/engine/windows.js";
+import { barState } from "@cricket/engine/windows.js";
 import { abbr, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
 }) {
   const vals = entries.filter((e) => e.value != null).map((e) => e.value as number);
   const top = Math.max(2, Math.ceil(Math.max(line + 0.5, ...vals, 1)));
-  const nt = Math.min(top, 5);
+  const nt = 1; // the axis names only the top and the floor: the line carries its own value, so no tick can sit on top of it
   const ticks = Array.from({ length: nt + 1 }, (_, i) => Math.round((top / nt) * i * 10) / 10);
   const wide = entries.length > 20;
   const scroller = useRef<HTMLDivElement>(null);
@@ -22,7 +22,7 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
   const colStyle = wide ? { flex: "0 0 30px" } : { flex: "1 1 0" };
   return (
     <figure className="m-0" aria-label={label || "Form chart"}>
-      <div className="grid grid-cols-[22px_minmax(0,1fr)] gap-1">
+      <div className="grid grid-cols-[28px_minmax(0,1fr)] gap-1 font-condensed">
         <div className="flex flex-col justify-between text-right text-sm leading-none text-foreground" style={{ height }}>{ticks.slice().reverse().map((t) => <span key={t}>{t}</span>)}</div>
         <div ref={scroller} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="w-max min-w-full">

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { barState, windowRate, windowRates } from "../src/engine/windows.js";
+import { barState, windowRate, windowRates } from "@cricket/engine/windows.js";
 
 const e = (value, extra = {}) => ({ value, ...extra });
 // oldest -> newest: 3, 0, 5, DNP, 2, 4, VOID, 1

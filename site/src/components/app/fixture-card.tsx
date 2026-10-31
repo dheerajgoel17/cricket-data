@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { clockLiveMs, liveBlurb, scoreLabel, sessionLabel, teamScore } from "@/engine/live.js";
+import { clockLiveMs, liveBlurb, scoreLabel, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { fixtureState } from "@/hooks/useEngine";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
@@ -68,7 +68,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
-            {session ? <span className="font-semibold uppercase tracking-wider text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight font-semibold uppercase tracking-wider text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="font-semibold uppercase tracking-wider">{final ? "Final" : "Upcoming"}</span>}
+            {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
             {city(f.venue) && <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
