@@ -72,15 +72,19 @@ export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, l
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
 }
 
-/** One market's row, in the props-list style: the label and the book's line and price(s), the better side's edge, and the last ten results as bars. */
+const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
+const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
+
+/** One market's row, in the props-list style: the label and the book's line and price(s), the better side's edge, and the last ten results as bars. A single book still shows its mark; "+N books" is only the extras. */
 export function OverviewRow({ r, onOpen, active, sub }: { r: any; onOpen: () => void; active?: boolean; sub?: string }) {
+  const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
   return (
     <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
       className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
     <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-semibold leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
                           {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-semibold", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
-                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap">{r.underBook && <><BookBadge source={r.underBook} />{" "}</>}{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap">{r.overBook && <><BookBadge source={r.overBook} />{" "}</>}O {odds(r.over)}</span> · <span className="whitespace-nowrap">{r.underBook && r.underBook !== r.overBook && <><BookBadge source={r.underBook} />{" "}</>}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
+                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={overSrc} />{odds(r.over)}</span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={underSrc} />{odds(r.under)}</span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap"><BookMark source={overSrc} />O {odds(r.over)}</span> · <span className="whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U {odds(r.under)}</span></span></>}{r.soFar != null && <span className={lineVerdict(r.soFar, r.line) ? "text-primary" : "text-muted-foreground"}> · {r.soFar} so far{lineVerdict(r.soFar, r.line) && <b className="font-semibold"> · Over cleared</b>}</span>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
                           <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>

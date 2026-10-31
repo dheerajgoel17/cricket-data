@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { Link, useNavigate } from "react-router-dom";
 import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
@@ -10,6 +10,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@/engine/live.js";
+import { MarketTape } from "./market-tape";
+import { StandingMark, Tick } from "./tick";
 import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@/engine/lines.js";
 import { runPlan } from "@/engine/plan.js";
 import { STATS } from "@/engine/rules.js";
@@ -26,6 +28,7 @@ import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { odds } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
@@ -116,9 +119,8 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 
 /** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
-const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const; // the words the player page's chart uses
 
-/** The best quote up front (the lowest line, and the best price at it, in the accent colour) with its book; the other books' line, over and under prices sit in a table that a "+N books" toggle opens. */
+/** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
 export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?: string }) {
   const [open, setOpen] = useState(false);
   const id = useId();
@@ -128,7 +130,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug">
         <span className={cn("whitespace-nowrap", top.best && "font-semibold text-primary")}>
-          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} {odds(top.over)}{top.underAt && <> · U {top.underAt.line} {odds(top.underAt.price)}</>}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
+          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} <Tick value={top.over}>{odds(top.over)}</Tick>{top.underAt && <> · U {top.underAt.line} {odds(top.underAt.price)}</>}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
@@ -140,7 +142,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
       {open && (
         <table id={id} className="w-full max-w-sm text-left">
           <thead><tr className="text-caption uppercase tracking-wider"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td>{odds(q.over)}</td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
+          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
     </div>
@@ -157,7 +159,7 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!(books && r.quotes.some((q) => q.line === r.line)) && <> · {r.quotes.length === 1 && <><BookBadge source={r.quotes[0].source} />{" "}</>}{odds(r.over)}</>}</span>{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "text-muted-foreground")}> · {soFar.v} {soFar.state === "live" ? "so far" : soFar.state}{soFar.verdict && <b className="font-semibold"> · {VERDICT[soFar.verdict]}</b>}</span>}</ItemDescription>
+            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!(books && r.quotes.some((q) => q.line === r.line)) && <> · {r.quotes.length === 1 && <><BookBadge source={r.quotes[0].source} />{" "}</>}<Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
           </ItemContent>
           <ItemActions className="gap-tight">
             <span className="grid justify-items-end text-right">
@@ -226,13 +228,13 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                     <PlayerBadge idx={r.idx} size="sm" className="size-control" />
                     <span className="grid min-w-0">
                       <span className="flex min-w-0 items-center gap-tight text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</span>
-                      <span className="truncate text-callout text-muted-foreground">O {r.line} {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <span className={cn("tabular-nums", soFar.verdict === "cleared" ? "text-primary" : soFar.verdict === "missed" ? "text-miss" : "")}> · {soFar.v}{soFar.verdict ? ` ${VERDICT[soFar.verdict]}` : " so far"}</span>}</span>
-                      {r.quotes.length > 1 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+                      <span className="truncate text-callout text-muted-foreground">O {r.line} {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</span>
+                      {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
                     </span>
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-semibold tabular-nums">{odds(r.over)}</td>
+                <td className="px-snug py-snug font-semibold tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick></td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
@@ -294,27 +296,36 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
   const rows = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" })).filter((r) => (teams ? onThis(r) && (team === "all" || norm(r.team) === norm(team)) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need)
     .sort((x, y) => hotOrder({ live: x.live, p: x[win].p, edge: x.edge }, { live: y.live, p: y[win].p, edge: y.edge })).slice(0, MAX_ROWS), [data, stat, win, need, day, teams, team, start, fmt, live.data, pick]);
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
+  const tapeRows = useMemo(() => (data || []).map((r) => {
+    const s = soFarOf(r);
+    return { idx: r.idx, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
+  }), [data, live.data, identity]);
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
       {heading ? <h1 className="hidden text-display font-bold tracking-tight lg:block">{heading}</h1> : null}
+      {!waiting ? <MarketTape rows={tapeRows} /> : null}
       {!teams && matchChips.length > 0 && (
-        <div className="hidden gap-tight overflow-x-auto [scrollbar-width:none] lg:flex [&::-webkit-scrollbar]:hidden" role="toolbar" aria-label="Matches">
-          <button type="button" aria-pressed={pick === "all"} onClick={() => setMatchKey("all")}
-            className={cn("flex h-control shrink-0 items-center rounded-[var(--chip-radius)] px-snug text-caption font-semibold ring-1", pick === "all" ? "bg-card ring-primary" : "bg-card ring-hairline hover:bg-surface-hover")}>All</button>
-          {matchChips.map((f) => <MatchChip key={f.id} f={f} active={pick === f.id} onPick={(id) => setMatchKey(id || "all")} />)}
-        </div>
+        <PillGroup
+          layoutId="hot-match"
+          label="Matches"
+          value={pick}
+          onChange={setMatchKey}
+          className="hidden lg:flex w-auto max-w-full"
+          itemClassName="h-auto min-h-control whitespace-normal px-snug py-tight"
+          items={[["all", "All"], ...matchChips.map((f) => [f.id, <MatchChip key={f.id} f={f} />] as [string, ReactNode])]}
+        />
       )}
       {/* one chip row for the prop type, plus a Filters button (current window on it) that opens an iOS-style bottom sheet for the rest */}
       <div className="flex items-center gap-snug">
         <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={setStat} items={tabs} className="min-w-0 flex-1" />
         <Sheet>
           <SheetTrigger asChild>
-            <button type="button" aria-label="Filters" className="relative flex h-control shrink-0 items-center gap-tight rounded-[var(--chip-radius)] bg-card px-3 text-callout font-medium transition-colors active:bg-accent">
+            <Button type="button" variant="secondary" size="sm" aria-label="Filters" className="relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
               <AdjustmentsHorizontalIcon className="size-4" />{wl}
-              {dirty && <span aria-hidden className="absolute -right-0.5 -top-0.5 size-3 rounded-full bg-primary ring-2 ring-background" />}
-            </button>
+              {dirty && <span aria-hidden className="absolute -right-hair -top-hair size-tight rounded-full bg-primary ring-2 ring-background" />}
+            </Button>
           </SheetTrigger>
           <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
             <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />

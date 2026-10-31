@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
 import { TeamBadge } from "./badges";
+import { StandingMark, Tick, type Standing } from "./tick";
 
 const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
-const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const;
 
 export type NextMatchInfo = {
   match: string;
@@ -27,7 +27,7 @@ export type NextMatchInfo = {
   phase?: "upcoming" | "live" | "final";
 };
 
-export type LineSoFar = { v: number; state: string; verdict: "cleared" | "missed" | "push" | null };
+export type LineSoFar = Standing;
 
 /** One context row: hit rate, n, fair decimal odds on the line the chart is on. */
 function RateRow({ label, r, side, line }: { label: string; r: { p: number | null; hits: number; played: number; fair: number | null }; side: string; line: number }) {
@@ -84,19 +84,15 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
           <div className="grid gap-hair border-t border-hairline pt-snug">
             <div className="flex flex-wrap items-baseline justify-between gap-snug">
               <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
-                {standing != null && (
-                  <span className={cn("font-medium tabular-nums", standing.verdict === "cleared" ? "text-primary" : standing.verdict === "missed" ? "text-miss" : "text-muted-foreground")}>
-                    {" "}· {standing.v} {standing.state === "live" ? "so far" : standing.state}{standing.verdict ? <> · {VERDICT[standing.verdict]}</> : null}
-                  </span>
-                )}
+                {standing != null && <> · <StandingMark standing={standing} line={line} /></>}
               </span>
-              {best > 1 ? <span className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</span> : null}
+              {best > 1 ? <Tick value={best} className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</Tick> : null}
             </div>
             {quotes.length ? (
               <div className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
                 {quotes.map((q) => (
                   <span key={q.source} className="whitespace-nowrap">
-                    <BookBadge source={q.source} /> <b className="font-semibold tabular-nums text-foreground">{odds(q.over)}</b>
+                    <BookBadge source={q.source} /> <Tick value={q.over} className="font-semibold tabular-nums text-foreground">{odds(q.over)}</Tick>
                     {q.under != null ? <> / {odds(q.under)}</> : null}
                   </span>
                 ))}
@@ -106,10 +102,10 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
             ) : null}
           </div>
 
-          <div className="grid gap-tight border-t border-hairline pt-snug">
-            {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : null}
-            {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
-            <p className="text-footnote text-muted-foreground">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
+          <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
+            {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
+            {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
+            <p className="text-footnote text-muted-foreground sm:col-span-2">{fmt ? `In ${fmt}, ` : ""}games played on this line. DNP / VOID are not counted. Fair odds have no book margin.</p>
           </div>
         </>
       ) : (

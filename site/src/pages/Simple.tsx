@@ -32,7 +32,7 @@ export function ToolsPage() {
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Tools"]]} />
-      <PageTitle sub="Cricket stats, player props and listed lines, completely free: no login, no paywall.">Free cricket stats tools</PageTitle>
+      <PageTitle sub="Cricket stats and data, completely free: no login, no paywall, no betting.">Free cricket stats tools</PageTitle>
       <div className="flex flex-wrap gap-2">{["100% free", "No registration", "Ball-by-ball data"].map((x) => <Badge key={x} variant="secondary" className="rounded-full px-3 py-1 font-normal">{x}</Badge>)}</div>
       <div className="mt-4 grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
         {TOOLS.map(([r, t, d, b], i) => (
@@ -56,7 +56,7 @@ export function OddsPage() {
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Price calculator"]]} />
-      <PageTitle sub="Decimal prices only. Turn a price into a probability, strip the bookmaker margin, and size a stake from your own estimate.">Price &amp; probability calculator</PageTitle>
+      <PageTitle sub="A stats calculator: turn a decimal price into a probability and strip the two-way margin. It does not place a bet.">Price &amp; probability calculator</PageTitle>
       <Card className="flex-row flex-wrap items-end gap-3 p-4 shadow-none">
         <Field label="Decimal price (this side)"><Input type="number" step="0.01" min="1.01" value={v.dec} onChange={set("dec")} className="w-36" /></Field>
         <Field label="Decimal price (other side)"><Input type="number" step="0.01" min="1.01" value={v.opp} onChange={set("opp")} className="w-36" /></Field>
@@ -70,7 +70,7 @@ export function OddsPage() {
         <T k="Expected value" val={ev != null ? `${(ev * 100).toFixed(1)}%` : "–"} s="per 1 staked at your probability" />
         <T k="Kelly stake" val={kelly != null && b ? `${(kelly * b).toFixed(0)}` : "–"} s={kelly != null ? `full Kelly ${(kelly * 100).toFixed(1)}% · quarter ${(kelly * 25).toFixed(1)}%` : ""} />
       </div>
-      <Muted>Not betting advice. Fair price on this site are 1 ÷ historical hit rate and ignore margin, form, pitch and XIs.</Muted>
+      <Muted>For reading prices as statistics only. Fair price on this site is 1 ÷ historical hit rate and ignores margin, form, pitch and XIs. Fancy.cash does not offer, promote or encourage gambling.</Muted>
     </div>
   );
 }
@@ -142,7 +142,7 @@ export function AboutPage() {
         <AccordionItem value="rules"><AccordionTrigger><span className="flex items-center gap-2">Settlement rules applied <Badge variant="secondary">{RULES.length}</Badge></span></AccordionTrigger><AccordionContent>{list(RULES)}</AccordionContent></AccordionItem>
         <AccordionItem value="defs"><AccordionTrigger><span className="flex items-center gap-2">Definitions <Badge variant="secondary">{DEFS.length}</Badge></span></AccordionTrigger><AccordionContent>{list(DEFS)}</AccordionContent></AccordionItem>
         <AccordionItem value="fresh"><AccordionTrigger>Data freshness</AccordionTrigger><AccordionContent><p className="text-muted-foreground">Ball-by-ball data through <b>{f.newestBase}</b>{f.provisionalIncluded ? <> · includes <b>{f.provisionalMatches}</b> provisional matches up to <b>{f.newestProvisional || "?"}</b></> : " · no provisional matches included"}.</p></AccordionContent></AccordionItem>
-        <AccordionItem value="credits"><AccordionTrigger>Credits and responsible use</AccordionTrigger><AccordionContent><p className="text-muted-foreground">We count page views and which buttons are used; analytics load without a consent prompt (ads cookies stay off; no account, no personal data sold). A short-lived site cookie is used only to load the data files; it is not a tracking cookie and is not prompted. Free cricket stats and player props. Photos: Wikimedia Commons (free licences, where available). Data: open ball-by-ball data plus provisional scorecards. Decimal prices only; fair price are 1 ÷ historical hit rate with no margin: a guide, not betting advice. 18+, gamble responsibly. Bookmaker names and logos are trademarks of their owners, shown only to say where a price comes from.</p></AccordionContent></AccordionItem>
+        <AccordionItem value="credits"><AccordionTrigger>Credits and how to use the site</AccordionTrigger><AccordionContent><p className="text-muted-foreground">We count page views and which buttons are used; analytics load without a consent prompt (ads cookies stay off; no account, no personal data sold). A short-lived site cookie is used only to load the data files; it is not a tracking cookie and is not prompted. Free cricket stats and data. Photos: Wikimedia Commons (free licences, where available). Data: open ball-by-ball data plus provisional scorecards. Decimal prices are market data shown next to history; fair price is 1 ÷ historical hit rate with no margin. Fancy.cash does not offer, promote or encourage gambling. Book names and logos are trademarks of their owners, shown only to say where a listed price comes from.</p></AccordionContent></AccordionItem>
       </Accordion></Card>
       <Muted className="mt-3">See also: <Link className="text-primary" to="/glossary">Cricket stats explained</Link>.</Muted>
     </div>

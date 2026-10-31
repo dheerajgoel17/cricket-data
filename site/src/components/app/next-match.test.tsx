@@ -64,4 +64,11 @@ describe("NextMatch", () => {
     render(<NextMatch next={{ ...next, phase: "final", priced: true }} entries={here} line={17.5} side="over" book={book} statLabel="Runs" fmt="T20" out />);
     expect(screen.getByText("Not in XI")).toBeInTheDocument();
   });
+
+  it("tracks a live line against the scorecard: so far and how many to go (hand-computed 12 of 17.5 is 5.5)", () => {
+    render(<NextMatch next={{ ...next, phase: "live", priced: true }} entries={here} line={17.5} side="over" book={book} statLabel="Runs" fmt="T20"
+      standing={{ v: 12, state: "live", verdict: null }} />);
+    expect(screen.getByText(/12 so far/)).toBeInTheDocument();
+    expect(screen.getByText(/5\.5 to go/)).toBeInTheDocument();
+  });
 });

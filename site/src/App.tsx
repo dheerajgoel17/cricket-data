@@ -14,6 +14,7 @@ const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage
 const PropsPage = page(() => import("@/pages/Lists"), "PropsPage"), FancyPage = page(() => import("@/pages/Lists"), "FancyPage"), PairPage = page(() => import("@/pages/Tools"), "PairPage");
 const ToolsPage = page(() => import("@/pages/Simple"), "ToolsPage"), OddsPage = page(() => import("@/pages/Simple"), "OddsPage"), GlossaryPage = page(() => import("@/pages/Simple"), "GlossaryPage");
 const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage = page(() => import("@/pages/Simple"), "SavedPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
+const PrivacyPage = page(() => import("@/pages/Legal"), "PrivacyPage"), TermsPage = page(() => import("@/pages/Legal"), "TermsPage"), DisclaimerPage = page(() => import("@/pages/Legal"), "DisclaimerPage");
 const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="team" /> })));
 const VenuePage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="venue" /> })));
 
@@ -62,6 +63,13 @@ export function App() {
             <Route path="props" element={<PropsPage />} /><Route path="fancy" element={<FancyPage />} />
             <Route path="ask" element={<Navigate to="/" replace />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="privacy-policy" element={<PrivacyPage />} />
+            <Route path="privacy" element={<Navigate to="/privacy-policy" replace />} />
+            <Route path="terms-of-use" element={<TermsPage />} />
+            <Route path="terms" element={<Navigate to="/terms-of-use" replace />} />
+            <Route path="docs" element={<DisclaimerPage />} />
+            <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
+            <Route path="responsible" element={<Navigate to="/docs" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

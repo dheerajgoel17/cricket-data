@@ -1,7 +1,7 @@
 // What a page tells search engines and link previews: one place for the browser (`lib/title.ts`) and the build step (`scripts/seo.mjs`). Plain ESM, no DOM.
 export const BRAND = "Fancy.cash";
-export const TAGLINE = "Free cricket stats, player props and ground info";
-export const DEFAULT_DESC = "Free cricket stats and player props: hit rates over any line, fair decimal prices, listed lines side by side, partnerships, fancy markets and ground stats. Built on open ball-by-ball data.";
+export const TAGLINE = "Free cricket stats and data";
+export const DEFAULT_DESC = "Free cricket stats and data: hit rates over any line, form, partnerships, fancy markets and ground stats from open ball-by-ball data. Listed prices are shown as market data, not as an invitation to bet.";
 export const THEME = "#27da8e";
 export const CARD_W = 1200;
 export const CARD_H = 630; // 1.91:1 — Facebook, LinkedIn, WhatsApp, Discord, Slack, Telegram, iMessage. X's 2:1 large card crops ~15 px top and bottom.
@@ -61,6 +61,14 @@ export const ROUTES = {
   saved: { title: "Saved", description: DEFAULT_DESC, noindex: true },
 };
 
+/** Typed URLs only (`/privacy-policy`, `/terms-of-use`, `/docs`). Not in ROUTES, so they are not prebuilt, listed in the sitemap, or linked from crawler nav. */
+export const UNLISTED = {
+  "privacy-policy": { title: "Privacy policy", description: "What Fancy.cash stores on your device, the functional cookies it uses, and the anonymous analytics it may collect." },
+  "terms-of-use": { title: "Terms of use", description: "Rules for using Fancy.cash: a free cricket stats and data site. It does not offer, promote or encourage gambling." },
+  docs: { title: "Docs", description: "Fancy.cash is cricket stats and data. Listed prices are market data next to history. We do not offer, promote or encourage gambling." },
+};
+const UNLISTED_ALIAS = { privacy: "privacy-policy", terms: "terms-of-use", disclaimer: "docs" };
+
 export const fullTitle = (t) => (!t ? BRAND : String(t).includes(BRAND) ? String(t) : `${t} | ${BRAND}`);
 
 /**
@@ -68,8 +76,10 @@ export const fullTitle = (t) => (!t ? BRAND : String(t).includes(BRAND) ? String
  */
 export function pageMeta(pathname, pageTitle = "") {
   const seg = String(pathname || "/").split("/").filter(Boolean)[0] || "";
+  const hidden = UNLISTED[UNLISTED_ALIAS[seg] || seg];
   const fixed = ROUTES[seg];
   const name = String(pageTitle || "").split(" | ")[0].split(": ")[0].trim(); // "Harry Brook: stats, hit rates and form | Fancy.cash" -> "Harry Brook"
+  if (hidden && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: hidden.description, noindex: true };
   if (fixed && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: fixed.description, noindex: !!fixed.noindex };
   const by = { player: "hit rates over any line, recent form and listed lines", fixture: "player stats, hit rates and listed lines", team: "form, venue record and the player grid", venue: "ground stats, runs, sixes and fours", league: "team tables, match totals and top scores" };
   return { description: `${name || BRAND}: ${by[seg] || "stats, hit rates and fair prices"}. Free on ${BRAND}.`, noindex: false };

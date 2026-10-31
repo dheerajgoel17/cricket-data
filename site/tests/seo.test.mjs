@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { headTags, pages, render } from "../scripts/seo.mjs";
-import { ROUTES, fullTitle, pageMeta, clipDesc, shareMetas, THEME, CARD_W, CARD_H } from "../src/lib/seo.js";
+import { ROUTES, UNLISTED, fullTitle, pageMeta, clipDesc, shareMetas, THEME, CARD_W, CARD_H } from "../src/lib/seo.js";
 
 const TPL = "<html><head><!--seo-head--></head><body><div id=\"root\"><!--seo-body--></div></body></html>";
 const fx = [{ id: "2026-10-29-afghanistan-v-zimbabwe", a: "Afghanistan", b: "Zimbabwe", start: "2026-10-29T14:30Z", venue: "Sharjah Cricket Stadium, Sharjah", status: "Upcoming" }];
@@ -13,6 +13,11 @@ test("titles carry the brand once, and a page that names itself gets a descripti
   assert.equal(fullTitle("Fancy.cash: free cricket"), "Fancy.cash: free cricket");
   assert.match(pageMeta("/player/1", "Harry Brook: stats, hit rates and form | Fancy.cash").description, /^Harry Brook: hit rates over any line, recent form and listed lines/);
   assert.equal(pageMeta("/about", "x").description, ROUTES.about.description);
+  assert.equal(pageMeta("/privacy-policy", "x").description, UNLISTED["privacy-policy"].description);
+  assert.equal(pageMeta("/privacy-policy").noindex, true);
+  assert.equal(pageMeta("/terms-of-use").noindex, true);
+  assert.equal(pageMeta("/docs").noindex, true);
+  assert.equal(pageMeta("/privacy").noindex, true);
   assert.equal(pageMeta("/saved", "Saved").noindex, true);
 });
 
@@ -50,6 +55,8 @@ test("every page gets its own title, description, canonical link and structured 
   assert.ok(by["league/0"] && !by["player/9"]); // a player the data does not know gets no page
   assert.match(render(TPL, by["venue/0"]), /<title>Sharjah Cricket Stadium, Sharjah: ground stats/);
   assert.match(render(TPL, by.saved), /noindex, follow/);
+  assert.ok(!by.privacy && !by["privacy-policy"] && !by.docs && !by["terms-of-use"]);
+  assert.doesNotMatch(render(TPL, by[""]), /href="\/privacy|href="\/docs|href="\/terms/);
 });
 
 test("the home page has no canonical link (the app shell also serves unknown paths) but has the site data", () => {

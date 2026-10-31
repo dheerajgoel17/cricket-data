@@ -15,7 +15,8 @@ python scripts/check_public_safe.py     # secrets / personal paths / forbidden h
 cd site && npm ci && npm test           # node >= 20; engine/API/photo tests (node:test) + component tests (Vitest)
 cd site && npm run build                # type-check + production build (CI runs this too)
 python scripts/make_site_fixture.py     # regenerate site/tests/fixtures after changing builder output (pytest fails if stale)
-python -m cricket_site.build --zip all_json.zip --data data --out site/public/data   # build site data (~30 s); then: cd site && npm run dev  (http://localhost:4173)
+python -m cricket_site.build --zip all_json.zip --data data --out site/public/data   # local data only if SITE_URL is unset
+cd site && npm run dev                  # http://localhost:4173 — with SITE_URL in site/.env.local, /data and /api/live come from production
 ```
 
 ## Hard rules
@@ -35,7 +36,7 @@ python -m cricket_site.build --zip all_json.zip --data data --out site/public/da
 * Home rail order and its settings -> `site/src/lib/priority.ts`, `config/home_rail.json` (read at view time from the repo, no deploy; docs/SITE.md).
 * LLM prompt/provider -> `site/src/engine/prompt.js`, `site/api/ask.js`.
 * Live scores -> `site/src/engine/live.js`, `site/api/live.js` (books-priced matches only). A Test at close of play stays `live` for 6 days, with scores and the session badge (Stumps / Lunch / Rain delay / Paused); the source's home list still has it after `/schedule` drops it; status 2 without a result is a day break, not the end.
-* Where a priced line stands (so far / final / Cleared / Missed / Push / Not in XI) -> settled on the server: `settleLines` in `live.js` (matching and verdicts, one place), shown by `lineStanding` / `lineNotIn`; a finished match's results are stored in its archive file by `settle` in `src/value_bets/archive.py` (PROJECT_GUIDE 5.4c). Fix a matching or settlement bug there, not in a component.
+* Where a priced line stands (so far / final / Cleared / Missed / Push / Not in XI) -> settled on the server: `settleLines` in `live.js` (matching and verdicts, one place), shown by `lineStanding` / `lineNotIn`; a finished match's results are stored in its archive file by `settle` in `src/value_bets/archive.py` (PROJECT_GUIDE 5.4c). Fix a matching or settlement bug there, not in a component. Player-performance so-far is runs + 20×wickets + 10×catches + 25×stumpings from the scorecard how-out (2 catch, 3 caught-and-bowled, 8 stumping). Live tracking is the 15 s `/api/live` poll (no websocket): `Tick` flashes a so-far or a price that moved; `engine/tape.js` buckets high-odds hits (≥2.50 cleared) and low-odds misses (≤1.40 missed).
 * Who is who across the data, the live source and the books -> the player-identity table: `src/cricket_site/identity.py` (builder), `data/mappings/player_identity.csv` (links checked by hand), `site/src/engine/identity.js` (lookups). Ids first, names only as the fallback; fix a bad link with a line in the CSV, not with another name rule (PROJECT_GUIDE 5.7).
 * Images/ids -> `src/cricket_site/crex_assets.py`, `assets_sync.py`, `site/src/lib/photos.js`, `site/src/lib/assets.ts`, `supabase/migrations/`.
 * Deploy/schedules -> `.github/workflows/site.yml`.

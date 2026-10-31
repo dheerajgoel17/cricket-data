@@ -403,13 +403,24 @@ test("a so-far number says when it can no longer move: dismissed, or innings / s
 
 test("an all-rounder's batting and bowling rows are told apart by the stat", () => {
   const m = { players: [
-    { name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false },
-    { name: "Axar Patel", team: "India", wickets: 1, conceded: 36, ballsBowled: 24 },
+    { name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false, catches: 1, stumpings: 0 },
+    { name: "Axar Patel", team: "India", wickets: 1, conceded: 36, ballsBowled: 24, catches: 1, stumpings: 0 },
   ] };
   assert.equal(livePlayer(m, "Axar Patel"), null, "no stat, two rows: ambiguous");
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "runs"), "runs"), 5);
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "wickets"), "wickets"), 1);
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "balls_bowled"), "balls_bowled"), 24);
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points"), "points"), 35, "5 runs + 20×1 wicket + 10×1 catch");
+});
+
+test("points still merges a bat row and a bowl row when one id is the source's and the other is the printed name", () => {
+  const m = { players: [
+    { id: "Axar Patel", name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false, catches: 1, stumpings: 0 },
+    { id: "8415", name: "Axar Patel", team: "India", wickets: 3, conceded: 20, ballsBowled: 24, catches: 1, stumpings: 0 },
+  ] };
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "wickets"), "wickets"), 3);
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points"), "points"), 75, "5 + 20×3 + 10 catch; mixed ids still one person");
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points", "", "8415"), "points"), 75, "source id hits the bowl row only; the same-name bat row is still merged");
 });
 
 test("the batting side is the page's first team, whatever the other fields say (a first innings, 9 down, the other side named in rt)", () => {
@@ -911,11 +922,46 @@ test("settleLines: the identity table finds a player the books name differently 
   assert.deepEqual(settleLines(m, [line], idn).map((x) => [x.pid, x.value, x.verdict]), [["d7ff1adc", 22, "cleared"]]);
 });
 
-test("liveStat points: runs + 20 wickets + 10 catches + 25 stumpings; missing fielding is not 0", () => {
-  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1 }, "points"), null);
+test("liveStat points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; missing fielding is 0 so far", () => {
+  assert.equal(liveStat({ name: "P", wickets: 3 }, "points"), 60);
+  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1 }, "points"), 33);
   assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 0, stumpings: 0 }, "points"), 33);
   assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 2, stumpings: 1 }, "points"), 78);
-  assert.equal(liveStat({ name: "P", catches: 1, stumpings: 0 }, "points"), null, "no batting or bowling row is not 0 points");
+  assert.equal(liveStat({ name: "P", stumpings: 1 }, "points"), 25);
+  assert.equal(liveStat({ name: "P", catches: 1, stumpings: 0 }, "points"), 10);
+  assert.equal(liveStat({ name: "P" }, "points"), null);
+});
+
+test("parseCardPage points: a catch, a caught-and-bowled and a stumping (hand-computed)", () => {
+  const html = pageHtml({
+    [CARD]: [{
+      c: "A", d: "19/3(30",
+      b: ["BT1.10.8.1.0.10.12.2.BW.FLD", "BT2.5.6.0.0.15.18.3.BW", "BT3.4.7.0.0.19.24.8.BW.WK"],
+      a: ["BW.20.24.0.3"],
+    }],
+    [MAP]: {
+      p: [
+        { f_key: "BT1", n: "Batter One" }, { f_key: "BT2", n: "Batter Two" }, { f_key: "BT3", n: "Batter Three" },
+        { f_key: "BW", n: "Bowler" }, { f_key: "FLD", n: "Fielder" }, { f_key: "WK", n: "Keeper" },
+      ],
+      t: [{ f_key: "A", n: "Side A" }, { f_key: "B", n: "Side B" }],
+    },
+  });
+  const m = parseCardPage(html);
+  const inn = liveCard(m)[0];
+  assert.equal(inn.batters[0].dismissal, "c Fielder b Bowler");
+  assert.equal(inn.batters[1].dismissal, "c & b Bowler");
+  assert.equal(inn.batters[2].dismissal, "st Keeper b Bowler");
+  assert.equal(liveStat(livePlayer(m, "Bowler", "wickets"), "wickets"), 3);
+  assert.equal(liveStat(livePlayer(m, "Bowler", "points"), "points"), 70, "20×3 wickets + 10 for the caught-and-bowled");
+  assert.equal(liveStat(livePlayer(m, "Fielder", "points"), "points"), 10);
+  assert.equal(liveStat(livePlayer(m, "Keeper", "points"), "points"), 25);
+  const row = { ...m, status: "live", fmt: "T20", start: "2026-10-31T08:00:00.000Z", teams: [{ name: "Side A" }, { name: "Side B" }] };
+  const line = { pid: "bw", player: "Bowler", team: "Side B", stat: "points", line: 55.5, match: "Side A vs Side B", fmt: "T20", start_utc: "2026-10-31T08:00:00Z" };
+  assert.deepEqual(settleLines(row, [line]).map((x) => [x.stat, x.value, x.verdict]), [["points", 70, "cleared"]]);
+  const merged = buildMatch(row, { players: [{ name: "Bowler", team: "Side B", wickets: 3, conceded: 20, ballsBowled: 24, current: true }] }, m);
+  assert.equal(liveStat(livePlayer(merged, "Bowler", "points"), "points"), 70, "match-page copy must not wipe the caught-and-bowled");
+  assert.equal(liveStat(livePlayer(merged, "Keeper", "points"), "points"), 25);
 });
 
 test("lineStanding: a server entry is found by the innings of its line, so a first-innings number is never read as the match total's", () => {

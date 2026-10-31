@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { PropTable } from "./hot-props";
 
+vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
 vi.mock("./badges", () => ({
   PlayerBadge: () => <span>pic</span>,
   TeamFlag: () => null,
@@ -35,5 +36,12 @@ describe("PropTable", () => {
     expect(screen.getByText("Wankhede Stadium")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "H2H" }));
     expect(onWin).toHaveBeenCalledWith("h2h");
+  });
+
+  it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
+    const one = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
+    render(<MemoryRouter><PropTable rows={[one]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("bet365")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
   });
 });

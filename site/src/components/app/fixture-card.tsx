@@ -2,6 +2,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
+import { AvatarGroup } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -98,30 +100,27 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   );
 }
 
-/** Compact match chip: overlapping crests, short names, kick-off. Tapping one filters the prop table when `onPick` is set. */
-export function MatchChip({ f, active, onPick }: { f: any; active?: boolean; onPick?: (id: string | null) => void }) {
+/** Crests + short names + kick-off; sits inside a PillGroup (shadcn ToggleGroup) item. */
+export function MatchChip({ f }: { f: any }) {
   const when = fixtureStart(f), timed = hasTime(f);
   const { match } = useLiveMatch(f);
   const session = sessionLabel(liveBlurb(match)) || match?.session || "";
+  const live = !!(session || match?.status === "live");
   const sub = session || (match?.status === "live" ? "Live" : timed ? localTime(when) : dayLabel(dayKey(f)));
-  const inner = (
-    <>
-      <span className="flex">
-        <TeamBadge name={f.a} size="xs" eager className="ring-2 ring-background" />
-        <TeamBadge name={f.b} size="xs" eager className="-ml-tight ring-2 ring-background" />
-      </span>
-      <span className="grid min-w-0 leading-tight">
+  return (
+    <span className="flex min-w-0 items-center gap-tight">
+      <AvatarGroup className="-space-x-tight">
+        <TeamBadge name={f.a} size="xs" eager />
+        <TeamBadge name={f.b} size="xs" eager />
+      </AvatarGroup>
+      <span className="grid min-w-0 text-left leading-tight">
         <span className="truncate text-caption font-semibold">{abbr(f.a)} v {abbr(f.b)}</span>
-        <span className={cn("truncate text-caption", session || match?.status === "live" ? "font-semibold text-destructive" : "text-muted-foreground")}>{sub}</span>
+        {live
+          ? <Badge variant="destructive" className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-semibold">{sub}</Badge>
+          : <span className="truncate text-caption opacity-70">{sub}</span>}
       </span>
-    </>
+    </span>
   );
-  const cls = cn("flex h-control shrink-0 items-center gap-tight rounded-[var(--chip-radius)] px-snug ring-1 transition-colors",
-    active ? "bg-card ring-primary" : "bg-card ring-hairline hover:bg-surface-hover");
-  if (onPick && f.id) {
-    return <button type="button" aria-pressed={!!active} className={cls} onClick={() => onPick(active ? null : f.id)}>{inner}</button>;
-  }
-  return <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className={cls}>{inner}</Link>;
 }
 
 /** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). The home phase bar (In play / Pre-match / Resulted) picks which cards sit here. */

@@ -344,6 +344,7 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     sm = (tmp_path / "public" / "sitemap.xml").read_text()
     assert "<loc>https://example.test/fixture/2026-10-29-afghanistan-v-zimbabwe</loc><lastmod>" in sm and n == len(sm.split("<url>")) - 1
     assert "<loc>https://example.test/venue/0</loc>" in sm
+    assert "/privacy" not in sm and "/terms" not in sm and "/disclaimer" not in sm and "/docs" not in sm and "/privacy-policy" not in sm
     robots = (tmp_path / "public" / "robots.txt").read_text()
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
     assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")

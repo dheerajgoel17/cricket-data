@@ -1,13 +1,10 @@
 import { useId } from "react";
 import { Link } from "react-router-dom";
 import { BRAND } from "@/lib/brand";
-import { BookmarkIcon, BookOpenIcon, InformationCircleIcon, MagnifyingGlassIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { BookmarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useSaved } from "@/lib/saved";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
-import { ThemeRadios, ThemeToggle } from "./ThemeToggle";
 
 /** The Fancy.cash mark: a rounded dark tile with a green F whose top arm ends in a ball. Inline SVG, so it is crisp at any size and needs no file. */
 export function BrandMark({ className }: { className?: string }) {
@@ -26,51 +23,34 @@ export function Brand() {
   return (
     <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <BrandMark className="size-9 transition-transform duration-300 group-hover:-rotate-6 group-active:scale-95" />
-      <span className="text-title font-extrabold leading-none tracking-tight text-primary-foreground">Fancy.cash</span>
+      <span className="text-title font-extrabold leading-none tracking-tight text-primary-foreground lg:text-foreground">Fancy.cash</span>
     </Link>
   );
 }
 
-/** Guest profile: there are no accounts (free, static site), so this is the personal corner: saved list, appearance, and the secondary pages. */
-function Profile() {
+function SavedLink() {
   const { list } = useSaved();
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger aria-label="Profile menu" className="relative rounded-full outline-none ring-offset-background transition focus-visible:ring-2 focus-visible:ring-ring">
-        <Avatar className="size-9 border-0 bg-primary-foreground transition hover:opacity-90">
-          <AvatarFallback className="bg-primary-foreground text-callout font-semibold text-primary">G</AvatarFallback>
-        </Avatar>
-        {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-bold text-primary-foreground">{list.length}</span>}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal"><div className="text-callout font-semibold">Guest</div><div className="text-footnote text-muted-foreground">Saved on this device only</div></DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild><Link to="/saved"><BookmarkIcon />Saved{list.length > 0 && <span className="ml-auto text-footnote text-muted-foreground">{list.length}</span>}</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link to="/tools"><WrenchScrewdriverIcon />Free tools</Link></DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-footnote font-medium text-muted-foreground">Appearance</DropdownMenuLabel>
-        <ThemeRadios />
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild><Link to="/glossary"><BookOpenIcon />Stats explained</Link></DropdownMenuItem>
-        <DropdownMenuItem asChild><Link to="/about"><InformationCircleIcon />Rules & data</Link></DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Link to="/saved" aria-label={list.length ? `Saved, ${list.length}` : "Saved"}
+      className="relative grid size-control place-items-center rounded-full bg-primary-foreground/15 text-primary-foreground transition hover:bg-primary-foreground/25 lg:bg-muted lg:text-foreground lg:hover:bg-surface-hover">
+      <BookmarkIcon className="size-4" />
+      {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-bold text-primary-foreground">{list.length}</span>}
+    </Link>
   );
 }
 
-/** Top bar: the logo at the left (after the sidebar toggle on wide screens), the search field centred on wide screens, search, theme and profile at the right. A solid bar in the theme colour with dark text and a dark logo tile. */
+/** Top bar: logo, centred search on wide screens, saved on the right. Phones keep the brand-green bar; from lg it is a surface bar with a hairline. No accounts, so no profile menu. */
 export function Header() {
   const search = useSearchDialog();
   return (
-    <header className="sticky top-0 z-50 h-header bg-primary text-primary-foreground shadow-[0_1px_0_rgba(0,0,0,0.12)]">
+    <header className="sticky top-0 z-50 h-header bg-primary text-primary-foreground shadow-[0_1px_0_rgba(0,0,0,0.12)] lg:bg-background lg:text-foreground lg:shadow-none lg:ring-1 lg:ring-hairline">
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
-        <SidebarTrigger className="-ml-2 hidden text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground lg:inline-flex" aria-label="Toggle sidebar" />
+        <SidebarTrigger className="-ml-2 hidden text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground lg:inline-flex lg:text-foreground lg:hover:bg-muted lg:hover:text-foreground" aria-label="Toggle sidebar" />
         <Brand />
         <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />
         <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-primary-foreground/15 md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
-          <ThemeToggle />
-          <Profile />
+          <SavedLink />
         </div>
       </div>
       <SearchDialog open={search.open} onOpenChange={search.setOpen} />

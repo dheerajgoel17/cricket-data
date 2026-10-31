@@ -485,8 +485,30 @@ function cardBatter(row, names, team) {
   return {
     id, name, team, runs, balls, fours, sixes, sr: strikeRate(runs, balls), out: !!code,
     dismissal: howOut(code, bowlerName, fielderNames),
+    how: code, bowlerId: bowler, fielderIds: fielders,
     fowRuns: f.length > 5 ? nInt(f[5]) : null, fowBalls: f.length > 6 ? nInt(f[6]) : null,
   };
+}
+
+/** Catches and stumpings from how-out, keyed by the source's player id. A caught-and-bowled is the bowler's catch. */
+function fieldingFromCard(inns) {
+  const byId = new Map(), teamOf = new Map();
+  const add = (id, key, team) => {
+    if (!id) return;
+    const cur = byId.get(id) || { catches: 0, stumpings: 0 };
+    cur[key] += 1;
+    byId.set(id, cur);
+    if (team && !teamOf.has(id)) teamOf.set(id, team);
+  };
+  for (const inn of inns || []) {
+    const bowlTeam = inn.bowlers?.[0]?.team || "";
+    for (const p of inn.batters || []) {
+      if (p.how === 2) add(p.fielderIds?.[0], "catches", bowlTeam);
+      else if (p.how === 3) add(p.bowlerId, "catches", bowlTeam);
+      else if (p.how === 8) add(p.fielderIds?.[0], "stumpings", bowlTeam);
+    }
+  }
+  return { byId, teamOf };
 }
 
 function cardBowler(row, names, team) {
@@ -528,10 +550,17 @@ export function parseCardPage(html) {
     };
   });
   const shown = card.filter((i) => i.batters.length || i.bowlers.length || i.runs != null || i.yetToBat.length); // before the first ball a card is the batting XI, all yet to bat
+  const { byId: field, teamOf } = fieldingFromCard(shown);
+  const credit = (id) => field.get(id) || { catches: 0, stumpings: 0 };
   const players = [];
   for (const inn of shown) {
-    for (const p of inn.batters) players.push({ id: p.id, name: p.name, team: p.team, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes, sr: p.sr, wickets: null, conceded: null, ballsBowled: null, out: p.out, dismissal: p.dismissal });
-    for (const p of inn.bowlers) players.push({ id: p.id, name: p.name, team: p.team, runs: null, balls: null, fours: null, sixes: null, wickets: p.wickets, conceded: p.conceded, ballsBowled: p.ballsBowled, maidens: p.maidens, econ: p.econ, out: false });
+    for (const p of inn.batters) players.push({ id: p.id, name: p.name, team: p.team, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes, sr: p.sr, wickets: null, conceded: null, ballsBowled: null, out: p.out, dismissal: p.dismissal, ...credit(p.id) });
+    for (const p of inn.bowlers) players.push({ id: p.id, name: p.name, team: p.team, runs: null, balls: null, fours: null, sixes: null, wickets: p.wickets, conceded: p.conceded, ballsBowled: p.ballsBowled, maidens: p.maidens, econ: p.econ, out: false, ...credit(p.id) });
+  }
+  const seen = new Set(players.map((p) => p.id).filter(Boolean));
+  for (const [id, f] of field) {
+    if (!id || seen.has(id) || !names[id]) continue;
+    players.push({ id, name: names[id], team: teamOf.get(id) || "", runs: null, balls: null, fours: null, sixes: null, wickets: null, conceded: null, ballsBowled: null, out: false, ...f });
   }
   const teamList = [...new Set(card.map((i) => i.team).filter(Boolean))];
   for (const n of Object.values(teams)) if (n && !teamList.includes(n)) teamList.push(n);
@@ -550,7 +579,7 @@ function flagLive(players, flags) {
     if (f.out) continue; // dismissed batters are already in the card in full
     const bat = f.runs != null;
     const hit = out.find((p) => (bat ? p.runs != null && !p.out : p.wickets != null) && namesMatch(p.name, f.name));
-    if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens });
+    if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens, catches: hit.catches, stumpings: hit.stumpings });
     else if (!(bat && out.some((p) => p.runs != null && p.out && namesMatch(p.name, f.name)))) out.push(f); // the card has him out: trust it
   }
   return out;
@@ -651,9 +680,50 @@ const BOWL_STATS = new Set(["wickets", "runs_conceded", "balls_bowled"]);
 
 const nameSet = (x) => [].concat(x || []).map(norm).filter(Boolean);
 
+/** Same person: one source id, or the same name on the same side (a bat row and a bowl row; the match page may have used the name as id). */
+function onePerson(rows) {
+  if (rows.length <= 1) return rows;
+  const ids = [...new Set(rows.map((p) => p.id).filter(Boolean))];
+  if (ids.length === 1) return rows;
+  return [...new Set(rows.map((p) => `${norm(p.name)}|${teamKey(p.team || "")}`))].length === 1 ? rows : [];
+}
+
+/** Sum batting and bowling; fielding is already the match total copied onto each role row, so it is taken once. */
+function mergePointsRows(rows) {
+  const out = { name: rows[0].name, team: rows[0].team, id: rows[0].id || "", out: false, catches: null, stumpings: null };
+  for (const p of rows) {
+    if (p.id) out.id = p.id;
+    if (p.team) out.team = p.team;
+    if (p.runs != null) {
+      out.runs = (out.runs || 0) + p.runs;
+      out.balls = (out.balls || 0) + (p.balls || 0);
+      out.fours = (out.fours || 0) + (p.fours || 0);
+      out.sixes = (out.sixes || 0) + (p.sixes || 0);
+      if (p.out) out.out = true;
+    }
+    if (p.wickets != null) {
+      out.wickets = (out.wickets || 0) + p.wickets;
+      out.conceded = (out.conceded || 0) + (p.conceded || 0);
+      out.ballsBowled = (out.ballsBowled || 0) + (p.ballsBowled || 0);
+    }
+    if (p.catches != null) out.catches = p.catches;
+    if (p.stumpings != null) out.stumpings = p.stumpings;
+  }
+  return out;
+}
+
+function takeRows(rows, stat) {
+  if (rows.length === 1) return rows[0];
+  if (stat === "points") {
+    const same = onePerson(rows);
+    return same.length ? mergePointsRows(same) : null;
+  }
+  return null;
+}
+
 /**
  * The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat.
- * With the source's own id for him (`sourceId`, from the identity table) the row is found by that id and no name is consulted. Otherwise names decide, and a row that
+ * Points merge those rows (runs + wickets + fielding). With the source's own id for him (`sourceId`, from the identity table) the row is found by that id and no name is consulted. Otherwise names decide, and a row that
  * belongs to a different player the table knows (`isLinked(row id)`, only asked once he is linked himself) is never taken for him. Ambiguous names stay unmatched.
  * @param {string | string[]} [commonName] the name(s) the books use for him
  * @param {((sourceId: string) => boolean) | null} [isLinked]
@@ -663,16 +733,25 @@ export function livePlayer(match, name, stat, commonName = "", sourceId = "", is
   let rows = (match?.players || []).filter((p) => !role || p[role] != null);
   if (sourceId) {
     const byId = rows.filter((p) => p.id === sourceId);
-    if (byId.length) return byId.length === 1 ? byId[0] : null; // two rows with his id (a Test, two innings) are as ambiguous as two names
+    if (byId.length) {
+      // Points need both roles. The match page sometimes stamps the printed name as id on the other row, so pull that in too.
+      if (stat === "points") {
+        const names = new Set(byId.map((p) => norm(p.name)));
+        const team = teamKey(byId[0].team || "");
+        const extra = rows.filter((p) => names.has(norm(p.name)) && teamKey(p.team || "") === team);
+        return takeRows(extra.length ? extra : byId, stat);
+      }
+      return takeRows(byId, stat); // two rows with his id: a Test's two innings, or bat + bowl
+    }
     if (isLinked) rows = rows.filter((p) => !isLinked(p.id));
   }
   // The books call a player what the live source calls him ("Kusal Mendis"); the data has initials ("BKG Mendis"), and "K" would match every Mendis with a K.
   // So the books' own name (the line's, else the identity table's), when there is one, is tried first and exactly.
   const books = nameSet(commonName);
   const exact = books.length ? rows.filter((p) => books.includes(norm(p.name))) : [];
-  if (exact.length === 1) return exact[0];
+  if (exact.length) return takeRows(exact, stat);
   const hits = rows.filter((p) => namesMatch(p.name, name));
-  return hits.length === 1 ? hits[0] : null;
+  return takeRows(hits, stat);
 }
 
 function withSr(p) {
@@ -720,14 +799,13 @@ export function liveBoard(match) {
 
 const STAT_FIELD = { runs: "runs", balls: "balls", fours: "fours", sixes: "sixes", wickets: "wickets", runs_conceded: "conceded", balls_bowled: "ballsBowled" };
 
-/** Live so-far for a priced line. Points need the card's catches and stumpings; missing fielding is not scored as 0. */
+/** Live so-far for a priced line. Points = runs + 20×wickets + 10×catches + 25×stumpings; a missing credit is 0 so far (the total can still rise). */
 export function liveStat(player, stat) {
   if (!player) return null;
   if (stat === "points") {
-    if (player.catches == null || player.stumpings == null) return null;
-    const r = player.runs, w = player.wickets;
-    if (r == null && w == null) return null;
-    return (r || 0) + 20 * (w || 0) + 10 * player.catches + 25 * player.stumpings;
+    const r = player.runs, w = player.wickets, ct = player.catches, st = player.stumpings;
+    if (r == null && w == null && !ct && !st) return null;
+    return (r || 0) + 20 * (w || 0) + 10 * (ct || 0) + 25 * (st || 0);
   }
   const k = STAT_FIELD[stat];
   if (!k || player[k] == null) return null;
