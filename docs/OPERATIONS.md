@@ -84,3 +84,15 @@ Google Analytics 4 loads the same way when `VITE_GA_MEASUREMENT_ID` is set (`sit
 
 **Errors and speed.** Page errors are counted as events named by kind: `error_chunk` (a script of an older deploy was gone; the page reloads itself), `error_render` (a page threw, the Reload button showed), `error_script` and `error_promise` (anything else), at most five per page load, so the totals read on the free plan (the message and page go along as properties, readable on Pro). Loading speed (Core Web Vitals per page) comes from Vercel Speed Insights (`@vercel/speed-insights`, Apache-2.0, free tier): turn on **Speed Insights** in the same project dashboard. Watch for a rise in `error_chunk` right after a deploy (normal, small) and any `error_render` (a bug).
 
+
+## Match state (one phase per match)
+`.github/workflows/state-sync.yml` runs `site/scripts/state-sync.mjs` every 5 minutes (GitHub cron can slip by several minutes): it reads the live feed the same way `api/live` does, upserts one row per match into `public.match_state` (migration `supabase/migrations/20261031_match_state.sql`, applied) and settles rows the feed no longer lists by the clock (in play for the keep window, then final). `site/api/state.js` serves the table in the shape of `/api/live` `matches[]`; the player page's match card uses it after the live feed and before the clock (`matchPhase`). It is only trusted while its last write is under 20 minutes old (`freshState`).
+
+| Name | Where | Used by |
+|---|---|---|
+| `SUPABASE_URL` | GitHub variable (already set) and **Vercel env** | the writer; `api/state.js` |
+| `SUPABASE_SERVICE_KEY` | GitHub secret (already set) | the writer (write access) |
+| `LIVE_SOURCE_BASE` | GitHub secret (add it if missing) | the writer |
+| `SUPABASE_ANON_KEY` | **Vercel env** (the project's publishable key) | `api/state.js` (read-only) |
+
+Until `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set on Vercel, `/api/state` answers 503 and the site works the phase out itself, as before. Check it: `select phase, count(*) from match_state group by 1;` and `select max(updated_at) from match_state;` (should be minutes old).

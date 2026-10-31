@@ -5,7 +5,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const feeds = vi.hoisted(() => ({ lines: null as any, live: null as any, rail: null as any, fixtures: null as any, liveCalls: 0 }));
-vi.mock("@/lib/feeds", () => ({ loadLines: () => feeds.lines.promise, loadLive: () => { feeds.liveCalls++; return feeds.live.promise; }, loadRail: () => feeds.rail.promise, loadArchive: async () => null }));
+vi.mock("@/lib/feeds", () => ({ loadLines: () => feeds.lines.promise, loadLive: () => { feeds.liveCalls++; return feeds.live.promise; }, loadRail: () => feeds.rail.promise, loadState: async () => null, loadArchive: async () => null }));
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: { loadFixtures: () => feeds.fixtures.promise, teams: [] }, rz: {}, identity: {} }) }));
 
 import { LIVE_CACHE_MS, saveLive } from "@/lib/live-cache";

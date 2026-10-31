@@ -65,3 +65,11 @@ export async function loadLive(): Promise<any | null> {
     return body;
   } catch { return null; }
 }
+
+/** The match-state table (one phase per match) from /api/state, or null when the route is not configured or down: the site then works the phase out itself. */
+export async function loadState(): Promise<any | null> {
+  try {
+    const r = await fetch("/api/state", { credentials: "same-origin", headers: { accept: "application/json" } });
+    return r.ok ? await readJson(r) : null;
+  } catch { return null; }
+}
