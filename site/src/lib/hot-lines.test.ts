@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byShard, dayOffset, hotDay, hotLines, hotOrder, matchChipId, norm, pool, sameMatch } from "./hot-lines";
+import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -8,12 +8,15 @@ const NOW = at(28, 12); // Wed 28 Oct, noon
 const line = (pid: string, match: string, start: string, over: Record<string, unknown> = {}) => ({ pid, match, start_utc: start, stat: "runs", fmt: "T20", line: 20.5, books: [{ over: 1.9 }], ...over });
 
 describe("dayOffset", () => {
-  it("is 0 for today and 1 for tomorrow, in the viewer's own days, and -1 for any other day", () => {
+  it("is 0 for today through HOT_DAYS-1 in the viewer's own days, and -1 outside that window", () => {
+    expect(HOT_DAYS).toBe(10);
     expect(dayOffset(iso(28, 0, 5), NOW)).toBe(0);
     expect(dayOffset(iso(28, 23, 55), NOW)).toBe(0);
     expect(dayOffset(iso(29, 0, 5), NOW)).toBe(1);
     expect(dayOffset(iso(29, 23, 55), NOW)).toBe(1);
-    expect(dayOffset(iso(30, 9), NOW)).toBe(-1);
+    expect(dayOffset(iso(30, 9), NOW)).toBe(2);
+    expect(dayOffset(iso(37, 9), NOW)).toBe(9); // 10th local day (6 Nov from 28 Oct)
+    expect(dayOffset(iso(38, 9), NOW)).toBe(-1); // day 11
     expect(dayOffset(iso(27, 20), NOW)).toBe(-1);
   });
 });
@@ -25,6 +28,18 @@ describe("hotDay", () => {
     expect(hotDay(iso(27, 20), "T20", NOW)).toBe(0); // last night, still inside 24 h
     expect(hotDay(iso(27, 4), "T20", NOW)).toBe(-1); // 32 h ago
     expect(hotDay(iso(29, 9), "Test", NOW)).toBe(1);
+    expect(hotDay(iso(31, 9), "T20", NOW)).toBe(3);
+  });
+});
+
+describe("hotDayLabels", () => {
+  it("is Today, Tomorrow, then weekday dates for the rest of HOT_DAYS", () => {
+    const items = hotDayLabels(NOW);
+    expect(items).toHaveLength(10);
+    expect(items[0]).toEqual(["0", "Today"]);
+    expect(items[1]).toEqual(["1", "Tomorrow"]);
+    expect(items[2][0]).toBe("2");
+    expect(items[2][1]).not.toMatch(/Today|Tomorrow/);
   });
 });
 
@@ -51,6 +66,11 @@ describe("hotLines", () => {
   it("takes one day's priced lines and no others", () => {
     expect(pids(hotLines(lines, { day: 0 }, NOW))).toEqual(["a", "b", "h"]);
     expect(pids(hotLines(lines, { day: 1 }, NOW))).toEqual(["c"]);
+    expect(pids(hotLines(lines, { day: 3 }, NOW))).toEqual(["d"]); // Fiji vs Samoa in three days
+  });
+  it("counts priced lines on the other Hot props days so the day switch stays", () => {
+    expect(otherHotCount(lines, 0, NOW)).toBe(2); // tomorrow + day 3
+    expect(otherHotCount(lines, 1, NOW)).toBe(4); // today (a,b,h) + day 3
   });
   it("keeps a Test on today's list through later days, and a T20 only for 24 hours", () => {
     const test = line("t", "South Africa vs Australia", iso(25, 8), { fmt: "Test" });

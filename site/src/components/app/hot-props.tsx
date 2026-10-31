@@ -21,7 +21,7 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { EMPTY_PHASE } from "./home-phase-bar";
-import { byShard, hotDay, hotLines, hotOrder, matchChipId, norm, pool, sameMatch } from "@/lib/hot-lines";
+import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { odds } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
@@ -107,7 +107,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
       return out;
     },
   });
-  const otherDay = useMemo(() => (teams ? 0 : hotLines(doc.data?.lines || [], { day: 1 - day }).length), [doc.data, teams, day]); // the other day's lines, only counted: the day switch stays when this day has none
+  const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
   return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
 }
@@ -246,7 +246,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
   );
 }
 
-/** "Hot player props" for today's matches, in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
+/** "Hot player props" for the selected day's matches (today by default, any of the next 10 days from Filters), in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
 export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string; phase?: HomePhase } = {}) {
   const [day, setDay] = useState("0");
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day));
@@ -332,7 +332,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase }: { teams
                     items={[["all", "Both"], ...teams.map((t) => [t, <span key={t} className="flex items-center gap-tight"><TeamBadge name={t} size="xs" />{t}</span>] as [string, React.ReactNode])]} /></div>
               ) : (
                 <div className="grid gap-tight"><span className="text-footnote font-medium text-muted-foreground">Day</span>
-                  <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={[["0", "Today"], ["1", "Tomorrow"]]} /></div>
+                  <PillGroup segmented layoutId="hot-day" label="Day" value={day} onChange={setDay} items={hotDayLabels()} /></div>
               )}
               <label className="flex min-h-control items-center justify-between gap-stack rounded-xl bg-surface-hover px-3 py-tight text-body">Form charts<Switch checked={bars} onCheckedChange={setBars} aria-label="Show form charts" /></label>
             </div>

@@ -157,7 +157,7 @@ def row_from_card(c: dict) -> dict | None:
             "team_a": c["teams"][0], "team_b": c["teams"][1], "venue": "", "status": "Upcoming", "result": "", "url": rel(link)}
 
 
-def fetch_schedule_paged(days: int = 5, max_pages: int = 12, now: datetime | None = None) -> list[dict]:
+def fetch_schedule_paged(days: int = 10, max_pages: int = 24, now: datetime | None = None) -> list[dict]:
     """The schedule page's first 20 matches (from its HTML, complete rows) plus the following pages, until the page reaches ``days`` ahead.
 
     Later pages load in the browser when "Next" is pressed, as for any visitor, so the page is opened in Chromium (set to UTC) and each page's cards are read

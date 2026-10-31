@@ -19,7 +19,7 @@ import { RailSkeleton } from "@/components/app/skeletons";
 
 export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
-  // matches in play first, then the ones to come, finished ones last; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
+  // matches in play first, then those starting within 24 hours, then later games up to 10 days; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
   const { ready, fixtures } = useHomeRail();
   const live = useLiveDoc();
   const [q, setQ] = useQ();

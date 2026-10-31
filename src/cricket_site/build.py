@@ -740,8 +740,8 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
     The bookmaker feed is for odds: books serve different regions, so its start times and team labels are not trustworthy as a
-    schedule. The one exception is a match the books already price that the schedule page has not reached yet (it lists only the next
-    ~20 matches): the archive (``value_bets/archive``, ``fixture`` still null) gives it a stop-gap row so its props show up, and the
+    schedule. The one exception is a match the books already price that the schedule page has not reached yet (it lists about 10 days
+    ahead): the archive (``value_bets/archive``, ``fixture`` still null) gives it a stop-gap row so its props show up, and the
     schedule's own row replaces that as soon as it appears."""
     rows = []
     p = data_dir / "fixtures" / "upcoming.csv"

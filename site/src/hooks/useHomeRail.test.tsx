@@ -9,7 +9,7 @@ vi.mock("@/lib/feeds", () => ({ loadLines: () => feeds.lines.promise, loadLive: 
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: { loadFixtures: () => feeds.fixtures.promise, teams: [] }, rz: {}, identity: {} }) }));
 
 import { LIVE_CACHE_MS, saveLive } from "@/lib/live-cache";
-import { FINISHED_KEEP_MS, LIVE_WAIT_MS, RAIL_WAIT_MS, keepFinished, useHomeRail } from "./useHomeRail";
+import { FINISHED_KEEP_MS, LIVE_WAIT_MS, RAIL_WAIT_MS, SHOW_AHEAD_MS, keepFinished, useHomeRail } from "./useHomeRail";
 import { usePricedFixtures } from "./useEngine";
 import { useLiveDoc } from "./useLive";
 
@@ -106,6 +106,16 @@ describe("useHomeRail", () => {
   });
 
   it("gives the rail file less time than the live scores", () => { expect(RAIL_WAIT_MS).toBeLessThan(LIVE_WAIT_MS); });
+
+  it("shows a priced match 9 days out and drops one on day 11", async () => {
+    expect(SHOW_AHEAD_MS).toBe(10 * 86400e3);
+    const far = [fx("Namibia", "Oman", 9 * 24), fx("India", "Australia", 11 * 24)];
+    const farBook = { generated_at_utc: "x", lines: [line("Namibia vs Oman", 9 * 24), line("India vs Australia", 11 * 24)], events: [], fancy: [] };
+    const { result } = run();
+    feeds.fixtures.resolve(far); feeds.lines.resolve(farBook); feeds.rail.resolve(null); feeds.live.resolve({ matches: [] });
+    await flush();
+    expect(names({ current: result.current.rail })).toEqual(["Namibia v Oman"]);
+  });
 
   it("ranks a match in play first as soon as the live state is known, ahead of a bigger match to come", async () => {
     const { result } = run();

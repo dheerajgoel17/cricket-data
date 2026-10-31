@@ -16,7 +16,8 @@ MAPPINGS = Path(os.environ.get("CV_MAPPINGS") or ROOT / "mappings")
 
 DEFAULTS = {
     "MIN_EDGE": 0.05,              # minimum edge (expected return) to report
-    "WINDOW_HOURS": 24.0,          # only matches starting within this many hours
+    "WINDOW_HOURS": 168.0,         # value-bet alerts: matches starting within this many hours (7 days)
+    "MATCH_START_DELTA_HOURS": 12.0,  # book kickoff vs schedule kickoff (join only; not a display window)
     "MIN_MINUTES_TO_START": 5.0,   # and at least this far in the future
     "KELLY_FRACTION": 0.25,
     "MAX_STAKE_PCT": 2.0,          # cap on stake % of bankroll
@@ -53,26 +54,26 @@ DEFAULTS = {
     # are off by default; add them back e.g. CV_SOURCES=smarkets,moviodds_bet365,betfair
     "SOURCES": "smarkets,moviodds_bet365",
     "FEEDK_SPACING_SECS": 2.0,     # Feed K (adapters/feedk.py, on whenever FEEDK_URL and FEEDK_BOOKS are set): seconds between its requests
-    "FEEDK_MAX_EVENTS": 10,        # ... event pages fetched per book per run
+    "FEEDK_MAX_EVENTS": 30,        # ... event pages fetched per book per run
     "FEEDK_MIN_OFFERS": 4,         # ... only events with at least this many offers (the others carry no player markets)
-    "FEEDK_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days; WINDOW_HOURS still 24 for alerts)
-    "FEEDK_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDK_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
+    "FEEDK_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDE_SPACING_SECS": 2.0,     # Feed E (adapters/feede.py, on whenever FEEDE_BOOKS is set): seconds between its requests
-    "FEEDE_MAX_EVENTS": 24,        # ... event pages fetched per book per run
-    "FEEDE_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
-    "FEEDE_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDE_MAX_EVENTS": 40,        # ... event pages fetched per book per run
+    "FEEDE_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
+    "FEEDE_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDF_SPACING_SECS": 2.0,     # Feed F (adapters/feedf.py, on whenever the FEEDF_* variables are set): seconds between its requests
-    "FEEDF_MAX_EVENTS": 12,        # ... matches read per run (two calls each)
-    "FEEDF_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
-    "FEEDF_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDF_MAX_EVENTS": 30,        # ... matches read per run (two calls each)
+    "FEEDF_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
+    "FEEDF_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDG_SPACING_SECS": 2.0,     # Feed G (adapters/feedg.py, on whenever FEEDG_NAME and FEEDG_API are set): seconds between its requests
-    "FEEDG_MAX_EVENTS": 12,        # ... matches read per run (a catalogue call and an odds call each)
-    "FEEDG_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
+    "FEEDG_MAX_EVENTS": 30,        # ... matches read per run (a catalogue call and an odds call each)
+    "FEEDG_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
     "FEEDG_STATE_MAX_HOURS": 3.0,  # ... how old the India runner's last read may be when GitHub's own servers are refused (state/feedg_latest.json)
-    "FEEDG_BUDGET_SECS": 70.0,     # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDG_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDH_SPACING_SECS": 0.5,     # Feed H (adapters/feedh.py, on whenever FEEDH_URL and FEEDH_NAME are set): seconds between its requests
     "FEEDH_MAX_EVENTS": 500,       # ... event/competition pages fetched per run (in-horizon games first, then internationals)
-    "FEEDH_HORIZON_HOURS": 168.0,  # ... only matches starting within this many hours (7 days)
+    "FEEDH_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
     "FEEDH_BUDGET_SECS": 240.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,

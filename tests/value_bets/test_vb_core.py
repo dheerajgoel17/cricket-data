@@ -144,6 +144,28 @@ def test_the_book_a_mirror_reads_player_performance_like_its_other_over_unders(m
     assert [(r["market_type"], r["player"], r["side"], r["line"], r["back"]) for r in rows] == [("player_points", "Hayley Matthews", "over", 45.5, 1.9), ("player_points", "Hayley Matthews", "under", 45.5, 1.9)]
 
 
+def test_book_odds_join_the_schedule_parent_by_teams_and_kickoff_delta():
+    """Books send two team names and a start with the odds. The parent is the schedule fixture with those sides whose kickoff is within MATCH_START_DELTA_HOURS of the book's — even if that kickoff is days away. A later meeting of the same two sides is a different parent."""
+    from datetime import datetime, timezone
+
+    from value_bets.pipeline import fixture_for_cluster
+
+    tres = TeamResolver({"male": {"Pakistan": 100, "Sri Lanka": 80}})
+    fixtures = [
+        {"gender": "male", "team_a": "Pakistan", "team_b": "Sri Lanka", "start_utc": "2026-10-31T08:00:00Z", "venue": "Gaddafi"},
+        {"gender": "male", "team_a": "Pakistan", "team_b": "Sri Lanka", "start_utc": "2026-11-06T08:00:00Z", "venue": "later"},
+    ]
+    soon = {"gender": "male", "canon_teams": ["Pakistan", "Sri Lanka"],
+            "start": datetime(2026, 10, 31, 8, 0, tzinfo=timezone.utc)}
+    later = {**soon, "start": datetime(2026, 11, 6, 8, 30, tzinfo=timezone.utc)}  # 30 min off the schedule
+    drifted = {**soon, "start": datetime(2026, 11, 1, 4, 0, tzinfo=timezone.utc)}  # 20 h off either row
+    assert fixture_for_cluster(soon, fixtures, tres)["venue"] == "Gaddafi"
+    assert fixture_for_cluster(later, fixtures, tres)["venue"] == "later"
+    assert fixture_for_cluster(drifted, fixtures, tres) is None
+    assert config.get("WINDOW_HOURS") == 168.0
+    assert config.get("MATCH_START_DELTA_HOURS") == 12.0
+
+
 def test_trailing_w_marks_a_womens_side():
     from value_bets.names import norm_team
     assert norm_team("Melbourne Renegades W") == ("melbourne renegades", "female")
