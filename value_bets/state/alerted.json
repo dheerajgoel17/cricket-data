@@ -18,5 +18,10 @@
   "edge": 0.076,
   "start_utc": "2026-11-01T14:30:00Z",
   "alerted_at": "2026-10-31T06:49:30.853572+00:00"
+ },
+ "female|Hobart Hurricanes Women|Sydney Sixers Women|2026-11-01|batter_runs||Ellyse Perry under 28.5|28.5|under": {
+  "edge": 0.0553,
+  "start_utc": "2026-11-01T08:10:00Z",
+  "alerted_at": "2026-10-31T20:11:39.030286+00:00"
  }
 }

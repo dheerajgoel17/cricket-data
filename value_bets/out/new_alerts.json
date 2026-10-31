@@ -1,4 +1,60 @@
 {
- "generated_at_ist": "2026-10-31 21:18 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-01 01:39 IST",
+ "alerts": [
+  {
+   "event_key": "female|Hobart Hurricanes Women|Sydney Sixers Women|2026-11-01",
+   "match": "Sydney Sixers vs Hobart Hurricanes",
+   "start_utc": "2026-11-01T08:10:00Z",
+   "start_ist": "2026-11-01 13:40 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_runs",
+   "market": "Ellyse Perry - Over/Under 28.5 Runs",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 28.5",
+   "player_matched_as": "Ellyse Perry",
+   "line": 28.5,
+   "side": "under",
+   "best_odds": 1.83,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 1.83,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "fair_odds": 1.734,
+   "fair_prob": 0.5767,
+   "model_prob": 0.6262,
+   "market_prob": 0.5362,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0553,
+   "edge_pct": 5.53,
+   "kelly_quarter_stake_pct": 1.67,
+   "confidence": "medium",
+   "why": "Model 63% vs market 54% for under 28.5 runs; form 31.0 runs/inn recency-weighted T20 (n_eff 72.7; last 5: 58, 11, 52, 62, 6), bats in 95% of games played; at Drummoyne Oval, Sydney: 8 inns avg 30.9; weather: high humidity 83%, cloud cover 77%",
+   "notes": "2 market source(s) for fair price; model 0.626 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 72.7,
+    "expected": 30.21,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.951,
+    "venue_matched": "drummoyne oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 14,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 83,
+    "cloud_pct": 77,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "d4c0cbac64687c65",
+   "alert_key": "female|Hobart Hurricanes Women|Sydney Sixers Women|2026-11-01|batter_runs||Ellyse Perry under 28.5|28.5|under",
+   "alerted_at_ist": "2026-11-01 01:41 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
