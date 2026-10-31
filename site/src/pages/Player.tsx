@@ -29,7 +29,7 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { venueStem } from "@cricket/engine/markets.js";
 import { matchPhase, pickPricedMatch } from "@cricket/engine/next-match.js";
-import { NextFilters, NextMatch } from "@/components/app/next-match";
+import { NextFilters, NextMatch, UnpricedNote } from "@/components/app/next-match";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
@@ -150,9 +150,9 @@ function PlayerScreen({ idx }: { idx: number }) {
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
   const keep = keepMsFor(FORMATS[fmtVal]);
   const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep) : [];
-  // A stat asked for in the link is shown even when no book prices it for this player (its form chart, with no line from a book); it joins the chips so it can be left again.
-  const asked_ = (STATS as any)[askedStat] && !pricedStats.includes(askedStat) ? ([[askedStat, (STATS as any)[askedStat].label]] as [string, string][]) : [];
-  const statItems = [...asked_, ...STAT_OPTIONS.filter(([k]) => pricedStats.includes(k))];
+  const pricedSet = new Set(pricedStats);
+  // Every prop category stays on the rail. Listed ones read at full weight; the rest are muted and open the same chart with no book line.
+  const statItems: [string, ReactNode][] = STAT_OPTIONS.map(([k, label]) => [k, pricedSet.has(k) ? label : <span className="opacity-70">{label}</span>]);
   const stat = pricedStats.includes(askedStat) || (STATS as any)[askedStat] ? askedStat : (pricedStats[0] || "runs"); // the stat in the link when it is a real one, else the first listed prop
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
@@ -180,11 +180,9 @@ function PlayerScreen({ idx }: { idx: number }) {
 
   return (
     <div className="flex flex-col gap-stack">
-      {statItems.length > 0 ? (
-        <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
-          <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => navigateWith({ stat: k, line: "", side: q.side })} items={statItems} />
-        </div>
-      ) : null}
+      <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
+        <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
+      </div>
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
@@ -307,6 +305,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
     <div className="flex flex-col gap-stack">
       {!entries.length || !cur ? (
         <>
+          {!book ? <UnpricedNote statLabel={res.statLabel} /> : null}
           {next ? (
             <div className="flex flex-col gap-snug lg:max-w-xl">
               <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
@@ -323,10 +322,10 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
         <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-stack lg:col-span-12", CARD)}>
           <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-7">
             <Metric k={`${cur.label} avg`} v={<Arrow up={cur.mean == null ? null : cur.mean > line}>{num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)}</Arrow>} />
-            <Metric k="Line" v={book && book.lines.length > 1
+            <Metric k={book ? "Line" : "Research line"} v={book && book.lines.length > 1
               ? <button type="button" onClick={() => setAltOpen(true)} className="flex items-center gap-hair text-left font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring lg:pointer-events-none">{side === "over" ? "O" : "U"} {line}<span aria-hidden className="text-muted-foreground lg:hidden">›</span></button>
               : `${side === "over" ? "O" : "U"} ${line}`} />
-            <Metric text k="Prop" v={res.statLabel} />
+            <Metric text k="Prop" v={book ? res.statLabel : <span className="grid gap-hair"><span>{res.statLabel}</span><span className="text-callout font-medium text-muted-foreground">Not listed</span></span>} />
             <Metric k="Hit rate" v={<Arrow up={cur.p == null ? null : cur.p >= 0.5}>{cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`}</Arrow>} />
             <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
             <Metric text k="Opponent" v={next?.opp ? <span className="grid gap-hair"><span>{abbr(next.opp)}</span><MatchStatus phase={next.phase || "upcoming"} start={next.start} className="text-callout text-muted-foreground" /></span> : "–"} />
@@ -338,8 +337,9 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
               : <Gauge p={cur.p} caption={`${cur.label} hit rate`} />}
           </div>
         </div>
+        {!book ? <div className="lg:col-span-12 lg:row-start-2"><UnpricedNote statLabel={res.statLabel} /></div> : null}
 
-        <section className={cn("flex flex-col gap-stack lg:row-start-2", book ? "lg:col-span-8" : "lg:col-span-12")}>
+        <section className={cn("flex flex-col gap-stack", book ? "lg:col-span-8 lg:row-start-2" : "lg:col-span-12 lg:row-start-3")}>
           <div className="flex flex-wrap items-center justify-between gap-snug">
             <PillGroup segmented layoutId="pl-side" label="Side" value={side} onChange={(v) => { setSide(v); keep({ line, side: v }); }} items={[["over", "Over"], ["under", "Under"]]} />
             <div className="flex items-center gap-snug">
@@ -374,7 +374,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
           ))}
         </section>
         {next ? (
-          <div className="flex flex-col gap-snug lg:col-span-5 lg:row-start-3">
+          <div className={cn("flex flex-col gap-snug lg:col-span-5", book ? "lg:row-start-3" : "lg:row-start-4")}>
             <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
             {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
           </div>
