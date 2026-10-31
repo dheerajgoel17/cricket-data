@@ -21,9 +21,11 @@ NOT_A_WICKET = {"retired hurt", "retired not out"}
 KINDS = ["", "bowled", "caught", "caught and bowled", "lbw", "stumped", "hit wicket", "run out",
          "retired out", "obstructing the field", "other", "retired hurt"]
 KIND_CODE = {k: i for i, k in enumerate(KINDS)}
-# innings array layout (all ints, then the top-scorer player indices)
+# innings array layout (all ints, then the top-scorer player indices). `ov` (cumulative runs at the end of each
+# completed over) is a parallel column on matches.json, not packed here: it is variable-length.
 INN_FIELDS = ["team", "runs", "wkts", "balls", "f4", "f6", "n30", "n50", "n100", "n10", "nsd", "nduck",
-              "ho", "mc", "ts"]
+              "ho", "mc", "ts", "ex", "ro", "mw"]
+INN_STATS = tuple(INN_FIELDS[1:])  # everything after team; compact rows insert opp between team and these
 OVERS_QUAL = 0.8  # T20/ODI summary markets: void unless 80% of the scheduled overs were bowled in BOTH innings
 
 
@@ -91,7 +93,7 @@ def parse_match(mid: str, doc: dict) -> dict | None:
         if team not in info["teams"]:
             continue
         opp = info["teams"][1 - info["teams"].index(team)]
-        r = _parse_innings(inn, people)
+        r = _parse_innings(inn, people, bpo)
         r["team"], r["opp"], r["no"] = team, opp, k
         innings.append(r)
         for p, b in r["bat"].items():
@@ -112,20 +114,21 @@ def parse_match(mid: str, doc: dict) -> dict | None:
     return m
 
 
-def _parse_innings(inn: dict, people: dict) -> dict:
+def _parse_innings(inn: dict, people: dict, bpo: int = 6) -> dict:
     pid = lambda n: people.get(n) or ""  # noqa: E731 - unknown registry ids are dropped by the exporter
     B: dict[str, dict] = {}
     W: dict[str, dict] = {}
     F: dict[str, dict] = {}  # fielding credits: catches (a caught-and-bowled is the bowler's) and stumpings
     order: list[str] = []
     parts: list[dict] = []
-    runs = wkts = legal = 0
+    runs = wkts = legal = extras = runouts = 0
     ho = 0
+    ov: list[int] = []  # cumulative runs at the end of each completed over (session / first-over markets)
     seg = None
     seg_k = 0
-    for ov in inn.get("overs", []):
-        orun = 0
-        for dl in ov["deliveries"]:
+    for over in inn.get("overs", []):
+        orun = over_legal = 0
+        for dl in over["deliveries"]:
             bt, ns, bw = dl["batter"], dl["non_striker"], dl["bowler"]
             for p in (bt, ns):
                 if p not in B:
@@ -136,6 +139,7 @@ def _parse_innings(inn: dict, people: dict) -> dict:
             tot = rr["total"]
             runs += tot
             orun += tot
+            extras += sum(ex.values()) if ex else int(rr.get("extras") or 0)
             b = B[bt]
             b["r"] += rr["batter"]
             if "wides" not in ex:
@@ -150,6 +154,7 @@ def _parse_innings(inn: dict, people: dict) -> dict:
             if leg:
                 w["bb"] += 1
                 legal += 1
+                over_legal += 1
             # partnership segment
             pair = frozenset((bt, ns))
             if seg is not None and seg["pair"] != pair:  # pair changed without a wicket (retirement): close it
@@ -172,6 +177,8 @@ def _parse_innings(inn: dict, people: dict) -> dict:
                         seg = None
                     continue
                 wkts += 1
+                if kind == "run out":
+                    runouts += 1
                 if kind in ("caught", "caught and bowled", "stumped"):
                     names = [f["name"] for f in wk.get("fielders") or [] if f.get("name")] or ([bw] if kind == "caught and bowled" else [])
                     for nm in names[:1]:
@@ -186,11 +193,13 @@ def _parse_innings(inn: dict, people: dict) -> dict:
                     seg = None
                     ended = True
         ho = max(ho, orun)
+        if over_legal >= bpo:  # only a completed over is a session checkpoint; a partial last over stays in `runs`
+            ov.append(runs)
     if seg is not None:
         parts.append(_close(seg, pid, None, 0))
     return {"bat": {pid(p): v for p, v in B.items() if pid(p)}, "bowl": {pid(p): v for p, v in W.items() if pid(p)}, "fld": {pid(p): v for p, v in F.items() if pid(p)},
-            "parts": [p for p in parts if p], "runs": runs, "wkts": wkts, "balls": legal, "ho": ho,
-            "order": [pid(p) for p in order]}
+            "parts": [p for p in parts if p], "runs": runs, "wkts": wkts, "balls": legal, "ho": ho, "ex": extras, "ro": runouts, "ov": ov,
+            "declared": bool(inn.get("declared")), "order": [pid(p) for p in order]}
 
 
 def _close(seg: dict, pid, out: str | None, kind: int, counted: bool = True) -> dict | None:
@@ -208,8 +217,14 @@ def _close(seg: dict, pid, out: str | None, kind: int, counted: bool = True) -> 
             "balls": seg["balls"], "ra": ra.get(a, 0), "rb": ra.get(b, 0), "x": who, "kd": kind}
 
 
+def pack_inn(inn: dict) -> list:
+    """One compact innings row: team, opp, INN_STATS, tops. `ov` is stored beside the innings list, not in it."""
+    return [inn["team"], inn.get("opp", ""), *[inn.get(k) for k in INN_STATS], inn.get("tops") or []]
+
+
 def _market_aggregates(m: dict) -> None:
     mc_by: dict[str, int] = {}
+    mw_by: dict[str, int] = {}
     top_all = 0
     for inn in m["innings"]:
         sc = [v["r"] for v in inn["bat"].values()]
@@ -223,10 +238,12 @@ def _market_aggregates(m: dict) -> None:
         inn["nduck"] = sum(1 for v in inn["bat"].values() if v["r"] == 0 and v["k"] and v["k"] != KIND_CODE["retired hurt"])
         inn["ts"] = max(sc) if sc else 0
         inn["mc"] = max((v["rc"] for v in inn["bowl"].values()), default=0)
+        inn["mw"] = max((v["w"] for v in inn["bowl"].values()), default=0)
         inn["tops"] = [p for p, v in inn["bat"].items() if v["r"] == inn["ts"] and inn["ts"] > 0]
         top_all = max(top_all, inn["ts"])
         for p, v in inn["bowl"].items():
             mc_by[p] = mc_by.get(p, 0) + v["rc"]
+            mw_by[p] = mw_by.get(p, 0) + v["w"]
         for p, v in inn["bat"].items():
             others = [q for q in inn["bat"] if q != p and inn["bat"][q]["r"] == v["r"]]
             v["tb"] = 0 if v["r"] != inn["ts"] or v["r"] == 0 else (2 if others else 1)
@@ -235,6 +252,7 @@ def _market_aggregates(m: dict) -> None:
         for v in inn["bat"].values():
             v["mt"] = 0 if v["r"] != top_all or top_all == 0 else (2 if tied > 1 else 1)
     m["mc"] = max(mc_by.values(), default=0)
+    m["mw"] = max(mw_by.values(), default=0)
     m["ts"] = top_all
     m["ho"] = max((i["ho"] for i in m["innings"]), default=0)
     m["q"] = qualifies(m)

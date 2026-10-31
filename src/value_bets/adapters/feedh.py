@@ -10,7 +10,7 @@ in-horizon game and competition page (internationals first), ``FEEDH_SPACING_SEC
 Rows are the player markets the other books already map: "Batsman Runs / Sixes / Fours - Last, First" and "Bowler Wickets - Last, First"
 over/unders, "Player Performance - Last, First" (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; the book's
 own scoring is not in the payload), "To score N - Last, First" yes/nos, and Top Batsman / Top Bowler (match and per side). Match
-totals of runs / fours / sixes and a side's total runs / fours / sixes come back as ``fancy`` lines. A Test's unscoped player line is
+totals of runs / fours / sixes, first-innings runs, highest over, ducks, run-outs, first-N-overs session runs and a side's total runs / fours / sixes come back as ``fancy`` lines. A Test's unscoped player line is
 not the match total the pipeline prices and is left out of rows (it still goes in the catalogue). Head-to-head is never a row.
 
 Every open market of a fetched match is also returned as a compact ``catalogue`` row (name, player, line, both decimal prices, which
@@ -63,6 +63,13 @@ MATCH_FOURS = re.compile(r"^Total fours\s*$", re.I)
 MATCH_SIXES = re.compile(r"^Total sixes\s*$", re.I)
 TOP_SCORE = re.compile(r"^Top batter total$", re.I)
 MATCH_RUNS = re.compile(r"^Match Total Runs$", re.I)
+FIRST_INNINGS = re.compile(r"^First Innings Total Runs$", re.I)
+HIGHEST_OVER = re.compile(r"^Total in the highest scoring over$", re.I)
+TEAM_HIGHEST = re.compile(r"^Total in the highest scoring over\s*- (?P<team>.+)$", re.I)
+DUCKS = re.compile(r"^Total Ducks$", re.I)
+RUNOUTS = re.compile(r"^Total run[- ]?outs$", re.I)
+AFTER_N = re.compile(r"^Total runs after (?P<n>\d+) overs(?:\s*- (?P<team>.+))?$", re.I)
+OVER_1 = re.compile(r"^Total runs for over 1 in 1st innings?(?:\s*- (?P<team>.+))?$", re.I)
 OU = re.compile(r"^(Over|Under)\s+(\d+(?:\.\d+)?)$", re.I)
 TOP_MT = {"Batsman": ("top_batter_team", "top_batter_match"), "Bowler": ("top_bowler_team", "top_bowler_match")}
 
@@ -289,6 +296,31 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
             continue
         if TOP_SCORE.match(name):
             add_ou(name, None, None, "top_score", fancy_key="top_score")
+            continue
+        if FIRST_INNINGS.match(name):
+            add_ou(name, None, None, "first_innings_runs", fancy_key="first_innings_runs")
+            continue
+        if HIGHEST_OVER.match(name):
+            add_ou(name, None, None, "highest_over", fancy_key="highest_over")
+            continue
+        if (mm := TEAM_HIGHEST.match(name)):
+            add_ou(name, None, mm["team"], "team_total_highest_over", fancy_key="team_total_highest_over", scope="team")
+            continue
+        if DUCKS.match(name):
+            add_ou(name, None, None, "match_ducks", fancy_key="match_ducks")
+            continue
+        if RUNOUTS.match(name):
+            add_ou(name, None, None, "match_runouts", fancy_key="match_runouts")
+            continue
+        if (mm := AFTER_N.match(name)):
+            n, side = int(mm["n"]), (mm["team"] or "").strip() or None
+            key = f"overs_{n}"
+            add_ou(name, None, side, key, fancy_key=key, scope="team" if side else "match")
+            continue
+        if (mm := OVER_1.match(name)):
+            side = (mm["team"] or "").strip() or None
+            key = "overs_1" if side else "first_over"
+            add_ou(name, None, side, key, fancy_key=key, scope="team" if side else "match")
             continue
         if (mm := TOP_TEAM.match(name)):
             mt = TOP_MT[mm["who"].title()][0]

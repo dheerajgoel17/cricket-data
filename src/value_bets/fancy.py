@@ -3,7 +3,7 @@
 A fancy line is the whole match's (or one side's across the match) unless it carries ``inn``: 1 or 2, one side's first or second innings, which only a Test has (Feed K and
 Feed E give those). ``inn`` is part of the line's key. The Match Fancy tab scores an innings team total on that side's own 1st/2nd innings as its own row, never mixed into the match total.
 
-These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score,
+These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score, run-outs,
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,
 paired into a line with its over and under decimal prices, and published as ``fancy`` in ``book_lines.json``. Keys match the site's engine
 markets (``site/src/engine/markets.js``). Back prices only; nothing here prices or recommends a bet.
@@ -37,7 +37,8 @@ def _fmt(m: dict) -> str | None:
     return None
 
 # group name -> (engine market key, scope) for groups whose quotes carry the side in `label` (or `side`) and the line in `handicap`
-MATCH_GROUPS = {"Total Match Runs": "match_runs", "Most Runs in a Single Over": "highest_over", "1st Innings Score": "first_innings_runs"}
+MATCH_GROUPS = {"Total Match Runs": "match_runs", "Most Runs in a Single Over": "highest_over", "1st Innings Score": "first_innings_runs",
+                "Total Run Outs - Match": "match_runouts"}
 # "Match Totals" holds several lines in one group; the quote's `line` names which
 TOTALS = {"Boundaries": "match_boundaries", "Sixes": "match_sixes", "Fours": "match_fours"}
 # team totals: the quote's `line` is the team name

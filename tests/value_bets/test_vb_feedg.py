@@ -54,14 +54,19 @@ def test_session_rows_read_back_and_lay_rates_as_the_exchange_does_hand_computed
     assert by["team_total_runs", "Melbourne Renegades W", 149.5] == (2.0, None) and by["team_total_runs", "Melbourne Renegades W", 146.5] == (None, 2.0)
     assert by["team_total_fours", "Sydney Thunder W", 16.5] == (2.0, None)  # "1st Inn Total Match Fours ST W"
     assert ("top_score", None, 58.5) in by and ("highest_over", None, 17.5) in by
+    # 6 Over Runs MR W 43 / 41 at 100 / 100: over 42.5 and under 40.5; extras 19 / 17; most wickets 4 / 3; first over 6 / 5
+    assert by["overs_6", "Melbourne Renegades W", 42.5] == (2.0, None) and by["overs_6", "Melbourne Renegades W", 40.5] == (None, 2.0)
+    assert by["match_extras", None, 18.5] == (2.0, None) and by["max_wickets", None, 3.5] == (2.0, None)
+    assert by["first_over", None, 5.5] == (2.0, None) and by["first_over", None, 4.5] == (None, 2.0)
     side = [f for f in fx if f["key"] == "team_total_runs"]
     assert all(f["bat_first"] and f["rules"] == "void_any_ball" for f in side) and all("bat_first" not in f and f["rules"] == "not_voided_by_lost_balls" for f in fx if f["scope"] == "match")
+    sess = [f for f in fx if f["key"].startswith("overs_")]
+    assert sess and all(f["bat_first"] and f["rules"] == "void_any_ball" for f in sess)
 
 
-def test_part_innings_odd_even_and_counting_markets_are_left_out():
+def test_odd_even_and_per_batter_boundaries_are_left_out():
     _, (rows, fx, left) = parsed()
-    assert {"6 Over Runs MR W Adv", "10 Over Runs ST W Adv", "6 Over Odd Even Run Bhav MR W Adv", "T Wilson Boundaries Adv", "Match 1st Over Run Adv", "Total Match Extras (MR W vs ST W) Adv"} <= set(left)
-    assert not any(f["line"] in (43.5, 44.5) for f in fx)  # no 6-over line
+    assert {"6 Over Odd Even Run Bhav MR W Adv", "T Wilson Boundaries Adv"} <= set(left)
 
 
 def test_a_closed_market_is_not_a_price():

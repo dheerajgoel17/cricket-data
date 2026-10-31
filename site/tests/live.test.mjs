@@ -281,6 +281,10 @@ test("parseCardPage batting, extras, FOW, yet-to-bat, bowling (hand-computed)", 
   assert.equal(inn.extras.total, 8); // 2+5+0+1+0
   assert.equal(inn.extras.byes, 2);
   assert.equal(inn.extras.legByes, 5);
+  assert.equal(m.innings[0].extras, 8);
+  assert.equal(liveMarket(m, "match_extras"), 8);
+  assert.equal(m.innings[0].maxWickets, 1);
+  assert.equal(m.innings[0].runouts, 0);
   assert.deepEqual(inn.fow.map((w) => [w.wkts, w.runs, w.name]), [[1, 27, "Evin Lewis"], [2, 70, "Shai Hope"]], "wickets are numbered in the order they fell, not batting order");
   assert.equal(inn.bowlers[0].name, "Jasprit Bumrah");
   assert.equal(inn.bowlers[0].overs, 4); // 24 balls
@@ -331,6 +335,13 @@ test("chase totals across both innings (hand-computed)", () => {
   assert.equal(liveMarket(m, "top_score"), 89);
   assert.equal(liveMarket(m, "match_50s"), 1); // Mitchell 89
   assert.equal(liveMarket(m, "match_30s"), 2); // Allen 40, Jacobs 39
+  assert.equal(liveMarket(m, "match_extras"), 11 + 6); // NZ 4+5+2, India 4+2
+  assert.equal(liveMarket(m, "max_wickets"), 2); // Arshdeep
+  assert.equal(liveMarket(m, "overs_6", "New Zealand"), null, "NZ have gone past 6 overs: the live total is not the session score");
+  assert.equal(liveMarket(m, "overs_6", "India"), 42, "India 1.4 ov, still inside the 6-over session");
+  assert.equal(liveMarket(m, "first_over"), null, "the first innings is past over 1");
+  assert.equal(fancyState(m, { key: "overs_6", team: "New Zealand" }), "final");
+  assert.equal(fancyState(m, { key: "overs_6", team: "India" }), "live");
 });
 
 test("a Test team's 2nd innings so-far is that side's own second turn, not the match's 4th innings number", () => {
@@ -375,6 +386,19 @@ test("fancyStanding: the same so-far / Cleared / Missed a player prop gets, from
     { n: 4, team: "West Indies", runs: 51, wkts: 1 },
   ] };
   assert.deepEqual(fancyStanding(chasing, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 135.5 }), { v: 142, state: "final", verdict: "cleared" }, "BAN 142 in their 2nd inns, WI now chasing: over 135.5 is done");
+});
+
+test("a fancy side run line tagged bat_first voids once that side is bowling first; premium (untagged) stays live for both", () => {
+  const m = chase();
+  const voided = { v: null, state: "void", verdict: null };
+  assert.deepEqual(fancyStanding(m, { key: "overs_6", team: "India", line: 40.5, bat_first: true }), voided, "India chasing: fancy 6-over run line is void");
+  assert.deepEqual(fancyStanding(m, { key: "overs_10", team: "India", line: 70.5, batFirst: true }), voided);
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 40.5, bat_first: true }), voided, "fancy lambi also voids if they did not bat first");
+  assert.deepEqual(fancyStanding(m, { key: "overs_6", team: "India", line: 40.5 }), { v: 42, state: "live", verdict: "cleared" }, "premium / untagged: India's chase so-far still counts");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_fours", team: "India", line: 10.5 }), { v: 4, state: "live", verdict: null }, "premium fours have no batting-order condition");
+  assert.equal(fancyStanding(m, { key: "overs_6", team: "New Zealand", line: 40.5, bat_first: true }), null, "NZ batted first and are past 6 overs: session so-far is gone, not void");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 180.5, bat_first: true }), { v: 198, state: "final", verdict: "cleared" }, "NZ batted first: fancy lambi still scores");
+  assert.equal(fancyStanding({ status: "live", innings: [] }, { key: "overs_6", team: "India", line: 40.5, bat_first: true }), null, "before an innings starts, do not void yet");
 });
 
 test("last wicket is the latest fall, not the last dismissed batter in batting order", () => {

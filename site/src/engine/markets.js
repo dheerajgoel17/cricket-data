@@ -2,9 +2,10 @@
 import { summarize, fairOdds, suggestLines } from "./stats.js";
 import { norm, round } from "./util.js";
 
-// innings array layout (see src/cricket_site/parse.py INN_FIELDS)
-const [IT, IR, IW, IB, IF4, IF6, I30, I50, I100, I10, ISD, IDK, IHO, IMC, ITS, ITOP] = Array.from({ length: 16 }, (_, i) => i);
-const sum = (inn, k) => inn.reduce((s, x) => s + x[k], 0);
+// innings array layout (see src/cricket_site/parse.py INN_FIELDS). tops start at ITOP; `ov` is a parallel column.
+const [IT, IR, IW, IB, IF4, IF6, I30, I50, I100, I10, ISD, IDK, IHO, IMC, ITS, IEX, IRO, IMW, ITOP] = Array.from({ length: 19 }, (_, i) => i);
+const sum = (inn, k) => inn.reduce((s, x) => s + (x[k] || 0), 0);
+const known = (inn, k) => inn.length && inn.every((x) => x[k] != null);
 
 export const MATCH_MARKETS = {
   match_runs: { label: "Match total runs", get: (s, m) => sum(s.M.inn[m], IR) },
@@ -13,14 +14,18 @@ export const MATCH_MARKETS = {
   match_sixes: { label: "Match sixes", get: (s, m) => sum(s.M.inn[m], IF6) },
   match_boundaries: { label: "Match boundaries (4s + 6s)", get: (s, m) => sum(s.M.inn[m], IF4) + sum(s.M.inn[m], IF6) },
   first_innings_runs: { label: "1st innings score", get: (s, m) => s.M.inn[m][0]?.[IR] ?? 0 },
+  first_over: { label: "1st over runs", get: (s, m) => oversScore(s.M.ov?.[m]?.[0], s.M.inn[m][0], 1) },
   match_30s: { label: "Match 30s (30-49)", get: (s, m) => sum(s.M.inn[m], I30) },
   match_50s: { label: "Match 50s (50-99)", get: (s, m) => sum(s.M.inn[m], I50) },
   match_100s: { label: "Match 100s", get: (s, m) => sum(s.M.inn[m], I100) },
   match_double_digits: { label: "Double-digit scores (10+)", get: (s, m) => sum(s.M.inn[m], I10) },
   match_single_digits: { label: "Single-digit scores (1-9, no ducks)", get: (s, m) => sum(s.M.inn[m], ISD) },
-  match_ducks: { label: "Ducks", get: (s, m) => sum(s.M.inn[m], IDK) },
+  match_ducks: { label: "Ducks", get: (s, m) => (known(s.M.inn[m], IDK) ? sum(s.M.inn[m], IDK) : null) },
+  match_extras: { label: "Match extras", get: (s, m) => (known(s.M.inn[m], IEX) ? sum(s.M.inn[m], IEX) : null) },
+  match_runouts: { label: "Match run outs", get: (s, m) => (known(s.M.inn[m], IRO) ? sum(s.M.inn[m], IRO) : null) },
   highest_over: { label: "Highest single over (runs)", get: (s, m) => (s.M.pv[m] && !s.M.ho[m] ? null : s.M.ho[m]) },
   max_conceded: { label: "Most runs conceded by a bowler", get: (s, m) => (s.M.pv[m] && !s.M.mc[m] ? null : s.M.mc[m]) },
+  max_wickets: { label: "Most wickets by a bowler", get: (s, m) => (s.M.pv[m] && !s.M.mw[m] ? null : s.M.mw[m]) },
   top_score: { label: "Top batter's score", get: (s, m) => s.M.ts[m] },
 };
 
@@ -48,7 +53,28 @@ export const TEAM_TOTAL_MARKETS = {
   team_total_fours: { label: "Team fours", keys: [IF4] },
   team_total_sixes: { label: "Team sixes", keys: [IF6] },
   team_total_boundaries: { label: "Team boundaries (4s + 6s)", keys: [IF4, IF6] },
+  team_total_extras: { label: "Team extras", keys: [IEX] },
+  team_total_runouts: { label: "Team run outs", keys: [IRO] },
+  team_total_ducks: { label: "Team ducks", keys: [IDK] },
+  team_total_highest_over: { label: "Team highest over", keys: [IHO] },
 };
+
+/** Session / first-N-overs keys the books quote (`overs_6`, `overs_10`, …). `first_over` is the match's opening over. */
+export const OVERS_KEY = /^overs_(\d+)$/;
+export const oversN = (key) => (key === "first_over" ? 1 : +(OVERS_KEY.exec(key) || [])[1] || 0);
+export const oversLabel = (n) => (n === 1 ? "1st over" : `${n} overs`);
+
+/**
+ * Cumulative runs after `n` completed overs. If the innings ended earlier (all out / declared), the innings total
+ * stands. An incomplete innings that never reached `n` overs is unknown (null), not zero.
+ */
+export function oversScore(ov, inn, n) {
+  if (!(n > 0)) return null;
+  const tape = Array.isArray(ov) ? ov : [];
+  if (tape.length >= n) return tape[n - 1];
+  if (inn && ((inn[IW] || 0) >= 10 || inn.declared)) return inn[IR] ?? null;
+  return null;
+}
 
 export const ALL_MARKETS = { ...MATCH_MARKETS, ...TEAM_MARKETS };
 
@@ -99,6 +125,12 @@ export function venueIndices(store, name) {
 export const venueStem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
 
 export function marketReport(store, ms, key, line = null) {
+  const n = oversN(key);
+  if (n && !ALL_MARKETS[key]) {
+    const values = ms.map((m) => oversScore(store.M.ov?.[m]?.[0], store.M.inn[m]?.[0], n)).filter((v) => v != null);
+    const sum_ = summarize(values, line);
+    return { key, label: oversLabel(n), n: values.length, summary: sum_, ladder: suggestLines(values, 1, 5).map((l) => summarize(values, l)), values };
+  }
   const def = ALL_MARKETS[key];
   const values = ms.map((m) => def.get(store, m)).filter((v) => v != null);
   const sum_ = summarize(values, line);
@@ -113,12 +145,14 @@ export function marketReport(store, ms, key, line = null) {
  */
 export function teamTotalValues(store, ms, team, key, inn = 0) {
   const { keys } = TEAM_TOTAL_MARKETS[key];
-  const add = (i) => keys.reduce((a, k) => a + i[k], 0);
+  const add = (i) => (keys.some((k) => i[k] == null) ? null : keys.reduce((a, k) => a + i[k], 0));
   return ms.flatMap((m) => {
     const inns = store.M.inn[m].filter((i) => i[IT] === team);
     const rows = inn > 0 ? inns.slice(inn - 1, inn) : inns;
     if (inn > 0 && !rows.length) return [];
-    return [rows.reduce((t, i) => t + add(i), 0)];
+    const vals = rows.map(add);
+    if (!vals.length || vals.some((v) => v == null)) return [];
+    return [vals.reduce((t, v) => t + v, 0)];
   });
 }
 
@@ -128,6 +162,26 @@ export function teamTotalReport(store, ms, team, key, line = null, inn = 0) {
   const sum_ = summarize(values, line);
   const lines = key === "team_total_runs" ? ladderAround(sum_.median, 10) : suggestLines(values, 1, 5);
   return { key, label: TEAM_TOTAL_MARKETS[key].label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };
+}
+
+/**
+ * Per-match values of "runs after n overs" for `team`. Same innings picking as `teamTotalValues`. A match that never
+ * completed n overs (and was not all out) is left out.
+ */
+export function teamOversValues(store, ms, team, n, inn = 0) {
+  return ms.flatMap((m) => {
+    const inns = store.M.inn[m].map((row, k) => ({ row, ov: store.M.ov?.[m]?.[k] || [] })).filter((x) => x.row[IT] === team);
+    const x = inns[(inn > 0 ? inn : 1) - 1]; // a session is one innings; unscoped is the side's first
+    if (!x) return [];
+    const v = oversScore(x.ov, x.row, n);
+    return v == null ? [] : [v];
+  });
+}
+
+export function teamOversReport(store, ms, team, n, line = null, inn = 0) {
+  const values = teamOversValues(store, ms, team, n, inn);
+  const sum_ = summarize(values, line);
+  return { key: `overs_${n}`, label: oversLabel(n), n: values.length, summary: sum_, ladder: suggestLines(values, 1, 5).map((l) => summarize(values, l)), values };
 }
 
 function ladderAround(med, step) {
