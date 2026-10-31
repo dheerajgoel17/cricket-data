@@ -4,6 +4,7 @@ import { bookQuotes } from "@cricket/engine/lines.js";
 import { nextMatchRates } from "@cricket/engine/next-match.js";
 import { localWhen, odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OddsTable } from "./odds-table";
@@ -30,6 +31,19 @@ export type NextMatchInfo = {
 };
 
 export type LineSoFar = Standing;
+
+/** Shown when this stat has no listed book line: the chart still uses history so a fair line is readable. */
+export function UnpricedNote({ statLabel, className }: { statLabel: string; className?: string }) {
+  return (
+    <p role="status" className={cn("flex gap-snug rounded-xl bg-secondary/60 p-snug text-callout", className)}>
+      <InformationCircleIcon aria-hidden className="relative top-px size-4 shrink-0 text-muted-foreground" />
+      <span>
+        <span className="font-semibold text-foreground">No book is offering odds for {statLabel}</span>
+        {" "}on this match. Hit rates and fair prices are from his history, not a listed market.
+      </span>
+    </p>
+  );
+}
 
 /** One context row: hit rate, n, fair decimal odds on the line the chart is on. */
 function RateRow({ label, r, side, line }: { label: string; r: { p: number | null; hits: number; played: number; fair: number | null }; side: string; line: number }) {
@@ -82,34 +96,40 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
       {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
       {book ? (
-        <>
-          <div className="grid gap-hair border-t border-hairline pt-snug">
-            <div className="flex flex-wrap items-baseline justify-between gap-snug">
-              <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
-                {standing != null && <> · <StandingMark standing={standing} line={line} /></>}
-              </span>
-              {best > 1 ? <Tick value={best} className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</Tick> : null}
-            </div>
-            {quotes.length ? (
-              <OddsTable lines={quotes.map((q: any) => ({ line: q.line, books: [{ source: q.source, over: q.over, under: q.under, underAt: q.underAt }] }))} />
-            ) : book.main && book.main.line !== line ? (
-              <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
-            ) : null}
+        <div className="grid gap-hair border-t border-hairline pt-snug">
+          <div className="flex flex-wrap items-baseline justify-between gap-snug">
+            <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
+              {standing != null && <> · <StandingMark standing={standing} line={line} /></>}
+            </span>
+            {best > 1 ? <Tick value={best} className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</Tick> : null}
           </div>
-
-          <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
-            {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
-            {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
-            <Note className="sm:col-span-2" title="How to read this" items={[
-              <>Hit rate counts {fmt ? <b className="font-semibold text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
-              "Games he did not play (DNP) or that were void are left out, not counted as misses.",
-              "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin, so compare them with the listed price.",
-            ]} />
-          </div>
-        </>
+          {quotes.length ? (
+            <OddsTable lines={quotes.map((q: any) => ({ line: q.line, books: [{ source: q.source, over: q.over, under: q.under, underAt: q.underAt }] }))} />
+          ) : book.main && book.main.line !== line ? (
+            <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
+          ) : null}
+        </div>
       ) : (
-        <p className="border-t border-hairline pt-snug text-callout text-muted-foreground">No props live yet</p>
+        <div className="grid gap-snug border-t border-hairline pt-snug">
+          <p role="status" className="text-callout">
+            <span className="font-semibold text-foreground">No listed odds</span>
+            <span className="text-muted-foreground"> · no book is offering {statLabel} on this match</span>
+          </p>
+          <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
+        </div>
       )}
+
+      <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
+        {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
+        {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
+        <Note className="sm:col-span-2" title="How to read this" items={[
+          <>Hit rate counts {fmt ? <b className="font-semibold text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
+          "Games he did not play (DNP) or that were void are left out, not counted as misses.",
+          book
+            ? "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin, so compare them with the listed price."
+            : "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin. No listed price to compare yet.",
+        ]} />
+      </div>
     </div>
   );
 }
