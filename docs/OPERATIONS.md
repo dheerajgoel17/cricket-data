@@ -86,13 +86,15 @@ Google Analytics 4 loads the same way when `VITE_GA_MEASUREMENT_ID` is set (`sit
 
 
 ## Match state (one phase per match)
-`.github/workflows/state-sync.yml` runs `site/scripts/state-sync.mjs` every 5 minutes (GitHub cron can slip by several minutes): it reads the live feed the same way `api/live` does, upserts one row per match into `public.match_state` (migration `supabase/migrations/20261031_match_state.sql`, applied) and settles rows the feed no longer lists by the clock (in play for the keep window, then final). `site/api/state.js` serves the table in the shape of `/api/live` `matches[]`; the player page's match card uses it after the live feed and before the clock (`matchPhase`). It is only trusted while its last write is under 20 minutes old (`freshState`).
+A **Cloudflare Worker** (`state/worker.js`, `state/wrangler.jsonc`, Cron Trigger every minute: GitHub's own cron slips by minutes, so it is not used for this) reads the live feed with the same code the site uses (`site/packages/engine/feed.js`) and writes `public.match_state` (migrations `supabase/migrations/20261031_match_state.sql` and `..._writer.sql`) through the database function `apply_match_state(token, upserts, phases)`: one row per match, rows the feed dropped settled by the clock (in play for the keep window, 24 h or 6 days for a Test, then final). The writer holds only the project's **public** key plus a random write token whose SHA-256 is stored in `private.match_state_writer`; the service key is not involved and the table cannot be written any other way with the public key.
+
+`site/api/state.js` serves the table in the shape of `/api/live` `matches[]`; the player page's match card uses it after the live feed and before the clock (`matchPhase`), and only while the table's last write is under 20 minutes old (`freshState`).
 
 | Name | Where | Used by |
 |---|---|---|
-| `SUPABASE_URL` | GitHub variable (already set) and **Vercel env** | the writer; `api/state.js` |
-| `SUPABASE_SERVICE_KEY` | GitHub secret (already set) | the writer (write access) |
-| `LIVE_SOURCE_BASE` | GitHub secret (add it if missing) | the writer |
-| `SUPABASE_ANON_KEY` | **Vercel env** (the project's publishable key) | `api/state.js` (read-only) |
+| `LIVE_SOURCE_BASE`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STATE_WRITE_TOKEN` | **Cloudflare Worker secrets** (`wrangler secret put`, in `state/`) | the writer |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Vercel env (Production and Preview) | `api/state.js` (read-only) |
 
-Until `SUPABASE_URL` and `SUPABASE_ANON_KEY` are set on Vercel, `/api/state` answers 503 and the site works the phase out itself, as before. Check it: `select phase, count(*) from match_state group by 1;` and `select max(updated_at) from match_state;` (should be minutes old).
+Deploy: `cd state && npx wrangler deploy`. Rotate the write token: generate a new random string, `update private.match_state_writer set token_hash = encode(extensions.digest('<token>', 'sha256'), 'hex')`, then `wrangler secret put STATE_WRITE_TOKEN`. By hand: `STATE_WRITE_TOKEN=... node site/scripts/state-sync.mjs`. Check: `select phase, count(*) from match_state group by 1;` and `select max(updated_at) from match_state;` (under two minutes old). Logs: Cloudflare dashboard, Worker `match-state`, Observability. Without the table (not configured, or stale) the site works the phase out itself, as before.
+
+**What belongs on Cloudflare rather than GitHub Actions:** anything on a clock tighter than about 15 minutes (GitHub cron is best-effort and a public repository's schedules are paused after 60 days of no activity) and anything whose source refuses GitHub's US runners (the Mumbai relay already). Heavy batch work (the Python data build, image sync) stays on GitHub.

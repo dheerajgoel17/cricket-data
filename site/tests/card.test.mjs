@@ -106,7 +106,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v7/player/12/runs/24.5.jpg");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v8/player/12/runs/24.5.jpg");
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });

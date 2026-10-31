@@ -4,44 +4,42 @@ import { readFeed, syncState } from "../scripts/state-sync.mjs";
 
 const feed = (o = {}) => ({ teams: [{ name: "India" }, { name: "Australia" }], start: "2026-10-31T09:00:00Z", fmt: "T20", status: "live", ...o });
 
-function fakeDb(open = []) {
+function fakeDb(open = [], { rpcStatus = 200 } = {}) {
   const calls = [];
   const fetchImpl = async (url, init) => {
     calls.push({ url: url.replace(/^https?:\/\/[^/]+/, ""), method: init.method, body: init.body ? JSON.parse(init.body) : null, headers: init.headers });
     if (init.method === "GET") return { ok: true, status: 200, json: async () => open };
-    return { ok: true, status: 201, json: async () => null };
+    return { ok: rpcStatus === 200, status: rpcStatus, json: async () => ({ upserted: 1, phased: 0 }) };
   };
   return { fetchImpl, calls };
 }
 
-test("upserts one row per feed match and uses the service key", async () => {
+test("writes the feed's rows in one database call with the public key and the write token", async () => {
   const db = fakeDb();
-  const out = await syncState({ matches: [feed(), feed({ teams: [{ name: "England" }] })], base: "https://x.test", key: "sb_secret_abc", now: Date.parse("2026-10-31T10:00:00Z"), fetchImpl: db.fetchImpl });
-  assert.deepEqual(out, { listed: 1, settled: 0 }); // the second has no two sides
-  const post = db.calls.find((c) => c.method === "POST");
-  assert.match(post.url, /^\/rest\/v1\/match_state\?on_conflict=match_key/);
-  assert.equal(post.body[0].phase, "live");
-  assert.equal(post.headers.apikey, "sb_secret_abc");
-  assert.equal(post.headers.Authorization, undefined); // a new-style secret key goes only in apikey
+  const out = await syncState({ matches: [feed(), feed({ teams: [{ name: "England" }] })], base: "https://x.test", key: "public-key", token: "tok", now: Date.parse("2026-10-31T10:00:00Z"), fetchImpl: db.fetchImpl });
+  assert.deepEqual(out, { listed: 1, settled: 0, written: 1 }); // the second has no two sides
+  const rpc = db.calls.find((c) => c.method === "POST");
+  assert.equal(rpc.url, "/rest/v1/rpc/apply_match_state");
+  assert.equal(rpc.body.token, "tok");
+  assert.equal(rpc.body.upserts[0].phase, "live");
+  assert.equal(rpc.headers.apikey, "public-key");
+  assert.equal(db.calls.filter((c) => c.method !== "GET").length, 1);
 });
 
-test("a row the feed no longer lists is settled by the clock, and a listed one is left to the feed", async () => {
+test("a row the feed no longer lists is settled by the clock in the same call, and a listed one is left to the feed", async () => {
   const now = Date.parse("2026-11-02T10:00:00Z");
   const open = [
     { match_key: "old", phase: "live", start_utc: "2026-10-31T09:00:00Z", fmt: "T20" }, // 49 h ago: over
     { match_key: "recent", phase: "live", start_utc: "2026-11-02T06:00:00Z", fmt: "T20" }, // 4 h ago: still in play
   ];
   const db = fakeDb(open);
-  const out = await syncState({ matches: [], base: "https://x.test", key: "legacy.jwt.key", now, fetchImpl: db.fetchImpl });
-  assert.deepEqual(out, { listed: 0, settled: 1 });
-  const patch = db.calls.find((c) => c.method === "PATCH");
-  assert.match(patch.url, /match_key=eq\.old/);
-  assert.equal(patch.body.phase, "final");
-  assert.equal(patch.headers.Authorization, "Bearer legacy.jwt.key");
+  const out = await syncState({ matches: [], base: "https://x.test", key: "k", token: "t", now, fetchImpl: db.fetchImpl });
+  assert.equal(out.settled, 1);
+  assert.deepEqual(db.calls.find((c) => c.method === "POST").body.phases, [{ match_key: "old", phase: "final" }]);
 });
 
-test("a failed write is an error, not a silent skip", async () => {
-  await assert.rejects(syncState({ matches: [feed()], base: "https://x.test", key: "k", fetchImpl: async () => ({ ok: false, status: 401 }) }), /HTTP 401/);
+test("a refused write (wrong token, database down) is an error, not a silent skip", async () => {
+  await assert.rejects(syncState({ matches: [feed()], base: "https://x.test", key: "k", token: "bad", fetchImpl: fakeDb([], { rpcStatus: 401 }).fetchImpl }), /HTTP 401/);
 });
 
 test("readFeed returns the matches of a 200 response and refuses anything else", async () => {
