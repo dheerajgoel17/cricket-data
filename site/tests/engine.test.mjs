@@ -70,6 +70,16 @@ test("team markets use only valid matches and the team batting first", async () 
   assert.ok(Object.keys(MATCH_MARKETS).includes("highest_over"));
 });
 
+test("a team's 2nd innings is not its match total (hand-computed)", () => {
+  const row = (team, runs) => { const a = Array(16).fill(0); a[0] = team; a[1] = runs; return a; };
+  const store = { M: { inn: [[row(0, 360), row(1, 200), row(0, 250), row(1, 100)], [row(0, 400), row(1, 150)]] } };
+  assert.deepEqual(teamTotalReport(store, [0, 1], 0, "team_total_runs").values, [610, 400], "both of team 0's innings, then the one-innings match");
+  assert.deepEqual(teamTotalReport(store, [0, 1], 0, "team_total_runs", null, 1).values, [360, 400]);
+  assert.deepEqual(teamTotalReport(store, [0, 1], 0, "team_total_runs", null, 2).values, [250], "the match where they only batted once is left out, not scored as 0");
+  assert.equal(teamTotalReport(store, [0], 0, "team_total_runs", 500.5).summary.over, 1, "610 over 500.5");
+  assert.equal(teamTotalReport(store, [0], 0, "team_total_runs", 500.5, 2).summary.over, 0, "250 is under 500.5");
+});
+
 test("match fancy: boundaries, first-innings score and a team's own innings", async () => {
   const { store, exp } = await loadFixture();
   const alpha = store.teams.findIndex((t) => t.n === "Alpha");

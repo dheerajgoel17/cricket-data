@@ -2,7 +2,7 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { Link, useNavigate } from "react-router-dom";
-import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ import { useData } from "@/lib/data";
 import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
-import { odds } from "@/lib/format";
+import { odds, shortVenue } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
-/** List row built from shadcn Item parts, iOS style at every width: photo, name and line, then the edge and the hit rate over the last-10 bars; a chevron marks it as tappable. */
+/** List row: photo, name + edge, line, bookmaker mark on the third row, then L10 / ground / bars on a fourth. */
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 
 /** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
@@ -150,7 +150,6 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
 }
 
 export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
-  const books = r.quotes.length > 1; // 2+ books price him: each shows its own line and price below, so the main line's price is not said twice
   return (
     <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-hairline last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
@@ -159,20 +158,23 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
           <ItemMedia><PlayerBadge idx={r.idx} size="md" className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{r.name}</span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!(books && r.quotes.some((q) => q.line === r.line)) && <> · {r.quotes.length === 1 && <><BookBadge source={r.quotes[0].source} />{" "}</>}<Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
+            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!r.quotes.length && <> · <Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
           </ItemContent>
-          <ItemActions className="gap-tight">
+          <ItemActions className="self-start items-center gap-tight">
             <span className="grid justify-items-end text-right">
               <span className="text-caption font-semibold tracking-wider text-muted-foreground">EDGE</span>
               <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
-            <span className="grid justify-items-end gap-hair">
-              <span className={cn("text-footnote font-semibold tabular-nums", pctClass(r[win].p))}>{pct(r[win].p)} <span className="font-normal text-muted-foreground">{wl}{(win === "h2h" || win === "ven") && r[win].played ? ` · ${r[win].played}` : ""}</span></span>
-              {win !== "ven" && r.ven?.played >= 2 && <span className={cn("text-caption tabular-nums", (r.ven.p ?? 0) >= 0.75 ? "font-semibold text-primary" : (r.ven.p ?? 1) <= 0.25 ? "font-semibold text-miss" : "text-muted-foreground")} title={r.venue}>At {String(r.venue).split(",")[0]} {pct(r.ven.p)} · {r.ven.hits}/{r.ven.played}</span>}
-              {bars && <Spark r={r} />}
-            </span>
+            <ChevronRightIcon className="size-4 text-muted-foreground" aria-hidden />
           </ItemActions>
-          {books && <BookQuotes quotes={r.quotes} className="basis-full pl-[calc(var(--control)+var(--spacing-snug))]" />}
+          {r.quotes.length > 0 && <BookQuotes quotes={r.quotes} className="basis-full pl-[calc(var(--control)+var(--spacing-snug))]" />}
+          <div className="flex basis-full items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-caption tabular-nums">
+              <span className={cn("font-semibold", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
+              {win !== "ven" && r.ven?.played >= 2 && <span className={cn("truncate", (r.ven.p ?? 0) >= 0.75 ? "font-semibold text-primary" : (r.ven.p ?? 1) <= 0.25 ? "font-semibold text-miss" : "text-muted-foreground")} title={r.venue}>{r.ven.hits}/{r.ven.played} at {shortVenue(r.venue)}</span>}
+            </span>
+            {bars && <Spark r={r} />}
+          </div>
         </Link>
       </Item>
     </motion.li>
@@ -218,7 +220,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
           {rows.map((r) => {
             const soFar = soFarOf(r), out = outOf(r);
             const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`;
-            const ground = String(r.venue || "").split(",")[0];
+            const ground = shortVenue(r.venue);
             return (
               <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} tabIndex={0} role="link"
                 className={cn("cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover", out && "opacity-60")}

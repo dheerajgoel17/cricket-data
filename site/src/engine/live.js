@@ -927,14 +927,16 @@ export function lineNotIn(match, l, idn = NO_IDENTITY) {
   return notInXI(match, l.player, l.team, idn.sourceOf(l.pid), [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean));
 }
 
-export function liveMarket(match, key, team) {
+/** So-far for a fancy market. `inn` 1 or 2 is that side's own first or second innings (a Test); 0 sums every innings they have batted. */
+export function liveMarket(match, key, team, inn = 0) {
   if (!match) return null;
-  const inn = match.innings || [];
-  const src = team ? inn.filter((i) => teamKey(i.team) === teamKey(team)) : inn;
-  if (!src.length && !["top_score"].includes(key)) return null;
-  const sum = (k) => src.reduce((a, i) => a + (i[k] || 0), 0);
+  const all = match.innings || [];
+  const src = team ? all.filter((i) => teamKey(i.team) === teamKey(team)) : all;
+  const rows = inn > 0 ? src.slice(inn - 1, inn) : src;
+  if (!rows.length && !["top_score"].includes(key)) return null;
+  const sum = (k) => rows.reduce((a, i) => a + (i[k] || 0), 0);
   if (key === "match_runs" || key === "team_total_runs") return sum("runs");
-  if (key === "first_innings_runs") return (team ? src : inn).find((i) => i.n === 1)?.runs ?? null;
+  if (key === "first_innings_runs") return (team ? src : all).find((i) => i.n === 1)?.runs ?? null;
   if (key === "match_sixes" || key === "team_total_sixes") return sum("sixes");
   if (key === "match_fours" || key === "team_total_fours") return sum("fours");
   if (key === "match_boundaries" || key === "team_total_boundaries") return sum("fours") + sum("sixes");
@@ -946,6 +948,49 @@ export function liveMarket(match, key, team) {
   if (key === "match_50s") return (match.players || []).filter((p) => (p.runs || 0) >= 50 && (p.runs || 0) < 100).length;
   if (key === "match_30s") return (match.players || []).filter((p) => (p.runs || 0) >= 30 && (p.runs || 0) < 50).length;
   return null;
+}
+
+/**
+ * Can this fancy so-far still move? A side's own 1st/2nd innings is final once that turn is over (the other side has begun, they are all out, or the overs are used);
+ * a limited-overs team total is final with that innings; a Test match total and a whole-match market stay live until the match ends.
+ */
+export function fancyState(match, { key, team, inn = 0 } = {}) {
+  if (!match) return "live";
+  if (match.status === "final") return "final";
+  const inns = match.innings || [];
+  if (inn > 0 && team) {
+    const src = inns.filter((i) => teamKey(i.team) === teamKey(team));
+    const row = src[inn - 1];
+    if (!row) return "live";
+    if (src.length > inn || inns.some((i) => i.n > row.n)) return "final";
+    const max = MAX_OVERS[match.fmt];
+    if (row.wkts === 10 || (max != null && row.overs != null && row.overs >= max)) return "final";
+    return "live";
+  }
+  if (key === "first_innings_runs") {
+    const first = inns.find((i) => i.n === 1);
+    if (!first) return "live";
+    const max = MAX_OVERS[match.fmt];
+    if (inns.some((i) => i.n > 1) || first.wkts === 10 || (max != null && first.overs != null && first.overs >= max)) return "final";
+    return "live";
+  }
+  if (team && String(key || "").startsWith("team_total_")) {
+    if (!MAX_OVERS[match.fmt]) return "live";
+    return inningsOver(match, team) ? "final" : "live";
+  }
+  return "live";
+}
+
+/**
+ * Where a fancy market stands on the live snapshot, `{v, state, verdict}` or null: the same shape `lineStanding` gives a player prop, from the innings totals
+ * (`liveMarket`) and `lineVerdict`. Overlay this at view time from the 15 s poll; do not bake it into the scored history.
+ */
+export function fancyStanding(match, row) {
+  if (!match || !row?.key) return null;
+  const v = liveMarket(match, row.key, row.team, row.inn || 0);
+  if (v == null) return null;
+  const state = fancyState(match, row);
+  return { v, state, verdict: lineVerdict(v, row.line, state) };
 }
 
 /**

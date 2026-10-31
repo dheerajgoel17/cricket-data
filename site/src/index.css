@@ -67,7 +67,7 @@
   --control: 2.25rem;       /* 36: tappable without iOS-native 44 */
   --chip-radius: 999px;     /* fully rounded pills */
   --row-min: 3.5rem;
-  --fixture-card: 17.5rem;
+  --fixture-card: 80vw;     /* phone peek rail: one card is 80% of the screen so the next one shows */
   --gutter: 0.875rem;
   --content-max: 100%;
   --fs-display: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);

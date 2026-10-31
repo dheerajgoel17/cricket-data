@@ -106,15 +106,25 @@ export function marketReport(store, ms, key, line = null) {
   return { key, label: def.label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };
 }
 
-/** Per-match values of a team-total market for `team` over the matches `ms`. */
-export function teamTotalValues(store, ms, team, key) {
+/**
+ * Per-match values of a team-total market for `team` over the matches `ms`. `inn` 0 (the default) sums every innings that side batted;
+ * 1 or 2 is that side's own first or second innings of the match (a Test: never the match's 3rd/4th innings number). A match where they
+ * did not have that turn is left out, not read as zero.
+ */
+export function teamTotalValues(store, ms, team, key, inn = 0) {
   const { keys } = TEAM_TOTAL_MARKETS[key];
-  return ms.map((m) => store.M.inn[m].filter((i) => i[IT] === team).reduce((t, i) => t + keys.reduce((a, k) => a + i[k], 0), 0));
+  const add = (i) => keys.reduce((a, k) => a + i[k], 0);
+  return ms.flatMap((m) => {
+    const inns = store.M.inn[m].filter((i) => i[IT] === team);
+    const rows = inn > 0 ? inns.slice(inn - 1, inn) : inns;
+    if (inn > 0 && !rows.length) return [];
+    return [rows.reduce((t, i) => t + add(i), 0)];
+  });
 }
 
-/** Same shape as marketReport, for a team-total market. */
-export function teamTotalReport(store, ms, team, key, line = null) {
-  const values = teamTotalValues(store, ms, team, key);
+/** Same shape as marketReport, for a team-total market. `inn` is the team's own innings (see `teamTotalValues`). */
+export function teamTotalReport(store, ms, team, key, line = null, inn = 0) {
+  const values = teamTotalValues(store, ms, team, key, inn);
   const sum_ = summarize(values, line);
   const lines = key === "team_total_runs" ? ladderAround(sum_.median, 10) : suggestLines(values, 1, 5);
   return { key, label: TEAM_TOTAL_MARKETS[key].label, n: values.length, summary: sum_, ladder: lines.map((l) => summarize(values, l)), values };

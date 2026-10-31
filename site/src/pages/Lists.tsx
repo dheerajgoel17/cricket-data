@@ -8,7 +8,7 @@ import { dayKey, dayLabel, fixtureStart, localTime } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { HotProps } from "@/components/app/hot-props";
 import { BookTable } from "@/components/app/book-table";
-import { OverviewRow } from "@/components/app/match-fancy";
+import { OverviewRow, fancyFm } from "@/components/app/match-fancy";
 import { useFancyCards } from "@/hooks/useFancyCards";
 import { TeamBadge } from "@/components/app/badges";
 import { RowsSkeleton } from "@/components/app/skeletons";
@@ -26,7 +26,7 @@ export function PropsPage() {
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
 
-/** Fancy: every priced match with its best-edge whole-match markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. */
+/** Fancy: every priced match with its best-edge markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. Matches in play lead, same as the home rail. */
 export function FancyPage() {
   setTitle("Cricket fancy lines: match totals and over/unders");
   const { cards: rows, ready } = useFancyCards();
@@ -68,9 +68,9 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           </Link>
           {rows.length ? (
             <ul className="border-t border-hairline">
-              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(r.key))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
+              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.id || r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(fancyFm(r.key, r.inn || 0) + (r.scope >= 0 ? `&sc=${r.scope}` : "")))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
             </ul>
-          ) : <p className="border-t border-hairline px-inset py-snug text-callout text-muted-foreground">Lines are up; no past matches to score them on.</p>}
+          ) : <p className="border-t border-hairline px-inset py-snug text-callout text-muted-foreground">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug px-inset pb-inset pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
             <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>

@@ -25,7 +25,7 @@ function TapeCard({ kind, rows }: { kind: "hit" | "miss"; rows: TapeRow[] }) {
   const hit = kind === "hit";
   if (!rows.length) return null;
   return (
-    <section className="flex min-w-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
+    <section className="flex h-full min-w-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
       <div className="flex items-center gap-tight">
         {hit ? <ArrowTrendingUpIcon className="size-4 text-primary" aria-hidden /> : <ArrowTrendingDownIcon className="size-4 text-miss" aria-hidden />}
         <h2 className="text-body font-semibold">{hit ? "High odds hits" : "Low odds misses"}</h2>
@@ -58,14 +58,29 @@ function TapeCard({ kind, rows }: { kind: "hit" | "miss"; rows: TapeRow[] }) {
   );
 }
 
-/** Two modules on the home / props list: long-shot overs that cleared, and short-priced overs that missed, from the scorecard's settled lines. */
+/** Dedicated high-odds-hits / low-odds-misses section. On a phone the two cards share the same 80vw peek rail as the fixture cards; from `lg` they sit side by side. */
 export function MarketTape({ rows }: { rows: TapeRow[] }) {
   const { hits, misses } = marketTape(rows);
-  if (!hits.length && !misses.length) return null;
+  const cards: ["hit" | "miss", TapeRow[]][] = [];
+  if (hits.length) cards.push(["hit", hits]);
+  if (misses.length) cards.push(["miss", misses]);
+  if (!cards.length) return null;
+  const peek = cards.length > 1;
   return (
-    <div className="grid gap-stack lg:grid-cols-2">
-      <TapeCard kind="hit" rows={hits} />
-      <TapeCard kind="miss" rows={misses} />
+    <div
+      role="list"
+      aria-label="High odds hits and low odds misses"
+      className={cn(
+        peek
+          ? "-mx-gutter flex snap-x snap-mandatory gap-snug overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-stack lg:overflow-visible lg:px-0 lg:snap-none"
+          : "grid gap-stack",
+      )}
+    >
+      {cards.map(([kind, list]) => (
+        <div key={kind} role="listitem" className={cn(peek && "w-(--fixture-card) shrink-0 snap-start lg:w-auto")}>
+          <TapeCard kind={kind} rows={list} />
+        </div>
+      ))}
     </div>
   );
 }

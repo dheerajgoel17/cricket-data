@@ -7,11 +7,16 @@ export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div aria-hidden className="-mx-gutter">
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="flex min-h-row items-center gap-snug px-gutter py-snug" style={{ opacity: 1 - i * 0.1 }}>
-          <Skeleton className="size-control shrink-0 rounded-full" />
-          <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-24" /></div>
-          <Skeleton className="h-5 w-16 rounded-md" />
-          <Skeleton className="h-9 w-[84px] rounded-md sm:w-[104px]" />
+        <div key={i} className="flex flex-col gap-tight px-gutter py-snug" style={{ opacity: 1 - i * 0.1 }}>
+          <div className="flex items-center gap-snug">
+            <Skeleton className="size-control shrink-0 rounded-full" />
+            <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-24" /></div>
+            <Skeleton className="h-5 w-16 rounded-md" />
+          </div>
+          <div className="flex items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-9 w-[72px] rounded-md" />
+          </div>
         </div>
       ))}
     </div>
@@ -78,12 +83,12 @@ export function ScorecardSkeleton() {
   );
 }
 
-/** High-odds / low-odds tape while the live lines settle. */
+/** High-odds / low-odds tape while the live lines settle. Same 80vw peek rail as the fixture cards on a phone. */
 export function TapeSkeleton() {
   return (
-    <div aria-hidden className="grid gap-stack lg:grid-cols-2">
+    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
       {[0, 1].map((k) => (
-        <div key={k} className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
+        <div key={k} className="flex w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:w-auto">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-48" />
           {[0, 1].map((n) => (
@@ -119,7 +124,7 @@ export function RailSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-stack">
       <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
-      <div className="flex gap-snug overflow-hidden">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] shrink-0 basis-[88%] rounded-[22px] sm:basis-[340px]" />)}</div>
+      <div className="-mx-gutter flex gap-snug overflow-hidden px-gutter">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}</div>
     </div>
   );
 }

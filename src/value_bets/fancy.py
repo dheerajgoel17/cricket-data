@@ -1,7 +1,7 @@
 """Match-level "fancy" over/under lines from the Feed P (Book A mirror) feed, for the site's Match Fancy tab.
 
 A fancy line is the whole match's (or one side's across the match) unless it carries ``inn``: 1 or 2, one side's first or second innings, which only a Test has (Feed K and
-Feed E give those). ``inn`` is part of the line's key and the Match Fancy tab shows only the lines without it.
+Feed E give those). ``inn`` is part of the line's key. The Match Fancy tab scores an innings team total on that side's own 1st/2nd innings as its own row, never mixed into the match total.
 
 These markets are about the whole match or one side (total runs, sixes, fours, boundaries, first-innings score, highest over, top score,
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,

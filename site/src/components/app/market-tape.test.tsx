@@ -17,6 +17,8 @@ describe("MarketTape", () => {
         ]} />
       </MemoryRouter>,
     );
+    const tape = screen.getByRole("list", { name: "High odds hits and low odds misses" });
+    expect(tape.children).toHaveLength(2);
     expect(screen.getByText("High odds hits")).toBeInTheDocument();
     expect(screen.getByText("Low odds misses")).toBeInTheDocument();
     expect(screen.getByText("Long shot")).toBeInTheDocument();

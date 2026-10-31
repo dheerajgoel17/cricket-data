@@ -20,6 +20,46 @@ export function fromIst(str?: string | null) {
 
 export const initials = (n: string) => String(n).replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 export const abbr = (n: string) => { const w = String(n).replace(/\(W\)/, "").trim().split(/\s+/); return (w.length > 1 ? w.map((x) => x[0]).join("") : w[0]).slice(0, 3).toUpperCase(); };
+
+/** Famous grounds people already shorten; matched against the stadium + city blob. */
+const VENUE_SHORT: [RegExp, string][] = [
+  [/western australia cricket association|\bwaca\b/, "WACA"],
+  [/melbourne cricket ground|\bmcg\b/, "MCG"],
+  [/sydney cricket ground|\bscg\b/, "SCG"],
+  [/\bgabba\b|brisbane cricket ground/, "Gabba"],
+  [/lord'?s/, "Lord's"],
+  [/kennington oval/, "The Oval"],
+  [/wanderers/, "Wanderers"],
+  [/sher-e-bangla/, "Sher-e-Bangla"],
+  [/old trafford/, "Old Trafford"],
+  [/himachal pradesh cricket association/, "HPCA"],
+  [/vidarbha cricket association/, "VCA"],
+];
+const VENUE_REGION = /^(South Australia|Eastern Cape|St Vincent|St Kitts|Hong Kong|Kenya|Kent|Assam|New Chandigarh)$/i;
+
+/**
+ * Tight label for a ground on a prop row: WACA / MCG / Gabba when those are the ground,
+ * else the stadium with "Cricket Association Stadium" tails dropped, else the city.
+ */
+export function shortVenue(v?: string | null) {
+  const raw = String(v || "").replace(/\(.*?\)/g, " ").replace(/\s+/g, " ").trim();
+  if (!raw) return "";
+  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  const ground = parts[0] || "", city = parts[1] || "";
+  const blob = `${ground} ${city}`.toLowerCase();
+  for (const [re, name] of VENUE_SHORT) if (re.test(blob)) return name;
+  let s = ground
+    .replace(/\s+International Cricket (Stadium|Ground)$/i, "")
+    .replace(/\s+Cricket Association(?: Cricket)? (Stadium|Ground)$/i, "")
+    .replace(/\s+(?:International )?(?:National )?(?:Cricket )?(Stadium|Ground)$/i, "")
+    .replace(/^The\s+/i, "")
+    .trim();
+  if (s.length > 18) {
+    const place = city && !VENUE_REGION.test(city) ? city : "";
+    s = place || s.split(/\s+/).slice(0, 2).join(" ");
+  }
+  return s;
+}
 export const shortDate = (d: string) => d.slice(5).split("-").reverse().join("/");
 export const pretty = (s: string) => (s || "").replace(/-/g, " ").replace(/\b[a-z]/g, (c) => c.toUpperCase());
 export const fixtureStart = (f: { start: string }) => (f.start.length > 10 ? new Date(f.start) : new Date(`${f.start}T12:00:00`));

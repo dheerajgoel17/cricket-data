@@ -123,7 +123,7 @@ export function MatchChip({ f }: { f: any }) {
   );
 }
 
-/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). The home phase bar (In play / Pre-match / Resulted) picks which cards sit here. */
+/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). On a phone each card is `--fixture-card` (80% of the screen) so the next match peeks; from `lg` the token is a fixed rem. The home phase bar (In play / Pre-match / Resulted) picks which cards sit here. */
 export function FixtureRail({ fx }: { fx: any[] }) {
   usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
   const [sel, setSel] = useState("all");
@@ -145,7 +145,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
         className="-mx-gutter flex snap-x snap-mandatory gap-snug overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden"
       >
         {shown.map((f, i) => (
-          <div key={`${f.id}${f.a}${f.b}`} role="listitem" className="w-[min(82%,var(--fixture-card))] shrink-0 snap-start">
+          <div key={`${f.id}${f.a}${f.b}`} role="listitem" className="w-(--fixture-card) shrink-0 snap-start">
             <FixtureCard f={f} i={i} />
           </div>
         ))}

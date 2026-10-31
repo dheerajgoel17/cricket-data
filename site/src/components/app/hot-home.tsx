@@ -36,18 +36,20 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const asLine = (r: any) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: any) => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
   const outOf = (r: any) => lineNotIn(matchOf(r), asLine(r), identity);
+  const liveOfFx = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status) === "live";
   const props = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r.l10.hits, r.l10.played, r.prior, r.over) })).filter((r) => r.day === 0 && r.l10.played >= 6 && (!phase || lineHomePhase(r, live.data) === phase))
-    .sort((x, y) => hotOrder({ live: false, p: x.l10.p, edge: x.edge }, { live: false, p: y.l10.p, edge: y.edge })).slice(0, SHOWN), [data, live.data, phase]);
-  const fancy = useMemo(() => cards.flatMap(({ f, rows }: any) => rows.map((r: any) => ({ r, f }))).filter(({ f }: any) => !phase || phaseOf(fixtureState(f, liveForFixture(live.data, f)?.status)) === phase).sort((x: any, y: any) => (y.r.edge ?? -9) - (x.r.edge ?? -9)).slice(0, SHOWN), [cards, live.data, phase]);
+    .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: x.l10.p, edge: x.edge }, { live: matchOf(y)?.status === "live", p: y.l10.p, edge: y.edge })).slice(0, SHOWN), [data, live.data, phase]);
+  const fancy = useMemo(() => cards.flatMap(({ f, rows }: any) => rows.map((r: any) => ({ r, f }))).filter(({ f }: any) => !phase || phaseOf(fixtureState(f, liveForFixture(live.data, f)?.status)) === phase)
+    .sort((x: any, y: any) => hotOrder({ live: liveOfFx(x.f), p: 0, edge: x.r.edge }, { live: liveOfFx(y.f), p: 0, edge: y.r.edge })).slice(0, SHOWN), [cards, live.data, phase]);
   const tapeRows = useMemo(() => (data || []).filter((r) => r.day === 0 && (!phase || lineHomePhase(r, live.data) === phase)).map((r) => {
     const s = soFarOf(r);
     return { idx: r.idx, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
   }), [data, live.data, identity, phase]);
   return (
     <>
+      <div className="empty:hidden lg:hidden">{!isLoading ? <MarketTape rows={tapeRows} /> : null}</div>
       <section aria-label="Hot props" className="flex flex-col gap-section lg:hidden">
         <h1 className="text-display font-bold">Hot props</h1>
-        {!isLoading ? <MarketTape rows={tapeRows} /> : null}
         <div className="flex flex-col gap-section">
         <div className="flex flex-col gap-snug">
           <Head title="Player props" to="/props" />
@@ -57,7 +59,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
         <div className="flex flex-col gap-snug">
           <Head title="Fancy" to="/fancy" />
           {!ready ? <RowsSkeleton /> : fancy.length ? <ul className="-mx-gutter">{fancy.map(({ r, f }: any) => (
-            <li key={`${f.id}${r.key}`} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} sub={`${f.a} v ${f.b}`} onOpen={() => nav(`/fixture/${f.id}?tab=fancy&fm=${r.key}`)} /></li>))}</ul>
+            <li key={`${f.id}${r.id || r.key}`} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} sub={`${f.a} v ${f.b}`} onOpen={() => nav(`/fixture/${f.id}?tab=fancy&fm=${r.inn ? `${r.key}:${r.inn}` : r.key}${r.scope >= 0 ? `&sc=${r.scope}` : ""}`)} /></li>))}</ul>
             : <p className="text-callout text-muted-foreground">{phase ? EMPTY_PHASE[phase] : "No fancy lines are live yet."}</p>}
         </div>
         </div>
