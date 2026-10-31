@@ -2295,6 +2295,14 @@ date,match_id,team,player,reason,candidates
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Harry Cullen Hieatt,no_candidate,
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Jack Wright,no_candidate,
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Jaskaran Sandhu,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Biratnagar Kings,Andre Russell,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Biratnagar Kings,Angelo Mathews,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Sudurpaschim Royals,Anil Kharel,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Biratnagar Kings,Imran Sheikh,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Biratnagar Kings,Rupesh Singh,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Biratnagar Kings,Shehan Jayasuriya,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Sudurpaschim Royals,Sherfane Rutherford,no_candidate,
+2026-10-31,crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5,Sudurpaschim Royals,Tharindu Ratnayake,no_candidate,
 2026-10-31,crex-ken-vs-png-44th-one-day-mens-cwc-challenge-league-a-2024-26-match-updates-14V9,Kenya,Rakep Patel,ambiguous,RR Patel=7fa6bd8e;RN Patel=db1bf9c2
 2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Melbourne Renegades Women,Annie Wikman,no_candidate,
 2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Melbourne Renegades Women,Chloe Lesleigh Tryon,no_candidate,
@@ -2303,3 +2311,6 @@ date,match_id,team,player,reason,candidates
 2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,United Arab Emirates,Khuzaima Bin Tanvir,no_candidate,
 2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,,Shariz Ahmad,no_candidate,
 2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,United Arab Emirates,Sohaib Khan,no_candidate,
+2026-10-31,crex-pak-vs-sl-final-odi-tri-series-in-pakistan-2026-match-updates-13NH,Sri Lanka,Kamindu Mendis,ambiguous,PHKD Mendis=08548b13;RTM Mendis=1be67d37;BKG Mendis=5d1e7582
+2026-10-31,crex-pak-vs-sl-final-odi-tri-series-in-pakistan-2026-match-updates-13NH,Sri Lanka,Kusal Mendis,ambiguous,PHKD Mendis=08548b13;RTM Mendis=1be67d37;BKG Mendis=5d1e7582
+2026-10-31,crex-war-vs-wp-60th-t20-csa-pro-t20-cup-2026-match-updates-1508,Western Province,Jiveshan Pillay,no_candidate,
