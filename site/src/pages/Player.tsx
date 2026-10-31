@@ -134,7 +134,8 @@ function PlayerScreen({ idx }: { idx: number }) {
   const keep = keepMsFor(FORMATS[fmtVal]);
   const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep) : [];
   const statItems = STAT_OPTIONS.filter(([k]) => pricedStats.includes(k));
-  const stat = pricedStats.includes(askedStat) ? askedStat : (pricedStats[0] || askedStat || "runs"); // only a listed prop, else the URL / runs for the form chart with no chips
+  // an explicit ?stat= (a Hot props / shared sixes link) keeps that prop even when a book also listed player performance on an earlier stamp of the same match
+  const stat = askedStat && (STATS as any)[askedStat] ? askedStat : (pricedStats[0] || "runs");
   // A Test batter has three views, each its own lines and its own chart, never mixed: both innings combined (the match total, which a 72.5 line is), his side's 1st innings and its
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
   // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.

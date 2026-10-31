@@ -72,13 +72,14 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0) {
       const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
       const keys = new Map<string, any>();
-      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${l.start_utc}|${lineScope(l)}`, l); // a Test's first-innings line is a row of its own beside the match line
+      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l); // a Test's first-innings line is a row of its own beside the match line; two stamps of one limited-overs fixture share a row
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const score = async (l: any) => {
         const idx = store.P.id.indexOf(l.pid);
         const inn = lineScope(l);
-        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => x.start_utc === l.start_utc) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
+        const chip = matchChipId(l.match, l.start_utc, l.fmt);
+        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null }, split_by: [] }, { playerIdx: idx });

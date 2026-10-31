@@ -48,6 +48,9 @@ describe("matchChipId", () => {
     expect(matchChipId("South Africa vs Australia", iso(27, 8), "Test")).toBe(matchChipId("Australia vs South Africa", iso(30, 8), "Test"));
     expect(matchChipId("India vs New Zealand", iso(28, 12), "T20")).not.toBe(matchChipId("India vs New Zealand", iso(30, 12), "T20"));
   });
+  it("treats two limited-overs stamps a few minutes apart as one chip, not two kick-offs", () => {
+    expect(matchChipId("Pakistan vs Sri Lanka", "2026-10-31T07:30:00Z", "ODI")).toBe(matchChipId("Sri Lanka vs Pakistan", "2026-10-31T08:00:00Z", "ODI"));
+  });
 });
 
 describe("hotLines", () => {
