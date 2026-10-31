@@ -24,7 +24,23 @@ export async function run(env) {
   return syncState({ matches, base: String(env.SUPABASE_URL).replace(/\/+$/, ""), key: env.SUPABASE_ANON_KEY, token: env.STATE_WRITE_TOKEN });
 }
 
+/** Constant-time string compare (the manual trigger below is guarded by the write token). */
+const same = (a, b) => {
+  const enc = new TextEncoder(), x = enc.encode(String(a)), y = enc.encode(String(b));
+  if (x.length !== y.length) return false;
+  let d = 0;
+  for (let i = 0; i < x.length; i++) d |= x[i] ^ y[i];
+  return d === 0;
+};
+
 export default {
+  /** By hand: GET with the header x-state-key equal to the write token runs one sync now and says what happened (for checking and for an uptime monitor). Anything else is a 404. */
+  async fetch(request, env) {
+    if (!env?.STATE_WRITE_TOKEN || !same(request.headers.get("x-state-key") || "", env.STATE_WRITE_TOKEN)) return new Response("not found", { status: 404 });
+    const t0 = Date.now();
+    try { return Response.json({ ok: true, ms: Date.now() - t0, ...(await run(env)) }); }
+    catch (e) { return Response.json({ ok: false, ms: Date.now() - t0, error: String(e.message || e).slice(0, 160) }, { status: 500 }); }
+  },
   async scheduled(_event, env, ctx) {
     ctx.waitUntil(run(env).then((out) => console.log(JSON.stringify({ ok: true, ...out })), (e) => { console.error(`match-state run failed: ${String(e.message || e).slice(0, 120)}`); throw e; }));
   },
