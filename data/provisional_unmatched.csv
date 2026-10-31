@@ -2192,6 +2192,7 @@ date,match_id,team,player,reason,candidates
 2026-10-26,crex-rlys-vs-tn-39th-first-class-ranji-trophy-elite-2026-27-match-updates-147D,Tamil Nadu,S R Athish,no_candidate,
 2026-10-26,crex-rlys-vs-tn-39th-first-class-ranji-trophy-elite-2026-27-match-updates-147D,Railways,Toufik Uddin Mondal,no_candidate,
 2026-10-26,crex-rlys-vs-tn-39th-first-class-ranji-trophy-elite-2026-27-match-updates-147D,Railways,Zubair Ali,no_candidate,
+2026-10-27,crex-aus-vs-sa-3rd-test-australia-tour-of-south-africa-2026-match-updates-10MS,Australia,Cameron Green,ambiguous,CJ Green=19b9f399;C Green=eaa76d3c
 2026-10-27,crex-bk-vs-cwr-2nd-t20-nepal-premier-league-2026-match-updates-14ET,Biratnagar Kings,Andre Russell,no_candidate,
 2026-10-27,crex-bk-vs-cwr-2nd-t20-nepal-premier-league-2026-match-updates-14ET,Biratnagar Kings,Angelo Mathews,no_candidate,
 2026-10-27,crex-bk-vs-cwr-2nd-t20-nepal-premier-league-2026-match-updates-14ET,Chitwan Rhinos,Bibek Kumar Yadav,no_candidate,
@@ -2294,3 +2295,11 @@ date,match_id,team,player,reason,candidates
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Harry Cullen Hieatt,no_candidate,
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Jack Wright,no_candidate,
 2026-10-31,crex-auck-vs-nb-4th-list-a-the-ford-trophy-2026-27-match-updates-13KX,Auckland,Jaskaran Sandhu,no_candidate,
+2026-10-31,crex-ken-vs-png-44th-one-day-mens-cwc-challenge-league-a-2024-26-match-updates-14V9,Kenya,Rakep Patel,ambiguous,RR Patel=7fa6bd8e;RN Patel=db1bf9c2
+2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Melbourne Renegades Women,Annie Wikman,no_candidate,
+2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Melbourne Renegades Women,Chloe Lesleigh Tryon,no_candidate,
+2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Perth Scorchers Women,Fatima Sana,no_candidate,
+2026-10-31,crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8,Melbourne Renegades Women,Tayla Vlaeminck,no_candidate,
+2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,United Arab Emirates,Khuzaima Bin Tanvir,no_candidate,
+2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,,Shariz Ahmad,no_candidate,
+2026-10-31,crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE,United Arab Emirates,Sohaib Khan,no_candidate,
