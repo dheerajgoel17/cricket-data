@@ -70,7 +70,7 @@ export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (
 }
 
 /** How far ahead an unpriced game still shows (flagged `noProps`). */
-export const NO_PROPS_DAYS = 5;
+export const NO_PROPS_DAYS = 10;
 
 /** Upcoming fixtures: the ones the books price (player props, event markets, or fancy) and, up to `NO_PROPS_DAYS` ahead, the ones they do not (`noProps`).
  *  A fixture matches a feed match when both team names agree (ignoring "(W)"/"Women") and the starts are within 14 h.

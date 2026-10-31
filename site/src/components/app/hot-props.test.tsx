@@ -48,7 +48,7 @@ const landAll = () => { for (let n = 0; n < 12; n++) env.store.land(n); };
 beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ["setTimeout", "clearTimeout", "Date"] });
   env.plans = [];
-  // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines that the home never shows
+  // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines scored only when that day is asked
   env.store = fakeStore(60, 12);
   env.doc = { generated_at_utc: "2026-10-28T05:00:00Z", events: [], fancy: [], lines: [
     ...Array.from({ length: 36 }, (_, i) => line(`id${i}`, at(28, 19))),
@@ -94,7 +94,7 @@ describe("useHotRows", () => {
     expect(result.current.isLoading).toBe(true);
     await settle();
     expect(result.current.data!.map((r) => r.idx).sort((a, b) => a - b)).toEqual([36, 37]);
-    expect(result.current.otherDay).toBe(36);
+    expect(result.current.otherDay).toBe(58); // today's 36 plus the third day's 22, counted so the day switch stays
   });
 
   it("puts the rows on screen while the last files are still on their way, once there is a page of them", async () => {

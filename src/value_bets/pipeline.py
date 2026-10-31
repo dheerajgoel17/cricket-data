@@ -220,6 +220,29 @@ def load_fixtures():
     return out
 
 
+def fixture_for_cluster(c, fixtures, tres):
+    """The schedule parent for a book cluster.
+
+    Books send ``team_a``, ``team_b`` and a start with the odds (odds-only: never the fixture). Those names are
+    canonicalised (``TeamResolver``: "PAK" / "Pakistan" → Pakistan) and joined to ``upcoming.csv`` when the gender
+    matches, the two sides match, and the kickoffs differ by less than ``MATCH_START_DELTA_HOURS``. That delta is the
+    join (books and the schedule often disagree by a few hours), not a display window: a match six days out still maps
+    when both starts are on that day. A later meeting of the same two sides is a different parent.
+    """
+    teams, start = c.get("canon_teams"), c.get("start")
+    if not teams or not start:
+        return None
+    delta = config.get("MATCH_START_DELTA_HOURS") * 3600
+    for f in fixtures:
+        g = f.get("gender") or "male"
+        fa = tres.resolve(f["team_a"], g)
+        fb = tres.resolve(f["team_b"], g)
+        st = parse_ts(f.get("start_utc"))
+        if g == c["gender"] and {fa, fb} == set(teams) and st and abs((st - start).total_seconds()) < delta:
+            return f
+    return None
+
+
 def detect_fmt(texts, has_draw, fixture_fmt, last_meeting_fmt):
     if fixture_fmt:
         return {"T20": "T20", "T20I": "T20", "ODI": "ODI", "TEST": "MULTI", "Test": "MULTI"}.get(fixture_fmt,
@@ -328,17 +351,7 @@ def run():
     for c in clusters.values():
         ca = [x for x in c["canon"] if x]
         c["canon_teams"] = sorted(set(ca)) if len(set(ca)) == 2 else None
-        fx = None
-        if c["canon_teams"] and c["start"]:
-            for f in fixtures:
-                g = f.get("gender") or "male"
-                fa = tres.resolve(f["team_a"], g)
-                fb = tres.resolve(f["team_b"], g)
-                st = parse_ts(f.get("start_utc"))
-                if g == c["gender"] and {fa, fb} == set(c["canon_teams"]) and st and \
-                        abs((st - c["start"]).total_seconds()) < 12 * 3600:
-                    fx = f
-                    break
+        fx = fixture_for_cluster(c, fixtures, tres)
         last_fmt = None
         if c["canon_teams"]:
             a, b = c["canon_teams"]

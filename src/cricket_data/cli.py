@@ -304,7 +304,7 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
         write_fixtures(out, found)
         rows = [f.row() for f in found]
     else:
-        try:  # the first page only reaches ~1-2 days; the paged read goes 5 days ahead and must never cost us the plain one
+        try:  # the first page only reaches ~1-2 days; the paged read goes 10 days ahead and must never cost us the plain one
             from .crex_schedule import fetch_schedule_paged
             rows = fetch_schedule_paged()
         except Exception as exc:  # noqa: BLE001

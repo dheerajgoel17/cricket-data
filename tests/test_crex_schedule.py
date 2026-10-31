@@ -1,3 +1,4 @@
+import inspect
 import json
 from datetime import datetime
 
@@ -14,6 +15,12 @@ def item(**kw):
             "venue": "Kotambi Stadium, Vadodara", "status": 0, "link": "/cricket-live-score/ind-w-vs-zim-w-1st-odi-x-1221"}
     base.update(kw)
     return base
+
+
+def test_paged_schedule_reads_ten_days_ahead():
+    sig = inspect.signature(cs.fetch_schedule_paged)
+    assert sig.parameters["days"].default == 10
+    assert sig.parameters["max_pages"].default == 24
 
 
 def test_parse_schedule_maps_time_format_gender_and_status():

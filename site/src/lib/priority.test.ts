@@ -31,13 +31,19 @@ describe("fixture order", () => {
     expect(order("australia")[0]).toBe("South Africa v Australia");
     expect(order(null).slice(0, 2)).toEqual(["South Africa v Australia", "New Zealand v India"]); // nobody's team: by standing alone
   });
-  it("keeps a series together: today's result sits next to that series' next game, not behind every other upcoming card", () => {
+  it("keeps a series together: a kick-off in the next 24 hours sits next to that series' result, ahead of a bigger match later in the week", () => {
     const now = Date.parse("2026-10-30T12:00:00Z");
     const heat = fx("Brisbane Heat Women", "Sydney Sixers Women", { series: "WBBL 2026", start: "2026-10-30T08:10:00Z" });
     const strikers = fx("Adelaide Strikers Women", "Melbourne Stars Women", { series: "WBBL 2026", start: "2026-10-31T08:10:00Z" });
     const india = fx("India", "New Zealand", { series: "IND vs NZ 2026", start: "2026-11-01T00:00:00Z" });
     const stateOf = (f: any) => (f.a.startsWith("Brisbane") ? "final" : "upcoming");
-    expect(arrangeFixtures([india, strikers, heat], stateOf, null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["India", "Brisbane Heat Women", "Adelaide Strikers Women"]);
+    expect(arrangeFixtures([india, strikers, heat], stateOf, null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["Adelaide Strikers Women", "Brisbane Heat Women", "India"]);
+  });
+  it("puts a series with a match starting within 24 hours ahead of a bigger match later in the week", () => {
+    const now = Date.parse("2026-10-30T12:00:00Z");
+    const later = fx("India", "Australia", { series: "IND vs AUS", start: "2026-11-06T08:00:00Z" });
+    const soon = fx("Namibia", "Oman", { series: "Namibia tour", start: "2026-10-30T20:00:00Z" });
+    expect(arrangeFixtures([later, soon], () => "upcoming", null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["Namibia", "India"]);
   });
   it("puts a series in play ahead of other series, and today's remaining game ahead of a finished one in the same series", () => {
     const now = Date.parse("2026-10-30T12:00:00Z");
