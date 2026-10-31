@@ -2,13 +2,11 @@
 
 import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { useTheme } from "@/components/layout/ThemeProvider"
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { resolved } = useTheme()
   return (
     <Sonner
-      theme={resolved}
+      theme="dark"
       className="toaster group"
       icons={{
         success: <CheckCircleIcon className="size-4" />,

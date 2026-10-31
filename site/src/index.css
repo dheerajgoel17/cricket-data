@@ -10,50 +10,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens: change colours here only. :root is light (iOS grouped gray); .dark is the original true-black look. */
+/* Design tokens: change colours here only. True-black canvas, accent #27DA8E. html.dark stays on so shadcn dark: variants match. */
 :root {
-  --radius: 0.75rem;
-  --background: #f2f2f7;
-  --foreground: #1c1c1e;
-  --card: #ffffff;
-  --card-foreground: #1c1c1e;
-  --popover: #ffffff;
-  --popover-foreground: #1c1c1e;
-  --primary: #27da8e;
-  --primary-foreground: #0f0f0f;
-  --secondary: #e5e5ea;
-  --secondary-foreground: #1c1c1e;
-  --muted: #e5e5ea;
-  --muted-foreground: #6c6c70;
-  --accent: #e8e8ed;
-  --accent-foreground: #1c1c1e;
-  --destructive: #ff3b30;
-  --border: #d1d1d6;
-  --input: #ffffff;
-  --ring: #27da8e;
-  --sidebar: #f2f2f7;
-  --sidebar-foreground: #1c1c1e;
-  --sidebar-primary: #27da8e;
-  --sidebar-primary-foreground: #0f0f0f;
-  --sidebar-accent: #e5e5ea;
-  --sidebar-accent-foreground: #1c1c1e;
-  --sidebar-border: #d1d1d6;
-  --sidebar-ring: #27da8e;
-  --hit: #27da8e;
-  --miss: #ff3b30;
-  --dnp: #8e8e93;
-  --amber: #f5a524;
-  --pill: #e5e5ea;
-  --hairline: rgba(60, 60, 67, 0.12);
-  --surface: #ffffff;
-  --surface-hover: #ebebf0;
-  --scrim: rgba(242, 242, 247, 0.88);
-  --ion-background-color: var(--background);
-  --ion-text-color: var(--foreground);
-}
-
-.dark {
   color-scheme: dark;
+  --radius: 0.75rem;
   --background: #000000;
   --foreground: #ffffff;
   --card: #1c1c1e;
@@ -89,10 +49,12 @@
   --surface: rgba(255, 255, 255, 0.03);
   --surface-hover: rgba(255, 255, 255, 0.06);
   --scrim: rgba(0, 0, 0, 0.40);
+  --ion-background-color: var(--background);
+  --ion-text-color: var(--foreground);
 }
 /*
  * Type and spacing scales: named roles only (src/lib/design-tokens.test.ts).
- * The look is iOS-inspired (grouped light / true-black dark, pills, glass); the sizes are a compact web scale so the
+ * The look is iOS-inspired (true-black, pills, glass); the sizes are a compact web scale so the
  * same CSS works on desktop and in Android/iOS browsers. Future Expo apps should reuse these
  * role names (text-body, gap-stack, control, …) and only swap the values for HIG / Material.
  */
@@ -105,7 +67,7 @@
   --control: 2.25rem;       /* 36: tappable without iOS-native 44 */
   --chip-radius: 999px;     /* fully rounded pills */
   --row-min: 3.5rem;
-  --fixture-card: 17.5rem;
+  --fixture-card: 80vw;     /* phone peek rail: one card is 80% of the screen so the next one shows */
   --gutter: 0.875rem;
   --content-max: 100%;
   --fs-display: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);
@@ -242,18 +204,34 @@
 .live-arc { animation: live-arc 1.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .live-arc { animation: none; } }
 
+/* A so-far or a book's price just moved: one flash, then gone. Green = up / shortening into the over; red = down / drifting. */
+@keyframes tick-up { 0% { background-color: color-mix(in srgb, var(--primary) 32%, transparent); } 100% { background-color: transparent; } }
+@keyframes tick-down { 0% { background-color: color-mix(in srgb, var(--miss) 32%, transparent); } 100% { background-color: transparent; } }
+.tick-up { animation: tick-up 1.1s ease-out; }
+.tick-down { animation: tick-down 1.1s ease-out; }
+
+/* Skeleton fill: a token-coloured shimmer the size of the real block, not a generic pulse. */
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+.skeleton-shimmer {
+  background-color: var(--accent);
+  background-image: linear-gradient(90deg, var(--accent) 0%, var(--surface-hover) 45%, var(--accent) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tick-up, .tick-down, .skeleton-shimmer { animation: none; }
+}
+
 /* Phone tab bar (Ionic's iOS bar): translucent material with the backdrop blur, hairline on top, system gray and the brand tint on the selected tab. */
 ion-tab-bar {
-  --background: rgba(255, 255, 255, 0.72);
-  --border: 0.55px solid rgba(60, 60, 67, 0.18);
-  --color: #6c6c70;
-  --color-selected: var(--primary);
-  font-family: var(--font-sans);
-}
-.dark ion-tab-bar {
   --background: rgba(22, 22, 24, 0.5); /* see-through: the page scrolls under it and shows blurred (the bar's own backdrop blur) */
   --border: 0.55px solid rgba(255, 255, 255, 0.16);
   --color: #8e8e93;
+  --color-selected: var(--primary);
+  font-family: var(--font-sans);
 }
 
 /* Unlayered so it beats Ionic's `body { background: var(--ion-background-color) }` (core.css is imported above; @layer base would lose). */

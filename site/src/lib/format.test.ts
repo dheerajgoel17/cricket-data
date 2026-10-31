@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { abbr, dayLabel, fixtureWhen, fixtureStart, fromIst, initials, localTime, num, odds, pc, shortDate } from "./format";
+import { abbr, dayLabel, fixtureWhen, fixtureStart, fromIst, initials, localTime, num, odds, pc, shortDate, shortVenue } from "./format";
 
 describe("format helpers", () => {
   it("formats odds, percentages and numbers, with a dash for missing values", () => {
@@ -16,6 +16,22 @@ describe("format helpers", () => {
     expect(initials("India (W)")).toBe("I");
     expect(abbr("Mumbai Indians")).toBe("MI");
     expect(abbr("India")).toBe("IND");
+  });
+  it("shortens a ground for a prop row: famous shorts, stripped stadium, else the city", () => {
+    expect(shortVenue("Western Australia Cricket Association Ground, Perth")).toBe("WACA");
+    expect(shortVenue("Melbourne Cricket Ground, Melbourne")).toBe("MCG");
+    expect(shortVenue("The Gabba, Brisbane")).toBe("Gabba");
+    expect(shortVenue("Lord's Cricket Ground, London")).toBe("Lord's");
+    expect(shortVenue("The Wanderers Stadium, Johannesburg")).toBe("Wanderers");
+    expect(shortVenue("Sher-e-Bangla National Stadium, Mirpur, Dhaka")).toBe("Sher-e-Bangla");
+    expect(shortVenue("Wankhede Stadium, Mumbai")).toBe("Wankhede");
+    expect(shortVenue("Gaddafi Stadium, Lahore")).toBe("Gaddafi");
+    expect(shortVenue("Eden Gardens, Kolkata")).toBe("Eden Gardens");
+    expect(shortVenue("Hagley Oval, Christchurch")).toBe("Hagley Oval");
+    expect(shortVenue("Newlands, Cape Town")).toBe("Newlands");
+    expect(shortVenue("Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh")).toBe("Mullanpur");
+    expect(shortVenue("Tribhuvan University International Cricket Ground, Kirtipur")).toBe("Kirtipur");
+    expect(shortVenue("")).toBe("");
   });
   it("turns a chart date into dd/mm", () => { expect(shortDate("2026-05-23")).toBe("23/05"); });
   it("parses the value-bets IST timestamp into the right instant", () => {

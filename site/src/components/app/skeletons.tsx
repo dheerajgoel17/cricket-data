@@ -1,16 +1,22 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Skeletons shaped like the real content (same row heights and widths), so the page does not jump when data arrives.
+// Skeletons shaped like the real content (same row heights, radii and grids), so the page does not jump when data arrives.
 
-/** Props / trends list rows: photo, two text lines, edge, bars. */
+/** Props / trends list rows: photo, two text lines, so-far pill, edge. */
 export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div aria-hidden className="-mx-gutter">
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="flex min-h-row items-center gap-snug px-gutter py-snug" style={{ opacity: 1 - i * 0.1 }}>
-          <Skeleton className="size-control shrink-0 rounded-full" />
-          <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-24" /></div>
-          <Skeleton className="h-9 w-[84px] rounded-md sm:w-[104px]" />
+        <div key={i} className="flex flex-col gap-tight px-gutter py-snug" style={{ opacity: 1 - i * 0.1 }}>
+          <div className="flex items-center gap-snug">
+            <Skeleton className="size-control shrink-0 rounded-full" />
+            <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-24" /></div>
+            <Skeleton className="h-5 w-16 rounded-md" />
+          </div>
+          <div className="flex items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-9 w-[72px] rounded-md" />
+          </div>
         </div>
       ))}
     </div>
@@ -40,7 +46,7 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/** Match header while the fixture list loads. */
+/** Match header while the fixture list loads: two sides, score in the middle. */
 export function MatchHeaderSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-tight pt-snug">
@@ -50,6 +56,50 @@ export function MatchHeaderSkeleton() {
         <div className="grid justify-items-center gap-tight"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-28" /><Skeleton className="h-4 w-24" /></div>
         <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
       </div>
+    </div>
+  );
+}
+
+/** Live board + scorecard accordion: pair, partnership, bowler, then batting rows. */
+export function ScorecardSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
+      <div className="flex items-center gap-snug">
+        <Skeleton className="size-16 rounded-full" />
+        <div className="grid flex-1 justify-items-center gap-tight"><Skeleton className="h-3 w-16" /><Skeleton className="h-6 w-12" /></div>
+        <Skeleton className="size-16 rounded-full" />
+      </div>
+      <div className="flex items-center justify-between gap-snug">
+        <div className="flex items-center gap-snug"><Skeleton className="size-9 rounded-full" /><Skeleton className="h-3.5 w-24" /></div>
+        <Skeleton className="h-3.5 w-16" />
+      </div>
+      <div className="flex gap-hair">{[0, 1, 2, 3, 4, 5].map((n) => <Skeleton key={n} className="size-6 rounded-md" />)}</div>
+      <div className="flex flex-col gap-tight">
+        {[0, 1, 2, 3].map((n) => (
+          <div key={n} className="flex items-center gap-snug"><Skeleton className="h-3.5 w-28" /><Skeleton className="ml-auto h-3.5 w-10" /><Skeleton className="h-3.5 w-8" /></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** High-odds / low-odds tape while the live lines settle. Same 80vw peek rail as the fixture cards on a phone. */
+export function TapeSkeleton() {
+  return (
+    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
+      {[0, 1].map((k) => (
+        <div key={k} className="flex w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:w-auto">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-3 w-48" />
+          {[0, 1].map((n) => (
+            <div key={n} className="flex min-h-row items-center gap-snug">
+              <Skeleton className="size-control rounded-full" />
+              <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3 w-20" /></div>
+              <Skeleton className="h-5 w-12 rounded-md" />
+            </div>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
@@ -74,7 +124,7 @@ export function RailSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-stack">
       <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
-      <div className="flex gap-snug overflow-hidden">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] shrink-0 basis-[88%] rounded-[22px] sm:basis-[340px]" />)}</div>
+      <div className="-mx-gutter flex gap-snug overflow-hidden px-gutter">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}</div>
     </div>
   );
 }
@@ -92,6 +142,7 @@ export function AppSkeleton() {
         <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug md:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
         <div className="mx-auto flex w-full min-w-0 max-w-[900px] flex-col gap-section px-gutter pb-section pt-stack">
           <RailSkeleton />
+          <TapeSkeleton />
           <div className="flex flex-col gap-stack"><Skeleton className="h-5 w-40" /><RowsSkeleton rows={6} /></div>
         </div>
       </div>
@@ -99,19 +150,26 @@ export function AppSkeleton() {
   );
 }
 
-/** Player page body while the run is going: summary card, side and line controls, chart card, bookmaker list. */
+/** Player page body: compact metrics, then the chart first (8) beside lines (4); this-match sits under the chart. */
 export function PlayerSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-section">
-      <div className="flex flex-col gap-stack">
-        <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
-          <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
-          <Skeleton className="size-20 rounded-full" />
-        </div>
-        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-control w-40 rounded-full" /><Skeleton className="h-control w-36 rounded-full" /></div>
-        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline"><Skeleton className="h-[300px] w-full" /><Skeleton className="h-control w-full rounded-full" /></div>
+    <div aria-hidden className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
+      <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline lg:col-span-12">
+        <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-6">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
+        <Skeleton className="size-20 rounded-full" />
       </div>
-      <div className="flex flex-col gap-snug"><Skeleton className="h-6 w-44" /><ListSkeleton rows={3} /></div>
+      <div className="flex flex-col gap-stack lg:col-span-8 lg:row-start-2">
+        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-control w-40 rounded-full" /><Skeleton className="h-control w-36 rounded-full" /></div>
+        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline"><Skeleton className="h-[340px] w-full" /><Skeleton className="h-control w-full rounded-full" /><Skeleton className="h-3 w-56" /></div>
+      </div>
+      <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:col-span-5 lg:row-start-3">
+        <Skeleton className="h-3 w-20" />
+        <div className="flex items-center gap-snug"><Skeleton className="size-8 rounded-full" /><Skeleton className="h-4 w-36" /></div>
+        <Skeleton className="h-3 w-48" />
+        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-5 w-32" /><Skeleton className="h-5 w-12 rounded-md" /></div>
+        <div className="grid grid-cols-2 gap-snug"><Skeleton className="h-16 rounded-xl" /><Skeleton className="h-16 rounded-xl" /></div>
+      </div>
+      <div className="flex flex-col gap-snug lg:col-span-4 lg:col-start-9 lg:row-start-2"><Skeleton className="h-6 w-24" /><ListSkeleton rows={4} /></div>
     </div>
   );
 }

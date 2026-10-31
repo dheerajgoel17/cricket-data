@@ -28,8 +28,9 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(screen.getAllByText("(lowest line, best price)", { exact: false })).toHaveLength(1);
   });
 
-  it("has no toggle when one book prices the line", () => {
+  it("has no toggle when one book prices the line, but still shows that book's mark and price", () => {
     render(<BookQuotes quotes={bookQuotes([{ line: 17.5, books: [B("bet365", 1.833, 1.833)] }])} />);
+    expect(screen.getByText(/bet365/)).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeNull();
   });
 });

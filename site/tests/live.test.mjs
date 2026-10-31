@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "../src/engine/live.js";
 import { identityIndex } from "../src/engine/identity.js";
@@ -281,6 +281,10 @@ test("parseCardPage batting, extras, FOW, yet-to-bat, bowling (hand-computed)", 
   assert.equal(inn.extras.total, 8); // 2+5+0+1+0
   assert.equal(inn.extras.byes, 2);
   assert.equal(inn.extras.legByes, 5);
+  assert.equal(m.innings[0].extras, 8);
+  assert.equal(liveMarket(m, "match_extras"), 8);
+  assert.equal(m.innings[0].maxWickets, 1);
+  assert.equal(m.innings[0].runouts, 0);
   assert.deepEqual(inn.fow.map((w) => [w.wkts, w.runs, w.name]), [[1, 27, "Evin Lewis"], [2, 70, "Shai Hope"]], "wickets are numbered in the order they fell, not batting order");
   assert.equal(inn.bowlers[0].name, "Jasprit Bumrah");
   assert.equal(inn.bowlers[0].overs, 4); // 24 balls
@@ -321,6 +325,9 @@ test("chase totals across both innings (hand-computed)", () => {
   assert.equal(liveMarket(m, "match_runs"), 240); // 198 + 42
   assert.equal(liveMarket(m, "first_innings_runs"), 198);
   assert.equal(liveMarket(m, "team_total_runs", "India"), 42);
+  assert.equal(liveMarket(m, "team_total_runs", "India", 1), 42);
+  assert.equal(liveMarket(m, "team_total_runs", "India", 2), null, "India have not batted a second innings");
+  assert.equal(liveMarket(m, "team_total_runs", "New Zealand", 1), 198);
   assert.equal(liveMarket(m, "match_wickets"), 3);
   assert.equal(liveMarket(m, "match_sixes"), 13); // NZ 0+3+4+0+3, India 1+2
   assert.equal(liveMarket(m, "match_fours"), 20); // NZ 0+4+8+1+3, India 1+3
@@ -328,6 +335,70 @@ test("chase totals across both innings (hand-computed)", () => {
   assert.equal(liveMarket(m, "top_score"), 89);
   assert.equal(liveMarket(m, "match_50s"), 1); // Mitchell 89
   assert.equal(liveMarket(m, "match_30s"), 2); // Allen 40, Jacobs 39
+  assert.equal(liveMarket(m, "match_extras"), 11 + 6); // NZ 4+5+2, India 4+2
+  assert.equal(liveMarket(m, "max_wickets"), 2); // Arshdeep
+  assert.equal(liveMarket(m, "overs_6", "New Zealand"), null, "NZ have gone past 6 overs: the live total is not the session score");
+  assert.equal(liveMarket(m, "overs_6", "India"), 42, "India 1.4 ov, still inside the 6-over session");
+  assert.equal(liveMarket(m, "first_over"), null, "the first innings is past over 1");
+  assert.equal(fancyState(m, { key: "overs_6", team: "New Zealand" }), "final");
+  assert.equal(fancyState(m, { key: "overs_6", team: "India" }), "live");
+});
+
+test("a Test team's 2nd innings so-far is that side's own second turn, not the match's 4th innings number", () => {
+  const m = { innings: [
+    { n: 1, team: "West Indies", runs: 400, fours: 40, sixes: 5, wkts: 10 },
+    { n: 2, team: "Bangladesh", runs: 360, fours: 30, sixes: 4, wkts: 10 },
+    { n: 3, team: "West Indies", runs: 200, fours: 20, sixes: 2, wkts: 10 },
+    { n: 4, team: "Bangladesh", runs: 80, fours: 8, sixes: 1, wkts: 3 },
+  ], players: [] };
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh"), 440); // 360 + 80
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh", 1), 360);
+  assert.equal(liveMarket(m, "team_total_runs", "Bangladesh", 2), 80);
+  assert.equal(liveMarket(m, "team_total_runs", "West Indies", 2), 200);
+});
+
+test("fancyStanding: the same so-far / Cleared / Missed a player prop gets, from the innings totals (hand-computed)", () => {
+  const m = chase();
+  assert.equal(m.fmt, "T20");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 40.5 }), { v: 42, state: "live", verdict: "cleared" }, "India 42 already past 40.5 while they bat");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 50.5 }), { v: 42, state: "live", verdict: null }, "42 of 50.5 is still to play for");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 200.5 }), { v: 198, state: "final", verdict: "missed" }, "NZ 198 all they will make, under 200.5");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 180.5 }), { v: 198, state: "final", verdict: "cleared" });
+  assert.deepEqual(fancyStanding(m, { key: "first_innings_runs", line: 180.5 }), { v: 198, state: "final", verdict: "cleared" }, "the first innings is over once India have begun");
+  assert.deepEqual(fancyStanding(m, { key: "match_runs", line: 250.5 }), { v: 240, state: "live", verdict: null }, "a whole-match total stays live until the match ends");
+  assert.equal(fancyStanding(m, { key: "team_total_runs", team: "India", inn: 2, line: 40.5 }), null, "India have not batted a second innings");
+
+  const testM = { status: "live", fmt: "Test", innings: [
+    { n: 1, team: "West Indies", runs: 400, wkts: 10 },
+    { n: 2, team: "Bangladesh", runs: 360, wkts: 10 },
+    { n: 3, team: "West Indies", runs: 200, wkts: 10 },
+    { n: 4, team: "Bangladesh", runs: 80, wkts: 3 },
+  ] };
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 135.5 }), { v: 80, state: "live", verdict: null }, "BAN's own 2nd inns, still batting, 80 of 135.5");
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 70.5 }), { v: 80, state: "live", verdict: "cleared" });
+  assert.deepEqual(fancyStanding(testM, { key: "team_total_runs", team: "Bangladesh", inn: 1, line: 350.5 }), { v: 360, state: "final", verdict: "cleared" }, "BAN's 1st inns is over once they have a 2nd");
+  assert.equal(fancyState(testM, { key: "team_total_runs", team: "Bangladesh" }), "live", "a Test match total stays live until the match ends");
+
+  const chasing = { status: "live", fmt: "Test", innings: [
+    { n: 1, team: "Bangladesh", runs: 272, wkts: 10 },
+    { n: 2, team: "West Indies", runs: 244, wkts: 10 },
+    { n: 3, team: "Bangladesh", runs: 142, wkts: 10 },
+    { n: 4, team: "West Indies", runs: 51, wkts: 1 },
+  ] };
+  assert.deepEqual(fancyStanding(chasing, { key: "team_total_runs", team: "Bangladesh", inn: 2, line: 135.5 }), { v: 142, state: "final", verdict: "cleared" }, "BAN 142 in their 2nd inns, WI now chasing: over 135.5 is done");
+});
+
+test("a fancy side run line tagged bat_first voids once that side is bowling first; premium (untagged) stays live for both", () => {
+  const m = chase();
+  const voided = { v: null, state: "void", verdict: null };
+  assert.deepEqual(fancyStanding(m, { key: "overs_6", team: "India", line: 40.5, bat_first: true }), voided, "India chasing: fancy 6-over run line is void");
+  assert.deepEqual(fancyStanding(m, { key: "overs_10", team: "India", line: 70.5, batFirst: true }), voided);
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "India", line: 40.5, bat_first: true }), voided, "fancy lambi also voids if they did not bat first");
+  assert.deepEqual(fancyStanding(m, { key: "overs_6", team: "India", line: 40.5 }), { v: 42, state: "live", verdict: "cleared" }, "premium / untagged: India's chase so-far still counts");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_fours", team: "India", line: 10.5 }), { v: 4, state: "live", verdict: null }, "premium fours have no batting-order condition");
+  assert.equal(fancyStanding(m, { key: "overs_6", team: "New Zealand", line: 40.5, bat_first: true }), null, "NZ batted first and are past 6 overs: session so-far is gone, not void");
+  assert.deepEqual(fancyStanding(m, { key: "team_total_runs", team: "New Zealand", line: 180.5, bat_first: true }), { v: 198, state: "final", verdict: "cleared" }, "NZ batted first: fancy lambi still scores");
+  assert.equal(fancyStanding({ status: "live", innings: [] }, { key: "overs_6", team: "India", line: 40.5, bat_first: true }), null, "before an innings starts, do not void yet");
 });
 
 test("last wicket is the latest fall, not the last dismissed batter in batting order", () => {
@@ -403,13 +474,24 @@ test("a so-far number says when it can no longer move: dismissed, or innings / s
 
 test("an all-rounder's batting and bowling rows are told apart by the stat", () => {
   const m = { players: [
-    { name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false },
-    { name: "Axar Patel", team: "India", wickets: 1, conceded: 36, ballsBowled: 24 },
+    { name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false, catches: 1, stumpings: 0 },
+    { name: "Axar Patel", team: "India", wickets: 1, conceded: 36, ballsBowled: 24, catches: 1, stumpings: 0 },
   ] };
   assert.equal(livePlayer(m, "Axar Patel"), null, "no stat, two rows: ambiguous");
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "runs"), "runs"), 5);
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "wickets"), "wickets"), 1);
   assert.equal(liveStat(livePlayer(m, "Axar Patel", "balls_bowled"), "balls_bowled"), 24);
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points"), "points"), 35, "5 runs + 20×1 wicket + 10×1 catch");
+});
+
+test("points still merges a bat row and a bowl row when one id is the source's and the other is the printed name", () => {
+  const m = { players: [
+    { id: "Axar Patel", name: "Axar Patel", team: "India", runs: 5, balls: 3, out: false, catches: 1, stumpings: 0 },
+    { id: "8415", name: "Axar Patel", team: "India", wickets: 3, conceded: 20, ballsBowled: 24, catches: 1, stumpings: 0 },
+  ] };
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "wickets"), "wickets"), 3);
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points"), "points"), 75, "5 + 20×3 + 10 catch; mixed ids still one person");
+  assert.equal(liveStat(livePlayer(m, "Axar Patel", "points", "", "8415"), "points"), 75, "source id hits the bowl row only; the same-name bat row is still merged");
 });
 
 test("the batting side is the page's first team, whatever the other fields say (a first innings, 9 down, the other side named in rt)", () => {
@@ -911,11 +993,46 @@ test("settleLines: the identity table finds a player the books name differently 
   assert.deepEqual(settleLines(m, [line], idn).map((x) => [x.pid, x.value, x.verdict]), [["d7ff1adc", 22, "cleared"]]);
 });
 
-test("liveStat points: runs + 20 wickets + 10 catches + 25 stumpings; missing fielding is not 0", () => {
-  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1 }, "points"), null);
+test("liveStat points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; missing fielding is 0 so far", () => {
+  assert.equal(liveStat({ name: "P", wickets: 3 }, "points"), 60);
+  assert.equal(liveStat({ name: "P", runs: 13, wickets: 1 }, "points"), 33);
   assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 0, stumpings: 0 }, "points"), 33);
   assert.equal(liveStat({ name: "P", runs: 13, wickets: 1, catches: 2, stumpings: 1 }, "points"), 78);
-  assert.equal(liveStat({ name: "P", catches: 1, stumpings: 0 }, "points"), null, "no batting or bowling row is not 0 points");
+  assert.equal(liveStat({ name: "P", stumpings: 1 }, "points"), 25);
+  assert.equal(liveStat({ name: "P", catches: 1, stumpings: 0 }, "points"), 10);
+  assert.equal(liveStat({ name: "P" }, "points"), null);
+});
+
+test("parseCardPage points: a catch, a caught-and-bowled and a stumping (hand-computed)", () => {
+  const html = pageHtml({
+    [CARD]: [{
+      c: "A", d: "19/3(30",
+      b: ["BT1.10.8.1.0.10.12.2.BW.FLD", "BT2.5.6.0.0.15.18.3.BW", "BT3.4.7.0.0.19.24.8.BW.WK"],
+      a: ["BW.20.24.0.3"],
+    }],
+    [MAP]: {
+      p: [
+        { f_key: "BT1", n: "Batter One" }, { f_key: "BT2", n: "Batter Two" }, { f_key: "BT3", n: "Batter Three" },
+        { f_key: "BW", n: "Bowler" }, { f_key: "FLD", n: "Fielder" }, { f_key: "WK", n: "Keeper" },
+      ],
+      t: [{ f_key: "A", n: "Side A" }, { f_key: "B", n: "Side B" }],
+    },
+  });
+  const m = parseCardPage(html);
+  const inn = liveCard(m)[0];
+  assert.equal(inn.batters[0].dismissal, "c Fielder b Bowler");
+  assert.equal(inn.batters[1].dismissal, "c & b Bowler");
+  assert.equal(inn.batters[2].dismissal, "st Keeper b Bowler");
+  assert.equal(liveStat(livePlayer(m, "Bowler", "wickets"), "wickets"), 3);
+  assert.equal(liveStat(livePlayer(m, "Bowler", "points"), "points"), 70, "20×3 wickets + 10 for the caught-and-bowled");
+  assert.equal(liveStat(livePlayer(m, "Fielder", "points"), "points"), 10);
+  assert.equal(liveStat(livePlayer(m, "Keeper", "points"), "points"), 25);
+  const row = { ...m, status: "live", fmt: "T20", start: "2026-10-31T08:00:00.000Z", teams: [{ name: "Side A" }, { name: "Side B" }] };
+  const line = { pid: "bw", player: "Bowler", team: "Side B", stat: "points", line: 55.5, match: "Side A vs Side B", fmt: "T20", start_utc: "2026-10-31T08:00:00Z" };
+  assert.deepEqual(settleLines(row, [line]).map((x) => [x.stat, x.value, x.verdict]), [["points", 70, "cleared"]]);
+  const merged = buildMatch(row, { players: [{ name: "Bowler", team: "Side B", wickets: 3, conceded: 20, ballsBowled: 24, current: true }] }, m);
+  assert.equal(liveStat(livePlayer(merged, "Bowler", "points"), "points"), 70, "match-page copy must not wipe the caught-and-bowled");
+  assert.equal(liveStat(livePlayer(merged, "Keeper", "points"), "points"), 25);
 });
 
 test("lineStanding: a server entry is found by the innings of its line, so a first-innings number is never read as the match total's", () => {

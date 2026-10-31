@@ -49,6 +49,13 @@ MARKETS = [
     named("Head To Head", [("New Zealand", 2.16), ("India", 1.67)], 10),
     ou("Total runs for over 1 in 1st inning - New Zealand", 6.5, 1.65, 2.1, 11),
     ou("Allen, Finn to score 50 and Duffy, Jacob to take 2 wickets", 1.5, 3.0, 1.35, 12),
+    ou("First Innings Total Runs", 200.5, 1.85, 1.85, 20),
+    ou("Total in the highest scoring over", 16.5, 1.9, 1.8, 21),
+    ou("Total in the highest scoring over - India", 14.5, 1.9, 1.8, 22),
+    ou("Total Ducks", 2.5, 1.85, 1.85, 23),
+    ou("Total run outs", 1.5, 1.8, 1.9, 24),
+    ou("Total runs after 5 overs", 35.5, 1.85, 1.85, 25),
+    ou("Total runs after 10 overs - India", 70.5, 1.85, 1.85, 26),
 ]
 
 
@@ -70,13 +77,19 @@ def test_mapped_player_lines_fancy_and_the_full_catalogue():
     assert rows[0]["match"] == "New Zealand vs India" and rows[0]["source"] == "feedh_d" and rows[0]["in_play"] is False
     keys = {(x["key"], x["team"], x["line"]) for x in fx}
     assert keys == {("match_runs", None, 401.5), ("team_total_runs", "India", 203.5), ("match_fours", None, 28.5),
-                    ("team_total_sixes", "New Zealand", 9.5), ("top_score", None, 72.5)}
+                    ("team_total_sixes", "New Zealand", 9.5), ("top_score", None, 72.5),
+                    ("overs_1", "New Zealand", 6.5), ("first_innings_runs", None, 200.5),
+                    ("highest_over", None, 16.5), ("team_total_highest_over", "India", 14.5),
+                    ("match_ducks", None, 2.5), ("match_runouts", None, 1.5),
+                    ("overs_5", None, 35.5), ("overs_10", "India", 70.5)}
     assert {x["name"] for x in cat} >= {"Batsman Runs - Suryavanshi, Vaibhav", "Head To Head",
                                         "Total runs for over 1 in 1st inning - New Zealand",
                                         "Allen, Finn to score 50 and Duffy, Jacob to take 2 wickets"}
     mapped = {x["name"]: x["mapped"] for x in cat}
     assert mapped["Batsman Runs - Suryavanshi, Vaibhav"] == "batter_runs"
     assert mapped["Player Performance - Kishan, Ishan"] == "player_points"
+    assert mapped["Total runs for over 1 in 1st inning - New Zealand"] == "overs_1"
+    assert mapped["First Innings Total Runs"] == "first_innings_runs"
     assert mapped["Head To Head"] is None
     assert "Head To Head" not in {r["market_raw"] for r in rows}
     assert left == {}

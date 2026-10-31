@@ -38,6 +38,8 @@ def test_build_outputs_and_meta(tmp_path):
         inn = M["inn"][m]
         assert sum(i[4] for i in inn) == e["fours"] and sum(i[5] for i in inn) == e["sixes"]
         assert sum(i[6] for i in inn) == e["n30"] and sum(i[7] for i in inn) == e["n50"] and M["ts"][m] == e["top"]
+        assert len(M["ov"][m]) == len(inn) and all(len(tape) == 20 for tape in M["ov"][m])  # a completed T20 over tape
+        assert all(i[15] is not None and i[16] is not None for i in inn)  # extras and run-outs from deliveries
     # an "X tour of Y" event makes Y the host, and Alpha's matches there are away
     hosts = IX["hosts"]
     m0 = byid["t20_00"]
@@ -344,6 +346,7 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     sm = (tmp_path / "public" / "sitemap.xml").read_text()
     assert "<loc>https://example.test/fixture/2026-10-29-afghanistan-v-zimbabwe</loc><lastmod>" in sm and n == len(sm.split("<url>")) - 1
     assert "<loc>https://example.test/venue/0</loc>" in sm
+    assert "/privacy" not in sm and "/terms" not in sm and "/disclaimer" not in sm and "/docs" not in sm and "/privacy-policy" not in sm
     robots = (tmp_path / "public" / "robots.txt").read_text()
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
     assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")

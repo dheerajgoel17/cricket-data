@@ -5,8 +5,9 @@ import { describe, expect, it } from "vitest";
 const GOVERNED = [
   "components/app/hot-props.tsx", "components/app/fixture-card.tsx", "components/app/live-board.tsx", "components/app/match-fancy.tsx", "components/app/recent-form.tsx",
   "components/app/pill-group.tsx", "components/app/grid.tsx", "components/app/skeletons.tsx", "components/app/mini-bars.tsx", "components/app/live-feed.tsx",
+  "components/app/tick.tsx", "components/app/market-tape.tsx", "components/app/next-match.tsx",
   "components/app/line-stepper.tsx", "components/app/viz.tsx",
-  "components/layout/Shell.tsx", "components/layout/Header.tsx", "components/layout/GlobalSearch.tsx", "components/layout/ThemeToggle.tsx", "pages/Fixtures.tsx", "pages/Home.tsx", "pages/Player.tsx", "pages/Lists.tsx", "components/app/hot-home.tsx", "components/app/home-phase-bar.tsx",
+  "components/layout/Shell.tsx", "components/layout/Header.tsx", "components/layout/GlobalSearch.tsx", "pages/Fixtures.tsx", "pages/Home.tsx", "pages/Player.tsx", "pages/Lists.tsx", "components/app/hot-home.tsx", "components/app/home-phase-bar.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";

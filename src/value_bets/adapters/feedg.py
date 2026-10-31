@@ -7,9 +7,10 @@ call for all the session markets, ``FEEDG_SPACING_SECS`` apart, one attempt each
 A session market quotes Yes at a line with a rate and No at a line with a rate, exactly as Feed F reads them (``feedf.session``): Yes (back) at rate R pays R per 100 staked
 (decimal 1 + R / 100), No (lay) at rate R needs R staked to win 100 (decimal 1 + 100 / R); Yes at Ly is "over Ly - 0.5" and No at Ln is "under Ln - 0.5", two lines usually a gap
 apart and so one-sided unless Ly == Ln. Player "<name> Runs Adv" gives two player rows; match totals ("Total Match Fours (A vs B) Adv": fours, sixes, boundaries, wickets, fifties,
-30s), the top score and the highest over are ``fancy`` lines, and so are a side's full-innings runs and "1st Inn Total Match Fours / Sixes <side>" (``bat_first``: the side must bat
-first). Left out: odd/even, meter, khado, part-innings runs, per-batter boundaries, bowler and counting markets. The book's own rules are not read yet: the lines carry the rule
-tags Feed F's fancy markets carry (an assumption: same family of exchange), and fancy markets close before the start.
+30s, extras), the top score, the highest over and most wickets by a bowler are ``fancy`` lines, and so are a side's full-innings runs, its first-N-overs session ("6 / 10 / 15 Over
+Runs"), "Match 1st Over Run Adv" and "1st Inn Total Match Fours / Sixes <side>" (``bat_first``: a side run line — first N overs, full innings, or 1st-inn fours/sixes — voids if that side does not bat first). Left
+out: odd/even, meter, khado, per-batter boundaries, bowler and counting markets. The book's own rules are not read yet: the lines carry the rule tags Feed F's fancy markets carry
+(an assumption: same family of exchange), and fancy markets close before the start.
 """
 from __future__ import annotations
 
@@ -33,10 +34,11 @@ SOURCE = "feedg_f"
 CRICKET = 4
 HUB_CHUNK = 80
 
-MATCH_TOTAL = re.compile(r"^Total Match (?P<what>Fours|Sixes|Boundaries|Wkts|Fifties|30s) \(.+ vs .+\) Adv$")
-MATCH_KEY = {"Fours": "match_fours", "Sixes": "match_sixes", "Boundaries": "match_boundaries", "Wkts": "match_wickets", "Fifties": "match_50s", "30s": "match_30s"}
-MATCH_OTHER = {"Top Batsman Runs in Match": "top_score", "Highest Scoring Over Runs in Match": "highest_over"}
+MATCH_TOTAL = re.compile(r"^Total Match (?P<what>Fours|Sixes|Boundaries|Wkts|Fifties|30s|Extras) \(.+ vs .+\) Adv$")
+MATCH_KEY = {"Fours": "match_fours", "Sixes": "match_sixes", "Boundaries": "match_boundaries", "Wkts": "match_wickets", "Fifties": "match_50s", "30s": "match_30s", "Extras": "match_extras"}
+MATCH_OTHER = {"Top Batsman Runs in Match": "top_score", "Highest Scoring Over Runs in Match": "highest_over", "Most Wickets By a Bowlers": "max_wickets"}
 TEAM_OVERS = re.compile(r"^(?P<n>\d+) Over Runs (?P<abbr>.+?) Adv$")
+FIRST_OVER = re.compile(r"^Match 1st Over Run Adv$")
 TEAM_FIRST = re.compile(r"^1st Inn Total Match (?P<what>Fours|Sixes) (?P<abbr>.+?) \(.+ vs .+\) Adv$")
 TEAM_FIRST_KEY = {"Fours": "team_total_fours", "Sixes": "team_total_sixes"}
 PLAYER_RUNS = re.compile(r"^(?P<p>[A-Z][A-Za-z.' -]*?) Runs Adv$")
@@ -143,10 +145,16 @@ def parse_event(catalogue: list[dict], odds: dict[str, dict[str, str]], ev: dict
             key = MATCH_KEY[mm["what"]]
         elif (base := re.sub(r" \(.+ vs .+\) Adv$", "", name)) in MATCH_OTHER:
             key = MATCH_OTHER[base]
-        elif (mm := TEAM_OVERS.match(name)) and int(mm["n"]) == full >= 20:
+        elif (mm := TEAM_OVERS.match(name)):
             hit = [t for t in teams if abbreviates(mm["abbr"], t)]
+            n = int(mm["n"])
             if len(hit) == 1:
-                key, team, rules, extra = "team_total_runs", hit[0], "fancy_side", {"bat_first": True}
+                if n == full >= 20:
+                    key, team, rules, extra = "team_total_runs", hit[0], "fancy_side", {"bat_first": True}
+                else:
+                    key, team, rules, extra = f"overs_{n}", hit[0], "fancy_side", {"bat_first": True}
+        elif FIRST_OVER.match(name):
+            key = "first_over"
         elif (mm := TEAM_FIRST.match(name)):
             hit = [t for t in teams if abbreviates(mm["abbr"], t)]
             if len(hit) == 1:

@@ -65,7 +65,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     return (
       <div className="m-8 rounded-lg border border-destructive p-6">
         <h2 className="text-xl font-medium">Data not found</h2>
-        <p className="mt-2 text-muted-foreground">Could not load the data files ({error}).{local ? " Run the site build first: see docs/SITE.md." : " Refresh, or try again in a moment."}</p>
+        <p className="mt-2 text-muted-foreground">Could not load the data files ({error}).{local ? " Set SITE_URL in site/.env.local to use production data, or run the site build (docs/SITE.md)." : " Refresh, or try again in a moment."}</p>
         <button type="button" className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" onClick={() => setTick((n) => n + 1)}>Try again</button>
       </div>
     );

@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { BookBadge } from "./book-badge";
@@ -16,7 +16,7 @@ export function BookTable({ books, shown, className }: { books: Priced[]; shown:
     <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
       <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)}
         className="inline-flex w-fit items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline">
-        {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+        {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
       </button>
       {open && (
         <table id={id} className="w-full max-w-sm text-left">

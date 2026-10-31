@@ -45,6 +45,8 @@ def test_bowler_credit_penalty_wides_and_retirements():
     assert (b2["w"], b2["bb"]) == (1, 3)   # only the catch counts
     i0 = m["innings"][0]
     assert i0["wkts"] == 2 and i0["runs"] == 4 + 1 + 3 + 2 + 5   # retired hurt is not a wicket; penalty counts in the total
+    assert i0["ex"] == 1 + 1 + 2 + 5 and i0["ro"] == 1  # wides + no-ball extra + byes + penalty; one run out
+    assert i0["mw"] == 1 and m["mw"] == 1  # B2's catch is the only bowler wicket
     a1 = _rows(m)[(pid("A1"), 1)]
     assert (a1["r"], a1["b"]) == (6, 6)      # the wide is not a ball faced; the no-ball, byes and penalty ball are
     assert _rows(m)[(pid("A2"), 1)]["k"] == 0  # retired hurt is not dismissed
@@ -155,3 +157,16 @@ def test_fielding_credits_catches_stumpings_and_a_caught_and_bowled_go_to_the_fi
     assert (fld[pid("C2")]["ct"], fld[pid("C2")]["st"]) == (0, 1)  # a stumping; the run out gives him nothing
     assert (fld[pid("B1")]["ct"], fld[pid("B1")]["st"]) == (2, 0)  # a caught and bowled, with or without the fielder listed, is the bowler's catch
     assert {r["team"] for r in m["fld"]} == {"Y"} and {r["opp"] for r in m["fld"]} == {"X"} and {r["inn"] for r in m["fld"]} == {1}
+
+
+def test_over_tape_is_cumulative_runs_after_each_completed_over():
+    """Session / first-over markets: 6 ones in over 1, 6 fours in over 2 → tape [6, 30]. A 3-ball last over is not a checkpoint."""
+    ones = [D("A1", "A2", "B1", 1) for _ in range(6)]
+    fours = [D("A1", "A2", "B1", 4) for _ in range(6)]
+    tail = [D("A1", "A2", "B1", 1) for _ in range(3)]  # over 3 started, not completed
+    inn = {"team": "X", "overs": [
+        {"over": 0, "deliveries": ones}, {"over": 1, "deliveries": fours}, {"over": 2, "deliveries": tail}]}
+    other = {"team": "Y", "overs": []}
+    m = parse_match("ov", doc("2024-01-01", ("X", "Y"), [inn, other]))
+    i0 = m["innings"][0]
+    assert i0["ov"] == [6, 30] and i0["runs"] == 6 + 24 + 3 and i0["ho"] == 24

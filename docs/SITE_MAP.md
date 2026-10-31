@@ -21,7 +21,7 @@ odds are served from their own backend (bookmaker logos, plus a "Sportsbook Odds
 | `/free-bets` | affiliate offers | not built | we run no affiliate links |
 | `/betting-academy/*` | blog | not built | could reuse the glossary as articles |
 | `/saved`, login | favourites | `/saved` (stars, browser-only) | no accounts |
-| footer | tools, popular leagues, resources, responsible gambling | footer with the same three columns | |
+| footer | tools, popular leagues, resources, responsible gambling | unlisted `/privacy-policy`, `/terms-of-use`, `/docs` (typed URLs only; stats/data site; no gambling promotion) | |
 
 ## Routing and SEO
 The app routes on the URL hash internally, and also accepts path URLs (`/player/123`): `vercel.json` rewrites unknown paths to `index.html`

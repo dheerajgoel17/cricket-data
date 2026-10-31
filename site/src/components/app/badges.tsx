@@ -31,7 +31,7 @@ const SIZES = { xs: "size-5 text-[8px]", sm: "size-6 text-[9px]", md: "size-9 te
 export type BadgeSize = keyof typeof SIZES;
 
 const Circle = ({ size, className, children, title }: { size: BadgeSize; className?: string; children: React.ReactNode; title?: string }) => (
-  <span title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-bold text-muted-foreground", SIZES[size], className)}>{children}</span>
+  <span data-slot="avatar" title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-bold text-muted-foreground", SIZES[size], className)}>{children}</span>
 );
 
 /** Round team badge: Source A logo when we know the team, else a flag, else initials. */

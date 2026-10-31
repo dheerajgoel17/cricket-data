@@ -8,10 +8,10 @@ Premium is decimal and two-way: "1st innings - <Last, First> total" over/unders 
 sixes" are ``fancy`` lines. Fancy is the exchange's session format: a market quotes Yes at line Ly and No at line Ln with a rate each. Yes (back) at rate R: 100
 staked wins R, so decimal 1 + R / 100. No (lay) at rate R: R staked wins 100, so decimal 1 + 100 / R (100 is even money, 2.00, either way). Yes wins at Ly or more and No wins at
 Ln - 1 or fewer: so Yes is "over Ly - 0.5" and No is "under Ln - 0.5", two lines a gap apart that are one-sided unless Ly == Ln. A player's "<name> Run Adv" gives two player
-rows; match totals (fours, sixes, boundaries, wickets, fifties) and a side's innings runs give ``fancy`` lines.
+rows; match totals (fours, sixes, boundaries, wickets, fifties), first-over runs and a side's innings or first-N-overs session runs give ``fancy`` lines.
 
-Rules the book states and the lines carry (``rules``): premium markets void unless 80% of the match is played and have no batting-order condition; fancy side lines count
-only the side batting first (``bat_first``) and void if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
+Rules the book states and the lines carry (``rules``): premium markets void unless 80% of the match is played and have no batting-order condition (a side's fours / sixes stand whether they bat first or second); a fancy side run line (the first N overs, or the full innings) counts
+only the side batting first (``bat_first``) and voids if that side bowls first, or if even one ball is lost to weather or the match is abandoned; fancy player lines stand once the outcome is decided;
 fancy match totals are not voided by lost balls. Fancy and player-performance markets close an hour before the scheduled start. Player-performance markets are
 fantasy points (1 per run, 20 per wicket, 10 per catch, 25 per stumping; the premium one does not state its scoring): they come back as ``player_points`` rows,
 published as the site's ``points`` stat (runs + 20 x wickets + 10 x catches + 25 x stumpings, counted from the ball by ball data; no model prices it). Meter, khado and lucky-number markets and multi-day matches (their markets are per innings) are left out.
@@ -45,7 +45,8 @@ TEAM_KEY = {"fours": "team_total_fours", "sixes": "team_total_sixes"}
 OU = re.compile(r"^(over|under) (\d+(?:\.\d+)?)$")
 
 FANCY_MATCH = {"Total Match Fours Adv": "match_fours", "Total Match Sixes Adv": "match_sixes", "Total Match Boundaries Adv": "match_boundaries",
-               "Total Match Wkts Adv": "match_wickets", "Total Match Fifties Adv": "match_50s"}
+               "Total Match Wkts Adv": "match_wickets", "Total Match Fifties Adv": "match_50s", "Total Match 30s Adv": "match_30s",
+               "Match 1st Over Run Adv": "first_over"}
 FANCY_PLAYER = re.compile(r"^(?P<p>[A-Za-z][A-Za-z.' -]*?)\s+Run Adv$")
 NOT_A_PLAYER = re.compile(r"\b(over|wkt|pship|match|fall|total|top|boundaries)\b", re.I)
 FANCY_TEAM_RUNS = re.compile(r"^(?P<n>\d+) Over Run (?P<abbr>[A-Z]{2,4})\s+Adv$")
@@ -247,12 +248,13 @@ def parse_fancy(data: list[dict], ev: dict, fetched_at: str) -> tuple[list[dict]
                 continue
             if clean in FANCY_MATCH:
                 key, team, rules = FANCY_MATCH[clean], None, "fancy_total"
-            elif (mm := FANCY_TEAM_RUNS.match(clean)) and int(mm["n"]) >= 20:
+            elif (mm := FANCY_TEAM_RUNS.match(clean)):
                 teams = [t for t in (ev["home"], ev["away"]) if abbreviates(mm["abbr"], t)]
                 if len(teams) != 1:
                     left[name] += 1
                     continue
-                key, team, rules = "team_total_runs", teams[0], "fancy_side"
+                n = int(mm["n"])
+                key, team, rules = ("team_total_runs", teams[0], "fancy_side") if n >= 20 else (f"overs_{n}", teams[0], "fancy_side")
             elif (mm := FANCY_PLAYER.match(clean)) and not NOT_A_PLAYER.search(mm["p"]):
                 player = mm["p"].strip()
                 for side, v in (("over", ov), ("under", un)):

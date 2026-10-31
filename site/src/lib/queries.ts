@@ -11,8 +11,10 @@ export const railQuery = queryOptions({ queryKey: ["rail"], queryFn: loadRail, s
 export const liveQuery = queryOptions({ queryKey: ["live-scores"], queryFn: loadLive, refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, placeholderData: (p: any) => p,
   initialData: () => readLive()?.body, initialDataUpdatedAt: () => readLive()?.t });
 
-/** Starts the feeds before the data files and the page code have loaded (they need nothing from either), so they are in by the time the home page mounts instead of starting then. */
+/** Starts the feeds before the data files and the page code have loaded (they need nothing from either), so they are in by the time the home page mounts instead of starting then. Live scores feed Fancy and player props too (`/fancy`, `/props`, a fixture page). */
 export function prefetchFeeds(client: QueryClient, path: string) {
   void client.prefetchQuery(linesQuery);
-  if (path === "/") { void client.prefetchQuery(railQuery); void client.prefetchQuery(liveQuery); }
+  const live = path === "/" || path.startsWith("/fancy") || path.startsWith("/props") || path.startsWith("/fixture");
+  if (path === "/") void client.prefetchQuery(railQuery);
+  if (live) void client.prefetchQuery(liveQuery);
 }

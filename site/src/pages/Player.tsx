@@ -40,6 +40,7 @@ import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 import { LineStepper } from "@/components/app/line-stepper";
 import { OutcomeDonut } from "@/components/app/viz";
+import { Tick } from "@/components/app/tick";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const FILTER_SKIP = new Set(["Player", "Stat", "Format", "Line", "Side", "Test innings"]); // those are on screen already (the Scope switch for the last)
@@ -90,19 +91,20 @@ function PlayerHeader({ idx, name, team, fmts, share }: { idx: number; name: str
   const nav = useNavigate();
   const teamIx = store.P.tm[idx];
   return (
-    <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
-      <div className="flex items-center gap-snug">
-        <PlayerPhoto idx={idx} className="size-20 shrink-0 rounded-full bg-secondary" />
+    <section className="flex flex-col gap-stack lg:flex-row lg:items-center lg:justify-between">
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="-ml-2 flex items-center self-start rounded-lg px-tight py-tight text-body text-primary transition-opacity active:opacity-40 lg:hidden"><ChevronLeftIcon className="size-5" />Back</button>
+      <div className="flex min-w-0 items-center gap-snug lg:gap-stack">
+        <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="hidden size-control shrink-0 place-items-center rounded-full bg-secondary text-primary lg:grid"><ChevronLeftIcon className="size-5" /></button>
+        <PlayerPhoto idx={idx} className="size-20 shrink-0 rounded-full bg-secondary lg:size-24" />
         <div className="grid min-w-0 flex-1 gap-tight">
           <h1 className="truncate text-display font-bold leading-tight tracking-tight">{name}</h1>
           <Link to={`/team/${teamIx}`} className="flex min-w-0 items-center gap-tight text-callout text-muted-foreground active:opacity-70"><TeamBadge name={team} size="sm" /><span className="truncate">{team}</span></Link>
           <div className="flex flex-wrap items-center gap-tight">{fmts.map(([i, f]) => <Badge key={i} variant="outline" className="px-snug py-hair text-caption font-semibold">{f}</Badge>)}</div>
         </div>
-        <div className="flex shrink-0 flex-col items-center gap-tight">
-          <StarButton kind="player" idx={idx} />
-          <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><ShareIcon className="size-5" /></motion.button>
-        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-tight lg:flex-col">
+        <StarButton kind="player" idx={idx} />
+        <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-control cursor-pointer place-items-center rounded-full bg-secondary"><ShareIcon className="size-5" /></motion.button>
       </div>
     </section>
   );
@@ -271,48 +273,58 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
 
   return (
     <div className="flex flex-col gap-section">
-      {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
-      {next && (next.opp || next.known) ? <div className="-mt-tight flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
-      <div className="flex flex-col gap-section lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:items-start">
-      {!entries.length || !cur ? <EmptyNote>No fixtures match these filters.</EmptyNote> : (
-        <section className="flex flex-col gap-stack">
-          <div className={cn("flex items-center justify-between gap-stack p-inset", CARD)}>
-            <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack">
-              <Metric k={`${cur.label} avg`} v={num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)} tone={cur.p != null && (cur.mean ?? 0) > line ? "up" : undefined} />
-              <Metric k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
-              <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
-              <Metric k="Line" v={`${side === "over" ? "O" : "U"} ${line}`} />
-              <Metric k="Prop" v={res.statLabel} />
-              <Metric k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
+      {!entries.length || !cur ? (
+        <>
+          {next ? (
+            <div className="flex flex-col gap-snug lg:max-w-xl">
+              <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
+              {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
             </div>
-            {mixSlices.length >= 3
-              ? <OutcomeDonut caption={`${cur.label} mix`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={mixSlices} />
-              : <Gauge p={cur.p} caption={`${cur.label} hit`} />}
+          ) : null}
+          <EmptyNote>No fixtures match these filters.</EmptyNote>
+        </>
+      ) : (
+      <div className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
+        <div className={cn("flex items-center justify-between gap-stack p-inset lg:col-span-12", CARD)}>
+          <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-6">
+            <Metric k={`${cur.label} avg`} v={num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)} tone={cur.p != null && (cur.mean ?? 0) > line ? "up" : undefined} />
+            <Metric k="Hit rate" v={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} tone={cur.p == null ? undefined : cur.p >= 0.6 ? "up" : cur.p < 0.4 ? "down" : undefined} />
+            <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
+            <Metric k="Line" v={`${side === "over" ? "O" : "U"} ${line}`} />
+            <Metric k="Prop" v={res.statLabel} />
+            <Metric k={`Avg ${(c.auxLabel || "").toLowerCase()}`} v={num(auxAvg == null ? null : Math.round(auxAvg * 100) / 100)} />
           </div>
-
+          {mixSlices.length >= 3
+            ? <OutcomeDonut caption={`${cur.label} mix`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={mixSlices} />
+            : <Gauge p={cur.p} caption={`${cur.label} hit`} />}
+        </div>
+        <section className={cn("flex flex-col gap-stack lg:row-start-2", book ? "lg:col-span-8" : "lg:col-span-12")}>
           <div className="flex flex-wrap items-center justify-between gap-snug">
             <PillGroup segmented layoutId="pl-side" label="Side" value={side} onChange={(v) => { setSide(v); keep({ line, side: v }); }} items={[["over", "Over"], ["under", "Under"]]} />
             <LineStepper value={line} label={side === "over" ? "O" : "U"} onStep={stepLine} />
           </div>
           {book && (bookAt ? (
-            <p className="-mt-tight text-callout text-muted-foreground">
-              {bookAt.books.map((b: any) => <span key={b.source} className="mr-snug whitespace-nowrap"><BookBadge source={b.source} /> <b className={cn("font-semibold tabular-nums", side === "over" ? "text-foreground" : "")}>{odds(b.over)}</b> / <b className={cn("font-semibold tabular-nums", side === "under" ? "text-foreground" : "")}>{odds(b.under)}</b></span>)}
+            <p className="text-callout text-muted-foreground">
+              {bookAt.books.map((b: any) => <span key={b.source} className="mr-snug whitespace-nowrap"><BookBadge source={b.source} /> <Tick value={b.over} className={cn("font-semibold tabular-nums", side === "over" ? "text-foreground" : "")}>{odds(b.over)}</Tick> / <Tick value={b.under} className={cn("font-semibold tabular-nums", side === "under" ? "text-foreground" : "")}>{odds(b.under)}</Tick></span>)}
             </p>
           ) : (
-            <p className="-mt-tight text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
+            <p className="text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
           ))}
-
-          <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
-              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
           <div className={cn("flex flex-col gap-snug p-inset", CARD)}>
-            <ChartBars entries={shown} line={line} side={side} height={300} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
+            <ChartBars entries={shown} line={line} side={side} height={340} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
+            <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
+              items={ws.map((w: any) => [String(w.n), <span key={w.n}>{w.label} <b className={cn("font-semibold", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="max-w-full" />
             <p className="text-footnote text-muted-foreground">{res.statLabel} {side} {line}{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}. Green cleared, red missed. DNP / VOID fixtures are not counted.</p>
           </div>
         </section>
-      )}
-
+        {next ? (
+          <div className="flex flex-col gap-snug lg:col-span-5 lg:row-start-3">
+            <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
+            {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
+          </div>
+        ) : null}
       {book && cur && (
-        <section className="flex flex-col gap-snug lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
+        <section className="flex flex-col gap-snug lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
           <div className="flex items-baseline justify-between gap-snug">
             <h2 className="flex items-center gap-tight text-title font-bold tracking-tight">
               Lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}
@@ -350,7 +362,7 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
                     className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-snug px-inset py-snug text-left transition-colors active:bg-accent", line === l.line && "bg-accent/60")}>
                     <span className="grid min-w-0 gap-hair">
                       <span className="text-body font-semibold">O/U {l.line}{l === book.main && <span className="ml-tight text-caption font-semibold uppercase tracking-wider text-primary">main</span>}</span>
-                      {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><BookBadge source={b.source} /> <span className={cn(l.books.length > 1 && b.over === bestO && "font-semibold text-primary")}>{odds(b.over)}</span> / <span className={cn(l.books.length > 1 && b.under === bestU && "font-semibold text-primary")}>{odds(b.under)}</span></span>)}
+                      {l.books.map((b: any) => <span key={b.source} className="truncate text-callout text-muted-foreground"><BookBadge source={b.source} /> <Tick value={b.over} className={cn(l.books.length > 1 && b.over === bestO && "font-semibold text-primary")}>{odds(b.over)}</Tick> / <Tick value={b.under} className={cn(l.books.length > 1 && b.under === bestU && "font-semibold text-primary")}>{odds(b.under)}</Tick></span>)}
                     </span>
                     <span className="grid justify-items-end gap-hair text-right">
                       <span className="text-footnote text-muted-foreground" title="Over chance with each book's margin removed">Mkt <b className="font-semibold tabular-nums text-foreground">{l.prob == null ? "–" : pc(l.prob)}</b></span>
@@ -364,22 +376,23 @@ function Loaded({ name, pid, stat, next, res, q, book, bookDefault, navigateWith
         </section>
       )}
       </div>
+      )}
 
-      <section className="flex flex-col gap-stack">
-        <div className="flex flex-wrap items-center gap-snug">
+      <section className="flex flex-col gap-stack lg:grid lg:grid-cols-12 lg:items-start">
+        <div className="flex flex-wrap items-center gap-snug lg:col-span-12">
           <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => setFiltersOpen(true)}><AdjustmentsHorizontalIcon />Filters{active.length ? ` · ${active.length}` : ""}</Button>
           {active.length ? active.map(([k, v]: [string, unknown], i: number) => <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-footnote font-normal">{k ? <b className="mr-tight font-semibold">{k}</b> : null}{String(v)}</Badge>)
             : <span className="text-callout text-muted-foreground">All matches</span>}
           {active.length ? <Button variant="link" className="h-control text-callout text-muted-foreground" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear</Button> : null}
         </div>
 
-        <div className={cn("flex flex-col gap-hair p-inset", CARD)}>
+        <div className={cn("flex flex-col gap-hair p-inset lg:col-span-12", CARD)}>
           <h2 className="text-body font-semibold">At a glance</h2>
           <p className="text-callout">{res.headline}</p>
           <p className="text-footnote text-muted-foreground">{res.freshness}</p>
         </div>
 
-        <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
+        <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack lg:col-span-12">
         <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={switchTab} items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} />
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">

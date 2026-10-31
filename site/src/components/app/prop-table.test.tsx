@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { PropTable } from "./hot-props";
+import { PropRow, PropTable } from "./hot-props";
 
+vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
 vi.mock("./badges", () => ({
   PlayerBadge: () => <span>pic</span>,
   TeamFlag: () => null,
@@ -32,8 +33,33 @@ describe("PropTable", () => {
     expect(screen.getByText("AM Tribe")).toBeInTheDocument();
     expect(screen.getByText("1.85")).toBeInTheDocument();
     expect(screen.getByText("+5.1")).toBeInTheDocument();
-    expect(screen.getByText("Wankhede Stadium")).toBeInTheDocument();
+    expect(screen.getByText("Wankhede")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "H2H" }));
     expect(onWin).toHaveBeenCalledWith("h2h");
+  });
+
+  it("uses a short stadium name on the prop card, full venue on the title", () => {
+    const r = { ...row, venue: "Western Australia Cricket Association Ground, Perth", ven: window(0.2, 5), l10: window(0.7, 10) };
+    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" bars i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByText("7 in L10")).toBeInTheDocument();
+    const chip = screen.getByTitle("Western Australia Cricket Association Ground, Perth");
+    expect(chip).toHaveTextContent("1/5 at WACA");
+    expect(screen.queryByText(/Western Australia Cricket Association Ground/)).toBeNull();
+    expect(document.querySelector("[data-slot=item] svg")).toBeTruthy();
+  });
+
+  it("puts the bookmaker mark on the third row of the prop card, even when only one book prices the line", () => {
+    const r = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
+    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" bars i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByText("bet365")).toBeInTheDocument();
+    expect(screen.getByText("bet365").closest("[data-slot=item-description]")).toBeNull();
+    expect(document.querySelector("[data-slot=item-description]")).not.toHaveTextContent("bet365");
+  });
+
+  it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
+    const one = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
+    render(<MemoryRouter><PropTable rows={[one]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("bet365")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
   });
 });

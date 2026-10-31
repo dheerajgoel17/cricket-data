@@ -485,8 +485,30 @@ function cardBatter(row, names, team) {
   return {
     id, name, team, runs, balls, fours, sixes, sr: strikeRate(runs, balls), out: !!code,
     dismissal: howOut(code, bowlerName, fielderNames),
+    how: code, bowlerId: bowler, fielderIds: fielders,
     fowRuns: f.length > 5 ? nInt(f[5]) : null, fowBalls: f.length > 6 ? nInt(f[6]) : null,
   };
+}
+
+/** Catches and stumpings from how-out, keyed by the source's player id. A caught-and-bowled is the bowler's catch. */
+function fieldingFromCard(inns) {
+  const byId = new Map(), teamOf = new Map();
+  const add = (id, key, team) => {
+    if (!id) return;
+    const cur = byId.get(id) || { catches: 0, stumpings: 0 };
+    cur[key] += 1;
+    byId.set(id, cur);
+    if (team && !teamOf.has(id)) teamOf.set(id, team);
+  };
+  for (const inn of inns || []) {
+    const bowlTeam = inn.bowlers?.[0]?.team || "";
+    for (const p of inn.batters || []) {
+      if (p.how === 2) add(p.fielderIds?.[0], "catches", bowlTeam);
+      else if (p.how === 3) add(p.bowlerId, "catches", bowlTeam);
+      else if (p.how === 8) add(p.fielderIds?.[0], "stumpings", bowlTeam);
+    }
+  }
+  return { byId, teamOf };
 }
 
 function cardBowler(row, names, team) {
@@ -528,17 +550,30 @@ export function parseCardPage(html) {
     };
   });
   const shown = card.filter((i) => i.batters.length || i.bowlers.length || i.runs != null || i.yetToBat.length); // before the first ball a card is the batting XI, all yet to bat
+  const { byId: field, teamOf } = fieldingFromCard(shown);
+  const credit = (id) => field.get(id) || { catches: 0, stumpings: 0 };
   const players = [];
   for (const inn of shown) {
-    for (const p of inn.batters) players.push({ id: p.id, name: p.name, team: p.team, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes, sr: p.sr, wickets: null, conceded: null, ballsBowled: null, out: p.out, dismissal: p.dismissal });
-    for (const p of inn.bowlers) players.push({ id: p.id, name: p.name, team: p.team, runs: null, balls: null, fours: null, sixes: null, wickets: p.wickets, conceded: p.conceded, ballsBowled: p.ballsBowled, maidens: p.maidens, econ: p.econ, out: false });
+    for (const p of inn.batters) players.push({ id: p.id, name: p.name, team: p.team, runs: p.runs, balls: p.balls, fours: p.fours, sixes: p.sixes, sr: p.sr, wickets: null, conceded: null, ballsBowled: null, out: p.out, dismissal: p.dismissal, ...credit(p.id) });
+    for (const p of inn.bowlers) players.push({ id: p.id, name: p.name, team: p.team, runs: null, balls: null, fours: null, sixes: null, wickets: p.wickets, conceded: p.conceded, ballsBowled: p.ballsBowled, maidens: p.maidens, econ: p.econ, out: false, ...credit(p.id) });
+  }
+  const seen = new Set(players.map((p) => p.id).filter(Boolean));
+  for (const [id, f] of field) {
+    if (!id || seen.has(id) || !names[id]) continue;
+    players.push({ id, name: names[id], team: teamOf.get(id) || "", runs: null, balls: null, fours: null, sixes: null, wickets: null, conceded: null, ballsBowled: null, out: false, ...f });
   }
   const teamList = [...new Set(card.map((i) => i.team).filter(Boolean))];
   for (const n of Object.values(teams)) if (n && !teamList.includes(n)) teamList.push(n);
   return {
     id: "", status: "live", start: "", summary: "", note: "", url: "",
     teams: teamList.slice(0, 2).map((name) => ({ name, abbr: name, batting: false, display: "", runs: null, wkts: null, overs: null })),
-    innings: shown.filter((i) => i.runs != null).map((i) => ({ n: i.n, team: i.team, headline: "Batting", fours: i.batters.reduce((a, p) => a + (p.fours || 0), 0), sixes: i.batters.reduce((a, p) => a + (p.sixes || 0), 0), runs: i.runs, wkts: i.wkts, overs: i.overs })),
+    innings: shown.filter((i) => i.runs != null).map((i) => ({
+      n: i.n, team: i.team, headline: "Batting",
+      fours: i.batters.reduce((a, p) => a + (p.fours || 0), 0), sixes: i.batters.reduce((a, p) => a + (p.sixes || 0), 0),
+      runs: i.runs, wkts: i.wkts, overs: i.overs, extras: i.extras?.total ?? null,
+      runouts: i.batters.filter((p) => p.how === 4).length,
+      maxWickets: i.bowlers.reduce((a, b) => Math.max(a, b.wickets || 0), 0),
+    })),
     players, card: shown,
   };
 }
@@ -550,7 +585,7 @@ function flagLive(players, flags) {
     if (f.out) continue; // dismissed batters are already in the card in full
     const bat = f.runs != null;
     const hit = out.find((p) => (bat ? p.runs != null && !p.out : p.wickets != null) && namesMatch(p.name, f.name));
-    if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens });
+    if (hit) Object.assign(hit, { ...f, id: hit.id, team: hit.team, maidens: hit.maidens ?? f.maidens, catches: hit.catches, stumpings: hit.stumpings });
     else if (!(bat && out.some((p) => p.runs != null && p.out && namesMatch(p.name, f.name)))) out.push(f); // the card has him out: trust it
   }
   return out;
@@ -651,9 +686,50 @@ const BOWL_STATS = new Set(["wickets", "runs_conceded", "balls_bowled"]);
 
 const nameSet = (x) => [].concat(x || []).map(norm).filter(Boolean);
 
+/** Same person: one source id, or the same name on the same side (a bat row and a bowl row; the match page may have used the name as id). */
+function onePerson(rows) {
+  if (rows.length <= 1) return rows;
+  const ids = [...new Set(rows.map((p) => p.id).filter(Boolean))];
+  if (ids.length === 1) return rows;
+  return [...new Set(rows.map((p) => `${norm(p.name)}|${teamKey(p.team || "")}`))].length === 1 ? rows : [];
+}
+
+/** Sum batting and bowling; fielding is already the match total copied onto each role row, so it is taken once. */
+function mergePointsRows(rows) {
+  const out = { name: rows[0].name, team: rows[0].team, id: rows[0].id || "", out: false, catches: null, stumpings: null };
+  for (const p of rows) {
+    if (p.id) out.id = p.id;
+    if (p.team) out.team = p.team;
+    if (p.runs != null) {
+      out.runs = (out.runs || 0) + p.runs;
+      out.balls = (out.balls || 0) + (p.balls || 0);
+      out.fours = (out.fours || 0) + (p.fours || 0);
+      out.sixes = (out.sixes || 0) + (p.sixes || 0);
+      if (p.out) out.out = true;
+    }
+    if (p.wickets != null) {
+      out.wickets = (out.wickets || 0) + p.wickets;
+      out.conceded = (out.conceded || 0) + (p.conceded || 0);
+      out.ballsBowled = (out.ballsBowled || 0) + (p.ballsBowled || 0);
+    }
+    if (p.catches != null) out.catches = p.catches;
+    if (p.stumpings != null) out.stumpings = p.stumpings;
+  }
+  return out;
+}
+
+function takeRows(rows, stat) {
+  if (rows.length === 1) return rows[0];
+  if (stat === "points") {
+    const same = onePerson(rows);
+    return same.length ? mergePointsRows(same) : null;
+  }
+  return null;
+}
+
 /**
  * The player's row for this stat: a scorecard has one row per role, so an all-rounder's batting and bowling rows are told apart by the stat.
- * With the source's own id for him (`sourceId`, from the identity table) the row is found by that id and no name is consulted. Otherwise names decide, and a row that
+ * Points merge those rows (runs + wickets + fielding). With the source's own id for him (`sourceId`, from the identity table) the row is found by that id and no name is consulted. Otherwise names decide, and a row that
  * belongs to a different player the table knows (`isLinked(row id)`, only asked once he is linked himself) is never taken for him. Ambiguous names stay unmatched.
  * @param {string | string[]} [commonName] the name(s) the books use for him
  * @param {((sourceId: string) => boolean) | null} [isLinked]
@@ -663,16 +739,25 @@ export function livePlayer(match, name, stat, commonName = "", sourceId = "", is
   let rows = (match?.players || []).filter((p) => !role || p[role] != null);
   if (sourceId) {
     const byId = rows.filter((p) => p.id === sourceId);
-    if (byId.length) return byId.length === 1 ? byId[0] : null; // two rows with his id (a Test, two innings) are as ambiguous as two names
+    if (byId.length) {
+      // Points need both roles. The match page sometimes stamps the printed name as id on the other row, so pull that in too.
+      if (stat === "points") {
+        const names = new Set(byId.map((p) => norm(p.name)));
+        const team = teamKey(byId[0].team || "");
+        const extra = rows.filter((p) => names.has(norm(p.name)) && teamKey(p.team || "") === team);
+        return takeRows(extra.length ? extra : byId, stat);
+      }
+      return takeRows(byId, stat); // two rows with his id: a Test's two innings, or bat + bowl
+    }
     if (isLinked) rows = rows.filter((p) => !isLinked(p.id));
   }
   // The books call a player what the live source calls him ("Kusal Mendis"); the data has initials ("BKG Mendis"), and "K" would match every Mendis with a K.
   // So the books' own name (the line's, else the identity table's), when there is one, is tried first and exactly.
   const books = nameSet(commonName);
   const exact = books.length ? rows.filter((p) => books.includes(norm(p.name))) : [];
-  if (exact.length === 1) return exact[0];
+  if (exact.length) return takeRows(exact, stat);
   const hits = rows.filter((p) => namesMatch(p.name, name));
-  return hits.length === 1 ? hits[0] : null;
+  return takeRows(hits, stat);
 }
 
 function withSr(p) {
@@ -720,14 +805,13 @@ export function liveBoard(match) {
 
 const STAT_FIELD = { runs: "runs", balls: "balls", fours: "fours", sixes: "sixes", wickets: "wickets", runs_conceded: "conceded", balls_bowled: "ballsBowled" };
 
-/** Live so-far for a priced line. Points need the card's catches and stumpings; missing fielding is not scored as 0. */
+/** Live so-far for a priced line. Points = runs + 20×wickets + 10×catches + 25×stumpings; a missing credit is 0 so far (the total can still rise). */
 export function liveStat(player, stat) {
   if (!player) return null;
   if (stat === "points") {
-    if (player.catches == null || player.stumpings == null) return null;
-    const r = player.runs, w = player.wickets;
-    if (r == null && w == null) return null;
-    return (r || 0) + 20 * (w || 0) + 10 * player.catches + 25 * player.stumpings;
+    const r = player.runs, w = player.wickets, ct = player.catches, st = player.stumpings;
+    if (r == null && w == null && !ct && !st) return null;
+    return (r || 0) + 20 * (w || 0) + 10 * (ct || 0) + 25 * (st || 0);
   }
   const k = STAT_FIELD[stat];
   if (!k || player[k] == null) return null;
@@ -849,25 +933,118 @@ export function lineNotIn(match, l, idn = NO_IDENTITY) {
   return notInXI(match, l.player, l.team, idn.sourceOf(l.pid), [l.book_name, ...idn.bookNames(l.pid)].filter(Boolean));
 }
 
-export function liveMarket(match, key, team) {
+function sessionSoFar(inn, n) {
+  if (!inn || !(n > 0) || inn.runs == null || inn.overs == null) return null;
+  return inn.overs <= n ? inn.runs : null; // past n the live total is no longer the session score; all out before n still has overs < n
+}
+
+function oversNof(key) {
+  if (key === "first_over") return 1;
+  const m = /^overs_(\d+)$/.exec(key || "");
+  return m ? +m[1] : 0;
+}
+
+/** So-far for a fancy market. `inn` 1 or 2 is that side's own first or second innings (a Test); 0 sums every innings they have batted. */
+export function liveMarket(match, key, team, inn = 0) {
   if (!match) return null;
-  const inn = match.innings || [];
-  const src = team ? inn.filter((i) => teamKey(i.team) === teamKey(team)) : inn;
-  if (!src.length && !["top_score"].includes(key)) return null;
-  const sum = (k) => src.reduce((a, i) => a + (i[k] || 0), 0);
+  const all = match.innings || [];
+  const src = team ? all.filter((i) => teamKey(i.team) === teamKey(team)) : all;
+  const rows = inn > 0 ? src.slice(inn - 1, inn) : src;
+  const nOvers = oversNof(key);
+  if (!rows.length && !["top_score", "max_wickets"].includes(key) && !nOvers) return null;
+  const sum = (k) => rows.reduce((a, i) => a + (i[k] || 0), 0);
+  if (nOvers) {
+    const row = key === "first_over" ? (team ? src : all).find((i) => i.n === 1) : (inn > 0 ? rows[0] : src[0]);
+    return sessionSoFar(row, nOvers);
+  }
   if (key === "match_runs" || key === "team_total_runs") return sum("runs");
-  if (key === "first_innings_runs") return (team ? src : inn).find((i) => i.n === 1)?.runs ?? null;
+  if (key === "first_innings_runs") return (team ? src : all).find((i) => i.n === 1)?.runs ?? null;
   if (key === "match_sixes" || key === "team_total_sixes") return sum("sixes");
   if (key === "match_fours" || key === "team_total_fours") return sum("fours");
   if (key === "match_boundaries" || key === "team_total_boundaries") return sum("fours") + sum("sixes");
   if (key === "match_wickets" || key === "team_total_wickets") return sum("wkts");
+  if (key === "match_extras" || key === "team_total_extras") return rows.some((i) => i.extras == null) ? null : sum("extras");
+  if (key === "match_runouts" || key === "team_total_runouts") return sum("runouts");
+  if (key === "team_total_highest_over") return null; // the live card has no over tape
   if (key === "top_score") {
     const xs = (match.players || []).map((p) => p.runs).filter((x) => x != null);
     return xs.length ? Math.max(...xs) : null;
   }
+  if (key === "max_wickets") {
+    const xs = (match.players || []).map((p) => p.wickets).filter((x) => x != null);
+    return xs.length ? Math.max(...xs) : (rows.length ? Math.max(0, ...rows.map((i) => i.maxWickets || 0)) : null);
+  }
   if (key === "match_50s") return (match.players || []).filter((p) => (p.runs || 0) >= 50 && (p.runs || 0) < 100).length;
   if (key === "match_30s") return (match.players || []).filter((p) => (p.runs || 0) >= 30 && (p.runs || 0) < 50).length;
+  if (key === "match_ducks" || key === "team_total_ducks") {
+    const ps = (match.players || []).filter((p) => p.out && (p.runs || 0) === 0);
+    return team ? ps.filter((p) => teamKey(p.team) === teamKey(team)).length : ps.length;
+  }
   return null;
+}
+
+/**
+ * Can this fancy so-far still move? A side's own 1st/2nd innings is final once that turn is over (the other side has begun, they are all out, or the overs are used);
+ * a limited-overs team total is final with that innings; a Test match total and a whole-match market stay live until the match ends.
+ */
+export function fancyState(match, { key, team, inn = 0 } = {}) {
+  if (!match) return "live";
+  if (match.status === "final") return "final";
+  const inns = match.innings || [];
+  const nOvers = oversNof(key);
+  if (nOvers) {
+    const src = team ? inns.filter((i) => teamKey(i.team) === teamKey(team)) : inns;
+    const row = key === "first_over" ? src.find((i) => i.n === 1) : src[(inn > 0 ? inn : 1) - 1];
+    if (!row) return "live";
+    if ((row.wkts || 0) >= 10 || (row.overs != null && row.overs >= nOvers) || inns.some((i) => i.n > row.n)) return "final";
+    return "live";
+  }
+  if (inn > 0 && team) {
+    const src = inns.filter((i) => teamKey(i.team) === teamKey(team));
+    const row = src[inn - 1];
+    if (!row) return "live";
+    if (src.length > inn || inns.some((i) => i.n > row.n)) return "final";
+    const max = MAX_OVERS[match.fmt];
+    if (row.wkts === 10 || (max != null && row.overs != null && row.overs >= max)) return "final";
+    return "live";
+  }
+  if (key === "first_innings_runs") {
+    const first = inns.find((i) => i.n === 1);
+    if (!first) return "live";
+    const max = MAX_OVERS[match.fmt];
+    if (inns.some((i) => i.n > 1) || first.wkts === 10 || (max != null && first.overs != null && first.overs >= max)) return "final";
+    return "live";
+  }
+  if (team && String(key || "").startsWith("team_total_")) {
+    if (!MAX_OVERS[match.fmt]) return "live";
+    return inningsOver(match, team) ? "final" : "live";
+  }
+  return "live";
+}
+
+/** Who batted first, from the live card. Null until an innings has started. */
+function battingFirst(match) {
+  const inns = match?.innings || [];
+  const first = inns.find((i) => i.n === 1) || inns[0];
+  return first?.team || null;
+}
+
+/**
+ * Where a fancy market stands on the live snapshot, `{v, state, verdict}` or null: the same shape `lineStanding` gives a player prop, from the innings totals
+ * (`liveMarket`) and `lineVerdict`. Overlay this at view time from the 15 s poll; do not bake it into the scored history.
+ * A fancy side run line tagged `bat_first` (first N overs, or the full innings) voids once that side is bowling first; premium fours / sixes are not tagged and stay live for both.
+ */
+export function fancyStanding(match, row) {
+  if (!match || !row?.key) return null;
+  const batFirst = !!(row.batFirst ?? row.bat_first);
+  if (batFirst && row.team && !(row.inn > 0)) {
+    const first = battingFirst(match);
+    if (first && teamKey(first) !== teamKey(row.team)) return { v: null, state: "void", verdict: null };
+  }
+  const v = liveMarket(match, row.key, row.team, row.inn || 0);
+  if (v == null) return null;
+  const state = fancyState(match, row);
+  return { v, state, verdict: lineVerdict(v, row.line, state) };
 }
 
 /**

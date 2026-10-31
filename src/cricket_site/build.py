@@ -24,7 +24,7 @@ from pathlib import Path
 
 from . import identity
 from .crex_doc import balls_doc
-from .parse import FORMAT_NAMES, KINDS, parse_match, qualifies, squad_quality
+from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
 
 NSHARD = 64
 SCHEMA = 1
@@ -37,11 +37,10 @@ _ZIP: zipfile.ZipFile | None = None
 
 def _compact(m: dict) -> dict:
     out = {k: m[k] for k in ("id", "date", "fmt", "gender", "intl", "event", "venue", "city", "teams", "winner",
-                              "res", "overs", "bpo", "days", "first", "q", "mc", "ts", "ho")}
+                              "res", "overs", "bpo", "days", "first", "q", "mc", "ts", "ho", "mw")}
     out["pv"] = 0
-    out["inn"] = [[i["team"], i["opp"], i["runs"], i["wkts"], i["balls"], i["f4"], i["f6"], i["n30"], i["n50"],
-                   i["n100"], i["n10"], i["nsd"], i["nduck"], i["ho"], i["mc"], i["ts"], i["tops"]]
-                  for i in m["innings"]]
+    out["inn"] = [pack_inn(i) for i in m["innings"]]
+    out["ov"] = [i.get("ov") or [] for i in m["innings"]]
     out["bat"] = [(p, i["no"], i["team"], i["opp"], v["o"], v["r"], v["b"], v["f"], v["s"], v["k"], v["tb"], v["mt"])
                   for i in m["innings"] for p, v in i["bat"].items()]
     out["bowl"] = [(p, i["no"], i["opp"], i["team"], v["w"], v["rc"], v["bb"])
@@ -146,7 +145,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
-             "mc": 0, "ts": 0, "ho": 0, "pv": 1, "inn": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
+             "mc": 0, "ts": 0, "ho": 0, "mw": 0, "pv": 1, "inn": [], "ov": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
         registry: dict[str, str] = {}
         for p in d.get("players", []):
             stat["rows"] += 1
@@ -202,7 +201,7 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     if not parsed or len(parsed["innings"]) < 1:
         return
     c = _compact(parsed)
-    for k in ("first", "q", "mc", "ts", "ho", "inn", "bat", "bowl", "parts"):
+    for k in ("first", "q", "mc", "ts", "ho", "mw", "inn", "ov", "bat", "bowl", "parts"):
         m[k] = c[k]
     if c["fld"]:  # the deliveries' own fielding credits; else the scraped totals stay
         m["fld"] = c["fld"]
@@ -222,8 +221,9 @@ def _batting_first(d: dict) -> str:
 def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     """Innings aggregates from the scraped scorecard when ball-by-ball is missing.
 
-    Match fours / sixes / runs and the 80% void rule can be read off player totals. Highest over and
-    most conceded cannot: they stay 0 and the engine must not treat those zeros as results.
+    Match fours / sixes / runs and the 80% void rule can be read off player totals. Highest over,
+    most conceded, extras, run-outs, most wickets and the over tape cannot: they stay empty and the
+    engine must not treat those zeros as results.
     """
     teams = [d.get("team_a", ""), d.get("team_b", "")]
     if not all(teams):
@@ -262,8 +262,8 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
             "f4": side[t]["f4"], "f6": side[t]["f6"],
             "n30": sum(30 <= x < 50 for x in sc), "n50": sum(50 <= x < 100 for x in sc),
             "n100": sum(x >= 100 for x in sc), "n10": sum(x >= 10 for x in sc),
-            "nsd": sum(1 <= x <= 9 for x in sc), "nduck": 0,
-            "ho": 0, "mc": 0, "ts": ts,
+            "nsd": sum(1 <= x <= 9 for x in sc), "nduck": None,  # dismissals (and so ducks) are not on a totals-only card
+            "ho": None, "mc": None, "ts": ts, "ex": None, "ro": None, "mw": None, "ov": [],
             "tops": [pid for pid, r in side[t]["tops"] if r == ts and ts > 0],
         })
     if len(inns) < 2:
@@ -272,8 +272,8 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     inns.sort(key=lambda i: 0 if _norm_team(i["team"]) == _norm_team(first) else 1)
     m["first"] = inns[0]["team"]
     m["ts"] = max(i["ts"] for i in inns)
-    m["inn"] = [[i["team"], i["opp"], i["runs"], i["wkts"], i["balls"], i["f4"], i["f6"], i["n30"], i["n50"],
-                 i["n100"], i["n10"], i["nsd"], i["nduck"], i["ho"], i["mc"], i["ts"], i["tops"]] for i in inns]
+    m["inn"] = [pack_inn(i) for i in inns]
+    m["ov"] = [i.get("ov") or [] for i in inns]
     m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"]})
     stat["with_totals_innings"] = stat.get("with_totals_innings", 0) + 1
 
@@ -359,7 +359,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
     return hosts, venue_host, per_match
 
 
-MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "xq")
+MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
 FLD_KEYS = ("p", "m", "i", "t", "q", "ct", "st")
@@ -432,7 +432,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         hn = host_of_match.get(m["id"]) or venue_host.get((m["venue"] or "?", m["intl"]))
         hs = -2 if hn is None else -1 if hn == "-" else host_ix[hn]  # -1 neutral ground, -2 host unknown
         _push(cols, MATCH_KEYS, (_public_id(m["id"]), m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
-                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m["xq"]))
+                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m.get("mw", 0), m["xq"]))
         m["_ix"] = mi
         m["_tix"] = (a, b)
 
@@ -448,13 +448,15 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         except ValueError:
             return 0
 
-    inn_col = []
+    inn_col, ov_col = [], []
+    nstat = len(INN_STATS)
     for m in ms:
         g = m["gender"]
         mi, (a, b) = m["_ix"], m["_tix"]
         T = _team_lookup(team_ix, g)
-        inn_col.append([[T(i[0]), i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], i[12], i[13], i[14], i[15]]
-                        + [pix[p] for p in i[16] if p in pix] for i in m["inn"]])
+        inn_col.append([[T(i[0]), *i[2:2 + nstat]] + [pix[p] for p in i[2 + nstat] if p in pix] for i in m["inn"]])
+        ov = m.get("ov")
+        ov_col.append(ov if ov is not None else [[] for _ in m["inn"]])
         for r in m["bat"]:
             pid = r[0]
             try:
@@ -491,7 +493,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
                 _push(shards[shard_of(pid)]["xi"], XI_KEYS, (pix[pid], mi))
         for pid, nm in m.get("aliases", []):
             aliases[pid].add(nm)
-    return {"ms": ms, "cols": cols, "inn": inn_col, "teams": teams, "venues": venues, "events": events, "hosts": hosts,
+    return {"ms": ms, "cols": cols, "inn": inn_col, "ov": ov_col, "teams": teams, "venues": venues, "events": events, "hosts": hosts,
             "pids": pids, "pix": pix, "pstat": pstat, "shards": shards, "aliases": aliases, "team_ix": team_ix}
 
 
@@ -611,6 +613,7 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
     dump = lambda o: json.dumps(o, separators=(",", ":"), ensure_ascii=False)  # noqa: E731
     cols = dict(A["cols"])
     cols["inn"] = A["inn"]
+    cols["ov"] = A["ov"]
     (out / "matches.json").write_text(dump(cols), encoding="utf-8")
     ps = A["pstat"]
     pcols = {"id": A["pids"], "nm": [names.get(p, p) for p in A["pids"]],

@@ -1,43 +1,45 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDownIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
 
+const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
+
 /** shadcn Sidebar under the header: full labels at xl, collapses to an icon rail (Ctrl/Cmd+B or the header trigger). Phones and tablets use the tab bar instead. */
 function AppSidebar() {
   const { pathname } = useLocation();
-  const moreActive = MORE_NAV.some(([, to]) => pathname.startsWith(to));
   return (
-    <Sidebar collapsible="icon" aria-label="Main" className="top-header h-[calc(100svh-var(--header-h))] border-0 [&_[data-sidebar=sidebar]]:bg-sidebar [&_[data-sidebar=sidebar]]:backdrop-blur-2xl [&_[data-sidebar=sidebar]]:backdrop-saturate-150">
+    <Sidebar collapsible="icon" aria-label="Main" className="top-header h-[calc(100svh-var(--header-h))] border-0 [&_[data-sidebar=sidebar]]:bg-sidebar [&_[data-sidebar=sidebar]]:ring-1 [&_[data-sidebar=sidebar]]:ring-hairline">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarMenu>
-            {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
-              <SidebarMenuItem key={to}>
-                <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className="h-control rounded-lg text-callout font-medium data-[active=true]:bg-hairline data-[active=true]:text-foreground [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]">
-                  <NavLink to={to}><Icon /><span>{label}</span></NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            <Collapsible asChild defaultOpen={moreActive} className="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="More" className="h-control rounded-lg text-callout font-medium [&>svg]:size-[18px]"><EllipsisHorizontalIcon /><span>More</span><ChevronDownIcon className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" /></SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {MORE_NAV.map(([label, to]) => (
-                      <SidebarMenuSubItem key={to}><SidebarMenuSubButton asChild isActive={pathname.startsWith(to)}><NavLink to={to}>{label}</NavLink></SidebarMenuSubButton></SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
-          </SidebarMenu>
+          <SidebarGroupLabel className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">Play</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {MAIN_NAV.map(({ to, label, icon: Icon, match }) => (
+                <SidebarMenuItem key={to}>
+                  <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className={navBtn}>
+                    <NavLink to={to}><Icon /><span>{label}</span></NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-caption font-semibold uppercase tracking-wider text-muted-foreground">More</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {MORE_NAV.map(([label, to]) => (
+                <SidebarMenuItem key={to}>
+                  <SidebarMenuButton asChild isActive={pathname === to || (to !== "/" && pathname.startsWith(to))} tooltip={label} className={navBtn}>
+                    <NavLink to={to}><span>{label}</span></NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
