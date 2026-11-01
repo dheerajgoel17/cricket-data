@@ -124,6 +124,26 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
     assert team_key("India (W)") == team_key("India Women") == team_key("India W") == "india"
     assert team_key("Brisbane Heat W") == team_key("Brisbane Heat Women") == "brisbaneheat"
     assert team_key("Auckland Aces") == team_key("Auckland") and team_key("Northern Districts") == team_key("Northern Brave")
+    assert team_key("Boland") == team_key("Rocks")
+    assert team_key("South Western Districts") == team_key("Garden Route Badgers") and team_key("Easterns") == team_key("Eastern Storm")
+    assert team_key("Central") == team_key("Central Districts") == team_key("Central Stags")
+    assert team_key("Eagles") == team_key("Mashonaland Eagles") and team_key("Tuskers") == team_key("Matabeleland Tuskers")
+
+
+def test_a_side_the_books_and_the_schedule_name_differently_is_one_file(tmp_path):
+    """The schedule says "Rocks", one pull's books "Boland" and another's "Rocks": one match, filed under the schedule's id, not two pages."""
+    sched = [{"start_utc": "2026-11-01T08:00Z", "format": "T20", "gender": "male", "team_a": "Dolphins", "team_b": "Rocks", "venue": "Kingsmead, Durban", "series": "CSA Pro T20 Cup 2026", "status": "Upcoming"}]
+    kw = dict(team="Dolphins", fmt="T20", competition="t20-south-africa-cup")
+    boland = {"match": "Dolphins vs Boland", "start_utc": "2026-11-01T08:00:00Z", **kw}
+    rocks = {"match": "Dolphins vs Rocks", "start_utc": "2026-11-01T07:30:00Z", **kw}
+    pull = {"generated_at_utc": "t", "events": [], "fancy": [], "lines": [line(pid="p1", player="Bryce Parsons", ln=20.5, **boland), line(pid="p1", player="Bryce Parsons", ln=20.5, books=(("smarkets", 1.85, 1.85),), **rocks),
+                                                                         line(pid="p2", player="Gavin Kaplan", ln=20.5, **boland)]}
+    (g,) = group(pull)
+    assert len(g["lines"]) == 3
+    assert update(tmp_path, pull, at(20, 31), None, sched)[0] == ["2026-11-01-dolphins-v-rocks"]
+    assert not (tmp_path / "2026-11" / "2026-11-01-dolphins-v-boland.json").exists()
+    d = read(tmp_path, "2026-11-01-dolphins-v-rocks")
+    assert [(x["player"], sorted(b["source"] for b in x["books"])) for x in d["lines"]] == [("Bryce Parsons", ["bet365", "smarkets"]), ("Gavin Kaplan", ["bet365"])]
 
 
 def test_same_side_is_the_sites():

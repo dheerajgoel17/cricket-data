@@ -420,3 +420,22 @@ def test_a_scraped_matchs_event_takes_the_base_name_of_the_same_league_so_a_live
     assert B.base_event("IPL 2026", 0, table) == "IPL 2026"                                    # another name for it: left as scraped
     assert B.base_event("Alpha tour of Beta, 2026", 0, table) == "Alpha tour of Beta, 2026"    # two Base names share one league key: no guess
     assert B.base_event("", 0, table) == ""
+
+
+def test_a_priced_match_the_books_name_differently_is_not_a_second_fixture(tmp_path):
+    """The schedule says "Dolphins v Rocks", the archive file of the books' pull "Dolphins vs Boland" (no schedule row linked): one fixture, the schedule's."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    (arc / "2026-11-01-dolphins-v-boland.json").write_text(json.dumps({"match": "Dolphins vs Boland", "start_utc": "2026-11-01T08:00:00Z", "fixture": None, "lines": [{"fmt": "T20"}]}))
+    now = datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)
+    sched = [{"start": "2026-11-01T08:00Z", "fmt": "T20", "a": "Dolphins", "b": "Rocks"}]
+    assert B._unscheduled_priced(vb, sched, now=now) == []
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["Dolphins"]  # with no schedule row it is still the stop-gap
+    (tmp_path / "fixtures").mkdir()
+    (tmp_path / "fixtures" / "upcoming.csv").write_text("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
+                                                         "2026-11-01T08:00Z,x,CSA,T20,male,Dolphins,Rocks,Kingsmead,Upcoming,,\n")
+    assert [f["id"] for f in B.build_fixtures(tmp_path, vb, {})] == ["2026-11-01-dolphins-v-rocks"]

@@ -151,6 +151,15 @@ export const teamKey = (n) => {
   return SAME_SIDE[k] || k;
 };
 
+/** Are two fixture ids (`date-team-v-team`) the same match? A side the books name differently ("...-dolphins-v-boland" / "...-dolphins-v-rocks") is one side (`SAME_SIDE`), so an old link still opens the page. */
+export function sameFixtureId(a, b) {
+  const key = (id) => {
+    const m = /^(\d{4}-\d{2}-\d{2})-(.+?)-v-(.+)$/.exec(String(id || ""));
+    return m ? [m[1], ...[m[2], m[3]].map((s) => SAME_SIDE[s.replace(/-/g, "")] || s.replace(/-/g, ""))].join("|") : null;
+  };
+  return !!key(a) && key(a) === key(b);
+}
+
 /** How far a book's start may be from a fixture's: 14 h, but a Test is priced day by day (each day's list carries that day's start), so any day of it is the same match. */
 export const bookWindow = (fixture) => sameMatchWindow(fixture?.fmt);
 
