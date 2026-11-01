@@ -2,8 +2,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fixtureBooks } from "@cricket/engine/lines.js";
-import { selectMatches, venueIndices } from "@cricket/engine/markets.js";
-import { FORMATS } from "@cricket/engine/util.js";
+import { fancyInputs } from "@cricket/engine/fancy-edge.js";
 import { useData } from "@/lib/data";
 import { fixtureStart } from "@/lib/format";
 import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
@@ -11,8 +10,6 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { fancyStanding, liveForFixture } from "@cricket/engine/live.js";
 import { collectOverview } from "@/components/app/match-fancy";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
-
-const WINDOW = 20; // the sides' last matches the lines are scored on
 
 const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as any).scheduler; if (sc?.yield) sc.yield().then(r); else setTimeout(r, 0); });
 
@@ -38,13 +35,8 @@ export function useFancyCards() {
       const out: any[] = [];
       for (const f of fixtures.filter((x: any) => !x.noProps && fixtureBooks(doc, x).fancy)) {
         const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
-        const fmtIdx = FORMATS.indexOf(f.fmt);
-        const g = f.gender === "female" ? 1 : 0;
-        const ms = [...new Set([f.a_ix, f.b_ix].filter((i: number) => i >= 0).flatMap((i: number) => selectMatches(store, { fmt: fmtIdx, gender: g, team: i, lastN: WINDOW }) as number[]))].sort((x, y) => x - y);
-        const venue = (venueIndices as (s: any, n: string) => number[])(store, f.venue);
-        const ground = venue.length ? (selectMatches(store, { fmt: fmtIdx, gender: f.gender === "female" ? 1 : 0, venue, lastN: 10 }) as number[]) : undefined; // the last ten matches at this ground
-        const teams: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
-        out.push({ f, ms, rows: collectOverview({ store, doc, fxInfo: fx, ms, teams, ground }) });
+        const { ms, ground, teams } = fancyInputs(store, f); // the sides' last matches and the ground's: the same ones the alerts are scored on (engine/fancy-edge.js)
+        out.push({ f, ms, rows: collectOverview({ store, doc, fxInfo: fx, ms, teams: teams as [string, number][], ground }) });
         await yieldToMain();
       }
       return out;

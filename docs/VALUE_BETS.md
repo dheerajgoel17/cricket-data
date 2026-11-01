@@ -30,6 +30,8 @@ scraper files, so it never merges value-bet changes.
 
 Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json`
 
+`value_bets/out/fancy_alerts.json` is written by the same workflow after the pipeline (not by the Python pipeline): `{"generated_at_utc", "window", "min_edge", "max_edge", "min_games", "per_match", "alerts": [...]}` with the pre-match fancy lines (`fancy` rows of `book_lines.json`) whose history-based edge is clearly positive, each with a stable `alert_id`, `side`, the side's own `line` and best price, `hits` / `played` / `chance` / `edge`. How the edge is computed and the bar are in docs/OPERATIONS.md ("Fancy edge alerts").
+
 The Telegram channel is the consumer of that file: the match-state Worker posts each new alert (edge, listed price, fair price, reason; never the stake) for a match that has not started, once per `alert_id` (docs/OPERATIONS.md, Telegram channel alerts).
 
 **Odds snapshots** (every normalised pull plus raw responses, gzip) are **not committed**. They are uploaded as the workflow

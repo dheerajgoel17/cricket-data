@@ -32,7 +32,7 @@ cd site && npm run dev                  # http://localhost:4173 — with SITE_UR
 
 ## Where to look
 * Rules for parsing matches -> `src/cricket_site/parse.py`; output format -> `build.py` (+ the table in PROJECT_GUIDE 5.1).
-* Stats/markets/plan logic -> `site/packages/engine/*` (no DOM, tested with node:test); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
+* Stats/markets/plan logic -> `site/packages/engine/*` (no DOM, tested with node:test); Match Fancy edge rows and the Telegram fancy edge alerts -> `engine/fancy-edge.js` (one definition for the tab and `scripts/fancy-alerts.mjs`); pages -> `site/src/pages/*`; shared pieces -> `site/src/components/app/*` and shadcn components in `site/src/components/ui/`; colours/tokens -> `site/src/index.css`.
 * Design tokens -> `site/packages/tokens/tokens.json` (edit there, run `npm run tokens`; `src/tokens.generated.css` is committed). Storage abstraction and saved-list helpers -> `site/packages/storage`; app hook `site/src/lib/saved.ts`. Props screener filter state (URL-backed, pure) -> `site/src/lib/screener.ts`; filter view -> `components/app/screener-filters.tsx` (docs/SITE.md, "Mobile-first shell").
 * Home rail order and its settings -> `site/src/lib/priority.ts`, `config/home_rail.json` (read at view time from the repo, no deploy; docs/SITE.md).
 * LLM prompt/provider -> `site/packages/engine/prompt.js`, `site/api/ask.js`.

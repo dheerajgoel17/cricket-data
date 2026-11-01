@@ -3,7 +3,7 @@
 // Worker secrets (never in this file): LIVE_SOURCE_BASE, SUPABASE_URL, SUPABASE_ANON_KEY (the public key) and STATE_WRITE_TOKEN (a random token; the database stores only its hash).
 // The same run also posts the channel alerts (site/packages/engine/alert-post.js) when TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are set (optional SITE_URL adds a link); without them it posts nothing.
 import { postAlerts } from "../site/packages/engine/alert-post.js";
-import { NEW_ALERTS_URL } from "../site/packages/engine/alerts.js";
+import { FANCY_ALERTS_URL, NEW_ALERTS_URL } from "../site/packages/engine/alerts.js";
 import { createFeed } from "../site/packages/engine/feed.js";
 import { NO_IDENTITY } from "../site/packages/engine/identity.js";
 import { syncState } from "../site/packages/engine/state-sync.js";
@@ -31,8 +31,8 @@ export async function run(env, { alerts = "post" } = {}) {
   // the two are independent: a Telegram or alert-file problem never stops the state table, and the other way round
   const [state, posted] = await Promise.allSettled([
     syncState({ matches, ...db }),
-    mode === "off" ? Promise.resolve({ off: true }) : json(NEW_ALERTS_URL, "json").catch(() => ({})).then((propsDoc) =>
-      postAlerts({ matches, booksDoc: feed.books() || {}, propsDoc, telegram: { token: env.TELEGRAM_BOT_TOKEN, chat: env.TELEGRAM_CHAT_ID }, db, siteUrl: env.SITE_URL || "", mode })),
+    mode === "off" ? Promise.resolve({ off: true }) : Promise.all([NEW_ALERTS_URL, FANCY_ALERTS_URL].map((u) => json(u, "json").catch(() => ({})))).then(([propsDoc, fancyDoc]) =>
+      postAlerts({ matches, booksDoc: feed.books() || {}, propsDoc, fancyDoc, telegram: { token: env.TELEGRAM_BOT_TOKEN, chat: env.TELEGRAM_CHAT_ID }, db, siteUrl: env.SITE_URL || "", mode })),
   ]);
   if (state.status === "rejected") throw state.reason;
   return { ...state.value, alerts: posted.status === "fulfilled" ? posted.value : { error: String(posted.reason?.message || posted.reason).slice(0, 120) } };
