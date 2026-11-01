@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useData } from "@/lib/data";
-import { flagUrl, playerPhotos, teamLogos } from "@/lib/assets";
+import { flagUrl, leagueLogos, playerPhotos, teamLogos } from "@/lib/assets";
 import { initials } from "@/lib/format";
 
 const loaded = new Set<string>(); // URLs already decoded this session: they render instantly, with no shimmer or re-fade
@@ -39,6 +39,16 @@ export function TeamBadge({ name, size = "sm", className, eager }: { name: strin
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
   return <Circle size={size} className={cn("border-0 bg-transparent", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
+}
+
+/** Round league badge: the source's logo for the league's newest season, else the league's initials ("IPL"). */
+export function LeagueBadge({ name, size = "md", className }: { name: string; size?: BadgeSize; className?: string }) {
+  const { photos } = useData();
+  return (
+    <Circle size={size} className={cn("border-0", className)} title={name}>
+      <Img urls={leagueLogos(photos, name) as string[]} alt={name} className="size-full object-contain p-0.5" fallback={initials(name)} />
+    </Circle>
+  );
 }
 
 /** Flat (unrounded) team flag for tight rows: the national flag when there is one, else the Source A logo, else the initials; the name goes in the tooltip. */

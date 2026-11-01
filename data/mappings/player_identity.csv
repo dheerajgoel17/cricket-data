@@ -4,3 +4,7 @@ player_id,source_id,note
 470f446b,DBT,V Suryavanshi is Vaibhav Sooryavanshi (the source spells the surname differently)
 9550470d,YL,WIA Fernando is Avishka Fernando (the source uses the name he is known by)
 d7ff1adc,37H,C Knott / CR Knott / Charli Knott is Charli Knott on the source
+85e0cf10,EF,M Prasidh Krishna is Prasidh Krishna on the source (it drops the initial; the name rule had picked another Krishna)
+41eb4a4f,4K,R Vinay Kumar is Vinay Kumar on the source (it drops the initial; the name rule had picked Rahul Kumar)
+7dcb9bc9,3VF,M Shahrukh Khan is Shahrukh Khan on the source (it drops the initial; the name rule had picked Mohammad Amir Khan)
+fe763256,1O,Y Venugopal Rao is Venugopal Rao on the source (it drops the initial; the name rule had picked Yug Rao)

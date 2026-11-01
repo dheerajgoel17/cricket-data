@@ -883,6 +883,16 @@ function readLine(match, l, idn) {
   return notInXI(match, l.player, l.team, sid, books) ? { value: null, state: "live", verdict: null, notInXI: true } : null;
 }
 
+/** Is this book row (a player line or a fancy line: `match` "A vs B" and `start_utc`) one of this match's: the same two sides, and a start within 14 hours (6 days for a Test)? */
+export function lineBelongs(match, l) {
+  const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
+  if (sides.size !== 2) return false;
+  const [a, b] = String(l?.match).split(/\s+vs\s+/i);
+  if (!b || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) return false;
+  const t = match?.start ? Date.parse(match.start) : NaN;
+  return !(Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= sameMatchWindowFor(match?.fmt, l.fmt));
+}
+
 /**
  * Where every line the books priced for this match stands, settled on the server so the browser does no name matching of its own: one entry per priced line,
  * `{pid, stat, line, value, state, verdict}` with `state` and `verdict` as `liveState` and `lineVerdict` give them (and `inn` on a Test's first- or second-innings line, whose
@@ -892,14 +902,9 @@ function readLine(match, l, idn) {
  * match is a result (a Test's innings line is one as soon as that innings is over).
  */
 export function settleLines(match, lines, idn = NO_IDENTITY) {
-  const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
-  const t = match?.start ? Date.parse(match.start) : NaN;
   const out = [];
-  if (sides.size !== 2) return out;
   for (const l of lines || []) {
-    const [a, b] = String(l.match).split(/\s+vs\s+/i);
-    if (!b || !l.pid || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) continue;
-    if (Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= sameMatchWindowFor(match?.fmt, l.fmt)) continue;
+    if (!l.pid || !lineBelongs(match, l)) continue;
     const got = readLine(match, l, idn);
     if (got) out.push({ pid: l.pid, stat: l.stat, line: l.line, ...(l.inn ? { inn: l.inn } : {}), ...got });
   }

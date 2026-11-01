@@ -24,6 +24,7 @@ from pathlib import Path
 
 from . import identity
 from .crex_assets import display_name as ca_display_name
+from .crex_assets import league_key
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
 from .sides import SAME_SIDE
@@ -388,13 +389,30 @@ def _team_lookup(team_ix: dict, gender: int):
     return lambda t: team_ix[(t, gender)]
 
 
+def canonical_events(canonical: list[dict]) -> dict[tuple[str, int], str | None]:
+    """{(league key, gender): the Base event name} for every Base event; None where two Base names share one key (no guess)."""
+    out: dict[tuple[str, int], str | None] = {}
+    for m in canonical:
+        if m["event"]:
+            k = (league_key(m["event"]), m["gender"])
+            out[k] = m["event"] if out.get(k, m["event"]) == m["event"] else None
+    return out
+
+
+def base_event(name: str, gender: int, table: dict[tuple[str, int], str | None]) -> str:
+    """A scraped match's event under Base's name for the same league ("Womens Big Bash League 2026" is "Women's Big Bash League"), so a live season sits with its history; else as scraped."""
+    return table.get((league_key(name), gender)) or name if name else name
+
+
 def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = None) -> dict:
     ms = sorted(canonical + provisional, key=lambda m: (m["date"], m["id"]))
     # team / venue / event / player tables
     tkeys, vkeys, ekeys = set(), set(), set()
     canon_name = {(_norm_team(t), m["gender"]): t for m in canonical for t in m["teams"]}
+    canon_event = canonical_events(canonical)
     for m in ms:
         if m["pv"]:
+            m["event"] = base_event(m["event"], m["gender"], canon_event)
             m["teams"] = [canon_name.get((_norm_team(t), m["gender"]), _strip_women(t)) for t in m["teams"]]
             if m["winner"]:
                 m["winner"] = canon_name.get((_norm_team(m["winner"]), m["gender"]), _strip_women(m["winner"]))
@@ -547,7 +565,7 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
 
     from . import crex_assets as ca
 
-    out: dict = {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
+    out: dict = {"p": {}, "t": {}, "l": {}, "names": {}, "index": {"players": [], "teams": []}}
     stat: dict[str, list] = {}
     teams = set()
     for m in canonical:
@@ -571,6 +589,10 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
     except Exception as exc:  # noqa: BLE001
         print(f"crex: sitemaps failed: {exc}", file=sys.stderr)
         return out
+    try:  # league logos: the newest season's series id for each Base event the source also lists
+        out["l"] = ca.match_leagues(sorted({m["event"] for m in canonical if m.get("event")}), ca.parse_series(ca.fetch_sitemap("series")))
+    except Exception as exc:  # noqa: BLE001 - logos are optional: the site falls back to initials
+        print(f"crex: series sitemap failed: {exc}", file=sys.stderr)
     by_ci = {c: p for p, c in cricinfo.items() if p in stat and p not in out["p"]} if wikidata else {}
     ids = sorted(by_ci)
     for i in range(0, len(ids), chunk):
@@ -662,7 +684,7 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
     if not site_url:
         return 0
     base = site_url.rstrip("/")
-    urls = [f"{base}/{p}" for p in ("", "props", "fancy", "players", "teams", "competitions", "trends", "tools", "odds", "glossary", "features", "about", "pair")]
+    urls = [f"{base}/{p}" for p in ("", "props", "fancy", "leagues", "players", "teams", "competitions", "trends", "tools", "odds", "glossary", "features", "about", "pair")]
     top = sorted(range(len(A["pids"])), key=lambda i: -A["pstat"][A["pids"][i]]["n"])[:3000]
     urls += [f"{base}/player/{i}" for i in top]
     cnt = Counter(m["event"] for m in A["ms"] if m["event"])
@@ -837,7 +859,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
           crex_cache: Path | None = None) -> dict:
     canonical = parse_zip(zpath, workers)
     names = player_names(zpath)
-    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "names": {}, "index": {"players": [], "teams": []}}
+    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "l": {}, "names": {}, "index": {"players": [], "teams": []}}
     ident, review = link_identity(cx, names, vb_dir, data_dir)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
@@ -859,7 +881,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     build_sitemap(out, A, names, site_url, fx)
     if photos:
         keep = set(A["pids"])
-        (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"]}, separators=(",", ":")), encoding="utf-8")
+        (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"], "l": cx.get("l", {})}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
         # full names for wide layouts: our names are initials plus surname ("P Rathnayake"); the source lists the full name for every linked player
         full = {pid: ca_display_name(nm) for _cid, nm, pid in cx["index"]["players"] if pid in keep and nm}

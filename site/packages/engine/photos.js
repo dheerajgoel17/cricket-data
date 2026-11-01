@@ -1,5 +1,5 @@
 // Pure helpers (no DOM) for image URLs, so they can be unit-tested. Data comes from data/photos.json:
-//   { p: { "<Base player id>": "c:<Source A id>" | "w:<Commons file>" }, t: { "<folded team name>": "<Source A team id>" } }
+//   { p: { "<Base player id>": "c:<Source A id>" | "w:<Commons file>" }, t: { "<folded team name>": "<Source A team id>" }, l: { "<folded event name>": "<Source A series id, newest season>" } }
 /** The third-party image host is configuration, not code: VITE_IMG_CDN is set in the build environment. */
 const cdn = () => (import.meta.env?.VITE_IMG_CDN ?? (typeof process !== "undefined" ? process.env.VITE_IMG_CDN : "")) || "";
 
@@ -25,6 +25,13 @@ export function teamLogos(photos, name) {
   return [held(photos, "t", id) ? `${photos.base}/teams/${id}.png` : null, `${cdn()}/Teams/${id}.png`].filter(Boolean);
 }
 export const teamLogo = (photos, name) => teamLogos(photos, name)[0] ?? null;
+
+/** League logo URLs to try in order, by the event's name ("Indian Premier League"): the logo file of the league's newest season. */
+export function leagueLogos(photos, name) {
+  const id = photos?.l?.[fold(name)];
+  if (!id) return [];
+  return [held(photos, "l", id) ? `${photos.base}/leagues/${id}.png` : null, `${cdn()}/Series/${id}.png`].filter(Boolean);
+}
 
 /**
  * The team's kit picture (a shirt on its own, transparent): the player portrait is his face avatar standing in it. Two kits exist, the coloured limited-overs one

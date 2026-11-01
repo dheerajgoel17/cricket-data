@@ -110,3 +110,13 @@ test("a card's file-like path and its query are each other's inverse", () => {
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });
+
+test("a card can be asked for by player id as well as by index: the same fields; an unknown or malformed id gives nothing", () => {
+  assert.deepEqual(cardFields({ pid: "aaaa1111", stat: "runs", line: "24.5" }, data), cardFields({ p: "0", stat: "runs", line: "24.5" }, data));
+  assert.equal(cardFields({ pid: "bbbb2222" }, data).name, "Rashid Khan");
+  assert.equal(cardFields({ pid: "cccc3333" }, data), null);
+  assert.equal(cardFields({ pid: "aaaa1111; drop" }, data), null);
+  for (const q of [{ pid: "aaaa1111", stat: "runs", line: "24.5" }, { pid: "aaaa1111" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
+  assert.equal(cardPath({ pid: "aaaa1111", stat: "runs", line: 24.5 }), "/card/v9/pid/aaaa1111/runs/24.5.jpg");
+  assert.deepEqual(cardQuery("pid/zz/runs/1.jpg"), {}); // not an id
+});

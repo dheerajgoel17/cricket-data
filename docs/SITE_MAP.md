@@ -10,7 +10,7 @@ odds are served from their own backend (bookmaker logos, plus a "Sportsbook Odds
 | `/fixture/<slug>/<id>` | match page: player x last-fixtures grid, next-match countdown | `/fixture/<date-teams>` | **Player grid** for both teams, **Trends**, **Team markets**, countdown |
 | `/player/<slug>/<id>` | hero, next match, Game logs / Table / Charts, stat tabs, line + games steppers, hit rate, odds, traits, season table | `/player/<idx>` | Charts tab (line/games steppers, L5-L50, DNP, balls line), Game logs, Table & splits, correlated props. No minutes, traits radar or season table yet |
 | `/team/<slug>/<id>` | hero, next match, overview list/grid, charts, results table | `/team/<idx>` | Player grid, Markets, Top batter, next-match card, About text |
-| `/league/<slug>/<id>` | competition page (standings, stats) | `/league/<event idx>` | Markets, Teams (W/L), Results. Standings need points rules per tournament: not built |
+| `/league/<slug>/<id>` | competition page (standings, stats) | `/leagues` (picker) and `/league/<event idx>` | **Stats** (top run-scorer, wicket-taker, lists for batting, bowling and overall, season by season), Markets, Teams (W/L), Results. Standings need points rules per tournament: not built |
 | `/player-trends` | cards of players clearing a line, with per-game strip | `/trends` | pick an upcoming fixture, stat, line, min hit rate |
 | `/prophunter`, `/prop-screener` | find players clearing a line, then check the price | `/props` (Prop Hunter) + `/trends` | price comes from our value-bets output, not a bookmaker feed |
 | `/team-screener`, `/team-stats`, `/player-stats` | landing + screeners | `/teams`, `/players`, `/tools` | |

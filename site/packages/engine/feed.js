@@ -14,7 +14,7 @@ const FINAL_TTL_MS = 10 * 60e3; // a finished match does not change: its pages a
 export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now = () => Date.now(), booksUrl = BOOKS_URL, scheduleUrl = SCHEDULE_URL }) {
   let inflight = null;
   const finals = new Map(); // match page URL -> { t, pages }
-  let memo = { t: 0, body: null };
+  let memo = { t: 0, body: null, books: null };
 
   async function snapshot() {
     const t0 = now();
@@ -44,11 +44,11 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
       // and each match carries where its priced lines stand (the books' player lines, settled with the identity table)
       const matches = rows.filter((m) => !gaps.includes(m) || keepGapRow(m, pages.get(m)?.live)).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) }; });
       const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, linked: idn.size, matches };
-      memo = { t: now(), body };
+      memo = { t: now(), body, books: booksDoc };
       return body;
     })().finally(() => { inflight = null; });
     return inflight;
   }
 
-  return { snapshot, last: () => memo.body };
+  return { snapshot, last: () => memo.body, /** the book lines file the last snapshot was settled against (the price of each line, for the alerts) */ books: () => memo.books };
 }

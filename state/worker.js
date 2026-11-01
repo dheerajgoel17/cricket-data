@@ -1,6 +1,9 @@
 // The match-state writer, as a Cloudflare Worker on a one-minute Cron Trigger (GitHub's own cron slips by minutes and cannot be relied on). Each run reads the live feed with the
 // same code the site uses (site/packages/engine/feed.js) and writes the match-state table through apply_match_state (site/packages/engine/state-sync.js).
 // Worker secrets (never in this file): LIVE_SOURCE_BASE, SUPABASE_URL, SUPABASE_ANON_KEY (the public key) and STATE_WRITE_TOKEN (a random token; the database stores only its hash).
+// The same run also posts the channel alerts (site/packages/engine/alert-post.js) when TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are set (optional SITE_URL adds a link); without them it posts nothing.
+import { postAlerts } from "../site/packages/engine/alert-post.js";
+import { FANCY_ALERTS_URL, NEW_ALERTS_URL } from "../site/packages/engine/alerts.js";
 import { createFeed } from "../site/packages/engine/feed.js";
 import { NO_IDENTITY } from "../site/packages/engine/identity.js";
 import { syncState } from "../site/packages/engine/state-sync.js";
@@ -16,12 +19,23 @@ const get = (ua, accept) => async (url, as) => {
 };
 const json = get(UA, "application/json"), text = get(UA, "*/*"), html = get(HTML_UA, "text/html");
 
-export async function run(env) {
+/** What to do with the alerts: "post" (the schedule; only with the bot token and the channel set), "preview" (build the messages that would go out, send and mark nothing; needs no bot) or "off". */
+export const alertMode = (env, want = "post") => (want === "preview" ? "preview" : want === "post" && env?.TELEGRAM_BOT_TOKEN && env?.TELEGRAM_CHAT_ID ? "post" : "off");
+
+export async function run(env, { alerts = "post" } = {}) {
   for (const k of ["LIVE_SOURCE_BASE", "SUPABASE_URL", "SUPABASE_ANON_KEY", "STATE_WRITE_TOKEN"]) if (!env?.[k]) throw new Error(`${k} is not set`);
   const base = String(env.LIVE_SOURCE_BASE).replace(/\/+$/, "");
   const feed = createFeed({ base: () => base, getJson: (u) => json(u, "json"), getText: (u) => text(u), getHtml: (u) => html(u), loadIdentity: async () => NO_IDENTITY });
   const { matches } = await feed.snapshot();
-  return syncState({ matches, base: String(env.SUPABASE_URL).replace(/\/+$/, ""), key: env.SUPABASE_ANON_KEY, token: env.STATE_WRITE_TOKEN });
+  const db = { base: String(env.SUPABASE_URL).replace(/\/+$/, ""), key: env.SUPABASE_ANON_KEY, token: env.STATE_WRITE_TOKEN }, mode = alertMode(env, alerts);
+  // the two are independent: a Telegram or alert-file problem never stops the state table, and the other way round
+  const [state, posted] = await Promise.allSettled([
+    syncState({ matches, ...db }),
+    mode === "off" ? Promise.resolve({ off: true }) : Promise.all([NEW_ALERTS_URL, FANCY_ALERTS_URL].map((u) => json(u, "json").catch(() => ({})))).then(([propsDoc, fancyDoc]) =>
+      postAlerts({ matches, booksDoc: feed.books() || {}, propsDoc, fancyDoc, telegram: { token: env.TELEGRAM_BOT_TOKEN, chat: env.TELEGRAM_CHAT_ID }, db, siteUrl: env.SITE_URL || "", mode })),
+  ]);
+  if (state.status === "rejected") throw state.reason;
+  return { ...state.value, alerts: posted.status === "fulfilled" ? posted.value : { error: String(posted.reason?.message || posted.reason).slice(0, 120) } };
 }
 
 /** Constant-time string compare (the manual trigger below is guarded by the write token). */
@@ -34,11 +48,14 @@ const same = (a, b) => {
 };
 
 export default {
-  /** By hand: GET with the header x-state-key equal to the write token runs one sync now and says what happened (for checking and for an uptime monitor). Anything else is a 404. */
+  /**
+   * By hand: GET with the header x-state-key equal to the write token runs one sync now and says what happened (for checking and for an uptime monitor). Anything else is a 404.
+   * The alerts are only previewed (the messages that would go out are in the answer, nothing is sent or marked); `?alerts=post` sends them now, `?alerts=off` skips them.
+   */
   async fetch(request, env) {
     if (!env?.STATE_WRITE_TOKEN || !same(request.headers.get("x-state-key") || "", env.STATE_WRITE_TOKEN)) return new Response("not found", { status: 404 });
-    const t0 = Date.now();
-    try { return Response.json({ ok: true, ms: Date.now() - t0, ...(await run(env)) }); }
+    const t0 = Date.now(), want = new URL(request.url).searchParams.get("alerts") || "preview";
+    try { return Response.json({ ok: true, ms: Date.now() - t0, ...(await run(env, { alerts: want })) }); }
     catch (e) { return Response.json({ ok: false, ms: Date.now() - t0, error: String(e.message || e).slice(0, 160) }, { status: 500 }); }
   },
   async scheduled(_event, env, ctx) {

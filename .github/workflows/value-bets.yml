@@ -4,6 +4,8 @@ name: Value bets
 # against the cricket-data history and commit ONLY the small outputs under value_bets/out + dedupe state.
 # Independent of the data workflows (own concurrency group, touches no files under data/).
 # Each run also adds the results of finished matches to value_bets/archive (read from the site's live route; see docs/PROJECT_GUIDE.md 5.4c).
+# And it writes value_bets/out/fancy_alerts.json: the pre-match fancy lines whose history-based edge is clearly positive, scored by the site's own engine on freshly built site data
+# (site/scripts/fancy-alerts.mjs; the Telegram Worker posts them, docs/OPERATIONS.md). That step is optional: if it fails the pipeline's own outputs are still committed.
 # Weekly (Sun 07:00 UTC) or on demand with refit=true: re-run the prop backtest (incl. the weather study, topping up
 # the Open-Meteo cache in value_bets/mappings) and refit state/prop_model.json.
 on:
@@ -11,7 +13,7 @@ on:
     - cron: "30 3-17 * * *"
     - cron: "0 7 * * 0"
   pull_request:  # dry run on PRs that touch the pipeline (proves the sources work from GitHub's runners; never commits)
-    paths: ["src/value_bets/**", "value_bets/**", ".github/workflows/value-bets.yml"]
+    paths: ["src/value_bets/**", "value_bets/**", ".github/workflows/value-bets.yml", "site/scripts/fancy-alerts.mjs", "site/packages/engine/fancy-edge.js"]
   workflow_dispatch:
     inputs:
       refit:
@@ -90,6 +92,41 @@ jobs:
             cat value_bets/out/value_bets_latest.md
           } >> "$GITHUB_STEP_SUMMARY"
           test ! -f value_bets/out/last_error.txt || { echo "::warning::pipeline error, see value_bets_run.log"; }
+      - uses: actions/setup-node@v4
+        if: github.event.schedule != '0 7 * * 0'
+        with:
+          node-version: "22"
+      - name: Today's date (cache key for the daily-changing download)
+        id: day
+        run: echo "d=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+      - name: Restore today's Base download
+        id: dl
+        if: github.event.schedule != '0 7 * * 0'
+        uses: actions/cache/restore@v4
+        with:
+          path: .sitecache
+          key: fancy-dl1-${{ steps.day.outputs.d }}  # not the Site workflow's key: that cache also holds the people register, which this one never downloads
+      - name: Download Base ball-by-ball (once a day)
+        if: github.event.schedule != '0 7 * * 0' && steps.dl.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: |
+          mkdir -p .sitecache
+          curl -fsSL --retry 4 --retry-delay 20 -o .sitecache/all_json.zip.part "$BASE_DATA_URL/downloads/all_json.zip"
+          mv .sitecache/all_json.zip.part .sitecache/all_json.zip
+      - name: Keep today's Base download
+        # saved only when the whole file arrived: a failed download must not be cached for the rest of the day
+        if: github.event.schedule != '0 7 * * 0' && steps.dl.outputs.cache-hit != 'true' && hashFiles('.sitecache/all_json.zip') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .sitecache
+          key: fancy-dl1-${{ steps.day.outputs.d }}
+      - name: Fancy edge alerts (site data built, then scored by the site's engine)
+        # the same data build the Site workflow runs (without photos), written outside the repository; the alert file is rewritten whole each run, and a failure leaves the last one in place
+        if: github.event.schedule != '0 7 * * 0'
+        continue-on-error: true
+        run: |
+          python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out "$RUNNER_TEMP/site-data" --value-bets value_bets/out > "$RUNNER_TEMP/build.json"
+          node site/scripts/fancy-alerts.mjs --data "$RUNNER_TEMP/site-data" --lines value_bets/out/book_lines.json --out value_bets/out/fancy_alerts.json
       - name: Store the results of finished matches in the archive
         # the site's live route settles every priced line of a finished match (ids through the identity table); this only writes those results into the match's archive file (added, never changed)
         if: github.event.schedule != '0 7 * * 0' && vars.SITE_URL != ''
