@@ -61,22 +61,45 @@ async function loadGeo() {
   } catch { /* offline or blocked */ }
 }
 
+/** True for a browser that says it is driven by a script (webdriver flag, a headless or known-bot User-Agent). Such a visit never opens the gate. */
+export function looksAutomated(nav: Nav = typeof navigator === "undefined" ? {} : navigator): boolean {
+  return !!nav.webdriver || BOT.test(nav.userAgent || "") || /Headless/i.test(nav.userAgent || "");
+}
+
+/** What a person does that a script that only loads the page does not. */
+const HUMAN = ["pointerdown", "keydown", "wheel", "touchstart", "scroll"] as const;
+
+let started = false;
+
+/**
+ * GA4 needs a person: the tag is set up at once (events queue in `dataLayer`), but the Google script is only loaded after the first click, key press, scroll or touch.
+ * A bot that loads the page and leaves, headless or not, sends nothing; a person's first page view is sent when they first touch the page. An automated browser never loads it.
+ */
 export function initGa(id = GA_ID) {
-  if (!id || typeof document === "undefined" || document.getElementById("ga4")) return;
+  if (!id || typeof document === "undefined" || started) return;
+  started = true;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function gtag() { window.dataLayer.push(arguments); };
   window.gtag("consent", "default", { analytics_storage: "granted", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
   window.gtag("js", new Date());
   window.gtag("config", id, { send_page_view: false });
-  const s = document.createElement("script");
-  s.id = "ga4";
-  s.async = true;
-  s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
-  document.head.appendChild(s);
-  loadGeo().then(() => {
-    if (geo.country && typeof window.gtag === "function") window.gtag("set", "user_properties", { country: geo.country, region: geo.region || "" });
-  });
+  if (looksAutomated()) return;
+  const open = () => {
+    HUMAN.forEach((t) => window.removeEventListener(t, open));
+    const s = document.createElement("script");
+    s.id = "ga4";
+    s.async = true;
+    s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+    document.head.appendChild(s);
+    loadGeo().then(() => {
+      if (geo.country && typeof window.gtag === "function") window.gtag("set", "user_properties", { country: geo.country, region: geo.region || "" });
+    });
+  };
+  HUMAN.forEach((t) => window.addEventListener(t, open, { passive: true, once: false }));
 }
+
+/** For tests: forget that the tag was set up. */
+export function resetGaForTest() { started = false; }
 
 export function trackPage(path: string) {
   if (typeof window.gtag !== "function") return;
