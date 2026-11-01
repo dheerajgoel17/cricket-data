@@ -1,3 +1,4 @@
+import { fromOurPage } from "./packages/engine/guard.js";
 // Edge: block known scrapers on /data and /api, require the gate cookie for /data JSON (except meta.json),
 // and send link-preview crawlers the share HTML (so WhatsApp/Twitter see the card without running the app).
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
@@ -41,6 +42,7 @@ export default async function middleware(req) {
   if (path === "/api/gate") return;
   if (!ua || BOT.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;
+  if (!fromOurPage((h) => req.headers.get(h))) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // a script with a browser's User-Agent but not a page's request
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
   if (!secret) return;
   if (await cookieOk(secret, req.headers.get("cookie"))) return;

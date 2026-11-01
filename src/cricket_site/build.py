@@ -646,6 +646,10 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
 
 
+# AI training / scraping crawlers asked to stay out (honest ones obey); search and link-preview bots are not here
+AI_CRAWLERS = ("GPTBot", "ChatGPT-User", "ClaudeBot", "Claude-Web", "anthropic-ai", "CCBot", "Google-Extended", "PerplexityBot", "Bytespider", "Amazonbot", "Applebot-Extended", "Meta-ExternalAgent", "cohere-ai", "Diffbot", "ImagesiftBot", "omgili")
+
+
 def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixtures: list[dict] | None = None) -> int:
     """sitemap.xml + robots.txt next to the site (real paths such as /player/12: the app uses path routes)."""
     if not site_url:
@@ -674,7 +678,8 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
         "User-agent: facebookexternalhit\nAllow: /\n\n"
         "User-agent: Facebot\nAllow: /\n\n"
         "User-agent: WhatsApp\nAllow: /\n\n"
-        f"User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /data/\nSitemap: {base}/sitemap.xml\n",
+        + "".join(f"User-agent: {bot}\nDisallow: /\n\n" for bot in AI_CRAWLERS)
+        + f"User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /data/\nSitemap: {base}/sitemap.xml\n",
         encoding="utf-8",
     )
     return len(urls)
