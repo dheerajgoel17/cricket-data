@@ -63,12 +63,15 @@ function listedLine(pid, doc) {
   return null;
 }
 
+/** A player id (8 hex characters) as his index in the player table, or null. */
+const pidIndex = (pid, data) => { const i = /^[0-9a-f]{8}$/.test(String(pid ?? "")) ? data.index?.players?.id?.indexOf(pid) : -1; return i >= 0 ? i : null; };
+
 /**
- * The fields of a card from the query: `p` (player index) with optional `stat` and `line` for a prop, or `f` (fixture id).
+ * The fields of a card from the query: `p` (player index) or `pid` (his id) with optional `stat` and `line` for a prop, or `f` (fixture id).
  * `data` is { index, photos, lines, fixtures } as the site data files hold them. Returns null when nothing matches (the caller serves the plain site card).
  */
 export function cardFields(q, data) {
-  const idx = num(q.p);
+  const idx = num(q.p) ?? pidIndex(q.pid, data);
   if (idx != null) {
     const P = data.index?.players;
     const name = P?.nm?.[idx];
