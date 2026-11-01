@@ -30,6 +30,8 @@ scraper files, so it never merges value-bet changes.
 
 Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json`
 
+The Telegram channel is the consumer of that file: the match-state Worker posts each new alert (edge, listed price, fair price, reason; never the stake) for a match that has not started, once per `alert_id` (docs/OPERATIONS.md, Telegram channel alerts).
+
 **Odds snapshots** (every normalised pull plus raw responses, gzip) are **not committed**. They are uploaded as the workflow
 artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `main` small. Caches (`*.pkl`) are rebuilt each run in about 25 s.
 
