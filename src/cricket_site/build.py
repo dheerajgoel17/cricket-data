@@ -26,6 +26,7 @@ from . import identity
 from .crex_assets import display_name as ca_display_name
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
+from .sides import SAME_SIDE
 
 NSHARD = 64
 SCHEMA = 1
@@ -85,6 +86,12 @@ def _norm_team(s: str) -> str:
     s = re.sub(r"\(.*?\)", "", s)
     s = re.sub(r"\s+(women|w)$", "", s.strip())
     return re.sub(r"[^a-z0-9]", "", s)
+
+
+def _side(s: str) -> str:
+    """``_norm_team`` with a side the books name differently from the schedule folded into one key (``SAME_SIDE``): for telling whether two rows are one match, never for finding a team."""
+    k = _norm_team(s)
+    return SAME_SIDE.get(k, k)
 
 
 def _strip_women(s: str) -> str:
@@ -695,7 +702,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         return []
     now = now or datetime.now(timezone.utc)
     now_min = now.timestamp() // 60
-    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
+    held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
@@ -705,7 +712,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             mins = _minutes(start)
         except (ValueError, KeyError, TypeError, OSError):
             continue
-        pair = frozenset((_norm_team(a), _norm_team(b)))
+        pair = frozenset((_side(a), _side(b)))
         if any(pair == k and abs(mins - m) < w for k, m, w in held):
             continue
         fx = d.get("fixture") or {}
@@ -765,7 +772,7 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):
-        key = (r["start"][:10], frozenset((_norm_team(r["a"]), _norm_team(r["b"]))))
+        key = (r["start"][:10], frozenset((_side(r["a"]), _side(r["b"]))))
         if key in seen:
             continue
         seen.add(key)

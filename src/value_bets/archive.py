@@ -26,6 +26,7 @@ import time
 import urllib.request
 from pathlib import Path
 
+from cricket_site.sides import SAME_SIDE
 from cricket_site.wrap import unwrap as unwrap_data
 
 from . import config
@@ -47,7 +48,6 @@ def fixture_id(start: str, a: str, b: str) -> str:
     return f"{start[:10]}-{_slug(a)}-v-{_slug(b)}"
 
 
-SAME_SIDE = {"aucklandaces": "auckland", "canterburykings": "canterbury", "wellingtonfirebirds": "wellington", "otagovolts": "otago", "northerndistricts": "northernbrave"}
 
 
 def team_key(n: str) -> str:

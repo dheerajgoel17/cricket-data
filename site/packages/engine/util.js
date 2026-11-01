@@ -27,7 +27,7 @@ export const SURNAME_ALIAS = {
 export const surnamesEq = (a, b) => a === b || (SURNAME_ALIAS[a] || []).includes(b);
 
 /** A side the books and the schedule name differently ("Auckland Aces" / "Auckland"), reduced to one team key. Kept equal to `SAME_SIDE` in src/value_bets/archive.py. */
-export const SAME_SIDE = { aucklandaces: "auckland", canterburykings: "canterbury", wellingtonfirebirds: "wellington", otagovolts: "otago", northerndistricts: "northernbrave" };
+export const SAME_SIDE = { aucklandaces: "auckland", canterburykings: "canterbury", wellingtonfirebirds: "wellington", otagovolts: "otago", northerndistricts: "northernbrave", boland: "rocks", southwesterndistricts: "gardenroutebadgers", easterns: "easternstorm", centraldistricts: "centralstags", central: "centralstags", eagles: "mashonalandeagles", tuskers: "matabelelandtuskers" };
 
 export function norm(s) {
   return String(s ?? "")

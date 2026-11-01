@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -189,6 +189,20 @@ test("withArchive leaves the live doc as it is when it still has the match's lin
   assert.deepEqual(doc.fancy, live.fancy);
   assert.equal(withArchive(live, null), live);
   assert.equal(withArchive(undefined, ENTRY).lines.length, 1);
+});
+
+test("a fixture id the books named differently is the same page (Boland / Rocks), another day or side is not", () => {
+  assert.equal(teamKey("Boland"), teamKey("Rocks"));
+  assert.equal(sameFixtureId("2026-11-01-dolphins-v-boland", "2026-11-01-dolphins-v-rocks"), true);
+  assert.equal(sameFixtureId("2026-11-01-dolphins-v-rocks", "2026-11-01-dolphins-v-rocks"), true);
+  assert.equal(sameFixtureId("2026-11-01-auckland-aces-v-otago-volts", "2026-11-01-auckland-v-otago"), true);
+  assert.equal(sameFixtureId("2026-10-31-south-western-districts-v-easterns", "2026-10-31-garden-route-badgers-v-eastern-storm"), true);
+  assert.equal(sameFixtureId("2026-10-31-otago-v-central-districts", "2026-10-31-otago-v-central-stags"), true);
+  assert.equal(sameFixtureId("2026-10-31-otago-v-central", "2026-10-31-otago-v-central-stags"), true);
+  assert.equal(sameFixtureId("2026-11-01-eagles-v-tuskers", "2026-11-01-mashonaland-eagles-v-matabeleland-tuskers"), true);
+  assert.equal(sameFixtureId("2026-11-02-dolphins-v-boland", "2026-11-01-dolphins-v-rocks"), false, "another day");
+  assert.equal(sameFixtureId("2026-11-01-dolphins-v-lions", "2026-11-01-dolphins-v-rocks"), false, "another side");
+  assert.equal(sameFixtureId("not-an-id", "not-an-id"), false);
 });
 
 test("sameFixture tells a series' matches apart: the same two sides, and a start within 14 hours", () => {

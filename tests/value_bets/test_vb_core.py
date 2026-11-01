@@ -54,6 +54,12 @@ def test_team_resolver_nz_domestic():
         assert t.resolve(sched, "male") == t.resolve(book, "male") is not None, (sched, book)
 
 
+def test_team_resolver_boland_is_the_rocks():
+    """The schedule says "Rocks" (the side the recent matches are filed under), the books "Boland" (the old Base name): one side, so a priced match finds its fixture."""
+    t = TeamResolver({"male": {"Boland": 22, "Rocks": 30, "Dolphins": 90}})
+    assert t.resolve("Boland", "male") == t.resolve("Rocks", "male") == "Rocks"
+
+
 def test_player_resolver():
     ros = {"India": [("Ishan Kishan", "a1", "2026-10-11", 30), ("Kuldeep Yadav", "a2", "2026-10-11", 40),
                      ("MP Yadav", "a3", "2026-10-11", 10), ("Prince Yadav", "a4", "2026-10-11", 5)],
