@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { NextMatch } from "./next-match";
+import { NextMatch, UnpricedNote } from "./next-match";
 
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined, bookVariant: () => "" }));
 vi.mock("@/lib/data", () => ({ useData: () => ({ photos: { teams: {}, flags: {} } }) }));
@@ -40,14 +40,23 @@ describe("NextMatch", () => {
     expect(screen.getByText(/Books price 14.5 on this match, not 17.5/)).toBeInTheDocument();
   });
 
-  it("does not invent a median line when no book prices this match", () => {
-    const entries = [{ value: 30, venueName: "SCG", opp: "Sydney Sixers" }];
+  it("states that no book is offering odds for this stat", () => {
+    render(<UnpricedNote statLabel="Sixes" />);
+    expect(screen.getByRole("status")).toHaveTextContent("No book is offering odds for Sixes on this match");
+    expect(screen.getByRole("status")).toHaveTextContent("not a listed market");
+  });
+
+  it("says no book is offering this stat, and still shows history on the chart line (hand-computed 1/1 = fair 1.00)", () => {
+    const entries = [{ value: 30, venueName: "Allan Border Field", opp: "Sydney Sixers Women" }];
     render(<NextMatch next={next} entries={entries} line={17.5} side="over" book={null} statLabel="Wickets" fmt="ODI" />);
     expect(screen.queryByText("bet365")).not.toBeInTheDocument();
-    expect(screen.queryByText(/O 17.5/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/1 of 1/)).not.toBeInTheDocument();
-    expect(screen.getByText("No props live yet")).toBeInTheDocument();
-    expect(screen.getByText("Sydney Sixers Women")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("No listed odds");
+    expect(screen.getByRole("status")).toHaveTextContent("no book is offering Wickets on this match");
+    expect(screen.getByText(/O 17.5/)).toBeInTheDocument();
+    expect(screen.getAllByText("1 of 1").length).toBe(2); // ground and opponent, same one innings
+    expect(screen.getAllByText("fair 1.00").length).toBe(2);
+    expect(screen.queryByText("No props live yet")).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Sydney Sixers Women/).length).toBeGreaterThan(0);
   });
 
   it("keeps the listed line after the match and says whether it cleared", () => {
