@@ -28,7 +28,7 @@ export function headTags({ title, description, url = "", image = "", type = "web
   ].filter(Boolean).join("\n    ");
 }
 
-const NAV = [["/", "Fixtures and hot props"], ["/players", "Players"], ["/teams", "Teams and venues"], ["/competitions", "Competitions"], ["/tools", "Free tools"], ["/glossary", "Stats explained"], ["/about", "Rules and data"]];
+const NAV = [["/", "Fixtures and hot props"], ["/players", "Players"], ["/teams", "Teams and venues"], ["/leagues", "Leagues"], ["/competitions", "Competitions"], ["/tools", "Free tools"], ["/glossary", "Stats explained"], ["/about", "Rules and data"]];
 
 /** A short text body for crawlers; the app replaces it as soon as it starts. */
 export function bodyHtml(h1, text) {
@@ -73,7 +73,7 @@ export function pages({ site, index, fixtures, sitemap }) {
     const name = names[m[1]][Number(m[2])];
     if (!name) continue;
     seen[m[1]]++;
-    const title = { player: `${name}: stats, hit rates and form`, team: `${name}: stats and player grid`, league: `${name}: team tables, totals and top scores`, venue: `${name}: ground stats` }[m[1]];
+    const title = { player: `${name}: stats, hit rates and form`, team: `${name}: stats and player grid`, league: `${name}: stats, top run-scorers, wicket-takers and totals`, venue: `${name}: ground stats` }[m[1]];
     const ldType = { player: { "@type": "Person", jobTitle: "Cricketer" }, team: { "@type": "SportsTeam", sport: "Cricket" }, league: { "@type": "SportsOrganization", sport: "Cricket" }, venue: { "@type": "Place" } }[m[1]];
     const card = m[1] === "player" ? { p: m[2] } : m[1] === "venue" ? { v: m[2] } : null;
     out.push([`${m[1]}/${m[2]}`, { title, description: pageMeta(p, title).description, url: abs(p), ogUrl: (m[1] === "player" || m[1] === "venue") ? abs(`/share/${m[1]}/${m[2]}`) : "", image: card && site ? `${site}${cardPath(card)}` : image, h1: title,

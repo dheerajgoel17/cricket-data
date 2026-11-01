@@ -1,7 +1,7 @@
 process.env.VITE_IMG_CDN = "https://img.test";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { playerPhoto, playerPhotos, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
+import { leagueLogos, playerPhoto, playerPhotos, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
 
 const photos = { p: { "4ae1755b": "c:1IG", "bad0cafe": "w:Jos buttler.JPG" }, t: { india: "O", "west indies": "V", "mumbai indians": "F" } };
 
@@ -25,4 +25,14 @@ test("our own copy (Supabase Storage) is tried first once we hold it, the source
   assert.deepEqual(playerPhotos(own, "4ae1755b"), ["https://store.example/storage/v1/object/public/avatars/players/1IG.png", "https://img.test/players/org/1IG.png"]);
   assert.deepEqual(teamLogos(own, "West Indies"), ["https://store.example/storage/v1/object/public/avatars/teams/V.png", "https://img.test/Teams/V.png"]);
   assert.deepEqual(teamLogos(own, "India"), ["https://img.test/Teams/O.png"]); // not copied yet
+});
+
+test("league logos are looked up by the event's folded name, the newest season's file, the source first and our own copy once we hold it", () => {
+  const lg = { ...photos, l: { "indian premier league": "1PW", "women s big bash league": "2KG" } };
+  assert.deepEqual(leagueLogos(lg, "Indian Premier League"), ["https://img.test/Series/1PW.png"]);
+  assert.deepEqual(leagueLogos(lg, "Women's Big Bash League"), ["https://img.test/Series/2KG.png"]);
+  assert.deepEqual(leagueLogos(lg, "Some Local Cup"), []);
+  assert.deepEqual(leagueLogos(photos, "Indian Premier League"), [], "a photos file from before leagues were added");
+  const own = { ...lg, base: "https://store.example/storage/v1/object/public/avatars", s: { l: ["1PW"] } };
+  assert.deepEqual(leagueLogos(own, "Indian Premier League"), ["https://store.example/storage/v1/object/public/avatars/leagues/1PW.png", "https://img.test/Series/1PW.png"]);
 });

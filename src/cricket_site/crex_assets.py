@@ -1,7 +1,7 @@
 """Player photos and team logos from Source A's public sitemaps (the repo already scrapes Source A), with Wikidata as the fallback.
 
-Source A lists every player (`/player/<name-slug>-<ID>`) and team (`/team/<name-slug>-<ID>`) in its sitemaps, and serves images at
-`$IMG_CDN_BASE/players/org/<ID>.png` and `.../Teams/<ID>.png`. We only store the ids; the browser loads the images.
+Source A lists every player (`/player/<name-slug>-<ID>`), team (`/team/<name-slug>-<ID>`) and series season (`/series/<name-slug>-<year>-<ID>`) in its sitemaps, and serves images at
+`$IMG_CDN_BASE/players/org/<ID>.png`, `.../Teams/<ID>.png` and `.../Series/<ID>.png`. We only store the ids; the browser loads the images.
 Matching a Source A full name ("harry-brook") to a Base name ("HC Brook") is deliberately conservative: surname must match,
 the first initial must agree, and an ambiguous name is skipped rather than guessed (a wrong face is worse than a silhouette).
 """
@@ -16,6 +16,7 @@ from cricket_data.hosts import host
 UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.1; +https://github.com/dheerajgoel17/cricket-data)"
 _PLAYER = re.compile(r"/player/(.+)-([0-9A-Z]+)(?:/matches)?$")
 _TEAM = re.compile(r"/team/(.+)-([0-9A-Z]+)(?:/[a-z-]+)?$")
+_SERIES = re.compile(r"/series/([^/]+)-([0-9A-Z]+)$")  # a season's own page only: `/matches`, `/team-squad`, `/points-table` pages are skipped
 PARTICLES = {"van", "der", "de", "den", "du", "la", "le", "di", "da", "bin", "al", "el", "mc", "von", "ten", "te"}
 
 
@@ -49,6 +50,17 @@ def parse_sitemap(xml: str, kind: str) -> list[tuple[str, str]]:
     out, seen = [], set()
     for loc in re.findall(r"<loc>([^<]+)</loc>", xml):
         m = rx.search(loc.strip())
+        if m and m.group(2) not in seen:
+            seen.add(m.group(2))
+            out.append((m.group(1).replace("-", " "), m.group(2)))
+    return out
+
+
+def parse_series(xml: str) -> list[tuple[str, str]]:
+    """-> [(series slug words, Source A series id)], one per season, de-duplicated by id."""
+    out, seen = [], set()
+    for loc in re.findall(r"<loc>([^<]+)</loc>", xml):
+        m = _SERIES.search(loc.strip())
         if m and m.group(2) not in seen:
             seen.add(m.group(2))
             out.append((m.group(1).replace("-", " "), m.group(2)))
@@ -157,4 +169,45 @@ def match_teams(teams: list[dict], crex: list[tuple[str, str]]) -> dict[str, str
             if cand and cand in avail:
                 out[raw] = avail[cand]
                 break
+    return out
+
+
+# ------------------------------------------------------------------ league logos
+_YEAR = re.compile(r"\b(?:19|20)\d{2}(?:[ -]\d{2,4})?\b")  # "2026", "2025-26", "2024 26": the season, which is not part of a league's identity
+_LEAGUE_STOP = {"the", "s", "men", "mens", "icc"}
+# Base names a league differently from the source: the folded Base name (season removed) -> the source's name for it. Add a line when a headline league does not match.
+LEAGUE_ALIASES = {
+    "vitality blast": "t20 blast", "vitality blast men": "t20 blast", "natwest t20 blast": "t20 blast", "vitality blast women": "t20 blast women",
+    "royal london one day cup": "england domestic one day cup", "ecb women s one day cup": "england women one day cup",
+    "the hundred men s competition": "the hundred men", "the hundred women s competition": "the hundred women",
+    "icc world twenty20": "t20 world cup", "world t20": "t20 world cup", "icc cricket world cup": "world cup", "icc world cup": "world cup",
+}
+
+
+def league_key(name: str) -> str:
+    """A league's name reduced to the words that tell it apart: no season, no "the" / "men's" / "ICC", "women" kept, Twenty20 = T20, so Base's "Women's Big Bash League" and
+    the source's `womens-big-bash-league` meet while the men's league and the women's one do not. The words keep their order."""
+    f = re.sub(r"\s+", " ", _YEAR.sub(" ", fold((name or "").replace("&", " and ")))).strip()
+    f = LEAGUE_ALIASES.get(f, f)
+    toks = list(dict.fromkeys("women" if t == "womens" else "t20" if t in ("twenty20", "t20i") else t for t in f.split() if t not in _LEAGUE_STOP))
+    if "women" in toks:  # "Big Bash League Women" and "Women's Big Bash League" are one league; the order of the other words stays ("India tour of England" is not "England tour of India")
+        toks.remove("women")
+        toks.insert(0, "women")
+    return " ".join(toks)
+
+
+def match_leagues(events: list[str], series: list[tuple[str, str]]) -> dict[str, str]:
+    """events: Base event names -> {folded event name: Source A series id}, the newest season's id of the same league (each season has its own logo file; the newest is the current one).
+    An exact match on the league's words only (`league_key`); a bilateral series, a qualifier or a warm-up has its own name and is matched or left out on that name, never guessed."""
+    newest: dict[str, tuple[int, str]] = {}
+    for name, sid in series:
+        year = max((int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", fold(name))), default=0)
+        k = league_key(name)
+        if k and (k not in newest or year > newest[k][0]):
+            newest[k] = (year, sid)
+    out: dict[str, str] = {}
+    for ev in events:
+        k = league_key(ev)
+        if ev and k in newest:
+            out[re.sub(r"\s+", " ", fold(ev))] = newest[k][1]  # the site folds the same way (one space between words)
     return out

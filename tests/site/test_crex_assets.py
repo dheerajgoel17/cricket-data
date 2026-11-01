@@ -50,3 +50,24 @@ def test_display_name_makes_a_readable_full_name_from_the_slug():
     assert display_name("ben mcdermott") == "Ben McDermott"
     assert display_name("kevin o'brien") == "Kevin O'Brien"
     assert display_name("") == ""
+
+
+def test_league_logos_are_matched_on_the_leagues_own_words_and_take_the_newest_season():
+    xml = ("<urlset>" + "".join(f"<url><loc>https://src.test/series/{x}</loc></url>" for x in (
+        "womens-big-bash-league-2026-2KG", "womens-big-bash-league-2026-2KG/matches", "womens-big-bash-league-2025-1W0",
+        "big-bash-league-2026-27-2KQ", "big-bash-league-2025-26-1ZZ", "indian-premier-league-2025-1PD", "indian-premier-league-2026-1PW",
+        "t20-blast-2026-241", "mens-t20-world-cup-2026-1UY", "mens-t20-world-cup-africa-qualifier-final-2026-9Q", "the-hundred-men-2026-2AW", "the-hundred-women-2026-2AX")) + "</urlset>")
+    series = ca.parse_series(xml)
+    assert ("womens big bash league 2026", "2KG") in series and not any(sid == "2KG" and "matches" in n for n, sid in series)  # a season's own page, not its /matches page
+    events = ["Women's Big Bash League", "Big Bash League", "Indian Premier League", "Vitality Blast", "ICC Men's T20 World Cup", "The Hundred Men's Competition",
+              "The Hundred Women's Competition", "Some Local Cup", "ICC Men's T20 World Cup Sub Regional Africa Qualifier"]
+    assert ca.match_leagues(events, series) == {
+        "women s big bash league": "2KG",           # the newest season (2026), and not the men's league
+        "big bash league": "2KQ",                   # "2026-27" is one season, the newest
+        "indian premier league": "1PW",
+        "vitality blast": "241",                    # Base and the source name it differently: an alias
+        "icc men s t20 world cup": "1UY",
+        "the hundred men s competition": "2AW", "the hundred women s competition": "2AX",
+    }                                               # a league the source does not list, and a qualifier it lists under another name, are left out
+    assert ca.league_key("Women's Big Bash League 2025-26") == ca.league_key("womens-big-bash-league") != ca.league_key("Big Bash League")
+    assert ca.league_key("ICC Men's Cricket World Cup League 2") != ca.league_key("ICC Cricket World Cup")   # a number inside the name is kept, only a season goes

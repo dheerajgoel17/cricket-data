@@ -10,6 +10,7 @@ const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.Pla
 
 const page = <T extends Record<string, unknown>>(mod: () => Promise<T>, name: keyof T) => lazy(() => mod().then((m) => ({ default: m[name] as React.ComponentType })));
 const FixturePage = page(() => import("@/pages/Fixtures"), "FixturePage"), TrendsPage = page(() => import("@/pages/Fixtures"), "TrendsPage");
+const LeaguesPage = page(() => import("@/pages/Leagues"), "LeaguesPage");
 const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage"), LeaguePage = page(() => import("@/pages/Markets"), "LeaguePage");
 const PropsPage = page(() => import("@/pages/Lists"), "PropsPage"), FancyPage = page(() => import("@/pages/Lists"), "FancyPage"), PairPage = page(() => import("@/pages/Tools"), "PairPage");
 const ToolsPage = page(() => import("@/pages/Simple"), "ToolsPage"), OddsPage = page(() => import("@/pages/Simple"), "OddsPage"), GlossaryPage = page(() => import("@/pages/Simple"), "GlossaryPage");
@@ -48,6 +49,7 @@ export function App() {
             <Route path="fixtures" element={<Navigate to="/" replace />} />
             <Route path="fixture/*" element={<FixturePage />} />
             <Route path="trends" element={<TrendsPage />} />
+            <Route path="leagues" element={<LeaguesPage />} /><Route path="stats" element={<Navigate to="/leagues" replace />} />
             <Route path="competitions" element={<CompetitionsPage />} />
             <Route path="league/:id" element={<LeaguePage />} />
             <Route path="tools" element={<ToolsPage />} /><Route path="features" element={<Navigate to="/tools" replace />} />

@@ -203,7 +203,8 @@ def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are
     from cricket_site import crex_assets as ca
 
     sitemaps = {"player": "<urlset><url><loc>https://src.test/player/harry-brook-1IG</loc></url><url><loc>https://src.test/player/ben-duckett-ZZ</loc></url></urlset>",
-                "team": "<urlset><url><loc>https://src.test/team/alpha-A1</loc></url></urlset>"}
+                "team": "<urlset><url><loc>https://src.test/team/alpha-A1</loc></url></urlset>",
+                "series": "<urlset><url><loc>https://src.test/series/alpha-tour-of-beta-2024-S1</loc></url><url><loc>https://src.test/series/alpha-tour-of-beta-2025-S2</loc></url></urlset>"}
     monkeypatch.setattr(ca, "fetch_sitemap", lambda kind: sitemaps[kind])
     z, data, out, _ = _out(tmp_path)
     pl = [{"player": "Harry Brook", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "40", "balls": "20", "fours": "3", "sixes": "2"},
@@ -220,6 +221,7 @@ def test_crex_names_link_scraped_players_that_link_players_missed_and_photos_are
     assert any(shard["m"][k] == m and shard["r"][k] == 40 for k in range(len(shard["p"])) if IX["players"]["id"][shard["p"][k]] == brook)
     ph = json.loads((out / "photos.json").read_text())
     assert ph["p"][brook] == "c:1IG" and ph["p"][synth.pid(synth.DUCKETT)] == "c:ZZ"   # keyed by Base id, so a shifting index cannot mismatch photos
+    assert ph["l"] == {"alpha tour of beta 2024": "S2", "alpha tour of beta 2025": "S2"}   # league logos: the newest season of the same series, the keys folded with one space (as the site folds); "Beta tour of Alpha" is another series and has none
     assert (tmp_path / "cache" / "crex_match.json").exists()
 
 
@@ -405,3 +407,16 @@ def test_a_match_named_by_its_sides_joins_the_series_of_its_siblings():
             {"start": "2027-03-01T14:30Z", "a": "Afghanistan", "b": "Zimbabwe", "series": "AFG vs ZIM"}]            # months away: another series
     B._name_series(rows)
     assert [r["series"] for r in rows] == ["Afghanistan vs Zimbabwe in UAE 2026", "Afghanistan vs Zimbabwe in UAE 2026", "OMN vs NEP", "AFG vs ZIM"]
+
+
+def test_a_scraped_matchs_event_takes_the_base_name_of_the_same_league_so_a_live_season_sits_with_its_history():
+    canonical = [{"event": "Women's Big Bash League", "gender": 1}, {"event": "Big Bash League", "gender": 0}, {"event": "Indian Premier League", "gender": 0},
+                 {"event": "Alpha tour of Beta, 2024", "gender": 0}, {"event": "Alpha tour of Beta, 2025", "gender": 0}, {"event": "", "gender": 0}]
+    table = B.canonical_events(canonical)
+    assert B.base_event("Womens Big Bash League", 1, table) == "Women's Big Bash League"       # no apostrophe in the scrape
+    assert B.base_event("Big Bash League 2026-27", 0, table) == "Big Bash League"              # a season in the name
+    assert B.base_event("Big Bash League", 1, table) == "Big Bash League"                      # a women's match is never put in the men's league: left as scraped
+    assert B.base_event("Women's Big Bash League", 1, table) == "Women's Big Bash League"
+    assert B.base_event("IPL 2026", 0, table) == "IPL 2026"                                    # another name for it: left as scraped
+    assert B.base_event("Alpha tour of Beta, 2026", 0, table) == "Alpha tour of Beta, 2026"    # two Base names share one league key: no guess
+    assert B.base_event("", 0, table) == ""

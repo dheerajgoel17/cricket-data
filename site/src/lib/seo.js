@@ -53,7 +53,8 @@ export const ROUTES = {
   fancy: { title: "Cricket fancy lines: match totals and over/unders", description: "Match totals and fancy lines for every priced cricket match, with the edge against the last ten results." },
   players: { title: "Cricket player stats and prop hit rates", description: "Search any cricketer: runs, wickets, sixes and fours hit rates over every line, recent form and listed lines." },
   teams: { title: "Cricket teams and grounds", description: "Team and ground stats: how many runs, sixes and fours fall at each venue, with team form and the player grid." },
-  competitions: { title: "Cricket competitions and leagues", description: "Every league and series in the data: team tables, match totals, sixes, fours and top scores." },
+  leagues: { title: "Cricket leagues: stats, top run-scorers and wicket-takers", description: "Most runs, most wickets, best figures, most sixes and team totals for every league and series, season by season, with the trend in scoring." },
+  competitions: { title: "Cricket competitions and leagues", description: "Every league and series in the data: season stats, most runs and wickets, team tables, match totals, sixes, fours and top scores." },
   trends: { title: "Cricket player trends", description: "Players on a run: hit rates and form for today's matches, line by line." },
   tools: { title: "Free cricket stats tools", description: "Price calculator, partnerships, player search and ground stats. Free, no sign-up." },
   odds: { title: "Odds and price calculator", description: "Convert decimal odds, remove the margin and find the fair price for any cricket market." },
@@ -83,6 +84,6 @@ export function pageMeta(pathname, pageTitle = "") {
   const name = String(pageTitle || "").split(" | ")[0].split(": ")[0].trim(); // "Harry Brook: stats, hit rates and form | Fancy.cash" -> "Harry Brook"
   if (hidden && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: hidden.description, noindex: true };
   if (fixed && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: fixed.description, noindex: !!fixed.noindex };
-  const by = { player: "hit rates over any line, recent form and listed lines", fixture: "player stats, hit rates and listed lines", team: "form, venue record and the player grid", venue: "ground stats, runs, sixes and fours", league: "team tables, match totals and top scores" };
+  const by = { player: "hit rates over any line, recent form and listed lines", fixture: "player stats, hit rates and listed lines", team: "form, venue record and the player grid", venue: "ground stats, runs, sixes and fours", league: "season stats (most runs, most wickets, best figures), team tables, match totals and top scores" };
   return { description: `${name || BRAND}: ${by[seg] || "stats, hit rates and fair prices"}. Free on ${BRAND}.`, noindex: false };
 }
