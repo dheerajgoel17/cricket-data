@@ -1,6 +1,6 @@
 // One alert run: what is new since the last one, claimed in the table so it goes out once, posted to the channel. The message wording is alerts.js; this file only does the
 // I/O in the right order, with every call injectable. Runtime-neutral (fetch only): run by the Cloudflare Worker once a minute.
-import { clearedHits, MAX_HITS, MAX_PROPS, messages, propAlerts } from "./alerts.js";
+import { clearedHits, fancyAlerts, MAX_FANCY, MAX_HITS, MAX_PROPS, messages, propAlerts } from "./alerts.js";
 import { claimAlerts, releaseAlerts } from "./alert-claims.js";
 import { CAPTION_MAX, sendMessage, sendPhoto, TelegramError } from "./telegram.js";
 
@@ -26,13 +26,14 @@ export async function deliver(telegram, msg, fetchImpl) {
  * @param {any[]} o.matches the live feed's matches (each with its settled `lines`)
  * @param {any} o.booksDoc the book lines file (`lines`, `fancy`)
  * @param {any} o.propsDoc the pipeline's `new_alerts.json`
+ * @param {any} [o.fancyDoc] the fancy edge file, `fancy_alerts.json`
  * @param {{ token: string, chat: string }} o.telegram the bot token and the channel (`@username`)
  * @param {{ base: string, key: string, token: string }} o.db the claim table's address, public key and write token
  * @param {"post" | "preview"} [o.mode] preview builds the messages that would go out (what is new) and sends and marks nothing
  * @returns {Promise<{ candidates: number, fresh: number, sent: number, error?: string, messages?: { keys: string[], text: string }[] }>}
  */
-export async function postAlerts({ matches, booksDoc, propsDoc, telegram, db, siteUrl = "", now = Date.now(), fetchImpl = fetch, mode = "post", maxMessages = MAX_MESSAGES }) {
-  const items = [...clearedHits(matches, booksDoc).slice(0, MAX_HITS), ...propAlerts(propsDoc, now, booksDoc).slice(0, MAX_PROPS)];
+export async function postAlerts({ matches, booksDoc, propsDoc, fancyDoc, telegram, db, siteUrl = "", now = Date.now(), fetchImpl = fetch, mode = "post", maxMessages = MAX_MESSAGES }) {
+  const items = [...clearedHits(matches, booksDoc).slice(0, MAX_HITS), ...propAlerts(propsDoc, now, booksDoc).slice(0, MAX_PROPS), ...fancyAlerts(fancyDoc, now).slice(0, MAX_FANCY)];
   const out = { candidates: items.length, fresh: 0, sent: 0 };
   if (!items.length) return out;
   const keys = items.map((i) => i.key);

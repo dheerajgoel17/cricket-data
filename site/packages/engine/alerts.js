@@ -10,10 +10,13 @@ import { stateRow } from "./state.js";
 import { HIGH_ODDS } from "./tape.js";
 
 export const NEW_ALERTS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json";
+export const FANCY_ALERTS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/fancy_alerts.json";
+/** The fancy alert file is rewritten every hour of the pipeline's day (03:30-17:30 UTC, a gap of ten hours at night); a file older than this means the step has stopped, so its prices are not posted. */
+export const FANCY_MAX_AGE_MS = 12 * 3600e3;
 /** Lines of one match in a single message (the rest follow in the next one, so a long list never hits Telegram's 4096 character limit). */
 export const MAX_LINES = 8;
 /** Candidates looked at per run: a backlog is posted a few messages a minute, never all at once. */
-export const MAX_HITS = 16, MAX_PROPS = 4;
+export const MAX_HITS = 16, MAX_PROPS = 4, MAX_FANCY = 24; // fancy edges are capped per match in the file (3), and a long list only drips out at `MAX_MESSAGES` a run: a small cap here would keep the same top few claimed in the window for good
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const price = (x) => Number(x).toFixed(2);
@@ -104,7 +107,29 @@ export function propAlerts(doc, now = Date.now(), booksDoc = null) {
   return out.sort((a, b) => b.edge - a.edge);
 }
 
-/** `items` (cleared hits and prop alerts) as messages `{keys, text, image}` (`image` is the share card's address when the site address is known and a player line is in the message, else ""): one message per match for hits (several when a match has more than `MAX_LINES`), one per prop alert. Hits first. */
+/**
+ * Pre-match fancy edges from `value_bets/out/fancy_alerts.json` (written hourly by site/scripts/fancy-alerts.mjs from the engine's Match Fancy scoring, each with a stable `alert_id`):
+ * a line whose last-matches record, pulled toward the market's chance, beats the best listed price. Only a file written within `FANCY_MAX_AGE_MS` and only a match that has not started,
+ * the biggest edge first. The numbers are the file's (the engine's); the text is stats, with no stake advice.
+ */
+export function fancyAlerts(doc, now = Date.now()) {
+  if (!(Date.parse(doc?.generated_at_utc) > now - FANCY_MAX_AGE_MS)) return [];
+  const out = [];
+  for (const a of doc?.alerts || []) {
+    if (!a?.alert_id || !(Date.parse(a.start_utc) > now) || !(a.best_odds > 1) || !(a.edge > 0) || !(a.side === "over" || a.side === "under") || !Number.isFinite(a.line)) continue;
+    const book = a.best_source ? bookName(a.best_source) : "";
+    const text = [
+      `📊 <b>History edge +${Number(a.edge_pct).toFixed(1)}%</b>`,
+      esc(`${fancyWords(a)}: ${a.side} ${a.line}`),
+      esc([String(a.match || "").replace(/\s+vs\s+/i, " v "), a.format, a.start_ist].filter(Boolean).join(" · ")),
+      `Listed ${price(a.best_odds)}${book ? ` (${esc(book)})` : ""} · ${a.side} in ${a.hits} of ${a.played} recent matches${a.bat_first ? " batting first" : ""} · history chance ${Math.round(a.chance * 100)}%`,
+    ].join("\n");
+    out.push({ kind: "fancy", key: `fancy|${a.alert_id}`, edge: Number(a.edge) || 0, text });
+  }
+  return out.sort((a, b) => b.edge - a.edge);
+}
+
+/** `items` (cleared hits, prop alerts and fancy edges) as messages `{keys, text, image}` (`image` is the share card's address when the site address is known and a player line is in the message, else ""): one message per match for hits (several when a match has more than `MAX_LINES`), one per prop alert and per fancy edge. Hits first. */
 export function messages(items, { siteUrl = "" } = {}) {
   const foot = siteUrl ? `\n<a href="${esc(siteUrl)}">Open the site</a>` : "";
   const site = String(siteUrl || "").replace(/\/+$/, ""), pic = (i) => (site && i ? `${site}${cardPath(i)}` : "");
@@ -125,5 +150,6 @@ export function messages(items, { siteUrl = "" } = {}) {
     }
   }
   for (const p of items.filter((i) => i.kind === "prop")) out.push({ keys: [p.key], text: `${p.text}\n\nModel output from past data, not advice.${foot}`, image: pic(p.image) });
+  for (const p of items.filter((i) => i.kind === "fancy")) out.push({ keys: [p.key], text: `${p.text}\n\nHit rate over recent matches, pulled toward the market price. Past data, not advice.${foot}`, image: "" });
   return out;
 }
