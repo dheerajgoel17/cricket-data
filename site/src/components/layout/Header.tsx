@@ -24,7 +24,7 @@ export function Brand() {
   return (
     <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <BrandMark className="size-9 transition-transform duration-300 group-hover:-rotate-6 group-active:scale-95" />
-      <span className="text-title font-extrabold leading-none tracking-tight text-foreground">Fancy.cash</span>
+      <span className="text-title font-bold leading-none tracking-tight text-foreground">Fancy.cash</span>
     </Link>
   );
 }

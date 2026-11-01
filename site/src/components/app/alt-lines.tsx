@@ -29,11 +29,11 @@ export function AltLines({ lines, active, side, onPick, onStep, min = 0.5 }: {
       <div className="grid justify-items-center gap-hair">
         <div className="flex items-center gap-stack">
           <button type="button" aria-label="Lower the line" disabled={active <= min} onClick={() => onStep(-0.5)} className="grid size-(--touch) place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 disabled:opacity-40"><MinusIcon className="size-5" /></button>
-          <span className="min-w-24 text-center font-condensed text-stat font-semibold leading-none tabular-nums">{active}</span>
+          <span className="min-w-24 text-center font-condensed text-stat font-medium leading-none tabular-nums">{active}</span>
           <button type="button" aria-label="Raise the line" onClick={() => onStep(0.5)} className="grid size-(--touch) place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"><PlusIcon className="size-5" /></button>
         </div>
         <p className="flex items-center gap-snug text-callout text-muted-foreground">
-          {top ? <><Tick value={top.price} className="font-condensed text-body font-semibold text-primary">{odds(top.price)}</Tick><BookBadge source={top.source} /><span>{n} {n === 1 ? "book" : "books"}</span></> : <span>No book lists {active}: the chart still counts how often he cleared it.</span>}
+          {top ? <><Tick value={top.price} className="font-condensed text-body font-medium text-primary">{odds(top.price)}</Tick><BookBadge source={top.source} /><span>{n} {n === 1 ? "book" : "books"}</span></> : <span>No book lists {active}: the chart still counts how often he cleared it.</span>}
         </p>
       </div>
 
@@ -48,10 +48,10 @@ export function AltLines({ lines, active, side, onPick, onStep, min = 0.5 }: {
               <li key={l.line} className="border-b border-hairline last:border-b-0">
                 <div className={cn("grid grid-cols-[3.5rem_minmax(0,1fr)_3.5rem_3rem_2rem] items-center gap-snug", sel && "bg-primary/10")}>
                   <button type="button" onClick={() => onPick(l.line)} aria-pressed={sel} aria-label={`Use line ${l.line}`} className="col-span-4 grid min-h-row grid-cols-subgrid items-center py-snug text-left outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
-                    <span className="grid"><span className="font-condensed text-metric font-semibold leading-none tabular-nums">{l.line}</span>{l.main && <span className="label-cap text-footnote text-primary">main</span>}</span>
-                    <span className="flex min-w-0 items-center gap-snug">{b ? <><span className={cn("font-condensed text-body font-semibold tabular-nums", sel && "text-primary")}>{odds(b.price)}</span><BookBadge source={b.source} /></> : <span className="text-callout text-muted-foreground">–</span>}</span>
+                    <span className="grid"><span className="font-condensed text-metric font-medium leading-none tabular-nums">{l.line}</span>{l.main && <span className="label-cap text-footnote text-primary">main</span>}</span>
+                    <span className="flex min-w-0 items-center gap-snug">{b ? <><span className={cn("font-condensed text-body font-medium tabular-nums", sel && "text-primary")}>{odds(b.price)}</span><BookBadge source={b.source} /></> : <span className="text-callout text-muted-foreground">–</span>}</span>
                     <span className="text-right font-condensed text-body tabular-nums text-muted-foreground">{o ? odds(o.price) : "–"}</span>
-                    <span className="text-right font-condensed text-body font-semibold tabular-nums">{l.hit == null ? "–" : pc(l.hit)}</span>
+                    <span className="text-right font-condensed text-body font-medium tabular-nums">{l.hit == null ? "–" : pc(l.hit)}</span>
                   </button>
                   <span className="grid place-items-center">
                     {sel ? <CheckIcon aria-label="On the chart" className="size-5 text-primary" /> : (

@@ -91,7 +91,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
           <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
           <div className="grid justify-items-end gap-hair text-right">
-            <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
+            <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
             <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : clock.value}</b>
           </div>
         </div>
@@ -183,7 +183,7 @@ export function FixturePage() {
               </div>
               {grids.isLoading || !shown ? <GridSkeleton /> : (
                 <section className="flex flex-col gap-snug">
-                  <h2 className="flex items-center gap-tight text-body font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                  <h2 className="flex items-center gap-tight text-body font-medium"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                   <GridTable g={shown.g} teamIdx={shown.team} line={line} />
                 </section>)}
             </>)}

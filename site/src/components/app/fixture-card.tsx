@@ -32,7 +32,7 @@ export function LiveScore({ s, size = "md", className }: { s: { display?: string
   const total = scoreLabel(s);
   return (
     <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
-      <span className={cn("font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body font-semibold")}>{total}</span>
+      <span className={cn("font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body font-medium")}>{total}</span>
       {s.overs != null && <span className="text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
     </span>
   );
@@ -78,12 +78,12 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
               <div key={t} className="contents">
                 <div className="flex min-w-0 items-center gap-snug" title={t}>
                   <TeamBadge name={t} size="md" eager />
-                  <span className={cn("truncate text-body font-semibold", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
+                  <span className={cn("truncate text-body font-medium", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
                 </div>
                 {hasScore || live ? <LiveScore s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
-                    {timed && <span className="text-callout font-semibold tabular-nums">{localTime(when)}</span>}
+                    {timed && <span className="text-callout font-medium tabular-nums">{localTime(when)}</span>}
                   </span>
                 ) : null}
               </div>
@@ -91,7 +91,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
           </div>
           <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
             <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
-            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">Props<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
+            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">Props<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
           </div>
         </div>
       </Card>
@@ -114,9 +114,9 @@ export function MatchChip({ f }: { f: any }) {
         <TeamBadge name={f.b} size="xs" eager />
       </AvatarGroup>
       <span className="grid min-w-0 text-left leading-tight">
-        <span className="truncate text-caption font-semibold">{abbr(f.a)} v {abbr(f.b)}</span>
+        <span className="truncate text-caption font-medium">{abbr(f.a)} v {abbr(f.b)}</span>
         {live
-          ? <Badge variant="destructive" className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-semibold">{sub}</Badge>
+          ? <Badge variant="destructive" className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-medium">{sub}</Badge>
           : <span className="truncate text-caption opacity-70">{sub}</span>}
       </span>
     </span>

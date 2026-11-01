@@ -52,7 +52,7 @@ function Who({ name, team, sides, strike, short, className }: { name: string; te
   const idx = usePlayerIdx(name, team, sides);
   const text = short ? shortName(name) : name;
   const label = <>{text}{strike ? <span className="text-primary">*</span> : null}</>;
-  const cls = cn("truncate font-semibold", strike && "text-primary", className);
+  const cls = cn("truncate font-medium", strike && "text-primary", className);
   return idx != null ? <Link to={`/player/${idx}`} className={cn(cls, "underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-primary active:opacity-70")}>{label}</Link> : <span className={cls}>{label}</span>;
 }
 
@@ -124,7 +124,7 @@ function Stat({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="grid justify-items-end gap-hair">
       <span className="label-cap text-footnote text-muted-foreground">{k}</span>
-      <span className="text-callout font-semibold tabular-nums">{v}</span>
+      <span className="text-callout font-medium tabular-nums">{v}</span>
     </div>
   );
 }
@@ -288,7 +288,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
         <AccordionItem value="scorecard" className="border-hairline">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <span className="flex min-w-0 flex-1 items-center gap-snug">
-              <span className="truncate text-body font-semibold">Scorecard</span>
+              <span className="truncate text-body font-medium">Scorecard</span>
               <span className="ml-auto truncate text-callout font-medium tabular-nums text-muted-foreground">{card[card.length - 1].team} {innScore(card[card.length - 1])}</span>
             </span>
           </AccordionTrigger>

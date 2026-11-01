@@ -32,7 +32,7 @@ export function FormHeadline({ teams, fmt }: { teams: [string, number][]; fmt: s
   const forms = useMemo(() => recentForms(store, teams, fmt, HEADLINE_N), [store, teams, fmt]);
   return (
     <span className="flex min-w-0 flex-1 items-center gap-snug">
-      <span className="shrink-0 text-body font-semibold">Recent form</span>
+      <span className="shrink-0 text-body font-medium">Recent form</span>
       <span className="ml-auto flex min-w-0 items-center justify-end gap-snug">
         {forms.filter((f) => f.games.length).map(({ name, idx, games }) => (
           <span key={idx} className="flex shrink-0 items-center gap-tight" title={name}>

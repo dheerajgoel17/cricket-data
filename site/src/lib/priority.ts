@@ -91,19 +91,20 @@ export const SOON_MS = 24 * 3600e3;
 
 /**
  * Home-rail order: series sit together. In a series, matches in play, then those starting within 24 hours (still to
- * come, then finished, newest first), then later games. Series with a match in play lead; among the rest, a series
+ * come, then finished, newest first). Games more than 24 hours away leave their series and rank with the other later games. Series with a match in play lead; among the rest, a series
  * with a kick-off in the next 24 hours leads a bigger match later in the week. A just-finished T20 then stays next
  * to that series' next game instead of falling behind every other upcoming card.
  */
 export function arrangeFixtures(fx: any[], stateOf: (f: any) => RailState, home: string | null, cfg: RailConfig = DEFAULT_RAIL, now = Date.now()): any[] {
+  const startMs = (f: any) => Date.parse(f.start) || 0;
+  const isSoon = (f: any) => { const t = startMs(f); return t >= now && t - now <= SOON_MS; };
+  // a series' games more than 24 hours away are a group of their own: they rank with the other later games, not beside today's match of that series
   const groups = new Map<string, any[]>();
   for (const f of fx) {
-    const k = seriesKey(f);
+    const k = seriesKey(f) + (stateOf(f) === "upcoming" && !isSoon(f) ? "\u0000later" : "");
     const g = groups.get(k);
     if (g) g.push(f); else groups.set(k, [f]);
   }
-  const startMs = (f: any) => Date.parse(f.start) || 0;
-  const isSoon = (f: any) => { const t = startMs(f); return t >= now && t - now <= SOON_MS; };
   const band = (f: any) => {
     const st = stateOf(f);
     if (st === "live") return 0;

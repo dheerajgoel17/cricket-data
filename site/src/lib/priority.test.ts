@@ -45,6 +45,13 @@ describe("fixture order", () => {
     const soon = fx("Namibia", "Oman", { series: "Namibia tour", start: "2026-10-30T20:00:00Z" });
     expect(arrangeFixtures([later, soon], () => "upcoming", null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["Namibia", "India"]);
   });
+  it("keeps a series' game days away out from beside today's game of that series, so a nearer match from another series comes first", () => {
+    const now = Date.parse("2026-10-30T12:00:00Z");
+    const t20 = fx("Afghanistan", "Zimbabwe", { series: "AFG vs ZIM", start: "2026-10-30T20:00:00Z" });
+    const test = fx("Afghanistan", "Zimbabwe", { series: "AFG vs ZIM", start: "2026-11-03T05:00:00Z" });
+    const odi = fx("Namibia", "Ireland", { series: "IRE tour of NAM", start: "2026-10-30T16:00:00Z" });
+    expect(arrangeFixtures([t20, test, odi], () => "upcoming", null, DEFAULT_RAIL, now).map((f: any) => f.start)).toEqual(["2026-10-30T20:00:00Z", "2026-10-30T16:00:00Z", "2026-11-03T05:00:00Z"]);
+  });
   it("puts a series in play ahead of other series, and today's remaining game ahead of a finished one in the same series", () => {
     const now = Date.parse("2026-10-30T12:00:00Z");
     const live = fx("South Africa", "Australia", { series: "AUS vs SA 2026", start: "2026-10-27T08:00:00Z", fmt: "Test" });

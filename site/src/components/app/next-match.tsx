@@ -45,7 +45,7 @@ function RateRow({ label, r, side, line }: { label: string; r: { p: number | nul
     <div className="flex items-baseline justify-between gap-snug text-callout">
       <span className="min-w-0 truncate text-muted-foreground">{label}</span>
       <span className="shrink-0 tabular-nums">
-        <b className={cn("font-semibold", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
+        <b className={cn("font-medium", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
         {" "}<span className="text-muted-foreground">{r.hits} of {r.played}</span>
         {" "}<span className="text-muted-foreground" title={`fair ${side} ${line}`}>fair {odds(r.fair)}</span>
       </span>
@@ -75,9 +75,9 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
       </div>
       <div className="flex min-w-0 items-center gap-snug">
         {next.team ? <><TeamBadge name={next.team} size="sm" eager /><span className="text-footnote text-muted-foreground">vs</span></> : null}
-        {next.opp ? <><TeamBadge name={next.opp} size="sm" eager /><span className="min-w-0 truncate text-body font-semibold">{next.opp}</span></>
-          : <span className="min-w-0 truncate text-body font-semibold">{next.match}</span>}
-        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-semibold text-muted-foreground">Not in XI</Badge> : null}
+        {next.opp ? <><TeamBadge name={next.opp} size="sm" eager /><span className="min-w-0 truncate text-body font-medium">{next.opp}</span></>
+          : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
+        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
       </div>
       {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
@@ -85,10 +85,10 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
         <>
           <div className="grid gap-hair border-t border-hairline pt-snug">
             <div className="flex flex-wrap items-baseline justify-between gap-snug">
-              <span className="text-body font-semibold tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
+              <span className="text-body font-medium tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
                 {standing != null && <> · <StandingMark standing={standing} line={line} /></>}
               </span>
-              {best > 1 ? <Tick value={best} className="text-callout font-semibold tabular-nums text-foreground">{odds(best)}</Tick> : null}
+              {best > 1 ? <Tick value={best} className="text-callout font-medium tabular-nums text-foreground">{odds(best)}</Tick> : null}
             </div>
             {quotes.length ? (
               <OddsTable lines={quotes.map((q: any) => ({ line: q.line, books: [{ source: q.source, over: q.over, under: q.under, underAt: q.underAt }] }))} />
@@ -101,7 +101,7 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
             {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
             {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
             <Note className="sm:col-span-2" title="How to read this" items={[
-              <>Hit rate counts {fmt ? <b className="font-semibold text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
+              <>Hit rate counts {fmt ? <b className="font-medium text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
               "Games he did not play (DNP) or that were void are left out, not counted as misses.",
               "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin, so compare them with the listed price.",
             ]} />

@@ -17,7 +17,7 @@ export function Chip({ on, onClick, children, className, ...rest }: { on?: boole
 export function ActiveChip({ label, value, onRemove }: { label: string; value: string; onRemove: () => void }) {
   return (
     <span className="inline-flex h-control shrink-0 items-center gap-hair rounded-[var(--chip-radius)] bg-primary/15 pl-snug text-callout text-primary">
-      <span className="text-muted-foreground">{label}</span><b className="font-semibold">{value}</b>
+      <span className="text-muted-foreground">{label}</span><b className="font-medium">{value}</b>
       <button type="button" aria-label={`Remove ${label} filter`} onClick={onRemove} className="grid size-control place-items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring active:opacity-60"><XMarkIcon className="size-3.5" /></button>
     </span>
   );

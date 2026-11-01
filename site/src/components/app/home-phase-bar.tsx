@@ -30,7 +30,7 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
                 role="tab"
                 aria-selected={on}
                 onClick={() => pick(id)}
-                className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-semibold", on ? "text-background" : "text-muted-foreground")}
+                className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-medium", on ? "text-background" : "text-muted-foreground")}
               >
                 {on && <motion.span layoutId="home-phase" aria-hidden className="absolute inset-0 rounded-[var(--chip-radius)] bg-foreground" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
                 <span className="relative flex items-center gap-hair">
@@ -51,7 +51,7 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
             <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />
             <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
               <SheetTitle className="text-title font-bold tracking-tight">More</SheetTitle>
-              <SheetClose className="text-body font-semibold text-primary active:opacity-50">Done</SheetClose>
+              <SheetClose className="text-body font-medium text-primary active:opacity-50">Done</SheetClose>
             </SheetHeader>
             <SheetDescription className="sr-only">Players, tools and the rest of the site</SheetDescription>
             <ul className="grid gap-hair pt-group">

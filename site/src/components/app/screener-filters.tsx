@@ -22,7 +22,7 @@ export interface FilterChoices {
 
 /** A section's header: its name and, when it is not at the default, the value it holds (so closed sections still say what is set). */
 function Head({ name, value }: { name: string; value?: string }) {
-  return <span className="flex min-w-0 items-center gap-snug text-body font-semibold">{name}{value ? <span className="truncate rounded-[var(--chip-radius)] bg-primary/15 px-snug py-hair text-footnote font-medium text-primary">{value}</span> : null}</span>;
+  return <span className="flex min-w-0 items-center gap-snug text-body font-medium">{name}{value ? <span className="truncate rounded-[var(--chip-radius)] bg-primary/15 px-snug py-hair text-footnote font-medium text-primary">{value}</span> : null}</span>;
 }
 
 const Section = ({ id, name, value, children }: { id: string; name: string; value?: string; children: ReactNode }) => (
@@ -105,7 +105,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
         </div>
         <footer className="flex shrink-0 items-center gap-snug border-t border-hairline bg-background px-gutter pt-snug pb-[max(var(--space-snug),env(safe-area-inset-bottom))]">
           <Button type="button" variant="secondary" className="h-(--touch) flex-1 rounded-full text-body" disabled={!active && draft.stat === state.stat} onClick={() => setDraft({ ...DEFAULTS })}>Clear all</Button>
-          <Button type="button" className="h-(--touch) flex-[2] rounded-full bg-primary text-body font-semibold text-primary-foreground" onClick={apply}>Apply</Button>
+          <Button type="button" className="h-(--touch) flex-[2] rounded-full bg-primary text-body font-medium text-primary-foreground" onClick={apply}>Apply</Button>
         </footer>
       </SheetContent>
     </Sheet>
