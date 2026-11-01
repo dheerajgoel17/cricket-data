@@ -71,7 +71,11 @@ export class Store {
   }
 
   async shard(n) {
-    if (!this.shards.has(n)) this.shards.set(n, this.get(`p/${String(n).padStart(2, "0")}.json`));
+    if (!this.shards.has(n)) {
+      const p = this.get(`p/${String(n).padStart(2, "0")}.json`);
+      this.shards.set(n, p);
+      p.catch(() => { if (this.shards.get(n) === p) this.shards.delete(n); }); // a failed read is not kept: the next ask tries again
+    }
     return this.shards.get(n);
   }
 

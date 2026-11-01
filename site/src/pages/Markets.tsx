@@ -18,15 +18,15 @@ import { Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app
 import { EntityHero } from "@/components/app/entity-hero";
 import { PillTabs } from "@/components/app/pill-tabs";
 import { GridTable } from "@/components/app/grid";
-import { TeamBadge } from "@/components/app/badges";
+import { LeagueBadge, TeamBadge } from "@/components/app/badges";
 import { StarButton } from "@/components/app/star";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
+import { TournamentStats } from "@/components/app/tournament-stats";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
-const caps = (s: string) => s.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 
 // ------------------------------------------------------------------ competitions
 export function CompetitionsPage() {
@@ -42,7 +42,7 @@ export function CompetitionsPage() {
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
-      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-accent"><span className="grid size-9 place-items-center rounded-lg bg-secondary text-xs font-bold text-primary">{caps(store.events[e])}</span><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
+      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-accent"><LeagueBadge name={store.events[e]} size="md" /><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
     </div>
   );
 }
@@ -67,15 +67,16 @@ export function LeaguePage() {
     const recent = ms.slice(-15).reverse().map((m) => { const inn = store.M.inn[m]; const sc = (i: number) => (inn[i] ? `${inn[i][1]}/${inn[i][2]}` : "–"); return [store.M.d[m], `${store.teamName(store.M.a[m], true)} v ${store.teamName(store.M.b[m], true)}`, store.venueName(store.M.v[m]), inn.length ? `${sc(0)} · ${sc(1)}` : "–", store.M.w[m] >= 0 ? store.teamName(store.M.w[m], true) : "–"]; });
     return { ms, fmtName, seasons, tt, teams, mk, recent };
   }, [store, e, valid]);
-  setTitle(valid ? `${store.events[e]}: team tables, totals and top scores` : "Competition stats");
+  setTitle(valid ? `${store.events[e]}: stats, top run-scorers, wicket-takers and totals` : "Competition stats");
   if (!valid || !data) return <EmptyNote>Unknown competition.</EmptyNote>;
-  const tab = ["overview", "teams", "results"].includes(q.tab) ? q.tab : "overview";
+  const tab = ["stats", "overview", "teams", "results"].includes(q.tab) ? q.tab : "stats";
   const name = store.events[e];
   return (
     <div>
       <Crumbs items={[["Home", "/"], ["Competitions", "/competitions"], [name]]} />
-      <EntityHero badge={<span className="grid size-16 place-items-center rounded-full bg-secondary text-lg font-bold text-muted-foreground">{caps(name)}</span>} name={name} sub={`${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}`} meta={[data.fmtName, `${data.tt.size} teams`]} />
-      <PillTabs layoutId="lg-tab" tabs={[["overview", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
+      <EntityHero badge={<LeagueBadge name={name} size="xl" />} name={name} sub={`${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}`} meta={[data.fmtName, `${data.tt.size} teams`]} />
+      <PillTabs layoutId="lg-tab" scrollable tabs={[["stats", "Stats"], ["overview", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
+        <TabsContent value="stats"><TournamentStats eventIdx={e} season={q.season} onSeason={(k) => setQ({ season: k })} /></TabsContent>
         <TabsContent value="overview"><Panel flat><DataTable columns={["Market", "Median", "Mean", "Matches"]} rows={data.mk} /></Panel><Muted className="mt-2">{data.fmtName} matches that count for summary markets (void games excluded).</Muted></TabsContent>
         <TabsContent value="teams"><Panel flat><DataTable columns={["Team", "Played", "Won", "Lost", "Win %"]} rows={data.teams.map(([t, r]: any) => [<Link key={t} className="text-primary" to={`/team/${t}?fmt=${data.fmtName}`}>{store.teamName(t)}</Link>, r.n, r.w, r.l, pc(r.n ? r.w / r.n : null)])} /></Panel></TabsContent>
         <TabsContent value="results"><Panel flat><DataTable columns={["Date", "Match", "Venue", "Innings runs", "Winner"]} rows={data.recent} /></Panel></TabsContent>

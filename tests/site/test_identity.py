@@ -97,3 +97,16 @@ def test_the_review_reads_as_a_table_with_the_line_to_add():
     md = I.to_markdown(r)
     assert "| V Suryavanshi | `p4` | - | no source player has this name | `S4` vaibhav sooryavanshi |" in md and "player_identity.csv" in md
     assert "Every priced player is linked" in I.to_markdown([])
+
+
+def test_the_committed_overrides_file_gives_each_player_and_each_source_id_once():
+    """Hand-checked links: a player or a source id listed twice would make one silently win."""
+    import csv
+    from pathlib import Path
+
+    f = Path(__file__).resolve().parents[2] / "data" / "mappings" / "player_identity.csv"
+    rows = [r for r in csv.reader(x for x in f.read_text(encoding="utf-8").splitlines() if x.strip() and not x.lstrip().startswith("#")) if r[0] != "player_id"]
+    assert all(len(r) >= 3 and r[2].strip() for r in rows), "every link says who he is and why"
+    assert len({r[0] for r in rows}) == len(rows) and len({r[1] for r in rows}) == len(rows)
+    assert {r[0]: r[1] for r in rows}["85e0cf10"] == "EF"   # M Prasidh Krishna is Prasidh Krishna, not another Krishna
+    assert len(I.load_overrides(f.parents[1])) == len(rows)

@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { BookmarkIcon, CalendarDaysIcon, ChartBarIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
+import { BookmarkIcon, CalendarDaysIcon, ChartBarIcon, PuzzlePieceIcon, TrophyIcon } from "@heroicons/react/24/outline";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 export interface NavItem { to: string; label: string; icon: Icon; match: (p: string) => boolean }
@@ -8,6 +8,7 @@ export const MAIN_NAV: NavItem[] = [
   { to: "/", label: "Fixtures", icon: CalendarDaysIcon, match: (p) => p === "/" || p.startsWith("/fixture") },
   { to: "/props", label: "Player props", icon: ChartBarIcon, match: (p) => p.startsWith("/props") || p.startsWith("/player/") },
   { to: "/fancy", label: "Fancy", icon: PuzzlePieceIcon, match: (p) => p.startsWith("/fancy") },
+  { to: "/leagues", label: "Leagues", icon: TrophyIcon, match: (p) => p.startsWith("/league") || p.startsWith("/competitions") },
   { to: "/saved", label: "Saved", icon: BookmarkIcon, match: (p) => p.startsWith("/saved") },
 ];
 /** Pages that are a top-level destination: no back button in the phone header. Everything else (a player, a team, a match) is one level down. */

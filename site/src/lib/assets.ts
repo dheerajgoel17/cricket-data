@@ -1,8 +1,8 @@
 // Free image sources, loaded lazily in the browser: Source A's public image CDN (ids matched at build time, see photos.ts),
 // flagcdn.com flags for national sides, Wikimedia Commons photos via Wikidata, then initials / a silhouette.
-export { playerPhotos, teamLogos } from "@cricket/engine/photos.js";
+export { leagueLogos, playerPhotos, teamLogos } from "@cricket/engine/photos.js";
 
-export interface Photos { p?: Record<string, string>; t?: Record<string, string>; base?: string; s?: Record<string, string[]> }
+export interface Photos { p?: Record<string, string>; t?: Record<string, string>; l?: Record<string, string>; base?: string; s?: Record<string, string[]> }
 
 const FLAGS: Record<string, string> = {
   England: "gb-eng", Scotland: "gb-sct", Wales: "gb-wls", Ireland: "ie", India: "in", Australia: "au", "New Zealand": "nz",
