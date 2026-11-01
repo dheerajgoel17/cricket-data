@@ -42,7 +42,8 @@ import { Note } from "@/components/app/note";
 import { MatchStatus } from "@/components/app/match-status";
 import { PlayerName } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
-import { sharePlayerUrl } from "@/lib/share";
+import { sendShare, sharePlayerUrl } from "@/lib/share";
+import { shareText } from "@cricket/engine/share-text.js";
 import { DataTable, EmptyNote } from "@/components/app/page";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
@@ -175,7 +176,14 @@ function PlayerScreen({ idx }: { idx: number }) {
   const nextMatch = useNextMatch(lines.data, pid, idx, FORMATS[fmtVal], team, lastGame);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
-  const share = () => { track("share", { kind: "player" }); const u = sharePlayerUrl(location.origin, idx, stat, shareLine); (navigator.share ? navigator.share({ title: name, url: u }) : navigator.clipboard.writeText(u).then(() => toast("Link copied"))).catch(() => {}); };
+  const sharePrice = Math.max(0, ...(book?.lines?.find((l: any) => shareLine != null && Math.abs(l.line - shareLine) < 0.01)?.books || []).map((b: any) => b[plan.side] || 0)) || null; // best price of the side on show at that line
+  const share = () => {
+    track("share", { kind: "player" });
+    const u = sharePlayerUrl(location.origin, idx, stat, shareLine);
+    // the card carries the pick; the words are the numbers behind it, then the link (one string, so every app keeps both)
+    const text = shareText({ entries: res.data?.ok ? res.data.chart?.entries : [], line: shareLine, side: plan.side, fmt: FORMATS[fmtVal], price: sharePrice, ground: nextMatch?.ground, opp: nextMatch?.opp, url: u }) || u;
+    void sendShare(text, name, () => toast("Copied"));
+  };
   const loading = lines.isLoading || res.isLoading || !res.data;
 
   return (

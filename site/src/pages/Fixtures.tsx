@@ -2,7 +2,11 @@
 import { useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
+import { matchShareText } from "@cricket/engine/share-text.js";
+import { sendShare, shareFixtureUrl } from "@/lib/share";
+import { track } from "@/lib/analytics";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,6 +81,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
+        <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
+          className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring", !live && "ml-auto")}><ArrowUpOnSquareIcon className="size-5" /></button>
       </div>
       {hasScore ? (
         <div className="grid gap-stack">

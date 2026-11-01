@@ -3,7 +3,10 @@ import { useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
+import { fancyShareText } from "@cricket/engine/share-text.js";
+import { sendShare, shareFixtureUrl } from "@/lib/share";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { fancyStanding } from "@cricket/engine/live.js";
@@ -201,6 +204,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
+  // the shared text: the pick (the side the sample favours, at its best listed price), how the ground has gone and the recent matches; the link is the match's card
+  const shareLine = () => {
+    if (!rep) return;
+    track("share", { kind: "fancy" });
+    const pO = rep.summary.pOver, pU = rep.summary.pUnder;
+    const lean = pO != null && pU != null && pO !== pU ? (pO > pU ? "over" : "under") : null;
+    const vms = venueIdx.length ? (batFirstNow ? firstInnsMs(store, hereMatches(10), scope) : hereMatches(10)) : [];
+    const url = shareFixtureUrl(location.origin, fx.id);
+    const text = fancyShareText({ a: fx.a, b: fx.b, label: [innTag(inn), team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
+    void sendShare(text || url, `${fx.a} v ${fx.b}`, () => toast("Copied"));
+  };
   // how this market has gone at the ground, set against the sample on screen: a ground can sit far from the teams' form (a small, slow one)
   const ground = useMemo(() => {
     if (!rep || key === "top_batter" || venueIdx.length === 0) return null;
@@ -264,7 +278,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                 {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                   <>
                     <section className="flex flex-col gap-stack">
-                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
+                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
                       {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                       <div className="flex items-end gap-group">
                         <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
