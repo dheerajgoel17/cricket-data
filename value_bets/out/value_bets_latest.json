@@ -1,54 +1,54 @@
 {
- "generated_at_utc": "2026-11-01T17:11:40Z",
- "generated_at_ist": "2026-11-01 22:41 IST",
- "runtime_secs": 108.6,
+ "generated_at_utc": "2026-11-01T21:18:13Z",
+ "generated_at_ist": "2026-11-02 02:48 IST",
+ "runtime_secs": 145.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-01",
-  "commit": "8208d04784"
+  "commit": "416c167405"
  },
  "sources": {
+  "moviodds_bet365": {
+   "status": "ok",
+   "rows": 664,
+   "secs": 0.4
+  },
   "feedk": {
    "status": "ok",
    "rows": 0,
-   "secs": 0.3,
+   "secs": 0.4,
    "events": 0
   },
   "feedg": {
    "status": "error",
    "reason": "blocked (HTTP 403) - likely geo/bot protection from this box's US IP",
-   "secs": 0.4
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 293,
-   "secs": 1.7
-  },
-  "moviodds_bet365": {
-   "status": "ok",
-   "rows": 662,
-   "secs": 2.0
+   "rows": 282,
+   "secs": 1.8
   },
   "feedf": {
    "status": "ok",
-   "rows": 190,
-   "secs": 26.5,
+   "rows": 218,
+   "secs": 26.9,
    "events": 5
   },
   "feede": {
    "status": "ok",
-   "rows": 286,
-   "secs": 29.3,
-   "events": 13
+   "rows": 314,
+   "secs": 65.8,
+   "events": 29
   },
   "feedh": {
    "status": "ok",
-   "rows": 920,
-   "secs": 71.2,
-   "events": 57
+   "rows": 1134,
+   "secs": 80.0,
+   "events": 77
   }
  },
- "snapshot": "odds_20261101T171140Z.jsonl.gz",
+ "snapshot": "odds_20261101T211813Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -118,22 +118,20 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 23,
-  "rows_in_window": 2296,
-  "selections_with_model": 1123,
-  "selections_with_market_fair": 1541,
-  "markets_in_window": 246,
+  "events_in_window": 41,
+  "rows_in_window": 2592,
+  "selections_with_model": 1157,
+  "selections_with_market_fair": 1767,
+  "markets_in_window": 312,
   "value_bets": 0,
   "dropped_by_filter": {
-   "model_only_no_market": 33,
-   "model_market_gap": 426,
    "odds_range": 4,
-   "rarely_selected": 1,
-   "model_disagrees": 5,
-   "top_wide_book": 1,
+   "model_market_gap": 436,
+   "model_only_no_market": 33,
    "loose_name_match": 1,
    "policy_min_edge": 1,
    "model_alone_no_value": 2,
+   "model_disagrees": 4,
    "suspect_edge": 1,
    "policy_max_odds": 1
   },
@@ -142,11 +140,11 @@
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 235,
-    "mean_model_p": 0.074,
+    "mean_model_p": 0.054,
     "mean_market_p": 0.063,
-    "mean_logit_diff_model_minus_market": 0.699,
-    "mean_abs_logit_diff": 1.075,
-    "corr": 0.694
+    "mean_logit_diff_model_minus_market": 0.374,
+    "mean_abs_logit_diff": 0.983,
+    "corr": 0.606
    },
    "top_bowler_team": {
     "n_prices": 144,
@@ -154,15 +152,15 @@
     "mean_market_p": 0.111,
     "mean_logit_diff_model_minus_market": -0.009,
     "mean_abs_logit_diff": 0.355,
-    "corr": 0.606
+    "corr": 0.605
    },
    "batter_runs": {
-    "n_prices": 354,
+    "n_prices": 404,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.697,
-    "corr": 0.316
+    "mean_abs_logit_diff": 0.686,
+    "corr": 0.07
    },
    "batter_sixes": {
     "n_prices": 32,
@@ -189,12 +187,12 @@
     "corr": 0.88
    },
    "batter_milestone": {
-    "n_prices": 273,
-    "mean_model_p": 0.436,
-    "mean_market_p": 0.461,
-    "mean_logit_diff_model_minus_market": -0.166,
-    "mean_abs_logit_diff": 0.873,
-    "corr": 0.983
+    "n_prices": 297,
+    "mean_model_p": 0.441,
+    "mean_market_p": 0.465,
+    "mean_logit_diff_model_minus_market": -0.153,
+    "mean_abs_logit_diff": 0.876,
+    "corr": 0.984
    },
    "bowler_milestone": {
     "n_prices": 74,
@@ -209,16 +207,16 @@
     "mean_model_p": 0.018,
     "mean_market_p": 0.034,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.979,
-    "corr": 0.595
+    "mean_abs_logit_diff": 0.989,
+    "corr": 0.592
    },
    "top_bowler_match": {
     "n_prices": 69,
     "mean_model_p": 0.051,
     "mean_market_p": 0.058,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.552,
-    "corr": 0.27
+    "mean_abs_logit_diff": 0.558,
+    "corr": 0.258
    }
   }
  },
@@ -250,6 +248,123 @@
    ]
   },
   {
+   "event": "male|Himachal Pradesh|Rajasthan|2026-11-02",
+   "start_ist": "2026-11-02 09:00 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Himachal Pradesh",
+    "Rajasthan"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Baroda|Uttar Pradesh|2026-11-02",
+   "start_ist": "2026-11-02 09:00 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Baroda",
+    "Uttar Pradesh"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Assam|Karnataka|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Assam",
+    "Karnataka"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Chhattisgarh|Hyderabad|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Chhattisgarh",
+    "Hyderabad"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Andhra|Punjab|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Andhra",
+    "Punjab"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Saurashtra|Tripura|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Saurashtra",
+    "Tripura"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Chandigarh|Tamil Nadu|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Chandigarh",
+    "Tamil Nadu"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Mumbai|Railways|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Mumbai",
+    "Railways"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Haryana|Uttarakhand|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Haryana",
+    "Uttarakhand"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
    "event": "male|Bihar|Goa|2026-11-02",
    "start_ist": "2026-11-02 09:30 IST",
    "format": null,
@@ -263,13 +378,13 @@
    ]
   },
   {
-   "event": "male|Baroda|Uttar Pradesh|2026-11-02",
+   "event": "male|Jammu & Kashmir|Puducherry|2026-11-02",
    "start_ist": "2026-11-02 09:30 IST",
    "format": null,
    "format_source": "fixtures",
    "teams_matched": [
-    "Baroda",
-    "Uttar Pradesh"
+    "Jammu & Kashmir",
+    "Puducherry"
    ],
    "sources": [
     "feedh_d"
@@ -289,6 +404,55 @@
    ]
   },
   {
+   "event": "male|Bengal|Maharashtra|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Bengal",
+    "Maharashtra"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Delhi|Services|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Delhi",
+    "Services"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Jharkhand|Odisha|2026-11-02",
+   "start_ist": "2026-11-02 09:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Jharkhand",
+    "Odisha"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Warriors|champions|2026-11-02",
+   "start_ist": "2026-11-02 10:00 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
    "event": "female|Warriors|champions|2026-11-02",
    "start_ist": "2026-11-02 10:30 IST",
    "format": "T20",
@@ -296,16 +460,6 @@
    "teams_matched": null,
    "sources": [
     "smarkets"
-   ]
-  },
-  {
-   "event": "male|Warriors|champions|2026-11-02",
-   "start_ist": "2026-11-02 10:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "feedh_d"
    ]
   },
   {
@@ -393,8 +547,71 @@
    ]
   },
   {
+   "event": "male|Chitwan Rhinos|Sudurpaschim Royals|2026-11-02",
+   "start_ist": "2026-11-02 16:15 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Chitwan Rhinos",
+    "Sudurpaschim Royals"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedf_p",
+    "feedh_d",
+    "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
    "event": "female|assam|karnataka|2026-11-02",
    "start_ist": "2026-11-02 16:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Ajman|Emirates Blues|2026-11-02",
+   "start_ist": "2026-11-02 18:00 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Ajman",
+    "Emirates Blues"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Dubai|Sharjah|2026-11-02",
+   "start_ist": "2026-11-02 22:00 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Dubai",
+    "Sharjah"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|colombo aces|fairfirst insurance|2026-11-03",
+   "start_ist": "2026-11-03 10:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|cdb a|dpgc|2026-11-03",
+   "start_ist": "2026-11-03 10:30 IST",
    "format": "T20",
    "format_source": "name",
    "teams_matched": null,
@@ -443,6 +660,20 @@
    ],
    "sources": [
     "feede_lb",
+    "feedh_d",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|England|West Indies A|2026-11-03",
+   "start_ist": "2026-11-03 23:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "England",
+    "West Indies A"
+   ],
+   "sources": [
     "feedh_d",
     "smarkets"
    ]
@@ -560,8 +791,10 @@
   "Champions (male)",
   "Chandigarh (W) (female)",
   "Chhattisgarh (W) (female)",
+  "Colombo Aces (male)",
+  "Dpgc (male)",
+  "Fairfirst Insurance (male)",
   "Goa (W) (female)",
-  "Hayleys Group A (male)",
   "Jammu And Kashmir (W) (female)",
   "Karnataka (W) (female)",
   "Maharashtra (W) (female)"
@@ -569,19 +802,31 @@
  "unmatched_players_in_window": [
   "A Wikman",
   "AR Patel",
+  "Aamir Gani",
   "Aaradhya Yadav",
   "Aasif Sheikh",
   "Abhinandan Singh",
   "Adarsh Singh",
   "Akshay More",
+  "Aneesh KV",
+  "Aneeshwar Gautam Narendra",
+  "Ankur Paul",
   "Annie O Neil",
   "Annie Wikman",
+  "Anuj Tiwary",
   "Ariful Islam",
+  "Arjun Azad",
+  "Aryaman Sen",
   "Aryan Nitesh Chavda",
   "Asakhe Tsaka",
   "Ayaka Kato Stafford",
+  "Ayush Doseja",
+  "Ayush Shashi Kanth Pandey",
   "B Berry",
+  "Babul Badal Dey",
   "Bashir Ahmed",
+  "Ben Stewart McKinney",
+  "Bhargav Merai",
   "Bongile Mfunelwa",
   "Bonnie Berry",
   "C Dean",
@@ -598,37 +843,51 @@
   "Chris Lynn",
   "Danish Malewar",
   "Deepak Hooda",
+  "Dega Nischal",
+  "Dheeru Singh",
   "Dhruv Shorey",
+  "Digvijay Patil",
   "Dinesh Kharel",
+  "Divyaansh Saxena",
   "E Hayward",
   "E Wilson",
   "E de Broughe",
   "Ella Hayward",
   "Ella Wilson",
   "Emma De Broughe",
+  "Eshaan Goyal",
   "F Sana",
   "Fatima Sana",
   "Grace Parsons",
+  "Haider Ali",
   "Harishankar Shah",
+  "Harnoor Singh",
+  "Hetvik Kotak",
+  "Hrituraj Roy",
   "I Malgioglio",
   "I Noble",
   "IY McKeon",
   "Imran Shekh",
   "Indigo Noble",
   "Ines Mackeon",
+  "Innesh Mahajan",
   "Ira Aery",
   "Isabella Malgioglio",
   "Jeet Shah",
   "Jiveshan Pillay",
   "Joshua Richards",
+  "K Himateja",
   "K Pelle",
+  "Kartik Sharma",
   "Kate Pelle",
+  "Kawalpreet Singh",
   "Keith Dudgeon",
   "Kevin Wickham",
   "Komal Khan",
   "L Wilson",
   "LK Hamilton",
   "Lakshit Toksiya",
+  "Lakshya Raichandani",
   "Lauren Smith",
   "Linsey Smith",
   "Lucy Hamilton",
@@ -642,31 +901,52 @@
   "Mahedi Hasan",
   "Maia Bouchier",
   "Manan Solanki",
+  "Mandadi Abhirath Reddy",
   "Manthan Khutkar",
+  "Maramreddy Hemanth Reddy",
   "Max O Dowd",
+  "Mayank Verma",
   "Megan Schutt",
   "Michael Kruiskamp",
   "Mikayla Friday",
   "Moeen Ali",
   "Muneeba Ali Siddiqi",
+  "Musheer Khan",
   "N Stalenburg",
   "Naman Gaurav",
   "Naomi Stalenberg",
+  "Nehal Pajni",
+  "Neyan Shyam Kangayan",
+  "Nikhil Gangta",
   "Ntando Zuma",
   "O Porter",
   "O Prendergast",
   "Olivia Porter",
   "Orla Prendergast",
+  "Pradosh Ranjan Paul",
+  "Pradyuman Saikia",
+  "Prithvi Shaw",
   "Priyanshu Moliya",
+  "Pukhraj Mann",
+  "R Vimal Khumar",
+  "Rahul Radesh Chigullapalli",
   "Raj Limbani",
+  "Rajveer Singh",
   "Rasikh Salam",
   "Ravail Farhan",
   "Ravikumar Samarth",
+  "Ravindra Jadeja",
+  "Ritesh Gudge",
+  "Rohan Rajbar",
   "S Reid",
+  "Sachin Ashok Yadav",
+  "Sachin Sanjay Dhas",
   "Sadaf Shamas",
   "Saif Hassan",
   "Saksham Purohit",
   "Sam Heazlett",
+  "Sanat sangwan",
+  "Sarabdeep Singh",
   "Satyam Bhoyar",
   "Sello Valintine Kitime",
   "Semal Pillay",
@@ -674,23 +954,32 @@
   "Sharman Nigrodh",
   "Shawaal Zulfiqar",
   "Shivendra Bhujbal",
+  "Shubham Arora",
+  "Shubham Rohilla",
   "Siddharth Sarvan Yadav",
   "Sidra Ameen",
   "Sinalo Gobeni",
   "Smit Patel",
   "Sophie Reid",
   "Srikar Bharat",
+  "Swastik Samal",
   "T Davidge",
   "T Vlaeminck",
   "Tayla Vlaeminck",
+  "Tejasvi Bhupendra Jaiswal",
   "Tejender Singh",
+  "Thomas Rew",
   "Tim Saulez",
   "Trit Raj Das",
+  "Uday Saharan",
   "Vaibhav Chaudhary",
+  "Vaibhav Kalta",
   "Vansh Chaudhary",
+  "Vihaan Malhotra",
   "Waco Bassick",
   "Y Bhatia",
   "Yash Dubey",
+  "Yashvardhan Dalal",
   "Yastika Harish Bhatia",
   "Z Samuel",
   "Zeeshan Ansari",
@@ -819,20 +1108,20 @@
   }
  },
  "log": [
-  "[22:41 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:41 IST] history: 23827 matches, last 2026-11-01, players 428488",
-  "[22:43 IST] source feedk: {'status': 'ok', 'rows': 0, 'secs': 0.3, 'events': 0}",
-  "[22:43 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.4}",
-  "[22:43 IST] source smarkets: {'status': 'ok', 'rows': 293, 'secs': 1.7}",
-  "[22:43 IST] source moviodds_bet365: {'status': 'ok', 'rows': 662, 'secs': 2.0}",
-  "[22:43 IST] source feedf: {'status': 'ok', 'rows': 190, 'secs': 26.5, 'events': 5}",
-  "[22:43 IST] source feede: {'status': 'ok', 'rows': 286, 'secs': 29.3, 'events': 13}",
-  "[22:43 IST] source feedh: {'status': 'ok', 'rows': 920, 'secs': 71.2, 'events': 57}",
-  "[22:43 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:43 IST] 55 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:43 IST] book lines: 243 player lines from 5 source(s)",
-  "[22:43 IST] 20 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[22:43 IST] weather: forecasts for 10 events, 0 failed",
-  "[22:43 IST] prop model: 640 prop selections modelled, 159 milestone ladder prices anchored to O/U"
+  "[02:48 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[02:48 IST] history: 23831 matches, last 2026-11-01, players 428577",
+  "[02:49 IST] source moviodds_bet365: {'status': 'ok', 'rows': 664, 'secs': 0.4}",
+  "[02:49 IST] source feedk: {'status': 'ok', 'rows': 0, 'secs': 0.4, 'events': 0}",
+  "[02:49 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.6}",
+  "[02:49 IST] source smarkets: {'status': 'ok', 'rows': 282, 'secs': 1.8}",
+  "[02:49 IST] source feedf: {'status': 'ok', 'rows': 218, 'secs': 26.9, 'events': 5}",
+  "[02:49 IST] source feede: {'status': 'ok', 'rows': 314, 'secs': 65.8, 'events': 29}",
+  "[02:49 IST] source feedh: {'status': 'ok', 'rows': 1134, 'secs': 80.0, 'events': 77}",
+  "[02:49 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[02:49 IST] 55 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[02:49 IST] book lines: 254 player lines from 5 source(s)",
+  "[02:49 IST] 20 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[02:50 IST] weather: forecasts for 11 events, 0 failed",
+  "[02:50 IST] prop model: 674 prop selections modelled, 159 milestone ladder prices anchored to O/U"
  ]
 }
