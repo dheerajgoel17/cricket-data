@@ -5,3 +5,11 @@ export function sharePlayerUrl(origin: string, idx: number, stat?: string | null
 }
 export const shareFixtureUrl = (origin: string, id: string) => `${origin.replace(/\/+$/, "")}/share/fixture/${encodeURIComponent(id)}`;
 export const shareVenueUrl = (origin: string, idx: number) => `${origin.replace(/\/+$/, "")}/share/venue/${idx}`;
+
+/** Opens the phone's share sheet with the text (the link is inside it, so every app keeps both); on a computer, copies it. */
+export async function sendShare(text: string, title: string, copied: () => void): Promise<void> {
+  try {
+    if (typeof navigator !== "undefined" && navigator.share) await navigator.share({ title, text });
+    else { await navigator.clipboard.writeText(text); copied(); }
+  } catch { /* cancelled */ }
+}

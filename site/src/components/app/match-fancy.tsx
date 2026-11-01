@@ -3,7 +3,10 @@ import { useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
+import { fancyShareText } from "@cricket/engine/share-text.js";
+import { sendShare, shareFixtureUrl } from "@/lib/share";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { fancyStanding } from "@cricket/engine/live.js";
@@ -118,13 +121,13 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
     <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
       className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
     <span className="grid min-w-0 gap-hair">
-                          <span className="truncate text-body font-semibold leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
-                          {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-semibold", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
+                          <span className="truncate text-body font-medium leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
+                          {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-medium", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
                           <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={overSrc} /><Tick value={r.over}>{odds(r.over)}</Tick></span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={underSrc} /><Tick value={r.under}>{odds(r.under)}</Tick></span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over}>{odds(r.over)}</Tick></span> · <span className="whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under}>{odds(r.under)}</Tick></span></span></>}{mark != null && <> · <StandingMark standing={mark} line={r.line} /></>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
-                          <span className="text-caption font-semibold tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
-                          <span className={cn("text-body font-semibold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+                          <span className="text-caption font-medium tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
+                          <span className={cn("text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
                         </span>
                         <MiniBars last={r.last} line={r.line} />
                         <ChevronRightIcon className="size-4 text-muted-foreground" />
@@ -201,6 +204,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
+  // the shared text: the pick (the side the sample favours, at its best listed price), how the ground has gone and the recent matches; the link is the match's card
+  const shareLine = () => {
+    if (!rep) return;
+    track("share", { kind: "fancy" });
+    const pO = rep.summary.pOver, pU = rep.summary.pUnder;
+    const lean = pO != null && pU != null && pO !== pU ? (pO > pU ? "over" : "under") : null;
+    const vms = venueIdx.length ? (batFirstNow ? firstInnsMs(store, hereMatches(10), scope) : hereMatches(10)) : [];
+    const url = shareFixtureUrl(location.origin, fx.id);
+    const text = fancyShareText({ a: fx.a, b: fx.b, label: [innTag(inn), team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
+    void sendShare(text || url, `${fx.a} v ${fx.b}`, () => toast("Copied"));
+  };
   // how this market has gone at the ground, set against the sample on screen: a ground can sit far from the teams' form (a small, slow one)
   const ground = useMemo(() => {
     if (!rep || key === "top_batter" || venueIdx.length === 0) return null;
@@ -264,12 +278,12 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                 {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                   <>
                     <section className="flex flex-col gap-stack">
-                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-semibold">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="text-footnote text-muted-foreground">last {rep.n} matches</span></div>
+                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
                       {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                       <div className="flex items-end gap-group">
                         <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
-                        <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-semibold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
-                        <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-semibold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
+                        <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-bold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
+                        <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-bold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
                       </div>
                       <ValueBars values={rep.values} line={line} labels={barLabels} />
                       <div className="flex flex-wrap items-center gap-snug">
@@ -295,7 +309,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                       </div>
                       {ground && (
                         <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
-                          {ground.differs && <b className="font-semibold">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
+                          {ground.differs && <b className="font-medium">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
                           {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
                         </p>)}
                       {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
@@ -308,7 +322,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                         <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
                           className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-inset py-snug text-left text-body transition-colors active:bg-accent">
                           {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                          <span className="relative flex items-center gap-tight font-semibold tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
+                          <span className="relative flex items-center gap-tight font-medium tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
                           <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
                           <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
                         </motion.button>))}
@@ -330,7 +344,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
   const max = Math.max(...t.rows.map((r: any) => r.pSole), 0.0001);
   return (
     <section className="overflow-hidden border-y border-hairline">
-      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-semibold">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
+      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-medium">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
       <ul>
         {t.rows.map((r: any, i: number) => (
           <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
@@ -338,8 +352,8 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
             <Item asChild size="sm" className="relative rounded-none border-0 px-inset py-snug transition-colors active:bg-accent">
               <Link to={`/player/${r.player}`}>
                 <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
-                <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-semibold"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
-                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-semibold tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
+                <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-medium"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
+                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
               </Link>
             </Item>
           </motion.li>))}

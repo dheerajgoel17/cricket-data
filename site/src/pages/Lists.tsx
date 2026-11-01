@@ -74,8 +74,8 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
               {[f.a, f.b].map((t: string, k: number) => (
                 <div key={t} className="contents">
-                  <div className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-semibold">{t}</span></div>
-                  {k === 0 && <span className="row-span-2 grid justify-items-end text-right"><span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span><span className="text-callout font-semibold tabular-nums">{localTime(when)}</span></span>}
+                  <div className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-medium">{t}</span></div>
+                  {k === 0 && <span className="row-span-2 grid justify-items-end text-right"><span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span><span className="text-callout font-medium tabular-nums">{localTime(when)}</span></span>}
                 </div>
               ))}
             </div>
@@ -87,7 +87,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           ) : <p className="border-t border-hairline py-snug text-callout text-muted-foreground">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
-            <span className="inline-flex shrink-0 items-center text-footnote font-semibold text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
+            <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
           </Link>
         </div>
       </div>

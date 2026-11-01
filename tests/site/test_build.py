@@ -351,6 +351,9 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
     assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")
     assert "User-agent: Twitterbot\nAllow: /" in robots
+    for bot in ("GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "PerplexityBot"):
+        assert f"User-agent: {bot}\nDisallow: /\n" in robots
+    assert "User-agent: Googlebot" not in robots and "User-agent: Bingbot" not in robots  # search engines stay allowed
 
 
 def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp_path):

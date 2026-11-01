@@ -24,7 +24,7 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
   it("marks the friendliest quote in the accent colour and for screen readers, and no other", () => {
     const { container } = render(<BookQuotes quotes={quotes} />);
     const [best] = [...container.querySelectorAll("[data-book]")].map((e) => e.parentElement!);
-    expect(best).toHaveClass("text-primary", "font-semibold");
+    expect(best).toHaveClass("text-primary", "font-medium");
     expect(screen.getAllByText("(lowest line, best price)", { exact: false })).toHaveLength(1);
   });
 

@@ -12,7 +12,7 @@ function LegalNav({ current }: { current: string }) {
     <nav aria-label="Legal pages" className="flex flex-wrap gap-snug">
       {LEGAL_NAV.map(([label, to]) => (
         to === current
-          ? <span key={to} className="text-callout font-semibold text-foreground">{label}</span>
+          ? <span key={to} className="text-callout font-medium text-foreground">{label}</span>
           : <Link key={to} to={to} className="text-callout text-primary">{label}</Link>
       ))}
       <Link to="/about" className="text-callout text-primary">Rules &amp; data</Link>
@@ -27,7 +27,7 @@ function LegalDoc({ title, sub, path, crumbs, children }: { title: string; sub: 
       <Crumbs items={[["Home", "/"], [crumbs]]} />
       <PageTitle sub={sub}>{title}</PageTitle>
       <p className="text-footnote text-muted-foreground">Last updated {UPDATED}.</p>
-      <Card className="flex flex-col gap-stack px-inset py-stack shadow-none text-callout text-muted-foreground [&_h2]:text-body [&_h2]:font-semibold [&_h2]:text-foreground [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-tight">{children}</Card>
+      <Card className="flex flex-col gap-stack px-inset py-stack shadow-none text-callout text-muted-foreground [&_h2]:text-body [&_h2]:font-medium [&_h2]:text-foreground [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-tight">{children}</Card>
       <LegalNav current={path} />
       <Muted>Fancy.cash is a free cricket stats and data site. It does not offer, promote or encourage gambling.</Muted>
     </div>

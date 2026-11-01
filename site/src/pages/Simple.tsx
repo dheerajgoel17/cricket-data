@@ -175,7 +175,7 @@ export function PlayersPage() {
                   <Link to={`/player/${p.idx}`}>
                     <ItemMedia><PlayerBadge idx={p.idx} size="md" className="size-control" /></ItemMedia>
                     <ItemContent className="min-w-0 gap-hair">
-                      <ItemTitle className="max-w-full text-body font-semibold leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
+                      <ItemTitle className="max-w-full text-body font-medium leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
                       <ItemDescription className="truncate text-callout text-muted-foreground">{store.teamName(p.team)} · {FORMATS.filter((_: string, i: number) => (store.P.fm[p.idx] >> i) & 1).join(" ")}{p.last ? ` · last ${p.last}` : ""}</ItemDescription>
                     </ItemContent>
                     <ItemActions className="gap-tight text-footnote tabular-nums text-muted-foreground">{store.P.n[p.idx]} inns<ChevronRightIcon className="size-4" aria-hidden /></ItemActions>

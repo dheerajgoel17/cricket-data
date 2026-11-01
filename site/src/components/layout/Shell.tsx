@@ -6,7 +6,7 @@ import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
 
-const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
+const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
 
 /** shadcn Sidebar under the header: full labels at xl, collapses to an icon rail (Ctrl/Cmd+B or the header trigger). Phones and tablets use the tab bar instead. */
 function AppSidebar() {

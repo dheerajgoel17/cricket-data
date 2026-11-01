@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
+import { createServer, request } from "node:http";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -27,6 +27,8 @@ const server = createServer(async (req, rsp) => {
 });
 await new Promise((r) => server.listen(0, r));
 const base = `http://localhost:${server.address().port}`;
+// fetch() refuses to send Sec-Fetch-* headers (a browser sets them), so the browser cases go through node:http
+const raw = (path, headers) => new Promise((ok, no) => { const r = request(`${base}${path}`, { headers }, (res) => { let body = ""; res.on("data", (c) => (body += c)); res.on("end", () => ok({ status: res.statusCode, headers: res.headers, body })); }); r.on("error", no); r.end(); });
 test.after(() => server.close());
 
 test("a shared prop link gives the tags a preview needs, no redirect a crawler would follow, and a card image under 300 KB", async () => {
@@ -40,13 +42,13 @@ test("a shared prop link gives the tags a preview needs, no redirect a crawler w
   assert.match(html, /twitter:card" content="summary_large_image"/);
   assert.match(html, /theme-color" content="#27da8e"/);
   assert.doesNotMatch(html, /location\.replace|http-equiv="refresh"/i);
-  assert.match(html, /<img src="[^"]*\/card\/v8\/player\/0\/runs\/24\.5\.jpg"/);
-  assert.match(html, /rel="image_src" href="[^"]*\/card\/v8\/player\/0\/runs\/24\.5\.jpg"/);
+  assert.match(html, /<img src="[^"]*\/card\/v9\/player\/0\/runs\/24\.5\.jpg"/);
+  assert.match(html, /rel="image_src" href="[^"]*\/card\/v9\/player\/0\/runs\/24\.5\.jpg"/);
   assert.match(html, /rel="canonical" href="[^"]*\/share\/player\/0\/runs\/24\.5"/);
   assert.ok(html.length < 32 * 1024); // Slack only reads the first 32 KB of the page
   assert.match(html, /og:url" content="[^"]*\/share\/player\/0\/runs\/24\.5"/);
   const image = /og:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&");
-  assert.match(image, /\/card\/v8\/player\/0\/runs\/24\.5\.jpg$/); // version in the path: X ignores ?v= when it has cached a failed picture
+  assert.match(image, /\/card\/v9\/player\/0\/runs\/24\.5\.jpg$/); // version in the path: X ignores ?v= when it has cached a failed picture
   assert.equal(/twitter:image" content="([^"]+)"/.exec(html)[1].replace(/&amp;/g, "&"), image);
   const r = await fetch(`${base}${new URL(image).pathname}${new URL(image).search}`);
   const buf = Buffer.from(await r.arrayBuffer());
@@ -61,10 +63,28 @@ test("a shared prop link gives the tags a preview needs, no redirect a crawler w
 test("a fixture link works the same way, and an unknown one goes to the home page", async () => {
   const html = await (await fetch(`${base}/share/fixture/2026-10-29-a-v-b`)).text();
   assert.match(html, /<title>A v B: stats, props/);
-  assert.match(html, /og:image" content="[^"]*\/card\/v8\/fixture\/2026-10-29-a-v-b\.jpg"/);
+  assert.match(html, /og:image" content="[^"]*\/card\/v9\/fixture\/2026-10-29-a-v-b\.jpg"/);
   const r = await fetch(`${base}/share/fixture/nope`, { redirect: "manual" });
   assert.equal(r.status, 302);
   assert.equal(r.headers.get("location"), "/");
+});
+
+test("a person opening a share link in a browser lands on the real page; every preview fetcher still gets the tags", async () => {
+  const safari = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
+  const nav = { "user-agent": safari, "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" };
+  const r = await raw("/share/player/0/runs/24.5", nav);
+  assert.equal(r.status, 302);
+  assert.equal(r.headers.location, "/player/0?stat=runs&line=24.5");
+  assert.equal(r.headers["cache-control"], "no-store");
+  const fetchers = ["facebookexternalhit/1.1", "WhatsApp/2.23.20", "TelegramBot (like TwitterBot)", "Mozilla/5.0 (compatible; Discordbot/2.0)", "Slackbot-LinkExpanding 1.0", "LinkedInBot/1.0",
+    "Mozilla/5.0 (compatible; Twitterbot/1.0)", "Mozilla/5.0 (Macintosh) AppleWebKit/605 (KHTML, like Gecko) Version/17 Safari/605 (Applebot/0.1)", "Mozilla/5.0 (compatible; SkypeUriPreview Preview/0.5)", "Googlebot/2.1"];
+  for (const ua of fetchers) {
+    const b = await raw("/share/player/0/runs/24.5", { "user-agent": ua, "sec-fetch-mode": "navigate", "sec-fetch-dest": "document" }); // even one that sends the headers
+    assert.equal(b.status, 200, ua);
+  }
+  const plain = await raw("/share/player/0/runs/24.5", { "user-agent": safari }); // a browser that sends no Sec-Fetch headers: the page with an Open button
+  assert.equal(plain.status, 200);
+  assert.match(plain.body, /Open on Fancy\.cash/);
 });
 
 test("vercel.json sends /share and /card to the functions before the catch-all, and the plain /api/og query still works", async () => {
@@ -76,9 +96,9 @@ test("vercel.json sends /share and /card to the functions before the catch-all, 
   assert.ok(spa.includes("_vercel") || spa === "/(.*)");
   const r = await fetch(`${base}/api/og?p=0`);
   assert.equal(r.headers.get("content-type"), "image/jpeg");
-  const head = await fetch(`${base}/card/v8/player/0/runs/24.5.jpg`, { method: "HEAD" });
+  const head = await fetch(`${base}/card/v9/player/0/runs/24.5.jpg`, { method: "HEAD" });
   assert.equal(head.status, 200);
   assert.equal(head.headers.get("content-type"), "image/jpeg");
-  const miss = await fetch(`${base}/card/v8/player/999.jpg`);
+  const miss = await fetch(`${base}/card/v9/player/999.jpg`);
   assert.equal(miss.headers.get("content-type"), "image/jpeg"); // never PNG from a .jpg URL: X drops a type mismatch
 });

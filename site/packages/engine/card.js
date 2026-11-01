@@ -201,7 +201,7 @@ function drawPlayer(g, f, { img, kit, text, bold, reg }) {
 function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg }) {
   drawKitPortrait(g, f, img, kit, text, bold);
   const left = 72, max = 580;
-  text("PLAYER PROP", left, 92, 22, GREEN, reg, "left", max);
+  text(`${f.stat.toUpperCase()}  ·  OVER ${f.line}`, left, 94, 30, GREEN, bold, "left", max);
   text(f.name, left, 158, 66, "#ffffff", bold, "left", max);
   const sub = [f.team, f.role, f.fmt].filter(Boolean).join("  ·  ");
   if (sub) text(sub, left, 198, 26, MUTED, reg, "left", max);
@@ -219,7 +219,7 @@ function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg })
   cols1.forEach((c, i) => drawMetric(g, c, left + i * 190, 336, text, bold, reg, i === 2 ? 220 : 170));
   const row2 = [
     hit != null ? { k: "Hit rate", v: `${Math.round(hit * 100)}%`, tone: hit >= 0.6 ? "up" : hit < 0.4 ? "down" : "" } : { k: "Format", v: f.fmt || "—" },
-    f.price ? { k: "Best price", v: f.price.toFixed(2), tone: "up" } : { k: "Listed", v: f.book || "—", img: bookImg },
+    f.price ? { k: "Best price", v: f.price.toFixed(2), tone: "up", chip: { img: bookImg, name: f.book } } : { k: "Listed", v: f.book || "—", img: bookImg },
     { k: "Opponent", v: f.opp ? abbr(f.opp) : (f.match || "—") },
   ];
   row2.forEach((c, i) => drawMetric(g, c, left + i * 190, 428, text, bold, reg, i === 2 ? 220 : 170));
@@ -227,7 +227,7 @@ function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg })
   if ((f.last5 && f.last5.length) || last != null) drawLast5(g, f, last, text, bold, reg, left, 522);
 }
 
-function drawMetric(g, { k, v, tone, img }, x, y, text, bold, reg, max = 160) {
+function drawMetric(g, { k, v, tone, img, chip }, x, y, text, bold, reg, max = 160) {
   text(String(k).toUpperCase(), x, y, 16, MUTED, reg, "left", max);
   if (img) { mark(g, img, x, y + 22, Math.min(max, 120), 26); return; }
   const color = tone === "up" ? GREEN : tone === "down" ? RED : "#ffffff";
@@ -237,10 +237,18 @@ function drawMetric(g, { k, v, tone, img }, x, y, text, bold, reg, max = 160) {
     if (tone === "up") { g.moveTo(x + 7, y + 18); g.lineTo(x + 14, y + 32); g.lineTo(x, y + 32); }
     else { g.moveTo(x + 7, y + 34); g.lineTo(x + 14, y + 20); g.lineTo(x, y + 20); }
     g.closePath(); g.fill();
-    text(v, x + 22, y + 48, 36, color, bold, "left", max - 22);
+    const w = text(v, x + 22, y + 48, 36, color, bold, "left", max - 22);
+    if (chip) bookChip(g, chip, x + 22 + w + 12, y + 14, 82, 36, text, bold);
   } else {
-    text(v, x, y + 48, 36, color, bold, "left", max);
+    text(v, x, y + 48, 36, color, reg, "left", max);
   }
+}
+
+/** The bookmaker's mark on a white pill (logos are drawn for dark or light grounds, a white pill reads for all); its name when there is no logo file. */
+function bookChip(g, { img, name }, x, y, w, h, text, bold) {
+  g.fillStyle = "#ffffff"; g.beginPath(); g.roundRect(x, y, w, h, h / 2); g.fill();
+  if (img) mark(g, img, x + 10, y + 6, w - 20, h - 12);
+  else if (name) text(name, x + w / 2, y + h / 2 + 7, 18, BG, bold, "center", w - 14);
 }
 
 function drawGauge(g, f, hit, text, bold, cx, cy) {

@@ -1,10 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { MarketTape } from "./market-tape";
 
 vi.mock("@/lib/analytics", () => ({ track: () => {} }));
 vi.mock("./badges", () => ({ PlayerBadge: () => <span>pic</span> }));
+
+Element.prototype.scrollTo = () => {}; // jsdom has none; the tab row scrolls its active chip into view
 
 describe("MarketTape", () => {
   it("lists a long-shot over that cleared and a short-priced over that missed", () => {
@@ -17,14 +19,15 @@ describe("MarketTape", () => {
         ]} />
       </MemoryRouter>,
     );
-    const tape = screen.getByRole("list", { name: "High odds hits and low odds misses" });
-    expect(tape.children).toHaveLength(2);
-    expect(screen.getByText("High odds hits")).toBeInTheDocument();
-    expect(screen.getByText("Low odds misses")).toBeInTheDocument();
+    expect(screen.getAllByRole("region", { name: "High odds hits and low odds misses" })).toHaveLength(1); // one card, two tabs
+    expect(screen.getByRole("radio", { name: "High odds hits · 1" })).toBeInTheDocument();
     expect(screen.getByText("Long shot")).toBeInTheDocument();
-    expect(screen.getByText("Short miss")).toBeInTheDocument();
-    expect(screen.queryByText("Quiet")).toBeNull();
+    expect(screen.queryByText("Short miss")).toBeNull();
     expect(screen.getByText("3.20")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "Low odds misses · 1" }));
+    expect(screen.getByText("Short miss")).toBeInTheDocument();
+    expect(screen.queryByText("Long shot")).toBeNull();
+    expect(screen.queryByText("Quiet")).toBeNull();
     expect(screen.getByText("1.22")).toBeInTheDocument();
   });
 

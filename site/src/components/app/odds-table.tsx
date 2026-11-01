@@ -35,19 +35,19 @@ export function OddsTable({ lines, active, onPick, stats = false, className }: {
                 <tr key={b.source} onClick={onPick ? () => onPick(l.line) : undefined} className={cn("border-b border-hairline last:border-b-0", onPick && "cursor-pointer active:bg-accent", on && "bg-accent/60")}>
                   {i === 0 && (
                     <td rowSpan={l.books.length} className="py-snug pr-snug align-middle">
-                      {onPick ? <button type="button" aria-label={`Use line ${l.line}`} aria-pressed={on} className="text-left text-body font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring">{l.line}</button> : <span className="text-body font-semibold">{l.line}</span>}
+                      {onPick ? <button type="button" aria-label={`Use line ${l.line}`} aria-pressed={on} className="text-left text-body font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring">{l.line}</button> : <span className="text-body font-medium">{l.line}</span>}
                       {l.main && <span className="label-cap block text-footnote text-primary">main</span>}
                     </td>
                   )}
                   <td className="py-snug pr-snug text-callout"><BookBadge source={b.source} /></td>
-                  <td className={cn("py-snug pr-snug text-right font-condensed text-body font-medium", many && b.over != null && b.over === bestO ? "font-semibold text-primary" : "text-foreground")}><Tick value={b.over}>{odds(b.over)}</Tick></td>
-                  <td className={cn("py-snug pr-snug text-right font-condensed text-body font-medium", many && b.under != null && b.under === bestU ? "font-semibold text-primary" : "text-foreground")}>
+                  <td className={cn("py-snug pr-snug text-right font-condensed text-body font-medium", many && b.over != null && b.over === bestO ? "font-medium text-primary" : "text-foreground")}><Tick value={b.over}>{odds(b.over)}</Tick></td>
+                  <td className={cn("py-snug pr-snug text-right font-condensed text-body font-medium", many && b.under != null && b.under === bestU ? "font-medium text-primary" : "text-foreground")}>
                     {b.underAt ? <><span className="text-footnote text-muted-foreground">U {b.underAt.line} </span><Tick value={b.underAt.price}>{odds(b.underAt.price)}</Tick></> : <Tick value={b.under}>{odds(b.under)}</Tick>}
                   </td>
                   {stats && i === 0 && (
                     <>
                       <td rowSpan={l.books.length} className="py-snug pr-snug text-right align-middle font-condensed text-body">{l.mkt == null ? "–" : pc(l.mkt)}</td>
-                      <td rowSpan={l.books.length} className="py-snug text-right align-middle font-condensed text-body font-semibold">{l.hit == null ? "–" : pc(l.hit)}</td>
+                      <td rowSpan={l.books.length} className="py-snug text-right align-middle font-condensed text-body font-medium">{l.hit == null ? "–" : pc(l.hit)}</td>
                     </>
                   )}
                 </tr>

@@ -10,7 +10,7 @@ import { RateHeatStrip } from "./viz";
 import { rateClass } from "@/lib/heat";
 import { cn } from "@/lib/utils";
 
-export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-2 py-0.5 font-semibold", rateClass(p))}>{pc(p)}</span>);
+export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-2 py-0.5 font-medium", rateClass(p))}>{pc(p)}</span>);
 
 export const LadderTable = ({ ladder, label = "Line" }: { ladder: any[]; label?: string }) => (
   <DataTable columns={[label, "Over %", "Fair over", "Under %", "Fair under", "n"]}
@@ -44,7 +44,7 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
     <div className="grid gap-3">
       <Card className="gap-1 border-l-4 border-l-primary px-4 py-3 shadow-none">
         {source ? <Badge variant="secondary" className="w-fit">{source}</Badge> : null}
-        <h2 className="text-xl font-semibold leading-snug">{r.headline}</h2>
+        <h2 className="text-xl font-medium leading-snug">{r.headline}</h2>
         <Muted>Sample size: {r.sample.n} {r.sample.unit}.</Muted>
         <Chips list={r.filters} />
       </Card>

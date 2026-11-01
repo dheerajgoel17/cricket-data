@@ -21,7 +21,7 @@ const SHOWN = 4; // rows of each kind on the home page; the dedicated tabs carry
 const Head = ({ title, to }: { title: string; to: string }) => (
   <div className="flex items-baseline justify-between gap-snug">
     <h2 className="text-title font-bold tracking-tight">{title}</h2>
-    <Link to={to} className="inline-flex items-center text-footnote font-semibold text-primary">See all<ChevronRightIcon className="size-4" aria-hidden /></Link>
+    <Link to={to} className="inline-flex items-center text-footnote font-medium text-primary">See all<ChevronRightIcon className="size-4" aria-hidden /></Link>
   </div>
 );
 

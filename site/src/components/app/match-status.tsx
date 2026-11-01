@@ -23,7 +23,7 @@ export function startLabel(iso: string, now = new Date()): string {
 export function MatchStatus({ phase, start, className }: { phase: MatchPhase; start?: string; className?: string }) {
   if (phase === "live") {
     return (
-      <span className={cn("inline-flex items-center gap-tight label-cap text-callout font-semibold text-destructive", className)} role="status">
+      <span className={cn("inline-flex items-center gap-tight label-cap text-callout font-medium text-destructive", className)} role="status">
         <span aria-hidden className="relative grid size-2 place-items-center"><span className="absolute inline-flex size-full animate-ping rounded-full bg-destructive/60 motion-reduce:animate-none" /><span className="relative size-2 rounded-full bg-destructive" /></span>Live
       </span>
     );

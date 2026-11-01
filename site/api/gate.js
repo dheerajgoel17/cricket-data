@@ -1,6 +1,7 @@
 // GET /api/gate -> {ok}. Sets a short-lived cookie the Edge middleware checks before serving /data/*.
 // The wrap key is an `X-Cd-K` header (not JSON), so a Network-tab response preview is not the secret. Scraper UAs are refused. No key in the bundle.
 import crypto from "node:crypto";
+import { fromOurPage } from "../packages/engine/guard.js";
 
 const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
 const hits = new Map();
@@ -31,7 +32,7 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
   const ua = String(req.headers["user-agent"] || "");
-  if (!ua || BOT.test(ua)) return res.status(403).json({ error: "no" });
+  if (!ua || BOT.test(ua) || !fromOurPage((h) => req.headers[h])) return res.status(403).json({ error: "no" }); // the key goes only to a page of ours, never to a script
   const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "?").split(",")[0].trim();
   if (limited(ip)) return res.status(429).json({ error: "rate limit" });
   const secret = (process.env.DATA_WRAP_KEY || "").trim();

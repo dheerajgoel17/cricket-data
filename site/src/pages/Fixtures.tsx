@@ -2,7 +2,11 @@
 import { useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
+import { matchShareText } from "@cricket/engine/share-text.js";
+import { sendShare, shareFixtureUrl } from "@/lib/share";
+import { track } from "@/lib/analytics";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,6 +81,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
+        <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
+          className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring", !live && "ml-auto")}><ArrowUpOnSquareIcon className="size-5" /></button>
       </div>
       {hasScore ? (
         <div className="grid gap-stack">
@@ -91,7 +97,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
           <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
           <div className="grid justify-items-end gap-hair text-right">
-            <span className="text-callout font-semibold text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
+            <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
             <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : clock.value}</b>
           </div>
         </div>
@@ -183,7 +189,7 @@ export function FixturePage() {
               </div>
               {grids.isLoading || !shown ? <GridSkeleton /> : (
                 <section className="flex flex-col gap-snug">
-                  <h2 className="flex items-center gap-tight text-body font-semibold"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                  <h2 className="flex items-center gap-tight text-body font-medium"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                   <GridTable g={shown.g} teamIdx={shown.team} line={line} />
                 </section>)}
             </>)}

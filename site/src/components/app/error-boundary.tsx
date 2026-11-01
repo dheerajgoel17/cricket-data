@@ -11,7 +11,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { failed: 
     if (!this.state.failed) return this.props.children;
     return (
       <div className="flex min-h-[50svh] flex-col items-center justify-center gap-stack p-inset text-center">
-        <p className="text-body font-semibold">This page did not load.</p>
+        <p className="text-body font-medium">This page did not load.</p>
         <p className="text-callout text-muted-foreground">The site was probably updated while it was open.</p>
         <Button onClick={() => location.reload()}>Reload</Button>
       </div>

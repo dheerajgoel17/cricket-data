@@ -45,10 +45,10 @@ export const StatTile = ({ k, v, s }: { k: string; v: ReactNode; s?: ReactNode }
 export const StatGridCards = ({ children }: { children: ReactNode }) => <div className="my-3 grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">{children}</div>;
 
 export const Chips = ({ list }: { list: [string, unknown][] }) => (
-  <div className="my-2 flex flex-wrap gap-1.5">{list.map(([k, v], i) => <Badge key={i} variant="secondary" className="rounded-full px-3 py-1 text-[13px] font-normal">{k ? <b className="mr-1 font-semibold text-muted-foreground">{k}:</b> : null}{String(v)}</Badge>)}</div>
+  <div className="my-2 flex flex-wrap gap-1.5">{list.map(([k, v], i) => <Badge key={i} variant="secondary" className="rounded-full px-3 py-1 text-[13px] font-normal">{k ? <b className="mr-1 font-medium text-muted-foreground">{k}:</b> : null}{String(v)}</Badge>)}</div>
 );
 
-export const OddsText = ({ children }: { children: ReactNode }) => <span className="font-semibold tabular-nums text-primary">{children}</span>;
+export const OddsText = ({ children }: { children: ReactNode }) => <span className="font-medium tabular-nums text-primary">{children}</span>;
 
 /** Simple data table on shadcn's Table: columns are labels, rows are arrays of cells. */
 export function DataTable({ columns, rows, className }: { columns: ReactNode[]; rows: ReactNode[][]; className?: string }) {
