@@ -22,5 +22,5 @@ export function prefetchFeeds(client: QueryClient, path: string) {
   void client.prefetchQuery(linesQuery);
   const live = path === "/" || path.startsWith("/fancy") || path.startsWith("/props") || path.startsWith("/fixture");
   if (path === "/") void client.prefetchQuery(railQuery);
-  if (live) void client.prefetchQuery(liveQuery);
+  if (live) { void client.prefetchQuery(liveQuery); void client.prefetchQuery(stateQuery); }
 }

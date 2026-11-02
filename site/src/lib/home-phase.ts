@@ -1,5 +1,5 @@
-import { liveForFixture } from "@cricket/engine/live.js";
-import { keepMsFor } from "@cricket/engine/lines.js";
+import { keepUntil } from "@cricket/engine/lines.js";
+import { matchEnd } from "@cricket/engine/state.js";
 
 /** The three buckets the home floating bar switches: a match in play, one yet to start, one that has a result. */
 export type HomePhase = "live" | "pre" | "final";
@@ -15,18 +15,18 @@ export function phaseOf(state: "live" | "final" | "upcoming"): HomePhase {
 }
 
 /**
- * Which bucket a Hot props row belongs in. The live feed's word first; a start still in the future (or a delayed match the feed still
- * calls upcoming) is pre-match; a start that has passed and is still inside the keep window (24 h, 6 days for a Test) is in play, so a
+ * Which bucket a Hot props row belongs in. The live feed's word first, then the match-state table's (`stateDoc`, pass it only while fresh); a start still in the future (or a delayed match
+ * the feed still calls upcoming) is pre-match; a start that has passed and is still inside the keep window (24 h, 6 days for a Test with no word on it, `keepUntil`) is in play, so a
  * Test the schedule dropped still sits in In play; older than that is resulted.
  */
-export function lineHomePhase(r: { match: string; start: string; fmt?: string }, liveDoc: unknown, now = Date.now()): HomePhase {
+export function lineHomePhase(r: { match: string; start: string; fmt?: string }, liveDoc: unknown, now = Date.now(), stateDoc?: unknown): HomePhase {
   const [a, b] = String(r.match).split(/\s+vs\s+/i);
-  const m = liveForFixture(liveDoc, { a, b, start: r.start, fmt: r.fmt });
-  if (m?.status === "live") return "live";
-  if (m?.status === "final") return "final";
+  const { status } = matchEnd({ a, b, start: r.start, fmt: r.fmt }, liveDoc, stateDoc);
+  if (status === "live") return "live";
+  if (status === "final") return "final";
   const t = Date.parse(r.start);
-  if (m?.status === "upcoming" || (Number.isFinite(t) && t > now)) return "pre";
-  if (Number.isFinite(t) && now - t < keepMsFor(r.fmt)) return "live";
+  if (status === "upcoming" || (Number.isFinite(t) && t > now)) return "pre";
+  if (Number.isFinite(t) && now < keepUntil(r.fmt, t)) return "live";
   return "final";
 }
 

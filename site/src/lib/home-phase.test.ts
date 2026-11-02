@@ -27,6 +27,14 @@ describe("lineHomePhase", () => {
     expect(lineHomePhase(row("2026-10-27T08:30:00Z"), { matches: [] }, NOW)).toBe("live");
     expect(lineHomePhase(row("2026-10-20T08:30:00Z"), { matches: [] }, NOW)).toBe("final");
   });
+  it("puts a Test the feed has dropped where the match-state table says it is, else in play for its six days", () => {
+    const start = "2026-10-28T09:00:00Z", now = Date.parse("2026-11-01T10:30:00Z");
+    const table = (status: string) => live({ a: "South Africa", b: "Australia", start, status, fmt: "Test" });
+    expect(lineHomePhase(row(start), { matches: [] }, now, table("final"))).toBe("final");
+    expect(lineHomePhase(row(start), { matches: [] }, now, table("live"))).toBe("live");
+    expect(lineHomePhase(row(start), { matches: [] }, now, null)).toBe("live"); // no fresh table: the clock (6 days)
+    expect(lineHomePhase(row(start), table("live"), now, table("final"))).toBe("live"); // the feed's word wins
+  });
   it("keeps a kick-off still in the future as pre-match", () => {
     expect(lineHomePhase(row("2026-10-30T18:00:00Z", "New Zealand vs India", "T20"), { matches: [] }, NOW)).toBe("pre");
   });

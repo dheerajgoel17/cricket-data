@@ -1,10 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
-import { linesQuery, liveQuery } from "@/lib/queries";
+import { freshState, linesQuery, liveQuery, stateQuery } from "@/lib/queries";
 
 /** The /api/live body, polled every ~15 s (see `liveQuery`). */
 export function useLiveDoc() {
   return useQuery(liveQuery);
+}
+
+/**
+ * The match-state table's body while it is fresh (written in the last 20 minutes), else null: it says when a match turned final, which is when a finished Test leaves the lists
+ * (`keepUntil`). Without it (not configured, down, stale) the lists fall back to the match's clock window.
+ */
+export function useStateDoc() {
+  return freshState(useQuery(stateQuery).data);
 }
 
 export function useLiveMatch(fixture: { a?: string; b?: string; start?: string; fmt?: string } | null | undefined) {

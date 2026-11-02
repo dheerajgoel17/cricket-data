@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
+import { HOT_DAYS, byShard, dayOffset, endOfLine, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -152,5 +152,44 @@ describe("a trailing W on a side", () => {
   it("is the same side as Women and (W)", () => {
     expect(norm("Melbourne Renegades W")).toBe(norm("Melbourne Renegades Women"));
     expect(sameMatch("Melbourne Renegades W vs Sydney Thunder W", ["Melbourne Renegades Women", "Sydney Thunder Women"])).toBe(true);
+  });
+});
+
+describe("a Test with a result leaves today's list 24 hours after it ended", () => {
+  // started 28 Oct 09:00 UTC, went final 31 Oct 10:00 UTC: 24 h later is 1 Nov 10:00
+  const start = "2026-10-28T09:00:00Z";
+  const at1 = (hhmm: string) => Date.parse(`2026-11-01T${hhmm}:00Z`);
+  const ended = { final: true, finalAt: "2026-10-31T10:00:00Z" };
+  const test = line("t", "South Africa vs Australia", start, { fmt: "Test" });
+  const state = { matches: [{ teams: [{ name: "South Africa" }, { name: "Australia" }], start, fmt: "Test", status: "final", final_at: "2026-10-31T10:00:00+00:00" }] };
+  const doc = (status: string) => ({ matches: [{ teams: [{ name: "South Africa" }, { name: "Australia" }], start, fmt: "Test", status }] });
+  const pids = (ls: any[]) => ls.map((l) => l.pid);
+
+  it("hotDay: today at 1 Nov 09:00, gone at 10:01; with no final_at the old 6 days (day 4 / day 5 at stumps stay)", () => {
+    expect(hotDay(start, "Test", at1("09:00"), ended)).toBe(0);
+    expect(hotDay(start, "Test", at1("10:01"), ended)).toBe(-1);
+    expect(hotDay(start, "Test", at1("10:01"), { final: true })).toBe(0); // a result but no final_at: the 6 days from the first morning
+    expect(hotDay(start, "Test", at1("10:01"), { final: false, finalAt: "2026-10-31T10:00:00Z" })).toBe(0); // not final: a rain day / stumps
+    expect(hotDay(start, "Test", Date.parse("2026-11-03T09:01:00Z"), { final: true })).toBe(-1);
+    expect(hotDay("2026-10-31T20:00:00Z", "T20", Date.parse("2026-11-01T19:00:00Z"), ended)).toBe(0); // a T20 keeps its 24 h whatever
+  });
+  it("endOfLine reads the live feed first and the match-state table for when it turned final", () => {
+    const endOf = endOfLine(doc("final"), state);
+    expect(endOf(test)).toMatchObject({ final: true, finalAt: "2026-10-31T10:00:00+00:00" });
+    expect(hotDay(test.start_utc, "Test", at1("09:00"), endOf(test))).toBe(0);
+    expect(hotDay(test.start_utc, "Test", at1("10:01"), endOf(test))).toBe(-1);
+    expect(endOfLine(doc("final"), null)(test)).toMatchObject({ final: true, finalAt: undefined }); // a stale table is not passed in: 6 days
+    expect(endOfLine(doc("live"), state)(test)).toMatchObject({ final: false }); // the feed says play is on
+  });
+  it("the day lists drop its lines (they are not even scored), the day switch does not count them, the fixture page keeps them", () => {
+    const today = line("a", "India vs Pakistan", "2026-11-01T11:00:00Z");
+    const endOf = endOfLine(doc("final"), state);
+    expect(pids(hotLines([test, today], { day: 0 }, at1("09:00"), endOf))).toEqual(["t", "a"]);
+    expect(pids(hotLines([test, today], { day: 0 }, at1("10:01"), endOf))).toEqual(["a"]);
+    expect(pids(hotLines([test, today], { day: 0 }, at1("10:01")))).toEqual(["t", "a"]); // no word on it: the clock window as before
+    expect(otherHotCount([test], 5, at1("09:00"), endOf)).toBe(1);
+    expect(otherHotCount([test], 5, at1("10:01"), endOf)).toBe(0);
+    // props are never taken away: its own page still lists the lines after the 24 hours (the book file still has them for a day or two)
+    expect(pids(hotLines([test, today], { teams: ["South Africa", "Australia"], archive: false }, at1("10:01"), endOf))).toEqual(["t"]);
   });
 });

@@ -1,7 +1,7 @@
 // Live score snapshots from Source A: the home list + schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { NO_IDENTITY } from "./identity.js";
-import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, sameMatchWindow, sameMatchWindowFor } from "./lines.js";
+import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, keepUntil, sameMatchWindow, sameMatchWindowFor } from "./lines.js";
 import { SAME_SIDE, norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
@@ -147,7 +147,7 @@ export function liveCard(match) {
 export function wantsCard(match, now = Date.now()) {
   if (match?.status === "live") return true;
   const t = match?.start ? Date.parse(match.start) : NaN;
-  if (match?.status === "final") return Number.isFinite(t) && now - t < keepMsFor(match.fmt); // a finished match keeps its scorecard: the props on it are decided by those numbers
+  if (match?.status === "final") return Number.isFinite(t) && now < keepUntil(match.fmt, t, { final: true, finalAt: match.final_at }); // a finished match keeps its scorecard: the props on it are decided by those numbers (the feed carries no `final_at`, so a Test keeps its 6 days here)
   return match?.status === "upcoming" && Number.isFinite(t) && t - now < 90 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 

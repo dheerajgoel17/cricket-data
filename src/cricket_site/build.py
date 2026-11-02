@@ -718,7 +718,8 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     """Stop-gap fixture rows for archived matches the schedule has no row for: an upcoming game, or a priced Test still in the 6-day window.
 
     The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
-    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match.
+    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match. A started match is Live until the fixture the archive holds has a result, then
+    Completed, a Test included (the site drops a finished Test 24 hours after it ended, one at stumps with no result keeps its 6 days).
     """
     if not vb_dir:
         return []
@@ -748,10 +749,10 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
-        elif fmt in ("Test", "FC") or not (fx.get("result") or "").strip():
-            status = "Live"
+        elif not (fx.get("result") or "").strip():
+            status = "Live"  # no result yet: a Test at stumps or on a rain day is still being played
         else:
-            status = "Completed"
+            status = "Completed"  # a result (a Test's too): the site lets a finished Test go 24 h after it ended, not 6 days after it started
         out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
                     "a": fx.get("a") or a.strip(), "b": fx.get("b") or b.strip(), "venue": fx.get("venue") or "",
                     "series": fx.get("series") or "", "status": status, "result": fx.get("result") or "", "source": "books"})

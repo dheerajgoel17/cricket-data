@@ -1,6 +1,7 @@
 // The match-state table: one row per match with ONE phase (upcoming / live / final), written by a single job and read by the site, so the browser stops
 // working the phase out again from sources of different ages. Pure helpers only (no I/O): the writer is scripts/state-sync.mjs, the reader api/state.js.
 import { teamKey } from "./lines.js";
+import { liveForFixture } from "./live.js";
 import { matchPhase } from "./next-match.js";
 
 export const PHASES = ["upcoming", "live", "final"];
@@ -19,8 +20,8 @@ export function stateRow(m) {
 }
 
 /**
- * The phase of a row the feed no longer lists: a match that was on stays in play for the keep window (24 h, 6 days for a Test) and is then over; one that never
- * started is still to come. A row already final stays final.
+ * The phase of a row the feed no longer lists: a match that was on stays in play for the keep window (24 h, 6 days for a Test: no result is known for it, see `keepUntil`) and is
+ * then over; one that never started is still to come. A row already final stays final. The database stamps `final_at` the moment a row turns final (here or in an upsert).
  */
 export function settlePhase(row, now = Date.now()) {
   if (row.phase === "final") return "final";
@@ -34,5 +35,17 @@ export function toLiveShape(row) {
   return {
     teams: names.map((name) => ({ name, ...(scores.find((s) => teamKey(s.name) === teamKey(name))?.display ? { display: scores.find((s) => teamKey(s.name) === teamKey(name)).display } : {}) })),
     start: row.start_utc, fmt: row.fmt, status: row.phase, session: row.session || "", summary: row.summary || "", series: row.series || "", venue: row.venue || "",
+    ...(row.phase === "final" && row.final_at ? { final_at: row.final_at } : {}), // when the row turned final: a finished Test goes off the lists 24 h after it (`keepUntil`)
   };
+}
+
+/**
+ * How one match stands for the lists: its phase (the live feed's word first, then the match-state table's) and, from the table, when it turned final. `finalAt` is given only
+ * when the table has the match as final; a missing or stale table (pass null) leaves it out, and `keepUntil` then keeps the match for its clock window as before.
+ * `fixture` is { a, b, start, fmt }, as `liveForFixture` takes it.
+ */
+export function matchEnd(fixture, liveDoc, stateDoc) {
+  const m = liveForFixture(liveDoc, fixture), s = liveForFixture(stateDoc, fixture);
+  const status = m?.status ?? s?.status;
+  return { status, final: status === "final", finalAt: status === "final" && s?.status === "final" ? s.final_at : undefined };
 }

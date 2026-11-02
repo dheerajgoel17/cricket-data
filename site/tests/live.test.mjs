@@ -190,6 +190,14 @@ test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not 
   assert.equal(wantsCard(row("final", "2026-10-25T05:00:00Z"), now), false);
 });
 
+test("wantsCard: a finished Test keeps its scorecard 6 days (the feed has no final_at), 24 h after it when the row carries one", () => {
+  const row = (extra) => ({ status: "final", fmt: "Test", start: "2026-10-28T09:00:00Z", ...extra });
+  assert.equal(wantsCard(row({}), Date.parse("2026-11-02T10:00:00Z")), true, "no final_at: the 6 days");
+  assert.equal(wantsCard(row({ final_at: "2026-10-31T10:00:00Z" }), Date.parse("2026-11-01T09:00:00Z")), true);
+  assert.equal(wantsCard(row({ final_at: "2026-10-31T10:00:00Z" }), Date.parse("2026-11-01T10:01:00Z")), false);
+  assert.equal(wantsCard(row({}), Date.parse("2026-11-03T09:01:00Z")), false);
+});
+
 test("pricedLive keeps only matches the books price (player props or fancy), not unpriced games", () => {
   const books = bookFixtures({
     events: [{ match: "New Zealand vs India", start_utc: "2026-10-27T07:00:00Z" }],
