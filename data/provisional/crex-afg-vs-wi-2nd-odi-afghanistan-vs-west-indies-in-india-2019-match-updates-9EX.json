@@ -2,6 +2,20 @@
   "date": "2019-11-09",
   "event": "Afghanistan vs West Indies in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 247,
+      "team": "West Indies",
+      "wickets": 9
+    },
+    {
+      "balls": 274,
+      "runs": 200,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-wi-2nd-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EX",
   "match_type": "ODI",
   "player_of_match": "Nicholas Pooran",

@@ -2,6 +2,20 @@
   "date": "2021-03-20",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 183,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Zimbabwe",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-v-zimbabwe-in-uae-2021-match-updates-932",
   "match_type": "T20",
   "player_of_match": "Najibullah Zadran",

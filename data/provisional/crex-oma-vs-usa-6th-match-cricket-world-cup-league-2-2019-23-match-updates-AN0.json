@@ -2,6 +2,20 @@
   "date": "2021-09-20",
   "event": "Cricket World Cup League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 274,
+      "team": "Oman",
+      "wickets": 7
+    },
+    {
+      "balls": 239,
+      "runs": 202,
+      "team": "United States",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-oma-vs-usa-6th-match-cricket-world-cup-league-2-2019-23-match-updates-AN0",
   "match_type": "ODI",
   "player_of_match": "Ayaan Khan",

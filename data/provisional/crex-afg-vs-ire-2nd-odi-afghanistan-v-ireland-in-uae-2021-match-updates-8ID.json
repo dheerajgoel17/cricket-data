@@ -2,6 +2,20 @@
   "date": "2021-01-24",
   "event": "Afghanistan v Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 259,
+      "team": "Ireland",
+      "wickets": 9
+    },
+    {
+      "balls": 272,
+      "runs": 260,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8ID",
   "match_type": "ODI",
   "player_of_match": "Rahmat Shah",

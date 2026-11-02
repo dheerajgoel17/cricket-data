@@ -2,6 +2,20 @@
   "date": "2021-01-26",
   "event": "Afghanistan v Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 266,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 283,
+      "runs": 230,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IE",
   "match_type": "ODI",
   "player_of_match": "Rashid Khan",

@@ -2,6 +2,20 @@
   "date": "2021-01-21",
   "event": "Afghanistan v Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 287,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 300,
+      "runs": 271,
+      "team": "Ireland",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2021-match-updates-8IC",
   "match_type": "ODI",
   "player_of_match": "Rahmanullah Gurbaz",

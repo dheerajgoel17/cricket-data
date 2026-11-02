@@ -2,6 +2,20 @@
   "date": "2021-01-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 164,
+      "team": "Rajasthan",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 148,
+      "team": "Bihar",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-bihr-vs-raj-4th-quater-final-syed-mushtaq-ali-trophy-2021-match-updates-8NY",
   "match_type": "T20",
   "player_of_match": "",

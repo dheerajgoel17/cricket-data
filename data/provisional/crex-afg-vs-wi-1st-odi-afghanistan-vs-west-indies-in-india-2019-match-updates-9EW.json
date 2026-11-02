@@ -2,6 +2,20 @@
   "date": "2019-11-06",
   "event": "Afghanistan vs West Indies in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 272,
+      "runs": 194,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 279,
+      "runs": 197,
+      "team": "West Indies",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-wi-1st-odi-afghanistan-vs-west-indies-in-india-2019-match-updates-9EW",
   "match_type": "ODI",
   "player_of_match": "Roston Chase",

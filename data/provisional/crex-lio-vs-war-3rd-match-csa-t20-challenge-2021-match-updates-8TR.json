@@ -2,6 +2,20 @@
   "date": "2021-02-20",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 157,
+      "team": "Warriors",
+      "wickets": 10
+    },
+    {
+      "balls": 116,
+      "runs": 159,
+      "team": "Lions",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-lio-vs-war-3rd-match-csa-t20-challenge-2021-match-updates-8TR",
   "match_type": "T20",
   "player_of_match": "",
