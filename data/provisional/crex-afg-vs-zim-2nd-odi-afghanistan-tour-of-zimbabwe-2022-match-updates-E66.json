@@ -2,6 +2,20 @@
   "date": "2022-06-06",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 228,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 267,
+      "runs": 229,
+      "team": "Afghanistan",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E66",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",

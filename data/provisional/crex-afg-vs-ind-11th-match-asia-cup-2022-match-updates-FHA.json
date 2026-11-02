@@ -2,6 +2,20 @@
   "date": "2022-09-08",
   "event": "Asia Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 212,
+      "team": "India",
+      "wickets": 2
+    },
+    {
+      "balls": 120,
+      "runs": 111,
+      "team": "Afghanistan",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-afg-vs-ind-11th-match-asia-cup-2022-match-updates-FHA",
   "match_type": "T20",
   "player_of_match": "Virat Kohli",

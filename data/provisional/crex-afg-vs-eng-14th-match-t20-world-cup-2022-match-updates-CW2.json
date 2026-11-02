@@ -2,6 +2,20 @@
   "date": "2022-10-22",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 118,
+      "runs": 112,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 109,
+      "runs": 113,
+      "team": "England",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-eng-14th-match-t20-world-cup-2022-match-updates-CW2",
   "match_type": "T20",
   "player_of_match": "Sam Curran",

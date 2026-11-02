@@ -2,6 +2,20 @@
   "date": "2022-01-21",
   "event": "Afghanistan vs Netherlands in Qatar",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 222,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 288,
+      "runs": 186,
+      "team": "Netherlands",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ned-1st-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFI",
   "match_type": "ODI",
   "player_of_match": "Hashmatullah Shahidi",

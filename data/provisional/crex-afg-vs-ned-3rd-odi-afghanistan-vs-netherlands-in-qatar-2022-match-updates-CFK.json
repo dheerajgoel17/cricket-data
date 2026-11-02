@@ -2,6 +2,20 @@
   "date": "2022-01-25",
   "event": "Afghanistan vs Netherlands in Qatar",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 254,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 256,
+      "runs": 179,
+      "team": "Netherlands",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ned-3rd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFK",
   "match_type": "ODI",
   "player_of_match": "Najibullah Zadran",

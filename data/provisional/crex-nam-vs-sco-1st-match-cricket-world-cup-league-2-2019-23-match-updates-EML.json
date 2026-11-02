@@ -2,6 +2,20 @@
   "date": "2022-07-10",
   "event": "Cricket World Cup League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 258,
+      "team": "Scotland",
+      "wickets": 6
+    },
+    {
+      "balls": 258,
+      "runs": 181,
+      "team": "Namibia",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-nam-vs-sco-1st-match-cricket-world-cup-league-2-2019-23-match-updates-EML",
   "match_type": "ODI",
   "player_of_match": "Safyaan Sharif",

@@ -2,6 +2,20 @@
   "date": "2022-10-11",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Assam",
+      "wickets": 5
+    },
+    {
+      "balls": 113,
+      "runs": 162,
+      "team": "Vidarbha",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-asm-vs-vid-11th-match-syed-mushtaq-ali-trophy-2022-match-updates-GCV",
   "match_type": "T20",
   "player_of_match": "",

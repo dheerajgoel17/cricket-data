@@ -2,6 +2,20 @@
   "date": "2022-10-16",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 155,
+      "team": "Mumbai",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 140,
+      "team": "Vidarbha",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-mum-vs-vid-57th-match-syed-mushtaq-ali-trophy-2022-match-updates-GH7",
   "match_type": "T20",
   "player_of_match": "",

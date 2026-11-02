@@ -2,6 +2,20 @@
   "date": "2022-08-27",
   "event": "Asia Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 118,
+      "runs": 105,
+      "team": "Sri Lanka",
+      "wickets": 10
+    },
+    {
+      "balls": 61,
+      "runs": 106,
+      "team": "Afghanistan",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-sl-1st-match-asia-cup-2022-match-updates-FH0",
   "match_type": "T20",
   "player_of_match": "Fazalhaq Farooqi",

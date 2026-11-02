@@ -2,6 +2,20 @@
   "date": "2022-10-12",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Vidarbha",
+      "wickets": 9
+    },
+    {
+      "balls": 93,
+      "runs": 137,
+      "team": "Rajasthan",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-raj-vs-vid-22nd-match-syed-mushtaq-ali-trophy-2022-match-updates-GD3",
   "match_type": "T20",
   "player_of_match": "",

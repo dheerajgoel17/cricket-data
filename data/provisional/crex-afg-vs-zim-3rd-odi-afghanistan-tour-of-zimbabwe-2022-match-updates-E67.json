@@ -2,6 +2,20 @@
   "date": "2022-06-09",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 269,
+      "runs": 135,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 226,
+      "runs": 137,
+      "team": "Afghanistan",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2022-match-updates-E67",
   "match_type": "ODI",
   "player_of_match": "Rashid Khan",

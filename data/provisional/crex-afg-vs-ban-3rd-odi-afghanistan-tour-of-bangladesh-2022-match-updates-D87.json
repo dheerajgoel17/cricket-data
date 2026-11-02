@@ -2,6 +2,20 @@
   "date": "2022-02-28",
   "event": "Afghanistan tour of Bangladesh",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 281,
+      "runs": 192,
+      "team": "Bangladesh",
+      "wickets": 10
+    },
+    {
+      "balls": 241,
+      "runs": 193,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2022-match-updates-D87",
   "match_type": "ODI",
   "player_of_match": "Rahmanullah Gurbaz",

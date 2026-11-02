@@ -2,6 +2,20 @@
   "date": "2022-01-23",
   "event": "Afghanistan vs Netherlands in Qatar",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 237,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 286,
+      "runs": 189,
+      "team": "Netherlands",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ned-2nd-odi-afghanistan-vs-netherlands-in-qatar-2022-match-updates-CFJ",
   "match_type": "ODI",
   "player_of_match": "Rahmanullah Gurbaz",
