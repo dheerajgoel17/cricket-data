@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Mississauga Skyhawks",
+      "wickets": 5
+    },
+    {
+      "balls": 96,
+      "runs": 162,
+      "team": "Toronto Kings",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-ms-vs-tk-1st-semi-final-global-t20-canada-2026-match-updates-1502",
   "match_type": "T20",
   "player_of_match": "Evin Lewis",

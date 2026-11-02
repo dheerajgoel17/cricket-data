@@ -94,6 +94,7 @@ class MatchRecord:
     status: str = "canonical"  # canonical | provisional
     source: str = ""
     players: list[PlayerPerf] = field(default_factory=list)
+    innings: list[dict] = field(default_factory=list)  # scraped matches: [{"team", "runs", "wickets", "balls"}] as the source states them; not a CSV column
 
     def row(self) -> dict[str, str]:
         d = asdict(self)

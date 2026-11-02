@@ -4,7 +4,7 @@ from datetime import date
 
 from conftest import make_match
 
-from cricket_data.cli import main
+from cricket_data.cli import _has_innings_summary, _known_ids, main
 from cricket_data.cricsheet import parse_match
 from cricket_data.models import MatchRecord, PlayerPerf
 from cricket_data.provisional import load_provisional, reconcile, write_provisional
@@ -124,3 +124,53 @@ def test_backfill_accepts_every_update_option(monkeypatch):
     cli.main(["backfill", "--zip", "x.zip"])
     assert set(vars(seen["update"])) <= set(vars(seen["backfill"]))
     assert seen["backfill"].dataset == "all_json.zip" and seen["backfill"].provisional_days == 30
+
+
+def test_the_innings_summary_is_stored_and_read_back(tmp_path):
+    s = Store(tmp_path)
+    rec = prov()
+    rec.innings = [{"team": "Australia", "runs": 171, "wickets": 10, "balls": 115}, {"team": "South Africa", "runs": 172, "wickets": 2, "balls": 88}]
+    path = write_provisional(s, rec)
+    assert json.loads(path.read_text())["innings"][1]["balls"] == 88
+    assert load_provisional(s)[0][1].innings == rec.innings
+    assert "innings" not in prov().row()  # not a CSV column: the match table keeps its columns
+
+
+def test_a_saved_scorecard_without_the_summary_is_fetched_again_and_a_failed_fetch_never_empties_it(tmp_path):
+    s = Store(tmp_path)
+    path = write_provisional(s, prov())
+    assert not _has_innings_summary(path)  # an older file: scrape it once more to gain the summary
+    # the re-scrape came back without players (page unreadable): the stored scorecard stays
+    write_provisional(s, MatchRecord(match_id=path.stem, date="2026-09-30", team_a="Australia", team_b="South Africa", winner="Australia", source="test"))
+    assert json.loads(path.read_text())["players"][0]["runs"] == "30"
+    # a good re-scrape adds the summary
+    again = prov()
+    again.match_id = path.stem
+    again.innings = [{"team": "Australia", "runs": 200, "wickets": 5, "balls": 120}]
+    write_provisional(s, again)
+    assert _has_innings_summary(path)
+    # a permanent class is never re-scraped and keeps its status when it is
+    keep = prov()
+    keep.match_id, keep.status = "crex-afg", "cricsheet_withheld"
+    p2 = write_provisional(s, keep)
+    assert _has_innings_summary(p2)
+    again2 = prov()
+    again2.match_id = "crex-afg"
+    write_provisional(s, again2)
+    assert json.loads(p2.read_text())["status"] == "cricsheet_withheld"
+
+
+def test_a_backlog_of_old_scorecards_is_fetched_again_a_few_per_run_newest_first(tmp_path):
+    s = Store(tmp_path)
+    for day in range(1, 21):  # 20 saved matches with no innings summary, one per day
+        rec = prov()
+        rec.match_id, rec.date = f"crex-m{day:02d}", f"2026-10-{day:02d}"
+        write_provisional(s, rec)
+    done = prov()
+    done.match_id, done.date = "crex-done", "2026-10-25"
+    done.innings = [{"team": "Australia", "runs": 1, "wickets": 1, "balls": 6}]
+    write_provisional(s, done)
+    known = _known_ids(tmp_path / "provisional", cap=5)
+    again = {f"m{day:02d}" for day in range(1, 21)} - known
+    assert again == {f"m{day:02d}" for day in range(16, 21)}  # the 5 newest; "done" already has its summary and stays known
+    assert "done" in known

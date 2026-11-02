@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 154,
+      "team": "Pakistan Sixes",
+      "wickets": 4
+    },
+    {
+      "balls": 36,
+      "runs": 136,
+      "team": "Oman Sixes",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-oma-s-vs-pak-s-23rd-match-hong-kong-sixes-2026-match-updates-14ZL",
   "match_type": "T20",
   "player_of_match": "Abbas Afridi",

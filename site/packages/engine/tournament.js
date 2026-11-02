@@ -263,11 +263,15 @@ export function boards(store, ed, rows, { limit = BOARD_LIMIT, minBalls = MIN_BA
 }
 
 // ------------------------------------------------------------------ the edition as a whole, and season by season
-/** Scoring in the matches of `ed` that count for summary markets (the Markets tab's rule: void games out), from the per-innings totals only. */
+/**
+ * Scoring in the matches of `ed` that count for summary markets (the Markets tab's rule: void games out), from the per-innings totals only. Who won batting first is a result, not a
+ * summary market: it counts every match with a winner, including a chase that ended before 80% of the overs (dropping those made bat-first look better than it is).
+ */
 export function editionSummary(store, ed) {
   const M = store.M;
   let counted = 0, first = 0, firstN = 0, second = 0, secondN = 0, f4 = 0, f6 = 0, runs = 0, balls = 0, decided = 0, batFirstWins = 0, highest = null;
   for (const m of ed.ms) {
+    if (M.r[m] === 0 && M.w[m] >= 0 && M.fi[m] >= 0) { decided++; if (M.w[m] === M.fi[m]) batFirstWins++; }
     const inn = M.inn?.[m] || [];
     if (M.q[m] !== 1 || !inn.length) continue;
     counted++;
@@ -277,7 +281,6 @@ export function editionSummary(store, ed) {
       f4 += x[IF4] || 0; f6 += x[IF6] || 0; runs += x[IR]; balls += x[IB];
       if (!highest || x[IR] > highest.runs) highest = { t: x[IT], m, runs: x[IR], wkts: x[IW] };
     }
-    if (M.r[m] === 0 && M.w[m] >= 0 && M.fi[m] >= 0) { decided++; if (M.w[m] === M.fi[m]) batFirstWins++; }
   }
   const per = (x, n) => (n ? round(x / n, 2) : null);
   return {

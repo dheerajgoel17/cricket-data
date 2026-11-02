@@ -127,6 +127,39 @@ def test_a_complete_scorecard_without_balls_still_qualifies_for_match_fours(tmp_
     assert inn[0][1] == 40  # Alpha batted first (Beta fielded)
 
 
+def test_a_stated_innings_summary_replaces_the_sum_of_the_player_rows():
+    """The WBBL 2026 opener: batters' runs gave Stars 176/3, the card states 192/4 (16 extras, one run-out)."""
+    def row(team, opp, **kw):
+        return {"player": f"{team}{len(kw)}", "player_id": "", "team": team, "opponent": opp, "runs": "0", "balls": "0", **{k: str(v) for k, v in kw.items()}}
+
+    pl = [row("Stars", "Hurricanes", runs=176, balls=110), row("Hurricanes", "Stars", runs=165, balls=118),
+          row("Hurricanes", "Stars", balls_bowled=120, wickets=3), row("Stars", "Hurricanes", balls_bowled=120, wickets=8)]
+    d = {"team_a": "Stars", "team_b": "Hurricanes", "winner": "Stars", "toss_winner": "Hurricanes", "toss_decision": "field", "players": pl}
+    plain = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+    B._inn_from_totals(plain, d, 0, {})
+    assert [(i[2], i[3], i[4], i[16]) for i in plain["inn"]] == [(176, 3, 120, None), (165, 8, 120, None)]  # runs, wkts, balls, extras: unknown
+    stated = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+    B._inn_from_totals(stated, {**d, "innings": [{"team": "Stars", "runs": 192, "wickets": 4, "balls": 120}, {"team": "Hurricanes", "runs": 174, "wickets": 8, "balls": 120}]}, 0, {})
+    assert [(i[2], i[3], i[4], i[16]) for i in stated["inn"]] == [(192, 4, 120, 16), (174, 8, 120, 9)]  # extras = stated total - batters: 16 and 9
+
+
+def test_a_scraped_scorecard_counts_run_outs_so_an_all_out_innings_is_a_natural_end():
+    """Bowlers' wickets alone read an all-out innings as 9 down when a run-out ended it; 80% of overs then voided a complete match."""
+    def row(team, opp, **kw):
+        return {"player": f"{team}{len(kw)}", "player_id": "", "team": team, "opponent": opp, "runs": "0", "balls": "0", **{k: str(v) for k, v in kw.items()}}
+
+    def card(beta_wickets, beta_run_outs):
+        pl = [row("Alpha", "Beta", runs=150, balls=100), row("Beta", "Alpha", runs=60, balls=70),
+              row("Beta", "Alpha", balls_bowled=120, wickets=2),                              # Beta bowls Alpha's full 20 overs
+              row("Alpha", "Beta", balls_bowled=72, wickets=beta_wickets, run_outs=beta_run_outs)]  # Beta is bowled out in 12 overs
+        return {"team_a": "Alpha", "team_b": "Beta", "winner": "Alpha", "toss_winner": "Alpha", "toss_decision": "bat", "players": pl}
+
+    for wickets, run_outs, wkts, q in ((7, 3, 10, 1), (9, 0, 9, 0), (9, 4, 10, 1)):  # all out by 7 + 3 run-outs; 9 down in 12 overs is a cut-short match; 13 is capped at 10
+        m = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+        B._inn_from_totals(m, card(wickets, run_outs), 0, {})
+        assert (m["inn"][1][3], m["inn"][1][4], m["q"]) == (wkts, 72, q)
+
+
 def test_a_scraped_players_catches_and_stumpings_are_kept_and_a_row_with_no_side_is_skipped_not_fatal(tmp_path):
     z, data, out, _ = _out(tmp_path)
     bro = synth.pid(synth.BROOK)
@@ -464,3 +497,53 @@ def test_a_started_priced_match_nothing_lists_is_started_not_live(tmp_path):
     # the schedule's own row replaces the stop-gap and carries the schedule's word, Live included
     sched = [{"start": "2026-11-01T07:30Z", "fmt": "", "a": "Eagles", "b": "Tuskers", "status": "Live", "source": "src"}]
     assert "Eagles" not in {r["a"] for r in B._unscheduled_priced(vb, sched, now=now)}
+
+
+def _archive_test(arc, name, match, start, **extra):
+    (arc / f"{name}.json").write_text(json.dumps({"id": name, "match": match, "start_utc": start, "lines": [{"fmt": "Test"}], **extra}))
+
+
+def test_a_priced_test_the_schedule_has_dropped_is_started_until_its_fixture_has_a_result_and_gone_a_day_after_it_ended(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    start = "2026-10-28T09:00:00Z"
+    fixture = {"start": start, "fmt": "Test"}
+    _archive_test(arc, "2026-10-28-sa-v-aus", "South Africa vs Australia", start, fixture={**fixture, "a": "South Africa", "b": "Australia", "result": ""})              # at stumps
+    _archive_test(arc, "2026-10-28-ban-v-wi", "Bangladesh vs West Indies", start, fixture={**fixture, "a": "Bangladesh", "b": "West Indies", "result": "West Indies won by 5 wickets"},
+                  settled_at="2026-10-31T10:00:00Z", results=[{"pid": "a", "stat": "runs", "value": 3}])
+    _archive_test(arc, "2026-10-28-ind-v-eng", "India vs England", start)                                                                                               # never on the schedule
+    by = lambda now: {f["a"]: (f["status"], f["result"]) for f in B._unscheduled_priced(vb, [], now=now)}  # noqa: E731
+    day5 = datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)   # the Test with a result ended 31 Oct 10:00: listed until 1 Nov 10:00
+    assert by(day5) == {"South Africa": ("Started", ""), "Bangladesh": ("Completed", "West Indies won by 5 wickets"), "India": ("Started", "")}
+    assert set(by(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc))) == {"South Africa", "India"}   # a Test with no result yet keeps its 6 days
+    assert by(datetime(2026, 11, 3, 10, 0, tzinfo=timezone.utc)) == {}
+
+
+def test_a_scheduled_test_leaves_the_fixtures_a_day_after_it_ended_and_nothing_else_does(tmp_path):
+    from datetime import datetime, timezone
+
+    (tmp_path / "fixtures").mkdir()
+    head = "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
+    (tmp_path / "fixtures" / "upcoming.csv").write_text(head
+        + "2026-10-28T09:00Z,a,S,Test,male,South Africa,Australia,Newlands,Live,u,\n"            # ended 31 Oct 10:00 (settled_at)
+        + "2026-10-28T09:00Z,b,S,Test,male,Bangladesh,West Indies,Mirpur,Live,u,\n"              # whole-match result stored before settled_at existed
+        + "2026-10-28T09:00Z,c,S,Test,male,India,England,Mumbai,Live,u,\n"                       # no result yet
+        + "2026-11-05T09:00Z,d,S,Test,male,South Africa,Australia,Durban,Upcoming,u,\n"          # the next Test of the series, a match of its own
+        + "2026-10-31T09:00Z,e,S,T20,male,South Africa,Australia,Newlands,Completed,u,won\n")    # limited overs: not this rule's business
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    start = "2026-10-28T09:00:00Z"
+    _archive_test(arc, "2026-10-28-south-africa-v-australia", "South Africa vs Australia", start, settled_at="2026-10-31T10:00:00Z", results=[{"pid": "a", "stat": "runs", "value": 3}])
+    _archive_test(arc, "2026-10-28-bangladesh-v-west-indies", "Bangladesh vs West Indies", start, results=[{"pid": "a", "stat": "runs", "value": 3}])
+    listed = lambda now: sorted((f["a"], f["start"][:10]) for f in B.build_fixtures(tmp_path, vb, {}, now=now))  # noqa: E731
+    everything = [("Bangladesh", "2026-10-28"), ("India", "2026-10-28"), ("South Africa", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]
+    assert listed(datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)) == everything                       # 23 h after the result, and day 5 starts 1 Nov 09:00
+    assert listed(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc)) == [x for x in everything if x != ("South Africa", "2026-10-28")]
+    assert listed(datetime(2026, 11, 2, 10, 0, tzinfo=timezone.utc)) == [("India", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]   # no end recorded: start of day 5 + 24 h
+    assert listed(datetime(2026, 11, 4, 10, 0, tzinfo=timezone.utc))[0] == ("India", "2026-10-28"), "a Test with no result keeps its place until the schedule itself lets go"

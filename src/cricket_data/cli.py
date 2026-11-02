@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import io
+import json
 import sqlite3
 import sys
 from datetime import date, datetime, timedelta
@@ -23,6 +24,35 @@ from .store import Store
 
 DEFAULT_DATA = "data"
 
+
+
+REFETCH_PER_RUN = 12  # saved scorecards without the innings summary that one run fetches again: a run has a 30-minute budget and commits only at the end
+
+
+def _known_ids(folder: Path, cap: int = REFETCH_PER_RUN) -> set[str]:
+    """Saved scraped matches the scraper must not fetch again. All of them, except the newest `cap` that lack the innings summary: those are fetched once more,
+    a few per run, so a backlog fills in over several runs instead of one run running out of time."""
+    known, missing = set(), []
+    for p in folder.glob("crex-*.json"):
+        stem = p.stem.removeprefix("crex-")
+        if _has_innings_summary(p):
+            known.add(stem)
+            continue
+        try:
+            missing.append((json.loads(p.read_text(encoding="utf-8")).get("date", ""), stem))
+        except ValueError:
+            known.add(stem)
+    missing.sort(reverse=True)
+    return known | {stem for _, stem in missing[cap:]}
+
+
+def _has_innings_summary(path: Path) -> bool:
+    """True when a stored scraped match needs no second fetch: it has its innings summary, or it is a permanent class (never re-scraped)."""
+    try:
+        d = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return True
+    return bool(d.get("innings")) or d.get("status") != "provisional"
 
 def _write_scraper_report(store: Store, conflicts: list) -> None:
     """Write scraper conflict report to a CSV file."""
@@ -106,8 +136,9 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     
     # Add web scraper if enabled
     if a.enable_scraper:
-        # matches already saved are not fetched again: a finished result never changes
-        known = {p.stem.removeprefix("crex-") for p in (store.root / "provisional").glob("crex-*.json")}
+        # matches already saved are not fetched again: a finished result never changes. The exception is a saved scorecard that lacks
+        # the innings summary (files written before it was kept): inside the look-back window it is fetched once more to gain it.
+        known = _known_ids(store.root / "provisional")
         scraper_source = ScraperSource(browser=browser, known_ids=known)
         sources.append(scraper_source)
         
