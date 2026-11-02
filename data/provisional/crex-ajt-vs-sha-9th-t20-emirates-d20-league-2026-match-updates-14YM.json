@@ -2,6 +2,20 @@
   "date": "2026-10-23",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 164,
+      "team": "Ajman",
+      "wickets": 5
+    },
+    {
+      "balls": 96,
+      "runs": 107,
+      "team": "Sharjah",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ajt-vs-sha-9th-t20-emirates-d20-league-2026-match-updates-14YM",
   "match_type": "T20",
   "player_of_match": "Lahiru Sandaruwan",

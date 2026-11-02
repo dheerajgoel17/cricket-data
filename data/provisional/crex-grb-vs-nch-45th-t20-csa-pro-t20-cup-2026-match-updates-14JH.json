@@ -2,6 +2,20 @@
   "date": "2026-10-21",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 126,
+      "team": "Northern Cape Heat",
+      "wickets": 6
+    },
+    {
+      "balls": 118,
+      "runs": 127,
+      "team": "Garden Route Badgers",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-grb-vs-nch-45th-t20-csa-pro-t20-cup-2026-match-updates-14JH",
   "match_type": "T20",
   "player_of_match": "",

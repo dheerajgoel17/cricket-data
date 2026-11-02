@@ -2,6 +2,20 @@
   "date": "2026-10-22",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 195,
+      "team": "Abu Dhabi",
+      "wickets": 7
+    },
+    {
+      "balls": 115,
+      "runs": 143,
+      "team": "Sharjah",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-abd-vs-sha-8th-t20-emirates-d20-league-2026-match-updates-14YL",
   "match_type": "T20",
   "player_of_match": "Sayam Khan",

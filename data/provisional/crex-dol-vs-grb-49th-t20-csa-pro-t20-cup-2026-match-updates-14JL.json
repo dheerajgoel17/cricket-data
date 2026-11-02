@@ -2,6 +2,20 @@
   "date": "2026-10-23",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 48,
+      "runs": 51,
+      "team": "Garden Route Badgers",
+      "wickets": 4
+    },
+    {
+      "balls": 23,
+      "runs": 56,
+      "team": "Dolphins",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-dol-vs-grb-49th-t20-csa-pro-t20-cup-2026-match-updates-14JL",
   "match_type": "T20",
   "player_of_match": "",

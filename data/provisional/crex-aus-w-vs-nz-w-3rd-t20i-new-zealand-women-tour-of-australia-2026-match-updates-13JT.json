@@ -2,6 +2,14 @@
   "date": "2026-10-22",
   "event": "New Zealand Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 16,
+      "runs": 11,
+      "team": "New Zealand Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-aus-w-vs-nz-w-3rd-t20i-new-zealand-women-tour-of-australia-2026-match-updates-13JT",
   "match_type": "T20",
   "player_of_match": "",

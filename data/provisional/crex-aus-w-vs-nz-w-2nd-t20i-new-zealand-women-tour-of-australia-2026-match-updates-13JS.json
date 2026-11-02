@@ -2,6 +2,20 @@
   "date": "2026-10-20",
   "event": "New Zealand Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 167,
+      "team": "Australia Women",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 127,
+      "team": "New Zealand Women",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-aus-w-vs-nz-w-2nd-t20i-new-zealand-women-tour-of-australia-2026-match-updates-13JS",
   "match_type": "T20",
   "player_of_match": "Ashleigh Gardner",

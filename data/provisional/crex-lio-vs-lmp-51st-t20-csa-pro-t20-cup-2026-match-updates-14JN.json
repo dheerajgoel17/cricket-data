@@ -2,6 +2,20 @@
   "date": "2026-10-24",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 119,
+      "team": "Limpopo Impalas",
+      "wickets": 6
+    },
+    {
+      "balls": 73,
+      "runs": 120,
+      "team": "Lions",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-lio-vs-lmp-51st-t20-csa-pro-t20-cup-2026-match-updates-14JN",
   "match_type": "T20",
   "player_of_match": "",

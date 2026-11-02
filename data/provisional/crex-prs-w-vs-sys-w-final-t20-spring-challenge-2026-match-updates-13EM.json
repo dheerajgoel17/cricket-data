@@ -2,6 +2,20 @@
   "date": "2026-10-21",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 149,
+      "team": "Sydney Sixers Women",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 134,
+      "team": "Perth Scorchers Women",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-prs-w-vs-sys-w-final-t20-spring-challenge-2026-match-updates-13EM",
   "match_type": "T20",
   "player_of_match": "Erin Burns",
