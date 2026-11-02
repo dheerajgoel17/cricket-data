@@ -1,4 +1,4 @@
-import { cardModel } from "@/lib/card";
+import { NO_SCORE, cardModel, playState } from "@/lib/card";
 
 const NOW = Date.parse("2026-11-01T10:00:00Z");
 const at = (hours: number) => new Date(NOW + hours * 3600e3).toISOString();
@@ -43,5 +43,37 @@ describe("cardModel", () => {
   test("a finished fixture the feed does not have shows its result", () => {
     const m = cardModel({ fixture: fixture({ start: at(-20), status: "Completed", result: "Ireland won by 4 wickets" }), live: null }, NOW);
     expect(m).toMatchObject({ final: true, status: "Ireland won by 4 wickets" });
+  });
+});
+
+describe("playState (mirrors the site's play-state tests)", () => {
+  const started = (o: Record<string, unknown> = {}) => fixture({ status: "Started", start: at(-3), ...o });
+  const feed = (status: string, scores = false) => ({ status, teams: [{ name: "India", display: scores ? "151/4" : "" }, { name: "New Zealand", display: "" }] });
+  const stateOf = (f: any, match: any = null) => playState(f, match, NOW).state;
+
+  test("a priced match no source lists is started, never live, with no score", () => {
+    expect(playState(started(), null, NOW)).toEqual({ state: "started", hasScore: false });
+    const m = cardModel({ fixture: started(), live: null }, NOW);
+    expect(m).toMatchObject({ live: false, started: true, final: false, delayed: false, hasScore: false, status: NO_SCORE });
+  });
+
+  test("it stays started for as long as the builder publishes it, a Test for days", () => {
+    expect(stateOf(started({ start: at(-20) }))).toBe("started");
+    expect(stateOf(started({ fmt: "Test", start: at(-72) }))).toBe("started");
+  });
+
+  test("live needs evidence: a score, the live feed's word, or the schedule's own Live", () => {
+    expect(playState(started(), feed("live", true), NOW)).toEqual({ state: "live", hasScore: true });
+    expect(stateOf(started(), feed("live"))).toBe("live");
+    expect(stateOf(started({ status: "Live" }))).toBe("live");
+  });
+
+  test("the clock alone never makes a match live: a start that has passed with the schedule behind is started", () => {
+    expect(stateOf(fixture({ status: "Upcoming", start: at(-1) }))).toBe("started");
+    expect(stateOf(fixture({ status: "Upcoming", start: at(-5) }))).toBe("upcoming"); // long past the clock's four hours, no word at all
+  });
+
+  test("delayed when the feed lists the match as not started although its time has passed", () => {
+    expect(stateOf(fixture({ status: "Upcoming", start: at(-1) }), feed("upcoming"))).toBe("delayed");
   });
 });

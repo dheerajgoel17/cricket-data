@@ -47,6 +47,27 @@ describe("buildRail", () => {
   });
 });
 
+describe("a started match (begun, no word that play is on)", () => {
+  const begun = fx("eag-tus", "Eagles", "Tuskers", -3, { status: "Started" });
+
+  test("fixtureState says started, never live, from the schedule's Started", () => {
+    expect(fixtureState(begun, undefined, NOW)).toBe("started");
+    expect(fixtureState(begun, "live", NOW)).toBe("live"); // the live feed's word wins
+  });
+
+  test("it keeps its place among the matches in play and counts under In play", () => {
+    const r = buildRail({ fixtures: [begun, ...fixtures], lines: books(["Eagles vs Tuskers", -3], ["India vs New Zealand", 3], ["Pakistan vs Sri Lanka", -1]), live: null, now: NOW });
+    expect(ids(r)).toContain("eag-tus");
+    expect(r.find((x) => x.fixture.id === "eag-tus")?.state).toBe("started");
+    expect(phaseView(r).counts.live).toBe(2); // Pakistan v Sri Lanka (Live) and Eagles v Tuskers (Started)
+  });
+
+  test("it stays on the rail past the twelve-hour window, as a match in play does", () => {
+    const old = fx("old", "Eagles", "Tuskers", -20, { status: "Started" });
+    expect(ids(buildRail({ fixtures: [old], lines: books(["Eagles vs Tuskers", -20]), live: null, now: NOW }))).toEqual(["old"]);
+  });
+});
+
 describe("fixtureState", () => {
   test("a Test at the close of a day, with no result, is still on", () => {
     expect(fixtureState(fx("t", "South Africa", "Australia", -30, { fmt: "Test", status: "Completed" }), undefined, NOW)).toBe("live");

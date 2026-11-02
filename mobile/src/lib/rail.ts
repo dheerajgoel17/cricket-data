@@ -5,7 +5,7 @@
 import { fixtureInBooks, bookFixtures, liveForFixture } from "@cricket/engine/live.js";
 import { keepMsFor } from "@cricket/engine/lines.js";
 import { countPhases, phaseOf, pickHomePhase, type HomePhase } from "@site/lib/home-phase";
-import { arrangeFixtures, DEFAULT_RAIL, rankFixtures, type RailConfig, type RailState } from "@site/lib/priority";
+import { arrangeFixtures, DEFAULT_RAIL, rankFixtures, type RailConfig } from "@site/lib/priority";
 
 /** How far ahead an unpriced game still shows (flagged `noProps`). */
 export const NO_PROPS_DAYS = 10;
@@ -22,12 +22,18 @@ const startedSince = (f: any, ms: number, now: number) => (f.start.length > 10 ?
 /** A multi-day match the schedule calls "Completed" at the close of a day, with no result yet, is still on. */
 const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, keepMsFor(f.fmt), now);
 
-/** A fixture's state: the live feed's word for it when it has one, else what the schedule file says. */
-export const fixtureState = (f: any, live?: string, now = Date.now()): RailState =>
-  live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : "upcoming";
+/**
+ * A fixture's state: the live feed's word for it when it has one, else what the schedule file says. `started` is a match whose start has passed with no result and no word that play is
+ * on (the builder publishes `status: "Started"` for a priced match neither the schedule nor the live feed lists): shown as started with no score, never as live.
+ */
+export type FixtureState = "live" | "started" | "final" | "upcoming";
+export const fixtureState = (f: any, live?: string, now = Date.now()): FixtureState =>
+  live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : f.status === "Started" ? "started" : "upcoming";
+/** A match that has begun and has no result keeps its place among the ones in play whether or not a score is available. */
+const begun = (s: string) => s === "live" || s === "started";
 
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
-  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
+  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (begun(stateOf(f)) && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
   const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
   const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
@@ -44,7 +50,7 @@ export const EMPTY_PHASE: Record<HomePhase, string> = {
   final: "No resulted matches still listed.",
 };
 
-export interface RailItem { fixture: any; state: RailState; live: any | null; noProps: boolean }
+export interface RailItem { fixture: any; state: FixtureState; live: any | null; noProps: boolean }
 
 /**
  * The rail in display order: matches in play, then those starting within 24 hours, then later games up to 10 days, then finished ones (`rankFixtures` / `arrangeFixtures`);

@@ -30,7 +30,7 @@ export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () =>
         <View style={styles.state}>
           {m.session ? <Text style={[styles.cap, { color: color.destructive }]}>{m.session}</Text>
             : m.live ? <><LiveDot /><Text style={[styles.cap, { color: color.destructive }]}>Live</Text></>
-            : <Text style={styles.cap}>{m.final ? "Final" : m.delayed ? "Delayed" : "Upcoming"}</Text>}
+            : <Text style={styles.cap}>{m.final ? "Final" : m.delayed ? "Delayed" : m.started ? "Started" : "Upcoming"}</Text>}
           <Text style={styles.cap}>· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</Text>
         </View>
         {onShare ? (
@@ -63,7 +63,7 @@ export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () =>
         ) : null}
       </View>
 
-      {m.live || m.final || m.delayed ? <Text style={styles.status}>{m.status}</Text> : null}
+      {m.live || m.final || m.delayed || m.started ? <Text style={styles.status}>{m.status}</Text> : null}
       <Text style={styles.series}>{seriesName(f)}{place ? ` · ${place}` : ""}</Text>
     </View>
   );

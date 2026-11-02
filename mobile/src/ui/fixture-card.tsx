@@ -38,7 +38,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
         ) : m.live ? (
           <View style={styles.liveRow}><LiveDot /><Text style={[styles.cap, styles.red]}>Live</Text></View>
         ) : (
-          <Text style={styles.cap}>{m.final ? "Final" : "Upcoming"}</Text>
+          <Text style={styles.cap}>{m.final ? "Final" : m.started ? "Started" : "Upcoming"}</Text>
         )}
         <Text style={styles.metaText}>·</Text>
         <Text style={styles.metaText}>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Text>
