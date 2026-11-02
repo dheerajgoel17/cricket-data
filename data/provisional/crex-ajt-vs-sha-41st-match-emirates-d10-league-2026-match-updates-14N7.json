@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 149,
+      "team": "Ajman",
+      "wickets": 2
+    },
+    {
+      "balls": 60,
+      "runs": 126,
+      "team": "Sharjah",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-ajt-vs-sha-41st-match-emirates-d10-league-2026-match-updates-14N7",
   "match_type": "T20",
   "player_of_match": "Lovepreet Singh",

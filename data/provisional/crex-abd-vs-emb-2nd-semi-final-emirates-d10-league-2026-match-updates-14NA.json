@@ -2,6 +2,20 @@
   "date": "2026-10-10",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 114,
+      "team": "Emirates Blues",
+      "wickets": 4
+    },
+    {
+      "balls": 60,
+      "runs": 107,
+      "team": "Abu Dhabi",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-abd-vs-emb-2nd-semi-final-emirates-d10-league-2026-match-updates-14NA",
   "match_type": "T20",
   "player_of_match": "Tahir Zaman",

@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 128,
+      "team": "Eastern Cape Iinyathi",
+      "wickets": 7
+    },
+    {
+      "balls": 92,
+      "runs": 129,
+      "team": "Dolphins",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-eci-28th-match-csa-pro-t20-cup-2026-match-updates-14J0",
   "match_type": "T20",
   "player_of_match": "",

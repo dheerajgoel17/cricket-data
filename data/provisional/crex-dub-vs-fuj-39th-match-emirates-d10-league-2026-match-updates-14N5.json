@@ -2,6 +2,20 @@
   "date": "2026-10-08",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 110,
+      "team": "Dubai",
+      "wickets": 4
+    },
+    {
+      "balls": 58,
+      "runs": 114,
+      "team": "Fujairah",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-dub-vs-fuj-39th-match-emirates-d10-league-2026-match-updates-14N5",
   "match_type": "T20",
   "player_of_match": "Yayin Rai",

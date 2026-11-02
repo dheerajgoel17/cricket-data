@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 115,
+      "team": "Emirates Blues",
+      "wickets": 3
+    },
+    {
+      "balls": 60,
+      "runs": 89,
+      "team": "Fujairah",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-emb-vs-fuj-40th-match-emirates-d10-league-2026-match-updates-14N6",
   "match_type": "T20",
   "player_of_match": "",

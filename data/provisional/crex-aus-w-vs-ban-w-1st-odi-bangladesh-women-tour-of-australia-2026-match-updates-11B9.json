@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Bangladesh Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 298,
+      "runs": 166,
+      "team": "Bangladesh Women",
+      "wickets": 10
+    },
+    {
+      "balls": 154,
+      "runs": 168,
+      "team": "Australia Women",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-aus-w-vs-ban-w-1st-odi-bangladesh-women-tour-of-australia-2026-match-updates-11B9",
   "match_type": "ODI",
   "player_of_match": "Annabel Sutherland",

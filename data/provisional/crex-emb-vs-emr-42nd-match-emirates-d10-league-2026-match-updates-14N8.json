@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 107,
+      "team": "Emirates Blues",
+      "wickets": 6
+    },
+    {
+      "balls": 60,
+      "runs": 94,
+      "team": "Emirates Red",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-emb-vs-emr-42nd-match-emirates-d10-league-2026-match-updates-14N8",
   "match_type": "T20",
   "player_of_match": "Muhammad Qasim",

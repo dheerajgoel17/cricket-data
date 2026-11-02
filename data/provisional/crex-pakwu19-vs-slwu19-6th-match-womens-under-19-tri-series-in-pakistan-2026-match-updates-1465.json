@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Women's Under-19 Tri-Series in Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 110,
+      "team": "Pakistan U19-Women",
+      "wickets": 8
+    },
+    {
+      "balls": 92,
+      "runs": 111,
+      "team": "Sri Lanka U19-Women",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-pakwu19-vs-slwu19-6th-match-womens-under-19-tri-series-in-pakistan-2026-match-updates-1465",
   "match_type": "T20",
   "player_of_match": "Sanjana Kavindi",

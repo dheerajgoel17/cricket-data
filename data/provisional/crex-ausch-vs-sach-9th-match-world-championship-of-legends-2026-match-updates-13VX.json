@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 209,
+      "team": "Australia Champions",
+      "wickets": 5
+    },
+    {
+      "balls": 94,
+      "runs": 210,
+      "team": "South Africa Champions",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-ausch-vs-sach-9th-match-world-championship-of-legends-2026-match-updates-13VX",
   "match_type": "T20",
   "player_of_match": "AB de Villiers",

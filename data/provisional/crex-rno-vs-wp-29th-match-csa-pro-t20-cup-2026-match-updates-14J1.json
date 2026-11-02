@@ -2,6 +2,20 @@
   "date": "2026-10-10",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Western Province",
+      "wickets": 7
+    },
+    {
+      "balls": 104,
+      "runs": 111,
+      "team": "Mpumalanga Rhinos",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-rno-vs-wp-29th-match-csa-pro-t20-cup-2026-match-updates-14J1",
   "match_type": "T20",
   "player_of_match": "",

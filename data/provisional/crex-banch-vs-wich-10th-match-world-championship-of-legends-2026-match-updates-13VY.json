@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 218,
+      "team": "Bangladesh Champions",
+      "wickets": 4
+    },
+    {
+      "balls": 115,
+      "runs": 221,
+      "team": "West Indies Champions",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-banch-vs-wich-10th-match-world-championship-of-legends-2026-match-updates-13VY",
   "match_type": "T20",
   "player_of_match": "Chadwick Walton",

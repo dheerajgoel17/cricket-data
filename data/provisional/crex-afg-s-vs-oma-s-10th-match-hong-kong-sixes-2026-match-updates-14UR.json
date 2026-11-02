@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 120,
+      "team": "Oman Sixes",
+      "wickets": 4
+    },
+    {
+      "balls": 32,
+      "runs": 125,
+      "team": "Afghanistan Sixes",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-s-vs-oma-s-10th-match-hong-kong-sixes-2026-match-updates-14UR",
   "match_type": "T20",
   "player_of_match": "Sediqullah Pacha",

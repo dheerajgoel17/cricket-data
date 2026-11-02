@@ -2,6 +2,20 @@
   "date": "2026-10-10",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 196,
+      "team": "India Champions",
+      "wickets": 8
+    },
+    {
+      "balls": 113,
+      "runs": 198,
+      "team": "South Africa Champions",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-indch-vs-sach-11th-match-world-championship-of-legends-2026-match-updates-13VZ",
   "match_type": "T20",
   "player_of_match": "JP Duminy",

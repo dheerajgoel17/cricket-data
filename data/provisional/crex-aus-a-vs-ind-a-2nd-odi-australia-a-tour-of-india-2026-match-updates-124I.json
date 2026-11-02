@@ -2,6 +2,20 @@
   "date": "2026-10-09",
   "event": "Australia A tour of India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 275,
+      "team": "Australia A",
+      "wickets": 10
+    },
+    {
+      "balls": 272,
+      "runs": 206,
+      "team": "India A",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-aus-a-vs-ind-a-2nd-odi-australia-a-tour-of-india-2026-match-updates-124I",
   "match_type": "ODI",
   "player_of_match": "Spencer Johnson",
