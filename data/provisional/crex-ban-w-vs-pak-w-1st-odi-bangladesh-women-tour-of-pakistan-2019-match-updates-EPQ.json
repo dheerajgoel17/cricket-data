@@ -2,6 +2,20 @@
   "date": "2019-11-02",
   "event": "Bangladesh Women tour of Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 293,
+      "runs": 215,
+      "team": "Pakistan Women",
+      "wickets": 10
+    },
+    {
+      "balls": 286,
+      "runs": 186,
+      "team": "Bangladesh Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ban-w-vs-pak-w-1st-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPQ",
   "match_type": "ODI",
   "player_of_match": "Nahida Khan",

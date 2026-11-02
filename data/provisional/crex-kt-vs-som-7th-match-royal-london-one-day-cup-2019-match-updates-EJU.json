@@ -2,6 +2,20 @@
   "date": "2019-04-19",
   "event": "Royal London One-Day Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 358,
+      "team": "Somerset",
+      "wickets": 9
+    },
+    {
+      "balls": 162,
+      "runs": 94,
+      "team": "Kent",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-kt-vs-som-7th-match-royal-london-one-day-cup-2019-match-updates-EJU",
   "match_type": "ODM",
   "player_of_match": "",

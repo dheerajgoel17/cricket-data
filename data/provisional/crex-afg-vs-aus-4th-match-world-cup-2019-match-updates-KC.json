@@ -2,6 +2,20 @@
   "date": "2019-06-01",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 230,
+      "runs": 207,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 209,
+      "runs": 209,
+      "team": "Australia",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-aus-4th-match-world-cup-2019-match-updates-KC",
   "match_type": "ODI",
   "player_of_match": "David Warner",

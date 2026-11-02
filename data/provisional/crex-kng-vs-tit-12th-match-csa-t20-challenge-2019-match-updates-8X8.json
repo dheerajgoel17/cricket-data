@@ -2,6 +2,14 @@
   "date": "2019-04-14",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 102,
+      "runs": 136,
+      "team": "Titans",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-kng-vs-tit-12th-match-csa-t20-challenge-2019-match-updates-8X8",
   "match_type": "T20",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2019-04-20",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 189,
+      "team": "Warriors",
+      "wickets": 10
+    },
+    {
+      "balls": 120,
+      "runs": 179,
+      "team": "Cape Cobras",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-cob-vs-war-16th-match-csa-t20-challenge-2019-match-updates-8XC",
   "match_type": "T20",
   "player_of_match": "Vernon Philander",

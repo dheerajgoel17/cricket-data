@@ -2,6 +2,20 @@
   "date": "2019-11-04",
   "event": "Bangladesh Women tour of Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 292,
+      "runs": 210,
+      "team": "Pakistan Women",
+      "wickets": 10
+    },
+    {
+      "balls": 299,
+      "runs": 211,
+      "team": "Bangladesh Women",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-ban-w-vs-pak-w-2nd-odi-bangladesh-women-tour-of-pakistan-2019-match-updates-EPR",
   "match_type": "ODI",
   "player_of_match": "Fargana Hoque",

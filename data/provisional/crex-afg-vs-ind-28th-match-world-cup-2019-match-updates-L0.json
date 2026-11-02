@@ -2,6 +2,20 @@
   "date": "2019-06-22",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 224,
+      "team": "India",
+      "wickets": 8
+    },
+    {
+      "balls": 299,
+      "runs": 213,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ind-28th-match-world-cup-2019-match-updates-L0",
   "match_type": "ODI",
   "player_of_match": "Jasprit Bumrah",

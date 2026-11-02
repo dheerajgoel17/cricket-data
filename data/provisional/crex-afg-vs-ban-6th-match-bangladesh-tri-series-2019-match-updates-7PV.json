@@ -2,6 +2,20 @@
   "date": "2019-09-21",
   "event": "Bangladesh Tri-Series",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 114,
+      "runs": 139,
+      "team": "Bangladesh",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-ban-6th-match-bangladesh-tri-series-2019-match-updates-7PV",
   "match_type": "T20",
   "player_of_match": "Shakib Al Hasan",

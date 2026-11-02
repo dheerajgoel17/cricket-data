@@ -2,6 +2,20 @@
   "date": "2019-09-20",
   "event": "Cricket World Cup League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 294,
+      "runs": 287,
+      "team": "Namibia",
+      "wickets": 8
+    },
+    {
+      "balls": 222,
+      "runs": 142,
+      "team": "United States",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-nam-vs-usa-4th-match-cricket-world-cup-league-2-2019-23-match-updates-AMA",
   "match_type": "ODI",
   "player_of_match": "Jean-Pierre Kotze",
