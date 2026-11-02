@@ -719,6 +719,10 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
 
     The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
     (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match.
+
+    The status says only what the archive knows. A match not started is ``Upcoming``; one with a result in its archived fixture is ``Completed``; any other
+    that has started is ``Started``, never ``Live``: the books say when a match begins, not whether play is on, and a match the schedule and the live feed do not
+    list has no score to show. ``Live`` is the schedule's word (``source: "src"``) alone.
     """
     if not vb_dir:
         return []
@@ -748,10 +752,10 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
-        elif fmt in ("Test", "FC") or not (fx.get("result") or "").strip():
-            status = "Live"
-        else:
+        elif (fx.get("result") or "").strip():
             status = "Completed"
+        else:
+            status = "Started"  # the books priced it and its start has passed; nothing says it is in play (that is the schedule's or the live feed's word, and neither lists it)
         out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
                     "a": fx.get("a") or a.strip(), "b": fx.get("b") or b.strip(), "venue": fx.get("venue") or "",
                     "series": fx.get("series") or "", "status": status, "result": fx.get("result") or "", "source": "books"})

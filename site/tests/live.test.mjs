@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockLiveMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "@cricket/engine/live.js";
 import { identityIndex } from "@cricket/engine/identity.js";
@@ -967,8 +967,8 @@ test("unlistedRows keeps a Test through the day break, and pricedLive matches a 
   assert.equal(wantsCard({ status: "final", fmt: "Test", start: "2026-10-27T08:30:00Z" }, now), true, "a finished Test keeps its scorecard through the 6-day window");
   const liveMatch = { ...fromDay1[0], fmt: "Test", start: "2026-10-27T08:30:00.000Z", teams: [{ name: "South Africa" }, { name: "Australia" }] };
   assert.equal(liveForFixture({ matches: [liveMatch] }, { a: "South Africa", b: "Australia", start: "2026-10-30T08:30:00Z" })?.id, "aus-vs-sa-3rd-test", "a day-4 book start still finds the Test when the fixture has no fmt");
-  assert.equal(clockLiveMs("Test"), TEST_WINDOW_MS);
-  assert.equal(clockLiveMs("T20"), 4 * 3600e3);
+  assert.equal(clockStartedMs("Test"), TEST_WINDOW_MS);
+  assert.equal(clockStartedMs("T20"), 4 * 3600e3);
   assert.equal(keepGapRow({ status: "live" }, null), true, "a live Test that dropped off the schedule stays even if its page was not read");
   assert.equal(keepGapRow({ status: "final" }, null), false);
   assert.equal(keepGapRow({ status: "final" }, { status: "final" }), true);

@@ -395,7 +395,7 @@ def test_a_priced_test_the_schedule_dropped_comes_back_from_its_archive(tmp_path
     now = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
     got = B._unscheduled_priced(vb, [], now=now)
     assert [(r["a"], r["status"], r["venue"], r["series"]) for r in got] == [
-        ("South Africa", "Live", "Newlands, Cape Town", "Australia tour of South Africa 2026")]
+        ("South Africa", "Started", "Newlands, Cape Town", "Australia tour of South Africa 2026")]
     listed = [{"start": "2026-10-27T08:30Z", "fmt": "Test", "a": "South Africa", "b": "Australia"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
 
@@ -439,3 +439,28 @@ def test_a_priced_match_the_books_name_differently_is_not_a_second_fixture(tmp_p
     (tmp_path / "fixtures" / "upcoming.csv").write_text("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
                                                          "2026-11-01T08:00Z,x,CSA,T20,male,Dolphins,Rocks,Kingsmead,Upcoming,,\n")
     assert [f["id"] for f in B.build_fixtures(tmp_path, vb, {})] == ["2026-11-01-dolphins-v-rocks"]
+
+
+def test_a_started_priced_match_nothing_lists_is_started_not_live(tmp_path):
+    """1 Nov 2026: two pro50 matches the books priced (fancy only, no schedule row, no live-feed row) were published as Live by the clock alone and showed a LIVE badge with no score and no players."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+
+    def book(name, match, start, **k):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "start_utc": start, "fixture": None, "lines": [], "fancy": [{"key": "match_runs"}], **k}))
+
+    book("2026-11-01-eagles-v-tuskers", "Eagles vs Tuskers", "2026-11-01T07:30:00Z")
+    book("2026-11-01-mid-west-rhinos-v-mountaineers", "MID West Rhinos vs Mountaineers", "2026-11-01T07:30:00Z")
+    book("2026-11-01-later", "Lions vs Titans", "2026-11-01T12:00:00Z")
+    book("2026-10-31-over", "Dolphins vs Boland", "2026-10-31T07:30:00Z")                                            # past its 24 h keep window: gone
+    book("2026-11-01-resulted", "Namibia vs Ireland", "2026-11-01T05:00:00Z", fixture={"start": "2026-11-01T05:00Z", "fmt": "T20", "gender": "male", "a": "Namibia", "b": "Ireland", "result": "Namibia won by 3 wickets"})
+    now = datetime(2026, 11, 1, 10, 30, tzinfo=timezone.utc)                                                          # 3 hours after the first two began
+    got = {r["a"]: (r["status"], r["source"]) for r in B._unscheduled_priced(vb, [], now=now)}
+    assert got == {"Eagles": ("Started", "books"), "MID West Rhinos": ("Started", "books"), "Lions": ("Upcoming", "books"), "Namibia": ("Completed", "books")}
+    # the schedule's own row replaces the stop-gap and carries the schedule's word, Live included
+    sched = [{"start": "2026-11-01T07:30Z", "fmt": "", "a": "Eagles", "b": "Tuskers", "status": "Live", "source": "src"}]
+    assert "Eagles" not in {r["a"] for r in B._unscheduled_priced(vb, sched, now=now)}

@@ -9,9 +9,9 @@ export function isHomePhase(v: unknown): v is HomePhase {
   return v === "live" || v === "pre" || v === "final";
 }
 
-/** Map the rail's live / upcoming / final word onto the bar's labels. */
-export function phaseOf(state: "live" | "final" | "upcoming"): HomePhase {
-  return state === "upcoming" ? "pre" : state;
+/** Map the rail's live / started / upcoming / final word onto the bar's labels. A started match (begun, no result, no score from the source) sits in In play; its card says "Started". */
+export function phaseOf(state: "live" | "started" | "final" | "upcoming"): HomePhase {
+  return state === "upcoming" ? "pre" : state === "started" ? "live" : state;
 }
 
 /**

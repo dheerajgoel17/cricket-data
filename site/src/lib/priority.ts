@@ -38,6 +38,8 @@ const REGION: Record<string, string> = {
 const BIG_EVENT = ["world cup", "champions trophy", "asia cup", "ashes", "border gavaskar", "ipl", "indian premier", "big bash", "bbl", "psl", "pakistan super", "sa20", "cpl", "caribbean premier", "the hundred", "ilt20", "lpl", "bpl", "t20 blast"]; // whole words in the series name
 
 export type RailState = "live" | "final" | "upcoming";
+/** The rail has three groups: a match that has started with no score from the source (`started`) sits with the ones in play. */
+const railStateOf = (stateOf: (f: any) => RailState | "started") => (f: any): RailState => { const s = stateOf(f); return s === "started" ? "live" : s; };
 export interface RailConfig { tiers: RailState[]; standing: Record<string, number>; region: Record<string, string>; bigEvent: string[]; bonus: { home: number; homeWomen: number; region: number; event: number } }
 
 export const DEFAULT_RAIL: RailConfig = { tiers: ["live", "upcoming", "final"], standing: STANDING, region: REGION, bigEvent: BIG_EVENT, bonus: { home: 100, homeWomen: 50, region: 30, event: 30 } };
@@ -79,7 +81,8 @@ export function fixtureScore(f: any, home: string | null, cfg: RailConfig = DEFA
 }
 
 /** The fixtures in order: by group first (`cfg.tiers`: matches in play, then to come, then finished; `stateOf` is the live feed's word for a match), then best first; equal scores keep the start order. */
-export function rankFixtures(fx: any[], home: string | null, stateOf: (f: any) => RailState = () => "upcoming", cfg: RailConfig = DEFAULT_RAIL): any[] {
+export function rankFixtures(fx: any[], home: string | null, rawState: (f: any) => RailState | "started" = () => "upcoming", cfg: RailConfig = DEFAULT_RAIL): any[] {
+  const stateOf = railStateOf(rawState);
   return fx.map((f, i) => ({ f, i, t: cfg.tiers.indexOf(stateOf(f)), s: fixtureScore(f, home, cfg) })).sort((x, y) => x.t - y.t || y.s - x.s || x.i - y.i).map((x) => x.f);
 }
 
@@ -95,7 +98,8 @@ export const SOON_MS = 24 * 3600e3;
  * with a kick-off in the next 24 hours leads a bigger match later in the week. A just-finished T20 then stays next
  * to that series' next game instead of falling behind every other upcoming card.
  */
-export function arrangeFixtures(fx: any[], stateOf: (f: any) => RailState, home: string | null, cfg: RailConfig = DEFAULT_RAIL, now = Date.now()): any[] {
+export function arrangeFixtures(fx: any[], rawState: (f: any) => RailState | "started", home: string | null, cfg: RailConfig = DEFAULT_RAIL, now = Date.now()): any[] {
+  const stateOf = railStateOf(rawState);
   const startMs = (f: any) => Date.parse(f.start) || 0;
   const isSoon = (f: any) => { const t = startMs(f); return t >= now && t - now <= SOON_MS; };
   // a series' games more than 24 hours away are a group of their own: they rank with the other later games, not beside today's match of that series

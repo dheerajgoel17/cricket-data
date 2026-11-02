@@ -51,10 +51,17 @@ const startedSince = (f: any, ms: number, now: number) => (f.start.length > 10 ?
 /** Fixtures that have not finished yet (4 h grace after the start). */
 export const upcomingOnly = (fx: any[], now = Date.now()) => fx.filter((f) => startedSince(f, 4 * 3600e3, now));
 
-/** A fixture's state: the live feed's word for it when it has one, else what the schedule file says (a match that has dropped off the source's page is stored as Completed). */
+/**
+ * A fixture's state: the live feed's word for it when it has one, else what the schedule file says (a match that has dropped off the source's page is stored as Completed).
+ * `started` is a match whose start has passed with no result and no word that play is on: the builder publishes it for a priced match neither the schedule nor the live feed lists
+ * (`status: "Started"`), and it is shown as started with no score, never as live. Only the live feed or the schedule's own `Live` makes a match `live`.
+ */
+export type FixtureState = "live" | "started" | "final" | "upcoming";
 /** A multi-day match the schedule calls "Completed" at the close of a day, with no result yet, is still on: a finished Test has its result ("won by", "drawn") in the row. */
 const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, keepMsFor(f.fmt), now);
-export const fixtureState = (f: any, live?: string, now = Date.now()): "live" | "final" | "upcoming" => (live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : "upcoming");
+export const fixtureState = (f: any, live?: string, now = Date.now()): FixtureState => (live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : f.status === "Started" ? "started" : "upcoming");
+/** A match that has begun and has no result: it keeps its place among the ones in play (the keep window, the In play bucket, the rail order) whether or not a score is available. */
+const begun = (s: string) => s === "live" || s === "started";
 
 /** Display-only extra: on a quiet day, finished limited-overs matches stay up to 4 days so the rail is not bare. Priced keep is `keepMsFor` (24 h / 6 days). */
 const QUIET_FILL_MS = 96 * 3600e3;
@@ -64,7 +71,7 @@ const QUIET_FILL_MS = 96 * 3600e3;
  * priced or not: 24 hours from the start (6 days for a Test), and while fewer than 3 matches are lined up, up to 4 days, so the page never goes bare.
  */
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
-  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
+  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (begun(stateOf(f)) && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
   const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
   const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));

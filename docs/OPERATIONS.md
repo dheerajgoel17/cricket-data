@@ -59,6 +59,9 @@ Job times, what is shown, and Test innings 0/1/2 rules: [SITE.md — Cadence and
 * Supabase: `select count(*) from assets;` should approach ~5.5k after the backfill.
 * CI: all four checks on PRs (`build`, `site-js`, `test (3.10)`, `test (3.12)`).
 
+## Data guard failed the Site build
+The "Data guard" step of `site.yml` (PROJECT_GUIDE 5.8) stops the job before the deploy when a hard invariant breaks, so the last good deploy stays up and nothing wrong ships. Open the run summary: the table names the check (a to g) and lists the matches at fault. The soft rows (warn) never stop a build; read them there. To reproduce: build the data (PROJECT_GUIDE section 7) and run `python -m cricket_site.guard --site site/public/data --data data`; `--now 2026-11-02T10:00Z` replays a moment. The live-body row needs the repository variable `SITE_URL` (the workflow reads `<site>/api/live`; with `DATA_WRAP_KEY` set it unwraps the body) and is skipped, never failed, when the body cannot be read. A failing hard check is fixed in the data or in the rule that made it (a stale `Live` row in `data/fixtures/upcoming.csv`, a duplicate fixture, an engine figure that no longer matches a recount), not by switching the step off; to ship an urgent change while the cause is fixed, run the workflow after correcting the data file.
+
 ## Cost and limits
 Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Supabase free). Watch: Supabase free projects pause after inactivity (the hourly sync keeps it active);
 1 GB storage / 500 MB DB; Vercel function limits; xAI Grok is the one **metered** dependency (a few hundred tokens per question), remove `XAI_API_KEY` to go fully free.

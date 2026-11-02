@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { clockLiveMs, liveBlurb, scoreLabel, sessionLabel, teamScore } from "@cricket/engine/live.js";
+import { liveBlurb, scoreLabel, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
-import { fixtureState } from "@/hooks/useEngine";
+import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamBadge, usePreloadTeams } from "./badges";
@@ -38,6 +38,9 @@ export function LiveScore({ s, size = "md", className }: { s: { display?: string
   );
 }
 
+/** What a started match says in place of its score when neither the schedule nor the live feed lists it. */
+export const NO_SCORE = "Score not available from our source";
+
 export function startsIn(ms: number) {
   const m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60), d = Math.floor(h / 24);
   if (d >= 1) return `Starts in ${d} day${d > 1 ? "s" : ""}`;
@@ -49,16 +52,12 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const now = useNow(30000);
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const { match } = useLiveMatch(f);
-  const clockLive = timed && ms <= 0 && ms > -clockLiveMs(f.fmt);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
-  const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final" || (!match && fixtureState(f) === "final");
-  // the live feed says the match has not started although its time has passed (rain, a late toss): it is delayed, not in play
-  const delayed = !final && !hasScore && match?.status === "upcoming" && ms <= 0 && ms > -24 * 3600e3;
-  const live = !final && !delayed && (hasScore || clockLive || fixtureState(f, match?.status) === "live"); // a Test between days is still on: scores and "Close of play" come from the live feed
+  const { state, hasScore } = playState(f, match, now);
+  const [final, delayed, live, started] = [state === "final", state === "delayed", state === "live", state === "started"]; // in play only on evidence; a started match with no word on play has no LIVE badge and no score columns
   const blurb = liveBlurb(match);
   const session = sessionLabel(blurb) || match?.session || "";
-  const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
   return (
@@ -68,7 +67,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
-            {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : "Upcoming"}</span>}
+            {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
             {city(f.venue) && <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}

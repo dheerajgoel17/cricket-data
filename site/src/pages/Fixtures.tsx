@@ -16,7 +16,8 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { clockLiveMs, liveBlurb, teamScore } from "@cricket/engine/live.js";
+import { clockStartedMs, liveBlurb, teamScore } from "@cricket/engine/live.js";
+import { playState } from "@/lib/play-state";
 import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
@@ -30,7 +31,7 @@ import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
-import { LiveScore } from "@/components/app/fixture-card";
+import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
 import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
 import { LiveFeed } from "@/components/app/live-feed";
 import { AnimatedHeight } from "@/components/app/animated-height";
@@ -46,13 +47,13 @@ const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
 
-/** Where the match is in time: label (Upcoming / Live / Completed) and the ticking value, from the shared 1 s clock. */
+/** Where the match is in time: label (Upcoming / Started / Completed) and the ticking value, from the shared 1 s clock. The clock never says Live. */
 function useMatchClock(when: Date, timed: boolean, fmt?: string) {
   const now = useNow(1000), ms = when.getTime() - now;
-  if (!timed) return { label: "Upcoming", value: "Time TBC", tone: "" };
-  if (ms > 0) return { label: "Upcoming", value: formatCountdown(ms), tone: "" };
-  if (ms > -clockLiveMs(fmt)) return { label: "Live", value: formatElapsed(-ms), tone: "live" };
-  return { label: "Completed", value: "", tone: "" };
+  if (!timed) return { label: "Upcoming", value: "Time TBC", tone: "", since: "" };
+  if (ms > 0) return { label: "Upcoming", value: formatCountdown(ms), tone: "", since: "" };
+  if (ms > -clockStartedMs(fmt)) return { label: "Started", value: formatElapsed(-ms), tone: "started", since: formatElapsed(-ms) };
+  return { label: "Completed", value: "", tone: "", since: formatElapsed(-ms) };
 }
 
 /** Match header, flat like Source B's (no card): status and format, the two sides with their start time and live timer, then series and venue. */
@@ -62,11 +63,9 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const clock = useMatchClock(when, timed, f.fmt);
   const { match } = useLiveMatch(f);
   const scores = [teamScore(match, f.a), teamScore(match, f.b)];
-  const hasScore = scores.some((s) => s?.display);
-  const final = match?.status === "final" || (!match && fixtureState(f) === "final");
-  const delayed = !final && !hasScore && match?.status === "upcoming" && clock.tone === "live"; // its time has passed but the live feed says it has not started: delayed, not in play
-  const on = !final && !delayed && (hasScore || clock.tone === "live" || fixtureState(f, match?.status) === "live");
-  const blurb = liveBlurb(match) || (final ? f.result || "" : "");
+  const { state, hasScore } = playState(f, match);
+  const [final, delayed, on, started] = [state === "final", state === "delayed", state === "live", state === "started"]; // in play only on evidence, never on the clock
+  const blurb = liveBlurb(match) || (final ? f.result || "" : started ? NO_SCORE : "");
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
@@ -77,7 +76,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className="flex items-center gap-snug">
         <span className={cn("label-cap text-footnote", on ? "text-miss" : "text-muted-foreground")}>
-          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : clock.label}
+          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : started ? "Started" : clock.label}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
@@ -98,7 +97,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
           <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
           <div className="grid justify-items-end gap-hair text-right">
             <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
-            <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : clock.value}</b>
+            <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : started ? clock.since : clock.value}</b>
           </div>
         </div>
       )}
