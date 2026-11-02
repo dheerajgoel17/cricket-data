@@ -142,7 +142,7 @@ Backfilling: `python -m value_bets.archive --backfill-book-names` adds `book_nam
 | `scraper-update.yml` | every 30 min (+03:17 backfill) | Source A scrape of newly finished matches into `data/provisional/` | optional API keys |
 | `balls-update.yml` | every 2 h | Source A ball-by-ball for recent matches Base lacks (`data/balls/`), prune the ones it now has | none |
 | `weekly-heal.yml` | Sun 06:15 | full re-sync / healing | none |
-| `value-bets.yml` | hourly 03:30-17:30 UTC, weekly refit | odds -> value bets, commits `value_bets/out`; files every match's lines in `value_bets/archive` and adds the results of finished matches (5.4c) | optional odds keys; var `SITE_URL` (results step) |
+| `value-bets.yml` | hourly, round the clock; weekly refit | odds -> value bets, commits `value_bets/out`; files every match's lines in `value_bets/archive` and adds the results of finished matches (5.4c) | optional odds keys; var `SITE_URL` (results step) |
 | `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), list unlinked priced players in the run summary, sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
 | `auto-merge-scraper-fixes.yml` | workflow_run | merges `scraper-fix` PRs that only touch scraper files | none |
 
