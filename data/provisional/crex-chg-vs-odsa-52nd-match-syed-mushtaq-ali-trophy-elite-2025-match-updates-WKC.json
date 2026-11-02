@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 135,
+      "team": "Odisha",
+      "wickets": 8
+    },
+    {
+      "balls": 118,
+      "runs": 108,
+      "team": "Chhattisgarh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-chg-vs-odsa-52nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKC",
   "match_type": "T20",
   "player_of_match": "Rajesh Mohanty",

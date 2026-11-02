@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 79,
+      "runs": 83,
+      "team": "Puducherry",
+      "wickets": 10
+    },
+    {
+      "balls": 54,
+      "runs": 84,
+      "team": "Gujarat",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-guj-vs-pdc-51st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK8",
   "match_type": "T20",
   "player_of_match": "Japagnya Bhatt",

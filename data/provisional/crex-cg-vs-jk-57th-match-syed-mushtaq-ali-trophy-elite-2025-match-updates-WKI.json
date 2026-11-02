@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 192,
+      "team": "Jammu and Kashmir",
+      "wickets": 10
+    },
+    {
+      "balls": 120,
+      "runs": 163,
+      "team": "Chandigarh",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-cg-vs-jk-57th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKI",
   "match_type": "T20",
   "player_of_match": "Yawer Hassan Khan",

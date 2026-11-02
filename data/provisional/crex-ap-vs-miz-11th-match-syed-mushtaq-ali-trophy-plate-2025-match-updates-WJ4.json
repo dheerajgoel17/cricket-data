@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 186,
+      "team": "Mizoram",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 128,
+      "team": "Arunachal Pradesh",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-ap-vs-miz-11th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ4",
   "match_type": "T20",
   "player_of_match": "Khiangte Vanrotlinga",

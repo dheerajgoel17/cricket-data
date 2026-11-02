@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 220,
+      "team": "Nagaland",
+      "wickets": 6
+    },
+    {
+      "balls": 109,
+      "runs": 188,
+      "team": "Manipur",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-mnp-vs-nagl-14th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ7",
   "match_type": "T20",
   "player_of_match": "Dega Nischal",

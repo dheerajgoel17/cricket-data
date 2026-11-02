@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 208,
+      "team": "Himachal Pradesh",
+      "wickets": 5
+    },
+    {
+      "balls": 112,
+      "runs": 212,
+      "team": "Bengal",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ben-vs-hp-59th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKG",
   "match_type": "T20",
   "player_of_match": "Karan Lal",

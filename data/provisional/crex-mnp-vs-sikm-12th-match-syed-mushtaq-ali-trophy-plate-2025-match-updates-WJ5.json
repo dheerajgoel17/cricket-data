@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 134,
+      "team": "Manipur",
+      "wickets": 10
+    },
+    {
+      "balls": 92,
+      "runs": 138,
+      "team": "Sikkim",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-mnp-vs-sikm-12th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ5",
   "match_type": "T20",
   "player_of_match": "C Kranthi Kumar",

@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 245,
+      "team": "Karnataka",
+      "wickets": 3
+    },
+    {
+      "balls": 86,
+      "runs": 100,
+      "team": "Tamil Nadu",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-kar-vs-tn-50th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK6",
   "match_type": "T20",
   "player_of_match": "Devdutt Padikkal",

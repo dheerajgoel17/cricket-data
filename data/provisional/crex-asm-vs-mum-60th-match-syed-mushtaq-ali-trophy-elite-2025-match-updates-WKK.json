@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 220,
+      "team": "Mumbai",
+      "wickets": 4
+    },
+    {
+      "balls": 115,
+      "runs": 122,
+      "team": "Assam",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-asm-vs-mum-60th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKK",
   "match_type": "T20",
   "player_of_match": "Sarfaraz Khan",

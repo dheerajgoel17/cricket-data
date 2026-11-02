@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 209,
+      "team": "Jharkhand",
+      "wickets": 8
+    },
+    {
+      "balls": 91,
+      "runs": 125,
+      "team": "Saurashtra",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-jhkd-vs-saur-58th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKE",
   "match_type": "T20",
   "player_of_match": "Ishan Kishan",

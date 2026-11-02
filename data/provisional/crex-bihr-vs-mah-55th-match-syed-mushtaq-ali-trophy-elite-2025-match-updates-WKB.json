@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 176,
+      "team": "Bihar",
+      "wickets": 3
+    },
+    {
+      "balls": 115,
+      "runs": 182,
+      "team": "Maharashtra",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-bihr-vs-mah-55th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKB",
   "match_type": "T20",
   "player_of_match": "Prithvi Shaw",
