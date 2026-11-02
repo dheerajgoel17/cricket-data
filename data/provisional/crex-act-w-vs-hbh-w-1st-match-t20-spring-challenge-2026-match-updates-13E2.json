@@ -2,6 +2,20 @@
   "date": "2026-10-12",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 127,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 7
+    },
+    {
+      "balls": 113,
+      "runs": 100,
+      "team": "ACT Meteors Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-act-w-vs-hbh-w-1st-match-t20-spring-challenge-2026-match-updates-13E2",
   "match_type": "T20",
   "player_of_match": "Amy Smith",

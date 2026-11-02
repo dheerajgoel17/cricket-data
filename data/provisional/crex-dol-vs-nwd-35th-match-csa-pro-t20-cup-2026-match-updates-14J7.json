@@ -2,6 +2,20 @@
   "date": "2026-10-13",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 144,
+      "team": "North West Dragons",
+      "wickets": 5
+    },
+    {
+      "balls": 96,
+      "runs": 148,
+      "team": "Dolphins",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-nwd-35th-match-csa-pro-t20-cup-2026-match-updates-14J7",
   "match_type": "T20",
   "player_of_match": "",

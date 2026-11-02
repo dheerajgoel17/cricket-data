@@ -2,6 +2,20 @@
   "date": "2026-10-13",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "Lions",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 133,
+      "team": "Eastern Cape Iinyathi",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-eci-vs-lio-36th-t20-csa-pro-t20-cup-2026-match-updates-14J8",
   "match_type": "T20",
   "player_of_match": "",

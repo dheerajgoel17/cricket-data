@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 260,
+      "team": "Titans",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Eastern Storm",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-es-vs-tit-32nd-match-csa-pro-t20-cup-2026-match-updates-14J4",
   "match_type": "T20",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2026-10-13",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 182,
+      "team": "Perth Scorchers Women",
+      "wickets": 8
+    },
+    {
+      "balls": 116,
+      "runs": 183,
+      "team": "Adelaide Strikers Women",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-ads-w-vs-prs-w-6th-match-t20-spring-challenge-2026-match-updates-13E7",
   "match_type": "T20",
   "player_of_match": "",

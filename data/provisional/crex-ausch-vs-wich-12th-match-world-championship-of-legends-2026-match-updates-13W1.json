@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 98,
+      "runs": 119,
+      "team": "Australia Champions",
+      "wickets": 10
+    },
+    {
+      "balls": 109,
+      "runs": 83,
+      "team": "West Indies Champions",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ausch-vs-wich-12th-match-world-championship-of-legends-2026-match-updates-13W1",
   "match_type": "T20",
   "player_of_match": "Ben Hilfenhaus",

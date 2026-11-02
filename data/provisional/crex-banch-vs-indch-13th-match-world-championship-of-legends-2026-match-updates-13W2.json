@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 141,
+      "team": "Bangladesh Champions",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "India Champions",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-banch-vs-indch-13th-match-world-championship-of-legends-2026-match-updates-13W2",
   "match_type": "T20",
   "player_of_match": "Enamul Haque jnr",

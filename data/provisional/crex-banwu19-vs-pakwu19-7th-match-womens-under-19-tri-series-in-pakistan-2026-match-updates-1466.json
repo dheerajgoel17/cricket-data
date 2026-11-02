@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "Women's Under-19 Tri-Series in Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Bangladesh U19-Women",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 104,
+      "team": "Pakistan U19-Women",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-banwu19-vs-pakwu19-7th-match-womens-under-19-tri-series-in-pakistan-2026-match-updates-1466",
   "match_type": "T20",
   "player_of_match": "Farjana Easmin",

@@ -2,6 +2,20 @@
   "date": "2026-10-12",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Sydney Sixers Women",
+      "wickets": 3
+    },
+    {
+      "balls": 108,
+      "runs": 90,
+      "team": "Brisbane Heat Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-bh-w-vs-sys-w-2nd-match-t20-spring-challenge-2026-match-updates-13E3",
   "match_type": "T20",
   "player_of_match": "",

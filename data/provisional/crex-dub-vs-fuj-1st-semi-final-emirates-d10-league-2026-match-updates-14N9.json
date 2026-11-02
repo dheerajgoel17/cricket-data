@@ -2,6 +2,20 @@
   "date": "2026-10-10",
   "event": "Emirates D10 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 131,
+      "team": "Fujairah",
+      "wickets": 0
+    },
+    {
+      "balls": 56,
+      "runs": 133,
+      "team": "Dubai",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dub-vs-fuj-1st-semi-final-emirates-d10-league-2026-match-updates-14N9",
   "match_type": "T20",
   "player_of_match": "Ansh Tandon",

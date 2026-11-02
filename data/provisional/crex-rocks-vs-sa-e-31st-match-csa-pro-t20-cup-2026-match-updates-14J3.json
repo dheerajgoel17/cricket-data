@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 151,
+      "team": "South Africa Emerging",
+      "wickets": 4
+    },
+    {
+      "balls": 99,
+      "runs": 155,
+      "team": "Rocks",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-rocks-vs-sa-e-31st-match-csa-pro-t20-cup-2026-match-updates-14J3",
   "match_type": "T20",
   "player_of_match": "",

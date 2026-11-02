@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "Australia A tour of India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 285,
+      "runs": 275,
+      "team": "India A",
+      "wickets": 10
+    },
+    {
+      "balls": 278,
+      "runs": 226,
+      "team": "Australia A",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-aus-a-vs-ind-a-3rd-odi-australia-a-tour-of-india-2026-match-updates-124J",
   "match_type": "ODI",
   "player_of_match": "Vipraj Nigam",

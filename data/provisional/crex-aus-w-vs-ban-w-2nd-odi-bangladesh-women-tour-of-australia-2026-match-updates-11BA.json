@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "Bangladesh Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 220,
+      "team": "Bangladesh Women",
+      "wickets": 6
+    },
+    {
+      "balls": 169,
+      "runs": 222,
+      "team": "Australia Women",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-aus-w-vs-ban-w-2nd-odi-bangladesh-women-tour-of-australia-2026-match-updates-11BA",
   "match_type": "ODI",
   "player_of_match": "Georgia Voll",

@@ -2,6 +2,20 @@
   "date": "2026-10-12",
   "event": "Women's Under-19 Tri-Series in Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 105,
+      "team": "Pakistan U19-Women",
+      "wickets": 8
+    },
+    {
+      "balls": 81,
+      "runs": 106,
+      "team": "Sri Lanka U19-Women",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-pakwu19-vs-slwu19-8th-match-womens-under-19-tri-series-in-pakistan-2026-match-updates-1467",
   "match_type": "T20",
   "player_of_match": "Limansa Thilakaratne",

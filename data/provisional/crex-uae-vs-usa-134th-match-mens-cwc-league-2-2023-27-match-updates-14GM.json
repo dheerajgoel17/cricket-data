@@ -2,6 +2,20 @@
   "date": "2026-10-11",
   "event": "Men's CWC League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 279,
+      "runs": 213,
+      "team": "United Arab Emirates",
+      "wickets": 10
+    },
+    {
+      "balls": 232,
+      "runs": 214,
+      "team": "United States",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-uae-vs-usa-134th-match-mens-cwc-league-2-2023-27-match-updates-14GM",
   "match_type": "ODI",
   "player_of_match": "",

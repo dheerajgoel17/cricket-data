@@ -2,6 +2,20 @@
   "date": "2026-10-12",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 90,
+      "runs": 78,
+      "team": "Melbourne Stars Women",
+      "wickets": 10
+    },
+    {
+      "balls": 58,
+      "runs": 79,
+      "team": "Sydney Thunder Women",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-mls-w-vs-syt-w-4th-match-t20-spring-challenge-2026-match-updates-13E5",
   "match_type": "T20",
   "player_of_match": "",
