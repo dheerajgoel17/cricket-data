@@ -50,7 +50,18 @@ def write_provisional(store: Store, rec: MatchRecord) -> Path:
         pl.match_id, pl.date = rec.match_id, rec.date
     path = _dir(store) / f"{rec.match_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():  # a re-scrape adds what was missing; it never replaces a stored scorecard with an emptier one
+        try:
+            old = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            old = {}
+        if old.get("players") and not rec.players:
+            return path
+        if old.get("status") in (MatchStatus.CRICSHEET_MISSING.value, MatchStatus.CRICSHEET_WITHHELD.value):
+            rec.status = old["status"]
     doc = {**rec.row(), "players": [p.row() for p in rec.players]}
+    if rec.innings:
+        doc["innings"] = rec.innings
     path.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return path
 

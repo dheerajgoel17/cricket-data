@@ -127,6 +127,39 @@ def test_a_complete_scorecard_without_balls_still_qualifies_for_match_fours(tmp_
     assert inn[0][1] == 40  # Alpha batted first (Beta fielded)
 
 
+def test_a_stated_innings_summary_replaces_the_sum_of_the_player_rows():
+    """The WBBL 2026 opener: batters' runs gave Stars 176/3, the card states 192/4 (16 extras, one run-out)."""
+    def row(team, opp, **kw):
+        return {"player": f"{team}{len(kw)}", "player_id": "", "team": team, "opponent": opp, "runs": "0", "balls": "0", **{k: str(v) for k, v in kw.items()}}
+
+    pl = [row("Stars", "Hurricanes", runs=176, balls=110), row("Hurricanes", "Stars", runs=165, balls=118),
+          row("Hurricanes", "Stars", balls_bowled=120, wickets=3), row("Stars", "Hurricanes", balls_bowled=120, wickets=8)]
+    d = {"team_a": "Stars", "team_b": "Hurricanes", "winner": "Stars", "toss_winner": "Hurricanes", "toss_decision": "field", "players": pl}
+    plain = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+    B._inn_from_totals(plain, d, 0, {})
+    assert [(i[2], i[3], i[4], i[16]) for i in plain["inn"]] == [(176, 3, 120, None), (165, 8, 120, None)]  # runs, wkts, balls, extras: unknown
+    stated = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+    B._inn_from_totals(stated, {**d, "innings": [{"team": "Stars", "runs": 192, "wickets": 4, "balls": 120}, {"team": "Hurricanes", "runs": 174, "wickets": 8, "balls": 120}]}, 0, {})
+    assert [(i[2], i[3], i[4], i[16]) for i in stated["inn"]] == [(192, 4, 120, 16), (174, 8, 120, 9)]  # extras = stated total - batters: 16 and 9
+
+
+def test_a_scraped_scorecard_counts_run_outs_so_an_all_out_innings_is_a_natural_end():
+    """Bowlers' wickets alone read an all-out innings as 9 down when a run-out ended it; 80% of overs then voided a complete match."""
+    def row(team, opp, **kw):
+        return {"player": f"{team}{len(kw)}", "player_id": "", "team": team, "opponent": opp, "runs": "0", "balls": "0", **{k: str(v) for k, v in kw.items()}}
+
+    def card(beta_wickets, beta_run_outs):
+        pl = [row("Alpha", "Beta", runs=150, balls=100), row("Beta", "Alpha", runs=60, balls=70),
+              row("Beta", "Alpha", balls_bowled=120, wickets=2),                              # Beta bowls Alpha's full 20 overs
+              row("Alpha", "Beta", balls_bowled=72, wickets=beta_wickets, run_outs=beta_run_outs)]  # Beta is bowled out in 12 overs
+        return {"team_a": "Alpha", "team_b": "Beta", "winner": "Alpha", "toss_winner": "Alpha", "toss_decision": "bat", "players": pl}
+
+    for wickets, run_outs, wkts, q in ((7, 3, 10, 1), (9, 0, 9, 0), (9, 4, 10, 1)):  # all out by 7 + 3 run-outs; 9 down in 12 overs is a cut-short match; 13 is capped at 10
+        m = {"overs": 0, "bpo": 6, "res": 0, "days": 1}
+        B._inn_from_totals(m, card(wickets, run_outs), 0, {})
+        assert (m["inn"][1][3], m["inn"][1][4], m["q"]) == (wkts, 72, q)
+
+
 def test_a_scraped_players_catches_and_stumpings_are_kept_and_a_row_with_no_side_is_skipped_not_fatal(tmp_path):
     z, data, out, _ = _out(tmp_path)
     bro = synth.pid(synth.BROOK)
