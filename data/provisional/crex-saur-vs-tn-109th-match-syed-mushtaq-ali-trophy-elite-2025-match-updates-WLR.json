@@ -2,6 +2,20 @@
   "date": "2025-12-08",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 183,
+      "team": "Saurashtra",
+      "wickets": 8
+    },
+    {
+      "balls": 112,
+      "runs": 185,
+      "team": "Tamil Nadu",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-saur-vs-tn-109th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLR",
   "match_type": "T20",
   "player_of_match": "B Sai Sudharsan",

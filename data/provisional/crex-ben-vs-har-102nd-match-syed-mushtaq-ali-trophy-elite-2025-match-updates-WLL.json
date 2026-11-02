@@ -2,6 +2,20 @@
   "date": "2025-12-08",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 191,
+      "team": "Haryana",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 167,
+      "team": "Bengal",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ben-vs-har-102nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLL",
   "match_type": "T20",
   "player_of_match": "Ishant Bhardwaj",
