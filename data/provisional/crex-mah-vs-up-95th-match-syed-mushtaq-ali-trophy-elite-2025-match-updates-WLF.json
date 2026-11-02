@@ -2,6 +2,20 @@
   "date": "2025-12-06",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 130,
+      "team": "Uttar Pradesh",
+      "wickets": 9
+    },
+    {
+      "balls": 114,
+      "runs": 131,
+      "team": "Maharashtra",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-mah-vs-up-95th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLF",
   "match_type": "T20",
   "player_of_match": "Rajvardhan Hangargekar",

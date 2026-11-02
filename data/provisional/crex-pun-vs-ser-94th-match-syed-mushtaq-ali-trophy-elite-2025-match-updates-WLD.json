@@ -2,6 +2,20 @@
   "date": "2025-12-06",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 233,
+      "team": "Punjab",
+      "wickets": 6
+    },
+    {
+      "balls": 118,
+      "runs": 160,
+      "team": "Services",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-pun-vs-ser-94th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLD",
   "match_type": "T20",
   "player_of_match": "Abhishek Sharma",

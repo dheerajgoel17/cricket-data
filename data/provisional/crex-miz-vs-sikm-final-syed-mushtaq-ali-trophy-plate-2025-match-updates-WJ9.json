@@ -2,6 +2,20 @@
   "date": "2025-12-06",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 148,
+      "team": "Mizoram",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "Sikkim",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-miz-vs-sikm-final-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ9",
   "match_type": "T20",
   "player_of_match": "KC Cariappa",

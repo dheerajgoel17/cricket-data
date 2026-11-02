@@ -2,6 +2,20 @@
   "date": "2025-12-06",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 175,
+      "team": "Delhi",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 177,
+      "team": "Rajasthan",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-del-vs-raj-90th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLA",
   "match_type": "T20",
   "player_of_match": "Mukul Choudhary",

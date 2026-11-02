@@ -2,6 +2,20 @@
   "date": "2025-12-08",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 188,
+      "team": "Punjab",
+      "wickets": 8
+    },
+    {
+      "balls": 97,
+      "runs": 113,
+      "team": "Gujarat",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-guj-vs-pun-107th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WLS",
   "match_type": "T20",
   "player_of_match": "Naman Dhir",
