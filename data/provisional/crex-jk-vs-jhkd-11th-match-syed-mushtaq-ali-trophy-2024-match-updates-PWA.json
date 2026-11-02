@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 224,
+      "team": "Jammu and Kashmir",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 199,
+      "team": "Jharkhand",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-jk-vs-jhkd-11th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWA",
   "match_type": "T20",
   "player_of_match": "Abid Mushtaq",

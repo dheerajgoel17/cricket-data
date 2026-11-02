@@ -2,6 +2,20 @@
   "date": "2024-11-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Bihar",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Meghalaya",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-bihr-vs-mgly-49th-match-syed-mushtaq-ali-trophy-2024-match-updates-PXE",
   "match_type": "T20",
   "player_of_match": "Sakibul Gani",

@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 157,
+      "team": "Saurashtra",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 103,
+      "team": "Sikkim",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-saur-vs-sikm-2nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW5",
   "match_type": "T20",
   "player_of_match": "",

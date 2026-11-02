@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 248,
+      "team": "Hyderabad",
+      "wickets": 4
+    },
+    {
+      "balls": 91,
+      "runs": 69,
+      "team": "Meghalaya",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-hyd-vs-mgly-3rd-match-syed-mushtaq-ali-trophy-2024-match-updates-PW7",
   "match_type": "T20",
   "player_of_match": "Tilak Varma",

@@ -2,6 +2,20 @@
   "date": "2024-11-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 218,
+      "team": "Tamil Nadu",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 84,
+      "team": "Sikkim",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-sikm-vs-tn-30th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWU",
   "match_type": "T20",
   "player_of_match": "Narayan Jagadeesan",

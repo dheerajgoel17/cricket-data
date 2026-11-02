@@ -2,6 +2,20 @@
   "date": "2024-11-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 103,
+      "runs": 77,
+      "team": "Nagaland",
+      "wickets": 10
+    },
+    {
+      "balls": 58,
+      "runs": 79,
+      "team": "Andhra",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-andr-vs-nagl-32nd-match-syed-mushtaq-ali-trophy-2024-match-updates-PWQ",
   "match_type": "T20",
   "player_of_match": "Tripurana Vijay",

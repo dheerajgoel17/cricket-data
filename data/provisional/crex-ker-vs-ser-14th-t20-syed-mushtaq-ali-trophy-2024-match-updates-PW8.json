@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 149,
+      "team": "Services",
+      "wickets": 9
+    },
+    {
+      "balls": 109,
+      "runs": 153,
+      "team": "Kerala",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-ker-vs-ser-14th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PW8",
   "match_type": "T20",
   "player_of_match": "Akhil Scaria",

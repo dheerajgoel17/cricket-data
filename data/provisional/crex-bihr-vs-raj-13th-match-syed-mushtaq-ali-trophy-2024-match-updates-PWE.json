@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 224,
+      "team": "Rajasthan",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 116,
+      "team": "Bihar",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-bihr-vs-raj-13th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWE",
   "match_type": "T20",
   "player_of_match": "Abhijeet Tomar",

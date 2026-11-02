@@ -2,6 +2,20 @@
   "date": "2024-11-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 222,
+      "team": "Madhya Pradesh",
+      "wickets": 5
+    },
+    {
+      "balls": 118,
+      "runs": 121,
+      "team": "Meghalaya",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-mgly-vs-mp-31st-match-syed-mushtaq-ali-trophy-2024-match-updates-PWW",
   "match_type": "T20",
   "player_of_match": "Rajat Patidar",

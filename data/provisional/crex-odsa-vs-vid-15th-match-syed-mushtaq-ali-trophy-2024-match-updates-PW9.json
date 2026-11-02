@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 216,
+      "team": "Vidarbha",
+      "wickets": 6
+    },
+    {
+      "balls": 115,
+      "runs": 183,
+      "team": "Odisha",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-odsa-vs-vid-15th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW9",
   "match_type": "T20",
   "player_of_match": "Karun Nair",

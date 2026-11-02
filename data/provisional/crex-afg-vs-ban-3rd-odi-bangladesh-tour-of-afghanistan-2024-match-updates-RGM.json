@@ -2,6 +2,20 @@
   "date": "2024-11-11",
   "event": "Bangladesh tour of Afghanistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 244,
+      "team": "Bangladesh",
+      "wickets": 8
+    },
+    {
+      "balls": 290,
+      "runs": 246,
+      "team": "Afghanistan",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-ban-3rd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGM",
   "match_type": "ODI",
   "player_of_match": "Azmatullah Omarzai",

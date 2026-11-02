@@ -2,6 +2,20 @@
   "date": "2024-11-23",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "Nagaland",
+      "wickets": 4
+    },
+    {
+      "balls": 91,
+      "runs": 151,
+      "team": "Maharashtra",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-mah-vs-nagl-6th-match-syed-mushtaq-ali-trophy-2024-match-updates-PW0",
   "match_type": "T20",
   "player_of_match": "Ankit Bawne",

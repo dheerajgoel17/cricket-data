@@ -2,6 +2,20 @@
   "date": "2024-11-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 155,
+      "team": "Tripura",
+      "wickets": 8
+    },
+    {
+      "balls": 62,
+      "runs": 156,
+      "team": "Gujarat",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-guj-vs-tri-38th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX4",
   "match_type": "T20",
   "player_of_match": "Urvil Patel",

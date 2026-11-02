@@ -2,6 +2,20 @@
   "date": "2024-11-09",
   "event": "Bangladesh tour of Afghanistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 252,
+      "team": "Bangladesh",
+      "wickets": 7
+    },
+    {
+      "balls": 261,
+      "runs": 184,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-2nd-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGL",
   "match_type": "ODI",
   "player_of_match": "Najmul Hossain Shanto",

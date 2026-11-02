@@ -2,6 +2,20 @@
   "date": "2024-11-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 255,
+      "team": "Haryana",
+      "wickets": 2
+    },
+    {
+      "balls": 102,
+      "runs": 80,
+      "team": "Arunachal Pradesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ap-vs-har-29th-match-syed-mushtaq-ali-trophy-2024-match-updates-PWS",
   "match_type": "T20",
   "player_of_match": "Nishant Sindhu",
