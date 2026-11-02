@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 154,
+      "team": "Brisbane Heat Women",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 157,
+      "team": "Sydney Sixers Women",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-bh-w-vs-sys-w-3rd-t20-womens-big-bash-league-2026-match-updates-12X6",
   "match_type": "T20",
   "player_of_match": "Ellyse Perry",

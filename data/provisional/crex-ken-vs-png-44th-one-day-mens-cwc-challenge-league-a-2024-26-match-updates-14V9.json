@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Men's CWC Challenge League A",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 228,
+      "runs": 230,
+      "team": "Kenya",
+      "wickets": 7
+    },
+    {
+      "balls": 181,
+      "runs": 142,
+      "team": "Papua New Guinea",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ken-vs-png-44th-one-day-mens-cwc-challenge-league-a-2024-26-match-updates-14V9",
   "match_type": "ODI",
   "player_of_match": "Francis Mutua",

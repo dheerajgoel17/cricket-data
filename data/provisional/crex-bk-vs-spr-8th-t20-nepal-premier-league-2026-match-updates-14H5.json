@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 30,
+      "runs": 105,
+      "team": "Biratnagar Kings",
+      "wickets": 2
+    },
+    {
+      "balls": 30,
+      "runs": 70,
+      "team": "Sudurpaschim Royals",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-bk-vs-spr-8th-t20-nepal-premier-league-2026-match-updates-14H5",
   "match_type": "T20",
   "player_of_match": "Andre Russell",

@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "India tour of New Zealand",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 259,
+      "team": "New Zealand",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 172,
+      "team": "India",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-ind-vs-nz-4th-t20i-india-tour-of-new-zealand-2026-match-updates-12JF",
   "match_type": "T20",
   "player_of_match": "Glenn Phillips",

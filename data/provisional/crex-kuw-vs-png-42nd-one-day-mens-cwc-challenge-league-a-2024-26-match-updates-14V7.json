@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Men's CWC Challenge League A",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 237,
+      "runs": 119,
+      "team": "Papua New Guinea",
+      "wickets": 10
+    },
+    {
+      "balls": 129,
+      "runs": 123,
+      "team": "Kuwait",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-kuw-vs-png-42nd-one-day-mens-cwc-challenge-league-a-2024-26-match-updates-14V7",
   "match_type": "ODI",
   "player_of_match": "Yasin Patel",
