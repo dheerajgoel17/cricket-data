@@ -2,6 +2,20 @@
   "date": "2018-08-03",
   "event": "Nepal tour of Netherlands",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 293,
+      "runs": 216,
+      "team": "Nepal",
+      "wickets": 10
+    },
+    {
+      "balls": 300,
+      "runs": 215,
+      "team": "Netherlands",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ned-vs-nep-2nd-odi-nepal-tour-of-netherlands-2018-match-updates-A5H",
   "match_type": "ODI",
   "player_of_match": "Sompal Kami",

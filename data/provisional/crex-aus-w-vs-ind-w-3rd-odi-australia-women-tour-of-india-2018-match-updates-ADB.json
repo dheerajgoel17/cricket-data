@@ -2,6 +2,20 @@
   "date": "2018-03-18",
   "event": "Australia women tour of India",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 332,
+      "team": "Australia women",
+      "wickets": 7
+    },
+    {
+      "balls": 268,
+      "runs": 235,
+      "team": "India Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-aus-w-vs-ind-w-3rd-odi-australia-women-tour-of-india-2018-match-updates-ADB",
   "match_type": "ODI",
   "player_of_match": "Alyssa Healy",

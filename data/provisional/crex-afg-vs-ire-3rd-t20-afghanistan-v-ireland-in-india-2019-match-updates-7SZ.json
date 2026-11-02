@@ -2,6 +2,20 @@
   "date": "2019-02-24",
   "event": "Afghanistan v Ireland in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 210,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 178,
+      "team": "Ireland",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-afg-vs-ire-3rd-t20-afghanistan-v-ireland-in-india-2019-match-updates-7SZ",
   "match_type": "T20",
   "player_of_match": "Mohammad Nabi",

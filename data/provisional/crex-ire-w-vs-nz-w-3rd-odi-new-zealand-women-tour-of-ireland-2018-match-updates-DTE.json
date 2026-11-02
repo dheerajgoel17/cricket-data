@@ -2,6 +2,20 @@
   "date": "2018-06-13",
   "event": "New Zealand Women tour of Ireland",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 440,
+      "team": "New Zealand Women",
+      "wickets": 3
+    },
+    {
+      "balls": 264,
+      "runs": 135,
+      "team": "Ireland Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ire-w-vs-nz-w-3rd-odi-new-zealand-women-tour-of-ireland-2018-match-updates-DTE",
   "match_type": "ODI",
   "player_of_match": "",

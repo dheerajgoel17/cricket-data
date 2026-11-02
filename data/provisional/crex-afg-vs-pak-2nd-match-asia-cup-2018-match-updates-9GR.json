@@ -2,6 +2,20 @@
   "date": "2018-09-21",
   "event": "Asia Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 257,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 297,
+      "runs": 258,
+      "team": "Pakistan",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-afg-vs-pak-2nd-match-asia-cup-2018-match-updates-9GR",
   "match_type": "ODI",
   "player_of_match": "Shoaib Malik",

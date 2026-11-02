@@ -2,6 +2,20 @@
   "date": "2018-08-01",
   "event": "Nepal tour of Netherlands",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 286,
+      "runs": 189,
+      "team": "Netherlands",
+      "wickets": 10
+    },
+    {
+      "balls": 251,
+      "runs": 134,
+      "team": "Nepal",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ned-vs-nep-1st-odi-nepal-tour-of-netherlands-2018-match-updates-A5G",
   "match_type": "ODI",
   "player_of_match": "Michael Rippon",
