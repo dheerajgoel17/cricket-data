@@ -2,6 +2,20 @@
   "date": "2026-01-19",
   "event": "Afghanistan vs West Indies in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 181,
+      "team": "Afghanistan",
+      "wickets": 3
+    },
+    {
+      "balls": 120,
+      "runs": 143,
+      "team": "West Indies",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-wi-1st-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z39",
   "match_type": "T20",
   "player_of_match": "Darwish Rasooli",

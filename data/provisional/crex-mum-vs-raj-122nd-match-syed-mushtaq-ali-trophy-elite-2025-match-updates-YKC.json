@@ -2,6 +2,20 @@
   "date": "2025-12-16",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 216,
+      "team": "Rajasthan",
+      "wickets": 4
+    },
+    {
+      "balls": 109,
+      "runs": 217,
+      "team": "Mumbai",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-mum-vs-raj-122nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YKC",
   "match_type": "T20",
   "player_of_match": "Sarfaraz Khan",

@@ -2,6 +2,20 @@
   "date": "2025-12-14",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 205,
+      "team": "Punjab",
+      "wickets": 5
+    },
+    {
+      "balls": 119,
+      "runs": 211,
+      "team": "Andhra",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-andr-vs-pun-118th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-YK8",
   "match_type": "T20",
   "player_of_match": "M Hemanth Reddy",

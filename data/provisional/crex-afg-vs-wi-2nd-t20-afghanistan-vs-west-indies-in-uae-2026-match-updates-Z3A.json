@@ -2,6 +2,20 @@
   "date": "2026-01-21",
   "event": "Afghanistan vs West Indies in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 189,
+      "team": "Afghanistan",
+      "wickets": 4
+    },
+    {
+      "balls": 113,
+      "runs": 150,
+      "team": "West Indies",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-wi-2nd-t20-afghanistan-vs-west-indies-in-uae-2026-match-updates-Z3A",
   "match_type": "T20",
   "player_of_match": "Mujeeb Ur Rahman",
