@@ -2,6 +2,20 @@
   "date": "2024-02-17",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 114,
+      "runs": 160,
+      "team": "Sri Lanka",
+      "wickets": 10
+    },
+    {
+      "balls": 120,
+      "runs": 156,
+      "team": "Afghanistan",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-sl-1st-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSD",
   "match_type": "T20",
   "player_of_match": "Matheesha Pathirana",

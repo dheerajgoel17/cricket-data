@@ -2,6 +2,20 @@
   "date": "2023-10-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 224,
+      "team": "Karnataka",
+      "wickets": 7
+    },
+    {
+      "balls": 109,
+      "runs": 156,
+      "team": "Tripura",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-kar-vs-tri-126th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4J",
   "match_type": "T20",
   "player_of_match": "",

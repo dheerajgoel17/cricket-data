@@ -2,6 +2,20 @@
   "date": "2024-02-19",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 187,
+      "team": "Sri Lanka",
+      "wickets": 6
+    },
+    {
+      "balls": 102,
+      "runs": 115,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sl-2nd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSE",
   "match_type": "T20",
   "player_of_match": "Angelo Mathews",

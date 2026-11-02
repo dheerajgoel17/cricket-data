@@ -2,6 +2,20 @@
   "date": "2023-11-10",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 244,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 285,
+      "runs": 247,
+      "team": "South Africa",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-sa-42nd-match-world-cup-2023-match-updates-L57",
   "match_type": "ODI",
   "player_of_match": "Rassie van der Dussen",

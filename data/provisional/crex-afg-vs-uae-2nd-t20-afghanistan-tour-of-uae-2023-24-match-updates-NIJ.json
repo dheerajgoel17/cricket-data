@@ -2,6 +2,20 @@
   "date": "2023-12-31",
   "event": "Afghanistan tour of UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 166,
+      "team": "United Arab Emirates",
+      "wickets": 7
+    },
+    {
+      "balls": 119,
+      "runs": 155,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-uae-2nd-t20-afghanistan-tour-of-uae-2023-24-match-updates-NIJ",
   "match_type": "T20",
   "player_of_match": "Aryan Lakra",

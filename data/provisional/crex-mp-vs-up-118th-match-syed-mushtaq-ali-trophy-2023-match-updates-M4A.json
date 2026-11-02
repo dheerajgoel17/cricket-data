@@ -2,6 +2,20 @@
   "date": "2023-10-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 135,
+      "team": "Uttar Pradesh",
+      "wickets": 7
+    },
+    {
+      "balls": 116,
+      "runs": 136,
+      "team": "Madhya Pradesh",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-mp-vs-up-118th-match-syed-mushtaq-ali-trophy-2023-match-updates-M4A",
   "match_type": "T20",
   "player_of_match": "",

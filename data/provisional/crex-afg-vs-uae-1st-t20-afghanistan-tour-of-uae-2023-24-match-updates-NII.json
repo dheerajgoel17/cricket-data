@@ -2,6 +2,20 @@
   "date": "2023-12-29",
   "event": "Afghanistan tour of UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 203,
+      "team": "Afghanistan",
+      "wickets": 3
+    },
+    {
+      "balls": 120,
+      "runs": 131,
+      "team": "United Arab Emirates",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-uae-1st-t20-afghanistan-tour-of-uae-2023-24-match-updates-NII",
   "match_type": "T20",
   "player_of_match": "Rahmanullah Gurbaz",

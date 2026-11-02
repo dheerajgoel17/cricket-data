@@ -2,6 +2,20 @@
   "date": "2023-11-03",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 279,
+      "runs": 179,
+      "team": "Netherlands",
+      "wickets": 10
+    },
+    {
+      "balls": 189,
+      "runs": 181,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ned-34th-match-world-cup-2023-match-updates-L4Z",
   "match_type": "ODI",
   "player_of_match": "Mohammad Nabi",

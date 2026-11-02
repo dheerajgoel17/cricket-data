@@ -2,6 +2,20 @@
   "date": "2023-10-30",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 297,
+      "runs": 241,
+      "team": "Sri Lanka",
+      "wickets": 10
+    },
+    {
+      "balls": 272,
+      "runs": 242,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-sl-30th-match-world-cup-2023-match-updates-L4V",
   "match_type": "ODI",
   "player_of_match": "Fazalhaq Farooqi",

@@ -2,6 +2,20 @@
   "date": "2024-02-11",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 308,
+      "team": "Sri Lanka",
+      "wickets": 6
+    },
+    {
+      "balls": 203,
+      "runs": 153,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sl-2nd-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSH",
   "match_type": "ODI",
   "player_of_match": "Charith Asalanka",

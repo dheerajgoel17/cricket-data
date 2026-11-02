@@ -2,6 +2,20 @@
   "date": "2023-11-07",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 291,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 281,
+      "runs": 293,
+      "team": "Australia",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-afg-vs-aus-39th-match-world-cup-2023-match-updates-L54",
   "match_type": "ODI",
   "player_of_match": "Glenn Maxwell",

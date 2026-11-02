@@ -2,6 +2,20 @@
   "date": "2024-02-09",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 381,
+      "team": "Sri Lanka",
+      "wickets": 3
+    },
+    {
+      "balls": 300,
+      "runs": 339,
+      "team": "Afghanistan",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2024-match-updates-NSG",
   "match_type": "ODI",
   "player_of_match": "Pathum Nissanka",

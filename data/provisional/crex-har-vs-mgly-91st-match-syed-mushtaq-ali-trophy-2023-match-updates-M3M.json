@@ -2,6 +2,20 @@
   "date": "2023-10-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 115,
+      "runs": 94,
+      "team": "Meghalaya",
+      "wickets": 10
+    },
+    {
+      "balls": 99,
+      "runs": 96,
+      "team": "Haryana",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-har-vs-mgly-91st-match-syed-mushtaq-ali-trophy-2023-match-updates-M3M",
   "match_type": "T20",
   "player_of_match": "",
