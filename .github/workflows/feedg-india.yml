@@ -5,7 +5,7 @@ name: Feed G (India runner)
 # Off until the repository variable FEEDG_INDIA_RUNNER is `on`, so no job waits for a runner that does not exist. Schedule and manual runs only: a pull request or push never reaches this runner.
 on:
   schedule:
-    - cron: "10 3-17 * * *"  # 20 minutes before value-bets, so its read is fresh
+    - cron: "10 * * * *"  # 20 minutes before value-bets, so its read is fresh (every hour, round the clock)
   workflow_dispatch:
 
 concurrency:

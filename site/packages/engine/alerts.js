@@ -11,8 +11,8 @@ import { HIGH_ODDS } from "./tape.js";
 
 export const NEW_ALERTS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json";
 export const FANCY_ALERTS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/fancy_alerts.json";
-/** The fancy alert file is rewritten every hour of the pipeline's day (03:30-17:30 UTC, a gap of ten hours at night); a file older than this means the step has stopped, so its prices are not posted. */
-export const FANCY_MAX_AGE_MS = 12 * 3600e3;
+/** The fancy alert file is rewritten every hour, round the clock; a file older than this (two missed runs) means the step has stopped, so its prices are not posted. */
+export const FANCY_MAX_AGE_MS = 3 * 3600e3;
 /** Lines of one match in a single message (the rest follow in the next one, so a long list never hits Telegram's 4096 character limit). */
 export const MAX_LINES = 8;
 /** Candidates looked at per run: a backlog is posted a few messages a minute, never all at once. */
