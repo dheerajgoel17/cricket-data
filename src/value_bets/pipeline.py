@@ -256,7 +256,8 @@ def detect_fmt(texts, has_draw, fixture_fmt, last_meeting_fmt):
         return "MULTI", "name"
     if "t20" in t or "t10" in t or "the hundred" in t or "twenty20" in t or "bash" in t or "premier league" in t:
         return "T20", "name"
-    if "odi" in t or "one day" in t or "one-day" in t or "50 over" in t or "league 2" in t or "list a" in t:
+    if ("odi" in t or "one day" in t or "one-day" in t or "50 over" in t or "50-over" in t or "pro50" in t or "pro 50" in t
+            or "ford trophy" in t or "hazare" in t or "league 2" in t or "list a" in t):
         return "ODI", "name"
     if last_meeting_fmt:
         return last_meeting_fmt, "last-meeting"
