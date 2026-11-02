@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import csv
 import io
-import json
 import sqlite3
 import sys
 from datetime import date, datetime, timedelta
@@ -15,7 +14,14 @@ from .cricsheet import download, iter_zip
 from .hosts import host
 from .models import MATCH_FIELDS, PLAYER_FIELDS
 from .polite import PoliteFetcher
-from .provisional import find_canonical, load_provisional, reconcile, write_provisional
+from .provisional import (
+    find_canonical,
+    innings_gaps,
+    load_provisional,
+    reconcile,
+    refresh_innings,
+    write_provisional,
+)
 from .registry import freshness, iter_combined, link_players
 from .scraper_monitor import ScraperFailure, ScraperRunReport, save_report
 from .scrapers import ScraperSource
@@ -23,36 +29,6 @@ from .sources import InboxSource, load_extra_sources
 from .store import Store
 
 DEFAULT_DATA = "data"
-
-
-
-REFETCH_PER_RUN = 12  # saved scorecards without the innings summary that one run fetches again: a run has a 30-minute budget and commits only at the end
-
-
-def _known_ids(folder: Path, cap: int = REFETCH_PER_RUN) -> set[str]:
-    """Saved scraped matches the scraper must not fetch again. All of them, except the newest `cap` that lack the innings summary: those are fetched once more,
-    a few per run, so a backlog fills in over several runs instead of one run running out of time."""
-    known, missing = set(), []
-    for p in folder.glob("crex-*.json"):
-        stem = p.stem.removeprefix("crex-")
-        if _has_innings_summary(p):
-            known.add(stem)
-            continue
-        try:
-            missing.append((json.loads(p.read_text(encoding="utf-8")).get("date", ""), stem))
-        except ValueError:
-            known.add(stem)
-    missing.sort(reverse=True)
-    return known | {stem for _, stem in missing[cap:]}
-
-
-def _has_innings_summary(path: Path) -> bool:
-    """True when a stored scraped match needs no second fetch: it has its innings summary, or it is a permanent class (never re-scraped)."""
-    try:
-        d = json.loads(path.read_text(encoding="utf-8"))
-    except ValueError:
-        return True
-    return bool(d.get("innings")) or d.get("status") != "provisional"
 
 def _write_scraper_report(store: Store, conflicts: list) -> None:
     """Write scraper conflict report to a CSV file."""
@@ -136,9 +112,8 @@ def _cmd_update(a: argparse.Namespace, browser) -> int:
     
     # Add web scraper if enabled
     if a.enable_scraper:
-        # matches already saved are not fetched again: a finished result never changes. The exception is a saved scorecard that lacks
-        # the innings summary (files written before it was kept): inside the look-back window it is fetched once more to gain it.
-        known = _known_ids(store.root / "provisional")
+        # matches already saved are not fetched again: a finished result never changes (`refresh-innings` adds what older files lack)
+        known = {p.stem.removeprefix("crex-") for p in (store.root / "provisional").glob("crex-*.json")}
         scraper_source = ScraperSource(browser=browser, known_ids=known)
         sources.append(scraper_source)
         
@@ -266,6 +241,19 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
           f"{res['failed']} failed, {res['warnings']} bowler warning(s)")
     for p in res["problems"]:
         print("  -", p)
+    return 0
+
+
+def cmd_refresh_innings(a: argparse.Namespace) -> int:
+    """Store the stated innings summary of every saved scraped match that lacks it (all formats and leagues, permanent matches too), a few per run."""
+    from .crex_browser import CREXBrowser
+
+    store = Store(a.data_dir)
+    base = f"{host('LIVE_SOURCE_BASE')}/cricket-live-score/"
+    before = len(innings_gaps(store))
+    with CREXBrowser(min_interval=a.min_interval) as browser:
+        res = refresh_innings(store, browser, base, limit=a.limit, max_seconds=a.max_minutes * 60)
+    print(f"refresh-innings: {res['saved']} saved, {res['failed']} without a usable scorecard, {res['left']} left for later runs ({before} lacked it before this run)")
     return 0
 
 
@@ -483,6 +471,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="first delete deliveries of matches whose provisional file is gone (Base has published them)")
     cb.add_argument("--force", action="store_true", help="re-scrape matches that already have deliveries")
     cb.set_defaults(fn=cmd_crex_balls)
+
+    ri = sub.add_parser("refresh-innings", help="store each saved scraped match's stated innings totals (runs / wickets / balls) a few per run")
+    ri.add_argument("--limit", type=int, default=20, help="cap on matches per run")
+    ri.add_argument("--max-minutes", type=float, default=10.0, help="stop starting new matches after this long")
+    ri.add_argument("--min-interval", type=float, default=1.5, help="seconds between page loads")
+    ri.set_defaults(fn=cmd_refresh_innings)
 
     s = sub.add_parser("stats", help="dataset summary")
     s.set_defaults(fn=cmd_stats)
