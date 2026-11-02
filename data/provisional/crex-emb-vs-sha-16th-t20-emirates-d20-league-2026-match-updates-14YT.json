@@ -2,6 +2,20 @@
   "date": "2026-10-26",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 183,
+      "team": "Emirates Blues",
+      "wickets": 3
+    },
+    {
+      "balls": 115,
+      "runs": 86,
+      "team": "Sharjah",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-emb-vs-sha-16th-t20-emirates-d20-league-2026-match-updates-14YT",
   "match_type": "T20",
   "player_of_match": "Asif Taniwal",

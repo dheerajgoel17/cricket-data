@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "Men's CWC Challenge League A",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 218,
+      "runs": 120,
+      "team": "Denmark",
+      "wickets": 10
+    },
+    {
+      "balls": 98,
+      "runs": 68,
+      "team": "Qatar",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-den-vs-qat-40th-list-a-mens-cwc-challenge-league-a-2024-26-match-updates-14V5",
   "match_type": "ODI",
   "player_of_match": "Saif Ahmad",

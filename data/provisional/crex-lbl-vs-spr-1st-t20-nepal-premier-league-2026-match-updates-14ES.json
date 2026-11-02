@@ -2,6 +2,20 @@
   "date": "2026-10-26",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 104,
+      "runs": 87,
+      "team": "Sudurpaschim Royals",
+      "wickets": 10
+    },
+    {
+      "balls": 59,
+      "runs": 88,
+      "team": "Lumbini Lions",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-lbl-vs-spr-1st-t20-nepal-premier-league-2026-match-updates-14ES",
   "match_type": "T20",
   "player_of_match": "Sher Malla",

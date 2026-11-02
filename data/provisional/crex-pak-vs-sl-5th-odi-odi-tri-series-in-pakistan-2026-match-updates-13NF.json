@@ -2,6 +2,20 @@
   "date": "2026-10-27",
   "event": "ODI Tri Series in Pakistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 153,
+      "runs": 110,
+      "team": "Pakistan",
+      "wickets": 10
+    },
+    {
+      "balls": 109,
+      "runs": 114,
+      "team": "Sri Lanka",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-pak-vs-sl-5th-odi-odi-tri-series-in-pakistan-2026-match-updates-13NF",
   "match_type": "ODI",
   "player_of_match": "Dilshan Madushanka",

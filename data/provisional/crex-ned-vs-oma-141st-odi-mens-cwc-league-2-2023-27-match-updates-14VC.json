@@ -2,6 +2,20 @@
   "date": "2026-10-27",
   "event": "Men's CWC League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 371,
+      "team": "Netherlands",
+      "wickets": 5
+    },
+    {
+      "balls": 297,
+      "runs": 265,
+      "team": "Oman",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ned-vs-oma-141st-odi-mens-cwc-league-2-2023-27-match-updates-14VC",
   "match_type": "ODI",
   "player_of_match": "Bas de Leede",

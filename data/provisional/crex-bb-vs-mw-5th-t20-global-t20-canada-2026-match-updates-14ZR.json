@@ -2,6 +2,14 @@
   "date": "2026-10-26",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 54,
+      "runs": 76,
+      "team": "Brampton Blazers",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-bb-vs-mw-5th-t20-global-t20-canada-2026-match-updates-14ZR",
   "match_type": "T20",
   "player_of_match": "",

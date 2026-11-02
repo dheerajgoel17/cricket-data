@@ -2,6 +2,20 @@
   "date": "2026-10-27",
   "event": "Ireland tour of Namibia",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 316,
+      "team": "Namibia",
+      "wickets": 7
+    },
+    {
+      "balls": 269,
+      "runs": 253,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ire-vs-nam-3rd-odi-ireland-tour-of-namibia-2026-match-updates-14SR",
   "match_type": "ODI",
   "player_of_match": "Jan Frylinck",

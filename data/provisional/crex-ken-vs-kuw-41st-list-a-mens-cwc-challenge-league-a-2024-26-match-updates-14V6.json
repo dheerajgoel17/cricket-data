@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "Men's CWC Challenge League A",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 367,
+      "team": "Kuwait",
+      "wickets": 9
+    },
+    {
+      "balls": 258,
+      "runs": 217,
+      "team": "Kenya",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ken-vs-kuw-41st-list-a-mens-cwc-challenge-league-a-2024-26-match-updates-14V6",
   "match_type": "ODI",
   "player_of_match": "Ravija Sandaruwan",

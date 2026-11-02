@@ -2,6 +2,20 @@
   "date": "2026-10-27",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 132,
+      "team": "Karnali Yaks",
+      "wickets": 9
+    },
+    {
+      "balls": 117,
+      "runs": 113,
+      "team": "Janakpur Bolts",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-jkb-vs-kny-3rd-t20-nepal-premier-league-2026-match-updates-14EU",
   "match_type": "T20",
   "player_of_match": "Unish Singh Thakuri",
