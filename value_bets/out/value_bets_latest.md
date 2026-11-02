@@ -1,31 +1,33 @@
-# Cricket value bets - 2026-11-02 21:00 IST
+# Cricket value bets - 2026-11-02 22:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
-- **moviodds_bet365**: ok, 1246 prices
-- **smarkets**: ok, 363 prices
+- **moviodds_bet365**: ok, 1272 prices
+- **smarkets**: ok, 390 prices
 - **feedk**: ok, 96 prices, 3 events
-- **feede**: ok, 380 prices, 14 events
-- **feedf**: ok, 186 prices, 8 events
-- **feedh**: ok, 951 prices, 57 events
+- **feede**: ok, 494 prices, 16 events
+- **feedf**: ok, 300 prices, 8 events
+- **feedh**: ok, 1083 prices, 60 events
 
-Matches starting in next 168h: **37**, markets priced: **301**, value bets: **2** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **39**, markets priced: **338**, value bets: **3** (new alerts: 2). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-04 07:30 IST | New Zealand vs India | Shubman Gill To Score 50 | Shubman Gill 50+ no | 1.67 @ feede_lb | 1.49 | 0.6613 | 12.3% | 2.00% | medium |
-| 11-04 07:30 IST | New Zealand vs India | Virat Kohli To Score 50 | Virat Kohli 50+ no | 1.67 @ feede_lb | 1.50 | 0.6778 | 11.5% | 2.00% | medium |
+| 11-04 07:30 IST | New Zealand vs India | Shubman Gill To Score 50 | Shubman Gill 50+ no | 1.73 @ feede_lb | 1.49 | 0.6613 | 16.4% | 2.00% | medium |
+| 11-04 07:30 IST | New Zealand vs India | Virat Kohli To Score 50 | Virat Kohli 50+ no | 1.73 @ feede_lb | 1.50 | 0.6778 | 15.5% | 2.00% | medium |
+| 11-04 07:30 IST | New Zealand vs India | Daryl Mitchell To Score 50 | Daryl Mitchell 50+ no | 1.57 @ feede_lb | 1.46 | 0.704 | 7.7% | 2.00% | medium |
 
 ### Why / notes per bet
 - **New Zealand vs India / Shubman Gill To Score 50 / Shubman Gill 50+ no** - why: Model 66% vs market 68% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: high humidity 84%. Notes: 3 market source(s) for fair price; model 0.661 vs market 0.682; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 - **New Zealand vs India / Virat Kohli To Score 50 / Virat Kohli 50+ no** - why: Model 68% vs market 66% for 50+ runs; form 53.7 runs/inn recency-weighted ODI (n_eff 24.2; last 5: 0, 29, 139, 74, 65), bats in 95% of games played; at Eden Park, Auckland: 1 inns avg 15.0; vs New Zealand: 25 inns avg 54.6; weather: high humidity 84%. Notes: 3 market source(s) for fair price; model 0.678 vs market 0.659; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / Daryl Mitchell To Score 50 / Daryl Mitchell 50+ no** - why: Model 70% vs market 67% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.2; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: high humidity 84%. Notes: 3 market source(s) for fair price; model 0.704 vs market 0.671; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
-- 11-04 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / SS Gill 100+ yes @ 8.00 (moviodds_bet365): edge 36.2%, model 0.1456, market 0.1905
-- 11-04 07:30 IST New Zealand vs India / To score a Century / Shubman Gill 100+ yes @ 8.00 (feedk_leoal): edge 36.6%, model 0.1456, market 0.1912
+- 11-04 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / SS Gill 100+ yes @ 8.00 (moviodds_bet365): edge 37.2%, model 0.1456, market 0.1927
+- 11-04 07:30 IST New Zealand vs India / To score a Century / Shubman Gill 100+ yes @ 8.00 (feedk_leoal): edge 37.5%, model 0.1456, market 0.1934
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Cdb A (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Fata Region (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Hyderabad (W) (female), Incredibles (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kerala (W) (female), Lahore Region Whites (male), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
+Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), Assam (W) (female), BBK Partnership (male), Baroda (W) (female), Cdb A (male), Central (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Fata Region (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Hyderabad (W) (female), Incredibles (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kerala (W) (female), Lahore Region Whites (male), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 151.4s. Snapshot: `odds_20261102T153037Z.jsonl.gz`
+Runtime 151.5s. Snapshot: `odds_20261102T163036Z.jsonl.gz`
