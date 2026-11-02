@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-02 15:00 IST
+# Cricket value bets - 2026-11-02 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
+- **moviodds_bet365**: ok, 1050 prices
 - **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
-- **moviodds_bet365**: ok, 1032 prices
-- **smarkets**: ok, 274 prices
-- **feedk**: ok, 32 prices, 1 events
-- **feede**: ok, 244 prices, 11 events
+- **smarkets**: ok, 303 prices
+- **feedk**: ok, 40 prices, 2 events
+- **feede**: ok, 244 prices, 13 events
 - **feedf**: ok, 132 prices, 8 events
-- **feedh**: ok, 659 prices, 38 events
+- **feedh**: ok, 671 prices, 38 events
 
-Matches starting in next 168h: **17**, markets priced: **228**, value bets: **3** (new alerts: 3). Min edge 5%.
+Matches starting in next 168h: **18**, markets priced: **230**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -29,6 +29,6 @@ Matches starting in next 168h: **17**, markets priced: **228**, value bets: **3*
 - 11-04 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / SS Gill 100+ yes @ 8.00 (moviodds_bet365): edge 52.4%, model 0.1456, market 0.2272
 - 11-04 13:40 IST Hobart Hurricanes vs Melbourne Renegades / Chamari Athapaththu To Score 50 / Chamari Athapaththu 50+ yes @ 6.00 (feede_lb): edge 36.6%, model 0.1673, market 0.2772
 
-Unmatched team names (add to mappings/teams.csv): Assam (W) (female), Cdb A (male), Chandigarh (W) (female), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Jammu And Kashmir (W) (female), Karnataka (W) (female)
+Unmatched team names (add to mappings/teams.csv): Assam (W) (female), Cdb A (male), Chandigarh (W) (female), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Fata Region (male), Jammu And Kashmir (W) (female), Karnataka (W) (female), Lahore Region Whites (male)
 
-Runtime 93.8s. Snapshot: `odds_20261102T093038Z.jsonl.gz`
+Runtime 103.7s. Snapshot: `odds_20261102T103044Z.jsonl.gz`
