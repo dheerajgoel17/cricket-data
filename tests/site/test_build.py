@@ -547,3 +547,14 @@ def test_a_scheduled_test_leaves_the_fixtures_a_day_after_it_ended_and_nothing_e
     assert listed(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc)) == [x for x in everything if x != ("South Africa", "2026-10-28")]
     assert listed(datetime(2026, 11, 2, 10, 0, tzinfo=timezone.utc)) == [("India", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]   # no end recorded: start of day 5 + 24 h
     assert listed(datetime(2026, 11, 4, 10, 0, tzinfo=timezone.utc))[0] == ("India", "2026-10-28"), "a Test with no result keeps its place until the schedule itself lets go"
+
+
+def test_the_weather_flag_is_published_per_match_for_the_data_guard(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    pl = [{"player": "A One", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "40", "balls": "20"}]
+    for mid, margin in (("crex-wet", "5 runs (DLS method)"), ("crex-dry", "5 runs")):
+        (data / "provisional" / f"{mid}.json").write_text(json.dumps(_prov(mid, "2025-06-01" if mid == "crex-wet" else "2025-06-02", "Alpha", "Beta", pl, result_margin=margin)))
+    B.build(z, data, out, None, workers=1)
+    M, _ = _load(out)
+    assert len(M["dls"]) == len(M["id"]) and set(M["dls"]) <= {0, 1}
+    assert (M["dls"][M["id"].index("prov-wet")], M["dls"][M["id"].index("prov-dry")]) == (1, 0)

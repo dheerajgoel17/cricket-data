@@ -40,7 +40,7 @@ _ZIP: zipfile.ZipFile | None = None
 
 def _compact(m: dict) -> dict:
     out = {k: m[k] for k in ("id", "date", "fmt", "gender", "intl", "event", "venue", "city", "teams", "winner",
-                              "res", "overs", "bpo", "days", "first", "q", "mc", "ts", "ho", "mw")}
+                              "res", "overs", "bpo", "days", "dls", "first", "q", "mc", "ts", "ho", "mw")}
     out["pv"] = 0
     out["inn"] = [pack_inn(i) for i in m["innings"]]
     out["ov"] = [i.get("ov") or [] for i in m["innings"]]
@@ -159,7 +159,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
-             "mc": 0, "ts": 0, "ho": 0, "mw": 0, "pv": 1, "inn": [], "ov": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
+             "mc": 0, "ts": 0, "ho": 0, "mw": 0, "dls": int(_dls_margin(d)), "pv": 1, "inn": [], "ov": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
         registry: dict[str, str] = {}
         for p in d.get("players", []):
             stat["rows"] += 1
@@ -381,7 +381,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
     return hosts, venue_host, per_match
 
 
-MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq")
+MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq", "dls")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
 FLD_KEYS = ("p", "m", "i", "t", "q", "ct", "st")
@@ -471,7 +471,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         hn = host_of_match.get(m["id"]) or venue_host.get((m["venue"] or "?", m["intl"]))
         hs = -2 if hn is None else -1 if hn == "-" else host_ix[hn]  # -1 neutral ground, -2 host unknown
         _push(cols, MATCH_KEYS, (_public_id(m["id"]), m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
-                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m.get("mw", 0), m["xq"]))
+                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m.get("mw", 0), m["xq"], m.get("dls", 0)))
         m["_ix"] = mi
         m["_tix"] = (a, b)
 
