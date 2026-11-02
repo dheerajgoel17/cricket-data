@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 207,
+      "team": "Delhi",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 197,
+      "team": "Saurashtra",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-del-vs-saur-45th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJZ",
   "match_type": "T20",
   "player_of_match": "Suyash Sharma",

@@ -2,6 +2,20 @@
   "date": "2025-12-02",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 139,
+      "team": "Nagaland",
+      "wickets": 6
+    },
+    {
+      "balls": 96,
+      "runs": 81,
+      "team": "Meghalaya",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-mgly-vs-nagl-10th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ3",
   "match_type": "T20",
   "player_of_match": "Sedezhalie Rupero",

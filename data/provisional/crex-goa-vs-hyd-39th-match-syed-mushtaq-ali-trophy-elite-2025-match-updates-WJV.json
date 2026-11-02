@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 160,
+      "team": "Goa",
+      "wickets": 4
+    },
+    {
+      "balls": 84,
+      "runs": 166,
+      "team": "Hyderabad",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-goa-vs-hyd-39th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJV",
   "match_type": "T20",
   "player_of_match": "Pragnay Reddy",

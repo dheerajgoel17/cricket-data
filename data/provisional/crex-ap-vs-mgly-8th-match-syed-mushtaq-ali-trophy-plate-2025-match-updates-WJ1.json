@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 118,
+      "team": "Arunachal Pradesh",
+      "wickets": 7
+    },
+    {
+      "balls": 90,
+      "runs": 123,
+      "team": "Meghalaya",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-ap-vs-mgly-8th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ1",
   "match_type": "T20",
   "player_of_match": "Kishan Lyngdoh",

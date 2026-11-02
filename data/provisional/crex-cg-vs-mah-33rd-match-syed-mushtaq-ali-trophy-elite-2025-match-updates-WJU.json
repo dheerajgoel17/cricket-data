@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 139,
+      "team": "Maharashtra",
+      "wickets": 7
+    },
+    {
+      "balls": 118,
+      "runs": 142,
+      "team": "Chandigarh",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-cg-vs-mah-33rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJU",
   "match_type": "T20",
   "player_of_match": "Manan Vohra",

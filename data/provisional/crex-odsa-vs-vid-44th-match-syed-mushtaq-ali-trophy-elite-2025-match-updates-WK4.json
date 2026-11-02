@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 160,
+      "team": "Odisha",
+      "wickets": 6
+    },
+    {
+      "balls": 89,
+      "runs": 163,
+      "team": "Vidarbha",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-odsa-vs-vid-44th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WK4",
   "match_type": "T20",
   "player_of_match": "Aman Mokhade",

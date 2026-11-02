@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 114,
+      "runs": 101,
+      "team": "Nagaland",
+      "wickets": 10
+    },
+    {
+      "balls": 76,
+      "runs": 105,
+      "team": "Sikkim",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-nagl-vs-sikm-9th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ2",
   "match_type": "T20",
   "player_of_match": "Gurinder Singh",

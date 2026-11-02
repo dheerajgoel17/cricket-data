@@ -2,6 +2,20 @@
   "date": "2025-11-30",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 310,
+      "team": "Punjab",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 198,
+      "team": "Bengal",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-ben-vs-pun-35th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJS",
   "match_type": "T20",
   "player_of_match": "Abhishek Sharma",
