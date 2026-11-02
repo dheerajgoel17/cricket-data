@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "@/ui/text";
 import { color, space, type } from "@/ui/tokens";
 
 /** A tab whose screen is not built yet (Phase 1 of the app). */

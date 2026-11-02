@@ -25,10 +25,16 @@ export function decodeUtf8(input?: Bytes): string {
   return out + String.fromCharCode.apply(null, units);
 }
 
+// The unwrap awaits one digest per 32-byte block, thousands in a row. Hashing is synchronous, so left alone a big file holds the main thread for hundreds of milliseconds; after
+// FRAME_MS of work the digest hands the thread back for a turn so touches and scrolls stay at 60 fps.
+const FRAME_MS = 8;
+let sliceStart = Date.now();
+
 /** `crypto.subtle.digest("SHA-256", data)`: the only call the unwrap makes. Synchronous inside, so thousands of small blocks do not each cross into native code. */
 export async function digest(algorithm: string | { name: string }, data: Bytes): Promise<ArrayBuffer> {
   const name = typeof algorithm === "string" ? algorithm : algorithm.name;
   if (name.toUpperCase() !== "SHA-256") throw new Error(`digest: ${name} is not supported`);
+  if (Date.now() - sliceStart >= FRAME_MS) { await new Promise<void>((r) => setTimeout(r, 0)); sliceStart = Date.now(); }
   const h = sha256(toBytes(data));
   return h.buffer.slice(h.byteOffset, h.byteOffset + h.byteLength) as ArrayBuffer;
 }

@@ -1,4 +1,4 @@
-import { buildRail, fixtureState } from "@/lib/rail";
+import { buildRail, fixtureState, phaseView, type RailItem } from "@/lib/rail";
 
 const NOW = Date.parse("2026-11-01T10:00:00Z");
 const at = (hours: number) => new Date(NOW + hours * 3600e3).toISOString();
@@ -56,5 +56,25 @@ describe("fixtureState", () => {
   });
   test("a limited-overs game marked Completed is final", () => {
     expect(fixtureState(fx("t", "India", "Pakistan", -5, { status: "Completed" }), undefined, NOW)).toBe("final");
+  });
+});
+
+describe("phaseView", () => {
+  const item = (id: string, state: RailItem["state"], noProps = false): RailItem => ({ fixture: { id }, state, live: null, noProps });
+  const items = [item("a", "live"), item("b", "live"), item("c", "upcoming"), item("d", "final"), item("e", "upcoming", true), item("f", "live", true)];
+
+  test("counts are of priced games only", () => {
+    expect(phaseView(items).counts).toEqual({ live: 2, pre: 1, final: 1 });
+  });
+  test("with no tap it opens In play when anything is on", () => {
+    const v = phaseView(items);
+    expect(v.phase).toBe("live");
+    expect(v.shown.map((i) => i.fixture.id)).toEqual(["a", "b"]); // the unpriced game that the schedule calls live is not under In play
+  });
+  test("games with no props yet are listed under Pre-match", () => {
+    expect(phaseView(items, "pre").shown.map((i) => i.fixture.id)).toEqual(["c", "e", "f"]);
+  });
+  test("an empty In play opens Pre-match", () => {
+    expect(phaseView([item("c", "upcoming"), item("d", "final")]).phase).toBe("pre");
   });
 });

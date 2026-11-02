@@ -4,6 +4,7 @@
 // React hooks and cannot be imported. Phase 1 moves it into the engine so there is one copy; until then a change to those two files needs the same change here.
 import { fixtureInBooks, bookFixtures, liveForFixture } from "@cricket/engine/live.js";
 import { keepMsFor } from "@cricket/engine/lines.js";
+import { countPhases, phaseOf, pickHomePhase, type HomePhase } from "@site/lib/home-phase";
 import { arrangeFixtures, DEFAULT_RAIL, rankFixtures, type RailConfig, type RailState } from "@site/lib/priority";
 
 /** How far ahead an unpriced game still shows (flagged `noProps`). */
@@ -36,6 +37,13 @@ export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (
 export const keepFinished = (finished: any[], now = Date.now()) =>
   finished.filter((f) => Date.parse(f.start) > now - keepMsFor(f.fmt)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
 
+// What the page says when a bucket is empty (site/src/components/app/home-phase-bar.tsx).
+export const EMPTY_PHASE: Record<HomePhase, string> = {
+  live: "Nothing in play. Pre-match lists the next games.",
+  pre: "No pre-match props yet.",
+  final: "No resulted matches still listed.",
+};
+
 export interface RailItem { fixture: any; state: RailState; live: any | null; noProps: boolean }
 
 /**
@@ -54,5 +62,23 @@ export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = n
   const arranged = arrangeFixtures(keepFinished(priced.filter((f) => stateOf(f) === "final"), now).concat(priced.filter((f) => stateOf(f) !== "final")), stateOf, home, rail, now);
   const upcoming = new Set(arranged.filter((f) => stateOf(f) === "upcoming" && Date.parse(f.start) < now + SHOW_AHEAD_MS));
   const shown = arranged.filter((f) => stateOf(f) !== "upcoming" || upcoming.has(f));
-  return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)].map((f) => ({ fixture: f, state: stateOf(f), live: liveForFixture(live, f), noProps: !!f.noProps }));
+  // the card's live match is the feed's, kept only when the books price the fixture too (`useLiveMatch`)
+  const matchOf = (f: any) => { const hit = liveForFixture(live, f); return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null; };
+  return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)].map((f) => ({ fixture: f, state: stateOf(f), live: matchOf(f), noProps: !!f.noProps }));
+}
+
+/** The live feed's match for a fixture, kept only when the books price it too (as the site's `useLiveMatch`). */
+export function liveMatchFor(live: any, lines: any, f: any) {
+  const feed = bookFixtures(lines), hit = liveForFixture(live, f);
+  return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null;
+}
+
+/**
+ * Which games Home shows under In play / Pre-match / Resulted, as the site's Home page does (site/src/pages/Home.tsx): the counts are of games the books price only,
+ * and a game with no props yet is listed under Pre-match only. `asked` is the bucket the viewer tapped; with none, the first that holds anything.
+ */
+export function phaseView(items: RailItem[], asked?: HomePhase) {
+  const counts = countPhases(items.filter((i) => !i.noProps), (i) => phaseOf(i.state));
+  const phase = pickHomePhase(counts, asked);
+  return { counts, phase, shown: items.filter((i) => (i.noProps ? phase === "pre" : phaseOf(i.state) === phase)) };
 }
