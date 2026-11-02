@@ -2,6 +2,20 @@
   "date": "2025-09-09",
   "event": "Asia Cup T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 188,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 94,
+      "team": "Hong Kong",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-hk-1st-match-asia-cup-t20-2025-match-updates-VUF",
   "match_type": "T20",
   "player_of_match": "Azmatullah Omarzai",

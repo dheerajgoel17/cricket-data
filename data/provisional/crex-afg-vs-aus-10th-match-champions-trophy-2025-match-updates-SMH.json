@@ -2,6 +2,20 @@
   "date": "2025-02-28",
   "event": "Champions Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 273,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 77,
+      "runs": 109,
+      "team": "Australia",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-afg-vs-aus-10th-match-champions-trophy-2025-match-updates-SMH",
   "match_type": "ODI",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2025-10-14",
   "event": "Afghanistan vs Bangladesh in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 293,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 163,
+      "runs": 93,
+      "team": "Bangladesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEJ",
   "match_type": "ODI",
   "player_of_match": "Bilal Sami",

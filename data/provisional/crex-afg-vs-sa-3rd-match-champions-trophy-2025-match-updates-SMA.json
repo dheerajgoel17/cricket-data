@@ -2,6 +2,20 @@
   "date": "2025-02-21",
   "event": "Champions Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 315,
+      "team": "South Africa",
+      "wickets": 6
+    },
+    {
+      "balls": 261,
+      "runs": 208,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sa-3rd-match-champions-trophy-2025-match-updates-SMA",
   "match_type": "ODI",
   "player_of_match": "Ryan Rickelton",

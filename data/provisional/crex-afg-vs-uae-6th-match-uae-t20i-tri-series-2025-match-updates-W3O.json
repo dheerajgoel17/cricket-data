@@ -2,6 +2,20 @@
   "date": "2025-09-05",
   "event": "UAE T20I Tri-Series",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 170,
+      "team": "Afghanistan",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 166,
+      "team": "United Arab Emirates",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-uae-6th-match-uae-t20i-tri-series-2025-match-updates-W3O",
   "match_type": "T20",
   "player_of_match": "Ibrahim Zadran",

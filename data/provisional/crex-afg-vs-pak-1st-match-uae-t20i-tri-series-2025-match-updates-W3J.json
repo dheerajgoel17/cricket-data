@@ -2,6 +2,20 @@
   "date": "2025-08-29",
   "event": "UAE T20I Tri-Series",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 182,
+      "team": "Pakistan",
+      "wickets": 7
+    },
+    {
+      "balls": 119,
+      "runs": 143,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-pak-1st-match-uae-t20i-tri-series-2025-match-updates-W3J",
   "match_type": "T20",
   "player_of_match": "Salman Ali Agha",

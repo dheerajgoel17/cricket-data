@@ -2,6 +2,20 @@
   "date": "2025-10-11",
   "event": "Afghanistan vs Bangladesh in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 269,
+      "runs": 190,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 171,
+      "runs": 109,
+      "team": "Bangladesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-2nd-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEI",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",

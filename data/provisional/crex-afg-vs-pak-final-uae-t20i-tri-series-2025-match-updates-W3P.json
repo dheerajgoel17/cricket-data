@@ -2,6 +2,20 @@
   "date": "2025-09-07",
   "event": "UAE T20I Tri-Series",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 141,
+      "team": "Pakistan",
+      "wickets": 8
+    },
+    {
+      "balls": 95,
+      "runs": 66,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-pak-final-uae-t20i-tri-series-2025-match-updates-W3P",
   "match_type": "T20",
   "player_of_match": "Mohammad Nawaz",

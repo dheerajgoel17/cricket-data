@@ -2,6 +2,20 @@
   "date": "2025-09-01",
   "event": "UAE T20I Tri-Series",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 188,
+      "team": "Afghanistan",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "United Arab Emirates",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-afg-vs-uae-3rd-match-uae-t20i-tri-series-2025-match-updates-W3L",
   "match_type": "T20",
   "player_of_match": "Sharafuddin Ashraf",

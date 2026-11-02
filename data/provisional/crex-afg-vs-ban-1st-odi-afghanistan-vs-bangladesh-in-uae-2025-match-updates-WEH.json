@@ -2,6 +2,20 @@
   "date": "2025-10-08",
   "event": "Afghanistan vs Bangladesh in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 293,
+      "runs": 221,
+      "team": "Bangladesh",
+      "wickets": 10
+    },
+    {
+      "balls": 283,
+      "runs": 226,
+      "team": "Afghanistan",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEH",
   "match_type": "ODI",
   "player_of_match": "Azmatullah Omarzai",

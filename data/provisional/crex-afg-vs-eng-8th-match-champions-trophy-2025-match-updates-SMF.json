@@ -2,6 +2,20 @@
   "date": "2025-02-26",
   "event": "Champions Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 325,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 299,
+      "runs": 317,
+      "team": "England",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-eng-8th-match-champions-trophy-2025-match-updates-SMF",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",

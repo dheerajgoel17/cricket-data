@@ -2,6 +2,20 @@
   "date": "2025-10-02",
   "event": "Afghanistan vs Bangladesh in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 151,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 112,
+      "runs": 153,
+      "team": "Bangladesh",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-ban-1st-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEE",
   "match_type": "T20",
   "player_of_match": "Parvez Hossain Emon",

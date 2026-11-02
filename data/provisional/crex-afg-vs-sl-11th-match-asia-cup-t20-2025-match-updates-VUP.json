@@ -2,6 +2,20 @@
   "date": "2025-09-18",
   "event": "Asia Cup T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 112,
+      "runs": 171,
+      "team": "Sri Lanka",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-sl-11th-match-asia-cup-t20-2025-match-updates-VUP",
   "match_type": "T20",
   "player_of_match": "Kusal Mendis",

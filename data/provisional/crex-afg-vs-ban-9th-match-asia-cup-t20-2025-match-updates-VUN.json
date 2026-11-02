@@ -2,6 +2,20 @@
   "date": "2025-09-16",
   "event": "Asia Cup T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 154,
+      "team": "Bangladesh",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 146,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-9th-match-asia-cup-t20-2025-match-updates-VUN",
   "match_type": "T20",
   "player_of_match": "Nasum Ahmed",

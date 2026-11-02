@@ -2,6 +2,20 @@
   "date": "2025-10-05",
   "event": "Afghanistan vs Bangladesh in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 143,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 108,
+      "runs": 144,
+      "team": "Bangladesh",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-ban-3rd-t20-afghanistan-vs-bangladesh-in-uae-2025-match-updates-WEG",
   "match_type": "T20",
   "player_of_match": "Saif Hassan",
