@@ -1,6 +1,6 @@
 name: Value bets
 
-# Hourly 03:30-17:30 UTC (09:00-23:00 IST): pull free odds (Exchange S, Book A via Feed P), price player props
+# Hourly, round the clock (minute 30): pull free odds (Exchange S, Book A via Feed P), price player props
 # against the cricket-data history and commit ONLY the small outputs under value_bets/out + dedupe state.
 # Independent of the data workflows (own concurrency group, touches no files under data/).
 # Each run also adds the results of finished matches to value_bets/archive (read from the site's live route; see docs/PROJECT_GUIDE.md 5.4c).
@@ -10,7 +10,7 @@ name: Value bets
 # the Open-Meteo cache in value_bets/mappings) and refit state/prop_model.json.
 on:
   schedule:
-    - cron: "30 3-17 * * *"
+    - cron: "30 * * * *"
     - cron: "0 7 * * 0"
   pull_request:  # dry run on PRs that touch the pipeline (proves the sources work from GitHub's runners; never commits)
     paths: ["src/value_bets/**", "value_bets/**", ".github/workflows/value-bets.yml", "site/scripts/fancy-alerts.mjs", "site/packages/engine/fancy-edge.js"]

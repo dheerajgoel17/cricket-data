@@ -179,6 +179,26 @@ test("edition summary and season-by-season series (matches that count for summar
   assert.equal(editionSummary(store, ed).counted, 2, "a void match is left out");
 });
 
+test("bat-first win % counts every match with a winner, also a chase that ended before 80% of the overs (the first 7 WBBL 2026 matches)", () => {
+  // teams: 0 Renegades, 1 Thunder, 2 Stars, 3 Hurricanes, 4 Heat, 5 Sixers, 6 Strikers, 7 Scorchers. Batting first won in matches 1, 3 and 6 only: 3 of 7.
+  // Match 4 (Scorchers chased 136 in 81 balls, 67%) is void for summary markets, so the old rule left it out and showed 3 of 6 = 50%.
+  const inn = (t1, r1, w1, b1, t2, r2, w2, b2) => [[t1, r1, w1, b1, 0, 0], [t2, r2, w2, b2, 0, 0]];
+  const M7 = {
+    id: ["w0", "w1", "w2", "w3", "w4", "w5", "w6"], d: ["2026-10-29", "2026-10-29", "2026-10-30", "2026-10-31", "2026-10-31", "2026-11-01", "2026-11-01"],
+    f: Array(7).fill(0), g: Array(7).fill(1), e: Array(7).fill(0), a: [0, 2, 4, 6, 7, 1, 5], b: [1, 3, 5, 2, 0, 4, 3],
+    w: [1, 2, 5, 6, 7, 1, 5], r: Array(7).fill(0), fi: [0, 2, 4, 6, 0, 4, 5], q: [1, 1, 1, 1, 0, 1, 1],
+    inn: [inn(0, 138, 9, 120, 1, 140, 4, 102), inn(2, 192, 4, 120, 3, 174, 8, 120), inn(4, 154, 5, 120, 5, 157, 6, 120), inn(6, 185, 2, 120, 2, 164, 7, 120),
+      inn(0, 136, 6, 120, 7, 138, 1, 81), inn(4, 178, 5, 120, 1, 180, 4, 100), inn(5, 196, 8, 120, 3, 109, 10, 106)],
+  };
+  const store = new Store({}, { ...index, events: ["WBBL"] }, M7, async () => ({}));
+  const s = editionSummary(store, editionsOf(store, 0)[0]);
+  assert.deepEqual([s.matches, s.counted, s.decided, s.batFirstWinPct], [7, 6, 7, 42.9]);
+  assert.equal(s.avgFirst, 173.83, "scoring still leaves the void match out: (138 + 192 + 154 + 185 + 178 + 196) / 6");
+  // a tie, a no result and a match whose batting order is unknown have no bat-first result
+  const odd = new Store({}, { ...index, events: ["WBBL"] }, { ...M7, r: [1, 2, 0, 0, 0, 0, 0], fi: [0, 2, -1, 6, 0, 4, 5] }, async () => ({}));
+  assert.deepEqual([editionSummary(odd, editionsOf(odd, 0)[0]).decided, editionSummary(odd, editionsOf(odd, 0)[0]).batFirstWinPct], [4, 50]);
+});
+
 test("a shard that fails once is read again, and the failed read is not kept", async () => {
   let calls = 0;
   const store = mkStore(async (p) => { if (p === "p/01.json" && ++calls === 1) throw new Error("HTTP 503"); return SHARDS[Number(p.slice(2, 4))]; });

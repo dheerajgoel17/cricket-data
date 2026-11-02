@@ -409,7 +409,7 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
     intl = _strip_qualifiers(a) in NATIONS and _strip_qualifiers(b) in NATIONS
     fam = entry_family(entry) or family_from_overs(facts.max_overs) or "t20"
     event = humanize(entry.series_name) if entry.series_name else ""
-    potm, players = "", []
+    potm, players, innings = "", [], []
     match_id = f"crex-{entry.match_id}"
     if scorecard is not None:
         event = event_name(scorecard.series_name) or event
@@ -418,6 +418,9 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
         canon = {n: next((t for t in (facts.team_a, facts.team_b) if names_match(n, t)), n) for n in scorecard.teams.values()}
         for pl in players:  # use the match page's team names everywhere ('United States' vs 'United States of America')
             pl.team, pl.opponent = canon.get(pl.team, pl.team), canon.get(pl.opponent, pl.opponent)
+        innings = [{"team": canon.get(scorecard.teams.get(i.batting_team, ""), scorecard.teams.get(i.batting_team, "")),
+                    "runs": i.runs, "wickets": i.wickets, "balls": i.balls}
+                   for i in scorecard.innings if i.runs is not None]
     return MatchRecord(
         match_id=match_id, date=match_date, match_type=cricsheet_match_type(match_type, fam, intl),
         team_type="international" if intl else "club",
@@ -425,7 +428,7 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
         event=event, venue=facts.venue, team_a=facts.team_a, team_b=facts.team_b,
         toss_winner=facts.toss_winner, toss_decision=facts.toss_decision,
         winner=facts.winner, result=facts.result, result_margin=facts.margin,
-        player_of_match=potm, status=status, source="crex", players=players)
+        player_of_match=potm, status=status, source="crex", players=players, innings=innings)
 
 
 def fetch_record(browser, entry: MatchEntry, facts: PageFacts, match_date: str, match_type: str = "",

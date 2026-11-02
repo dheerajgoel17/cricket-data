@@ -2,7 +2,7 @@
 
 A Test is carried for 6 days from its first morning so that one at stumps or on a rain day (no result yet) stays up. Once it has a result it should go a day after
 it ended. The archive file of a match (``value_bets/archive``, see ``value_bets.archive``) says when: ``settled_at`` is the hourly run that first saw the result
-(``settle``), so it can be up to an hour late, or ten overnight (the pipeline runs 09:00-23:00 IST). A Test is over by the start of its fifth day, so the end is never
+(``settle``), so it can be up to an hour late (the pipeline runs hourly). A Test is over by the start of its fifth day, so the end is never
 taken later than that; a file that has the whole match's result from before ``settled_at`` was recorded is taken to have ended then. The data the site shows is
 published from here (the book file's carry, the schedule's rows), not decided again in the browser, because an app in the wild cannot be updated at will.
 
