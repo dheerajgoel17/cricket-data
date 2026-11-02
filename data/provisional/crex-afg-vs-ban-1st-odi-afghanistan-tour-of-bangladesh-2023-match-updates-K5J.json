@@ -2,6 +2,20 @@
   "date": "2023-07-05",
   "event": "Afghanistan tour of Bangladesh",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 258,
+      "runs": 169,
+      "team": "Bangladesh",
+      "wickets": 9
+    },
+    {
+      "balls": 130,
+      "runs": 83,
+      "team": "Afghanistan",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5J",
   "match_type": "ODI",
   "player_of_match": "Fazalhaq Farooqi",

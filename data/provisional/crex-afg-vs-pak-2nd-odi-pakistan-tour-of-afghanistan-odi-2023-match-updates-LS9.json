@@ -2,6 +2,20 @@
   "date": "2023-08-24",
   "event": "Pakistan tour of Afghanistan ODI",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 300,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 299,
+      "runs": 302,
+      "team": "Pakistan",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-pak-2nd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS9",
   "match_type": "ODI",
   "player_of_match": "Shadab Khan",

@@ -2,6 +2,20 @@
   "date": "2023-08-22",
   "event": "Pakistan tour of Afghanistan ODI",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 283,
+      "runs": 201,
+      "team": "Pakistan",
+      "wickets": 10
+    },
+    {
+      "balls": 116,
+      "runs": 59,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-pak-1st-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LS8",
   "match_type": "ODI",
   "player_of_match": "Haris Rauf",

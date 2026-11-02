@@ -2,6 +2,20 @@
   "date": "2023-07-11",
   "event": "Afghanistan tour of Bangladesh",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 272,
+      "runs": 126,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 141,
+      "runs": 129,
+      "team": "Bangladesh",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ban-3rd-odi-afghanistan-tour-of-bangladesh-2023-match-updates-K5L",
   "match_type": "ODI",
   "player_of_match": "Shoriful Islam",

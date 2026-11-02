@@ -2,6 +2,20 @@
   "date": "2023-02-26",
   "event": "Australia Domestic One-Day Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 272,
+      "team": "Queensland",
+      "wickets": 10
+    },
+    {
+      "balls": 299,
+      "runs": 269,
+      "team": "New South Wales",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-nsw-vs-qld-21st-match-australia-domestic-one-day-cup-2022-23-match-updates-GPT",
   "match_type": "ODM",
   "player_of_match": "Liam Hatcher",

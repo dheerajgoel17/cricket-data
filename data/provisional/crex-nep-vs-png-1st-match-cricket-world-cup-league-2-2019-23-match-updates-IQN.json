@@ -2,6 +2,20 @@
   "date": "2023-02-27",
   "event": "Cricket World Cup League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 203,
+      "team": "Papua New Guinea",
+      "wickets": 9
+    },
+    {
+      "balls": 272,
+      "runs": 207,
+      "team": "Nepal",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-nep-vs-png-1st-match-cricket-world-cup-league-2-2019-23-match-updates-IQN",
   "match_type": "ODI",
   "player_of_match": "Kushal Bhurtel",

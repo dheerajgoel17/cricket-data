@@ -2,6 +2,20 @@
   "date": "2023-06-02",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 268,
+      "team": "Sri Lanka",
+      "wickets": 10
+    },
+    {
+      "balls": 281,
+      "runs": 269,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-sl-1st-odi-afghanistan-tour-of-sri-lanka-2023-match-updates-JP3",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",

@@ -2,6 +2,20 @@
   "date": "2022-10-22",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Baroda",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "Andhra",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-andr-vs-brd-114th-match-syed-mushtaq-ali-trophy-2022-match-updates-GIV",
   "match_type": "T20",
   "player_of_match": "",

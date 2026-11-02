@@ -2,6 +2,20 @@
   "date": "2022-11-30",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 313,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 298,
+      "runs": 314,
+      "team": "Sri Lanka",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-sl-3rd-odi-afghanistan-tour-of-sri-lanka-2022-match-updates-H4A",
   "match_type": "ODI",
   "player_of_match": "Charith Asalanka",

@@ -2,6 +2,20 @@
   "date": "2022-11-04",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 168,
+      "team": "Australia",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 164,
+      "team": "Afghanistan",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-afg-vs-aus-38th-match-t20-world-cup-2022-match-updates-CWR",
   "match_type": "T20",
   "player_of_match": "Glenn Maxwell",

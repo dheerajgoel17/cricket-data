@@ -2,6 +2,20 @@
   "date": "2023-03-29",
   "event": "Cricket World Cup Qualifier Play-off",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 381,
+      "team": "Namibia",
+      "wickets": 8
+    },
+    {
+      "balls": 278,
+      "runs": 333,
+      "team": "Papua New Guinea",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-nam-vs-png-5th-match-cricket-world-cup-qualifier-play-off-2023-match-updates-J40",
   "match_type": "ODI",
   "player_of_match": "Gerhard Erasmus",

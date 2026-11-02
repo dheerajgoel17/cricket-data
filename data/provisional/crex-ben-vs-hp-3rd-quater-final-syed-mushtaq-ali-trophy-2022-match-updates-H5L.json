@@ -2,6 +2,20 @@
   "date": "2022-11-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 199,
+      "team": "Bengal",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 200,
+      "team": "Himachal Pradesh",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-ben-vs-hp-3rd-quater-final-syed-mushtaq-ali-trophy-2022-match-updates-H5L",
   "match_type": "T20",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2022-11-01",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 144,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 111,
+      "runs": 148,
+      "team": "Sri Lanka",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-sl-32nd-match-t20-world-cup-2022-match-updates-CWL",
   "match_type": "T20",
   "player_of_match": "Wanindu Hasaranga",
