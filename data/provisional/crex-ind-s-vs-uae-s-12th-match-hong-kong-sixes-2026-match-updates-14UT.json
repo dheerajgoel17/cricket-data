@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 94,
+      "team": "India Sixes",
+      "wickets": 6
+    },
+    {
+      "balls": 26,
+      "runs": 97,
+      "team": "United Arab Emirates Sixes",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-ind-s-vs-uae-s-12th-match-hong-kong-sixes-2026-match-updates-14UT",
   "match_type": "T20",
   "player_of_match": "Zahid Ali",

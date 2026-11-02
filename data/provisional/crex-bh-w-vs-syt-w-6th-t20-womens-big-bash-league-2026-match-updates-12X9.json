@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 178,
+      "team": "Brisbane Heat Women",
+      "wickets": 5
+    },
+    {
+      "balls": 100,
+      "runs": 180,
+      "team": "Sydney Thunder Women",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-bh-w-vs-syt-w-6th-t20-womens-big-bash-league-2026-match-updates-12X9",
   "match_type": "T20",
   "player_of_match": "Heather Knight",

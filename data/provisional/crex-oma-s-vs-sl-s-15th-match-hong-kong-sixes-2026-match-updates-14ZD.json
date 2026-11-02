@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 92,
+      "team": "Sri Lanka Sixes",
+      "wickets": 5
+    },
+    {
+      "balls": 28,
+      "runs": 93,
+      "team": "Oman Sixes",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-oma-s-vs-sl-s-15th-match-hong-kong-sixes-2026-match-updates-14ZD",
   "match_type": "T20",
   "player_of_match": "",

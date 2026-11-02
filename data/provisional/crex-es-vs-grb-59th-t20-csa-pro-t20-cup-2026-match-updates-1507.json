@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 144,
+      "team": "Eastern Storm",
+      "wickets": 7
+    },
+    {
+      "balls": 114,
+      "runs": 149,
+      "team": "Garden Route Badgers",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-es-vs-grb-59th-t20-csa-pro-t20-cup-2026-match-updates-1507",
   "match_type": "T20",
   "player_of_match": "",
