@@ -1,54 +1,54 @@
 {
- "generated_at_utc": "2026-11-02T20:30:37Z",
- "generated_at_ist": "2026-11-03 02:00 IST",
- "runtime_secs": 158.3,
+ "generated_at_utc": "2026-11-02T21:30:27Z",
+ "generated_at_ist": "2026-11-03 03:00 IST",
+ "runtime_secs": 146.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-02",
-  "commit": "098d4502fb"
+  "commit": "77613bb4be"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1277,
-   "secs": 0.5
+   "rows": 1296,
+   "secs": 0.4
   },
   "feedg": {
    "status": "error",
    "reason": "blocked (HTTP 403) - likely geo/bot protection from this box's US IP",
-   "secs": 0.5
+   "secs": 0.4
   },
   "smarkets": {
    "status": "ok",
    "rows": 386,
-   "secs": 2.2
+   "secs": 2.0
   },
   "feedk": {
    "status": "ok",
    "rows": 132,
-   "secs": 9.1,
+   "secs": 9.3,
    "events": 4
   },
   "feedf": {
    "status": "ok",
    "rows": 300,
-   "secs": 41.0,
+   "secs": 42.5,
    "events": 8
   },
   "feede": {
    "status": "ok",
    "rows": 526,
-   "secs": 43.7,
-   "events": 19
+   "secs": 46.1,
+   "events": 20
   },
   "feedh": {
    "status": "ok",
    "rows": 1215,
-   "secs": 80.2,
-   "events": 63
+   "secs": 81.3,
+   "events": 64
   }
  },
- "snapshot": "odds_20261102T203037Z.jsonl.gz",
+ "snapshot": "odds_20261102T213027Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -119,13 +119,13 @@
  },
  "stats": {
   "events_in_window": 42,
-  "rows_in_window": 3804,
-  "selections_with_model": 1895,
-  "selections_with_market_fair": 2357,
-  "markets_in_window": 363,
+  "rows_in_window": 3823,
+  "selections_with_model": 1914,
+  "selections_with_market_fair": 2376,
+  "markets_in_window": 364,
   "value_bets": 3,
   "dropped_by_filter": {
-   "model_market_gap": 1036,
+   "model_market_gap": 1038,
    "odds_range": 18,
    "policy_min_edge": 3,
    "suspect_edge": 1,
@@ -142,9 +142,9 @@
     "n_prices": 497,
     "mean_model_p": 0.068,
     "mean_market_p": 0.062,
-    "mean_logit_diff_model_minus_market": 0.785,
-    "mean_abs_logit_diff": 1.213,
-    "corr": 0.639
+    "mean_logit_diff_model_minus_market": 0.788,
+    "mean_abs_logit_diff": 1.216,
+    "corr": 0.637
    },
    "top_bowler_team": {
     "n_prices": 193,
@@ -182,7 +182,7 @@
     "n_prices": 56,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.427,
     "corr": 0.762
    },
@@ -211,12 +211,12 @@
     "corr": 0.575
    },
    "top_bowler_match": {
-    "n_prices": 103,
-    "mean_model_p": 0.052,
-    "mean_market_p": 0.058,
-    "mean_logit_diff_model_minus_market": 0.001,
-    "mean_abs_logit_diff": 0.584,
-    "corr": 0.246
+    "n_prices": 122,
+    "mean_model_p": 0.053,
+    "mean_market_p": 0.057,
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.555,
+    "corr": 0.294
    }
   }
  },
@@ -369,6 +369,19 @@
     "feedh_d",
     "feedk_leoal",
     "moviodds_bet365",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Ajman|Dubai|2026-11-03",
+   "start_ist": "2026-11-03 22:00 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Ajman",
+    "Dubai"
+   ],
+   "sources": [
     "smarkets"
    ]
   },
@@ -635,16 +648,6 @@
   },
   {
    "event": "female|punjab|tripura|2026-11-04",
-   "start_ist": "2026-11-04 16:30 IST",
-   "format": "T20",
-   "format_source": "name",
-   "teams_matched": null,
-   "sources": [
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|madhya pradesh|saurashtra|2026-11-04",
    "start_ist": "2026-11-04 16:30 IST",
    "format": "T20",
    "format_source": "name",
@@ -944,7 +947,6 @@
   "Jharkhand (W) (female)",
   "Kerala (W) (female)",
   "Lahore Region Whites (male)",
-  "Madhya Pradesh (W) (female)",
   "Maharashtra (W) (female)",
   "Multan Region (male)",
   "Odisha (W) (female)",
@@ -952,7 +954,6 @@
   "Punjab (W) (female)",
   "Railways (W) (female)",
   "Rajasthan (W) (female)",
-  "Saurashtra (W) (female)",
   "Sikkim (W) (female)",
   "Tamil Nadu (W) (female)",
   "Tripura (W) (female)",
@@ -1258,21 +1259,21 @@
   }
  },
  "log": [
-  "[02:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[02:00 IST] history: 23853 matches, last 2026-11-02, players 429064",
-  "[02:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1277, 'secs': 0.5}",
-  "[02:02 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.5}",
-  "[02:02 IST] source smarkets: {'status': 'ok', 'rows': 386, 'secs': 2.2}",
-  "[02:02 IST] source feedk: {'status': 'ok', 'rows': 132, 'secs': 9.1, 'events': 4}",
-  "[02:02 IST] source feedf: {'status': 'ok', 'rows': 300, 'secs': 41.0, 'events': 8}",
-  "[02:02 IST] source feede: {'status': 'ok', 'rows': 526, 'secs': 43.7, 'events': 19}",
-  "[02:02 IST] source feedh: {'status': 'ok', 'rows': 1215, 'secs': 80.2, 'events': 63}",
-  "[02:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[02:02 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[02:02 IST] 52 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[02:02 IST] book lines: 366 player lines from 5 source(s)",
-  "[02:02 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[02:03 IST] weather: forecasts for 14 events, 0 failed",
-  "[02:03 IST] prop model: 1196 prop selections modelled, 329 milestone ladder prices anchored to O/U"
+  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[03:00 IST] history: 23853 matches, last 2026-11-02, players 429064",
+  "[03:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1296, 'secs': 0.4}",
+  "[03:01 IST] source feedg: {'status': 'error', 'reason': \"blocked (HTTP 403) - likely geo/bot protection from this box's US IP\", 'secs': 0.4}",
+  "[03:01 IST] source smarkets: {'status': 'ok', 'rows': 386, 'secs': 2.0}",
+  "[03:01 IST] source feedk: {'status': 'ok', 'rows': 132, 'secs': 9.3, 'events': 4}",
+  "[03:01 IST] source feedf: {'status': 'ok', 'rows': 300, 'secs': 42.5, 'events': 8}",
+  "[03:01 IST] source feede: {'status': 'ok', 'rows': 526, 'secs': 46.1, 'events': 20}",
+  "[03:01 IST] source feedh: {'status': 'ok', 'rows': 1215, 'secs': 81.3, 'events': 64}",
+  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[03:02 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[03:02 IST] 52 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[03:02 IST] book lines: 366 player lines from 5 source(s)",
+  "[03:02 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[03:02 IST] weather: forecasts for 14 events, 0 failed",
+  "[03:02 IST] prop model: 1196 prop selections modelled, 329 milestone ladder prices anchored to O/U"
  ]
 }
