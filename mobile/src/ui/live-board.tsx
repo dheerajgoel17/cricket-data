@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   end: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   endText: { flex: 1, minWidth: 0, gap: 2 },
   endScore: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
-  endRuns: { ...num, fontSize: 22, lineHeight: 24, color: color.foreground },
+  endRuns: { ...num, fontSize: 22, letterSpacing: -0.44, lineHeight: 24, color: color.foreground },
   ship: { alignItems: "center", justifyContent: "space-between", paddingVertical: 2 },
   shipV: { ...num, fontSize: 17, color: color.foreground },
   shipB: { ...type.caption, color: color["muted-foreground"] },

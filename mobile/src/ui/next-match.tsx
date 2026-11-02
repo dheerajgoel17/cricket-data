@@ -81,7 +81,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
         <View style={styles.lineRow}>
           <Text style={styles.lineText}>{sideLetter} {line} <Text style={styles.statLabel}>{statLabel}</Text></Text>
           {standing != null ? <StandingMark standing={standing} line={line} /> : null}
-          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...num, fontSize: 20, color: color.primary }}>{odds(best)}</Tick></View> : null}
+          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...num, fontSize: 20, letterSpacing: -0.4, color: color.primary }}>{odds(best)}</Tick></View> : null}
         </View>
         {book ? (
           quotes.length ? (
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   statLabel: { ...type.callout, color: color["muted-foreground"] },
   tiles: { flexDirection: "row", gap: space.snug },
   tile: { flex: 1, minWidth: 0, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 14, padding: space.snug + 2, gap: 2 },
-  tileNum: { ...num, fontSize: 30, lineHeight: 34 },
+  tileNum: { ...num, fontSize: 30, letterSpacing: -0.6, lineHeight: 34 },
   tileSub: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
   noSample: { ...type.callout, color: color["muted-foreground"], paddingTop: space.tight },
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },

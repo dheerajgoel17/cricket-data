@@ -153,6 +153,6 @@ const styles = StyleSheet.create({
   trend: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug + 2 },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   desc: { ...type.footnote, color: color["muted-foreground"] },
-  rate: { ...num, fontSize: 22, lineHeight: 24, color: color.primary },
+  rate: { ...num, fontSize: 22, letterSpacing: -0.44, lineHeight: 24, color: color.primary },
   fairText: { ...type.caption, color: color["muted-foreground"] },
 });

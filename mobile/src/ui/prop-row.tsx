@@ -86,5 +86,5 @@ const styles = StyleSheet.create({
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
   edge: { alignItems: "flex-end", minWidth: 46 },
   edgeLabel: { ...type.caption, ...cap, color: color["muted-foreground"] },
-  edgeValue: { ...num, fontSize: 20, lineHeight: 22 },
+  edgeValue: { ...num, fontSize: 20, letterSpacing: -0.4, lineHeight: 22 },
 });

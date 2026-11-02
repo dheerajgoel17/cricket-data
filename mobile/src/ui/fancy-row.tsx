@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   odds: { ...type.callout, ...num, fontSize: 15, color: color.foreground },
   side: { alignItems: "flex-end", gap: space.snug },
   edgeLabel: { ...type.caption, ...cap, color: color["muted-foreground"] },
-  edgeValue: { ...num, fontSize: 24, lineHeight: 26 },
+  edgeValue: { ...num, fontSize: 24, letterSpacing: -0.48, lineHeight: 26 },
   more: { ...type.footnote, fontFamily: font.medium, color: "rgba(255,255,255,0.7)" },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   bookPrice: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },

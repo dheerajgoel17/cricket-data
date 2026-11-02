@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   overs: { ...type.footnote, color: color["muted-foreground"] },
   when: { alignItems: "flex-end", gap: 2 },
   whenDay: { ...type.callout, color: color["muted-foreground"] },
-  clock: { ...num, fontSize: 30, lineHeight: 34, color: color.foreground },
+  clock: { ...num, fontSize: 30, letterSpacing: -0.6, lineHeight: 34, color: color.foreground },
   status: { ...type.callout, color: color.foreground },
   series: { ...type.callout, color: color["muted-foreground"] },
 });

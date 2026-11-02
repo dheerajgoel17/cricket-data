@@ -4,7 +4,6 @@ import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { BarlowSemiCondensed_500Medium } from "@expo-google-fonts/barlow-semi-condensed";
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -24,7 +23,7 @@ const theme = {
 
 export default function RootLayout() {
   const [fonts, fontError] = useFonts({
-    [font.regular]: Inter_400Regular, [font.medium]: Inter_500Medium, [font.semibold]: Inter_600SemiBold, [font.bold]: Inter_700Bold, [font.cond]: BarlowSemiCondensed_500Medium,
+    [font.regular]: Inter_400Regular, [font.medium]: Inter_500Medium, [font.semibold]: Inter_600SemiBold, [font.bold]: Inter_700Bold,
   });
   useEffect(watchAppState, []);
   useEffect(() => { if (fonts || fontError) void SplashScreen.hideAsync(); }, [fonts, fontError]); // a failed font load shows the system font rather than a blank screen

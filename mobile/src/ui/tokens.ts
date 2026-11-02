@@ -6,14 +6,15 @@ import tokens from "@cricket/tokens/tokens.json";
 export const color = tokens.color;
 
 /**
- * The site's fonts: Inter for text, one family name per weight (React Native has no variable-weight lookup for bundled fonts), and Barlow Semi Condensed, medium only, for
- * numbers (hit rates, odds, edge, stat values) and small uppercase labels (docs/SITE.md). Loaded in `app/_layout.tsx`.
+ * The site's fonts: Inter, the face of Cue's own chart component, for everything: text in Regular / Medium / Semibold / Bold (one family name per weight, since React Native has no variable-weight
+ * lookup for bundled fonts), and numbers (hit rates, odds, edge, stat values) and small uppercase labels in Semibold with figures of equal width. Big figures close their tracking by -2%
+ * of the size, as Cue's do. Loaded in `app/_layout.tsx`.
  */
-export const font = { regular: "Inter_400Regular", medium: "Inter_500Medium", semibold: "Inter_600SemiBold", bold: "Inter_700Bold", cond: "BarlowSemiCondensed_500Medium" } as const;
+export const font = { regular: "Inter_400Regular", medium: "Inter_500Medium", semibold: "Inter_600SemiBold", bold: "Inter_700Bold", cond: "Inter_600SemiBold" } as const;
 
-/** The site's `label-cap`: a small uppercase label in the condensed face (spread after a `type` role: `{ ...type.footnote, ...cap }`). */
+/** The site's `label-cap`: a small uppercase label in Inter Semibold (spread after a `type` role: `{ ...type.footnote, ...cap }`). */
 export const cap = { fontFamily: font.cond, textTransform: "uppercase" as const, letterSpacing: 0.6 };
-/** The site's `num-cond`: a number in the condensed face with figures of equal width. */
+/** The site's `num-cond`: a number in Inter Semibold with figures of equal width. */
 export const num = { fontFamily: font.cond, fontVariant: ["tabular-nums" as const] };
 
 /**
