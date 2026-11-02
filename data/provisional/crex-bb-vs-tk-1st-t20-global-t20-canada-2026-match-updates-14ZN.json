@@ -2,6 +2,20 @@
   "date": "2026-10-24",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 153,
+      "team": "Toronto Kings",
+      "wickets": 6
+    },
+    {
+      "balls": 115,
+      "runs": 154,
+      "team": "Brampton Blazers",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-bb-vs-tk-1st-t20-global-t20-canada-2026-match-updates-14ZN",
   "match_type": "T20",
   "player_of_match": "Hamza Tariq",

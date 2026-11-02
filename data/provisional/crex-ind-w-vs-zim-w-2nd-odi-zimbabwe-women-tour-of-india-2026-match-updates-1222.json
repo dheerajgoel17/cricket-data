@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Zimbabwe Women tour of India",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 328,
+      "team": "India Women",
+      "wickets": 6
+    },
+    {
+      "balls": 293,
+      "runs": 207,
+      "team": "Zimbabwe Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ind-w-vs-zim-w-2nd-odi-zimbabwe-women-tour-of-india-2026-match-updates-1222",
   "match_type": "ODI",
   "player_of_match": "Harmanpreet Kaur",

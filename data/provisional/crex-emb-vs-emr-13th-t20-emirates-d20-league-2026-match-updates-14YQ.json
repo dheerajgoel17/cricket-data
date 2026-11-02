@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 167,
+      "team": "Emirates Blues",
+      "wickets": 2
+    },
+    {
+      "balls": 120,
+      "runs": 131,
+      "team": "Emirates Red",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-emb-vs-emr-13th-t20-emirates-d20-league-2026-match-updates-14YQ",
   "match_type": "T20",
   "player_of_match": "Ahmed Tariq",

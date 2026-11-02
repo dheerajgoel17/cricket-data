@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Vancouver Guardians",
+      "wickets": 4
+    },
+    {
+      "balls": 118,
+      "runs": 170,
+      "team": "Mississauga Skyhawks",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-ms-vs-vg-4th-t20-global-t20-canada-2026-match-updates-14ZQ",
   "match_type": "T20",
   "player_of_match": "Unmukt Chand",

@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 145,
+      "team": "South Africa Emerging",
+      "wickets": 8
+    },
+    {
+      "balls": 96,
+      "runs": 146,
+      "team": "Eastern Storm",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-es-vs-sa-e-56th-t20-csa-pro-t20-cup-2026-match-updates-14JP",
   "match_type": "T20",
   "player_of_match": "",

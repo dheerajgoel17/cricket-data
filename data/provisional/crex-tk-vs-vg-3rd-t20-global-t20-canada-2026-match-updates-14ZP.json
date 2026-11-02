@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 197,
+      "team": "Toronto Kings",
+      "wickets": 7
+    },
+    {
+      "balls": 110,
+      "runs": 112,
+      "team": "Vancouver Guardians",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-tk-vs-vg-3rd-t20-global-t20-canada-2026-match-updates-14ZP",
   "match_type": "T20",
   "player_of_match": "Evin Lewis",

@@ -2,6 +2,20 @@
   "date": "2026-10-24",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 141,
+      "team": "Mississauga Skyhawks",
+      "wickets": 6
+    },
+    {
+      "balls": 108,
+      "runs": 146,
+      "team": "Montreal Warriors",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-ms-vs-mw-2nd-t20-global-t20-canada-2026-match-updates-14ZO",
   "match_type": "T20",
   "player_of_match": "Andre Fletcher",

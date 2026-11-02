@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 104,
+      "runs": 112,
+      "team": "Dubai",
+      "wickets": 10
+    },
+    {
+      "balls": 103,
+      "runs": 113,
+      "team": "Ajman",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ajt-vs-dub-14th-t20-emirates-d20-league-2026-match-updates-14YR",
   "match_type": "T20",
   "player_of_match": "Lovepreet Singh",

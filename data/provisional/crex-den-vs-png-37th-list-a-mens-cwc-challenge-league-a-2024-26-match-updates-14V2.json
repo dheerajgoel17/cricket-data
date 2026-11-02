@@ -2,6 +2,20 @@
   "date": "2026-10-25",
   "event": "Men's CWC Challenge League A",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 304,
+      "team": "Denmark",
+      "wickets": 6
+    },
+    {
+      "balls": 295,
+      "runs": 307,
+      "team": "Papua New Guinea",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-den-vs-png-37th-list-a-mens-cwc-challenge-league-a-2024-26-match-updates-14V2",
   "match_type": "ODI",
   "player_of_match": "Lucky Ali Malik",
