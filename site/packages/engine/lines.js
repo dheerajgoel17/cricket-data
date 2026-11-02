@@ -10,22 +10,6 @@ export const BOOK_KEEP_MS = 24 * 3600e3;
 export const TEST_KEEP_MS = 6 * 24 * 3600e3;
 export const keepMsFor = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS : BOOK_KEEP_MS);
 
-/**
- * When a match leaves the "Today" lists (ms since the epoch): the one clock Hot props, the home rail, the player page's match card and the phase of a line share. A limited-overs match goes 24 hours
- * after it starts. A Test / first-class match keeps 6 days from its first morning, so one at stumps or on a rain day (no result yet) stays; once it has a result (`final`) it goes 24 hours after it
- * turned final (`finalAt`, the match-state table's `final_at`: an ISO string or ms), never later than those 6 days, and with no `finalAt` known it keeps the 6 days. Props are never deleted: this
- * only decides what the lists show, a finished match stays on its fixture page and in the archive.
- * @param {string | undefined} fmt
- * @param {number} startMs
- * @param {{ final?: boolean, finalAt?: string | number | null }} [end]
- */
-export function keepUntil(fmt, startMs, { final = false, finalAt } = {}) {
-  const base = startMs + keepMsFor(fmt);
-  if (!final || keepMsFor(fmt) === BOOK_KEEP_MS) return base;
-  const t = typeof finalAt === "number" ? finalAt : Date.parse(finalAt);
-  return Number.isFinite(t) ? Math.min(base, t + BOOK_KEEP_MS) : base;
-}
-
 /** How far a book's start may be from a fixture's or the live feed's: 14 h, but a Test is priced day by day so any day of it is the same match. */
 export const BOOK_WINDOW_MS = 14 * 3600e3;
 export const sameMatchWindow = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS : BOOK_WINDOW_MS);

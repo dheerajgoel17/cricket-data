@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Which book lines the Hot props score, and in what order the player files they need are fetched. Pure, so it is tested without the page.
 
-import { keepMsFor, keepUntil } from "@cricket/engine/lines.js";
-import { matchEnd } from "@cricket/engine/state.js";
+import { keepMsFor } from "@cricket/engine/lines.js";
 
 export const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
 export const sameMatch = (match: string, [a, b]: [string, string]) => { const [x, y] = String(match).split(/\s+vs\s+/i); const s = new Set([norm(x), norm(y)]); return s.has(norm(a)) && s.has(norm(b)); };
@@ -18,25 +17,15 @@ export function dayOffset(iso: string, now = Date.now()): number {
   return n >= 0 && n < HOT_DAYS ? n : -1;
 }
 
-/** How a line's match stands for the keep window: `final` and, when the match-state table knows it, `finalAt` (see `keepUntil`). Nothing known = the match's clock window. */
-export type Ended = { final?: boolean; finalAt?: string | number; status?: string } | undefined;
-
-/** `endOf` for the lines of a book doc: the live feed's and the match-state table's word on each line's match (`matchEnd`). Pass a fresh state doc, or null. */
-export const endOfLine = (liveDoc: unknown, stateDoc: unknown) => (l: { match?: string; fmt?: string; start_utc?: string; start?: string }): Ended => {
-  const [a, b] = String(l.match).split(/\s+vs\s+/i);
-  return matchEnd({ a, b, start: l.start_utc ?? l.start, fmt: l.fmt }, liveDoc, stateDoc);
-};
-
 /**
  * Which day's Hot props list a priced line belongs on. Days 0…`HOT_DAYS-1` follow the viewer's calendar; a match that has already started and is still
- * in the keep window (24 h, 6 days for a Test — books restamp a Test each morning; a Test with a result goes 24 h after it ended, `keepUntil`) is today's, so day 4 of a Test is not
- * dropped because its first start was Tuesday. `end` is what is known of how the match ended.
+ * in the keep window (24 h, 6 days for a Test — books restamp a Test each morning) is today's, so day 4 of a Test is not dropped because its first start was Tuesday.
  */
-export function hotDay(iso: string, fmt?: string, now = Date.now(), end?: Ended): number {
+export function hotDay(iso: string, fmt?: string, now = Date.now()): number {
   const off = dayOffset(iso, now);
   if (off >= 0) return off;
   const t = Date.parse(iso);
-  return Number.isFinite(t) && t <= now && keepUntil(fmt, t, end) > now ? 0 : -1;
+  return Number.isFinite(t) && t <= now && t > now - keepMsFor(fmt) ? 0 : -1;
 }
 
 /** Chip labels for the Hot props day filter: Today, Tomorrow, then weekday dates. */
@@ -52,10 +41,10 @@ export function hotDayLabels(now = Date.now()): [string, string][] {
 }
 
 /** How many priced lines sit on another Hot props day (so the day switch stays when this day has none). */
-export function otherHotCount(lines: any[], day: number, now = Date.now(), endOf?: (l: any) => Ended): number {
+export function otherHotCount(lines: any[], day: number, now = Date.now()): number {
   return lines.filter((l) => {
     if (!l.start_utc || !l.books?.length) return false;
-    const d = hotDay(l.start_utc, l.fmt, now, endOf?.(l));
+    const d = hotDay(l.start_utc, l.fmt, now);
     return d >= 0 && d !== day;
   }).length;
 }
@@ -76,12 +65,10 @@ export type HotScope =
  * The priced lines to score. The home scores one day's lines at a time (today by default, another of the next `HOT_DAYS` when asked): every other day's lines would be scored and then thrown
  * away by the day filter, and each one costs a player file. A fixture page scores only its own two sides.
  */
-export function hotLines(lines: any[], scope: HotScope, now = Date.now(), endOf?: (l: any) => Ended): any[] {
+export function hotLines(lines: any[], scope: HotScope, now = Date.now()): any[] {
   const priced = (l: any) => l.start_utc && l.books?.length;
-  // a fixture page keeps every line its match has while the book file lists it (the clock window only drops an older match of the same two sides): props are never taken away, so a finished Test's
-  // 24 hours on the day lists does not apply here
   if ("teams" in scope) return lines.filter((l) => priced(l) && sameMatch(l.match, scope.teams) && (scope.archive || Date.parse(l.start_utc) > now - keepMsFor(l.fmt)));
-  return lines.filter((l) => priced(l) && hotDay(l.start_utc, l.fmt, now, endOf?.(l)) === scope.day);
+  return lines.filter((l) => priced(l) && hotDay(l.start_utc, l.fmt, now) === scope.day);
 }
 
 /** What orders a Hot props row: whether its match is in play now, the hit rate over the window shown, the edge. */

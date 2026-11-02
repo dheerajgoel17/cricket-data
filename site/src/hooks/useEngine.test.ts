@@ -63,31 +63,6 @@ describe("shownFixtures", () => {
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "SAvAus", fmt: "Test", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["SAvAus", "m1", "m2", "m3"]);
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "T20", fmt: "T20", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["m1", "m2", "m3"]);
   });
-  describe("a finished Test goes 24 hours after its result", () => {
-    // started 28 Oct 09:00, went final 31 Oct 10:00: on the lists at 1 Nov 09:00, gone at 1 Nov 10:01
-    const test = f("2026-10-28T09:00Z", { a: "SAvAus", fmt: "Test", status: "Completed", result: "Australia won by 5 wickets" });
-    const finalAtOf = () => "2026-10-31T10:00:00Z";
-    const lined = (now: number) => ids(shownFixtures([test], state, () => true, now, finalAtOf));
-    it("is on the lists at 1 Nov 09:00 and gone at 1 Nov 10:01, however quiet the day", () => {
-      expect(lined(at("2026-11-01T09:00:00Z"))).toEqual(["SAvAus"]);
-      expect(lined(at("2026-11-01T10:01:00Z"))).toEqual([]); // a quiet day's 4-day padding is for limited-overs matches only
-    });
-    it("falls back to the 6 days when final_at is not known", () => {
-      expect(ids(shownFixtures([test], state, () => true, at("2026-11-01T10:01:00Z")))).toEqual(["SAvAus"]);
-      expect(ids(shownFixtures([test], state, () => true, at("2026-11-03T09:01:00Z")))).toEqual([]);
-    });
-    it("keeps a Test at stumps with no result for its 6 days (day 5)", () => {
-      const stumps = f("2026-10-28T09:00Z", { a: "SAvAus", fmt: "Test", status: "Completed", result: "" });
-      expect(fixtureState(stumps, undefined, at("2026-11-01T10:01:00Z"))).toBe("live");
-      expect(ids(shownFixtures([stumps], state, () => true, at("2026-11-01T10:01:00Z"), finalAtOf))).toEqual(["SAvAus"]);
-      expect(ids(shownFixtures([stumps], state, () => true, at("2026-11-03T09:01:00Z"), finalAtOf))).toEqual([]);
-    });
-    it("leaves a limited-overs match alone: 24 hours from the start, and the quiet-day padding", () => {
-      const t20 = f("2026-11-01T01:00Z", { a: "T20", fmt: "T20", status: "Completed" });
-      expect(ids(shownFixtures([t20], state, () => true, at("2026-11-01T10:00:00Z"), finalAtOf))).toEqual(["T20"]); // 9 h on
-      expect(ids(shownFixtures([t20], state, () => true, at("2026-11-03T00:00:00Z"), finalAtOf))).toEqual(["T20"]); // 47 h on, quiet day: padded to 4 days
-    });
-  });
   it("keeps a match whose start has passed with no play yet (a delay) for 12 hours, then lets it go", () => {
     expect(shownFixtures([f("2026-10-29T01:00Z", { a: "Delayed" })], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(1); // 8 hours late
     expect(shownFixtures([f("2026-10-28T09:00Z", { a: "Gone" })], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(0); // a day late

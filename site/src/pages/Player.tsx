@@ -19,7 +19,6 @@ import { barState, windowRate, windowRates } from "@cricket/engine/windows.js";
 import { useData } from "@/lib/data";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { freshState, linesQuery, stateQuery } from "@/lib/queries";
-import { endOfLine } from "@/lib/hot-lines";
 import { abbr, fixtureStart, localTime, localWhen, num, odds, pc, shortDate } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { pushRecentPlayer } from "@/lib/saved";
@@ -216,8 +215,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
   const state = useQuery(stateQuery);
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
-    const stateDoc = freshState(state.data, now);
-    const priced = pickPricedMatch(doc, pid, fmt, now, endOfLine(live.data, stateDoc)); // a Test with a result is replaced 24 hours after it ended, the same clock as Hot props
+    const priced = pickPricedMatch(doc, pid, fmt, now);
     let match: string, start: string, competition: string, club = "", row: any, phase: "upcoming" | "live" | "final" = "upcoming";
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
@@ -230,7 +228,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
       const [h, w] = String(match).split(/\s+vs\s+/i);
       // the live feed's word first (15 s), then the match-state table (a job's, minutes old but one phase for the match), then the clock
       const asked = { a: h, b: w, start, fmt };
-      phase = matchPhase(start, now, liveForFixture(live.data, asked)?.status ?? liveForFixture(stateDoc, asked)?.status, fmt);
+      phase = matchPhase(start, now, liveForFixture(live.data, asked)?.status ?? liveForFixture(freshState(state.data, now), asked)?.status, fmt);
     } else {
       const women = store.P.g[idx] === 1;
       row = fx.filter((f: any) => f.fmt === fmt && (f.gender === "female") === women && (teamKey(f.a) === teamKey(lastSide || team) || teamKey(f.b) === teamKey(lastSide || team)) && fixtureStart(f).getTime() > now).sort((x: any, y: any) => (x.start < y.start ? -1 : 1))[0];

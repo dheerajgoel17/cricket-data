@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, keepUntil, lineProb, lineScope, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -386,40 +386,4 @@ test("an exchange's No on its own line is quoted beside its Yes, and an under-on
   assert.deepEqual([only[0].over, only[0].under, only[0].underOnly], [null, 1.95, true]);
   const doc = { lines: lines.map((l) => ({ ...l, pid: "p", stat: "points", fmt: "T20", start_utc: "2099-01-01T00:00:00Z", match: "A vs B" })) };
   assert.equal(bookLinesFor(doc, "p", "points", "T20").main.line, 43.5);
-});
-
-test("keepUntil: a limited-overs match goes 24 h after the start whatever its result", () => {
-  const start = Date.parse("2026-10-28T09:00:00Z");
-  const gone = Date.parse("2026-10-29T09:00:00Z");
-  assert.equal(keepUntil("T20", start), gone);
-  assert.equal(keepUntil("ODI", start, { final: true, finalAt: "2026-10-28T12:00:00Z" }), gone, "a limited-overs result changes nothing: 24 h from the kick-off");
-});
-
-test("keepUntil: a Test with a result goes 24 h after it turned final (28 Oct 09:00 start, final 31 Oct 10:00 -> gone from 1 Nov 10:00)", () => {
-  const start = Date.parse("2026-10-28T09:00:00Z");
-  const end = { final: true, finalAt: "2026-10-31T10:00:00Z" };
-  const until = keepUntil("Test", start, end);
-  assert.equal(until, Date.parse("2026-11-01T10:00:00Z"));
-  assert.ok(Date.parse("2026-11-01T09:00:00Z") < until, "on the lists at 1 Nov 09:00");
-  assert.ok(Date.parse("2026-11-01T10:01:00Z") > until, "gone at 1 Nov 10:01");
-  assert.equal(keepUntil("FC", start, end), until, "first-class is the same");
-  assert.equal(keepUntil("Test", start, { final: true, finalAt: Date.parse("2026-10-31T10:00:00Z") }), until, "ms or an ISO string");
-});
-
-test("keepUntil: a Test with no result yet keeps its 6 days from the first morning, whatever final_at says", () => {
-  const start = Date.parse("2026-10-28T09:00:00Z");
-  const sixDays = Date.parse("2026-11-03T09:00:00Z"); // day 5 at stumps (1 Nov) and a rain day are well inside
-  assert.equal(keepUntil("Test", start), sixDays);
-  assert.equal(keepUntil("Test", start, { final: false }), sixDays);
-  assert.equal(keepUntil("Test", start, { final: false, finalAt: "2026-10-30T10:00:00Z" }), sixDays, "a final_at on a row that is not final is ignored");
-  assert.equal(keepUntil("Test", start, {}), sixDays);
-});
-
-test("keepUntil: a Test with a result but no usable final_at falls back to the 6 days, and never outlives them", () => {
-  const start = Date.parse("2026-10-28T09:00:00Z");
-  const sixDays = Date.parse("2026-11-03T09:00:00Z");
-  assert.equal(keepUntil("Test", start, { final: true }), sixDays);
-  assert.equal(keepUntil("Test", start, { final: true, finalAt: null }), sixDays);
-  assert.equal(keepUntil("Test", start, { final: true, finalAt: "soon" }), sixDays);
-  assert.equal(keepUntil("Test", start, { final: true, finalAt: "2026-11-03T09:00:00Z" }), sixDays, "a row the clock settled at day 6 does not get a 7th day");
 });

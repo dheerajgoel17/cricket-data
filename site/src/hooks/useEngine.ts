@@ -2,13 +2,12 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
-import { archiveFixture, fixtureBooks, keepMsFor, keepUntil, sameFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { archiveFixture, fixtureBooks, keepMsFor, sameFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
-import { matchEnd } from "@cricket/engine/state.js";
 import { useData } from "@/lib/data";
 import { loadArchive } from "@/lib/feeds";
 import { linesQuery } from "@/lib/queries";
-import { useLiveDoc, useStateDoc } from "@/hooks/useLive";
+import { useLiveDoc } from "@/hooks/useLive";
 import { fixtureStart } from "@/lib/format";
 
 /** Runs an engine plan (cached by plan + hints). Every number the pages show comes from this, never from an LLM. */
@@ -47,30 +46,27 @@ export function useFixtureBooks(id: string) {
   }, [listed, entry, lines.data, fixtures.isLoading, need, archive.isLoading, store]);
 }
 
-const startMs = (f: any) => Date.parse(f.start.length > 10 ? f.start : `${f.start}T23:59Z`);
 const startedSince = (f: any, ms: number, now: number) => (f.start.length > 10 ? f.start : `${f.start}T23:59Z`) >= new Date(now - ms).toISOString();
-const multiDay = (f: any) => f.fmt === "Test" || f.fmt === "FC";
 
 /** Fixtures that have not finished yet (4 h grace after the start). */
 export const upcomingOnly = (fx: any[], now = Date.now()) => fx.filter((f) => startedSince(f, 4 * 3600e3, now));
 
 /** A fixture's state: the live feed's word for it when it has one, else what the schedule file says (a match that has dropped off the source's page is stored as Completed). */
 /** A multi-day match the schedule calls "Completed" at the close of a day, with no result yet, is still on: a finished Test has its result ("won by", "drawn") in the row. */
-const betweenDays = (f: any, now: number) => multiDay(f) && f.status === "Completed" && !String(f.result || "").trim() && now < keepUntil(f.fmt, startMs(f));
+const betweenDays = (f: any, now: number) => (f.fmt === "Test" || f.fmt === "FC") && f.status === "Completed" && !String(f.result || "").trim() && startedSince(f, keepMsFor(f.fmt), now);
 export const fixtureState = (f: any, live?: string, now = Date.now()): "live" | "final" | "upcoming" => (live === "live" || live === "final" ? live : f.status === "Completed" ? (betweenDays(f, now) ? "live" : "final") : f.status === "Live" ? "live" : "upcoming");
 
-/** Display-only extra: on a quiet day, finished limited-overs matches stay up to 4 days so the rail is not bare (a finished Test is not padded: it goes 24 h after its result). Priced keep is `keepUntil` (24 h / 6 days, a Test with a result 24 h after it ended). */
+/** Display-only extra: on a quiet day, finished limited-overs matches stay up to 4 days so the rail is not bare. Priced keep is `keepMsFor` (24 h / 6 days). */
 const QUIET_FILL_MS = 96 * 3600e3;
 
 /**
  * What the home list keeps. Upcoming matches, matches in the first 12 hours (a delay can be long) and matches being played (up to 6 days, for a Test) that the books price; and finished matches,
- * priced or not: 24 hours from the start (a Test with a result: 24 hours after it turned final, `finalAtOf`, 6 days from the start when that is not known), and while fewer than 3 matches are
- * lined up, finished limited-overs matches up to 4 days, so the page never goes bare.
+ * priced or not: 24 hours from the start (6 days for a Test), and while fewer than 3 matches are lined up, up to 4 days, so the page never goes bare.
  */
-export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now(), finalAtOf: (f: any) => string | number | undefined = () => undefined) {
-  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && now < keepUntil(f.fmt, startMs(f)))) && inBooks(f));
+export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
+  const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (stateOf(f) === "live" && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
   const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
-  const finished = fx.filter((f) => stateOf(f) === "final" && ((!multiDay(f) && startedSince(f, window, now)) || now < keepUntil(f.fmt, startMs(f), { final: true, finalAt: finalAtOf(f) })));
+  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 
@@ -85,19 +81,17 @@ export function usePricedFixtures() {
   const fx = useFixtures();
   const lines = useQuery(linesQuery);
   const live = useLiveDoc();
-  const stateDoc = useStateDoc();
   return useMemo(() => {
     const feed = bookFixtures(lines.data), haveBooks = feed.length > 0;
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
-    const finalAtOf = (f: any) => matchEnd(f, live.data, stateDoc).finalAt; // when the match-state table says a finished match turned final
-    const all = shownFixtures(fx.data || [], stateOf, undefined, undefined, finalAtOf);
+    const all = shownFixtures(fx.data || [], stateOf);
     const ready = !fx.isLoading && !lines.isLoading;
     const now = Date.now();
     const soon = (f: any) => fixtureStart(f).getTime() < now + NO_PROPS_DAYS * 86400e3;
     // priced games first-class; the unpriced ones in the next days stay on the list, flagged `noProps` ("No props live yet"), as they may be priced later
-    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now, finalAtOf).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true })) : all;
+    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true })) : all;
     const priced = all.filter((f) => fixtureInBooks(feed, f));
     const last = priced.length ? Math.max(...priced.map((f) => fixtureStart(f).getTime())) : 0;
     return { loading: fx.isLoading, ready, all, fixtures, priced: haveBooks, through: priced.length ? new Date(last) : null, feedMatches: feed.length, doc: lines.data };
-  }, [fx.data, fx.isLoading, lines.isLoading, lines.data, live.data, stateDoc]);
+  }, [fx.data, fx.isLoading, lines.isLoading, lines.data, live.data]);
 }

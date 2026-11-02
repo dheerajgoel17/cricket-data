@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[], filters: [] as any[], state: null as any }));
-vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null, loadState: async () => env.state }));
+const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[], filters: [] as any[] }));
+vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null, loadState: async () => null }));
 vi.mock("@/lib/data", () => ({ useData: () => ({ store: env.store, rz: {}, identity: {} }) }));
 vi.mock("@cricket/engine/plan.js", () => ({
   runPlan: async (_s: any, _r: any, _p: any, hints: any) => {
@@ -50,7 +50,6 @@ beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ["setTimeout", "clearTimeout", "Date"] });
   env.plans = [];
   env.filters = [];
-  env.state = null;
   // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines scored only when that day is asked
   env.store = fakeStore(60, 12);
   env.doc = { generated_at_utc: "2026-10-28T05:00:00Z", events: [], fancy: [], lines: [
@@ -157,38 +156,5 @@ describe("useHotRows", () => {
     expect(result.current.isError).toBe(false);
     expect(result.current.data!.map((r) => r.idx)).not.toContain(2);
     expect(result.current.data).toHaveLength(33); // file 2 held players 2, 14 and 26
-  });
-});
-
-describe("a Test with a result", () => {
-  // started 26 Oct 09:00 local; the tests say when the table has it going final (now is 28 Oct 12:00 local), the first 27 h ago: off the day list, the second 11 h ago: still on it
-  const start = new Date(2026, 9, 26, 9).toISOString();
-  const stateDoc = (finalAt: string) => ({ updatedAt: new Date(NOW).toISOString(), matches: [{ teams: [{ name: "South Africa" }, { name: "Australia" }], start, fmt: "Test", status: "final", final_at: finalAt }] });
-  const testLine = (pid: string) => ({ ...line(pid, start, "South Africa vs Australia"), fmt: "Test", team: "South Africa" });
-  beforeEach(() => { env.doc.lines.push(testLine("id40"), testLine("id41")); });
-
-  it("is not scored for today's list 24 hours after it turned final, but its own fixture page still lists it", async () => {
-    env.state = stateDoc(new Date(2026, 9, 27, 9).toISOString()); // final 27 Oct 09:00 local; now is 28 Oct 12:00, 27 h on
-    let r = run(0);
-    await flush(); landAll(); await settle();
-    expect(env.plans).not.toContain(40);
-    r.unmount();
-    env.plans = []; env.store = fakeStore(60, 12);
-    r = run(0, ["South Africa", "Australia"]);
-    await flush(); landAll(); await settle();
-    expect([...env.plans].sort()).toEqual([40, 41]); // props are never taken away
-    expect(r.result.current.data).toHaveLength(2);
-  });
-
-  it("is still today's within the 24 hours, and for its 6 days when the table does not say when it ended", async () => {
-    env.state = stateDoc(new Date(2026, 9, 28, 1).toISOString()); // final 11 h ago
-    let r = run(0);
-    await flush(); landAll(); await settle();
-    expect(env.plans).toContain(40);
-    r.unmount();
-    env.plans = []; env.store = fakeStore(60, 12); env.state = null;
-    r = run(0);
-    await flush(); landAll(); await settle();
-    expect(env.plans).toContain(40); // no table: 2 days after the first morning, inside the 6
   });
 });

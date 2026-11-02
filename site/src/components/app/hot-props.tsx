@@ -10,7 +10,7 @@ import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { MarketTape } from "./market-tape";
 import { StandingMark, Tick } from "./tick";
-import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, keepUntil, lineScope, sameFixture } from "@cricket/engine/lines.js";
+import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { sideEdge } from "@cricket/engine/stats.js";
@@ -18,13 +18,13 @@ import { fmtIndex } from "@cricket/engine/util.js";
 import { venueStem } from "@cricket/engine/markets.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
 import { fixtureState } from "@/hooks/useEngine";
-import { useLiveDoc, useStateDoc } from "@/hooks/useLive";
+import { useLiveDoc } from "@/hooks/useLive";
 import { useRail } from "@/hooks/useRail";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { EMPTY_PHASE } from "./home-phase-bar";
-import { byShard, endOfLine, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
+import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { abbr, odds, shortVenue } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
@@ -67,13 +67,9 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const qc = useQueryClient();
   const lines = useQuery(linesQuery);
   const fixtures = useFixtures(); // each match's ground, for the venue window
-  const live = useLiveDoc();
-  const stateDoc = useStateDoc();
-  const endOf = useMemo(() => endOfLine(live.data, stateDoc), [live.data, stateDoc]); // how each line's match ended: a Test with a result is today's for 24 hours after it turned final, not 6 days
-  const finals = (stateDoc?.matches || []).map((m: any) => m.final_at).filter(Boolean).sort().join(","); // a match turning final changes which lines are today's
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day, finals];
+  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
     queryKey: key,
     enabled: !!doc.data && !fixtures.isLoading,
@@ -81,7 +77,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
-      const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now, endOf) };
+      const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
       const keys = new Map<string, any>();
       for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l); // a Test's first-innings line is a row of its own beside the match line; two stamps of one limited-overs fixture share a row
@@ -108,7 +104,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now, endOf(l)), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -123,7 +119,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
       return out;
     },
   });
-  const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day, Date.now(), endOf)), [doc.data, teams, day, endOf]); // other days' lines, only counted: the day switch stays when this day has none
+  const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
   return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
 }
@@ -279,17 +275,16 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   const { data: all, isLoading, scoring, otherDay } = useHotRows(archive, teams, Number(day), sc.inns);
   const onThis = (r: Row) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: teams![0], b: teams![1], start, fmt }); // this match: the same two sides, a Test on any of its days, not the series' next game
   const live = useLiveDoc();
-  const stateDoc = useStateDoc();
   const { rail } = useRail();
-  // a match stays 24 hours after the start (6 days for a Test; a Test with a result goes 24 hours after it ended, `keepUntil`), and while the live feed still lists it as being played
+  // a match stays 24 hours after the start (6 days for a Test), and while the live feed still lists it as being played
   const onFixture = !!teams;
-  const endOf = useMemo(() => endOfLine(live.data, stateDoc), [live.data, stateDoc]);
   const data = useMemo(() => (all || []).filter((r) => {
     if (onFixture) return true; // a fixture's own page shows every line it has, whatever the match's age: props are never taken away
-    if (phase && lineHomePhase(r, live.data, Date.now(), stateDoc) !== phase) return false;
-    const end = endOf(r);
-    return keepUntil(r.fmt, Date.parse(r.start), end) > Date.now() || end?.status === "live";
-  }), [all, live.data, stateDoc, endOf, onFixture, phase]);
+    if (phase && lineHomePhase(r, live.data) !== phase) return false;
+    if (Date.parse(r.start) > Date.now() - keepMsFor(r.fmt)) return true;
+    const [a, b] = String(r.match).split(/\s+vs\s+/i);
+    return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt })?.status === "live";
+  }), [all, live.data, onFixture, phase]);
   const { identity } = useData();
   // Where a priced line stands is settled on the server (`lines` on each live match, /api/live) and an old match's results are stored in its archive file: `lineStanding`
   // shows those first and reads the card itself only as the fallback.

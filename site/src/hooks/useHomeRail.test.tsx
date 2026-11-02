@@ -54,25 +54,6 @@ describe("keepFinished", () => {
   });
 });
 
-describe("keepFinished with the time a Test turned final", () => {
-  const start = "2026-10-28T09:00:00Z"; // final 31 Oct 10:00: gone from 1 Nov 10:00
-  const test = { a: "SAvAus", start, fmt: "Test" };
-  const finalAtOf = () => "2026-10-31T10:00:00Z";
-  it("keeps it at 1 Nov 09:00 and lets it go at 1 Nov 10:01", () => {
-    expect(keepFinished([test], Date.parse("2026-11-01T09:00:00Z"), finalAtOf)).toHaveLength(1);
-    expect(keepFinished([test], Date.parse("2026-11-01T10:01:00Z"), finalAtOf)).toHaveLength(0);
-  });
-  it("keeps it for the 6 days when its final time is not known", () => {
-    expect(keepFinished([test], Date.parse("2026-11-01T10:01:00Z"))).toHaveLength(1);
-    expect(keepFinished([test], Date.parse("2026-11-03T09:01:00Z"))).toHaveLength(0);
-  });
-  it("does not change a T20 (24 hours from the start)", () => {
-    const t20 = { a: "T20", start: "2026-11-01T01:00:00Z", fmt: "T20" };
-    expect(keepFinished([t20], Date.parse("2026-11-01T10:00:00Z"), finalAtOf)).toHaveLength(1);
-    expect(keepFinished([t20], Date.parse("2026-11-02T01:01:00Z"), finalAtOf)).toHaveLength(0);
-  });
-});
-
 describe("useHomeRail", () => {
   it("shows nothing while the bookmaker lines are out, rather than the whole unpriced schedule", async () => {
     const { result } = run();

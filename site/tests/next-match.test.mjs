@@ -81,22 +81,3 @@ test("nextMatchRates: every miss is 0% with no fair over price; a 100% under is 
   assert.equal(under.here.hits, 2);
   assert.equal(under.here.fair, 1);
 });
-
-test("pickPricedMatch: a Test with a result goes 24 h after it ended (28 Oct 09:00 start, final 31 Oct 10:00), one with no result keeps 6 days", () => {
-  const test = { pid: "sk", stat: "runs", fmt: "Test", line: 30.5, match: "South Africa vs Australia", start_utc: "2026-10-28T09:00:00Z",
-    books: [{ source: "bet365", kind: "bookmaker", over: 1.83, under: 1.83 }] };
-  const doc = { lines: [test] };
-  const over = () => ({ final: true, finalAt: "2026-10-31T10:00:00Z" });
-  assert.equal(pickPricedMatch(doc, "sk", "Test", Date.parse("2026-11-01T09:00:00Z"), over).match, test.match, "23 h after the result");
-  assert.equal(pickPricedMatch(doc, "sk", "Test", Date.parse("2026-11-01T10:01:00Z"), over), null, "24 h and a minute after it");
-  assert.equal(pickPricedMatch(doc, "sk", "Test", Date.parse("2026-11-01T10:01:00Z")).match, test.match, "no word on how it ended: still the 6 days");
-  assert.equal(pickPricedMatch(doc, "sk", "Test", Date.parse("2026-11-01T10:01:00Z"), () => ({ final: false })).match, test.match, "day 5, no result yet");
-  assert.equal(pickPricedMatch(doc, "sk", "Test", Date.parse("2026-11-03T09:01:00Z")), null, "6 days from the first morning");
-});
-
-test("matchPhase: a Test with no word is in play for its 6 days, a final word is final at once", () => {
-  const start = "2026-10-28T09:00:00Z";
-  assert.equal(matchPhase(start, Date.parse("2026-11-03T08:59:00Z"), undefined, "Test"), "live");
-  assert.equal(matchPhase(start, Date.parse("2026-11-03T09:01:00Z"), undefined, "Test"), "final");
-  assert.equal(matchPhase(start, Date.parse("2026-10-30T09:00:00Z"), "final", "Test"), "final");
-});
