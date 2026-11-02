@@ -135,3 +135,12 @@ def test_fill_team_scope_keeps_unmatched_players_in_team_market():
     # a market that genuinely mixes teams is left alone
     mixed = [mk(f"p{i}", "Pakistan") for i in range(3)] + [mk(f"s{i}", "Sri Lanka") for i in range(3)] + [mk("x", "?")]
     assert fill_team_scope(mixed) == 0
+
+
+def test_detect_fmt_reads_50_over_competition_names_before_falling_back_to_the_last_meeting():
+    from value_bets.pipeline import detect_fmt
+
+    # the last meeting of these two sides was a T20, but the competition is a 50-over one: T20 history must not price it
+    for name in ("Zimbabwe Pro50 Championship", "Pro 50 Championship", "Ford Trophy", "Vijay Hazare Trophy", "Bangladesh 50-over League"):
+        assert detect_fmt([name], False, None, "T20") == ("ODI", "name")
+    assert detect_fmt(["Some Unknown Cup"], False, None, "T20") == ("T20", "last-meeting")  # no name to go on: the last meeting still decides
