@@ -1,7 +1,7 @@
 // The Match Fancy edge as plain functions of the data (no DOM, no clock of its own): one definition for the site (Match Fancy tab, /fancy cards) and for the server step that picks
 // the pre-match edges worth announcing (site/scripts/fancy-alerts.mjs). Every number is the history of the two sides over a line the books list, through `sideEdge` (stats.js).
 import { fancyByLine, fancyFor, fancyHeadline, fixtureBooks, lineProb } from "./lines.js";
-import { marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
 import { shrunkProb, sideEdge } from "./stats.js";
 import { FORMATS } from "./util.js";
 
@@ -77,6 +77,31 @@ export function fancyOverview({ store, doc, fxInfo, ms, teams, ground }) {
     ...teams.filter(([, i]) => i >= 0).flatMap(([name, i]) => FANCY_INNS.flatMap((inn) => overviewRows({ store, doc, fxInfo, ms, scope: i, teamName: name, keys: TEAM_KEYS.map(([k]) => k), ground, inn }))),
   ];
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
+}
+
+/** The id a Match Fancy link carries for a market: "key", or "key:1" / "key:2" for a team's own 1st / 2nd innings. `parseFm` reads it back. */
+export const fancyFm = (key, inn = 0) => (inn ? `${key}:${inn}` : key);
+export const parseFm = (fm) => {
+  const [key, raw] = String(fm || "").split(":");
+  const inn = Number(raw);
+  return { key, inn: inn === 1 || inn === 2 ? inn : 0 };
+};
+export const innTag = (inn) => (inn === 1 ? "1st inns" : inn === 2 ? "2nd inns" : "");
+const abbr = (n) => { const w = String(n || "").replace(/\(W\)/i, "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join("") : (w[0] || "?")).slice(0, 3).toUpperCase(); };
+
+/** A market row as the Match Fancy tab shows it: the engine's numbers (`marketRow`) plus the id the link carries and the label (the side's short name in front when `nameInLabel`). */
+const withLabel = (r, label, nameInLabel) => ({ ...r, id: fancyFm(`${r.scope}:${r.key}`, r.inn), label: [nameInLabel && r.team ? abbr(r.team) : "", innTag(r.inn), label(r.key)].filter(Boolean).join(" · ") });
+
+/** `overviewRows` of `keys` ([key, label] pairs), each with its id and label. `label` names a key the pairs do not. */
+export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, ground, inn = 0, nameInLabel = false }) {
+  return overviewRows({ store, doc, fxInfo, ms, scope, teamName, keys: keys.map(([k]) => k), ground, inn }).map((r) => withLabel(r, label, nameInLabel));
+}
+
+/** `fancyOverview` with each row labelled ("Total runs", "IND · 1st inns · Runs"): what the Match Fancy tab and the Fancy cards list. */
+export function collectOverview({ store, doc, fxInfo, ms, teams, ground }) {
+  const matchLabel = (k) => MATCH_KEYS.find(([id]) => id === k)?.[1] ?? MATCH_MARKETS[k]?.label ?? k;
+  const teamLabel = (k) => TEAM_KEYS.find(([id]) => id === k)?.[1] ?? TEAM_TOTAL_MARKETS[k]?.label ?? k;
+  return fancyOverview({ store, doc, fxInfo, ms, teams, ground }).map((r) => (r.scope < 0 ? withLabel(r, matchLabel, false) : withLabel(r, teamLabel, true)));
 }
 
 /** The matches a fixture's lines are scored on: each side's last `WINDOW` in the format, and the last `GROUND_WINDOW` at the ground (the data spells one ground several ways). `f` is a schedule row. */

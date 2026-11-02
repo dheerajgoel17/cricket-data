@@ -15,7 +15,7 @@ import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
-import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, batFirstBooked, fancyOverview, firstInnsMs as firstInns, overviewRows, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
+import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -35,12 +35,8 @@ import { FancySkeleton } from "./skeletons";
 // the markets the tab lists, with their short labels, are the engine's (the server step scores the same ones)
 export const MATCH_KEYS = MATCH_KEY_LIST as [string, string][];
 export const TEAM_KEYS = TEAM_KEY_LIST as [string, string][];
-export const fancyFm = (key: string, inn = 0) => (inn ? `${key}:${inn}` : key);
-export const parseFm = (fm: string): { key: string; inn: number } => {
-  const [key, raw] = String(fm || "").split(":");
-  const inn = Number(raw);
-  return { key, inn: inn === 1 || inn === 2 ? inn : 0 };
-};
+export { fancyFm };
+export const parseFm = parseFmRaw as (fm: string) => { key: string; inn: number };
 const WINDOWS = [5, 10, 20, 30];
 const HERE_MIN = 3;
 const DIFFERS = 0.3; // how far (as a share of matches) the ground's hit rate must sit from the teams' form to be called out
@@ -50,26 +46,16 @@ const scoreMarket = score as (store: any, ms: number[], scope: number, k: string
 const firstInnsMs = firstInns as (store: any, ms: number[], scope: number) => number[];
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => { line: number; over: number; under: number; source: string; bat_first?: boolean }[];
-const innTag = (inn: number) => (inn === 1 ? "1st inns" : inn === 2 ? "2nd inns" : "");
 type BookLine = { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] };
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$|^overs_/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
 
-/** A market row as the tab shows it: the engine's numbers (`marketRow`) plus the id the link carries and the label. */
-const withLabel = (r: any, label: (k: string) => string, nameInLabel: boolean) => ({ ...r, id: fancyFm(`${r.scope}:${r.key}`, r.inn), label: [nameInLabel && r.team ? abbr(r.team) : "", innTag(r.inn), label(r.key)].filter(Boolean).join(" · ") });
-
-/** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line (`overviewRows`, `engine/fancy-edge.js`). `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. Live so-far is overlaid later (`fancyStanding`), not baked in here. */
-export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, ground, inn = 0, nameInLabel = false }: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; ground?: number[]; inn?: number; nameInLabel?: boolean }) {
-  return (overviewRows({ store, doc, fxInfo, ms, scope, teamName, keys: keys.map(([k]) => k), ground, inn }) as any[]).map((r) => withLabel(r, label, nameInLabel));
-}
+/** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line (`engine/fancy-edge.js`). `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. Live so-far is overlaid later (`fancyStanding`), not baked in here. */
+export const buildOverview = buildOverviewRows as (o: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; ground?: number[]; inn?: number; nameInLabel?: boolean }) => any[];
 
 /** Whole-match markets plus each side's team totals, including a Test's own 1st/2nd innings lines, ranked by edge. */
-export function collectOverview({ store, doc, fxInfo, ms, teams, ground }: { store: any; doc: any; fxInfo: any; ms: number[]; teams: [string, number][]; ground?: number[] }) {
-  const matchLabel = (k: string) => MATCH_KEYS.find(([id]) => id === k)?.[1] ?? (MATCH_MARKETS as any)[k]?.label ?? k;
-  const teamLabel = (k: string) => TEAM_KEYS.find(([id]) => id === k)?.[1] ?? (TEAM_TOTAL_MARKETS as any)[k]?.label ?? k;
-  return (fancyOverview({ store, doc, fxInfo, ms, teams, ground }) as any[]).map((r) => (r.scope < 0 ? withLabel(r, matchLabel, false) : withLabel(r, teamLabel, true)));
-}
+export const collectOverview = collectOverviewRows as (o: { store: any; doc: any; fxInfo: any; ms: number[]; teams: [string, number][]; ground?: number[] }) => any[];
 
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);

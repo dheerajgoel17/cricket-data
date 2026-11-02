@@ -1,0 +1,36 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@site/*": [
+        "../site/src/*"
+      ],
+      "@cricket/engine/*": [
+        "../site/packages/engine/*"
+      ],
+      "@cricket/storage": [
+        "../site/packages/storage/index.js"
+      ],
+      "@cricket/tokens/*": [
+        "../site/packages/tokens/*"
+      ]
+    },
+    "types": [
+      "jest",
+      "node"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { WINDOW, fancyEdgeAlerts, fancyInputs, fancyOverview, istLabel, marketRow } from "@cricket/engine/fancy-edge.js";
+import { WINDOW, collectOverview, fancyEdgeAlerts, fancyFm, fancyInputs, fancyOverview, innTag, istLabel, marketRow, parseFm } from "@cricket/engine/fancy-edge.js";
 import { Store } from "@cricket/engine/store.js";
 import { buildDoc } from "../scripts/fancy-alerts.mjs";
 
@@ -146,4 +146,25 @@ test("the script reads the built data files and the book file and writes the sam
   await put("fixtures.json", []);
   await assert.rejects(buildDoc({ dataDir: data, linesPath: join(dir, "book_lines.json"), now: NOW }), /no fixtures/);
   assert.match(await readFile(join(dir, "book_lines.json"), "utf8"), /match_runs/);
+});
+
+test("a market's link id carries its innings and reads back; a Test side's innings is named", () => {
+  assert.equal(fancyFm("match_runs"), "match_runs");
+  assert.equal(fancyFm("team_total_runs", 2), "team_total_runs:2");
+  assert.deepEqual(parseFm("team_total_runs:2"), { key: "team_total_runs", inn: 2 });
+  assert.deepEqual(parseFm("match_runs"), { key: "match_runs", inn: 0 });
+  assert.deepEqual(parseFm("match_runs:7"), { key: "match_runs", inn: 0 }); // only 1 and 2 are innings
+  assert.deepEqual(parseFm(undefined), { key: "", inn: 0 });
+  assert.deepEqual([innTag(0), innTag(1), innTag(2)], ["", "1st inns", "2nd inns"]);
+});
+
+test("the labelled overview names each market and puts the side's short name in front of a team total", () => {
+  const store = synthetic(), f = fixture(), { ms, ground, teams } = fancyInputs(store, f);
+  const fxInfo = { a: "Alpha", b: "Beta", fmt: "T20", startMs: Date.parse(START) };
+  const rows = collectOverview({ store, doc: doc(row("match_runs", 300.5, 1.8), row("team_total_sixes", 7.5, 1.9, { team: "Alpha", over: 1.9 })), fxInfo, ms, teams, ground });
+  const byKey = Object.fromEntries(rows.map((r) => [r.key, r]));
+  assert.equal(byKey.match_runs.label, "Total runs");
+  assert.equal(byKey.match_runs.id, "-1:match_runs");
+  assert.equal(byKey.team_total_sixes.label, "ALP · Sixes");
+  assert.equal(byKey.team_total_sixes.id, "0:team_total_sixes");
 });
