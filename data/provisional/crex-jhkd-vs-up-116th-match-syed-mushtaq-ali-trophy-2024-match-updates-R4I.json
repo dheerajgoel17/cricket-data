@@ -2,6 +2,20 @@
   "date": "2024-12-05",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 160,
+      "team": "Uttar Pradesh",
+      "wickets": 8
+    },
+    {
+      "balls": 119,
+      "runs": 150,
+      "team": "Jharkhand",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-jhkd-vs-up-116th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4I",
   "match_type": "T20",
   "player_of_match": "Bhuvneshwar Kumar",

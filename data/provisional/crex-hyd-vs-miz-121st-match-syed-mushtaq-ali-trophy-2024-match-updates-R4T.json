@@ -2,6 +2,20 @@
   "date": "2024-12-05",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 111,
+      "runs": 123,
+      "team": "Mizoram",
+      "wickets": 10
+    },
+    {
+      "balls": 70,
+      "runs": 127,
+      "team": "Hyderabad",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-hyd-vs-miz-121st-match-syed-mushtaq-ali-trophy-2024-match-updates-R4T",
   "match_type": "T20",
   "player_of_match": "Aman Rao",

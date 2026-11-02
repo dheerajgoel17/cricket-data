@@ -2,6 +2,20 @@
   "date": "2024-12-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 110,
+      "team": "Manipur",
+      "wickets": 8
+    },
+    {
+      "balls": 118,
+      "runs": 113,
+      "team": "Jammu and Kashmir",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-jk-vs-mnp-88th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3Q",
   "match_type": "T20",
   "player_of_match": "Rasikh Salam",

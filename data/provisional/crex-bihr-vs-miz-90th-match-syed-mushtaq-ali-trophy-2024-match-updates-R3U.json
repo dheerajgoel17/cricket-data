@@ -2,6 +2,20 @@
   "date": "2024-12-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 199,
+      "team": "Bihar",
+      "wickets": 2
+    },
+    {
+      "balls": 90,
+      "runs": 96,
+      "team": "Mizoram",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-bihr-vs-miz-90th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3U",
   "match_type": "T20",
   "player_of_match": "Sakibul Gani",

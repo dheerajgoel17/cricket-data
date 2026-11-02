@@ -2,6 +2,20 @@
   "date": "2024-12-03",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 119,
+      "team": "Manipur",
+      "wickets": 9
+    },
+    {
+      "balls": 119,
+      "runs": 99,
+      "team": "Arunachal Pradesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ap-vs-mnp-106th-match-syed-mushtaq-ali-trophy-2024-match-updates-R48",
   "match_type": "T20",
   "player_of_match": "Johnson Singh",

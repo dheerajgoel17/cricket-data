@@ -2,6 +2,20 @@
   "date": "2024-12-19",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 286,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 107,
+      "runs": 54,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV9",
   "match_type": "ODI",
   "player_of_match": "Sediqullah Atal",

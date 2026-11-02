@@ -2,6 +2,20 @@
   "date": "2024-12-21",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 181,
+      "runs": 127,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 161,
+      "runs": 131,
+      "team": "Afghanistan",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-zim-3rd-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RVA",
   "match_type": "ODI",
   "player_of_match": "Allah Mohammad Ghazanfar",

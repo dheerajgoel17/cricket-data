@@ -2,6 +2,20 @@
   "date": "2024-12-03",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 147,
+      "team": "Bihar",
+      "wickets": 6
+    },
+    {
+      "balls": 84,
+      "runs": 150,
+      "team": "Bengal",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-ben-vs-bihr-93rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R43",
   "match_type": "T20",
   "player_of_match": "Karan Lal",

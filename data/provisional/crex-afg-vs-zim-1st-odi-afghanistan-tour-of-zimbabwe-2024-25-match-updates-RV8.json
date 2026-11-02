@@ -2,6 +2,14 @@
   "date": "2024-12-17",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 56,
+      "runs": 44,
+      "team": "Zimbabwe",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2024-25-match-updates-RV8",
   "match_type": "ODI",
   "player_of_match": "",

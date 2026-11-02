@@ -2,6 +2,20 @@
   "date": "2024-12-05",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 89,
+      "team": "Arunachal Pradesh",
+      "wickets": 7
+    },
+    {
+      "balls": 37,
+      "runs": 92,
+      "team": "Delhi",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-ap-vs-del-109th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4H",
   "match_type": "T20",
   "player_of_match": "Aayush Singh",

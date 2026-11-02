@@ -2,6 +2,20 @@
   "date": "2024-12-03",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 111,
+      "team": "Meghalaya",
+      "wickets": 8
+    },
+    {
+      "balls": 104,
+      "runs": 112,
+      "team": "Mizoram",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-mgly-vs-miz-108th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4C",
   "match_type": "T20",
   "player_of_match": "Agni Chopra",

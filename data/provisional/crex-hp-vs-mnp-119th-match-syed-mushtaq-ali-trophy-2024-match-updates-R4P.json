@@ -2,6 +2,20 @@
   "date": "2024-12-05",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 134,
+      "team": "Manipur",
+      "wickets": 7
+    },
+    {
+      "balls": 83,
+      "runs": 135,
+      "team": "Himachal Pradesh",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-hp-vs-mnp-119th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4P",
   "match_type": "T20",
   "player_of_match": "Kanwar Abhinay Singh",

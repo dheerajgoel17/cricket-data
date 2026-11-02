@@ -2,6 +2,20 @@
   "date": "2024-12-03",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 54,
+      "runs": 120,
+      "team": "Odisha",
+      "wickets": 7
+    },
+    {
+      "balls": 49,
+      "runs": 57,
+      "team": "Assam",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-asm-vs-odsa-97th-t20-syed-mushtaq-ali-trophy-2024-match-updates-R3Y",
   "match_type": "T20",
   "player_of_match": "Swastik Samal",

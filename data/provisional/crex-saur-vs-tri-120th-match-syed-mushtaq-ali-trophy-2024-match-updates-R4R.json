@@ -2,6 +2,20 @@
   "date": "2024-12-05",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 117,
+      "runs": 136,
+      "team": "Tripura",
+      "wickets": 10
+    },
+    {
+      "balls": 81,
+      "runs": 141,
+      "team": "Saurashtra",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-saur-vs-tri-120th-match-syed-mushtaq-ali-trophy-2024-match-updates-R4R",
   "match_type": "T20",
   "player_of_match": "Prerak Mankad",
