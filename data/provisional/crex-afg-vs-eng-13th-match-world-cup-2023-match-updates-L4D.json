@@ -2,6 +2,20 @@
   "date": "2023-10-15",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 284,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 243,
+      "runs": 215,
+      "team": "England",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-eng-13th-match-world-cup-2023-match-updates-L4D",
   "match_type": "ODI",
   "player_of_match": "Mujeeb Ur Rahman",

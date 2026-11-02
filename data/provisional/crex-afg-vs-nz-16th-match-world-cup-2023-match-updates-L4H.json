@@ -2,6 +2,20 @@
   "date": "2023-10-18",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 288,
+      "team": "New Zealand",
+      "wickets": 6
+    },
+    {
+      "balls": 208,
+      "runs": 139,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-nz-16th-match-world-cup-2023-match-updates-L4H",
   "match_type": "ODI",
   "player_of_match": "Glenn Phillips",

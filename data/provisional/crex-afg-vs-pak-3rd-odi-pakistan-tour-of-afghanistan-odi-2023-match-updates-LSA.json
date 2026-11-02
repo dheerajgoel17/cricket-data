@@ -2,6 +2,20 @@
   "date": "2023-08-26",
   "event": "Pakistan tour of Afghanistan ODI",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 268,
+      "team": "Pakistan",
+      "wickets": 8
+    },
+    {
+      "balls": 292,
+      "runs": 209,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-pak-3rd-odi-pakistan-tour-of-afghanistan-odi-2023-match-updates-LSA",
   "match_type": "ODI",
   "player_of_match": "Mohammad Rizwan",

@@ -2,6 +2,20 @@
   "date": "2023-10-23",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 282,
+      "team": "Pakistan",
+      "wickets": 7
+    },
+    {
+      "balls": 294,
+      "runs": 286,
+      "team": "Afghanistan",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-pak-22nd-match-world-cup-2023-match-updates-L4N",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",

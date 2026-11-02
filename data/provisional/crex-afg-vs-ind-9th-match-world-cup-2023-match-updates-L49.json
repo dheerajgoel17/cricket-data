@@ -2,6 +2,20 @@
   "date": "2023-10-11",
   "event": "World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 272,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 210,
+      "runs": 273,
+      "team": "India",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-afg-vs-ind-9th-match-world-cup-2023-match-updates-L49",
   "match_type": "ODI",
   "player_of_match": "Rohit Sharma",

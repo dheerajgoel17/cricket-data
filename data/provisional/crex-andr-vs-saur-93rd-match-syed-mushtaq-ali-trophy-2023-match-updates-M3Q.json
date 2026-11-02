@@ -2,6 +2,20 @@
   "date": "2023-10-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 152,
+      "team": "Andhra",
+      "wickets": 9
+    },
+    {
+      "balls": 106,
+      "runs": 156,
+      "team": "Saurashtra",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-andr-vs-saur-93rd-match-syed-mushtaq-ali-trophy-2023-match-updates-M3Q",
   "match_type": "T20",
   "player_of_match": "",

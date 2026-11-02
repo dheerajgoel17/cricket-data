@@ -2,6 +2,20 @@
   "date": "2023-10-03",
   "event": "World Cup 2023 Warm-Up",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 278,
+      "runs": 294,
+      "team": "Sri Lanka",
+      "wickets": 10
+    },
+    {
+      "balls": 229,
+      "runs": 261,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-sl-8th-match-world-cup-2023-warm-up-match-updates-M8E",
   "match_type": "ODI",
   "player_of_match": "",

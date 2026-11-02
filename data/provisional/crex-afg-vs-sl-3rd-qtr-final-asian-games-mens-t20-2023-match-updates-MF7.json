@@ -2,6 +2,20 @@
   "date": "2023-10-04",
   "event": "Asian Games Men's T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 111,
+      "runs": 116,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 115,
+      "runs": 108,
+      "team": "Sri Lanka",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sl-3rd-qtr-final-asian-games-mens-t20-2023-match-updates-MF7",
   "match_type": "T20",
   "player_of_match": "",

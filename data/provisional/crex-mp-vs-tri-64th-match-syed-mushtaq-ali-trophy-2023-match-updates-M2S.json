@@ -2,6 +2,20 @@
   "date": "2023-10-21",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 168,
+      "team": "Madhya Pradesh",
+      "wickets": 5
+    },
+    {
+      "balls": 118,
+      "runs": 131,
+      "team": "Tripura",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-mp-vs-tri-64th-match-syed-mushtaq-ali-trophy-2023-match-updates-M2S",
   "match_type": "T20",
   "player_of_match": "",

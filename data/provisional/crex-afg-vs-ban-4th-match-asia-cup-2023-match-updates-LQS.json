@@ -2,6 +2,20 @@
   "date": "2023-09-03",
   "event": "Asia Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 334,
+      "team": "Bangladesh",
+      "wickets": 5
+    },
+    {
+      "balls": 267,
+      "runs": 245,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-4th-match-asia-cup-2023-match-updates-LQS",
   "match_type": "ODI",
   "player_of_match": "Mehidy Hasan Miraz",

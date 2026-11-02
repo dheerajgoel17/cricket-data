@@ -2,6 +2,20 @@
   "date": "2023-10-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Delhi",
+      "wickets": 4
+    },
+    {
+      "balls": 85,
+      "runs": 83,
+      "team": "Tripura",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-del-vs-tri-100th-match-syed-mushtaq-ali-trophy-2023-match-updates-M3S",
   "match_type": "T20",
   "player_of_match": "",

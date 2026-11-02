@@ -2,6 +2,20 @@
   "date": "2023-10-17",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 159,
+      "team": "Jammu and Kashmir",
+      "wickets": 8
+    },
+    {
+      "balls": 111,
+      "runs": 160,
+      "team": "Hyderabad",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-hyd-vs-jk-19th-match-syed-mushtaq-ali-trophy-2023-match-updates-M1M",
   "match_type": "T20",
   "player_of_match": "",

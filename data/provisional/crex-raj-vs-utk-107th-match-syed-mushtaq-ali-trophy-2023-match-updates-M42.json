@@ -2,6 +2,20 @@
   "date": "2023-10-25",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 160,
+      "team": "Uttarakhand",
+      "wickets": 10
+    },
+    {
+      "balls": 116,
+      "runs": 164,
+      "team": "Rajasthan",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-raj-vs-utk-107th-match-syed-mushtaq-ali-trophy-2023-match-updates-M42",
   "match_type": "T20",
   "player_of_match": "",
