@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Odisha",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 168,
+      "team": "Railways",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-odsa-vs-rlys-80th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL1",
   "match_type": "T20",
   "player_of_match": "Soumya Lenka",

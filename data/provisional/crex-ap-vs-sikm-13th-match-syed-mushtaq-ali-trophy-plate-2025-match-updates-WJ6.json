@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 90,
+      "team": "Arunachal Pradesh",
+      "wickets": 9
+    },
+    {
+      "balls": 57,
+      "runs": 93,
+      "team": "Sikkim",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-ap-vs-sikm-13th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ6",
   "match_type": "T20",
   "player_of_match": "Amit Rajera",

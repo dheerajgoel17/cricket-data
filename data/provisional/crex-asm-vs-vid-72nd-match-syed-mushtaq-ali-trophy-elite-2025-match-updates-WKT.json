@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 175,
+      "team": "Assam",
+      "wickets": 7
+    },
+    {
+      "balls": 107,
+      "runs": 117,
+      "team": "Vidarbha",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-asm-vs-vid-72nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKT",
   "match_type": "T20",
   "player_of_match": "Mukhtar Hussain",

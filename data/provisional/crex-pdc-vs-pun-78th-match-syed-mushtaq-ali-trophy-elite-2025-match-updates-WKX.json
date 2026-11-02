@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 192,
+      "team": "Punjab",
+      "wickets": 5
+    },
+    {
+      "balls": 112,
+      "runs": 138,
+      "team": "Puducherry",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-pdc-vs-pun-78th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKX",
   "match_type": "T20",
   "player_of_match": "Abhishek Sharma",

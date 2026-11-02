@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "Meghalaya",
+      "wickets": 8
+    },
+    {
+      "balls": 107,
+      "runs": 151,
+      "team": "Mizoram",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-mgly-vs-miz-15th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WJ8",
   "match_type": "T20",
   "player_of_match": "Jehu Anderson",

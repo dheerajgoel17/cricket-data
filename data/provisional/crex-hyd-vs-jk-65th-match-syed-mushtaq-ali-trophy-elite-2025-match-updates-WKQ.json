@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 117,
+      "runs": 112,
+      "team": "Jammu and Kashmir",
+      "wickets": 10
+    },
+    {
+      "balls": 91,
+      "runs": 115,
+      "team": "Hyderabad",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-hyd-vs-jk-65th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKQ",
   "match_type": "T20",
   "player_of_match": "Nitin Sai Yadav",

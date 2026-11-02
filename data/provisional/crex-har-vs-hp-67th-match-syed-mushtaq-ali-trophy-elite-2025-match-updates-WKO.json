@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 176,
+      "team": "Himachal Pradesh",
+      "wickets": 8
+    },
+    {
+      "balls": 108,
+      "runs": 177,
+      "team": "Haryana",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-har-vs-hp-67th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKO",
   "match_type": "T20",
   "player_of_match": "Yashvardhan Dalal",

@@ -2,6 +2,20 @@
   "date": "2025-12-04",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 110,
+      "runs": 165,
+      "team": "Services",
+      "wickets": 10
+    },
+    {
+      "balls": 91,
+      "runs": 167,
+      "team": "Bengal",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-ben-vs-ser-70th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WKP",
   "match_type": "T20",
   "player_of_match": "Mohammed Shami",

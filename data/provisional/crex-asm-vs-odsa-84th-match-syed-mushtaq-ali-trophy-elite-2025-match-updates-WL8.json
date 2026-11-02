@@ -2,6 +2,20 @@
   "date": "2025-12-06",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 171,
+      "team": "Odisha",
+      "wickets": 4
+    },
+    {
+      "balls": 96,
+      "runs": 98,
+      "team": "Assam",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-asm-vs-odsa-84th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WL8",
   "match_type": "T20",
   "player_of_match": "Aashirwad Swain",
