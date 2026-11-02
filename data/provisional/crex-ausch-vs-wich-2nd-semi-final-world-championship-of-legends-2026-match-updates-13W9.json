@@ -2,6 +2,20 @@
   "date": "2026-10-16",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 172,
+      "team": "Australia Champions",
+      "wickets": 7
+    },
+    {
+      "balls": 114,
+      "runs": 173,
+      "team": "West Indies Champions",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ausch-vs-wich-2nd-semi-final-world-championship-of-legends-2026-match-updates-13W9",
   "match_type": "T20",
   "player_of_match": "Chadwick Walton",

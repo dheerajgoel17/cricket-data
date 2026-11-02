@@ -2,6 +2,20 @@
   "date": "2026-10-16",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 189,
+      "team": "England Champions",
+      "wickets": 8
+    },
+    {
+      "balls": 101,
+      "runs": 143,
+      "team": "South Africa Champions",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-engch-vs-sach-1st-semi-final-world-championship-of-legends-2026-match-updates-13W8",
   "match_type": "T20",
   "player_of_match": "Moeen Ali",

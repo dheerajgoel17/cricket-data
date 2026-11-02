@@ -2,6 +2,20 @@
   "date": "2026-10-17",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 129,
+      "team": "ACT Meteors Women",
+      "wickets": 4
+    },
+    {
+      "balls": 115,
+      "runs": 132,
+      "team": "Melbourne Stars Women",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-act-w-vs-mls-w-13th-t20-t20-spring-challenge-2026-match-updates-13EE",
   "match_type": "T20",
   "player_of_match": "Carly Leeson",

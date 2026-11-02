@@ -2,6 +2,20 @@
   "date": "2026-10-16",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 98,
+      "runs": 68,
+      "team": "Garden Route Badgers",
+      "wickets": 10
+    },
+    {
+      "balls": 57,
+      "runs": 70,
+      "team": "Warriors",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-grb-vs-war-40th-t20-csa-pro-t20-cup-2026-match-updates-14JC",
   "match_type": "T20",
   "player_of_match": "",

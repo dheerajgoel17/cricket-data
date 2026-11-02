@@ -2,6 +2,20 @@
   "date": "2026-10-17",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 166,
+      "team": "Perth Scorchers Women",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-hbh-w-vs-prs-w-11th-t20-t20-spring-challenge-2026-match-updates-13EC",
   "match_type": "T20",
   "player_of_match": "",

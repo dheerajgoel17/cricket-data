@@ -2,6 +2,20 @@
   "date": "2026-10-17",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 143,
+      "team": "Adelaide Strikers Women",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 105,
+      "team": "Sydney Sixers Women",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-ads-w-vs-sys-w-14th-t20-t20-spring-challenge-2026-match-updates-13EF",
   "match_type": "T20",
   "player_of_match": "Madeline Penna",

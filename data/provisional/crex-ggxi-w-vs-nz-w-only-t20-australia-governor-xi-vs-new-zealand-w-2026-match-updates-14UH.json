@@ -2,6 +2,20 @@
   "date": "2026-10-15",
   "event": "Australia Governor XI vs New Zealand-W",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 77,
+      "team": "Australia Governor XI",
+      "wickets": 2
+    },
+    {
+      "balls": 60,
+      "runs": 85,
+      "team": "New Zealand Women",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-ggxi-w-vs-nz-w-only-t20-australia-governor-xi-vs-new-zealand-w-2026-match-updates-14UH",
   "match_type": "T20",
   "player_of_match": "",

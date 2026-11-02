@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "Bangladesh Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 172,
+      "team": "Bangladesh Women",
+      "wickets": 10
+    },
+    {
+      "balls": 136,
+      "runs": 175,
+      "team": "Australia Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-aus-w-vs-ban-w-3rd-odi-bangladesh-women-tour-of-australia-2026-match-updates-11BB",
   "match_type": "ODI",
   "player_of_match": "Megan Schutt",

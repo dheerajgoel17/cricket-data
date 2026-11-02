@@ -2,6 +2,20 @@
   "date": "2026-10-16",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 105,
+      "runs": 83,
+      "team": "ACT Meteors Women",
+      "wickets": 10
+    },
+    {
+      "balls": 85,
+      "runs": 86,
+      "team": "Brisbane Heat Women",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-act-w-vs-bh-w-10th-t20-t20-spring-challenge-2026-match-updates-13EB",
   "match_type": "T20",
   "player_of_match": "Sianna Ginger",

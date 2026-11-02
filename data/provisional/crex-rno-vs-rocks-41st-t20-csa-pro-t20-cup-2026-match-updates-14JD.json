@@ -2,6 +2,20 @@
   "date": "2026-10-17",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 141,
+      "team": "Rocks",
+      "wickets": 6
+    },
+    {
+      "balls": 116,
+      "runs": 102,
+      "team": "Mpumalanga Rhinos",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-rno-vs-rocks-41st-t20-csa-pro-t20-cup-2026-match-updates-14JD",
   "match_type": "T20",
   "player_of_match": "",

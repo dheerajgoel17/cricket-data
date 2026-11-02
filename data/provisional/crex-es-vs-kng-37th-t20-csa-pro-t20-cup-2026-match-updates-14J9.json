@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 186,
+      "team": "Eastern Storm",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 168,
+      "team": "Knights",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-es-vs-kng-37th-t20-csa-pro-t20-cup-2026-match-updates-14J9",
   "match_type": "T20",
   "player_of_match": "",

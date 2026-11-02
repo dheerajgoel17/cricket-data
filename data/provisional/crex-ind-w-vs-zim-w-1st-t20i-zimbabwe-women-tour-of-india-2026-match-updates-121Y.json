@@ -2,6 +2,20 @@
   "date": "2026-10-16",
   "event": "Zimbabwe Women tour of India",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 114,
+      "team": "Zimbabwe Women",
+      "wickets": 5
+    },
+    {
+      "balls": 94,
+      "runs": 116,
+      "team": "India Women",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-ind-w-vs-zim-w-1st-t20i-zimbabwe-women-tour-of-india-2026-match-updates-121Y",
   "match_type": "T20",
   "player_of_match": "Deepti Sharma",
