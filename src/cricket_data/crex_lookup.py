@@ -401,6 +401,15 @@ def cricsheet_match_type(match_type: str, fam: str, international: bool) -> str:
     return mt
 
 
+def stated_innings(scorecard, teams: tuple[str, str]) -> list[dict]:
+    """Each innings' stated runs / wickets / balls under the match page's own team names (the player rows alone miss extras and run-outs)."""
+    def canon(n: str) -> str:
+        return next((t for t in teams if names_match(n, t)), n)
+
+    return [{"team": canon(scorecard.teams.get(i.batting_team, "")), "runs": i.runs, "wickets": i.wickets, "balls": i.balls}
+            for i in scorecard.innings if i.runs is not None]
+
+
 def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, match_type: str = "",
                       status: str = "provisional", scorecard=None) -> MatchRecord:
     from .crex_scorecard import event_name, player_rows
@@ -418,9 +427,7 @@ def record_from_facts(entry: MatchEntry, facts: PageFacts, match_date: str, matc
         canon = {n: next((t for t in (facts.team_a, facts.team_b) if names_match(n, t)), n) for n in scorecard.teams.values()}
         for pl in players:  # use the match page's team names everywhere ('United States' vs 'United States of America')
             pl.team, pl.opponent = canon.get(pl.team, pl.team), canon.get(pl.opponent, pl.opponent)
-        innings = [{"team": canon.get(scorecard.teams.get(i.batting_team, ""), scorecard.teams.get(i.batting_team, "")),
-                    "runs": i.runs, "wickets": i.wickets, "balls": i.balls}
-                   for i in scorecard.innings if i.runs is not None]
+        innings = stated_innings(scorecard, (facts.team_a, facts.team_b))
     return MatchRecord(
         match_id=match_id, date=match_date, match_type=cricsheet_match_type(match_type, fam, intl),
         team_type="international" if intl else "club",

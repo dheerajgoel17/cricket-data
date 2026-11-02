@@ -121,6 +121,12 @@ jobs:
         continue-on-error: true
         run: cricket-data fixtures
 
+      - name: Add stated innings totals to saved matches (a few per run, all formats)
+        # not on the daily backfill run (about 23 minutes already: the job has 30) nor on a manual run with a backfill batch
+        if: github.event.schedule != '17 3 * * *' && (github.event.inputs.backfill_batch_size || '0') == '0'
+        continue-on-error: true
+        run: cricket-data refresh-innings --limit 20 --max-minutes 8
+
       - name: Size guard
         run: |
           du -sh .git data
