@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 124,
+      "team": "England Sixes",
+      "wickets": 2
+    },
+    {
+      "balls": 36,
+      "runs": 121,
+      "team": "India Sixes",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-eng-s-vs-ind-s-14th-match-hong-kong-sixes-2026-match-updates-14ZC",
   "match_type": "T20",
   "player_of_match": "Martin Andersson",

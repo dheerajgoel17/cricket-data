@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 141,
+      "team": "Australia Sixes",
+      "wickets": 3
+    },
+    {
+      "balls": 33,
+      "runs": 88,
+      "team": "United Arab Emirates Sixes",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-aus-s-vs-uae-s-17th-match-hong-kong-sixes-2026-match-updates-14ZF",
   "match_type": "T20",
   "player_of_match": "",

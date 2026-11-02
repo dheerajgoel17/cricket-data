@@ -10,6 +10,8 @@ import time
 import traceback
 from collections import defaultdict
 
+from cricket_site import testend
+
 from . import archive, booklines, config, fancy, history, store, strategy, weather
 from .adapters import (
     betfair,
@@ -813,7 +815,12 @@ def run():
         log(f"archive: {len(wrote)} match file(s) written" + (f", {len(bad)} unreadable and left as they are" if bad else ""))
     except Exception as e:
         log(f"archive failed: {e!r}")
-    book = booklines.carry_started(book, prev_book, now)  # a match stays in the file while it is being played
+    try:  # a Test with a result goes a day after it ended; the archive says when, and it being unreadable must never stop the run
+        ended = testend.ended(config.ARCHIVE, now)
+    except Exception as e:
+        ended = []
+        log(f"archive: ended Tests not read: {e!r}")
+    book = booklines.carry_started(book, prev_book, now, ended)  # a match stays in the file while it is being played
     (config.OUT / "book_lines.json").write_text(json.dumps(book, separators=(",", ":")))
     (config.OUT / "new_alerts.json").write_text(json.dumps({"generated_at_ist": ist(now), "alerts": alerts},
                                                           indent=1, default=str))

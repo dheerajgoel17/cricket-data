@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 185,
+      "team": "Adelaide Strikers Women",
+      "wickets": 2
+    },
+    {
+      "balls": 120,
+      "runs": 164,
+      "team": "Melbourne Stars Women",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-ads-w-vs-mls-w-4th-t20-womens-big-bash-league-2026-match-updates-12X7",
   "match_type": "T20",
   "player_of_match": "Amanda-Jade Wellington",

@@ -22,11 +22,12 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import identity
+from . import identity, testend
 from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
+from .sides import SAME_SIDE
 
 NSHARD = 64
 SCHEMA = 1
@@ -88,8 +89,19 @@ def _norm_team(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", s)
 
 
+def _side(s: str) -> str:
+    """``_norm_team`` with a side the books name differently from the schedule folded into one key (``SAME_SIDE``): for telling whether two rows are one match, never for finding a team."""
+    k = _norm_team(s)
+    return SAME_SIDE.get(k, k)
+
+
 def _strip_women(s: str) -> str:
     return re.sub(r"\s+(women|\(w\)|w)$", "", (s or "").strip(), flags=re.I)
+
+
+def _dls_margin(d: dict) -> bool:
+    """True when a scraped result was decided by a weather adjustment (its margin text names the method)."""
+    return bool(re.search(r"DLS|D/L|VJD|DUCKWORTH", (d.get("result_margin") or "").upper()))
 
 
 def fold_name(s: str) -> str:
@@ -194,7 +206,7 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20", 4: "T10", 5: "ODI"}[fmt],
             "overs": {4: 10, 5: 60}.get(fmt, 0),
             "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
-            "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
+            "outcome": ({"winner": d["winner"], **({"method": "D/L"} if _dls_margin(d) else {})}) if d.get("winner") else {}, "registry": {"people": registry}}
     try:
         parsed = parse_match(m["id"], balls_doc(rows, info))
     except (KeyError, ValueError) as exc:  # malformed stored rows: keep the totals-only match, never sink the build
@@ -231,7 +243,7 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     if not all(teams):
         return
     n = _int_getter
-    side = {t: {"runs": 0, "balls": 0, "f4": 0, "f6": 0, "scores": [], "bowl_wkts": 0, "bowl_balls": 0, "bowl_rc": 0, "tops": []} for t in teams}
+    side = {t: {"runs": 0, "balls": 0, "f4": 0, "f6": 0, "scores": [], "bowl_wkts": 0, "run_outs": 0, "bowl_balls": 0, "bowl_rc": 0, "tops": []} for t in teams}
     for p in d.get("players", []):
         t = p.get("team", "")
         if t not in side:
@@ -249,8 +261,10 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
             if pid:
                 s["tops"].append((pid, r))
         side[t]["bowl_wkts"] += get("wickets")
+        side[t]["run_outs"] += get("run_outs")  # a run-out is no bowler's wicket: without it an all-out innings reads 9 down
         side[t]["bowl_balls"] += get("balls_bowled")
         side[t]["bowl_rc"] += get("runs_conceded")
+    stated = {_norm_team(x.get("team", "")): x for x in d.get("innings") or [] if x.get("runs") is not None}  # the source's own innings summary
     inns = []
     for t in teams:
         o = teams[1] if t == teams[0] else teams[0]
@@ -259,13 +273,18 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
             continue
         balls = side[o]["bowl_balls"] or side[t]["balls"]
         ts = max(sc) if sc else 0
+        runs, wkts = side[t]["runs"], min(10, side[o]["bowl_wkts"] + side[o]["run_outs"])
+        ex = None
+        if (st := stated.get(_norm_team(t))) is not None:  # player rows alone miss extras and run-outs: the stated summary has them
+            ex = max(0, st["runs"] - runs)
+            runs, wkts, balls = st["runs"], st["wickets"], st["balls"]
         inns.append({
-            "team": t, "opp": o, "runs": side[t]["runs"], "wkts": side[o]["bowl_wkts"], "balls": balls,
+            "team": t, "opp": o, "runs": runs, "wkts": wkts, "balls": balls,
             "f4": side[t]["f4"], "f6": side[t]["f6"],
             "n30": sum(30 <= x < 50 for x in sc), "n50": sum(50 <= x < 100 for x in sc),
             "n100": sum(x >= 100 for x in sc), "n10": sum(x >= 10 for x in sc),
             "nsd": sum(1 <= x <= 9 for x in sc), "nduck": None,  # dismissals (and so ducks) are not on a totals-only card
-            "ho": None, "mc": None, "ts": ts, "ex": None, "ro": None, "mw": None, "ov": [],
+            "ho": None, "mc": None, "ts": ts, "ex": ex, "ro": None, "mw": None, "ov": [],
             "tops": [pid for pid, r in side[t]["tops"] if r == ts and ts > 0],
         })
     if len(inns) < 2:
@@ -276,7 +295,8 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     m["ts"] = max(i["ts"] for i in inns)
     m["inn"] = [pack_inn(i) for i in inns]
     m["ov"] = [i.get("ov") or [] for i in inns]
-    m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"]})
+    winner = next((t for t in teams if d.get("winner") and _norm_team(t) == _norm_team(d["winner"])), "")  # in the innings' own spelling
+    m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"], "winner": winner, "dls": _dls_margin(d)})
     stat["with_totals_innings"] = stat.get("with_totals_innings", 0) + 1
 
 
@@ -711,13 +731,14 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     """Stop-gap fixture rows for archived matches the schedule has no row for: an upcoming game, or a priced Test still in the 6-day window.
 
     The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
-    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match.
+    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match. A started match is Live until the fixture the archive holds has a
+    result, then Completed, a Test included; a Test with a result goes a day after it ended (``cricket_site.testend``), one at stumps with no result keeps its 6 days.
     """
     if not vb_dir:
         return []
     now = now or datetime.now(timezone.utc)
     now_min = now.timestamp() // 60
-    held = [(frozenset((_norm_team(r["a"]), _norm_team(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
+    held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
@@ -727,7 +748,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             mins = _minutes(start)
         except (ValueError, KeyError, TypeError, OSError):
             continue
-        pair = frozenset((_norm_team(a), _norm_team(b)))
+        pair = frozenset((_side(a), _side(b)))
         if any(pair == k and abs(mins - m) < w for k, m, w in held):
             continue
         fx = d.get("fixture") or {}
@@ -738,11 +759,13 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
                 continue  # already linked to a schedule row; the upcoming stop-gap is only for a match the page has not reached yet
         elif mins < now_min - keep_min:
             continue
+        elif fmt == "Test" and (end := testend.end_of(d)) and testend.gone(end, now):
+            continue  # it has a result and ended more than a day ago; its fixture page opens from the archive
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
-        elif fmt in ("Test", "FC") or not (fx.get("result") or "").strip():
-            status = "Live"
+        elif not (fx.get("result") or "").strip():
+            status = "Live"  # no result yet: a Test at stumps or on a rain day is still being played
         else:
             status = "Completed"
         out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
@@ -767,7 +790,23 @@ def _name_series(rows: list[dict]) -> None:
             r["series"] = min(near)[1]
 
 
-def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
+def _drop_ended_tests(rows: list[dict], vb_dir: Path | None, now: datetime) -> list[dict]:
+    """A Test the archive says ended more than a day ago is no longer one of the fixtures the site lists (``cricket_site.testend``): the rail then agrees with the book file, which
+    stops carrying its lines at the same time. Its fixture page still opens, from the archive; one with no result yet, or not in the archive, is not touched."""
+    ends = testend.ended(vb_dir.parent / "archive", now) if vb_dir else []
+    if not ends:
+        return rows
+    gone = [(frozenset(_side(x) for x in re.split(r"\s+vs\s+", m, maxsplit=1, flags=re.I)), start, end) for m, start, end in ends if testend.gone(end, now) and re.search(r"\s+vs\s+", m, re.I)]
+
+    def over(r: dict) -> bool:
+        st = testend.parse(r["start"])
+        pair = frozenset((_side(r["a"]), _side(r["b"])))
+        return r["fmt"] == "Test" and bool(st) and any(k == pair and abs(start - st) < testend.TEST_WINDOW for k, start, _ in gone)
+
+    return [r for r in rows if not over(r)]
+
+
+def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict, now: datetime | None = None) -> list[dict]:
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
     The bookmaker feed is for odds: books serve different regions, so its start times and team labels are not trustworthy as a
@@ -783,11 +822,13 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
                              "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
     _name_series(rows)
-    rows += _unscheduled_priced(vb_dir, rows)
+    now = now or datetime.now(timezone.utc)
+    rows += _unscheduled_priced(vb_dir, rows, now)
+    rows = _drop_ended_tests(rows, vb_dir, now)
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):
-        key = (r["start"][:10], frozenset((_norm_team(r["a"]), _norm_team(r["b"]))))
+        key = (r["start"][:10], frozenset((_side(r["a"]), _side(r["b"]))))
         if key in seen:
             continue
         seen.add(key)

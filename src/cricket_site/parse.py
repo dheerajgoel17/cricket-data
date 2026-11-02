@@ -66,6 +66,9 @@ def parse_match(mid: str, doc: dict) -> dict | None:
     sched_overs = info.get("overs") or 0
     toss = info.get("toss") or {}
     winner = outcome.get("winner", "")
+    docs_innings = [i for i in doc.get("innings", []) if not i.get("super_over")]
+    # decided by a weather adjustment: the outcome names a method, or the chase was set a target over fewer overs than the match was scheduled for
+    dls = int(bool(outcome.get("method")) or any(0 < ((i.get("target") or {}).get("overs") or 0) < (info.get("overs") or 0) for i in docs_innings))
     if winner:
         res = 0
     elif outcome.get("result") == "tie" or "eliminator" in outcome:
@@ -80,7 +83,7 @@ def parse_match(mid: str, doc: dict) -> dict | None:
         "event": (info.get("event") or {}).get("name", "") if isinstance(info.get("event"), dict) else str(info.get("event") or ""),
         "venue": info.get("venue", "") or "", "city": info.get("city", "") or "",
         "teams": list(info["teams"]), "winner": winner, "res": res, "overs": sched_overs, "bpo": bpo,
-        "days": len(dates), "toss_winner": toss.get("winner", ""), "toss_decision": toss.get("decision", ""),
+        "days": len(dates), "dls": dls, "toss_winner": toss.get("winner", ""), "toss_decision": toss.get("decision", ""),
         "pom": list(info.get("player_of_match") or []),
     }
     innings, bat, bowl, fld, parts = [], [], [], [], []
@@ -258,15 +261,23 @@ def _market_aggregates(m: dict) -> None:
     m["q"] = qualifies(m)
 
 
+def _ended_naturally(m: dict, k: int) -> bool:
+    """True when innings `k` ended on its own: all out, or (second innings) the target reached in a match no weather adjustment decided. Such an innings is complete however few balls it took."""
+    i = m["innings"][k]
+    if (i.get("wkts") or 0) >= 10:
+        return True
+    return k == 1 and m.get("res") == 0 and not m.get("dls") and bool(i.get("team")) and i.get("team") == m.get("winner")
+
+
 def qualifies(m: dict) -> int:
-    """Exchange-style validity of match-summary markets (1 valid, 0 void)."""
+    """Exchange-style validity of match-summary markets (1 valid, 0 void). The 80% rule is for matches cut short from outside (rain, light, a DLS result); an innings that ended naturally is complete."""
     inns = m["innings"]
     if m["fmt"] != 2:
         default = INN_LEN[m["fmt"]]
         overs = m["overs"] if 0 < m["overs"] <= default else default  # a few T20 files carry overs=50: use the format's own length
         sched = overs * m["bpo"]
         need = round(OVERS_QUAL * sched)
-        return int(len(inns) >= 2 and min(i["balls"] for i in inns[:2]) >= need)
+        return int(len(inns) >= 2 and all(inns[k]["balls"] >= need or _ended_naturally(m, k) for k in (0, 1)))
     if m["res"] in (0, 1):  # Test with a result (win or tie)
         return 1
     overs = sum(i["balls"] for i in inns) / m["bpo"]

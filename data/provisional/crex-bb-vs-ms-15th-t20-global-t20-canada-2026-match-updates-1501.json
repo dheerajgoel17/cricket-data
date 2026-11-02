@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 114,
+      "runs": 142,
+      "team": "Mississauga Skyhawks",
+      "wickets": 6
+    },
+    {
+      "balls": 112,
+      "runs": 144,
+      "team": "Brampton Blazers",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-bb-vs-ms-15th-t20-global-t20-canada-2026-match-updates-1501",
   "match_type": "T20",
   "player_of_match": "Toby Albert",

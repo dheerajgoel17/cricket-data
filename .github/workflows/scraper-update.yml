@@ -14,6 +14,10 @@ on:
       backfill_priority:
         description: "Comma-separated task-key prefixes to backfill first, e.g. 2025-12-18-Jharkhand"
         default: ""
+      health_check:
+        description: "Also run the sitemap health check (the daily run does; the scheduler Worker's 30-minute dispatches must not)"
+        type: boolean
+        default: false
 
 # Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
 env:
@@ -55,7 +59,7 @@ jobs:
           restore-keys: crex-index-
       - name: Health check (which layer would break?)
         id: health
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '17 3 * * *'  # daily; it downloads the sitemaps
+        if: inputs.health_check || github.event.schedule == '17 3 * * *'  # daily; it downloads the sitemaps
         run: cricket-data health --out diagnostics
         continue-on-error: true
       - name: Scrape recent matches
@@ -120,6 +124,12 @@ jobs:
         if: github.event.schedule != '17 3 * * *'
         continue-on-error: true
         run: cricket-data fixtures
+
+      - name: Add stated innings totals to saved matches (a few per run, all formats)
+        # not on the daily backfill run (about 23 minutes already: the job has 30) nor on a manual run with a backfill batch
+        if: github.event.schedule != '17 3 * * *' && (github.event.inputs.backfill_batch_size || '0') == '0'
+        continue-on-error: true
+        run: cricket-data refresh-innings --limit 20 --max-minutes 8
 
       - name: Size guard
         run: |

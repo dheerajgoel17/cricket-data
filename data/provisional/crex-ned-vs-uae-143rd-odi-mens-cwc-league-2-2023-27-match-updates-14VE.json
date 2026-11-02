@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Men's CWC League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 263,
+      "team": "Netherlands",
+      "wickets": 4
+    },
+    {
+      "balls": 294,
+      "runs": 266,
+      "team": "United Arab Emirates",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ned-vs-uae-143rd-odi-mens-cwc-league-2-2023-27-match-updates-14VE",
   "match_type": "ODI",
   "player_of_match": "Akshdeep Nath",

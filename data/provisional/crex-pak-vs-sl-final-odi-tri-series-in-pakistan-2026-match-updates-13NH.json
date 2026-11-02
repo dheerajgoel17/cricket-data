@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "ODI Tri Series in Pakistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 325,
+      "team": "Sri Lanka",
+      "wickets": 8
+    },
+    {
+      "balls": 291,
+      "runs": 331,
+      "team": "Pakistan",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-pak-vs-sl-final-odi-tri-series-in-pakistan-2026-match-updates-13NH",
   "match_type": "ODI",
   "player_of_match": "Fakhar Zaman",

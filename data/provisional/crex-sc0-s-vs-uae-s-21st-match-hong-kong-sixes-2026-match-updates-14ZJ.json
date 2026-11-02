@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 135,
+      "team": "Scotland Sixes",
+      "wickets": 1
+    },
+    {
+      "balls": 36,
+      "runs": 90,
+      "team": "United Arab Emirates Sixes",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-sc0-s-vs-uae-s-21st-match-hong-kong-sixes-2026-match-updates-14ZJ",
   "match_type": "T20",
   "player_of_match": "Michael Alexander Leask",

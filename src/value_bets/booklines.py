@@ -14,6 +14,8 @@ import datetime as dt
 import json
 from collections import defaultdict
 
+from cricket_site import testend
+
 from .adapters import feede, feedf, feedg, feedh, feedk
 from .util import parse_ts
 
@@ -86,11 +88,12 @@ LIVE_KEEP = dt.timedelta(hours=40)  # buffer past the site's 24 h keep so a late
 TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
 
 
-def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
+def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list | None = None) -> dict:
     """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
     the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
     and has no rows of a kind in this pull keeps the previous pull's rows of that kind: the last pre-match prices. Upcoming matches are never
-    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one).
+    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one). A Test that has a result goes ``RESULT_KEEP`` after it ended instead of
+    after ``TEST_KEEP``; ``ended`` is ``cricket_site.testend.ended`` (match, start, end) from the archive, and a Test with no result yet (stumps, a rain day) keeps its 6 days.
 
     A Test is one match: books restamp ``start_utc`` each morning, so rows of the same pair within ``TEST_KEEP`` keep the earliest start
     (the first morning) and merge by player / stat / inn / line. A first-innings line is not dropped when a later day's pull only has the match total.
@@ -127,8 +130,12 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime) -> dict:
 
     def alive(row: dict) -> bool:
         st = parse_ts(row.get("start_utc"))
-        keep = TEST_KEEP if is_test(row) else LIVE_KEEP
-        return bool(st) and st <= now < st + keep
+        if not st or st > now:
+            return False
+        if not is_test(row):
+            return now < st + LIVE_KEEP
+        over = [end for m, start, end in ended or [] if m == row.get("match") and abs(start - st) < testend.TEST_WINDOW]  # the Test's result, if the archive has one
+        return now < st + TEST_KEEP and not (over and testend.gone(min(over), now))
 
     def order(x: dict):
         line = x.get("line")

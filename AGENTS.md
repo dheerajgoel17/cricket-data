@@ -43,3 +43,4 @@ cd mobile && npm ci && npm run typecheck && npm test   # the iOS / Android app (
 * Images/ids -> `src/cricket_site/crex_assets.py`, `assets_sync.py`, `site/src/lib/photos.js`, `site/src/lib/assets.ts`, `supabase/migrations/`.
 * The iOS / Android app (Expo, React Native, `mobile/`) -> `docs/MOBILE.md`. It imports the engine, storage and tokens packages and two pure helpers (`priority.ts`, `home-phase.ts`) from `site/`, never copies them; the site URL is `EXPO_PUBLIC_SITE_URL` in `mobile/.env.local`, never in a tracked file.
 * Deploy/schedules -> `.github/workflows/site.yml`.
+* Workflow clock (starts the scheduled workflows on time through `workflow_dispatch`; slot rules in one pure function, tests in `site/tests/scheduler.test.mjs`, lag report `node scheduler/measure.mjs`) -> `scheduler/` (docs/OPERATIONS.md, "Scheduler Worker"). A cron change in a workflow means the same change in `scheduler/slots.js` (a test fails otherwise).

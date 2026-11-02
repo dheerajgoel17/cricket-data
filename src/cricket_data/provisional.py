@@ -50,7 +50,18 @@ def write_provisional(store: Store, rec: MatchRecord) -> Path:
         pl.match_id, pl.date = rec.match_id, rec.date
     path = _dir(store) / f"{rec.match_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():  # a re-scrape adds what was missing; it never replaces a stored scorecard with an emptier one
+        try:
+            old = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            old = {}
+        if old.get("players") and not rec.players:
+            return path
+        if old.get("status") in (MatchStatus.CRICSHEET_MISSING.value, MatchStatus.CRICSHEET_WITHHELD.value):
+            rec.status = old["status"]
     doc = {**rec.row(), "players": [p.row() for p in rec.players]}
+    if rec.innings:
+        doc["innings"] = rec.innings
     path.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return path
 
@@ -171,3 +182,64 @@ def reconcile(store: Store, today: date | None = None) -> dict[str, int]:
             path.unlink()  # canonical copy exists: free the space
     
     return stats
+
+
+REFRESH_TRIES = 3  # a page that gives no usable scorecard this many times is left alone
+
+
+def innings_gaps(store: Store) -> list[tuple[Path, dict]]:
+    """Saved scraped matches that lack their stated innings summary: still-provisional ones first, then the permanent classes, newest first in each."""
+    out = []
+    for p in _dir(store).glob("crex-*.json"):
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        if not d.get("innings") and d.get("date"):
+            out.append((p, d))
+    out.sort(key=lambda x: x[1]["date"], reverse=True)
+    out.sort(key=lambda x: x[1].get("status") != MatchStatus.PROVISIONAL.value)  # stable: provisional first, each group newest first
+    return out
+
+
+def refresh_innings(store: Store, browser, base: str, *, limit: int = 20, max_seconds: float = 600.0, clock=None) -> dict:
+    """Store the stated innings summary (runs / wickets / balls) of saved scraped matches that lack it, a few per run, by fetching just the scorecard page.
+
+    Only the `innings` key is added; nothing else in a saved match changes. A scorecard is accepted only when its teams are the match's own and no side's batters
+    out-score its stated total. A page that gives nothing is counted in `data/state/innings_refresh.json` and left alone after `REFRESH_TRIES` tries."""
+    import time
+
+    from .crex_lookup import stated_innings
+    from .crex_scorecard import parse_scorecard
+
+    clock = clock or time.monotonic
+    started = clock()
+    ledger_path = store.root / "state" / "innings_refresh.json"
+    ledger: dict[str, int] = json.loads(ledger_path.read_text(encoding="utf-8")) if ledger_path.exists() else {}
+    res = {"saved": 0, "failed": 0, "left": 0}
+    todo = [(p, d) for p, d in innings_gaps(store) if ledger.get(d["match_id"], 0) < REFRESH_TRIES]
+    for p, d in todo:
+        if res["saved"] + res["failed"] >= limit or clock() - started > max_seconds:
+            res["left"] += 1
+            continue
+        mid = d["match_id"]
+        try:
+            page = browser.render(f"{base.rstrip('/')}/{mid.removeprefix('crex-')}/match-scorecard", marker="getSC4")
+            sc = parse_scorecard(page.html) if page.status < 400 else None
+        except Exception:
+            sc = None
+        innings = stated_innings(sc, (d.get("team_a", ""), d.get("team_b", ""))) if sc else []
+        sides = {d.get("team_a"), d.get("team_b")}
+        batters: dict[str, int] = {}
+        for pl in d.get("players", []):
+            batters[pl.get("team", "")] = batters.get(pl.get("team", ""), 0) + int(pl.get("runs") or 0)
+        if not innings or any(i["team"] not in sides or i["runs"] < batters.get(i["team"], 0) for i in innings):
+            ledger[mid] = ledger.get(mid, 0) + 1
+            res["failed"] += 1
+            continue
+        d["innings"] = innings
+        p.write_text(json.dumps(d, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        res["saved"] += 1
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    ledger_path.write_text(json.dumps(ledger, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return res

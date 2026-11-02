@@ -474,6 +474,13 @@ def test_full_record_has_toss_potm_event_and_players(index):
     assert rec.venue.endswith("Lucknow") and len(rec.players) == 22
 
 
+def test_the_innings_summary_is_kept_and_equals_batters_plus_extras():
+    """The scorecard states each innings as runs/wickets/balls; the player rows alone miss extras (163 + 8 extras = 171, 171 + 1 = 172)."""
+    sc = _scorecard()
+    assert [(i.runs, i.wickets, i.balls) for i in sc.innings] == [(171, 10, 115), (172, 2, 88)]
+    assert [sum(b.runs for b in i.batters) for i in sc.innings] == [163, 171]
+
+
 def test_fetch_record_survives_an_unreadable_scorecard():
     from cricket_data.crex_lookup import fetch_record
     from cricket_data.crex_sitemap import MatchEntry

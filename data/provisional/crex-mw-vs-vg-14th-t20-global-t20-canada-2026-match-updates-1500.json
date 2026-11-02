@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 171,
+      "team": "Montreal Warriors",
+      "wickets": 8
+    },
+    {
+      "balls": 112,
+      "runs": 101,
+      "team": "Vancouver Guardians",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-mw-vs-vg-14th-t20-global-t20-canada-2026-match-updates-1500",
   "match_type": "T20",
   "player_of_match": "Ali Sheikh",

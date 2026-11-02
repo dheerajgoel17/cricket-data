@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 119,
+      "team": "Hong Kong Sixes",
+      "wickets": 0
+    },
+    {
+      "balls": 36,
+      "runs": 118,
+      "team": "Sri Lanka Sixes",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-hk-s-vs-sl-s-20th-match-hong-kong-sixes-2026-match-updates-14ZI",
   "match_type": "T20",
   "player_of_match": "Yasim Murtaza",

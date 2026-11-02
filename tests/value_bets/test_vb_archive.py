@@ -124,6 +124,26 @@ def test_the_ids_agree_with_the_ones_the_site_builder_gives_a_fixture(tmp_path):
     assert team_key("India (W)") == team_key("India Women") == team_key("India W") == "india"
     assert team_key("Brisbane Heat W") == team_key("Brisbane Heat Women") == "brisbaneheat"
     assert team_key("Auckland Aces") == team_key("Auckland") and team_key("Northern Districts") == team_key("Northern Brave")
+    assert team_key("Boland") == team_key("Rocks")
+    assert team_key("South Western Districts") == team_key("Garden Route Badgers") and team_key("Easterns") == team_key("Eastern Storm")
+    assert team_key("Central") == team_key("Central Districts") == team_key("Central Stags")
+    assert team_key("Eagles") == team_key("Mashonaland Eagles") and team_key("Tuskers") == team_key("Matabeleland Tuskers")
+
+
+def test_a_side_the_books_and_the_schedule_name_differently_is_one_file(tmp_path):
+    """The schedule says "Rocks", one pull's books "Boland" and another's "Rocks": one match, filed under the schedule's id, not two pages."""
+    sched = [{"start_utc": "2026-11-01T08:00Z", "format": "T20", "gender": "male", "team_a": "Dolphins", "team_b": "Rocks", "venue": "Kingsmead, Durban", "series": "CSA Pro T20 Cup 2026", "status": "Upcoming"}]
+    kw = dict(team="Dolphins", fmt="T20", competition="t20-south-africa-cup")
+    boland = {"match": "Dolphins vs Boland", "start_utc": "2026-11-01T08:00:00Z", **kw}
+    rocks = {"match": "Dolphins vs Rocks", "start_utc": "2026-11-01T07:30:00Z", **kw}
+    pull = {"generated_at_utc": "t", "events": [], "fancy": [], "lines": [line(pid="p1", player="Bryce Parsons", ln=20.5, **boland), line(pid="p1", player="Bryce Parsons", ln=20.5, books=(("smarkets", 1.85, 1.85),), **rocks),
+                                                                         line(pid="p2", player="Gavin Kaplan", ln=20.5, **boland)]}
+    (g,) = group(pull)
+    assert len(g["lines"]) == 3
+    assert update(tmp_path, pull, at(20, 31), None, sched)[0] == ["2026-11-01-dolphins-v-rocks"]
+    assert not (tmp_path / "2026-11" / "2026-11-01-dolphins-v-boland.json").exists()
+    d = read(tmp_path, "2026-11-01-dolphins-v-rocks")
+    assert [(x["player"], sorted(b["source"] for b in x["books"])) for x in d["lines"]] == [("Bryce Parsons", ["bet365", "smarkets"]), ("Gavin Kaplan", ["bet365"])]
 
 
 def test_same_side_is_the_sites():
@@ -354,3 +374,45 @@ def test_the_command_reads_a_live_route_twice_when_an_innings_is_settled(tmp_pat
     monkeypatch.setattr(arch, "_read_body", lambda src: json.loads(body.read_text()))
     assert main(["--results", "https://site.test/api/live", "--again", "30"], sleep=slept.append) == 0 and slept == [30.0]
     assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}] and json.loads(capsys.readouterr().out)["results_written"]
+
+
+# ---- settled_at: when a Test was first seen over (what lets it leave the lists a day later)
+
+def test_the_run_that_first_stores_a_tests_whole_match_results_records_settled_at_once(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5), line(fmt="Test", ln=26.5, inn=1))
+    live = live_match([settled("ab12", "runs", 72.5, 80, state="live"), settled("ab12", "runs", 26.5, 31, inn=1)], status="live")
+    settle(tmp_path, [{"matches": [live]}, {"matches": [live]}], NOW)
+    d = read(tmp_path)
+    assert d["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}] and "settled_at" not in d, "a 1st innings is settled while the Test is on: that is not the end"
+    done = live_match([settled("ab12", "runs", 72.5, 80), settled("ab12", "runs", 26.5, 31, inn=1)])
+    settle(tmp_path, [{"matches": [done]}, {"matches": [done]}], at(19, 27))
+    assert read(tmp_path)["settled_at"] == "2026-10-27T19:00:00Z"
+    more = live_match([settled("ab12", "runs", 72.5, 80), settled("cd34", "runs", 22.5, 4)])
+    filed_again = line(pid="cd34", player="Tilak Varma", ln=22.5, fmt="Test")
+    update(tmp_path, book([filed_again]), at(21, 27), None, SCHED)
+    settle(tmp_path, [{"matches": [more]}, {"matches": [more]}], at(22, 27))   # a later read brings one more player
+    d = read(tmp_path)
+    assert d["settled_at"] == "2026-10-27T19:00:00Z" and any(r["pid"] == "cd34" for r in d["results"]), "added once, never changed"
+
+
+def test_the_hourly_pull_keeps_settled_at(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5))
+    done = live_match([settled("ab12", "runs", 72.5, 80)])
+    settle(tmp_path, [{"matches": [done]}, {"matches": [done]}], NOW)
+    update(tmp_path, book([line(fmt="Test", ln=72.5), line(fmt="Test", pid="cd34", player="Tilak Varma", ln=22.5)]), at(19, 27), None, SCHED)
+    assert read(tmp_path)["settled_at"] == "2026-10-27T18:00:00Z"
+
+
+def test_a_file_that_had_its_whole_match_results_before_settled_at_existed_is_left_without_one_and_a_limited_overs_match_never_gets_one(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5), line(fmt="Test", ln=22.5, pid="cd34", player="Tilak Varma"))
+    p = tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json"
+    d = read(tmp_path)
+    d["results"] = [{"pid": "ab12", "stat": "runs", "value": 80}]   # stored by the run before this field existed
+    p.write_text(json.dumps(d))
+    settle(tmp_path, [{"matches": [live_match([settled("ab12", "runs", 72.5, 80), settled("cd34", "runs", 22.5, 4)])]}], NOW)
+    d = read(tmp_path)
+    assert len(d["results"]) == 2 and "settled_at" not in d, "its end is estimated (cricket_site.testend), not guessed from this run"
+    t20 = tmp_path / "t20"
+    filed(t20)
+    settle(t20, [{"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}], NOW)
+    assert "settled_at" not in read(t20) and read(t20)["results"], "other formats are untouched"

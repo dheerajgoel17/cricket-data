@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 116,
+      "team": "Bangladesh Sixes",
+      "wickets": 5
+    },
+    {
+      "balls": 36,
+      "runs": 117,
+      "team": "India Sixes",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-ban-s-vs-ind-s-19th-match-hong-kong-sixes-2026-match-updates-14ZH",
   "match_type": "T20",
   "player_of_match": "Krunal Pandya",

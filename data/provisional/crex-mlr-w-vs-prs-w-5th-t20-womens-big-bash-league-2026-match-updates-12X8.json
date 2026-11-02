@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Melbourne Renegades Women",
+      "wickets": 6
+    },
+    {
+      "balls": 81,
+      "runs": 138,
+      "team": "Perth Scorchers Women",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-mlr-w-vs-prs-w-5th-t20-womens-big-bash-league-2026-match-updates-12X8",
   "match_type": "T20",
   "player_of_match": "Beth Mooney",

@@ -105,6 +105,39 @@ def test_void_rules_odi_hundred_and_test():
     assert qualifies(test) == 1  # a result always counts
 
 
+def test_natural_endings_are_complete_and_only_a_cut_short_match_is_void():
+    inn = lambda team, balls, wkts: {"team": team, "balls": balls, "wkts": wkts}  # noqa: E731
+    t20 = lambda *innings, **kw: {"fmt": 0, "overs": 20, "bpo": 6, "innings": list(innings), "res": 0, "days": 1, "winner": "Y", **kw}  # noqa: E731
+    # Y chases 136 and gets there in 81 balls (13.3 overs, 67%): the target was reached, so nothing was lost
+    assert qualifies(t20(inn("X", 120, 6), inn("Y", 81, 1))) == 1
+    # the chase falls short and the side is all out in 81 balls: also a natural end
+    assert qualifies(t20(inn("X", 120, 6), inn("Y", 81, 10), winner="X")) == 1
+    # a side all out in 14 overs, the chase done in 12: both innings complete
+    assert qualifies(t20(inn("X", 84, 10), inn("Y", 72, 2))) == 1
+    # a chase left at 81 balls with wickets in hand and no win (rain stopped it): void
+    assert qualifies(t20(inn("X", 120, 6), inn("Y", 81, 4), winner="X")) == 0
+    # the same chase won, but on a DLS target: the weather cut it, so it is void
+    assert qualifies(t20(inn("X", 120, 6), inn("Y", 81, 1), dls=1)) == 0
+    # a first innings stopped at 81 balls, 6 down, is short whatever happens next
+    assert qualifies(t20(inn("X", 81, 6), inn("Y", 60, 1))) == 0
+    # no result: nothing was won by chasing
+    assert qualifies(t20(inn("X", 120, 6), inn("Y", 81, 1), res=2, winner="")) == 0
+
+
+def test_a_weather_adjusted_result_is_flagged_and_an_ordinary_one_is_not():
+    a = scripted("X", ["A", "B"], {"A": dict(runs=5), "B": dict(runs=0)}, ["Z"], pad_to=120)
+    b = scripted("Y", ["P", "Q"], {"P": dict(runs=0), "Q": dict(runs=0)}, ["Z"], pad_to=120)
+    plain = doc("2024-01-01", ("X", "Y"), [a, b])
+    assert parse_match("m", plain)["dls"] == 0
+    plain["innings"][1]["target"] = {"overs": 20, "runs": 6}  # a normal chase carries its target over the full 20
+    assert parse_match("m", plain)["dls"] == 0
+    plain["innings"][1]["target"] = {"overs": 15, "runs": 5}  # set over fewer overs: weather
+    assert parse_match("m", plain)["dls"] == 1
+    plain["innings"][1].pop("target")
+    plain["info"]["outcome"]["method"] = "D/L"
+    assert parse_match("m", plain)["dls"] == 1
+
+
 def test_hundred_is_its_own_format_and_first_class_is_ignored():
     inn = scripted("X", ["A", "B"], {"A": dict(runs=1), "B": dict(runs=0)}, ["Z"], pad_to=100)
     d = doc("2024-08-01", ("X", "Y"), [inn], mtype="T20", bpo=5)
