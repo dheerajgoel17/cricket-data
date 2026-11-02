@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 147,
+      "team": "Himachal Pradesh",
+      "wickets": 8
+    },
+    {
+      "balls": 83,
+      "runs": 153,
+      "team": "Punjab",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-hp-vs-pun-7th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDV",
   "match_type": "T20",
   "player_of_match": "Harpreet Brar",

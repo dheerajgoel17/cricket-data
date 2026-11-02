@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 182,
+      "team": "Services",
+      "wickets": 9
+    },
+    {
+      "balls": 75,
+      "runs": 183,
+      "team": "Gujarat",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-guj-vs-ser-3rd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDU",
   "match_type": "T20",
   "player_of_match": "Urvil Patel",

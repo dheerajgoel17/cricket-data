@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Tamil Nadu",
+      "wickets": 8
+    },
+    {
+      "balls": 99,
+      "runs": 170,
+      "team": "Rajasthan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-raj-vs-tn-10th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDZ",
   "match_type": "T20",
   "player_of_match": "Deepak Hooda",

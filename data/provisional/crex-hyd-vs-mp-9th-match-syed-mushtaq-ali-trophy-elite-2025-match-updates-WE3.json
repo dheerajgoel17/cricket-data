@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 144,
+      "team": "Madhya Pradesh",
+      "wickets": 9
+    },
+    {
+      "balls": 109,
+      "runs": 145,
+      "team": "Hyderabad",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-hyd-vs-mp-9th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE3",
   "match_type": "T20",
   "player_of_match": "Rahul Buddhi",

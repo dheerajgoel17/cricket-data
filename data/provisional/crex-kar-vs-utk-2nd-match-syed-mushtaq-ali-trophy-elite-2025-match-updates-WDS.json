@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 197,
+      "team": "Uttarakhand",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 198,
+      "team": "Karnataka",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-kar-vs-utk-2nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDS",
   "match_type": "T20",
   "player_of_match": "Smaran Ravichandran",

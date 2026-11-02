@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 143,
+      "team": "Andhra",
+      "wickets": 9
+    },
+    {
+      "balls": 118,
+      "runs": 114,
+      "team": "Assam",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-andr-vs-asm-16th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE6",
   "match_type": "T20",
   "player_of_match": "Ricky Bhui",

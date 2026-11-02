@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 201,
+      "team": "Puducherry",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 196,
+      "team": "Haryana",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-har-vs-pdc-11th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE1",
   "match_type": "T20",
   "player_of_match": "Aman Khan",

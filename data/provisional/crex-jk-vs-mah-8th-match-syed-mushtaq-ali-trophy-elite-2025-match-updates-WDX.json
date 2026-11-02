@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 130,
+      "team": "Maharashtra",
+      "wickets": 10
+    },
+    {
+      "balls": 112,
+      "runs": 132,
+      "team": "Jammu and Kashmir",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-jk-vs-mah-8th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDX",
   "match_type": "T20",
   "player_of_match": "Abid Mushtaq",

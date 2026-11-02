@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 176,
+      "team": "Odisha",
+      "wickets": 7
+    },
+    {
+      "balls": 99,
+      "runs": 177,
+      "team": "Kerala",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-ker-vs-odsa-12th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE5",
   "match_type": "T20",
   "player_of_match": "Rohan Kunnummal",

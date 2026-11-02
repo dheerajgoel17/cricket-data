@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 207,
+      "team": "Manipur",
+      "wickets": 3
+    },
+    {
+      "balls": 120,
+      "runs": 117,
+      "team": "Arunachal Pradesh",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-ap-vs-mnp-3rd-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIW",
   "match_type": "T20",
   "player_of_match": "Kangabam Priyojit Singh",

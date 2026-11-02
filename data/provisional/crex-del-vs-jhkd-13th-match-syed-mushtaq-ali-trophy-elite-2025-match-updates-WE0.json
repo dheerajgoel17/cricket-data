@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 116,
+      "runs": 132,
+      "team": "Delhi",
+      "wickets": 10
+    },
+    {
+      "balls": 89,
+      "runs": 138,
+      "team": "Jharkhand",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-del-vs-jhkd-13th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WE0",
   "match_type": "T20",
   "player_of_match": "Utkarsh Singh",

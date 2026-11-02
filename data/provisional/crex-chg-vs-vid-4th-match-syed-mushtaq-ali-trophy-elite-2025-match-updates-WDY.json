@@ -2,6 +2,20 @@
   "date": "2025-11-26",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 133,
+      "team": "Chhattisgarh",
+      "wickets": 9
+    },
+    {
+      "balls": 115,
+      "runs": 106,
+      "team": "Vidarbha",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-chg-vs-vid-4th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WDY",
   "match_type": "T20",
   "player_of_match": "Ravi Kiran",
