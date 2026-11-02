@@ -1,0 +1,9 @@
+{
+  "name": "dispatch-scheduler",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": true,
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": { "GITHUB_REPO": "dheerajgoel17/cricket-data", "DISPATCH_REF": "main" },
+  "observability": { "enabled": true }
+}

@@ -33,6 +33,7 @@ Two products in one repo, both **100% free to run**:
 data/                 matches/ players/ (monthly csv.gz), provisional/*.json (Source A scrapes), mappings/, fixtures/, state/, reconcile_log.csv
 docs/                 documentation (this file, OPERATIONS, SITE, SITE_MAP, VALUE_BETS, SCRAPER, PROVISIONAL, DATA_DICTIONARY, ...)
 scripts/              check_public_safe.py, make_site_fixture.py, model_backtest/ (research)
+scheduler/            Cloudflare Worker that starts the data workflows on time (slots.js, worker.js, measure.mjs); state/ and relay/ are the other two Workers
 src/cricket_data/     dataset package: Base ingest, store, provisional + reconcile, registry/link-players, Source A scraper, CLI
 src/value_bets/       hourly prop-pricing pipeline (model, adapters for Exchange S / Feed P, weather, alerts)
 src/cricket_site/     site builder (stdlib only): parse.py, build.py, crex_assets.py, identity.py, assets_sync.py
@@ -146,6 +147,7 @@ Backfilling: `python -m value_bets.archive --backfill-book-names` adds `book_nam
 | `value-bets.yml` | hourly, round the clock; weekly refit | odds -> value bets, commits `value_bets/out`; files every match's lines in `value_bets/archive` and adds the results of finished matches (5.4c) | optional odds keys; var `SITE_URL` (results step) |
 | `site.yml` | **hourly :50**, after Daily update, push to main touching site, manual | JS tests, build site data (zip/people/photos cached daily), list unlinked priced players in the run summary, sync images to Supabase, deploy to Vercel (PRs: build + test only) | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_SERVICE_KEY`; vars `SITE_URL`, `SUPABASE_URL` |
 | `auto-merge-scraper-fixes.yml` | workflow_run | merges `scraper-fix` PRs that only touch scraper files | none |
+| *(Worker)* `scheduler/` | Cloudflare cron, every minute | starts `scraper-update` (:07, :37), `value-bets` (:30), `site` (:50) and `balls-update` (:47 every 2nd hour) through `workflow_dispatch` when the slot has no run yet; their own crons above stay as the fallback (OPERATIONS, "Scheduler Worker") | Worker secret `GITHUB_DISPATCH_TOKEN`; vars `GITHUB_REPO`, `DISPATCH_REF` |
 
 ## 7. Local development
 ```bash
