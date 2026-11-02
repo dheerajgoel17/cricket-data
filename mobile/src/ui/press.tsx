@@ -22,7 +22,7 @@ export function Press({ scale = 0.97, style, onPressIn, onPressOut, children, ..
   const calm = useReducedMotion(); // the phone's "reduce motion" setting: no springing
   const [pressed, setPressed] = useState(false);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: s.value }] }));
-  const base = typeof style === "function" ? style({ pressed, hovered: false }) : style;
+  const base = typeof style === "function" ? style({ pressed } as PressableStateCallbackType) : style;
   return (
     <AnimatedPressable
       {...rest}
