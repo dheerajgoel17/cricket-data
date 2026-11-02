@@ -2,6 +2,20 @@
   "date": "2026-09-24",
   "event": "Asian Games Men's T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 129,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 117,
+      "runs": 81,
+      "team": "Japan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-jpn-1st-match-asian-games-mens-t20-2026-match-updates-13PH",
   "match_type": "T20",
   "player_of_match": "",

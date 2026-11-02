@@ -2,6 +2,20 @@
   "date": "2026-10-23",
   "event": "Afghanistan U19 vs Bangladesh U19 in Oman",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 219,
+      "team": "Bangladesh U19",
+      "wickets": 9
+    },
+    {
+      "balls": 289,
+      "runs": 222,
+      "team": "Afghanistan U19",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-u19-vs-ban-u19-4th-youth-odi-afghanistan-u19-vs-bangladesh-u19-in-oman-2026-match-updates-14SY",
   "match_type": "ODI",
   "player_of_match": "Taher Sarwary",

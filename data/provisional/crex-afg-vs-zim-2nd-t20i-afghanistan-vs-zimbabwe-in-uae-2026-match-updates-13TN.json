@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Afghanistan vs Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 221,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 202,
+      "team": "Zimbabwe",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-t20i-afghanistan-vs-zimbabwe-in-uae-2026-match-updates-13TN",
   "match_type": "T20",
   "player_of_match": "Azmatullah Omarzai",

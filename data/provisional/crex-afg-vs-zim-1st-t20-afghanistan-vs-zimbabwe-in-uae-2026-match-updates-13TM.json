@@ -2,6 +2,20 @@
   "date": "2026-10-27",
   "event": "Afghanistan vs Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 119,
+      "runs": 177,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 115,
+      "runs": 140,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-1st-t20-afghanistan-vs-zimbabwe-in-uae-2026-match-updates-13TM",
   "match_type": "T20",
   "player_of_match": "Rashid Khan",

@@ -2,6 +2,20 @@
   "date": "2026-09-25",
   "event": "Asian Games Men's T20",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 102,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 104,
+      "runs": 103,
+      "team": "Nepal",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-nep-4th-match-asian-games-mens-t20-2026-match-updates-13PK",
   "match_type": "T20",
   "player_of_match": "",

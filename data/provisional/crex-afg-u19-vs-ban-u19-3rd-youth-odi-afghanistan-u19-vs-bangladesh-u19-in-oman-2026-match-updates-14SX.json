@@ -2,6 +2,20 @@
   "date": "2026-10-21",
   "event": "Afghanistan U19 vs Bangladesh U19 in Oman",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 237,
+      "team": "Afghanistan U19",
+      "wickets": 10
+    },
+    {
+      "balls": 230,
+      "runs": 194,
+      "team": "Bangladesh U19",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-u19-vs-ban-u19-3rd-youth-odi-afghanistan-u19-vs-bangladesh-u19-in-oman-2026-match-updates-14SX",
   "match_type": "ODI",
   "player_of_match": "Subhan Ali",

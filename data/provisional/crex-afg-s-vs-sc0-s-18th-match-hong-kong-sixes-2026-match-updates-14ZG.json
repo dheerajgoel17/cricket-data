@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 121,
+      "team": "Afghanistan Sixes",
+      "wickets": 4
+    },
+    {
+      "balls": 36,
+      "runs": 100,
+      "team": "Scotland Sixes",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-s-vs-sc0-s-18th-match-hong-kong-sixes-2026-match-updates-14ZG",
   "match_type": "T20",
   "player_of_match": "Gulbadin Naib",

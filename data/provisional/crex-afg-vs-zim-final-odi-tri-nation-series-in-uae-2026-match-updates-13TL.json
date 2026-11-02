@@ -2,6 +2,20 @@
   "date": "2026-10-23",
   "event": "ODI Tri-Nation Series in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 261,
+      "runs": 169,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 207,
+      "runs": 170,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-zim-final-odi-tri-nation-series-in-uae-2026-match-updates-13TL",
   "match_type": "ODI",
   "player_of_match": "Ibrahim Zadran",
