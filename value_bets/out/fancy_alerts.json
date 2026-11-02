@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-02T08:49:55Z",
+ "generated_at_utc": "2026-11-02T09:33:16Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -211,29 +211,6 @@
    "chance": 0.6819,
    "edge": 0.1776,
    "edge_pct": 17.8,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-05-adelaide-strikers-women-v-brisbane-heat-women|team_total_runs|Brisbane Heat Women|0|under",
-   "fixture_id": "2026-11-05-adelaide-strikers-women-v-brisbane-heat-women",
-   "match": "Adelaide Strikers Women vs Brisbane Heat Women",
-   "format": "T20",
-   "series": "WBBL 2026",
-   "start_utc": "2026-11-05T04:40:00Z",
-   "start_ist": "2026-11-05 10:10 IST",
-   "key": "team_total_runs",
-   "team": "Brisbane Heat Women",
-   "inn": 0,
-   "side": "under",
-   "line": 153.5,
-   "best_odds": 1.85,
-   "best_source": "Dafabet",
-   "hits": 14,
-   "played": 20,
-   "window": 20,
-   "chance": 0.6333,
-   "edge": 0.1717,
-   "edge_pct": 17.2,
    "bat_first": false
   },
   {
