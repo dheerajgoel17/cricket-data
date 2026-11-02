@@ -31,7 +31,7 @@ def test_doc_parses_to_the_scorecard_numbers():
     one, two = m["innings"]
     assert (one["team"], one["runs"], one["wkts"], one["balls"]) == ("India Champions", 110, 8, 120)
     assert (two["runs"], two["wkts"]) == (111, 4)
-    assert m["q"] == 0  # the chase ended inside 15 overs: below 80% of 20, so summary markets are void
+    assert m["q"] == 1  # the chase ended inside 15 overs, but by reaching the target: a natural end, not a cut-short match
     # every batter's line equals Source A's scorecard
     pid = people()
     for k, inn in enumerate(card().innings):
@@ -71,7 +71,7 @@ def test_build_gives_a_provisional_match_innings_and_markets_when_it_has_deliver
     M = json.loads((out / "matches.json").read_text())
     m = M["id"].index("prov-x")
     assert M["pv"][m] == 1 and len(M["inn"][m]) == 2 and M["inn"][m][0][1:4] == [110, 8, 120]
-    assert M["fi"][m] != -1 and M["q"][m] == 0
+    assert M["fi"][m] != -1 and M["q"][m] == 1  # the chase reached the target inside 80% of the overs: complete
 
 
 def test_rows_saved_before_the_name_columns_still_build(tmp_path):

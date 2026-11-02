@@ -99,6 +99,11 @@ def _strip_women(s: str) -> str:
     return re.sub(r"\s+(women|\(w\)|w)$", "", (s or "").strip(), flags=re.I)
 
 
+def _dls_margin(d: dict) -> bool:
+    """True when a scraped result was decided by a weather adjustment (its margin text names the method)."""
+    return bool(re.search(r"DLS|D/L|VJD|DUCKWORTH", (d.get("result_margin") or "").upper()))
+
+
 def fold_name(s: str) -> str:
     from .crex_assets import fold
 
@@ -201,7 +206,7 @@ def _with_deliveries(m: dict, d: dict, fmt: int, rows: list[dict], registry: dic
     info = {"dates": [d["date"]], "match_type": {0: "T20", 1: "ODI", 2: "Test", 3: "T20", 4: "T10", 5: "ODI"}[fmt],
             "overs": {4: 10, 5: 60}.get(fmt, 0),
             "team_type": d.get("team_type", ""), "gender": d.get("gender", ""), "teams": [d["team_a"], d["team_b"]],
-            "outcome": {"winner": d["winner"]} if d.get("winner") else {}, "registry": {"people": registry}}
+            "outcome": ({"winner": d["winner"], **({"method": "D/L"} if _dls_margin(d) else {})}) if d.get("winner") else {}, "registry": {"people": registry}}
     try:
         parsed = parse_match(m["id"], balls_doc(rows, info))
     except (KeyError, ValueError) as exc:  # malformed stored rows: keep the totals-only match, never sink the build
@@ -238,7 +243,7 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     if not all(teams):
         return
     n = _int_getter
-    side = {t: {"runs": 0, "balls": 0, "f4": 0, "f6": 0, "scores": [], "bowl_wkts": 0, "bowl_balls": 0, "bowl_rc": 0, "tops": []} for t in teams}
+    side = {t: {"runs": 0, "balls": 0, "f4": 0, "f6": 0, "scores": [], "bowl_wkts": 0, "run_outs": 0, "bowl_balls": 0, "bowl_rc": 0, "tops": []} for t in teams}
     for p in d.get("players", []):
         t = p.get("team", "")
         if t not in side:
@@ -256,8 +261,10 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
             if pid:
                 s["tops"].append((pid, r))
         side[t]["bowl_wkts"] += get("wickets")
+        side[t]["run_outs"] += get("run_outs")  # a run-out is no bowler's wicket: without it an all-out innings reads 9 down
         side[t]["bowl_balls"] += get("balls_bowled")
         side[t]["bowl_rc"] += get("runs_conceded")
+    stated = {_norm_team(x.get("team", "")): x for x in d.get("innings") or [] if x.get("runs") is not None}  # the source's own innings summary
     inns = []
     for t in teams:
         o = teams[1] if t == teams[0] else teams[0]
@@ -266,13 +273,18 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
             continue
         balls = side[o]["bowl_balls"] or side[t]["balls"]
         ts = max(sc) if sc else 0
+        runs, wkts = side[t]["runs"], min(10, side[o]["bowl_wkts"] + side[o]["run_outs"])
+        ex = None
+        if (st := stated.get(_norm_team(t))) is not None:  # player rows alone miss extras and run-outs: the stated summary has them
+            ex = max(0, st["runs"] - runs)
+            runs, wkts, balls = st["runs"], st["wickets"], st["balls"]
         inns.append({
-            "team": t, "opp": o, "runs": side[t]["runs"], "wkts": side[o]["bowl_wkts"], "balls": balls,
+            "team": t, "opp": o, "runs": runs, "wkts": wkts, "balls": balls,
             "f4": side[t]["f4"], "f6": side[t]["f6"],
             "n30": sum(30 <= x < 50 for x in sc), "n50": sum(50 <= x < 100 for x in sc),
             "n100": sum(x >= 100 for x in sc), "n10": sum(x >= 10 for x in sc),
             "nsd": sum(1 <= x <= 9 for x in sc), "nduck": None,  # dismissals (and so ducks) are not on a totals-only card
-            "ho": None, "mc": None, "ts": ts, "ex": None, "ro": None, "mw": None, "ov": [],
+            "ho": None, "mc": None, "ts": ts, "ex": ex, "ro": None, "mw": None, "ov": [],
             "tops": [pid for pid, r in side[t]["tops"] if r == ts and ts > 0],
         })
     if len(inns) < 2:
@@ -283,7 +295,8 @@ def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
     m["ts"] = max(i["ts"] for i in inns)
     m["inn"] = [pack_inn(i) for i in inns]
     m["ov"] = [i.get("ov") or [] for i in inns]
-    m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"]})
+    winner = next((t for t in teams if d.get("winner") and _norm_team(t) == _norm_team(d["winner"])), "")  # in the innings' own spelling
+    m["q"] = qualifies({"fmt": fmt, "overs": m["overs"], "bpo": m["bpo"], "innings": inns, "res": m["res"], "days": m["days"], "winner": winner, "dls": _dls_margin(d)})
     stat["with_totals_innings"] = stat.get("with_totals_innings", 0) + 1
 
 

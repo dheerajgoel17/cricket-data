@@ -60,6 +60,10 @@ class Innings:
     batting_team: str  # team id
     batters: list[Batter]
     bowlers: list[Bowler]
+    # the innings' own summary ("171/10(115": runs / wickets / balls): extras, penalty runs and run-outs are in it, the player rows alone miss them
+    runs: int | None = None
+    wickets: int | None = None
+    balls: int | None = None
 
 
 @dataclass
@@ -98,6 +102,14 @@ def _bowler(row: str) -> Bowler:
                   wickets=_i(f[4]) if len(f) > 4 else 0)
 
 
+_SUMMARY = re.compile(r"^\s*(\d+)/(\d+)\((\d+)")
+
+
+def _summary(text: str) -> tuple[int | None, int | None, int | None]:
+    m = _SUMMARY.match(text or "")
+    return (int(m.group(1)), int(m.group(2)), int(m.group(3))) if m else (None, None, None)
+
+
 def parse_state(html: str) -> dict | None:
     m = _STATE.search(html or "")
     if not m:
@@ -133,8 +145,11 @@ def parse_scorecard(html: str) -> Scorecard | None:
     if not isinstance(rows, list) or not rows:
         return None
     names, teams, series = _maps(state)
-    innings = [Innings(batting_team=i.get("c", ""), batters=[_batter(r) for r in i.get("b", [])],
-                       bowlers=[_bowler(r) for r in i.get("a", [])]) for i in rows]
+    innings = []
+    for i in rows:
+        runs, wickets, balls = _summary(i.get("d", ""))
+        innings.append(Innings(batting_team=i.get("c", ""), batters=[_batter(r) for r in i.get("b", [])],
+                               bowlers=[_bowler(r) for r in i.get("a", [])], runs=runs, wickets=wickets, balls=balls))
     return Scorecard(teams=teams, names=names, innings=innings, series_name=series)
 
 
