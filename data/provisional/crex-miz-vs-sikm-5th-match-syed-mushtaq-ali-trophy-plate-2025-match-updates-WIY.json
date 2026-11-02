@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 148,
+      "team": "Mizoram",
+      "wickets": 6
+    },
+    {
+      "balls": 104,
+      "runs": 149,
+      "team": "Sikkim",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-miz-vs-sikm-5th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIY",
   "match_type": "T20",
   "player_of_match": "Gurinder Singh",

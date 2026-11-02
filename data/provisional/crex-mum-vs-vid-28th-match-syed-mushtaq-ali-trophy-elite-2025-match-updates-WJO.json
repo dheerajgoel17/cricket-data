@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 192,
+      "team": "Vidarbha",
+      "wickets": 9
+    },
+    {
+      "balls": 107,
+      "runs": 194,
+      "team": "Mumbai",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-mum-vs-vid-28th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJO",
   "match_type": "T20",
   "player_of_match": "Ayush Mhatre",

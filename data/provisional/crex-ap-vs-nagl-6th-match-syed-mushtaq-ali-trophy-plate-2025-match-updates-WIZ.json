@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Plate",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 214,
+      "team": "Nagaland",
+      "wickets": 4
+    },
+    {
+      "balls": 101,
+      "runs": 97,
+      "team": "Arunachal Pradesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ap-vs-nagl-6th-match-syed-mushtaq-ali-trophy-plate-2025-match-updates-WIZ",
   "match_type": "T20",
   "player_of_match": "Joshua Ozukum",

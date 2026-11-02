@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 166,
+      "team": "Puducherry",
+      "wickets": 9
+    },
+    {
+      "balls": 113,
+      "runs": 149,
+      "team": "Baroda",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-brd-vs-pdc-22nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJD",
   "match_type": "T20",
   "player_of_match": "Aman Khan",

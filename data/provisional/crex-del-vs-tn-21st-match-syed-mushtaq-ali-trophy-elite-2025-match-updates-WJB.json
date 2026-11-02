@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 198,
+      "team": "Tamil Nadu",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 203,
+      "team": "Delhi",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-del-vs-tn-21st-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJB",
   "match_type": "T20",
   "player_of_match": "Yash Dhull",

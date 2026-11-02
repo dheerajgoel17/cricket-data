@@ -2,6 +2,14 @@
   "date": "2025-11-28",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 33,
+      "runs": 64,
+      "team": "Dolphins",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-dol-vs-war-qualifier-2-csa-t20-challenge-2025-match-updates-XDU",
   "match_type": "T20",
   "player_of_match": "",

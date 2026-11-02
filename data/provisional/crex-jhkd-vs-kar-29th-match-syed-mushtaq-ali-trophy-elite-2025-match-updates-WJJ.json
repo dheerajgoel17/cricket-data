@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 157,
+      "team": "Karnataka",
+      "wickets": 9
+    },
+    {
+      "balls": 118,
+      "runs": 158,
+      "team": "Jharkhand",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-jhkd-vs-kar-29th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJJ",
   "match_type": "T20",
   "player_of_match": "Anukul Roy",

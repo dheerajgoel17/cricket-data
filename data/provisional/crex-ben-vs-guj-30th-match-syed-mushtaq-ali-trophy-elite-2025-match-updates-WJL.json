@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 111,
+      "runs": 127,
+      "team": "Gujarat",
+      "wickets": 10
+    },
+    {
+      "balls": 113,
+      "runs": 130,
+      "team": "Bengal",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-ben-vs-guj-30th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJL",
   "match_type": "T20",
   "player_of_match": "Saksham Chaudhary",

@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 167,
+      "team": "Assam",
+      "wickets": 9
+    },
+    {
+      "balls": 103,
+      "runs": 119,
+      "team": "Chhattisgarh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-asm-vs-chg-32nd-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJP",
   "match_type": "T20",
   "player_of_match": "Mukhtar Hussain",

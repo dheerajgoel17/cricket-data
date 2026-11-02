@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 169,
+      "team": "Tripura",
+      "wickets": 7
+    },
+    {
+      "balls": 113,
+      "runs": 171,
+      "team": "Rajasthan",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-raj-vs-tri-18th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJA",
   "match_type": "T20",
   "player_of_match": "Shubham Shankar Garhwal",

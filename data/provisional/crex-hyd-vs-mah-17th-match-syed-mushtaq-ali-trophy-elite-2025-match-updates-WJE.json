@@ -2,6 +2,20 @@
   "date": "2025-11-28",
   "event": "Syed Mushtaq Ali Trophy Elite",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 191,
+      "team": "Hyderabad",
+      "wickets": 8
+    },
+    {
+      "balls": 112,
+      "runs": 192,
+      "team": "Maharashtra",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-hyd-vs-mah-17th-match-syed-mushtaq-ali-trophy-elite-2025-match-updates-WJE",
   "match_type": "T20",
   "player_of_match": "Arshin Kulkarni",
