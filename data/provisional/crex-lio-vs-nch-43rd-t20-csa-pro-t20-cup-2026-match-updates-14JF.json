@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 137,
+      "team": "Northern Cape Heat",
+      "wickets": 5
+    },
+    {
+      "balls": 72,
+      "runs": 139,
+      "team": "Lions",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-lio-vs-nch-43rd-t20-csa-pro-t20-cup-2026-match-updates-14JF",
   "match_type": "T20",
   "player_of_match": "",

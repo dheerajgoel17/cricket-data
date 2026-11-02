@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "Zimbabwe Women tour of India",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 102,
+      "team": "Zimbabwe Women",
+      "wickets": 8
+    },
+    {
+      "balls": 53,
+      "runs": 104,
+      "team": "India Women",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-ind-w-vs-zim-w-2nd-t20i-zimbabwe-women-tour-of-india-2026-match-updates-121Z",
   "match_type": "T20",
   "player_of_match": "Shafali Verma",

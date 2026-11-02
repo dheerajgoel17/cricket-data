@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 139,
+      "team": "Adelaide Strikers Women",
+      "wickets": 6
+    },
+    {
+      "balls": 107,
+      "runs": 129,
+      "team": "Brisbane Heat Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ads-w-vs-bh-w-16th-t20-t20-spring-challenge-2026-match-updates-13EH",
   "match_type": "T20",
   "player_of_match": "",

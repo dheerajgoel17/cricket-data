@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 129,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 8
+    },
+    {
+      "balls": 103,
+      "runs": 132,
+      "team": "Melbourne Renegades Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-hbh-w-vs-mlr-w-15th-t20-t20-spring-challenge-2026-match-updates-13EG",
   "match_type": "T20",
   "player_of_match": "Annie Wikman",

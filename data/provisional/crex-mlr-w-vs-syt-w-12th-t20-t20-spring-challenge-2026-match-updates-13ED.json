@@ -2,6 +2,20 @@
   "date": "2026-10-17",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 121,
+      "team": "Melbourne Renegades Women",
+      "wickets": 9
+    },
+    {
+      "balls": 113,
+      "runs": 122,
+      "team": "Sydney Thunder Women",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-mlr-w-vs-syt-w-12th-t20-t20-spring-challenge-2026-match-updates-13ED",
   "match_type": "T20",
   "player_of_match": "Alexandra Mavros",

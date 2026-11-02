@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 110,
+      "runs": 92,
+      "team": "Perth Scorchers Women",
+      "wickets": 10
+    },
+    {
+      "balls": 79,
+      "runs": 93,
+      "team": "Sydney Thunder Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-prs-w-vs-syt-w-17th-t20-t20-spring-challenge-2026-match-updates-13EI",
   "match_type": "T20",
   "player_of_match": "Hasrat Gill",

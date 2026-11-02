@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "New Zealand Women tour of Australia",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 162,
+      "team": "New Zealand Women",
+      "wickets": 2
+    },
+    {
+      "balls": 113,
+      "runs": 165,
+      "team": "Australia Women",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-aus-w-vs-nz-w-1st-t20i-new-zealand-women-tour-of-australia-2026-match-updates-13JR",
   "match_type": "T20",
   "player_of_match": "Georgia Plimmer",

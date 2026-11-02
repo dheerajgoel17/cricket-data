@@ -2,6 +2,20 @@
   "date": "2026-10-20",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 152,
+      "team": "Sydney Thunder Women",
+      "wickets": 9
+    },
+    {
+      "balls": 117,
+      "runs": 153,
+      "team": "Sydney Sixers Women",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-sys-w-vs-syt-w-2nd-semi-final-t20-spring-challenge-2026-match-updates-13EL",
   "match_type": "T20",
   "player_of_match": "Lauren Cheatle",

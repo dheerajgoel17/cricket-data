@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 206,
+      "team": "Knights",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 152,
+      "team": "South Africa Emerging",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-kng-vs-sa-e-42nd-t20-csa-pro-t20-cup-2026-match-updates-14JE",
   "match_type": "T20",
   "player_of_match": "",

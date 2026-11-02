@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 155,
+      "team": "Sydney Sixers Women",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 158,
+      "team": "Melbourne Stars Women",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-mls-w-vs-sys-w-18th-t20-t20-spring-challenge-2026-match-updates-13EJ",
   "match_type": "T20",
   "player_of_match": "Meg Lanning",

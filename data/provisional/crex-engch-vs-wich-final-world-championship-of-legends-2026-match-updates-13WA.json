@@ -2,6 +2,20 @@
   "date": "2026-10-18",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 159,
+      "team": "England Champions",
+      "wickets": 7
+    },
+    {
+      "balls": 102,
+      "runs": 165,
+      "team": "West Indies Champions",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-engch-vs-wich-final-world-championship-of-legends-2026-match-updates-13WA",
   "match_type": "T20",
   "player_of_match": "",
