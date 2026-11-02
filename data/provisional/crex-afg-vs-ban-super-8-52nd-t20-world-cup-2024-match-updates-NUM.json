@@ -2,6 +2,20 @@
   "date": "2024-06-25",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 115,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 107,
+      "runs": 105,
+      "team": "Bangladesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-super-8-52nd-t20-world-cup-2024-match-updates-NUM",
   "match_type": "T20",
   "player_of_match": "Naveen ul Haq",

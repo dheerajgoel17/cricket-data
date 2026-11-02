@@ -2,6 +2,20 @@
   "date": "2024-04-19",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 145,
+      "team": "Warriors",
+      "wickets": 7
+    },
+    {
+      "balls": 111,
+      "runs": 146,
+      "team": "North West Dragons",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-nwd-vs-war-52nd-match-csa-t20-challenge-2024-match-updates-OOH",
   "match_type": "T20",
   "player_of_match": "",

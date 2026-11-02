@@ -2,6 +2,20 @@
   "date": "2024-04-28",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 165,
+      "team": "Dolphins",
+      "wickets": 8
+    },
+    {
+      "balls": 106,
+      "runs": 168,
+      "team": "Lions",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-lio-final-csa-t20-challenge-2024-match-updates-OOO",
   "match_type": "T20",
   "player_of_match": "",

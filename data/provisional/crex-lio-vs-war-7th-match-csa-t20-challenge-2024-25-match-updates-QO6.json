@@ -2,6 +2,20 @@
   "date": "2024-10-04",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 239,
+      "team": "Lions",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 177,
+      "team": "Warriors",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-lio-vs-war-7th-match-csa-t20-challenge-2024-25-match-updates-QO6",
   "match_type": "T20",
   "player_of_match": "Junaid Dawood",

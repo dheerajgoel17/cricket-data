@@ -2,6 +2,20 @@
   "date": "2024-06-20",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 181,
+      "team": "India",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 134,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ind-super-8-43rd-t20-world-cup-2024-match-updates-NUD",
   "match_type": "T20",
   "player_of_match": "Suryakumar Yadav",

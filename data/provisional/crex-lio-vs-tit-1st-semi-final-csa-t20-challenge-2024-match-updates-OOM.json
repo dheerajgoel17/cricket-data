@@ -2,6 +2,20 @@
   "date": "2024-04-24",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 108,
+      "runs": 131,
+      "team": "Titans",
+      "wickets": 9
+    },
+    {
+      "balls": 88,
+      "runs": 134,
+      "team": "Lions",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-lio-vs-tit-1st-semi-final-csa-t20-challenge-2024-match-updates-OOM",
   "match_type": "T20",
   "player_of_match": "",

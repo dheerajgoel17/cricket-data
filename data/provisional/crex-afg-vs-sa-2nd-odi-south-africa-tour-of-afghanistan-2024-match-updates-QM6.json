@@ -2,6 +2,20 @@
   "date": "2024-09-20",
   "event": "South Africa tour of Afghanistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 311,
+      "team": "Afghanistan",
+      "wickets": 4
+    },
+    {
+      "balls": 206,
+      "runs": 134,
+      "team": "South Africa",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sa-2nd-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM6",
   "match_type": "ODI",
   "player_of_match": "Rashid Khan",

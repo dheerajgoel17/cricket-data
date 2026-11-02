@@ -2,6 +2,20 @@
   "date": "2024-11-06",
   "event": "Bangladesh tour of Afghanistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 298,
+      "runs": 235,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 207,
+      "runs": 143,
+      "team": "Bangladesh",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-1st-odi-bangladesh-tour-of-afghanistan-2024-match-updates-RGK",
   "match_type": "ODI",
   "player_of_match": "Allah Mohammad Ghazanfar",

@@ -2,6 +2,20 @@
   "date": "2024-04-17",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 152,
+      "team": "Lions",
+      "wickets": 9
+    },
+    {
+      "balls": 115,
+      "runs": 109,
+      "team": "Warriors",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-lio-vs-war-48th-match-csa-t20-challenge-2024-match-updates-OOD",
   "match_type": "T20",
   "player_of_match": "",

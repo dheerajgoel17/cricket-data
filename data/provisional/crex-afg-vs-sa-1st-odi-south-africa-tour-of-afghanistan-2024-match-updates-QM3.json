@@ -2,6 +2,20 @@
   "date": "2024-09-18",
   "event": "South Africa tour of Afghanistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 201,
+      "runs": 106,
+      "team": "South Africa",
+      "wickets": 10
+    },
+    {
+      "balls": 156,
+      "runs": 107,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-sa-1st-odi-south-africa-tour-of-afghanistan-2024-match-updates-QM3",
   "match_type": "ODI",
   "player_of_match": "Fazalhaq Farooqi",

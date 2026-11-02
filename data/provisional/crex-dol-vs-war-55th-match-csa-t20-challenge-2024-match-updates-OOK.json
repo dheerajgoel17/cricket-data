@@ -2,6 +2,20 @@
   "date": "2024-04-21",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 130,
+      "team": "Warriors",
+      "wickets": 8
+    },
+    {
+      "balls": 104,
+      "runs": 131,
+      "team": "Dolphins",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-war-55th-match-csa-t20-challenge-2024-match-updates-OOK",
   "match_type": "T20",
   "player_of_match": "",

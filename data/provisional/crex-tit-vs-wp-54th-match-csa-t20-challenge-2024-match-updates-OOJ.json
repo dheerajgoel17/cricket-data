@@ -2,6 +2,20 @@
   "date": "2024-04-21",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 113,
+      "team": "Western Province",
+      "wickets": 9
+    },
+    {
+      "balls": 80,
+      "runs": 114,
+      "team": "Titans",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-tit-vs-wp-54th-match-csa-t20-challenge-2024-match-updates-OOJ",
   "match_type": "T20",
   "player_of_match": "",
