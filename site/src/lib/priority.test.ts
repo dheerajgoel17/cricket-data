@@ -21,6 +21,17 @@ describe("where the viewer is", () => {
   });
 });
 
+describe("a started match with no score", () => {
+  it("ranks and clusters with the matches in play, not after the ones to come", () => {
+    const stateOf = (f: any) => (f.a === "Namibia" ? "started" : "upcoming");
+    expect(order("india", stateOf)[0]).toBe("Namibia v Ireland");
+    const now = Date.parse("2026-11-01T10:30:00Z");
+    const eagles = fx("Eagles", "Tuskers", { series: "Pro50", start: "2026-11-01T07:30:00Z" });
+    const lions = fx("Lions", "Titans", { series: "CSA", start: "2026-11-01T12:00:00Z" });
+    expect(arrangeFixtures([lions, eagles], (f: any) => (f.a === "Eagles" ? "started" : "upcoming"), null, DEFAULT_RAIL, now).map((f) => f.a)).toEqual(["Eagles", "Lions"]);
+  });
+});
+
 describe("fixture order", () => {
   it("leads with the viewer's own team, then the biggest matches, then their part of the world", () => {
     expect(order("india").slice(0, 5)).toEqual(["New Zealand v India", "Pakistan v Sri Lanka", "South Africa v Australia", "Bangladesh v West Indies", "India Women v Zimbabwe Women"]);

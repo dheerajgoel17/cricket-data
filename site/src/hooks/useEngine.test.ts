@@ -14,6 +14,11 @@ describe("fixtureState", () => {
     expect(fixtureState(f("2026-10-27T07:00Z", { status: "Completed" }), "live")).toBe("live");
     expect(fixtureState(f("2026-10-27T07:00Z"))).toBe("upcoming");
   });
+  it("calls a started match with no word on play started, never live: only the live feed or the schedule's own Live makes it live", () => {
+    expect(fixtureState(f("2026-11-01T07:30Z", { status: "Started" }))).toBe("started");
+    expect(fixtureState(f("2026-11-01T07:30Z", { status: "Started" }), "live")).toBe("live");
+    expect(fixtureState(f("2026-11-01T07:30Z", { status: "Started" }), "final")).toBe("final");
+  });
 });
 
 describe("a Test between days", () => {
@@ -62,6 +67,12 @@ describe("shownFixtures", () => {
     const lined = [f("2026-10-29T10:00Z", { a: "m1" }), f("2026-10-29T11:00Z", { a: "m2" }), f("2026-10-29T14:00Z", { a: "m3" })];
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "SAvAus", fmt: "Test", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["SAvAus", "m1", "m2", "m3"]);
     expect(ids(shownFixtures([f("2026-10-27T08:30Z", { a: "T20", fmt: "T20", status: "Completed" }), ...lined], state, () => true, now))).toEqual(["m1", "m2", "m3"]);
+  });
+  it("keeps a started match (no score from the source) for its keep window, 24 hours or 6 days for a Test, like one in play", () => {
+    const started = (a: string, start: string, fmt?: string) => f(start, { a, fmt, status: "Started" });
+    expect(shownFixtures([started("T20", "2026-10-28T10:00Z", "T20")], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(1); // 23 hours on
+    expect(shownFixtures([started("T20", "2026-10-28T08:00Z", "T20")], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(0); // 25 hours on
+    expect(shownFixtures([started("Test", "2026-10-27T04:00Z", "Test")], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(1);
   });
   it("keeps a match whose start has passed with no play yet (a delay) for 12 hours, then lets it go", () => {
     expect(shownFixtures([f("2026-10-29T01:00Z", { a: "Delayed" })], state, () => true, at("2026-10-29T09:00:00Z"))).toHaveLength(1); // 8 hours late

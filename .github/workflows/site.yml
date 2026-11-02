@@ -107,6 +107,12 @@ jobs:
               print("::warning::Neither Base nor the scraper has data newer than 3 days")
           PY
           du -sh site/public/data
+      - name: Data guard (the built data and the book lines hold their invariants; a hard failure stops the deploy and the last good one stays)
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          LIVE=""; [ -n "$SITE_URL" ] && LIVE="--live ${SITE_URL%/}/api/live"
+          python -m cricket_site.guard --site site/public/data --data data $LIVE --summary "$GITHUB_STEP_SUMMARY"
       - name: List the priced players that could not be linked to the source
         run: |
           if [ -f site/public/data/identity_review.json ]; then

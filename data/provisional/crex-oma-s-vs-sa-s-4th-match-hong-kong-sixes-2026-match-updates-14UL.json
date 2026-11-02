@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 107,
+      "team": "Oman Sixes",
+      "wickets": 2
+    },
+    {
+      "balls": 24,
+      "runs": 58,
+      "team": "South Africa Sixes",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-oma-s-vs-sa-s-4th-match-hong-kong-sixes-2026-match-updates-14UL",
   "match_type": "T20",
   "player_of_match": "",

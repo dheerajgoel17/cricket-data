@@ -258,14 +258,15 @@ export const isFixtureId = (id) => /^\d{4}-\d{2}-\d{2}-[a-z0-9]+(-[a-z0-9]+)*$/.
 
 /**
  * The fixture an archive file (value_bets/archive, see src/value_bets/archive.py) stands for: the schedule row it was filed with, else one made from the books' own names.
- * `teamIx(name, gender)` gives the data's index for a team (-1 if unknown). A match that began long ago (12 h; 6 days for a Test) is Completed.
+ * `teamIx(name, gender)` gives the data's index for a team (-1 if unknown). A match that began long ago (24 h; 6 days for a Test) is Completed; one that began within the keep window is
+ * Started (the archive holds no word that play is on, so never Live: same as the builder's stop-gap rows).
  */
 export function archiveFixture(entry, teamIx, now = Date.now()) {
   if (!entry?.id) return null;
   const [pa, pb] = String(entry.match || "").split(/\s+vs\s+/i);
   const f = entry.fixture || { start: entry.start_utc, fmt: entry.lines?.[0]?.fmt || "", gender: /\(w\)|women/i.test(entry.match || "") ? "female" : "male", a: pa, b: pb, venue: "", series: entry.competition || "" };
   const age = now - Date.parse(f.start);
-  return { ...f, id: entry.id, a_ix: teamIx?.(f.a, f.gender) ?? -1, b_ix: teamIx?.(f.b, f.gender) ?? -1, status: age > keepMsFor(f.fmt) ? "Completed" : "", result: "", source: "archive" };
+  return { ...f, id: entry.id, a_ix: teamIx?.(f.a, f.gender) ?? -1, b_ix: teamIx?.(f.b, f.gender) ?? -1, status: age > keepMsFor(f.fmt) ? "Completed" : age > 0 ? "Started" : "", result: "", source: "archive" };
 }
 
 /**

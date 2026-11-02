@@ -157,8 +157,9 @@ test("only a fixture id can name an archive file", () => {
 test("an archived match is a fixture again: the schedule row it was filed with, the data's team index, Completed once it is old", () => {
   const f = archiveFixture(ENTRY, teamIx, Date.parse("2026-10-30T00:00:00Z"));
   assert.deepEqual([f.id, f.a, f.b, f.a_ix, f.b_ix, f.fmt, f.gender, f.venue, f.status, f.source], ["2026-10-27-new-zealand-v-india", "New Zealand", "India", 7, 3, "T20", "male", "Eden Park", "Completed", "archive"]);
-  assert.equal(archiveFixture(ENTRY, teamIx, Date.parse("2026-10-27T10:00:00Z")).status, "", "3 hours after the start it is still on");
-  assert.equal(archiveFixture({ ...ENTRY, fixture: { ...ENTRY.fixture, fmt: "Test" } }, teamIx, Date.parse("2026-10-30T00:00:00Z")).status, "", "a Test runs for days");
+  assert.equal(archiveFixture(ENTRY, teamIx, Date.parse("2026-10-27T10:00:00Z")).status, "Started", "3 hours after the start: begun, and nothing in the archive says play is on, so never Live");
+  assert.equal(archiveFixture({ ...ENTRY, fixture: { ...ENTRY.fixture, fmt: "Test" } }, teamIx, Date.parse("2026-10-30T00:00:00Z")).status, "Started", "a Test runs for days");
+  assert.equal(archiveFixture(ENTRY, teamIx, Date.parse("2026-10-26T10:00:00Z")).status, "", "before the start it is just a fixture");
   assert.equal(archiveFixture(null), null);
 });
 

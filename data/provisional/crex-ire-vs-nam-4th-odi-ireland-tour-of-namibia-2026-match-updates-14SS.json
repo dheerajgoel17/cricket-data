@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Ireland tour of Namibia",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 298,
+      "team": "Ireland",
+      "wickets": 8
+    },
+    {
+      "balls": 246,
+      "runs": 168,
+      "team": "Namibia",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ire-vs-nam-4th-odi-ireland-tour-of-namibia-2026-match-updates-14SS",
   "match_type": "ODI",
   "player_of_match": "Jai Moondra",

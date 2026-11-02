@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 149,
+      "team": "Hong Kong Sixes",
+      "wickets": 5
+    },
+    {
+      "balls": 36,
+      "runs": 88,
+      "team": "England Sixes",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-eng-s-vs-hk-s-5th-match-hong-kong-sixes-2026-match-updates-14UM",
   "match_type": "T20",
   "player_of_match": "Anshuman Rath",

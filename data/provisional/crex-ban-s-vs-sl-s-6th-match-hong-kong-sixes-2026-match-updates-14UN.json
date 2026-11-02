@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 127,
+      "team": "Bangladesh Sixes",
+      "wickets": 4
+    },
+    {
+      "balls": 32,
+      "runs": 129,
+      "team": "Sri Lanka Sixes",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ban-s-vs-sl-s-6th-match-hong-kong-sixes-2026-match-updates-14UN",
   "match_type": "T20",
   "player_of_match": "Vishen Halambage",

@@ -2,6 +2,20 @@
   "date": "2026-10-31",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 106,
+      "team": "Hong Kong Sixes",
+      "wickets": 3
+    },
+    {
+      "balls": 27,
+      "runs": 107,
+      "team": "Pakistan Sixes",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-hk-s-vs-pak-s-16th-match-hong-kong-sixes-2026-match-updates-14ZE",
   "match_type": "T20",
   "player_of_match": "Abbas Afridi",
