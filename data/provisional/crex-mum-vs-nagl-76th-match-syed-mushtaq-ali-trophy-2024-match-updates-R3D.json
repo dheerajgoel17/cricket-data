@@ -2,6 +2,20 @@
   "date": "2024-12-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 118,
+      "runs": 107,
+      "team": "Nagaland",
+      "wickets": 10
+    },
+    {
+      "balls": 73,
+      "runs": 108,
+      "team": "Mumbai",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-mum-vs-nagl-76th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3D",
   "match_type": "T20",
   "player_of_match": "",

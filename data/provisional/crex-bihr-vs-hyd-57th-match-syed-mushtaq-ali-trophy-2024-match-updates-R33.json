@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 118,
+      "team": "Bihar",
+      "wickets": 9
+    },
+    {
+      "balls": 75,
+      "runs": 119,
+      "team": "Hyderabad",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-bihr-vs-hyd-57th-match-syed-mushtaq-ali-trophy-2024-match-updates-R33",
   "match_type": "T20",
   "player_of_match": "Ravi Teja",

@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 173,
+      "team": "Jammu and Kashmir",
+      "wickets": 8
+    },
+    {
+      "balls": 117,
+      "runs": 177,
+      "team": "Himachal Pradesh",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-hp-vs-jk-55th-match-syed-mushtaq-ali-trophy-2024-match-updates-R2Z",
   "match_type": "T20",
   "player_of_match": "Mayank Dagar",

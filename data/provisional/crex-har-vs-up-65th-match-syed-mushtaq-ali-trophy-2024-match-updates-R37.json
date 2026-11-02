@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 133,
+      "team": "Haryana",
+      "wickets": 9
+    },
+    {
+      "balls": 107,
+      "runs": 134,
+      "team": "Uttar Pradesh",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-har-vs-up-65th-match-syed-mushtaq-ali-trophy-2024-match-updates-R37",
   "match_type": "T20",
   "player_of_match": "Bhuvneshwar Kumar",

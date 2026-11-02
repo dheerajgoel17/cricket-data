@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 109,
+      "team": "Tripura",
+      "wickets": 9
+    },
+    {
+      "balls": 68,
+      "runs": 115,
+      "team": "Baroda",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-brd-vs-tri-63rd-match-syed-mushtaq-ali-trophy-2024-match-updates-R32",
   "match_type": "T20",
   "player_of_match": "Akash Singh",

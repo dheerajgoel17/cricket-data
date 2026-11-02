@@ -2,6 +2,20 @@
   "date": "2024-11-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 120,
+      "team": "Nagaland",
+      "wickets": 8
+    },
+    {
+      "balls": 68,
+      "runs": 121,
+      "team": "Kerala",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-ker-vs-nagl-40th-t20-syed-mushtaq-ali-trophy-2024-match-updates-PWY",
   "match_type": "T20",
   "player_of_match": "Rohan Kunnummal",

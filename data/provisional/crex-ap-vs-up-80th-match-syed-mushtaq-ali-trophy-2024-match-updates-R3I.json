@@ -2,6 +2,20 @@
   "date": "2024-12-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 242,
+      "team": "Uttar Pradesh",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 86,
+      "team": "Arunachal Pradesh",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ap-vs-up-80th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3I",
   "match_type": "T20",
   "player_of_match": "Priyam Garg",

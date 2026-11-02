@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 120,
+      "team": "Manipur",
+      "wickets": 8
+    },
+    {
+      "balls": 111,
+      "runs": 124,
+      "team": "Delhi",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-del-vs-mnp-62nd-match-syed-mushtaq-ali-trophy-2024-match-updates-R30",
   "match_type": "T20",
   "player_of_match": "Yash Dhull",

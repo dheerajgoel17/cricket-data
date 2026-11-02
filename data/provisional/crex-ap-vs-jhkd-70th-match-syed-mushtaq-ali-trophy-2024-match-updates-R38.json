@@ -2,6 +2,20 @@
   "date": "2024-11-29",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 93,
+      "team": "Arunachal Pradesh",
+      "wickets": 10
+    },
+    {
+      "balls": 27,
+      "runs": 94,
+      "team": "Jharkhand",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-ap-vs-jhkd-70th-match-syed-mushtaq-ali-trophy-2024-match-updates-R38",
   "match_type": "T20",
   "player_of_match": "Ishan Kishan",

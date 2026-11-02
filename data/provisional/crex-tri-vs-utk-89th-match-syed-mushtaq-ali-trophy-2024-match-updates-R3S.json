@@ -2,6 +2,20 @@
   "date": "2024-12-01",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "Uttarakhand",
+      "wickets": 7
+    },
+    {
+      "balls": 86,
+      "runs": 154,
+      "team": "Tripura",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-tri-vs-utk-89th-match-syed-mushtaq-ali-trophy-2024-match-updates-R3S",
   "match_type": "T20",
   "player_of_match": "Bikramkumar Das",

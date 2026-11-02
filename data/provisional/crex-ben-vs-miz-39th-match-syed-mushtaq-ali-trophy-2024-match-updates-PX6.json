@@ -2,6 +2,20 @@
   "date": "2024-11-27",
   "event": "Syed Mushtaq Ali Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 157,
+      "team": "Mizoram",
+      "wickets": 4
+    },
+    {
+      "balls": 93,
+      "runs": 158,
+      "team": "Bengal",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-ben-vs-miz-39th-match-syed-mushtaq-ali-trophy-2024-match-updates-PX6",
   "match_type": "T20",
   "player_of_match": "Abishek Porel",
