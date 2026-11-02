@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 174,
+      "team": "Rocks",
+      "wickets": 7
+    },
+    {
+      "balls": 119,
+      "runs": 175,
+      "team": "Western Province",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-rocks-vs-wp-38th-t20-csa-pro-t20-cup-2026-match-updates-14JA",
   "match_type": "T20",
   "player_of_match": "",

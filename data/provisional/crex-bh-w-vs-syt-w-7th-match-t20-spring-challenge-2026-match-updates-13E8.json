@@ -2,6 +2,14 @@
   "date": "2026-10-13",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 0,
+      "runs": 0,
+      "team": "Sydney Thunder Women",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-bh-w-vs-syt-w-7th-match-t20-spring-challenge-2026-match-updates-13E8",
   "match_type": "T20",
   "player_of_match": "",

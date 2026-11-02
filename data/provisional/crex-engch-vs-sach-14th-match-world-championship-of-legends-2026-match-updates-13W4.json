@@ -2,6 +2,20 @@
   "date": "2026-10-13",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 204,
+      "team": "South Africa Champions",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 195,
+      "team": "England Champions",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-engch-vs-sach-14th-match-world-championship-of-legends-2026-match-updates-13W4",
   "match_type": "T20",
   "player_of_match": "Wayne Parnell",

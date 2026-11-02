@@ -2,6 +2,20 @@
   "date": "2026-10-13",
   "event": "Men's CWC League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 277,
+      "team": "United States",
+      "wickets": 7
+    },
+    {
+      "balls": 291,
+      "runs": 278,
+      "team": "Namibia",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-nam-vs-usa-136th-odi-mens-cwc-league-2-2023-27-match-updates-14GN",
   "match_type": "ODI",
   "player_of_match": "",

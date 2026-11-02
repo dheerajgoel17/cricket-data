@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "T20 Spring Challenge",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 165,
+      "team": "Adelaide Strikers Women",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 136,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-ads-w-vs-hbh-w-9th-t20-t20-spring-challenge-2026-match-updates-13EA",
   "match_type": "T20",
   "player_of_match": "",

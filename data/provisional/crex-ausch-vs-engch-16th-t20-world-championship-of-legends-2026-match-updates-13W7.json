@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "World Championship of Legends",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 218,
+      "team": "Australia Champions",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 202,
+      "team": "England Champions",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-ausch-vs-engch-16th-t20-world-championship-of-legends-2026-match-updates-13W7",
   "match_type": "T20",
   "player_of_match": "D'Arcy Short",

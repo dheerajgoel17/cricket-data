@@ -2,6 +2,20 @@
   "date": "2026-10-14",
   "event": "Women's Under-19 Tri-Series in Pakistan",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 105,
+      "runs": 58,
+      "team": "Bangladesh U19-Women",
+      "wickets": 10
+    },
+    {
+      "balls": 64,
+      "runs": 59,
+      "team": "Sri Lanka U19-Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-banwu19-vs-slwu19-9th-youth-t20-womens-under-19-tri-series-in-pakistan-2026-match-updates-1468",
   "match_type": "T20",
   "player_of_match": "Limansa Thilakaratne",
