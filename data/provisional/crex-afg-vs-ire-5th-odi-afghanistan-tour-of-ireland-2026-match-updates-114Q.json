@@ -2,6 +2,20 @@
   "date": "2026-08-15",
   "event": "Afghanistan tour of Ireland",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 298,
+      "team": "Ireland",
+      "wickets": 7
+    },
+    {
+      "balls": 293,
+      "runs": 302,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-ire-5th-odi-afghanistan-tour-of-ireland-2026-match-updates-114Q",
   "match_type": "ODI",
   "player_of_match": "Rahmat Shah",

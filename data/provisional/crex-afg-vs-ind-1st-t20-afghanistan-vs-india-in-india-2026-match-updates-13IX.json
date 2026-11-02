@@ -2,6 +2,20 @@
   "date": "2026-09-13",
   "event": "Afghanistan vs India in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 156,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 82,
+      "runs": 157,
+      "team": "India",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ind-1st-t20-afghanistan-vs-india-in-india-2026-match-updates-13IX",
   "match_type": "T20",
   "player_of_match": "Abhishek Sharma",

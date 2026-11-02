@@ -2,6 +2,20 @@
   "date": "2026-06-20",
   "event": "Afghanistan tour of India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 266,
+      "runs": 218,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 172,
+      "runs": 224,
+      "team": "India",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-afg-vs-ind-3rd-odi-afghanistan-tour-of-india-2026-match-updates-10ZF",
   "match_type": "ODI",
   "player_of_match": "Prasidh Krishna",

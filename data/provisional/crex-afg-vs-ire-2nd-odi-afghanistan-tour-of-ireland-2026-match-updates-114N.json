@@ -2,6 +2,20 @@
   "date": "2026-08-07",
   "event": "Afghanistan tour of Ireland",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 282,
+      "runs": 299,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 202,
+      "runs": 207,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2026-match-updates-114N",
   "match_type": "ODI",
   "player_of_match": "Rashid Khan",

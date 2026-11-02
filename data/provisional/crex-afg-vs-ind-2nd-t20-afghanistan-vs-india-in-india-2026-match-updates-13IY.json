@@ -2,6 +2,20 @@
   "date": "2026-09-15",
   "event": "Afghanistan vs India in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 159,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 89,
+      "runs": 163,
+      "team": "India",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-ind-2nd-t20-afghanistan-vs-india-in-india-2026-match-updates-13IY",
   "match_type": "T20",
   "player_of_match": "Nitish Kumar Reddy",

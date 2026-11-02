@@ -2,6 +2,20 @@
   "date": "2026-08-12",
   "event": "Afghanistan tour of Ireland",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 343,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 288,
+      "runs": 301,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-4th-odi-afghanistan-tour-of-ireland-2026-match-updates-114P",
   "match_type": "ODI",
   "player_of_match": "Sediqullah Atal",

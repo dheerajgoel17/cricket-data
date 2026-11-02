@@ -2,6 +2,20 @@
   "date": "2026-02-16",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 160,
+      "team": "United Arab Emirates",
+      "wickets": 9
+    },
+    {
+      "balls": 116,
+      "runs": 162,
+      "team": "Afghanistan",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-uae-28th-match-t20-world-cup-2026-match-updates-Y9K",
   "match_type": "T20",
   "player_of_match": "Azmatullah Omarzai",
