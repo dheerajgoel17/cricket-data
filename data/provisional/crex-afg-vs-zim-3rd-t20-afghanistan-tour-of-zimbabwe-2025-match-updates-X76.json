@@ -2,6 +2,20 @@
   "date": "2025-11-02",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 210,
+      "team": "Afghanistan",
+      "wickets": 3
+    },
+    {
+      "balls": 120,
+      "runs": 201,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-3rd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X76",
   "match_type": "T20",
   "player_of_match": "Rahmanullah Gurbaz",

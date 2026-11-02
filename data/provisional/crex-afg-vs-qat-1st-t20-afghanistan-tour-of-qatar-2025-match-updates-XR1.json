@@ -2,6 +2,20 @@
   "date": "2025-11-11",
   "event": "Afghanistan tour of Qatar",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 149,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 124,
+      "team": "Qatar",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-afg-vs-qat-1st-t20-afghanistan-tour-of-qatar-2025-match-updates-XR1",
   "match_type": "T20",
   "player_of_match": "Darwish Rasooli",

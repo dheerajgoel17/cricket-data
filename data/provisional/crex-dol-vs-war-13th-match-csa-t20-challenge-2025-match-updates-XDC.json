@@ -2,6 +2,20 @@
   "date": "2025-11-09",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 115,
+      "runs": 94,
+      "team": "Warriors",
+      "wickets": 10
+    },
+    {
+      "balls": 86,
+      "runs": 100,
+      "team": "Dolphins",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-war-13th-match-csa-t20-challenge-2025-match-updates-XDC",
   "match_type": "T20",
   "player_of_match": "",

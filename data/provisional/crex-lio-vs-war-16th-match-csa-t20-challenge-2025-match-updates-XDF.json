@@ -2,6 +2,20 @@
   "date": "2025-11-11",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 146,
+      "team": "Lions",
+      "wickets": 7
+    },
+    {
+      "balls": 106,
+      "runs": 151,
+      "team": "Warriors",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-lio-vs-war-16th-match-csa-t20-challenge-2025-match-updates-XDF",
   "match_type": "T20",
   "player_of_match": "",

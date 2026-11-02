@@ -2,6 +2,20 @@
   "date": "2025-11-23",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 194,
+      "team": "Lions",
+      "wickets": 2
+    },
+    {
+      "balls": 118,
+      "runs": 195,
+      "team": "Dolphins",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-dol-vs-lio-28th-match-csa-t20-challenge-2025-match-updates-XDR",
   "match_type": "T20",
   "player_of_match": "",

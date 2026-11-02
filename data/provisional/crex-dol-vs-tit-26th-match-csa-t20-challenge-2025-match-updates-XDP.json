@@ -2,6 +2,20 @@
   "date": "2025-11-21",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 248,
+      "team": "Titans",
+      "wickets": 3
+    },
+    {
+      "balls": 42,
+      "runs": 104,
+      "team": "Dolphins",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-tit-26th-match-csa-t20-challenge-2025-match-updates-XDP",
   "match_type": "T20",
   "player_of_match": "",

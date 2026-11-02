@@ -2,6 +2,20 @@
   "date": "2025-11-09",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 225,
+      "team": "Western Province",
+      "wickets": 6
+    },
+    {
+      "balls": 106,
+      "runs": 141,
+      "team": "Titans",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-tit-vs-wp-14th-match-csa-t20-challenge-2025-match-updates-XDD",
   "match_type": "T20",
   "player_of_match": "",

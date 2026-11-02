@@ -2,6 +2,20 @@
   "date": "2025-10-31",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 117,
+      "runs": 125,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 108,
+      "runs": 129,
+      "team": "Afghanistan",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X75",
   "match_type": "T20",
   "player_of_match": "Rashid Khan",

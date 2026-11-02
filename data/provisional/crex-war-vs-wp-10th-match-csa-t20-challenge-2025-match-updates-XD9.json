@@ -2,6 +2,20 @@
   "date": "2025-11-07",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 134,
+      "team": "Western Province",
+      "wickets": 9
+    },
+    {
+      "balls": 93,
+      "runs": 135,
+      "team": "Warriors",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-war-vs-wp-10th-match-csa-t20-challenge-2025-match-updates-XD9",
   "match_type": "T20",
   "player_of_match": "",

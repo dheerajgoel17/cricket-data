@@ -2,6 +2,20 @@
   "date": "2025-11-14",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 196,
+      "team": "Titans",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 189,
+      "team": "North West Dragons",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-nwd-vs-tit-19th-match-csa-t20-challenge-2025-match-updates-XDI",
   "match_type": "T20",
   "player_of_match": "",

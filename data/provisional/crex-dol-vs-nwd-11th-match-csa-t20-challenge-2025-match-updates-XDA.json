@@ -2,6 +2,20 @@
   "date": "2025-11-07",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 102,
+      "runs": 155,
+      "team": "Dolphins",
+      "wickets": 9
+    },
+    {
+      "balls": 102,
+      "runs": 124,
+      "team": "North West Dragons",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-dol-vs-nwd-11th-match-csa-t20-challenge-2025-match-updates-XDA",
   "match_type": "T20",
   "player_of_match": "",

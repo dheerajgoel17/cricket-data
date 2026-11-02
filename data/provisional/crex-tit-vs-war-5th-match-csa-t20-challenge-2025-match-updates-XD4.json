@@ -2,6 +2,20 @@
   "date": "2025-11-01",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 193,
+      "team": "Warriors",
+      "wickets": 3
+    },
+    {
+      "balls": 103,
+      "runs": 107,
+      "team": "Titans",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-tit-vs-war-5th-match-csa-t20-challenge-2025-match-updates-XD4",
   "match_type": "T20",
   "player_of_match": "",

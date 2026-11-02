@@ -2,6 +2,20 @@
   "date": "2025-11-16",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "Dolphins",
+      "wickets": 7
+    },
+    {
+      "balls": 109,
+      "runs": 139,
+      "team": "Western Province",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-dol-vs-wp-22nd-match-csa-t20-challenge-2025-match-updates-XDL",
   "match_type": "T20",
   "player_of_match": "",

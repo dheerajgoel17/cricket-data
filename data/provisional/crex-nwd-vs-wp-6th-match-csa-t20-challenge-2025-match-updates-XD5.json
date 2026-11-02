@@ -2,6 +2,20 @@
   "date": "2025-11-02",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 186,
+      "team": "North West Dragons",
+      "wickets": 5
+    },
+    {
+      "balls": 101,
+      "runs": 188,
+      "team": "Western Province",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-nwd-vs-wp-6th-match-csa-t20-challenge-2025-match-updates-XD5",
   "match_type": "T20",
   "player_of_match": "",

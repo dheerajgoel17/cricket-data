@@ -2,6 +2,20 @@
   "date": "2025-10-29",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 180,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 97,
+      "runs": 127,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-1st-t20-afghanistan-tour-of-zimbabwe-2025-match-updates-X74",
   "match_type": "T20",
   "player_of_match": "Azmatullah Omarzai",
