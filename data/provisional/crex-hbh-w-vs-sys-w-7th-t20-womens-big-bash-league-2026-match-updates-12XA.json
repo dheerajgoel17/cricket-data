@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 196,
+      "team": "Sydney Sixers Women",
+      "wickets": 8
+    },
+    {
+      "balls": 106,
+      "runs": 109,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-hbh-w-vs-sys-w-7th-t20-womens-big-bash-league-2026-match-updates-12XA",
   "match_type": "T20",
   "player_of_match": "Ashleigh Gardner",

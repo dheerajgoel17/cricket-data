@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Hong Kong Sixes",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 36,
+      "runs": 95,
+      "team": "England Sixes",
+      "wickets": 6
+    },
+    {
+      "balls": 31,
+      "runs": 101,
+      "team": "South Africa Sixes",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-eng-s-vs-sa-s-22nd-match-hong-kong-sixes-2026-match-updates-152J",
   "match_type": "T20",
   "player_of_match": "Blake Simpson",

@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "India tour of New Zealand",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 191,
+      "team": "India",
+      "wickets": 8
+    },
+    {
+      "balls": 108,
+      "runs": 195,
+      "team": "New Zealand",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-ind-vs-nz-5th-t20i-india-tour-of-new-zealand-2026-match-updates-12JG",
   "match_type": "T20",
   "player_of_match": "Adam Milne",

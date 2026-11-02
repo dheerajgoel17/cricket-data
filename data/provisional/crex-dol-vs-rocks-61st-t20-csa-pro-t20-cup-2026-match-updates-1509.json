@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 174,
+      "team": "Dolphins",
+      "wickets": 4
+    },
+    {
+      "balls": 117,
+      "runs": 178,
+      "team": "Rocks",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-dol-vs-rocks-61st-t20-csa-pro-t20-cup-2026-match-updates-1509",
   "match_type": "T20",
   "player_of_match": "",

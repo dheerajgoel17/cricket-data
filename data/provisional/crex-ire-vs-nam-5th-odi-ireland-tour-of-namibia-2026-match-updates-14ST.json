@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "Ireland tour of Namibia",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 199,
+      "runs": 129,
+      "team": "Ireland",
+      "wickets": 10
+    },
+    {
+      "balls": 128,
+      "runs": 131,
+      "team": "Namibia",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-ire-vs-nam-5th-odi-ireland-tour-of-namibia-2026-match-updates-14ST",
   "match_type": "ODI",
   "player_of_match": "JJ Smit",

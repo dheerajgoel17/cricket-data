@@ -4,7 +4,7 @@ from datetime import date
 
 from conftest import make_match
 
-from cricket_data.cli import _has_innings_summary, main
+from cricket_data.cli import _has_innings_summary, _known_ids, main
 from cricket_data.cricsheet import parse_match
 from cricket_data.models import MatchRecord, PlayerPerf
 from cricket_data.provisional import load_provisional, reconcile, write_provisional
@@ -158,3 +158,19 @@ def test_a_saved_scorecard_without_the_summary_is_fetched_again_and_a_failed_fet
     again2.match_id = "crex-afg"
     write_provisional(s, again2)
     assert json.loads(p2.read_text())["status"] == "cricsheet_withheld"
+
+
+def test_a_backlog_of_old_scorecards_is_fetched_again_a_few_per_run_newest_first(tmp_path):
+    s = Store(tmp_path)
+    for day in range(1, 21):  # 20 saved matches with no innings summary, one per day
+        rec = prov()
+        rec.match_id, rec.date = f"crex-m{day:02d}", f"2026-10-{day:02d}"
+        write_provisional(s, rec)
+    done = prov()
+    done.match_id, done.date = "crex-done", "2026-10-25"
+    done.innings = [{"team": "Australia", "runs": 1, "wickets": 1, "balls": 6}]
+    write_provisional(s, done)
+    known = _known_ids(tmp_path / "provisional", cap=5)
+    again = {f"m{day:02d}" for day in range(1, 21)} - known
+    assert again == {f"m{day:02d}" for day in range(16, 21)}  # the 5 newest; "done" already has its summary and stays known
+    assert "done" in known

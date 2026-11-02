@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 206,
+      "team": "Lions",
+      "wickets": 3
+    },
+    {
+      "balls": 120,
+      "runs": 191,
+      "team": "Titans",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-lio-vs-tit-62nd-t20-csa-pro-t20-cup-2026-match-updates-150A",
   "match_type": "T20",
   "player_of_match": "",

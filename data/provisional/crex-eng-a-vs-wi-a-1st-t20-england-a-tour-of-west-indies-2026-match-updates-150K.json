@@ -2,6 +2,20 @@
   "date": "2026-11-01",
   "event": "England A tour of West Indies",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 118,
+      "runs": 98,
+      "team": "West Indies A",
+      "wickets": 10
+    },
+    {
+      "balls": 61,
+      "runs": 101,
+      "team": "England A",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-eng-a-vs-wi-a-1st-t20-england-a-tour-of-west-indies-2026-match-updates-150K",
   "match_type": "T20",
   "player_of_match": "",
