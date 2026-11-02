@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 186,
+      "team": "Biratnagar Kings",
+      "wickets": 7
+    },
+    {
+      "balls": 119,
+      "runs": 187,
+      "team": "Karnali Yaks",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-bk-vs-kny-6th-t20-nepal-premier-league-2026-match-updates-14H3",
   "match_type": "T20",
   "player_of_match": "Sompal Kami",

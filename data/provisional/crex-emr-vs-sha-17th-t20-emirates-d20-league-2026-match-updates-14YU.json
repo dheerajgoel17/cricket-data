@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 181,
+      "team": "Emirates Red",
+      "wickets": 8
+    },
+    {
+      "balls": 120,
+      "runs": 147,
+      "team": "Sharjah",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-emr-vs-sha-17th-t20-emirates-d20-league-2026-match-updates-14YU",
   "match_type": "T20",
   "player_of_match": "Harsh Desai",

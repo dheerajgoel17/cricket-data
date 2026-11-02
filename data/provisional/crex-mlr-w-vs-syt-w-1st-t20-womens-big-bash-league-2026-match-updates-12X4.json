@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 138,
+      "team": "Melbourne Renegades Women",
+      "wickets": 9
+    },
+    {
+      "balls": 102,
+      "runs": 140,
+      "team": "Sydney Thunder Women",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-mlr-w-vs-syt-w-1st-t20-womens-big-bash-league-2026-match-updates-12X4",
   "match_type": "T20",
   "player_of_match": "Georgia Voll",

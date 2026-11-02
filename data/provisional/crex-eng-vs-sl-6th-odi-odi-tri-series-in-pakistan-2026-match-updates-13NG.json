@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "ODI Tri Series in Pakistan",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 386,
+      "team": "England",
+      "wickets": 5
+    },
+    {
+      "balls": 271,
+      "runs": 331,
+      "team": "Sri Lanka",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-eng-vs-sl-6th-odi-odi-tri-series-in-pakistan-2026-match-updates-13NG",
   "match_type": "ODI",
   "player_of_match": "Ben Duckett",

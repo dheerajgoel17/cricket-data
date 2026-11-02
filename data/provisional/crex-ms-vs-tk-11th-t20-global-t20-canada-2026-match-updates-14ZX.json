@@ -2,6 +2,20 @@
   "date": "2026-10-30",
   "event": "Global T20 Canada",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 191,
+      "team": "Toronto Kings",
+      "wickets": 10
+    },
+    {
+      "balls": 120,
+      "runs": 158,
+      "team": "Mississauga Skyhawks",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-ms-vs-tk-11th-t20-global-t20-canada-2026-match-updates-14ZX",
   "match_type": "T20",
   "player_of_match": "Saad Bin Zafar",

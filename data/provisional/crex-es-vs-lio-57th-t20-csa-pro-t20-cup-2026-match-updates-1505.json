@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "CSA Pro T20 Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 198,
+      "team": "Eastern Storm",
+      "wickets": 6
+    },
+    {
+      "balls": 108,
+      "runs": 204,
+      "team": "Lions",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-es-vs-lio-57th-t20-csa-pro-t20-cup-2026-match-updates-1505",
   "match_type": "T20",
   "player_of_match": "",

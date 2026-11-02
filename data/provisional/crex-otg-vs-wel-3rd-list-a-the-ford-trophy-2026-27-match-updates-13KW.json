@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "The Ford Trophy",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 289,
+      "runs": 213,
+      "team": "Wellington",
+      "wickets": 10
+    },
+    {
+      "balls": 223,
+      "runs": 214,
+      "team": "Otago",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-otg-vs-wel-3rd-list-a-the-ford-trophy-2026-27-match-updates-13KW",
   "match_type": "ODM",
   "player_of_match": "",

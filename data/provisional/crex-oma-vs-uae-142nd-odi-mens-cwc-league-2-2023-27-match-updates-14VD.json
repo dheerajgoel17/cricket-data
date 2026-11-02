@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Men's CWC League 2",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 271,
+      "runs": 196,
+      "team": "Oman",
+      "wickets": 10
+    },
+    {
+      "balls": 285,
+      "runs": 199,
+      "team": "United Arab Emirates",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-oma-vs-uae-142nd-odi-mens-cwc-league-2-2023-27-match-updates-14VD",
   "match_type": "ODI",
   "player_of_match": "Awais Ali Shah",

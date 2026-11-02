@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Womens Big Bash League",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 192,
+      "team": "Melbourne Stars Women",
+      "wickets": 4
+    },
+    {
+      "balls": 120,
+      "runs": 174,
+      "team": "Hobart Hurricanes Women",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-hbh-w-vs-mls-w-2nd-t20-womens-big-bash-league-2026-match-updates-12X5",
   "match_type": "T20",
   "player_of_match": "Annabel Sutherland",

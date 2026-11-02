@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 117,
+      "runs": 115,
+      "team": "Kathmandu Gurkhas",
+      "wickets": 10
+    },
+    {
+      "balls": 104,
+      "runs": 116,
+      "team": "Janakpur Bolts",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-jkb-vs-kmg-5th-t20-nepal-premier-league-2026-match-updates-14EW",
   "match_type": "T20",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "Zimbabwe Women tour of India",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 239,
+      "runs": 131,
+      "team": "Zimbabwe Women",
+      "wickets": 10
+    },
+    {
+      "balls": 102,
+      "runs": 133,
+      "team": "India Women",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-ind-w-vs-zim-w-3rd-odi-zimbabwe-women-tour-of-india-2026-match-updates-1223",
   "match_type": "ODI",
   "player_of_match": "Vaishnavi Sharma",

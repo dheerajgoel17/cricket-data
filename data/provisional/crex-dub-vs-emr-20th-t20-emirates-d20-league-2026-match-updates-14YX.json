@@ -2,6 +2,20 @@
   "date": "2026-10-29",
   "event": "Emirates D20 League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 87,
+      "runs": 24,
+      "team": "Emirates Red",
+      "wickets": 10
+    },
+    {
+      "balls": 15,
+      "runs": 25,
+      "team": "Dubai",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-dub-vs-emr-20th-t20-emirates-d20-league-2026-match-updates-14YX",
   "match_type": "T20",
   "player_of_match": "Said Nazeer Afridi",

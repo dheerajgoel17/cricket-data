@@ -2,6 +2,20 @@
   "date": "2026-10-28",
   "event": "Nepal Premier League",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 145,
+      "team": "Pokhara Avengers",
+      "wickets": 7
+    },
+    {
+      "balls": 101,
+      "runs": 148,
+      "team": "Sudurpaschim Royals",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-pka-vs-spr-4th-t20-nepal-premier-league-2026-match-updates-14EV",
   "match_type": "T20",
   "player_of_match": "",
