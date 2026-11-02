@@ -172,3 +172,47 @@ def test_rows_carried_over_from_an_older_pull_are_published_under_the_book_name_
     assert out["lines"][0]["books"][0]["source"] == "bet365"
     assert out["events"][0]["sources"] == ["bet365", "smarkets"]
     assert "moviodds" not in json.dumps(public(prev))
+
+
+def test_a_test_with_a_result_goes_a_day_after_it_ended_not_after_six_days():
+    """Started 28 Oct 09:00, first seen over by the 31 Oct 10:00 run: listed until 1 Nov 10:00, so carried at 09:00 and gone by 11:00."""
+    start = dt.datetime(2026, 10, 28, 9, 0, tzinfo=dt.timezone.utc)
+    prev = doc(("SA vs Aus", "2026-10-28T09:00:00Z", "Test"))
+    ended = [("SA vs Aus", start, dt.datetime(2026, 10, 31, 10, 0, tzinfo=dt.timezone.utc))]
+    kept = carry_started(doc(), prev, dt.datetime(2026, 11, 1, 9, 0, tzinfo=dt.timezone.utc), ended)
+    assert {k: len(kept[k]) for k in ("events", "lines", "fancy")} == {"events": 1, "lines": 1, "fancy": 1}
+    gone = carry_started(doc(), prev, dt.datetime(2026, 11, 1, 11, 0, tzinfo=dt.timezone.utc), ended)
+    assert gone["events"] == gone["lines"] == gone["fancy"] == []
+
+
+def test_a_test_with_no_result_yet_keeps_its_six_days_at_stumps_and_on_a_rain_day():
+    prev = doc(("SA vs Aus", "2026-10-28T09:00:00Z", "Test"))
+    assert len(carry_started(doc(), prev, dt.datetime(2026, 11, 1, 11, 0, tzinfo=dt.timezone.utc), [])["lines"]) == 1   # day 5
+    assert len(carry_started(doc(), prev, dt.datetime(2026, 11, 3, 8, 59, tzinfo=dt.timezone.utc), None)["lines"]) == 1
+    assert carry_started(doc(), prev, dt.datetime(2026, 11, 3, 9, 1, tzinfo=dt.timezone.utc), [])["lines"] == []   # 28 Oct 09:00 + 6 days
+
+
+def test_a_test_whose_end_was_not_recorded_is_taken_to_have_ended_at_the_start_of_day_5():
+    """Final with no settled_at (settled before it was recorded): end = start + 4 days = 1 Nov 09:00, listed until 2 Nov 09:00."""
+    from cricket_site import testend
+
+    start = dt.datetime(2026, 10, 28, 9, 0, tzinfo=dt.timezone.utc)
+    end = testend.end_of({"start_utc": "2026-10-28T09:00:00Z", "results": [{"pid": "a", "stat": "runs", "value": 31}]})
+    assert end == dt.datetime(2026, 11, 1, 9, 0, tzinfo=dt.timezone.utc)
+    prev, ended = doc(("SA vs Aus", "2026-10-28T09:00:00Z", "Test")), [("SA vs Aus", start, end)]
+    assert len(carry_started(doc(), prev, dt.datetime(2026, 11, 2, 8, 0, tzinfo=dt.timezone.utc), ended)["lines"]) == 1
+    assert carry_started(doc(), prev, dt.datetime(2026, 11, 2, 10, 0, tzinfo=dt.timezone.utc), ended)["lines"] == []
+
+
+def test_the_end_of_one_test_does_not_touch_another_match_of_the_series_or_a_limited_overs_match():
+    start = dt.datetime(2026, 10, 28, 9, 0, tzinfo=dt.timezone.utc)
+    ended = [("SA vs Aus", start, dt.datetime(2026, 10, 31, 10, 0, tzinfo=dt.timezone.utc))]
+    now = dt.datetime(2026, 11, 8, 0, 0, tzinfo=dt.timezone.utc)
+    second = doc(("SA vs Aus", "2026-11-05T09:00:00Z", "Test"))   # the series' next Test, 8 days on: a match of its own
+    assert len(carry_started(doc(), second, now, ended)["lines"]) == 1
+    t20 = doc(("SA vs Aus", "2026-11-07T20:00:00Z", "T20"))      # same name, limited overs: 40 hours as ever
+    assert len(carry_started(doc(), t20, now, ended)["lines"]) == 1
+    odi = doc(("India vs NZ", "2026-11-07T07:00:00Z", "ODI"))
+    other = [("India vs NZ", start, start)]   # even an entry for its name changes nothing: only a Test reads it
+    assert len(carry_started(doc(), odi, dt.datetime(2026, 11, 8, 22, 0, tzinfo=dt.timezone.utc), other)["lines"]) == 1   # 39 h in
+    assert carry_started(doc(), odi, dt.datetime(2026, 11, 9, 0, 0, tzinfo=dt.timezone.utc), other)["lines"] == []   # past its 40 h, as before
