@@ -2,6 +2,20 @@
   "date": "2024-04-14",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 110,
+      "runs": 85,
+      "team": "North West Dragons",
+      "wickets": 10
+    },
+    {
+      "balls": 56,
+      "runs": 86,
+      "team": "Lions",
+      "wickets": 0
+    }
+  ],
   "match_id": "crex-lio-vs-nwd-44th-match-csa-t20-challenge-2024-match-updates-OO9",
   "match_type": "T20",
   "player_of_match": "",

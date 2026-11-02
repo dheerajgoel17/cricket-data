@@ -2,6 +2,20 @@
   "date": "2024-03-15",
   "event": "Afghanistan vs Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 149,
+      "team": "Ireland",
+      "wickets": 6
+    },
+    {
+      "balls": 112,
+      "runs": 111,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-1st-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVF",
   "match_type": "T20",
   "player_of_match": "Ben White",

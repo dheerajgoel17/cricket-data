@@ -2,6 +2,20 @@
   "date": "2024-03-18",
   "event": "Afghanistan vs Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 155,
+      "team": "Afghanistan",
+      "wickets": 7
+    },
+    {
+      "balls": 104,
+      "runs": 98,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-3rd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVH",
   "match_type": "T20",
   "player_of_match": "Ibrahim Zadran",

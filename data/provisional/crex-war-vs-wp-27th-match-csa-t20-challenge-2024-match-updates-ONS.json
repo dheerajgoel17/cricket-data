@@ -2,6 +2,20 @@
   "date": "2024-03-31",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 142,
+      "team": "Western Province",
+      "wickets": 7
+    },
+    {
+      "balls": 99,
+      "runs": 145,
+      "team": "Warriors",
+      "wickets": 1
+    }
+  ],
   "match_id": "crex-war-vs-wp-27th-match-csa-t20-challenge-2024-match-updates-ONS",
   "match_type": "T20",
   "player_of_match": "Matthew Breetzke",

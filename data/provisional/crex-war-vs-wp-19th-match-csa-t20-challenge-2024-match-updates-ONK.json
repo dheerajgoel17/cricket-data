@@ -2,6 +2,20 @@
   "date": "2024-03-21",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 149,
+      "team": "Western Province",
+      "wickets": 7
+    },
+    {
+      "balls": 106,
+      "runs": 151,
+      "team": "Warriors",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-war-vs-wp-19th-match-csa-t20-challenge-2024-match-updates-ONK",
   "match_type": "T20",
   "player_of_match": "",

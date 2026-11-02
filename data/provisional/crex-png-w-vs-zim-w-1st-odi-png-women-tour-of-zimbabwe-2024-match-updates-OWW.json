@@ -2,6 +2,20 @@
   "date": "2024-03-24",
   "event": "PNG Women tour of Zimbabwe",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 288,
+      "runs": 177,
+      "team": "Papua New Guinea Women",
+      "wickets": 10
+    },
+    {
+      "balls": 233,
+      "runs": 178,
+      "team": "Zimbabwe Women",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-png-w-vs-zim-w-1st-odi-png-women-tour-of-zimbabwe-2024-match-updates-OWW",
   "match_type": "ODI",
   "player_of_match": "Chipo Mugeri-Tiripano",

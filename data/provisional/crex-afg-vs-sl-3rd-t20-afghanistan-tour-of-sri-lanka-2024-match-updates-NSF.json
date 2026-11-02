@@ -2,6 +2,20 @@
   "date": "2024-02-21",
   "event": "Afghanistan tour of Sri Lanka",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 209,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 206,
+      "team": "Sri Lanka",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-afg-vs-sl-3rd-t20-afghanistan-tour-of-sri-lanka-2024-match-updates-NSF",
   "match_type": "T20",
   "player_of_match": "Rahmanullah Gurbaz",

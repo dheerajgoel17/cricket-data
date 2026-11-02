@@ -2,6 +2,20 @@
   "date": "2024-03-07",
   "event": "Afghanistan vs Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 310,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 300,
+      "runs": 275,
+      "team": "Ireland",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVC",
   "match_type": "ODI",
   "player_of_match": "Rahmanullah Gurbaz",

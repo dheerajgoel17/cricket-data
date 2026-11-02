@@ -2,6 +2,20 @@
   "date": "2024-03-12",
   "event": "Afghanistan vs Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 236,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 210,
+      "runs": 119,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-vs-ireland-in-uae-2024-match-updates-NVE",
   "match_type": "ODI",
   "player_of_match": "Mohammad Nabi",

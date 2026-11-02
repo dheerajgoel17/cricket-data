@@ -2,6 +2,20 @@
   "date": "2024-04-03",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 213,
+      "team": "Lions",
+      "wickets": 2
+    },
+    {
+      "balls": 87,
+      "runs": 81,
+      "team": "Western Province",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-lio-vs-wp-31st-match-csa-t20-challenge-2024-match-updates-ONW",
   "match_type": "T20",
   "player_of_match": "",

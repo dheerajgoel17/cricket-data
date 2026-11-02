@@ -2,6 +2,20 @@
   "date": "2024-03-13",
   "event": "CSA T20 Challenge",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 185,
+      "team": "Warriors",
+      "wickets": 5
+    },
+    {
+      "balls": 120,
+      "runs": 183,
+      "team": "Titans",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-tit-vs-war-11th-match-csa-t20-challenge-2024-match-updates-ONC",
   "match_type": "T20",
   "player_of_match": "",

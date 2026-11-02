@@ -2,6 +2,20 @@
   "date": "2024-03-17",
   "event": "Afghanistan vs Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 152,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 142,
+      "team": "Ireland",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-afg-vs-ire-2nd-t20-afghanistan-vs-ireland-in-uae-2024-match-updates-NVG",
   "match_type": "T20",
   "player_of_match": "Rashid Khan",
