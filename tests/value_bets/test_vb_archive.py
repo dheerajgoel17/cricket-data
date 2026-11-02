@@ -374,3 +374,45 @@ def test_the_command_reads_a_live_route_twice_when_an_innings_is_settled(tmp_pat
     monkeypatch.setattr(arch, "_read_body", lambda src: json.loads(body.read_text()))
     assert main(["--results", "https://site.test/api/live", "--again", "30"], sleep=slept.append) == 0 and slept == [30.0]
     assert read(tmp_path)["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}] and json.loads(capsys.readouterr().out)["results_written"]
+
+
+# ---- settled_at: when a Test was first seen over (what lets it leave the lists a day later)
+
+def test_the_run_that_first_stores_a_tests_whole_match_results_records_settled_at_once(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5), line(fmt="Test", ln=26.5, inn=1))
+    live = live_match([settled("ab12", "runs", 72.5, 80, state="live"), settled("ab12", "runs", 26.5, 31, inn=1)], status="live")
+    settle(tmp_path, [{"matches": [live]}, {"matches": [live]}], NOW)
+    d = read(tmp_path)
+    assert d["results"] == [{"pid": "ab12", "stat": "runs", "inn": 1, "value": 31}] and "settled_at" not in d, "a 1st innings is settled while the Test is on: that is not the end"
+    done = live_match([settled("ab12", "runs", 72.5, 80), settled("ab12", "runs", 26.5, 31, inn=1)])
+    settle(tmp_path, [{"matches": [done]}, {"matches": [done]}], at(19, 27))
+    assert read(tmp_path)["settled_at"] == "2026-10-27T19:00:00Z"
+    more = live_match([settled("ab12", "runs", 72.5, 80), settled("cd34", "runs", 22.5, 4)])
+    filed_again = line(pid="cd34", player="Tilak Varma", ln=22.5, fmt="Test")
+    update(tmp_path, book([filed_again]), at(21, 27), None, SCHED)
+    settle(tmp_path, [{"matches": [more]}, {"matches": [more]}], at(22, 27))   # a later read brings one more player
+    d = read(tmp_path)
+    assert d["settled_at"] == "2026-10-27T19:00:00Z" and any(r["pid"] == "cd34" for r in d["results"]), "added once, never changed"
+
+
+def test_the_hourly_pull_keeps_settled_at(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5))
+    done = live_match([settled("ab12", "runs", 72.5, 80)])
+    settle(tmp_path, [{"matches": [done]}, {"matches": [done]}], NOW)
+    update(tmp_path, book([line(fmt="Test", ln=72.5), line(fmt="Test", pid="cd34", player="Tilak Varma", ln=22.5)]), at(19, 27), None, SCHED)
+    assert read(tmp_path)["settled_at"] == "2026-10-27T18:00:00Z"
+
+
+def test_a_file_that_had_its_whole_match_results_before_settled_at_existed_is_left_without_one_and_a_limited_overs_match_never_gets_one(tmp_path):
+    filed(tmp_path, line(fmt="Test", ln=72.5), line(fmt="Test", ln=22.5, pid="cd34", player="Tilak Varma"))
+    p = tmp_path / "2026-10" / "2026-10-27-new-zealand-v-india.json"
+    d = read(tmp_path)
+    d["results"] = [{"pid": "ab12", "stat": "runs", "value": 80}]   # stored by the run before this field existed
+    p.write_text(json.dumps(d))
+    settle(tmp_path, [{"matches": [live_match([settled("ab12", "runs", 72.5, 80), settled("cd34", "runs", 22.5, 4)])]}], NOW)
+    d = read(tmp_path)
+    assert len(d["results"]) == 2 and "settled_at" not in d, "its end is estimated (cricket_site.testend), not guessed from this run"
+    t20 = tmp_path / "t20"
+    filed(t20)
+    settle(t20, [{"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}], NOW)
+    assert "settled_at" not in read(t20) and read(t20)["results"], "other formats are untouched"

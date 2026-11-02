@@ -439,3 +439,53 @@ def test_a_priced_match_the_books_name_differently_is_not_a_second_fixture(tmp_p
     (tmp_path / "fixtures" / "upcoming.csv").write_text("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
                                                          "2026-11-01T08:00Z,x,CSA,T20,male,Dolphins,Rocks,Kingsmead,Upcoming,,\n")
     assert [f["id"] for f in B.build_fixtures(tmp_path, vb, {})] == ["2026-11-01-dolphins-v-rocks"]
+
+
+def _archive_test(arc, name, match, start, **extra):
+    (arc / f"{name}.json").write_text(json.dumps({"id": name, "match": match, "start_utc": start, "lines": [{"fmt": "Test"}], **extra}))
+
+
+def test_a_priced_test_the_schedule_has_dropped_is_live_until_its_fixture_has_a_result_and_gone_a_day_after_it_ended(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    start = "2026-10-28T09:00:00Z"
+    fixture = {"start": start, "fmt": "Test"}
+    _archive_test(arc, "2026-10-28-sa-v-aus", "South Africa vs Australia", start, fixture={**fixture, "a": "South Africa", "b": "Australia", "result": ""})              # at stumps
+    _archive_test(arc, "2026-10-28-ban-v-wi", "Bangladesh vs West Indies", start, fixture={**fixture, "a": "Bangladesh", "b": "West Indies", "result": "West Indies won by 5 wickets"},
+                  settled_at="2026-10-31T10:00:00Z", results=[{"pid": "a", "stat": "runs", "value": 3}])
+    _archive_test(arc, "2026-10-28-ind-v-eng", "India vs England", start)                                                                                               # never on the schedule
+    by = lambda now: {f["a"]: (f["status"], f["result"]) for f in B._unscheduled_priced(vb, [], now=now)}  # noqa: E731
+    day5 = datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)   # the Test with a result ended 31 Oct 10:00: listed until 1 Nov 10:00
+    assert by(day5) == {"South Africa": ("Live", ""), "Bangladesh": ("Completed", "West Indies won by 5 wickets"), "India": ("Live", "")}
+    assert set(by(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc))) == {"South Africa", "India"}   # a Test with no result yet keeps its 6 days
+    assert by(datetime(2026, 11, 3, 10, 0, tzinfo=timezone.utc)) == {}
+
+
+def test_a_scheduled_test_leaves_the_fixtures_a_day_after_it_ended_and_nothing_else_does(tmp_path):
+    from datetime import datetime, timezone
+
+    (tmp_path / "fixtures").mkdir()
+    head = "start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
+    (tmp_path / "fixtures" / "upcoming.csv").write_text(head
+        + "2026-10-28T09:00Z,a,S,Test,male,South Africa,Australia,Newlands,Live,u,\n"            # ended 31 Oct 10:00 (settled_at)
+        + "2026-10-28T09:00Z,b,S,Test,male,Bangladesh,West Indies,Mirpur,Live,u,\n"              # whole-match result stored before settled_at existed
+        + "2026-10-28T09:00Z,c,S,Test,male,India,England,Mumbai,Live,u,\n"                       # no result yet
+        + "2026-11-05T09:00Z,d,S,Test,male,South Africa,Australia,Durban,Upcoming,u,\n"          # the next Test of the series, a match of its own
+        + "2026-10-31T09:00Z,e,S,T20,male,South Africa,Australia,Newlands,Completed,u,won\n")    # limited overs: not this rule's business
+    arc = tmp_path / "value_bets" / "archive" / "2026-10"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    start = "2026-10-28T09:00:00Z"
+    _archive_test(arc, "2026-10-28-south-africa-v-australia", "South Africa vs Australia", start, settled_at="2026-10-31T10:00:00Z", results=[{"pid": "a", "stat": "runs", "value": 3}])
+    _archive_test(arc, "2026-10-28-bangladesh-v-west-indies", "Bangladesh vs West Indies", start, results=[{"pid": "a", "stat": "runs", "value": 3}])
+    listed = lambda now: sorted((f["a"], f["start"][:10]) for f in B.build_fixtures(tmp_path, vb, {}, now=now))  # noqa: E731
+    everything = [("Bangladesh", "2026-10-28"), ("India", "2026-10-28"), ("South Africa", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]
+    assert listed(datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)) == everything                       # 23 h after the result, and day 5 starts 1 Nov 09:00
+    assert listed(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc)) == [x for x in everything if x != ("South Africa", "2026-10-28")]
+    assert listed(datetime(2026, 11, 2, 10, 0, tzinfo=timezone.utc)) == [("India", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]   # no end recorded: start of day 5 + 24 h
+    assert listed(datetime(2026, 11, 4, 10, 0, tzinfo=timezone.utc))[0] == ("India", "2026-10-28"), "a Test with no result keeps its place until the schedule itself lets go"

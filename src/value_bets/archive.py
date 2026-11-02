@@ -9,6 +9,8 @@ add the key. The file name is the fixture id the site uses (``start date`` + tea
 
 Once a match is over its file also gets ``results``: ``[{pid, stat, value}]``, what each priced player actually did, as the site's live route settled it
 (``settle``). They are only ever added, never changed, so an old fixture page needs neither the live feed nor any name matching to show how its lines went.
+The run that first stores a Test's whole-match results also records ``settled_at`` (a field added once, never changed; other formats have none): when the Test was first
+seen over, which is what lets it go from the lists a day later instead of after its 6 days (``cricket_site.testend``).
 
 A Test's first-innings line (``inn``: 1, see ``booklines``) is a line of its own: the same player, stat and number as a match-total line is a different bet, so ``inn`` is
 part of the key of a line and of its result (``{pid, stat, inn, value}``). A line or result with no ``inn`` is the whole match's, which is every one filed before the
@@ -172,7 +174,8 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
                "fixture": _fixture_record(f, fid) if f else (old or {}).get("fixture"),
                "first_seen": (old or {}).get("first_seen") or now.strftime("%Y-%m-%dT%H:%M:%SZ"),
                **{k: _merge(k, (old or {}).get(k, []), [_slim(x) if k == "lines" else x for x in g[k]], refresh) for k in KINDS},
-               **({"results": old["results"]} if (old or {}).get("results") else {})}  # stored by ``settle``, never touched here
+               **({"results": old["results"]} if (old or {}).get("results") else {}),  # stored by ``settle``, never touched here
+               **({"settled_at": old["settled_at"]} if (old or {}).get("settled_at") else {})}
         if not new.get("catalogue") and not (old or {}).get("catalogue"):
             new.pop("catalogue", None)  # do not rewrite every older file just to add an empty key
         if old is not None and {k: v for k, v in new.items() if k != "updated"} == {k: v for k, v in old.items() if k != "updated"}:
@@ -278,6 +281,11 @@ def settle(root: Path, bodies: list[dict], now: dt.datetime) -> tuple[list[str],
             add = [{"pid": p, "stat": s, **({"inn": i} if i else {}), "value": v} for (p, s, i), v in sorted(got.items()) if (p, s, i) in priced and (p, s, i) not in have]
             if not add:
                 continue
+            # the first time a Test's whole-match results are stored: it was first seen over now (its innings results are stored while it is still being played, and a file that had
+            # the whole match's results before this field existed is left without one: its end is estimated, see ``cricket_site.testend.end_of``)
+            whole = [r for r in add if not r.get("inn")]
+            if whole and any(x.get("fmt") == "Test" for x in d.get("lines", [])) and not any(not r.get("inn") for r in d.get("results", [])) and not d.get("settled_at"):
+                d["settled_at"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
             d["results"] = sorted([*d.get("results", []), *add], key=lambda r: (r["pid"], r["stat"], r.get("inn", 0)))
             d["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
             tmp = path.with_suffix(".tmp")

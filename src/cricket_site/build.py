@@ -22,7 +22,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import identity
+from . import identity, testend
 from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
@@ -718,7 +718,8 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     """Stop-gap fixture rows for archived matches the schedule has no row for: an upcoming game, or a priced Test still in the 6-day window.
 
     The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
-    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match.
+    (or the keep window ends). Same two sides within 14 hours (6 days for a Test) is the same match. A started match is Live until the fixture the archive holds has a
+    result, then Completed, a Test included; a Test with a result goes a day after it ended (``cricket_site.testend``), one at stumps with no result keeps its 6 days.
     """
     if not vb_dir:
         return []
@@ -745,11 +746,13 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
                 continue  # already linked to a schedule row; the upcoming stop-gap is only for a match the page has not reached yet
         elif mins < now_min - keep_min:
             continue
+        elif fmt == "Test" and (end := testend.end_of(d)) and testend.gone(end, now):
+            continue  # it has a result and ended more than a day ago; its fixture page opens from the archive
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
-        elif fmt in ("Test", "FC") or not (fx.get("result") or "").strip():
-            status = "Live"
+        elif not (fx.get("result") or "").strip():
+            status = "Live"  # no result yet: a Test at stumps or on a rain day is still being played
         else:
             status = "Completed"
         out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
@@ -774,7 +777,23 @@ def _name_series(rows: list[dict]) -> None:
             r["series"] = min(near)[1]
 
 
-def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[dict]:
+def _drop_ended_tests(rows: list[dict], vb_dir: Path | None, now: datetime) -> list[dict]:
+    """A Test the archive says ended more than a day ago is no longer one of the fixtures the site lists (``cricket_site.testend``): the rail then agrees with the book file, which
+    stops carrying its lines at the same time. Its fixture page still opens, from the archive; one with no result yet, or not in the archive, is not touched."""
+    ends = testend.ended(vb_dir.parent / "archive", now) if vb_dir else []
+    if not ends:
+        return rows
+    gone = [(frozenset(_side(x) for x in re.split(r"\s+vs\s+", m, maxsplit=1, flags=re.I)), start, end) for m, start, end in ends if testend.gone(end, now) and re.search(r"\s+vs\s+", m, re.I)]
+
+    def over(r: dict) -> bool:
+        st = testend.parse(r["start"])
+        pair = frozenset((_side(r["a"]), _side(r["b"])))
+        return r["fmt"] == "Test" and bool(st) and any(k == pair and abs(start - st) < testend.TEST_WINDOW for k, start, _ in gone)
+
+    return [r for r in rows if not over(r)]
+
+
+def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict, now: datetime | None = None) -> list[dict]:
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
     The bookmaker feed is for odds: books serve different regions, so its start times and team labels are not trustworthy as a
@@ -790,7 +809,9 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict) -> list[d
                              "b": r["team_b"], "venue": r.get("venue", ""), "series": r.get("series", ""),
                              "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
     _name_series(rows)
-    rows += _unscheduled_priced(vb_dir, rows)
+    now = now or datetime.now(timezone.utc)
+    rows += _unscheduled_priced(vb_dir, rows, now)
+    rows = _drop_ended_tests(rows, vb_dir, now)
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):
