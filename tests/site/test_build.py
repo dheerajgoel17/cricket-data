@@ -428,7 +428,7 @@ def test_a_priced_test_the_schedule_dropped_comes_back_from_its_archive(tmp_path
     now = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
     got = B._unscheduled_priced(vb, [], now=now)
     assert [(r["a"], r["status"], r["venue"], r["series"]) for r in got] == [
-        ("South Africa", "Live", "Newlands, Cape Town", "Australia tour of South Africa 2026")]
+        ("South Africa", "Started", "Newlands, Cape Town", "Australia tour of South Africa 2026")]
     listed = [{"start": "2026-10-27T08:30Z", "fmt": "Test", "a": "South Africa", "b": "Australia"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
 
@@ -474,11 +474,36 @@ def test_a_priced_match_the_books_name_differently_is_not_a_second_fixture(tmp_p
     assert [f["id"] for f in B.build_fixtures(tmp_path, vb, {})] == ["2026-11-01-dolphins-v-rocks"]
 
 
+def test_a_started_priced_match_nothing_lists_is_started_not_live(tmp_path):
+    """1 Nov 2026: two pro50 matches the books priced (fancy only, no schedule row, no live-feed row) were published as Live by the clock alone and showed a LIVE badge with no score and no players."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+
+    def book(name, match, start, **k):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "start_utc": start, "fixture": None, "lines": [], "fancy": [{"key": "match_runs"}], **k}))
+
+    book("2026-11-01-eagles-v-tuskers", "Eagles vs Tuskers", "2026-11-01T07:30:00Z")
+    book("2026-11-01-mid-west-rhinos-v-mountaineers", "MID West Rhinos vs Mountaineers", "2026-11-01T07:30:00Z")
+    book("2026-11-01-later", "Lions vs Titans", "2026-11-01T12:00:00Z")
+    book("2026-10-31-over", "Dolphins vs Boland", "2026-10-31T07:30:00Z")                                            # past its 24 h keep window: gone
+    book("2026-11-01-resulted", "Namibia vs Ireland", "2026-11-01T05:00:00Z", fixture={"start": "2026-11-01T05:00Z", "fmt": "T20", "gender": "male", "a": "Namibia", "b": "Ireland", "result": "Namibia won by 3 wickets"})
+    now = datetime(2026, 11, 1, 10, 30, tzinfo=timezone.utc)                                                          # 3 hours after the first two began
+    got = {r["a"]: (r["status"], r["source"]) for r in B._unscheduled_priced(vb, [], now=now)}
+    assert got == {"Eagles": ("Started", "books"), "MID West Rhinos": ("Started", "books"), "Lions": ("Upcoming", "books"), "Namibia": ("Completed", "books")}
+    # the schedule's own row replaces the stop-gap and carries the schedule's word, Live included
+    sched = [{"start": "2026-11-01T07:30Z", "fmt": "", "a": "Eagles", "b": "Tuskers", "status": "Live", "source": "src"}]
+    assert "Eagles" not in {r["a"] for r in B._unscheduled_priced(vb, sched, now=now)}
+
+
 def _archive_test(arc, name, match, start, **extra):
     (arc / f"{name}.json").write_text(json.dumps({"id": name, "match": match, "start_utc": start, "lines": [{"fmt": "Test"}], **extra}))
 
 
-def test_a_priced_test_the_schedule_has_dropped_is_live_until_its_fixture_has_a_result_and_gone_a_day_after_it_ended(tmp_path):
+def test_a_priced_test_the_schedule_has_dropped_is_started_until_its_fixture_has_a_result_and_gone_a_day_after_it_ended(tmp_path):
     from datetime import datetime, timezone
 
     arc = tmp_path / "value_bets" / "archive" / "2026-10"
@@ -493,7 +518,7 @@ def test_a_priced_test_the_schedule_has_dropped_is_live_until_its_fixture_has_a_
     _archive_test(arc, "2026-10-28-ind-v-eng", "India vs England", start)                                                                                               # never on the schedule
     by = lambda now: {f["a"]: (f["status"], f["result"]) for f in B._unscheduled_priced(vb, [], now=now)}  # noqa: E731
     day5 = datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)   # the Test with a result ended 31 Oct 10:00: listed until 1 Nov 10:00
-    assert by(day5) == {"South Africa": ("Live", ""), "Bangladesh": ("Completed", "West Indies won by 5 wickets"), "India": ("Live", "")}
+    assert by(day5) == {"South Africa": ("Started", ""), "Bangladesh": ("Completed", "West Indies won by 5 wickets"), "India": ("Started", "")}
     assert set(by(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc))) == {"South Africa", "India"}   # a Test with no result yet keeps its 6 days
     assert by(datetime(2026, 11, 3, 10, 0, tzinfo=timezone.utc)) == {}
 
@@ -522,3 +547,14 @@ def test_a_scheduled_test_leaves_the_fixtures_a_day_after_it_ended_and_nothing_e
     assert listed(datetime(2026, 11, 1, 11, 0, tzinfo=timezone.utc)) == [x for x in everything if x != ("South Africa", "2026-10-28")]
     assert listed(datetime(2026, 11, 2, 10, 0, tzinfo=timezone.utc)) == [("India", "2026-10-28"), ("South Africa", "2026-10-31"), ("South Africa", "2026-11-05")]   # no end recorded: start of day 5 + 24 h
     assert listed(datetime(2026, 11, 4, 10, 0, tzinfo=timezone.utc))[0] == ("India", "2026-10-28"), "a Test with no result keeps its place until the schedule itself lets go"
+
+
+def test_the_weather_flag_is_published_per_match_for_the_data_guard(tmp_path):
+    z, data, out, _ = _out(tmp_path)
+    pl = [{"player": "A One", "player_id": "", "team": "Alpha", "opponent": "Beta", "runs": "40", "balls": "20"}]
+    for mid, margin in (("crex-wet", "5 runs (DLS method)"), ("crex-dry", "5 runs")):
+        (data / "provisional" / f"{mid}.json").write_text(json.dumps(_prov(mid, "2025-06-01" if mid == "crex-wet" else "2025-06-02", "Alpha", "Beta", pl, result_margin=margin)))
+    B.build(z, data, out, None, workers=1)
+    M, _ = _load(out)
+    assert len(M["dls"]) == len(M["id"]) and set(M["dls"]) <= {0, 1}
+    assert (M["dls"][M["id"].index("prov-wet")], M["dls"][M["id"].index("prov-dry")]) == (1, 0)

@@ -13,8 +13,8 @@ export function matchWindow(fmt) {
   return sameMatchWindow(fmt);
 }
 
-/** How long the fixture header treats a started match as live on the clock: 4 hours, 6 days for a Test. */
-export function clockLiveMs(fmt) {
+/** How long after its start a fixture counts the time since the start on the clock: 4 hours, 6 days for a Test. The clock alone says "Started", never "Live": play is on only when the live feed or the schedule says so. */
+export function clockStartedMs(fmt) {
   return fmt === "Test" || fmt === "FC" ? TEST_WINDOW_MS : 4 * 3600e3;
 }
 

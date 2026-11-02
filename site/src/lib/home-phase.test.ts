@@ -13,6 +13,9 @@ describe("phaseOf", () => {
     expect(phaseOf("final")).toBe("final");
     expect(phaseOf("upcoming")).toBe("pre");
   });
+  it("puts a started match (begun, no score from the source) in In play, where its card says Started", () => {
+    expect(phaseOf("started")).toBe("live");
+  });
 });
 
 describe("lineHomePhase", () => {
