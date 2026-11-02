@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-02 23:00 IST
+# Cricket value bets - 2026-11-03 00:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
+- **moviodds_bet365**: ok, 1277 prices
 - **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
-- **moviodds_bet365**: ok, 1273 prices
-- **smarkets**: ok, 390 prices
-- **feedk**: ok, 94 prices, 3 events
-- **feede**: ok, 494 prices, 16 events
+- **smarkets**: ok, 386 prices
+- **feedk**: ok, 96 prices, 3 events
 - **feedf**: ok, 300 prices, 8 events
-- **feedh**: ok, 1083 prices, 60 events
+- **feede**: ok, 526 prices, 19 events
+- **feedh**: ok, 1215 prices, 63 events
 
-Matches starting in next 168h: **39**, markets priced: **338**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **41**, markets priced: **363**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +28,6 @@ Matches starting in next 168h: **39**, markets priced: **338**, value bets: **3*
 - 11-04 07:30 IST New Zealand vs India / Batter Milestones / SS Gill 100+ yes @ 8.00 (moviodds_bet365): edge 39.4%, model 0.1456, market 0.1978
 - 11-04 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / SS Gill 100+ yes @ 8.00 (moviodds_bet365): edge 43.8%, model 0.1456, market 0.2076
 
-Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), Assam (W) (female), BBK Partnership (male), Baroda (W) (female), Cdb A (male), Central (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Fata Region (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Hyderabad (W) (female), Incredibles (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kerala (W) (female), Lahore Region Whites (male), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
+Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), Assam (W) (female), BBK Partnership (male), Baroda (W) (female), Cdb A (male), Central (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Fata Region (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Hyderabad (W) (female), Incredibles (W) (female), Islamabad Region (male), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kerala (W) (female), Lahore Region Whites (male), Maharashtra (W) (female), Multan Region (male), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 121.2s. Snapshot: `odds_20261102T173048Z.jsonl.gz`
+Runtime 115.1s. Snapshot: `odds_20261102T183034Z.jsonl.gz`
