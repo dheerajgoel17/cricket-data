@@ -164,6 +164,14 @@ def test_a_test_is_one_match_when_the_books_restamp_the_start():
     assert sorted(x.get("inn", 0) for x in out["lines"]) == [0, 1]
 
 
+def test_the_next_test_of_a_series_is_not_restamped_to_the_first_tests_start():
+    prev = doc(("BAN vs WI", "2026-10-28T03:30:00Z", "Test"))
+    new = doc(("BAN vs WI", "2026-11-05T03:30:00Z", "Test"))  # the 2nd Test, priced before it starts
+    out = carry_started(new, prev, dt.datetime(2026, 11, 3, 5, 30, tzinfo=dt.timezone.utc))
+    assert {x["start_utc"] for x in out["lines"]} == {"2026-11-05T03:30:00Z"}
+    assert {x["start_utc"] for x in out["events"]} == {"2026-11-05T03:30:00Z"}
+
+
 def test_rows_carried_over_from_an_older_pull_are_published_under_the_book_name_too():
     prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "T20"))
     prev["lines"][0]["books"] = [{"source": "moviodds_bet365", "kind": "bookmaker", "over": 1.8, "under": 1.9}]
