@@ -3,7 +3,7 @@
 The book and its host are deployment configuration, never code (docs/OPERATIONS.md): ``FEEDH_URL`` is the sportsbook root and
 ``FEEDH_NAME`` is the name its prices are published under. Unset, the source is skipped. It never runs on a laptop: ``fetch`` raises
 ``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it always goes through the Cloudflare Worker relay
-(``FEEDH_RELAY`` or Feed G's pair); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing, then every
+(``FEEDH_RELAY`` / ``FEEDH_RELAY_KEY``, or Feed G's pair when those still point at the Worker); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing, then every
 in-horizon game and competition page (internationals first), ``FEEDH_SPACING_SECS`` apart, one attempt each; a 429 ends the run and
 ``FEEDH_BUDGET_SECS`` stops new pages.
 

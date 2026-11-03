@@ -55,7 +55,7 @@ def settings() -> dict[str, str]:
 
 
 def relay() -> tuple[str, str] | None:
-    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the relay (relay/worker.js, Cloudflare Worker placed near Mumbai)."""
+    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the Mumbai hop (relay/api/relay.js on Vercel bom1; Cloudflare Worker is Feed H)."""
     addr, key = os.environ.get("FEEDG_RELAY", "").strip(), os.environ.get("FEEDG_RELAY_KEY", "").strip()
     return (addr, key) if addr.startswith("https://") and key else None
 
@@ -70,7 +70,7 @@ def _http_body(err: urllib.error.HTTPError) -> str:
     if "host not allowed" in low:
         return text.split("\n", 1)[0][:240]
     if "<!doctype html" in low or "cf-browser-verification" in low or "just a moment" in low or "cdn-cgi/challenge" in low:
-        return "cloudflare challenge from the book (datacenter IP blocked — use the India runner)"
+        return "cloudflare challenge from the book (datacenter IP blocked — point FEEDG_RELAY at Vercel bom1 or use the India runner)"
     return text[:240]
 
 
