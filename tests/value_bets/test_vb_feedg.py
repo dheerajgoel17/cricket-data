@@ -185,6 +185,7 @@ def test_with_a_relay_every_call_goes_through_it_with_the_key_and_the_real_addre
     rows, raw = feedg.fetch(STAMP)
     assert rows and raw["books"]["Test Book"]["events"] == 1
     assert all(u.startswith("https://relay.invalid/api/relay?u=https%3A%2F%2F") and h["x-relay-key"] == "k-1" for _, u, h, _ in calls)
+    assert all(h.get("x-relay-origin", "").startswith("https://") and h.get("x-relay-referer", "").endswith("/") for _, _, h, _ in calls)
     assert [m for m, *_ in calls] == ["GET", "POST", "POST"] and calls[0][1].endswith("%2Fapi%2Fguest%2Fevent_list")
     assert calls[1][2]["Content-Type"] == "application/x-www-form-urlencoded" and calls[2][3].startswith(b"market_ids[]=")
     monkeypatch.delenv("FEEDG_RELAY_KEY")

@@ -60,15 +60,56 @@ def relay() -> tuple[str, str] | None:
     return (addr, key) if addr.startswith("https://") and key else None
 
 
+def _http_body(err: urllib.error.HTTPError) -> str:
+    """Upstream / Worker body on a 4xx (``host not allowed``, Cloudflare HTML, book JSON), else empty. ``HTTPError.read`` is one-shot."""
+    try:
+        text = (err.read() or b"").decode("utf-8", "replace").strip()
+    except Exception:  # noqa: BLE001
+        return ""
+    low = text[:400].lower()
+    if "host not allowed" in low:
+        return text.split("\n", 1)[0][:240]
+    if "<!doctype html" in low or "cf-browser-verification" in low or "just a moment" in low or "cdn-cgi/challenge" in low:
+        return "cloudflare challenge from the book (datacenter IP blocked — use the India runner)"
+    return text[:240]
+
+
+def _relay_headers(url: str, body: bytes | None) -> dict[str, str]:
+    """Key + browser-like Origin/Referer for the target host (the Worker also rebuilds a Chromium UA). Optional FEEDG_RELAY_COOKIE for a warmed session."""
+    host = urllib.parse.urlparse(url).hostname or ""
+    origin = f"https://{host}" if host else ""
+    head = {
+        "x-relay-key": relay()[1],  # type: ignore[index]
+        "x-relay-origin": origin,
+        "x-relay-referer": f"{origin}/",
+    }
+    if body is not None:
+        head["Content-Type"] = "application/x-www-form-urlencoded"
+    cookie = os.environ.get("FEEDG_RELAY_COOKIE", "").strip()
+    if cookie:
+        head["x-relay-cookie"] = cookie
+    return head
+
+
 def request(url: str, body: bytes | None = None):
-    """One call to the book: direct, or through the relay when it is configured. ``body`` makes it a form POST."""
+    """One call to the book: direct, or through the relay when it is configured. ``body`` makes it a form POST.
+    Through the relay, Origin/Referer of the book host go along so the book sees a same-site XHR, not a bare Worker fetch."""
     rl = relay()
     if rl is None:
         if body is None:
             return http_json(url, retries=0)[0]
         return http_json(url, method="POST", data=body, headers={"Content-Type": "application/x-www-form-urlencoded"}, retries=0)[0]
-    head = {"x-relay-key": rl[1], **({"Content-Type": "application/x-www-form-urlencoded"} if body is not None else {})}
-    return http_json(f"{rl[0]}?u={urllib.parse.quote(url, safe='')}", method="GET" if body is None else "POST", data=body, headers=head, retries=0)[0]
+    try:
+        return http_json(
+            f"{rl[0]}?u={urllib.parse.quote(url, safe='')}",
+            method="GET" if body is None else "POST",
+            data=body,
+            headers=_relay_headers(url, body),
+            retries=0,
+        )[0]
+    except urllib.error.HTTPError as e:
+        detail = _http_body(e)
+        raise urllib.error.HTTPError(e.url, e.code, detail or e.reason, e.hdrs, None) from e
 
 
 def published() -> dict[str, str]:
