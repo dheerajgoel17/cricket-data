@@ -2,6 +2,20 @@
   "date": "2016-03-23",
   "event": "T20 World Cup",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 142,
+      "team": "England",
+      "wickets": 7
+    },
+    {
+      "balls": 120,
+      "runs": 127,
+      "team": "Afghanistan",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-eng-24th-match-t20-world-cup-2016-match-updates-4BV",
   "match_type": "T20",
   "player_of_match": "Moeen Ali",
