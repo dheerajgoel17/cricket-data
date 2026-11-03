@@ -2,6 +2,20 @@
   "date": "2017-01-14",
   "event": "South Africa Women tour of Bangladesh",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 294,
+      "runs": 223,
+      "team": "South Africa Women",
+      "wickets": 10
+    },
+    {
+      "balls": 300,
+      "runs": 206,
+      "team": "Bangladesh Women",
+      "wickets": 8
+    }
+  ],
   "match_id": "crex-ban-w-vs-sa-w-2nd-odi-south-africa-women-tour-of-bangladesh-2017-match-updates-DU7",
   "match_type": "ODI",
   "player_of_match": "Lizelle Lee",

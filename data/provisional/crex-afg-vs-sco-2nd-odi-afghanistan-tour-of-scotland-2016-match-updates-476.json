@@ -2,6 +2,20 @@
   "date": "2016-07-06",
   "event": "Afghanistan tour of Scotland",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 224,
+      "runs": 178,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 223,
+      "runs": 132,
+      "team": "Scotland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2016-match-updates-476",
   "match_type": "ODI",
   "player_of_match": "",

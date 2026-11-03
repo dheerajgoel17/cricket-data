@@ -2,6 +2,20 @@
   "date": "2016-07-12",
   "event": "Afghanistan tour of Ireland",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 296,
+      "runs": 250,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 290,
+      "runs": 211,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-2nd-odi-afghanistan-tour-of-ireland-2016-match-updates-46U",
   "match_type": "ODI",
   "player_of_match": "",

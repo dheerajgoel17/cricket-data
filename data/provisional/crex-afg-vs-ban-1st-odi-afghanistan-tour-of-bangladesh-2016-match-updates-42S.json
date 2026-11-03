@@ -2,6 +2,20 @@
   "date": "2016-09-25",
   "event": "Afghanistan tour of Bangladesh",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 265,
+      "team": "Bangladesh",
+      "wickets": 10
+    },
+    {
+      "balls": 300,
+      "runs": 258,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ban-1st-odi-afghanistan-tour-of-bangladesh-2016-match-updates-42S",
   "match_type": "ODI",
   "player_of_match": "Shakib Al Hasan",

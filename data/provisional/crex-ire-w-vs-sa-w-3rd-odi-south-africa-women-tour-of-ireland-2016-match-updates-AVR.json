@@ -2,6 +2,20 @@
   "date": "2016-08-09",
   "event": "South Africa Women tour of Ireland",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 260,
+      "team": "South Africa Women",
+      "wickets": 6
+    },
+    {
+      "balls": 270,
+      "runs": 193,
+      "team": "Ireland Women",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-ire-w-vs-sa-w-3rd-odi-south-africa-women-tour-of-ireland-2016-match-updates-AVR",
   "match_type": "ODI",
   "player_of_match": "",

@@ -2,6 +2,20 @@
   "date": "2016-12-14",
   "event": "Afghanistan tour of United Arab Emirates",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 161,
+      "team": "Afghanistan",
+      "wickets": 6
+    },
+    {
+      "balls": 120,
+      "runs": 150,
+      "team": "United Arab Emirates",
+      "wickets": 7
+    }
+  ],
   "match_id": "crex-afg-vs-uae-1st-t20-afghanistan-tour-of-united-arab-emirates-2016-match-updates-409",
   "match_type": "T20",
   "player_of_match": "Karim Janat",

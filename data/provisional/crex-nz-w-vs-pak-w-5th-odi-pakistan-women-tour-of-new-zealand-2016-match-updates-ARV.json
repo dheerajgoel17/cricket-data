@@ -2,6 +2,20 @@
   "date": "2016-11-19",
   "event": "Pakistan Women tour of New Zealand",
   "gender": "female",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 220,
+      "team": "Pakistan Women",
+      "wickets": 10
+    },
+    {
+      "balls": 231,
+      "runs": 223,
+      "team": "New Zealand Women",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-nz-w-vs-pak-w-5th-odi-pakistan-women-tour-of-new-zealand-2016-match-updates-ARV",
   "match_type": "ODI",
   "player_of_match": "Thamsyn Newton",

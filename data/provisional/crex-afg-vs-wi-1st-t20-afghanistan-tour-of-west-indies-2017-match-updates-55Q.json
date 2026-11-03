@@ -2,6 +2,20 @@
   "date": "2017-06-03",
   "event": "Afghanistan tour of West Indies",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 110,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 99,
+      "runs": 114,
+      "team": "West Indies",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-wi-1st-t20-afghanistan-tour-of-west-indies-2017-match-updates-55Q",
   "match_type": "T20",
   "player_of_match": "Sunil Narine",

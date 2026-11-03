@@ -2,6 +2,20 @@
   "date": "2017-03-10",
   "event": "Afghanistan v Ireland in India",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 184,
+      "team": "Afghanistan",
+      "wickets": 8
+    },
+    {
+      "balls": 66,
+      "runs": 93,
+      "team": "Ireland",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-ire-2nd-t20-afghanistan-v-ireland-in-india-2017-match-updates-58U",
   "match_type": "T20",
   "player_of_match": "Najeeb Tarakai",

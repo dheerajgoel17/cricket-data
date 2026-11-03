@@ -2,6 +2,20 @@
   "date": "2017-02-16",
   "event": "Afghanistan tour of Zimbabwe",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 296,
+      "runs": 215,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 164,
+      "runs": 99,
+      "team": "Zimbabwe",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-zim-1st-odi-afghanistan-tour-of-zimbabwe-2017-match-updates-HOW",
   "match_type": "ODI",
   "player_of_match": "Asghar Afghan",
