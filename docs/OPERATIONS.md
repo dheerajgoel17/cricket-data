@@ -14,8 +14,8 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 |---|---|---|---|
 | `VERCEL_TOKEN` | GitHub secret | vercel.com/account/tokens | `site.yml` deploy |
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
-| `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
-| `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync`; also passed as `VITE_SUPABASE_URL` on the site deploy |
+| `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access); value-bets internal `edge_bets` ledger |
+| `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync`; value-bets ledger; also passed as `VITE_SUPABASE_URL` on the site deploy |
 | `SUPABASE_ANON_KEY` | GitHub secret **and** Vercel env | Supabase dashboard -> API Keys (anon / public) | browser Auth + Saved (`VITE_SUPABASE_ANON_KEY` at build); also `api/state.js` / Workers as `SUPABASE_ANON_KEY` |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Vercel env (Production, Preview) and/or GitHub via `site.yml` `--build-env` | same values as above; Vite inlines them into the client bundle (anon key is public by design) | sign-in + server Saved |
 | `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build and `/api/live` at runtime; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate header + live wrap). `value-bets.yml` uses it to unwrap `/api/live` when storing results. Do not paste it into the repo |
@@ -99,6 +99,9 @@ Google Analytics 4 loads the same way when `VITE_GA_MEASUREMENT_ID` is set (`sit
 
 **Errors and speed.** Page errors are counted as events named by kind: `error_chunk` (a script of an older deploy was gone; the page reloads itself), `error_render` (a page threw, the Reload button showed), `error_script` and `error_promise` (anything else), at most five per page load, so the totals read on the free plan (the message and page go along as properties, readable on Pro). Loading speed (Core Web Vitals per page) comes from Vercel Speed Insights (`@vercel/speed-insights`, Apache-2.0, free tier): turn on **Speed Insights** in the same project dashboard. Watch for a rise in `error_chunk` right after a deploy (normal, small) and any `error_render` (a bug).
 
+
+## Internal edge-bet P&L ledger
+`public.edge_bets` (migration `supabase/migrations/20261104_edge_bets.sql`) holds every recommended model value bet and fancy-edge alert (odds + edge) for our own win/loss review. Flat 1u paper P&L; service role only; **not** on the site and not posted to Telegram as a P&L report. Apply the migration once in the Supabase SQL editor (or CLI). The hourly value-bets job upserts and settles with `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` (`src/value_bets/ledger.py`, `docs/VALUE_BETS.md`).
 
 ## Match state (one phase per match)
 A **Cloudflare Worker** (`state/worker.js`, `state/wrangler.jsonc`, Cron Trigger every minute: GitHub's own cron slips by minutes, so it is not used for this) reads the live feed with the same code the site uses (`site/packages/engine/feed.js`) and writes `public.match_state` (migrations `supabase/migrations/20261031_match_state.sql` and `..._writer.sql`) through the database function `apply_match_state(token, upserts, phases)`: one row per match, rows the feed dropped settled by the clock (in play for the keep window, 24 h or 6 days for a Test, then final). The writer holds only the project's **public** key plus a random write token whose SHA-256 is stored in `private.match_state_writer`; the service key is not involved and the table cannot be written any other way with the public key.
