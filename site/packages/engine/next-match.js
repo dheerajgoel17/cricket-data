@@ -30,6 +30,7 @@ export function teamIndexByName(teams, name, fallback = -1) {
  * When he is priced on two games of this format at once (international ODI and a List A club game), `prefer` from the
  * shared link (`{ start?, line?, stat? }`) picks the match that link opened from: kick-off first, else the line (and
  * optionally that stat), else the soonest — same rule as `ofBookMatch` in lines.js.
+ * @param {{ start?: string, line?: number, stat?: string } | null} [prefer]
  */
 export function pickPricedMatch(doc, pid, fmt, now = Date.now(), prefer = null) {
   const keep = keepMsFor(fmt);

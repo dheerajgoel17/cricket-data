@@ -70,6 +70,7 @@ export function bookQuotes(lines) {
  * page are always one match's. `prefer` is `{ start?, line? }` from the player URL (a fixture row's kick-off and/or the line it opened with).
  * Returns null when there are none, else { match, competition, start_utc, lines: [{line, books, prob}], main } where `main` is the line priced closest to evens
  * (the line a book hangs as "the" line), ties going to the lower line.
+ * @param {{ start?: string, line?: number, stat?: string } | null} [prefer]
  */
 export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, inn = 0, prefer = null) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
@@ -96,6 +97,8 @@ const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
  * When a player is priced on two games of the same format at once (NZ ODI and a Ford Trophy List A), a shared link from one of them must not land on the other:
  * `prefer.start` (the fixture's kick-off) wins when it is within the book window of some open line; else `prefer.line` picks the match that prices that exact line;
  * else the soonest. Books stamp one fixture minutes apart, so those stamps stay one match via `sameBookMatch`.
+ * @param {object[]} lines
+ * @param {{ start?: string, line?: number, stat?: string } | null} [prefer]
  */
 export function ofBookMatch(lines, prefer = null) {
   if (!lines.length) return [];
@@ -147,6 +150,7 @@ function openLines(doc, pid, stat, fmt, now, graceMs) {
  * Stats a book prices for this player in this format, on the same match `bookLinesFor` picks. Empty when none
  * (the player page then hides the prop-category chips instead of offering a median line as if it were listed).
  * `prefer` is the same `{ start?, line? }` the lines helper takes, so the prop rail and the kit stay on one match.
+ * @param {{ start?: string, line?: number, stat?: string } | null} [prefer]
  */
 export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600e3, prefer = null) {
   const all = openPlayerLines(doc, pid, fmt, now, graceMs);
@@ -157,6 +161,7 @@ export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600
 /**
  * The scopes the books price this player's stat in, for the same match `bookLinesFor` picks: a sorted list of 0 (the whole match), 1 and 2 (a Test's first and second
  * innings). Empty when there are no lines. The player page offers a switch between them.
+ * @param {{ start?: string, line?: number, stat?: string } | null} [prefer]
  */
 export function bookScopesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, prefer = null) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
