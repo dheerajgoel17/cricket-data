@@ -7,6 +7,18 @@ import { fmtIndex } from "@cricket/engine/util.js";
 
 export const fixturePath = (id: string) => `/fixture/${encodeURIComponent(id)}`;
 
+/** One fancy market's page (the site's `/fixture/:id/fancy?fm=&sc=`). */
+export function fancyMarketPath(id: string, o: { fm: string; sc?: number | string | null; mw?: number | string | null; mv?: string | null; ml?: number | string | null }) {
+  const q = new URLSearchParams();
+  if (o.fm) q.set("fm", o.fm);
+  if (o.sc != null && o.sc !== "" && String(o.sc) !== "-1") q.set("sc", String(o.sc));
+  if (o.mw != null && o.mw !== "" && Number(o.mw) !== 20) q.set("mw", String(o.mw));
+  if (o.mv === "1") q.set("mv", "1");
+  if (o.ml != null && o.ml !== "") q.set("ml", String(o.ml));
+  const s = q.toString();
+  return `${fixturePath(id)}/fancy${s ? `?${s}` : ""}`;
+}
+
 /** The player link: the site's own parameters (`stat`, `line`, `fmt` as the format's number, `scope` for a Test side's innings), plus `team` for the shirt. */
 export const playerPath = (r: { idx: number; stat: string; line: number; fmt: string; inn?: number; team?: string }) =>
   `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}${r.team ? `&team=${encodeURIComponent(r.team)}` : ""}`;

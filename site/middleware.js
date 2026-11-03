@@ -42,8 +42,10 @@ export default async function middleware(req) {
   if (path === "/api/gate") return;
   if (!ua || BOT.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;
-  if (!fromOurPage((h) => req.headers.get(h))) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // a script with a browser's User-Agent but not a page's request
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
+  // api/og fetches matches.json + one player shard with this header (shards stay out of the function bundle).
+  if (secret && req.headers.get("x-cd-k") === secret) return;
+  if (!fromOurPage((h) => req.headers.get(h))) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // a script with a browser's User-Agent but not a page's request
   if (!secret) return;
   if (await cookieOk(secret, req.headers.get("cookie"))) return;
   return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });

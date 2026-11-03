@@ -15,7 +15,9 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `VERCEL_TOKEN` | GitHub secret | vercel.com/account/tokens | `site.yml` deploy |
 | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | GitHub secrets | from `site/.vercel/project.json` after `vercel link` | `site.yml` deploy |
 | `SUPABASE_SERVICE_KEY` | GitHub secret | Supabase dashboard -> Project Settings -> API Keys (service role / secret) | `assets_sync` (write access) |
-| `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync` |
+| `SUPABASE_URL` | GitHub variable | repo Settings -> Variables | `assets_sync`; also passed as `VITE_SUPABASE_URL` on the site deploy |
+| `SUPABASE_ANON_KEY` | GitHub secret **and** Vercel env | Supabase dashboard -> API Keys (anon / public) | browser Auth + Saved (`VITE_SUPABASE_ANON_KEY` at build); also `api/state.js` / Workers as `SUPABASE_ANON_KEY` |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Vercel env (Production, Preview) and/or GitHub via `site.yml` `--build-env` | same values as above; Vite inlines them into the client bundle (anon key is public by design) | sign-in + server Saved |
 | `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build and `/api/live` at runtime; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate header + live wrap). `value-bets.yml` uses it to unwrap `/api/live` when storing results. Do not paste it into the repo |
 | `VITE_GA_MEASUREMENT_ID` | GitHub secret | GA4 measurement id (`G-…`) | inlined at the Vercel build (`site.yml` `--build-env`). Empty or unset: no Google tag. Never commit the id |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset); and local `npm run dev` (copy into gitignored `site/.env.local`) which then proxies `/data`, `/api/gate` and `/api/live` so the UI uses production JSON and scores |
@@ -50,7 +52,9 @@ Job times, what is shown, and Test innings 0/1/2 rules: [SITE.md — Cadence and
 **Deploy manually**: build data (see PROJECT_GUIDE section 7) then `cd site && npx vercel deploy --prod --yes && rm -f .env.local`.
 **Force a site refresh now**: Actions -> Site -> Run workflow (optionally `sync_limit`).
 **First image backfill**: run Site with `sync_limit=6000` once; afterwards hourly runs only add new ids.
-**Add a column/table in Supabase**: add a migration file in `supabase/migrations/` and apply it (Supabase MCP `apply_migration` or SQL editor); keep RLS on and reads public, writes service-only.
+**Add a column/table in Supabase**: add a migration file in `supabase/migrations/` and apply it (Supabase MCP `apply_migration` or SQL editor); keep RLS on. Public-read tables stay public; user Saved tables (`profiles`, `saved_items`, `saved_combos` in `20261103_user_saved.sql`) use `auth.uid()` RLS only.
+**Enable Auth (Saved, site + mobile)**: in the Supabase project, Authentication → Providers: turn on **Email** and **Google**. For Google, create an OAuth client in Google Cloud (Web); paste the **callback URL shown on the Google provider page** in the dashboard (never commit that host). Redirect URLs: production `<origin>/auth/callback`, `http://localhost:4173/auth/callback`, and mobile `fancycash://auth/callback`. GitHub secret `SUPABASE_ANON_KEY` + variable `SUPABASE_URL` feed `site.yml` `--build-env` as `VITE_SUPABASE_*`. Vercel also has `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (config type — anon key is public by design). Locally: those Vite names in `site/.env.local`; mobile uses `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` in `mobile/.env.local`.
+
 **Base looks stale**: expected for a few days; the scraper's provisional matches cover the gap. A `data-stale` issue opens if canonical data is > 3 days old; the Site workflow warns only if both sources are old.
 **Scraper broke (Source A layout change)**: see [SELF_HEALING.md](SELF_HEALING.md), run `cricket-data health --out diagnostics`; `auto-merge-scraper-fixes` merges fixes labelled `scraper-fix`.
 **A workflow shows "workflow file issue"**: YAML error. `pip install actionlint-py && actionlint .github/workflows/*.yml`.
@@ -71,6 +75,8 @@ The "Data guard" step of `site.yml` (PROJECT_GUIDE 5.8) stops the job before the
 ## Cost and limits
 Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Supabase free). Watch: Supabase free projects pause after inactivity (the hourly sync keeps it active);
 1 GB storage / 500 MB DB; Vercel function limits; xAI Grok is the one **metered** dependency (a few hundred tokens per question), remove `XAI_API_KEY` to go fully free.
+
+**Vercel Functions Storage (Hobby 10 GB):** driven by serverless bundle size, not static `/data`. `api/og` / `api/share` must only `includeFiles` the four small card JSON files (`index` / `photos` / `lines` / `fixtures`), books and fonts — never `public/data/p/*` or a `public/data/*.json` glob. L5 form fetches `matches.json` and one `p/NN.json` over HTTP with `x-cd-k` (= `DATA_WRAP_KEY`). `share.js` imports `load-data.js`, not `og.js`. After fat deploys: `npx vercel remove cricket-props-hub --safe --yes`; check with `npx vercel inspect <url>`.
 
 
 ## Mumbai relay (Feed G, Feed H)

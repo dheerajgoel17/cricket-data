@@ -1,10 +1,11 @@
 import { Fragment, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { EmptyState } from "./empty-state";
 
 export const PageTitle = ({ children, sub }: { children: ReactNode; sub?: ReactNode }) => (
   <header className="mb-4"><h1 className="text-2xl font-medium tracking-tight md:text-3xl">{children}</h1>{sub ? <p className="mt-1 text-muted-foreground">{sub}</p> : null}</header>
@@ -17,7 +18,7 @@ export function Crumbs({ items }: { items: [string, string?][] }) {
     <nav aria-label="Breadcrumb" className="my-3 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
       {items.map(([label, to], i) => (
         <Fragment key={label + i}>
-          {i > 0 && <ChevronRight className="size-3.5 opacity-50" />}
+          {i > 0 && <ChevronRightIcon className="size-3.5 opacity-50" aria-hidden />}
           {i === items.length - 1 || !to ? <span className="rounded-full bg-secondary px-3 py-1 font-medium text-foreground">{label}</span> : <Link to={to} className="hover:text-foreground">{label}</Link>}
         </Fragment>
       ))}
@@ -60,4 +61,7 @@ export function DataTable({ columns, rows, className }: { columns: ReactNode[]; 
   );
 }
 
-export const EmptyNote = ({ children }: { children: ReactNode }) => <Card className="px-4 py-3 text-muted-foreground shadow-none">{children}</Card>;
+/** Legacy one-line empty; prefer `EmptyState` with a title and body for new sections. */
+export const EmptyNote = ({ children, title }: { children: ReactNode; title?: string }) => (
+  <EmptyState compact title={title || children} body={title ? children : undefined} />
+);

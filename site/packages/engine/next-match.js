@@ -6,6 +6,25 @@ import { fairOdds } from "./stats.js";
 import { windowRate } from "./windows.js";
 
 /**
+ * The side to show for kit, crest and hero label: the match he is filed under when we know one
+ * (book line / nextMatch.team), else his profile team. Empty strings do not win.
+ */
+export function matchSide(nextTeam, indexTeam) {
+  const next = String(nextTeam || "").trim();
+  return next || String(indexTeam || "").trim();
+}
+
+/**
+ * Index of a team in `store.teams` by display name (SAME_SIDE / Women fold via teamKey), or `fallback` when none match.
+ */
+export function teamIndexByName(teams, name, fallback = -1) {
+  const want = teamKey(name);
+  if (!want || !Array.isArray(teams)) return fallback;
+  const i = teams.findIndex((t) => teamKey(t?.n) === want);
+  return i >= 0 ? i : fallback;
+}
+
+/**
  * The nearest booked match still in the keep window (24 h, 6 days for a Test), including one that has started
  * or just finished. Null when none. Same window Hot props uses, so the two pages agree.
  */

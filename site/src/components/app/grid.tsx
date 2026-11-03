@@ -54,7 +54,7 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
   }
   items.sort((a, b) => b.rate - a.rate || b.vals.length - a.vals.length);
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
-  if (!list.length) return <EmptyNote>No player clears that hit rate in the last games. Lower the hit-rate filter or line.</EmptyNote>;
+  if (!list.length) return <EmptyNote title="No one clears that bar">Lower the hit-rate filter or the line to see more players.</EmptyNote>;
   const label = (STATS as any)[stat].label;
   return (
     <ul className="-mx-4 sm:mx-0">

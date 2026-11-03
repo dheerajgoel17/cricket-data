@@ -77,6 +77,60 @@ export interface HotKey { live: boolean; p: number | null; edge: number | null }
 /** Hot props order: rows of a match in play first (the live feed's word for it, as the home rail uses), then the higher hit rate, then the higher edge. */
 export const hotOrder = (x: HotKey, y: HotKey): number => Number(y.live) - Number(x.live) || (y.p ?? 0) - (x.p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1);
 
+/**
+ * Home Props mix: rank all rows by `hotOrder` first (live → hit rate → edge). When both kinds exist, only then
+ * rebalance so each sits in about [⌊n/3⌋, ⌈2n/3⌉] — leave a natural 4+2 alone, fix a 6+0 or 5+1 by swapping the
+ * weakest of the heavy kind for the best excluded of the light one. If the light kind cannot fill its floor, trim
+ * the heavy kind to the ceiling (short card beats a flood). One kind alone still fills `n`.
+ */
+export function mixHomeRows<T extends HotKey & { kind: string }>(rows: T[], n: number): T[] {
+  if (n <= 0 || !rows.length) return [];
+  const byKind = (k: string) => rows.filter((r) => r.kind === k).sort(hotOrder);
+  const players = byKind("player"), fancy = byKind("fancy");
+  if (!players.length) return fancy.slice(0, n);
+  if (!fancy.length) return players.slice(0, n);
+
+  const lo = Math.floor(n / 3), hi = Math.ceil((2 * n) / 3);
+  const picked = [...rows].sort(hotOrder).slice(0, Math.min(n, rows.length));
+  const has = new Set(picked);
+  const count = (k: string) => picked.filter((r) => r.kind === k).length;
+  const bestOut = (pool: T[]) => pool.find((r) => !has.has(r));
+  const worstIn = (k: string) => [...picked].filter((r) => r.kind === k).sort(hotOrder).at(-1);
+  const swap = (drop: T, add: T) => {
+    const i = picked.indexOf(drop);
+    if (i < 0) return;
+    picked[i] = add;
+    has.delete(drop);
+    has.add(add);
+  };
+  const trim = (k: string) => {
+    const drop = worstIn(k);
+    if (!drop) return false;
+    const i = picked.indexOf(drop);
+    picked.splice(i, 1);
+    has.delete(drop);
+    return true;
+  };
+
+  for (const [need, other, pool] of [["player", "fancy", players], ["fancy", "player", fancy]] as const) {
+    const want = Math.min(lo, pool.length);
+    while (count(need) < want) {
+      const add = bestOut(pool), drop = worstIn(other);
+      if (!add || !drop) break;
+      swap(drop, add);
+    }
+  }
+  for (const [heavy, light, pool] of [["player", "fancy", fancy], ["fancy", "player", players]] as const) {
+    while (count(heavy) > hi) {
+      const add = bestOut(pool), drop = worstIn(heavy);
+      if (add && drop) swap(drop, add);
+      else if (!trim(heavy)) break;
+      else if (count(heavy) <= Math.max(count(light), 1) && count(light) < lo) break;
+    }
+  }
+  return picked.sort(hotOrder);
+}
+
 /** The lines grouped by the player file (shard) their player is in, the file with the most lines first (the most rows are ready when it lands). Lines of players the data does not know are left out. */
 export function byShard(lines: any[], indexOf: (pid: string) => number, shardOf: (idx: number) => number): { shard: number; lines: any[] }[] {
   const groups = new Map<number, any[]>();

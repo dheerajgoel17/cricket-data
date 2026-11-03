@@ -29,7 +29,7 @@ import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { venueStem } from "@cricket/engine/markets.js";
-import { matchPhase, pickPricedMatch } from "@cricket/engine/next-match.js";
+import { matchPhase, matchSide, pickPricedMatch, teamIndexByName } from "@cricket/engine/next-match.js";
 import { NextFilters, NextMatch, UnpricedNote } from "@/components/app/next-match";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { PlayerPhoto, TeamBadge } from "@/components/app/badges";
@@ -39,7 +39,6 @@ import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
 import { OddsTable } from "@/components/app/odds-table";
 import { AltLines } from "@/components/app/alt-lines";
-import { Note } from "@/components/app/note";
 import { MatchStatus } from "@/components/app/match-status";
 import { PlayerName } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
@@ -102,11 +101,10 @@ export function PlayerPage() {
   return <PlayerScreen key={idx} idx={idx} />;
 }
 
-/** Back row, then the player flat on the page (no card): photo, name, team and formats, save and share. */
-function PlayerHeader({ idx, name, team, kitTeam, test, fmts, share }: { idx: number; name: string; team: string; kitTeam?: string; test?: boolean; fmts: [number, string][]; share: () => void }) {
+/** Back row, then the player flat on the page (no card): photo, name, match-side team and formats, save and share. `team` is the side for this match (kit + crest + label); `teamIx` is that side's team page. */
+function PlayerHeader({ idx, name, team, teamIx, test, fmts, share }: { idx: number; name: string; team: string; teamIx: number; test?: boolean; fmts: [number, string][]; share: () => void }) {
   const { store } = useData();
   const nav = useNavigate();
-  const teamIx = store.P.tm[idx];
   const profiles = useQuery({ queryKey: ["profiles"], queryFn: () => loadJson("/data/profiles.json"), staleTime: 60 * 60_000 });
   const profile = profileParts(profiles.data, store.P.id[idx]).join(" · ");
   // Name, team and formats in two grey lines, then the team badge, star and share as round buttons; the photo stands on the rule under them (no container).
@@ -122,7 +120,7 @@ function PlayerHeader({ idx, name, team, kitTeam, test, fmts, share }: { idx: nu
           <motion.button type="button" aria-label="Share" whileTap={{ scale: 0.9 }} onClick={share} className="grid size-(--touch) cursor-pointer place-items-center rounded-full bg-secondary"><ArrowUpOnSquareIcon className="size-5" /></motion.button>
         </div>
       </div>
-      <PlayerPortrait idx={idx} team={kitTeam} test={test} className="w-36 self-end lg:w-44" />
+      <PlayerPortrait idx={idx} team={team} test={test} className="w-36 self-end lg:w-44" />
     </section>
   );
 }
@@ -177,6 +175,9 @@ function PlayerScreen({ idx }: { idx: number }) {
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
   const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
   const nextMatch = useNextMatch(lines.data, pid, idx, FORMATS[fmtVal], team, lastGame);
+  // kit, crest and hero label follow the match side (India vs NZ → India; IPL → Sunrisers); profile team only when there is no match
+  const side = matchSide(nextMatch?.team, team);
+  const sideIx = teamIndexByName(store.teams, side, store.P.tm[idx]);
   // the shared link is a card for this player and, when a line is on show, this prop (stat, line and best price in the picture)
   const shareLine = q.line !== undefined && q.line !== "" ? Number(q.line) : book ? book.main.line : null;
   const sharePrice = Math.max(0, ...(book?.lines?.find((l: any) => shareLine != null && Math.abs(l.line - shareLine) < 0.01)?.books || []).map((b: any) => b[plan.side] || 0)) || null; // best price of the side on show at that line
@@ -197,7 +198,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
-      <PlayerHeader {...{ idx, name, team, fmts, share }} kitTeam={nextMatch?.team || team} test={FORMATS[fmtVal] === "Test"} />
+      <PlayerHeader {...{ idx, name, fmts, share }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, bookDefault, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
         : <EmptyNote>{res.data.error}</EmptyNote>}
@@ -282,7 +283,6 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
   // the engine's own summary is the authority while the line is the one it ran (so this block matches its headline and the "when it hits" table); once the line is stepped here, the tally above is used
   const es = res.summary, sameLine = res.plan?.line === line && (res.plan?.side || "over") === side;
   const all = sameLine && es?.n ? { hits: side === "over" ? es.over : es.under, played: es.n, p: side === "over" ? es.pOver : es.pUnder } : nAll ? { hits: tally.hit, played: nAll, p: tally.hit / nAll } : null;
-  const fr = store.freshness();
   const shown = cur ? (cur.n ? entries.slice(-cur.n) : entries) : [];
   const played = shown.filter((e) => e.value != null);
   const auxAvg = played.length ? played.reduce((t, e) => t + (e.aux || 0), 0) / played.length : null;
@@ -320,7 +320,6 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
           {next ? (
             <div className="flex flex-col gap-snug lg:max-w-xl">
               <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
-              {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
             </div>
           ) : null}
           <div className="flex flex-col items-start gap-snug" role="status">
@@ -363,18 +362,25 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
             <ChartBars entries={shown} line={line} side={side} height={phone ? 240 : 340} animateKey={`${win}-${shown.length}`} onSelect={(e, s) => setGame({ e, s })} label={`${res.statLabel} ${side} ${line}`} />
             <PillGroup segmented layoutId="pl-win" label="Games" value={String(cur.n)} onChange={(v) => setWin(Number(v))}
               items={ws.map((w: any) => [String(w.n), <span key={w.n} className="grid justify-items-center leading-tight"><span className="label-cap text-footnote text-muted-foreground">{w.label}</span><b className={cn("font-condensed text-body font-medium tabular-nums", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b></span>] as [string, ReactNode])} className="h-auto w-full max-w-full" itemClassName="flex-1 py-tight" />
-            <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role={cur.played < 5 ? "status" : undefined}>
-              <b className="font-medium tabular-nums">{cur.played}</b> {res.sample?.unit || "games"} counted.
-              <Popover>
-                <PopoverTrigger asChild><button type="button" aria-label="About this chart" className="ml-tight inline-grid size-5 place-items-center rounded-full align-middle text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"><InformationCircleIcon className="size-4" /></button></PopoverTrigger>
-                <PopoverContent side="top" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
-                  <span><b className="font-medium">{res.statLabel} {side} {line}</b>{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}.</span>
-                  <span>Green cleared, red missed, grey not played. DNP / VOID fixtures are not counted{mix.out > 0 ? `: ${mix.out} void or not in the XI left out here` : ""}.</span>
-                </PopoverContent>
-              </Popover>
-              {cur.played < 5 ? ` Too few for a steady read${active.length ? ": relax a filter" : ""}.` : ""}
-              {cur.played < 5 && active.length > 0 && <> <button type="button" className="font-medium underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></>}
-            </p>
+            {mix.out > 0 || cur.played < 5 ? (
+              <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
+                {mix.out > 0 ? (
+                  <>
+                    <b className="font-medium tabular-nums">{mix.out}</b> void or not in the XI left out
+                    {" · "}
+                    <b className="font-medium tabular-nums">{cur.played}</b> {res.sample?.unit || "games"} counted.
+                    <Popover>
+                      <PopoverTrigger asChild><button type="button" aria-label="About this chart" className="ml-tight inline-grid size-5 place-items-center rounded-full align-middle text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"><InformationCircleIcon className="size-4" /></button></PopoverTrigger>
+                      <PopoverContent side="top" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
+                        <span><b className="font-medium">{res.statLabel} {side} {line}</b>{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}.</span>
+                        <span>Green cleared, red missed. DNP / VOID fixtures are not counted as misses.</span>
+                      </PopoverContent>
+                    </Popover>
+                  </>
+                ) : null}
+                {cur.played < 5 ? <>{mix.out > 0 ? " " : ""}Too few for a steady read{active.length ? ": relax a filter" : ""}.{active.length > 0 ? <> <button type="button" className="font-medium underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></> : null}</> : null}
+              </p>
+            ) : null}
           </div>
           {book && !(bookAt && next?.priced) && (bookAt ? (
             <p className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
@@ -387,7 +393,6 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
         {next ? (
           <div className={cn("flex flex-col gap-snug lg:col-span-5", book ? "lg:row-start-3" : "lg:row-start-4")}>
             <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
-            {next.opp || next.known ? <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div> : null}
           </div>
         ) : null}
       {book && cur && (
@@ -465,10 +470,6 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
               <p className="text-callout text-muted-foreground">{name} · {fmt} {res.statLabel.toLowerCase()} {side} {line}, over all {all.played} {res.sample?.unit || "innings"} in this sample.</p>
             </div>
           )}
-          <Note title="Data" items={[
-            fr.newestBase ? <>Newest match in the base data: <b className="font-medium text-foreground tabular-nums">{fr.newestBase}</b>.</> : "Base data date unknown.",
-            fr.provisionalIncluded ? <>Includes <b className="font-medium text-foreground tabular-nums">{fr.provisionalMatches}</b> provisional (scraped) matches up to <b className="font-medium text-foreground tabular-nums">{fr.newestProvisional}</b>.</> : "No provisional matches included.",
-          ]} />
         </section>
 
         <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack lg:col-span-12">
@@ -537,6 +538,12 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="bottom" className="z-[70] mx-auto max-h-[90vh] max-w-xl overflow-y-auto rounded-t-2xl">
           <SheetHeader><SheetTitle>Filters</SheetTitle><SheetDescription>Filters apply as you change them.</SheetDescription></SheetHeader>
+          {next && (next.opp || next.known) ? (
+            <div className="flex flex-col gap-snug border-b border-hairline px-gutter pb-stack">
+              <span className="label-cap text-footnote text-muted-foreground">This match</span>
+              <div className="flex flex-wrap gap-snug"><NextFilters {...{ next, q, navigateWith }} /></div>
+            </div>
+          ) : null}
           <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
           <datalist id="dl-venues">{store.venues.map((n: string) => <option key={n} value={n} />)}</datalist>
           <LiveForm onValues={(v) => { navigateWith({ ...v, line: "", side: "" }); }} className="grid grid-cols-2 border-0 bg-transparent px-gutter pb-section">

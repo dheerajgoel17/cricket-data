@@ -1,33 +1,35 @@
 import { useMemo, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, RefreshControl, StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
-import { Text } from "@/ui/text";
 import { useQueryClient } from "@tanstack/react-query";
 import { hotDayLabels } from "@site/lib/hot-lines";
 import { MAX_ROWS } from "@/lib/hot";
 import { useHotView } from "@/lib/use-hot";
 import { AppHeader } from "@/ui/brand";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
 import { PropRow } from "@/ui/prop-row";
-import { color, space, type } from "@/ui/tokens";
+import { color, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Player props: every line the books price for a day, scored against the player's history and ranked (matches in play, hit rate, edge). Today by default; the chips pick another of the next ten days. */
 export default function PlayerProps() {
   const inset = useScreenInsets();
   const [day, setDay] = useState("0");
+  const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
   const { rows, isLoading, scoring, error, otherDay, soFarOf, outOf, refetch } = useHotViewWithRefetch(Number(day));
   const shown = rows.slice(0, MAX_ROWS);
+  const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
   const header = (
     <View>
       <Chips items={days} value={day} onChange={setDay} />
     </View>
   );
-  // A recycling list (FlashList): only the rows on screen exist, however many there are, and a row scrolled away is reused for the next one.
+  // FlashList recycles off-screen rows. Tighter drawDistance on Android; RefreshControl on both (iOS bounce + Material spinner).
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Player props" info={<InfoButton topic="player-props" />} />
@@ -38,15 +40,23 @@ export default function PlayerProps() {
         ListHeaderComponent={header}
         ListEmptyComponent={
           isLoading || (scoring && !shown.length) ? <Working label="Scoring the day's lines…" rows={5} />
-            : error ? <Text style={styles.empty}>Could not score the lines. Try again in a moment.</Text>
-            : <Text style={styles.empty}>{day === "0" ? "No player props are priced for today yet." : "No player props are priced for this day yet."}{otherDay ? ` ${otherDay} lines are priced on other days.` : ""}</Text>
+            : error ? <View style={styles.emptyPad}><EmptyState title="Could not score the lines" body="Try again in a moment." /></View>
+            : (
+              <View style={styles.emptyPad}>
+                <EmptyState
+                  title={day === "0" ? "No props priced today" : "No props for this day"}
+                  body={otherDay ? `${otherDay} lines are priced on other days — pick another chip above.` : "Lines usually land a few hours before the toss."}
+                />
+              </View>
+            )
         }
         ListFooterComponent={scoring && shown.length ? <Working label="Scoring more lines…" rows={2} /> : null}
         contentContainerStyle={{ paddingBottom: inset.bottom + 24 }}
         showsVerticalScrollIndicator={false}
+        drawDistance={Platform.OS === "android" ? 280 : 480}
+        removeClippedSubviews={Platform.OS === "android"}
         maintainVisibleContentPosition={{ disabled: true }}
-        refreshing={false}
-        onRefresh={Platform.OS === "ios" ? () => void refetch() : undefined}
+        refreshControl={<RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}
       />
       <TabFade />
     </View>
@@ -62,5 +72,5 @@ function useHotViewWithRefetch(day: number) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  empty: { ...type.callout, color: color["muted-foreground"], paddingVertical: space.section, paddingHorizontal: space.gutter },
+  emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
 });

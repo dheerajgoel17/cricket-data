@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
+import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, mixHomeRows, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -145,6 +145,42 @@ describe("hotOrder", () => {
   });
   it("puts a row with no hit rate after those with one", () => {
     expect(order([row("none", false, null), row("some", false, 0.1)])).toEqual(["some", "none"]);
+  });
+});
+
+describe("mixHomeRows", () => {
+  type R = { id: string; kind: string; live: boolean; p: number | null; edge: number | null };
+  const r = (id: string, kind: string, p: number | null, edge: number | null = null): R => ({ id, kind, live: false, p, edge });
+  const ids = (rows: R[]) => rows.map((x) => x.id);
+  const kinds = (rows: R[]) => ({ p: rows.filter((x) => x.kind === "player").length, f: rows.filter((x) => x.kind === "fancy").length });
+
+  it("leaves a natural mix alone when it already sits in the 1/3–2/3 band", () => {
+    // top-4 by rank: p1, p2, p3, f1 → 3 player + 1 fancy; n=4 band is [1, 3] so OK as-is
+    const rows = [
+      r("p1", "player", 0.9), r("p2", "player", 0.8), r("p3", "player", 0.7),
+      r("f1", "fancy", 0.5, 0.1), r("f2", "fancy", 0.4),
+    ];
+    expect(ids(mixHomeRows(rows, 4))).toEqual(["p1", "p2", "p3", "f1"]);
+    expect(kinds(mixHomeRows(rows, 4))).toEqual({ p: 3, f: 1 });
+  });
+  it("fills from one kind when the other is empty", () => {
+    expect(ids(mixHomeRows([r("f1", "fancy", 0, 0.4), r("f2", "fancy", 0, 0.1)], 4))).toEqual(["f1", "f2"]);
+    expect(ids(mixHomeRows([r("p1", "player", 0.5), r("p2", "player", 0.4)], 3))).toEqual(["p1", "p2"]);
+  });
+  it("pulls the light kind up when pure rank would be all fancy", () => {
+    const fancy = Array.from({ length: 20 }, (_, i) => r(`f${i}`, "fancy", 0.9 - i * 0.01, 0.2));
+    const players = Array.from({ length: 10 }, (_, i) => r(`p${i}`, "player", 0.4 - i * 0.01, 0.05));
+    const mix = mixHomeRows([...fancy, ...players], 6);
+    // band [2, 4]: swap until at least 2 players; fancy may keep up to 4
+    expect(kinds(mix).p).toBeGreaterThanOrEqual(2);
+    expect(kinds(mix).f).toBeLessThanOrEqual(4);
+    expect(kinds(mix).p + kinds(mix).f).toBe(6);
+    expect(ids(mix).slice(0, 4)).toEqual(["f0", "f1", "f2", "f3"]); // strongest fancy still lead
+  });
+  it("trims the heavy kind when the other cannot fill its floor", () => {
+    const fancy = Array.from({ length: 20 }, (_, i) => r(`f${i}`, "fancy", 0.6, 0.2 - i * 0.01));
+    const mix = mixHomeRows([...fancy, r("p1", "player", 0.55)], 6);
+    expect(kinds(mix)).toEqual({ p: 1, f: 4 }); // hi = ⌈2·6/3⌉, not five or six fancy
   });
 });
 

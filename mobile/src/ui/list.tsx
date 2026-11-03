@@ -3,16 +3,17 @@ import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
+import { EmptyState } from "@/ui/empty-state";
 import { ChevronRight } from "@/ui/icons";
 import { cap, color, font, radius, space, type, tonal } from "@/ui/tokens";
 
-/** A titled group of rows in a rounded container (the site's Saved sections): small-caps title with its count, then the rows, or a line saying what goes here when there are none. */
-export function Section({ title, count, empty, children }: { title: string; count?: number; empty?: string; children?: ReactNode }) {
+/** A titled group of rows in a rounded container (the site's Saved sections): small-caps title with its count, then the rows, or an EmptyState when there are none. */
+export function Section({ title, count, empty, emptyTitle, children }: { title: string; count?: number; empty?: string; emptyTitle?: string; children?: ReactNode }) {
   const none = count === 0;
   return (
     <View style={styles.section}>
       <View style={styles.head}><Text style={styles.title}>{title}</Text>{count ? <Text style={styles.count}>{count}</Text> : null}</View>
-      {none ? <Text style={styles.empty}>{empty}</Text> : <View style={styles.box}>{children}</View>}
+      {none ? <EmptyState compact title={emptyTitle || title} body={empty} /> : <View style={styles.box}>{children}</View>}
     </View>
   );
 }
@@ -44,7 +45,6 @@ const styles = StyleSheet.create({
   title: { ...type.footnote, ...cap, color: color["muted-foreground"] },
   count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
-  empty: { ...type.callout, color: color["muted-foreground"], ...tonal, borderRadius: radius.card, padding: space.stack },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   text: { flex: 1, minWidth: 0, gap: 1 },

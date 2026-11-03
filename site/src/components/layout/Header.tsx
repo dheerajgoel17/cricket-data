@@ -1,7 +1,8 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/lib/brand";
-import { BookmarkIcon, ChevronLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { BookmarkIcon, ChevronLeftIcon, MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "@/lib/auth";
 import { useSaved } from "@/lib/saved";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
@@ -40,7 +41,35 @@ function SavedLink() {
   );
 }
 
-/** Top bar: logo, centred search on wide screens, saved on the right. Phones keep the brand-green bar; from lg it is a surface bar with a hairline. No accounts, so no profile menu. */
+function AccountControl() {
+  const { user, openSignIn, signOut } = useAuth();
+  const [open, setOpen] = useState(false);
+  if (!user) {
+    return (
+      <button type="button" aria-label="Sign in" onClick={openSignIn}
+        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition hover:bg-surface-hover">
+        <UserCircleIcon className="size-5" />
+      </button>
+    );
+  }
+  const label = user.email || "Account";
+  return (
+    <div className="relative">
+      <button type="button" aria-label={`Account, ${label}`} aria-expanded={open} onClick={() => setOpen((v) => !v)}
+        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition hover:bg-surface-hover">
+        <UserCircleIcon className="size-5 text-primary" />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+var(--spacing-tight))] z-50 min-w-48 overflow-hidden rounded-xl bg-card py-tight ring-1 ring-hairline" role="menu">
+          <p className="truncate px-inset py-tight text-footnote text-muted-foreground" title={label}>{label}</p>
+          <button type="button" role="menuitem" className="block w-full px-inset py-snug text-left text-callout hover:bg-muted" onClick={() => { setOpen(false); void signOut(); }}>Sign out</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Top bar: logo, centred search on wide screens, account + saved on the right. */
 export function Header() {
   const search = useSearchDialog();
   const { pathname } = useLocation();
@@ -56,6 +85,7 @@ export function Header() {
         <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />
         <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
+          <AccountControl />
           <span className="hidden lg:contents"><SavedLink /></span>
         </div>
       </div>

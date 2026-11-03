@@ -1,10 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@ionic/core/css/core.css"; /* variables and utility classes only; used by the phone tab bar */
-@import "@fontsource-variable/inter";
-@import "@fontsource/sofia-sans-condensed/500.css";
-@import "@fontsource/sofia-sans-condensed/600.css";
-@import "@fontsource/bebas-neue";
+/* Cricket stats pairing: Satoshi (≈ Crex Diatype) for UI text; Barlow Condensed for scores, odds, hit rates, label-cap and brand. */
+@import "../fonts/satoshi/satoshi.css";
+@import "@fontsource/barlow-condensed/500.css";
+@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource/barlow-condensed/900.css";
 @import "./tokens.generated.css"; /* colours, sizes, type scale, spacing: generated from packages/tokens/tokens.json (npm run tokens) */
 
 @custom-variant dark (&:is(.dark *));
@@ -38,16 +39,22 @@
   --text-title--letter-spacing: var(--fs-title-ls);
   --text-body: var(--fs-body);
   --text-body--line-height: var(--fs-body-lh);
+  --text-body--letter-spacing: var(--fs-body-ls);
   --text-callout: var(--fs-callout);
   --text-callout--line-height: var(--fs-callout-lh);
+  --text-callout--letter-spacing: var(--fs-callout-ls);
   --text-footnote: var(--fs-footnote);
   --text-footnote--line-height: var(--fs-footnote-lh);
+  /* no footnote letter-spacing: 0em would override `label-cap` (+6% tracking) when both classes sit on a rail label */
   --text-caption: var(--fs-caption);
   --text-caption--line-height: var(--fs-caption-lh);
+  --text-caption--letter-spacing: var(--fs-caption-ls);
   --text-metric: var(--fs-metric);
   --text-metric--line-height: var(--fs-metric-lh);
+  --text-metric--letter-spacing: var(--fs-metric-ls);
   --text-stat: var(--fs-stat);
   --text-stat--line-height: var(--fs-stat-lh);
+  --text-stat--letter-spacing: var(--fs-stat-ls);
 
   --spacing-hair: var(--space-hair);
   --spacing-tight: var(--space-tight);
@@ -63,18 +70,14 @@
   --spacing-row: var(--row-min);
 }
 
-/* Type pairing. Props.Cash sets text in Diatype (400/500/700) and every number and label in Diatype Condensed 500 at text size; both are paid fonts, so the free stand-ins are:
- *   Inter 400/500/700        names, headings, body, buttons (Diatype's three weights: 500 for body-size emphasis, 700 for titles and big figures; never 600 or 800)                         (neo-grotesque, the closest free match to Diatype)
- *   Sofia Sans Condensed     numbers (hit rates, odds, edge, stat values) and small uppercase labels (label-cap), at text size, 500 (600 for the largest scores); same family as the app
- *   Bebas Neue               brand moments only (--font-brand), never data
- * Condensed stays small (15-20 px): it is for scanning figures, not for display sizes. */
-@utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
-@utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; }
+/* Type — Satoshi for names/UI; Barlow Condensed for scoreboard figures and uppercase rail labels. */
+@utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; line-height: 1.2; }
+@utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; font-weight: 700; }
 
 @theme inline {
   --font-sans: var(--font-sans-stack);
-  --font-condensed: "Sofia Sans Condensed", "Arial Narrow", sans-serif;
-  --font-brand: "Bebas Neue", Impact, sans-serif;
+  --font-condensed: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-brand: "Barlow Condensed", "Arial Narrow", sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -119,8 +122,11 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body { @apply bg-background text-foreground font-sans antialiased; font-size: var(--body-size); }
+  /* 14 px base (Crex-like); names/rows bump via text-body (15). Antialiased keeps Satoshi crisp on dark. */
+  body { @apply bg-background text-foreground font-sans antialiased font-normal; font-size: var(--body-size); line-height: 1.35; letter-spacing: -0.005em; }
   a { color: inherit; }
+  /* Scores / odds / hit rates: equal-width figures when marked tabular or num-cond. */
+  .tabular-nums, .num-cond { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

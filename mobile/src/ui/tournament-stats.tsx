@@ -10,6 +10,7 @@ import { editionRows, editionSummary, editionsOf, boards as tournamentBoards, tr
 import { abbr } from "@site/lib/format";
 import { storeQuery } from "@/lib/data";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -52,7 +53,7 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
           <Press scale={1} onPress={() => void rows.refetch()} accessibilityRole="button" style={styles.retry}><Text style={styles.retryText}>Try again</Text></Press>
         </View>
       ) : !result ? <Loading done={read[0]} total={read[1]} />
-        : !result.groups.some((g: any) => g.boards.length) ? <Text style={styles.box}>No player records for this season yet.</Text>
+        : !result.groups.some((g: any) => g.boards.length) ? <EmptyState title="No player records yet" body="This season has no counted matches in the data yet." />
         : <Lists ed={ed} result={result} />}
       {trend.length > 1 ? <Trends points={trend} current={ed.key} onPick={onSeason} /> : null}
     </View>

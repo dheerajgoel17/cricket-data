@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cardFields, cardPath, cardQuery, cardText, propForm, renderCard } from "@cricket/engine/card.js";
+import { cardFields, cardPath, cardQuery, cardText, propForm, renderCard, CARD_V } from "@cricket/engine/card.js";
 import { parseShare } from "../api/share.js";
 
 const data = {
@@ -73,14 +73,20 @@ test("L5 mean, hit rate and last innings are the last five played values vs the 
   assert.deepEqual(f.last5.map((e) => e.value), [10, 20, 5, 30, 25]);
 });
 
-test("a prop card draws the book's own mark from public/books", async () => {
-  const { readFileSync } = await import("node:fs");
+test("a prop card draws every book's mark from public/books next to the price", async () => {
+  const { readdirSync, readFileSync } = await import("node:fs");
   const { dirname, join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
-  const bookLogo = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../public/books/bet365.svg"));
-  const img = await renderCard(cardFields({ p: "0", stat: "runs", line: "24.5" }, data), { bookLogo });
-  assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff]);
-  assert.ok(img.length < 300 * 1024);
+  const dir = join(dirname(fileURLToPath(import.meta.url)), "../public/books");
+  const files = readdirSync(dir).filter((n) => /\.(svg|png|jpg|webp)$/i.test(n));
+  assert.ok(files.length >= 7, `expected every stem logo, got ${files.join(",")}`);
+  const fields = cardFields({ p: "0", stat: "runs", line: "24.5" }, data);
+  for (const name of files) {
+    const bookLogo = readFileSync(join(dir, name));
+    const img = await renderCard(fields, { bookLogo });
+    assert.deepEqual([...img.subarray(0, 3)], [0xff, 0xd8, 0xff], name);
+    assert.ok(img.length < 300 * 1024, name);
+  }
 });
 
 test("a prop card draws the site mark from public/icon-192.png", async () => {
@@ -106,7 +112,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 
 test("a card's file-like path and its query are each other's inverse", () => {
   for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), "/card/v9/player/12/runs/24.5.jpg");
+  assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), `/card/v${CARD_V}/player/12/runs/24.5.jpg`);
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});
 });
@@ -117,6 +123,6 @@ test("a card can be asked for by player id as well as by index: the same fields;
   assert.equal(cardFields({ pid: "cccc3333" }, data), null);
   assert.equal(cardFields({ pid: "aaaa1111; drop" }, data), null);
   for (const q of [{ pid: "aaaa1111", stat: "runs", line: "24.5" }, { pid: "aaaa1111" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
-  assert.equal(cardPath({ pid: "aaaa1111", stat: "runs", line: 24.5 }), "/card/v9/pid/aaaa1111/runs/24.5.jpg");
+  assert.equal(cardPath({ pid: "aaaa1111", stat: "runs", line: 24.5 }), `/card/v${CARD_V}/pid/aaaa1111/runs/24.5.jpg`);
   assert.deepEqual(cardQuery("pid/zz/runs/1.jpg"), {}); // not an id
 });

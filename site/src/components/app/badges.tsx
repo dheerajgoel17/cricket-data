@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useData } from "@/lib/data";
 import { flagUrl, leagueLogos, playerPhotos, teamLogos } from "@/lib/assets";
@@ -34,11 +35,38 @@ const Circle = ({ size, className, children, title }: { size: BadgeSize; classNa
   <span data-slot="avatar" title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-bold text-muted-foreground", SIZES[size], className)}>{children}</span>
 );
 
-/** Round team badge: Source A logo when we know the team, else a flag, else initials. */
-export function TeamBadge({ name, size = "sm", className, eager }: { name: string; size?: BadgeSize; className?: string; eager?: boolean }) {
+/**
+ * Team crest: Source A logo when we know the team, else a flag, else initials.
+ * `bare`: the logo alone (no circle) so the full crest shows — use in MatchChip / AvatarGroup.
+ * Default is the round badge used on fixture cards and rows.
+ */
+export function TeamBadge({ name, size = "sm", className, eager, bare }: { name: string; size?: BadgeSize; className?: string; eager?: boolean; bare?: boolean }) {
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
-  return <Circle size={size} className={cn("border-0 bg-transparent", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} /></Circle>;
+  if (bare) {
+    return (
+      <span title={name} className={cn("relative inline-grid shrink-0 place-items-center", SIZES[size], className)}>
+        <Img eager={eager} urls={urls} alt={name} className="size-full object-contain" fallback={<span className="text-[length:inherit] font-bold text-muted-foreground">{initials(name)}</span>} />
+      </span>
+    );
+  }
+  return <Circle size={size} className={cn("border-0 bg-secondary", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-contain p-0.5" fallback={initials(name)} /></Circle>;
+}
+
+const AVATAR_SIZE = { xs: "sm", sm: "sm", md: "default", lg: "lg", xl: "lg" } as const;
+
+/** shadcn Avatar for AvatarGroup (hashtags): one root, image fills it, initials as fallback — no nested Circle. */
+export function TeamAvatar({ name, size = "sm", eager }: { name: string; size?: BadgeSize; eager?: boolean }) {
+  const { photos } = useData();
+  const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
+  const [i, setI] = useState(0);
+  const url = urls[i];
+  return (
+    <Avatar size={AVATAR_SIZE[size]} title={name} className={cn("bg-secondary", size === "xs" && "size-5")}>
+      {url ? <AvatarImage src={url} alt={name} loading={eager ? "eager" : "lazy"} className="size-full object-contain p-0.5" onError={() => setI((n) => n + 1)} /> : null}
+      <AvatarFallback className="bg-secondary text-[8px] font-bold">{initials(name)}</AvatarFallback>
+    </Avatar>
+  );
 }
 
 /** Round league badge: the source's logo for the league's newest season, else the league's initials ("IPL"). */

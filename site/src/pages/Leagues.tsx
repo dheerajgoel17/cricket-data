@@ -1,6 +1,6 @@
 import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { featuredEvents } from "@cricket/engine/tournament.js";
 import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
@@ -9,6 +9,7 @@ import { track } from "@/lib/analytics";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
 import { LeagueBadge } from "@/components/app/badges";
+import { EmptyState } from "@/components/app/empty-state";
 import { useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
 import { TournamentStats } from "@/components/app/tournament-stats";
@@ -33,7 +34,7 @@ export function LeaguesPage() {
   const featured = useMemo(() => featuredEvents(store, { big: rail.bigEvent, pin: PIN_FIRST, fixtures: fixtures.data || [] }) as Pick[], [store, rail.bigEvent, fixtures.data]);
   const asked = Number(q.c);
   const e = q.c && Number.isInteger(asked) && asked > 0 && asked < store.events.length ? asked : featured[0]?.e;
-  if (e == null) return <p className="rounded-2xl bg-card p-inset text-callout text-muted-foreground ring-1 ring-hairline">No leagues to show yet.</p>;
+  if (e == null) return <EmptyState icon={<TrophyIcon />} title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." />;
   const picks = featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured];
   return (
     <div className="flex flex-col gap-section">

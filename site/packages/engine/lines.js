@@ -1,9 +1,11 @@
 // Bookmaker / exchange lines for a player (value_bets/out/book_lines.json): which line is "the" line and how the market prices it.
 // All prices are decimal back prices as published; nothing here is computed by a model. Pure functions, unit-tested.
+import { bookDisplayName, bookLogoStem } from "./books.js";
 import { SAME_SIDE, canonFmt } from "./util.js";
 
 export const BOOK_NAMES = { bet365: "bet365", smarkets: "Smarkets", betfair: "Betfair", matchbook: "Matchbook", polymarket: "Polymarket" };
-export const bookName = (src) => BOOK_NAMES[src] || src;
+/** Display name for a feed source: stem books via books.js (handles moviodds_bet365, FairWin247 Premium, …); exchanges via BOOK_NAMES. */
+export const bookName = (src) => (bookLogoStem(src) ? bookDisplayName(src) : (BOOK_NAMES[src] || BOOK_NAMES[String(src || "").toLowerCase()] || src));
 
 /** How long the player page and Hot props keep a limited-overs match after it starts (24 hours). A Test stays 6 days so a match in play is not dropped. */
 export const BOOK_KEEP_MS = 24 * 3600e3;

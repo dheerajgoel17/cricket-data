@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, teamKey } from "@cricket/engine/lines.js";
 import { liveForFixture } from "@cricket/engine/live.js";
 import { venueStem } from "@cricket/engine/markets.js";
-import { matchPhase, pickPricedMatch } from "@cricket/engine/next-match.js";
+import { matchPhase, matchSide, pickPricedMatch } from "@cricket/engine/next-match.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { SPLITS } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
@@ -63,7 +63,9 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
   });
   const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
   const next = useMemo(() => nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures: fixtures.data || [], live: live.data }), [store, doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data]);
-  return { ok, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
+  // kit, crest and hero label follow the match side; profile team only when there is no match
+  const side = matchSide(next?.team, team);
+  return { ok, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
 }
 
 /**

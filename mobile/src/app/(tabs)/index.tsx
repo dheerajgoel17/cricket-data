@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
-import { FlatList, Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
-import { Text } from "@/ui/text";
+import { RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import type { HomePhase } from "@site/lib/home-phase";
 import { seriesName, shortSeries } from "@/lib/format";
@@ -9,13 +8,14 @@ import { useNow } from "@/lib/use-now";
 import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
 import { HotHome } from "@/ui/hot-home";
 import { RailCard } from "@/ui/rail-card";
 import { useScreenInsets } from "@/ui/insets";
 import { enter, Skeleton } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
-import { color, FIXTURE_CARD_SHARE, radius, space, type } from "@/ui/tokens";
+import { color, FIXTURE_CARD_SHARE, radius, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 export default function Fixtures() {
@@ -45,13 +45,13 @@ export default function Fixtures() {
       <AppHeader />
       <ScrollView
         contentContainerStyle={{ paddingBottom: inset.bottom + 96 }}
-        refreshControl={Platform.OS !== "ios" ? undefined : <RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} />}
+        refreshControl={<RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}
         showsVerticalScrollIndicator={false}>
         {ready && inPhase.length > 0 ? <Chips items={chips} value={sel} onChange={setSeries} /> : null}
         {!ready ? (
-          error ? <Text style={styles.empty}>Could not load fixtures. Pull to retry.</Text> : <RailSkeleton width={cardW} />
+          error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
         ) : shown.length === 0 ? (
-          <Text style={styles.empty}>{EMPTY_PHASE[phase]}</Text>
+          <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
         ) : (
           <Animated.FlatList<RailItem>
             key={`${phase}|${sel}`}
@@ -93,7 +93,7 @@ function RailSkeleton({ width }: { width: number }) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  empty: { ...type.callout, color: color["muted-foreground"], textAlign: "center", paddingVertical: space.section, paddingHorizontal: space.gutter },
+  emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
   skeletonRow: { flexDirection: "row", gap: space.snug, paddingTop: space.snug, paddingHorizontal: space.gutter },
   skeleton: { height: 190, borderRadius: radius.card },
 });

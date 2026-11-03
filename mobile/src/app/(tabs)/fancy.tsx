@@ -9,8 +9,9 @@ import { dayKey, dayLabel } from "@site/lib/format";
 import { fixtureStart } from "@/lib/rail";
 import { localTime } from "@/lib/format";
 import { useFancyCards, type FancyCard as Card } from "@/lib/fancy";
-import { fixturePath, push } from "@/lib/nav";
+import { fancyMarketPath, fixturePath, push } from "@/lib/nav";
 import { AppHeader } from "@/ui/brand";
+import { EmptyState } from "@/ui/empty-state";
 import { OverviewRow } from "@/ui/fancy-row";
 import { useScreenInsets } from "@/ui/insets";
 import { ChevronRight } from "@/ui/icons";
@@ -31,9 +32,9 @@ export default function Fancy() {
       <AppHeader title="Fancy" />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
         {!ready ? (
-          error ? <Text style={styles.empty}>Could not score the fancy lines. Try again in a moment.</Text> : <Working label="Scoring the fancy lines…" rows={4} />
+          error ? <View style={styles.emptyPad}><EmptyState title="Could not score fancy lines" body="Try again in a moment." /></View> : <Working label="Scoring the fancy lines…" rows={4} />
         ) : !shown.length ? (
-          <Text style={styles.empty}>No fancy lines with history to show yet. They open a day or two before a match, once there are past matches to score them on.</Text>
+          <View style={styles.emptyPad}><EmptyState title="No fancy lines yet" body="They open a day or two before a match, once there are past matches to score them on." /></View>
         ) : (
           <View style={styles.list}>
             {shown.map((c, i) => <Animated.View key={c.f.id || `${c.f.a}${c.f.b}${c.f.start}`} entering={i < 6 ? enter(i) : undefined}><MatchCard {...c} /></Animated.View>)}
@@ -49,7 +50,7 @@ export default function Fancy() {
 function MatchCard({ f, ms, rows }: Card) {
   const when = fixtureStart(f);
   const ground = String(f.venue || "").split(",")[0].replace(/\(.*\)/, "").trim();
-  const to = (fm?: string, sc?: number) => `${fixturePath(f.id)}?tab=fancy${fm ? `&fm=${encodeURIComponent(fm)}` : ""}${sc != null && sc >= 0 ? `&sc=${sc}` : ""}`;
+  const to = (fm?: string, sc?: number) => (fm ? fancyMarketPath(f.id, { fm, sc: sc != null && sc >= 0 ? sc : null }) : `${fixturePath(f.id)}?tab=fancy`);
   return (
     <View style={styles.card}>
       <Press onPress={() => push(to())} accessibilityRole="button" accessibilityLabel={`${f.a} v ${f.b}`} style={styles.top}>
@@ -84,7 +85,7 @@ function MatchCard({ f, ms, rows }: Card) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  empty: { ...type.callout, color: color["muted-foreground"], paddingHorizontal: space.gutter, paddingTop: space.snug },
+  emptyPad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   list: { gap: space.stack, paddingHorizontal: space.gutter },
   card: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
   top: { padding: space.stack, gap: space.snug },

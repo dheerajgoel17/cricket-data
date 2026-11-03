@@ -70,8 +70,8 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
   );
 }
 
-export const EMPTY_PHASE: Record<HomePhase, string> = {
-  live: "Nothing in play. Pre-match lists the next games.",
-  pre: "No pre-match props yet.",
-  final: "No resulted matches still listed.",
+export const EMPTY_PHASE: Record<HomePhase, { title: string; body: string }> = {
+  live: { title: "Nothing in play", body: "Pre-match lists the next games with priced lines." },
+  pre: { title: "No pre-match props yet", body: "Lines usually land a few hours before the toss." },
+  final: { title: "No resulted matches", body: "Finished priced games stay listed for a day after the start." },
 };

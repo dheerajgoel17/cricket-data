@@ -9,7 +9,6 @@ import { odds } from "@site/lib/format";
 import { dayLabel, localTime } from "@/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { DataTable } from "@/ui/data-table";
-import { InfoButton } from "@/ui/info-button";
 import { LiveDot } from "@/ui/motion";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
@@ -39,7 +38,7 @@ function RateTile({ label, r, side, line }: { label: string; r: { p: number | nu
   return (
     <View style={styles.tile} accessibilityLabel={`${label}: fair ${side} ${line}`}>
       <Text style={styles.cap} numberOfLines={1}>{label}</Text>
-      {r.played < 1 ? <Text style={styles.noSample}>No sample</Text> : (
+      {r.played < 1 ? <Text style={styles.noSample}>No data</Text> : (
         <>
           <Text style={[styles.tileNum, { color: tone(r.p) }]}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</Text>
           <Text style={styles.tileSub} numberOfLines={1}>{r.hits} of {r.played} · fair {odds(r.fair)}</Text>
@@ -67,12 +66,23 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
   return (
     <View style={[styles.card, out && { opacity: 0.6 }]}>
       <View style={styles.headRow}>
-        <View style={styles.headLeft}><Text style={styles.cap}>{heading}</Text><InfoButton topic="next-match" label="How to read this match" /></View>
+        <Text style={styles.cap}>{heading}</Text>
         <MatchStatus phase={next.phase || "upcoming"} start={next.start} />
       </View>
       <View style={styles.teams}>
-        {next.team ? <><TeamBadge name={next.team} size={32} /><Text style={styles.vs}>vs</Text></> : null}
-        {next.opp ? <><TeamBadge name={next.opp} size={32} /><Text style={styles.opp} numberOfLines={1}>{next.opp}</Text></> : <Text style={styles.opp} numberOfLines={1}>{next.match}</Text>}
+        {next.team ? (
+          <View style={styles.side}>
+            <TeamBadge name={next.team} size={32} />
+            <Text style={styles.opp} numberOfLines={1}>{next.team}</Text>
+          </View>
+        ) : null}
+        {next.team && next.opp ? <Text style={styles.vs}>vs</Text> : null}
+        {next.opp ? (
+          <View style={styles.side}>
+            <TeamBadge name={next.opp} size={32} />
+            <Text style={styles.opp} numberOfLines={1}>{next.opp}</Text>
+          </View>
+        ) : <Text style={styles.opp} numberOfLines={1}>{next.match}</Text>}
         {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
       </View>
       {place ? <Text style={styles.ground} numberOfLines={2}>{place}</Text> : null}
@@ -99,7 +109,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
   );
 }
 
-/** Quick filters: only games against his next opponent, only games at its ground (the same filters as the Filters section). */
+/** Quick picks inside Filters: only games against his next opponent, only games at its ground. */
 export function NextFilters({ next, filters, onChange }: { next: NextInfo; filters: { opp?: string; venue?: string }; onChange: (patch: Record<string, string>) => void }) {
   const chips: [string, string, string][] = [];
   if (next.opp) chips.push(["opp", next.opp, `vs ${next.opp}`]);
@@ -107,17 +117,17 @@ export function NextFilters({ next, filters, onChange }: { next: NextInfo; filte
   if (!chips.length) return null;
   return (
     <View style={{ gap: space.snug }}>
-    <Text style={styles.chartFilters}>Chart filters</Text>
-    <View style={styles.chipRow}>
-      {chips.map(([k, v, label]) => {
-        const on = (filters as any)[k] === v;
-        return (
-          <Press scale={1} key={k} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { void Haptics.selectionAsync(); onChange({ [k]: on ? "" : v }); }} style={[styles.chip, on && styles.chipOn]}>
-            <Text style={[styles.chipText, on && styles.chipTextOn]}>{on ? `${label} ✓` : `Only ${label}`}</Text>
-          </Press>
-        );
-      })}
-    </View>
+      <Text style={styles.chartFilters}>This match</Text>
+      <View style={styles.chipRow}>
+        {chips.map(([k, v, label]) => {
+          const on = (filters as any)[k] === v;
+          return (
+            <Press scale={1} key={k} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { void Haptics.selectionAsync(); onChange({ [k]: on ? "" : v }); }} style={[styles.chip, on && styles.chipOn]}>
+              <Text style={[styles.chipText, on && styles.chipTextOn]}>{on ? `${label} ✓` : `Only ${label}`}</Text>
+            </Press>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -125,13 +135,13 @@ export function NextFilters({ next, filters, onChange }: { next: NextInfo; filte
 const styles = StyleSheet.create({
   card: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  headLeft: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
   when: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   statusRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  teams: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  teams: { flexDirection: "row", alignItems: "center", gap: space.snug, flexWrap: "wrap" },
+  side: { flexDirection: "row", alignItems: "center", gap: space.tight, flexShrink: 1, maxWidth: "46%" },
   vs: { ...type.footnote, color: color["muted-foreground"] },
-  opp: { ...type.title, color: color.foreground, flexShrink: 1 },
+  opp: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   ground: { ...type.callout, color: color["muted-foreground"] },
   block: { gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },

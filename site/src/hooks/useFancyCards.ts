@@ -51,7 +51,7 @@ export function useFancyCards() {
     return arrangeFixtures(list.map((c: any) => c.f), stateOf, homeTeam()).map((f: any) => by.get(idOf(f))).filter(Boolean)
       .map((c: any) => {
         const match = liveForFixture(live.data, c.f);
-        return { ...c, rows: c.rows.map((r: any) => ({ ...r, standing: fancyStanding(match, r) })) };
+        return { ...c, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
       });
   }, [q.data, live.data]);
   return { ready: ready && !q.isLoading && !!q.data, cards };

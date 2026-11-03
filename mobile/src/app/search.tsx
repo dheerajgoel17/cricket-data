@@ -12,6 +12,7 @@ import { storeQuery } from "@/lib/data";
 import { fixturePath, goBack, push } from "@/lib/nav";
 import { fixturesQuery } from "@/lib/queries";
 import { useRecents } from "@/lib/saved";
+import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -67,7 +68,7 @@ export default function Search() {
             ) : null}
           </>
         ) : none ? (
-          <Text style={styles.empty}>No player, team, match or league matches “{query.trim()}”.</Text>
+          <EmptyState title="No matches" body={`No player, team, match or league matches “${query.trim()}”.`} />
         ) : (
           <>
             {found.matches.length ? (
@@ -105,5 +106,4 @@ const styles = StyleSheet.create({
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
   cancel: { ...type.body, color: color.primary },
   body: { gap: space.group, paddingHorizontal: space.gutter, paddingTop: space.snug },
-  empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },
 });

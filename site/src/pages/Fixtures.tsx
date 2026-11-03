@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowUpOnSquareIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { matchShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
+import { fancyMarketPath } from "@/lib/fancy-path";
 import { track } from "@/lib/analytics";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,7 @@ import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
 import { clockStartedMs, liveBlurb, teamScore } from "@cricket/engine/live.js";
 import { playState } from "@/lib/play-state";
-import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
+import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { fixtureBooks } from "@cricket/engine/lines.js";
@@ -26,7 +27,7 @@ import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
-import { LineStepper } from "@/components/app/line-stepper";
+import { GridFilterBar } from "@/components/app/grid-filters";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
@@ -45,7 +46,7 @@ const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
-const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Trends"]];
+const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]];
 
 /** Where the match is in time: label (Upcoming / Started / Completed) and the ticking value, from the shared 1 s clock. The clock never says Live. */
 function useMatchClock(when: Date, timed: boolean, fmt?: string) {
@@ -107,24 +108,12 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   );
 }
 
-/** Stat pills, a line stepper and the games window; hit-rate floor only for Trends. All state lives in the URL. */
-function FilterBar({ stat, line, games, hit, setQ }: { stat: string; line: number; games: number; hit?: string; setQ: (p: Record<string, unknown>) => void }) {
-  const step = (d: number) => setQ({ line: Math.max(0, Math.round((line + d) * 2) / 2) });
-  return (
-    <div className="flex min-w-0 flex-col gap-snug">
-      <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={STAT_OPTIONS} />
-      <div className="flex items-center gap-tight">
-        <LineStepper value={line} label="O" min={0} onStep={step} />
-        <PillGroup segmented layoutId="fx-games" label="Games" value={String(games)} onChange={(v) => setQ({ n: v })} items={[5, 10, 15, 20, 30].map((n) => [String(n), `L${n}`])} className="min-w-0" />
-      </div>
-      {hit !== undefined && <PillGroup segmented layoutId="fx-hit" label="Minimum hit rate" value={hit} onChange={(v) => setQ({ hit: v })} items={HITS.map(([v, l]) => [String(v), l])} />}
-    </div>
-  );
-}
-
 export function FixturePage() {
   const { store } = useData();
-  const { "*": id = "" } = useParams();
+  const nav = useNavigate();
+  const { "*": raw = "" } = useParams();
+  const fancyDetail = /\/fancy\/?$/.test(raw);
+  const id = fancyDetail ? raw.replace(/\/fancy\/?$/, "") : raw;
   const [q, setQ] = useQ();
   const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
   const { fx, doc, archived, isLoading } = useFixtureBooks(id);
@@ -145,6 +134,10 @@ export function FixturePage() {
   const grids = useQuery({ queryKey: ["fx-grids", id, fmt, stat, games], enabled: !!fx && fx.fmt !== "FC", queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, games) }))) });
   const bodyRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  // old links opened a market with ?tab=fancy&fm=… and scrolled the chart into view; send them to the market page instead
+  useEffect(() => {
+    if (!fancyDetail && tab === "fancy" && q.fm) nav(fancyMarketPath(id, { fm: q.fm, sc: q.sc, mw: q.mw, mv: q.mv, ml: q.ml }), { replace: true });
+  }, [fancyDetail, tab, q.fm, q.sc, q.mw, q.mv, q.ml, id, nav]);
   // switching tabs: if the page is scrolled past the top of the tab body, bring the new body into view (smoothly) instead of stranding the reader mid-way
   const switchTab = (t: string) => {
     setQ({ tab: t });
@@ -156,8 +149,24 @@ export function FixturePage() {
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
   if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><ScorecardSkeleton /><RowsSkeleton /></div>;
-  if (!fx) return <div className="flex flex-col items-start gap-snug pt-snug"><EmptyNote>That fixture is no longer in the schedule.</EmptyNote><Button asChild variant="secondary" className="rounded-full"><Link to="/">Back to fixtures</Link></Button></div>;
+  if (!fx) return (
+    <div className="flex flex-col items-stretch gap-snug pt-snug">
+      <EmptyNote title="Fixture gone">That match is no longer in the schedule.</EmptyNote>
+      <Button asChild variant="secondary" className="w-fit rounded-full"><Link to="/">Back to fixtures</Link></Button>
+    </div>
+  );
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
+  if (fancyDetail) {
+    return (
+      <div className="flex flex-col gap-section">
+        <MatchHeader f={fx} live={live} />
+        <Link to={`/fixture/${fx.id}?tab=fancy`} className="inline-flex w-fit items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+          <ChevronLeftIcon className="size-4" aria-hidden />Match Fancy
+        </Link>
+        <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-section">
       <MatchHeader f={fx} live={live} />
@@ -174,11 +183,11 @@ export function FixturePage() {
           {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} fmt={fx.fmt} archive={archived ? doc : undefined} />}
           {tab === "grid" && (
             <>
-              <FilterBar {...{ stat, line, games, setQ }} />
+              <GridFilterBar stat={stat} line={line} games={games} items={STAT_OPTIONS} setQ={setQ} />
               <div className="flex min-w-0 flex-col gap-snug">
                 {known.length > 1 && (
-                  <PillGroup segmented layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })}
-                    items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{name}</span>])} />
+                  <PillGroup layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })}
+                    items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>])} />
                 )}
                 <div className="flex flex-wrap items-center gap-x-stack gap-y-tight text-footnote text-muted-foreground">
                   <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
@@ -194,10 +203,10 @@ export function FixturePage() {
             </>)}
           {tab === "trends" && (
             <>
-              <FilterBar {...{ stat, line, games, hit, setQ }} />
+              <GridFilterBar stat={stat} line={line} games={games} hit={hit} items={STAT_OPTIONS} setQ={setQ} />
               {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(hit)} stat={stat} /> : <RowsSkeleton />}
             </>)}
-          {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} />}
+          {tab === "fancy" && <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="list" />}
               </motion.div>
             </AnimatePresence>
           </AnimatedHeight>
@@ -231,7 +240,7 @@ export function TrendsPage() {
         <Field label="Games"><NativeSelect name="n" options={GAMES} defaultValue={n} /></Field>
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
-      {!sel ? <EmptyNote>No upcoming fixtures with known teams right now.</EmptyNote> : (
+      {!sel ? <EmptyNote title="No fixtures to trend">No upcoming matches with known teams right now.</EmptyNote> : (
         <div className="flex flex-col gap-snug"><h2 className="text-title font-medium">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <ListSkeleton rows={4} />}
           <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}

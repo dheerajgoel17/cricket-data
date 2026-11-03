@@ -2,7 +2,7 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { editionRows, editionSummary, editionsOf, boards as tournamentBoards, trendSeries, TREND_METRICS } from "@cricket/engine/tournament.js";
 import { useData } from "@/lib/data";
 import { track } from "@/lib/analytics";
@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AnimatedHeight } from "./animated-height";
 import { PlayerBadge, TeamBadge } from "./badges";
+import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { PlayerName } from "./player-name";
 import { PlayerAvatar } from "./portrait";
@@ -77,7 +78,7 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
           <button type="button" onClick={() => rows.refetch()} className="h-control shrink-0 rounded-[var(--chip-radius)] bg-foreground px-snug text-callout font-medium text-background active:opacity-70">Try again</button>
         </div>
       ) : !result ? <Loading done={read[0]} total={read[1]} />
-        : !result.groups.some((g: any) => g.boards.length) ? <p className={cn(CARD, "p-inset text-callout text-muted-foreground")}>No player records for this season yet.</p>
+        : !result.groups.some((g: any) => g.boards.length) ? <EmptyState icon={<ChartBarIcon />} title="No player records yet" body="This season has no counted matches in the data yet." />
         : <Lists ed={ed} result={result} />}
       {trend.length > 1 && <Trends points={trend} current={ed.key} onPick={onSeason} />}
     </div>

@@ -46,13 +46,14 @@ describe("ScreenerFilters", () => {
     expect(screen.queryByRole("button", { name: /^Competition/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /^Match/ })).toBeNull();
   });
-  it("saves the combination on this device and refuses an empty one", () => {
-    localStorage.clear();
+  it("saves the combination to the account and refuses an empty one", async () => {
     setup({ ...DEFAULTS, min: 70 });
     fireEvent.click(screen.getByRole("button", { name: /^Save and share/ }));
     fireEvent.click(screen.getByRole("button", { name: "70%+" }));
     fireEvent.change(screen.getByLabelText("Name this combination"), { target: { value: "Safe overs" } });
     fireEvent.click(within(document.body).getByRole("button", { name: "Save" }));
-    expect(JSON.parse(localStorage.getItem("cph-combos") || "[]")[0]).toMatchObject({ name: "Safe overs", query: "min=70" });
+    const { waitFor } = await import("@testing-library/react");
+    const { comboRows } = await import("@/test/auth-harness");
+    await waitFor(() => expect(comboRows()[0]).toMatchObject({ name: "Safe overs", query: "min=70" }));
   });
 });

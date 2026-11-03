@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpOnSquareIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
+import { fancyMarketPath } from "@/lib/fancy-path";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { fancyStanding } from "@cricket/engine/live.js";
@@ -21,10 +22,12 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
-import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
+import { abbr, fixtureStart, num, odds, pc, shortVenue } from "@/lib/format";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
+import { ActiveChip } from "./chip";
+import { FancyFilters } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
@@ -61,44 +64,79 @@ export const collectOverview = collectOverviewRows as (o: { store: any; doc: any
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
 
-/** One market's row, in the props-list style: the label and the book's line and price(s), the better side's edge, and the last ten results as bars. A single book still shows its mark; "+N books" is only the extras. `standing` is the 15 s live so-far (`fancyStanding`), same words as a player prop. */
+/** One market's row — same chrome as a player PropRow: title, condensed line, books, model edge + last-N bars. `standing` is the 15 s live so-far (`fancyStanding`). */
 export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null }) {
   const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
   const mark = standing ?? r.standing;
+  const split = r.overLine != null && r.underLine != null && r.overLine !== r.underLine;
+  const lean = r.side === "under" ? "U" : "O";
+  const leanLine = r.side === "under" && r.underLine != null ? r.underLine : r.overLine != null ? r.overLine : r.line;
   return (
     <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
-      className={cn("grid min-h-row w-full grid-cols-[minmax(0,1fr)_3.5rem_auto_1rem] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
-    <span className="grid min-w-0 gap-hair">
-                          <span className="truncate text-body font-medium leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
-                          {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-medium", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
-                          <span className="line-clamp-2 text-callout text-muted-foreground">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={overSrc} /><Tick value={r.over}>{odds(r.over)}</Tick></span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={underSrc} /><Tick value={r.under}>{odds(r.under)}</Tick></span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over}>{odds(r.over)}</Tick></span> · <span className="whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under}>{odds(r.under)}</Tick></span></span></>}{mark != null && <> · <StandingMark standing={mark} line={r.line} /></>}</span>
-                        </span>
-                        <span className="grid justify-items-end text-right">
-                          <span className="label-cap text-caption font-medium text-muted-foreground">Model</span>
-                          <span className={cn("text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-                          {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
-                        </span>
-                        <MiniBars last={r.last} line={r.line} />
-                        <ChevronRightIcon className="size-4 text-muted-foreground" />
+      className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
+      {r.team
+        ? <TeamBadge name={r.team} size="md" className="size-control" />
+        : <span className="grid size-control place-items-center rounded-full bg-secondary text-muted-foreground" aria-hidden><ChartBarIcon className="size-5" /></span>}
+      <span className="grid min-w-0 gap-hair">
+        <span className="truncate text-body font-medium leading-snug">{r.label}</span>
+        {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
+        <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
+          <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
+          {r.at && (() => {
+            const ground = shortVenue(r.venue);
+            const hits = r.at.side === "over" ? r.at.over : r.at.under;
+            return (
+              <span className={cn("truncate text-footnote", r.at.side === r.side && r.edge != null ? "font-medium text-primary" : "text-muted-foreground")} title={r.venue || undefined}>
+                {hits}/{r.at.n} {r.at.side}{ground ? ` at ${ground}` : ""}
+              </span>
+            );
+          })()}
+        </span>
+        <span className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
+          {split ? (
+            <>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O {r.overLine} <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U {r.underLine} <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+            </>
+          ) : (
+            <>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+            </>
+          )}
+          {mark != null && <StandingMark standing={mark} line={r.line} />}
+        </span>
+      </span>
+      <span className="grid justify-items-end gap-hair">
+        <span className="grid justify-items-end gap-hair text-right">
+          <span className="flex items-baseline gap-tight whitespace-nowrap">
+            <span className="label-cap text-caption text-muted-foreground">Model</span>
+            <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+          </span>
+          {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
+        </span>
+        <MiniBars last={r.last} line={r.line} />
+      </span>
     </button>
   );
 }
 
-type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any };
+type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any; /** `list` is the fixture tab (chips + bookmaker lines); `detail` is `/fixture/:id/fancy` (one market's chart, like a player page). */ mode?: "list" | "detail" };
 
 /**
  * Match Fancy: whole-match and team-total markets (runs, session overs, extras, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
- * in this format. A Test team's 1st/2nd innings total is its own row, scored on that turn only. A "Bookmaker lines" list shows every market the books
- * price, one row each in the props-list style; the market chips open any market in a detail panel with the median, a chart of every recent match against
- * the line, over / under shares and fair prices, and a tappable line ladder.
+ * in this format. A Test team's 1st/2nd innings total is its own row, scored on that turn only. The list mode shows every priced market in the props-list style; tapping a row
+ * opens `/fixture/:id/fancy` with the median, a chart of every recent match against the line, over / under shares and fair prices, and a tappable line ladder. Filters
+ * (window + ground) sit behind the same chip row + Filters button pattern as Player props.
  */
-export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
+export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" }: Props) {
   const { store } = useData();
+  const nav = useNavigate();
   const { match: liveMatch } = useLiveMatch(fx);
   const reduce = useReducedMotion();
   const lines = useQuery(linesQuery);
   const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => FANCY_INNS.some((inn) => booked(k, teamName, inn)));
@@ -135,9 +173,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     const ground = venueIdx.length ? hereMatches(10) : undefined;
     const inns = scope < 0 ? [0] : FANCY_INNS;
     return inns.flatMap((n) => buildOverview({ store, doc: doc.data, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys: scope < 0 ? MATCH_KEYS : TEAM_KEYS, label: marketLabel, ground, inn: n }))
-      .map((r: any) => ({ ...r, standing: fancyStanding(liveMatch, r) }))
+      .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
-  }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => byLine(bookedNow), [bookedNow]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -180,29 +218,46 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
     const opp = scope >= 0 ? (a === scope ? b : a) : -1;
     return { date: d, text: scope >= 0 ? `v ${abbr(store.teamName(opp, true))}` : `${abbr(store.teamName(a, true))} v ${abbr(store.teamName(b, true))}` };
   }), [scoredMs, store, scope]);
-  const open = (k: string) => { track("fancy_market", { market: k }); set({ fm: k }); requestAnimationFrame(() => panelRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" })); };
+  const open = (k: string) => {
+    track("fancy_market", { market: k });
+    if (mode === "list") {
+      nav(fancyMarketPath(fx.id, { fm: k, sc: scope, mw: win, mv: here ? "1" : "" }));
+      return;
+    }
+    set({ fm: k });
+  };
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
-
+  const activeFilters: { key: string; label: string; value: string }[] = [];
+  if (win !== 20) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
+  if (here) activeFilters.push({ key: "mv", label: "Sample", value: `At ${venueName}` });
   return (
     <div className="flex min-w-0 flex-col gap-stack">
-      <div className="flex min-w-0 flex-col gap-snug">
-        {scopes.length > 1 && (
-          <PillGroup segmented layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v })}
-            items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
-        )}
+      <div className={cn("flex flex-col gap-snug", mode === "detail" && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
         <div className="flex items-center gap-snug">
-          <PillGroup segmented layoutId="fancy-window" label="Matches" value={String(win)} onChange={(v) => set({ mw: v })} items={WINDOWS.map((n) => [String(n), `L${n}`])} className="shrink-0" />
-          <span className="min-w-0 truncate text-footnote text-muted-foreground">{scoredMs.length} {fmt} matches{here ? ` at ${venueName}` : scope >= 0 ? ` of ${team?.[0]}` : ""}{batFirstNow ? " batting first" : ""}{scoredMs.length ? ` · through ${new Date(`${store.M.d[scoredMs[scoredMs.length - 1]]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}` : ""}{scoredMs.some((m) => store.M.pv[m]) ? " · includes scraped matches" : ""}</span>
+          {scopes.length > 1 ? (
+            <PillGroup layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v, ...(mode === "list" ? { fm: "" } : {}) })}
+              className="min-w-0 flex-1"
+              items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
+          ) : <span className="min-w-0 flex-1" />}
+          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            <AdjustmentsHorizontalIcon className="size-4" />L{win}
+            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+          </Button>
         </div>
-        {venueIdx.length > 0 && (
-          <PillGroup segmented layoutId="fancy-sample" label="Matches from" value={here ? "1" : "0"} onChange={(v) => set({ mv: v === "1" ? "1" : "" })}
-            items={[["0", "Teams' form"], ["1", `At ${venueName}`]]} />
+        {activeFilters.length > 0 && (
+          <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
+            <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+          </div>
         )}
       </div>
+      <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
+        onApply={({ win: w, here: h }) => set({ mw: w === 20 ? "" : String(w), mv: h ? "1" : "" })} />
 
-      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote>No {fmt} matches to base this on.</EmptyNote> : (
+      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
         <>
-          {overview.length > 0 && (
+          {mode === "list" && overview.length > 0 && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <h2 className="text-title font-bold">Bookmaker lines</h2>
               {liveMatch?.status === "live" && <p className="text-footnote text-muted-foreground">So far this match, delayed up to about 20 seconds. Not used for settlement.</p>}
@@ -212,75 +267,77 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given }: Props) {
                     <motion.li key={r.id || rowFm(r)} layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
                       className="border-t border-hairline first:border-t-0">
-                      <OverviewRow r={r} onOpen={() => open(rowFm(r))} active={rowFm(r) === fm} />
+                      <OverviewRow r={r} onOpen={() => open(rowFm(r))} />
                       <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
                     </motion.li>))}
                 </AnimatePresence>
               </ul>
             </section>)}
 
-          <div ref={panelRef} className="flex min-w-0 scroll-mt-24 flex-col gap-snug">
-            {keyList.length > 1 && <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={(v) => set({ fm: v })} items={keyList} />}
-            <AnimatedHeight>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
-                {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
-                  <>
-                    <section className="flex flex-col gap-stack">
-                      <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
-                      {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
-                      <div className="flex items-end gap-group">
-                        <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
-                        <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-bold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
-                        <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-bold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
-                      </div>
-                      <ValueBars values={rep.values} line={line} labels={barLabels} />
-                      <div className="flex flex-wrap items-center gap-snug">
-                        <LineStepper value={line} label="O/U" min={0} onStep={(d) => set({ ml: d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2 })} />
-                        {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{b.books.map((x) => <BookBadge key={x.source} source={x.source} />)} line {b.line}</Button>)}
-                      </div>
-                      <div className="grid grid-cols-2 gap-snug">
-                        {(["over", "under"] as const).map((side) => {
-                          const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
-                          return (
-                            <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
-                              <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
-                              <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
-                              <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
-                              <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                              {bookHere && (() => { const b = bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side]) : null; return b && (
-                                <div className="flex items-baseline justify-between gap-tight border-t border-hairline pt-tight text-footnote">
-                                  <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
-                                  <b className="tabular-nums text-primary">{odds(b[side])}</b>
-                                </div>); })()}
-                            </div>);
-                        })}
-                      </div>
-                      {ground && (
-                        <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
-                          {ground.differs && <b className="font-medium">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
-                          {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
-                        </p>)}
-                      {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
-                      {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
-                    </section>
+          {mode === "detail" && (
+            <div className="flex min-w-0 flex-col gap-snug">
+              {keyList.length > 1 && <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={(v) => set({ fm: v })} items={keyList} />}
+              <AnimatedHeight>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
+                  {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
+                    <>
+                      <section className="flex flex-col gap-stack">
+                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
+                        {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
+                        <div className="flex items-end gap-group">
+                          <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
+                          <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-bold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
+                          <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-bold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
+                        </div>
+                        <ValueBars values={rep.values} line={line} labels={barLabels} />
+                        <div className="flex flex-wrap items-center gap-snug">
+                          <LineStepper value={line} label="O/U" min={0} onStep={(d) => set({ ml: d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2 })} />
+                          {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{b.books.map((x) => <BookBadge key={x.source} source={x.source} />)} line {b.line}</Button>)}
+                        </div>
+                        <div className="grid grid-cols-2 gap-snug">
+                          {(["over", "under"] as const).map((side) => {
+                            const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
+                            return (
+                              <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
+                                <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
+                                <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                                <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
+                                <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
+                                {bookHere && (() => { const b = bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side]) : null; return b && (
+                                  <div className="flex items-baseline justify-between gap-tight border-t border-hairline pt-tight text-footnote">
+                                    <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
+                                    <b className="tabular-nums text-primary">{odds(b[side])}</b>
+                                  </div>); })()}
+                              </div>);
+                          })}
+                        </div>
+                        {ground && (
+                          <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
+                            {ground.differs && <b className="font-medium">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
+                            {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
+                          </p>)}
+                        {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
+                        {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
+                      </section>
 
-                    <section className="overflow-hidden border-y border-hairline" aria-label="Line ladder">
-                      <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
-                      {ladder.map((l: any, i: number) => (
-                        <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
-                          className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-inset py-snug text-left text-body transition-colors active:bg-accent">
-                          {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                          <span className="relative flex items-center gap-tight font-medium tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
-                          <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
-                          <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
-                        </motion.button>))}
-                    </section>
-                  </>)}
-              </motion.div>
-            </AnimatePresence>
-            </AnimatedHeight>
-          </div>
+                      <section className="overflow-hidden border-y border-hairline" aria-label="Line ladder">
+                        <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+                        {ladder.map((l: any, i: number) => (
+                          <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
+                            className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-inset py-snug text-left text-body transition-colors active:bg-accent">
+                            {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
+                            <span className="relative flex items-center gap-tight font-medium tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
+                            <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
+                            <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
+                          </motion.button>))}
+                      </section>
+                    </>)}
+                </motion.div>
+              </AnimatePresence>
+              </AnimatedHeight>
+            </div>
+          )}
         </>)}
     </div>
   );

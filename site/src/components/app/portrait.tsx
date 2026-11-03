@@ -24,13 +24,13 @@ export function PlayerPortrait({ idx, team, test, className }: { idx: number; te
 }
 
 /**
- * The round avatar for rows and cards: the same player-in-his-shirt picture, cropped to a circle so the face and the collar and shoulders of the shirt show.
- * `team` and `test` choose the kit as in `PlayerPortrait` (a row knows the side the book files him under and the format of the line).
+ * The round avatar for rows and cards: face + kit fill the circle as one image (no nested flag/crest container).
+ * `team` and `test` choose the kit as in `PlayerPortrait`.
  */
 export function PlayerAvatar({ idx, team, test, className }: { idx: number; team?: string; test?: boolean; className?: string }) {
   return (
     <span className={cn("relative block shrink-0 overflow-hidden rounded-full bg-secondary", className)}>
-      <PlayerPortrait idx={idx} team={team} test={test} className="absolute inset-x-0 bottom-0 w-full" />
+      <PlayerPortrait idx={idx} team={team} test={test} className="!aspect-auto absolute inset-0 size-full" />
     </span>
   );
 }

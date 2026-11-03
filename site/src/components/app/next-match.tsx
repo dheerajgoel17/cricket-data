@@ -8,12 +8,11 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OddsTable } from "./odds-table";
-import { Note } from "./note";
 import { MatchStatus } from "./match-status";
 import { TeamBadge } from "./badges";
 import { StandingMark, Tick, type Standing } from "./tick";
 
-const CARD = ""; // flat: the page is the container
+const CARD = "rounded-2xl bg-card p-inset ring-1 ring-hairline";
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
 
 export type NextMatchInfo = {
@@ -51,7 +50,7 @@ function RateRow({ label, r, side, line }: { label: string; r: { p: number | nul
     return (
       <div className="flex items-baseline justify-between gap-snug text-callout">
         <span className="min-w-0 truncate text-muted-foreground">{label}</span>
-        <span className="text-muted-foreground">no sample</span>
+        <span className="text-muted-foreground">No data</span>
       </div>
     );
   }
@@ -82,18 +81,30 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
   const ground = next.ground.split(",")[0];
   const heading = next.phase && next.phase !== "upcoming" ? "This match" : "Next match";
   return (
-    <div className={cn("grid gap-snug", CARD, out && "opacity-60")}>
-      <div className="flex items-start justify-between gap-snug">
-        <span className="label-cap text-footnote text-muted-foreground">{heading}</span>
-        {next.phase === "live" || next.phase === "final" ? <MatchStatus phase={next.phase} className="shrink-0 text-footnote" /> : <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>}
+    <div className={cn("grid gap-stack", CARD, out && "opacity-60")}>
+      <div className="grid gap-snug">
+        <div className="flex items-start justify-between gap-snug">
+          <span className="label-cap text-footnote text-muted-foreground">{heading}</span>
+          {next.phase === "live" || next.phase === "final" ? <MatchStatus phase={next.phase} className="shrink-0 text-footnote" /> : <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>}
+        </div>
+        <div className="flex min-w-0 flex-wrap items-center gap-snug">
+          {next.team ? (
+            <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
+              <TeamBadge name={next.team} size="sm" eager />
+              <span className="min-w-0 truncate text-body font-medium">{next.team}</span>
+            </span>
+          ) : null}
+          {next.team && next.opp ? <span className="shrink-0 text-footnote text-muted-foreground">vs</span> : null}
+          {next.opp ? (
+            <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
+              <TeamBadge name={next.opp} size="sm" eager />
+              <span className="min-w-0 truncate text-body font-medium">{next.opp}</span>
+            </span>
+          ) : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
+          {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
+        </div>
+        {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
       </div>
-      <div className="flex min-w-0 items-center gap-snug">
-        {next.team ? <><TeamBadge name={next.team} size="sm" eager /><span className="text-footnote text-muted-foreground">vs</span></> : null}
-        {next.opp ? <><TeamBadge name={next.opp} size="sm" eager /><span className="min-w-0 truncate text-body font-medium">{next.opp}</span></>
-          : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
-        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
-      </div>
-      {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
 
       {book ? (
         <div className="grid gap-hair border-t border-hairline pt-snug">
@@ -119,22 +130,17 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
         </div>
       )}
 
-      <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
-        {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
-        {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
-        <Note className="sm:col-span-2" title="How to read this" items={[
-          <>Hit rate counts {fmt ? <b className="font-medium text-foreground">{fmt}</b> : "the"} games he played on this line. Other formats are never mixed in.</>,
-          "Games he did not play (DNP) or that were void are left out, not counted as misses.",
-          book
-            ? "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin, so compare them with the listed price."
-            : "Fair odds are 1 ÷ hit rate. They carry no bookmaker margin. No listed price to compare yet.",
-        ]} />
-      </div>
+      {(next.ground || next.opp) ? (
+        <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
+          {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
+          {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-/** Quick filters: only games against his next opponent, only games at its ground (the same URL keys as the sheet). */
+/** Quick picks inside the Filters sheet: only games against his next opponent, only games at its ground. */
 export function NextFilters({ next, q, navigateWith }: { next: NextMatchInfo; q: Record<string, string>; navigateWith: (p: Record<string, unknown>) => void }) {
   const chips: [string, string, string][] = [];
   if (next.opp) chips.push(["opp", next.opp, `vs ${next.opp}`]);

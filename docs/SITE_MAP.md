@@ -20,7 +20,7 @@ odds are served from their own backend (bookmaker logos, plus a "Sportsbook Odds
 | `/free-tools`, `/features` | tools hub | `/tools` (and `/features`) | |
 | `/free-bets` | affiliate offers | not built | we run no affiliate links |
 | `/betting-academy/*` | blog | not built | could reuse the glossary as articles |
-| `/saved`, login | favourites | `/saved` (stars, browser-only) | no accounts |
+| `/saved`, login | favourites | `/saved` (stars; free Google / email sign-in; server Saved) | optional free account |
 | footer | tools, popular leagues, resources, responsible gambling | unlisted `/privacy-policy`, `/terms-of-use`, `/docs` (typed URLs only; stats/data site; no gambling promotion) | |
 
 ## Routing and SEO

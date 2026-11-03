@@ -42,7 +42,7 @@ export function useFancyCards(enabled = true) {
   });
   const cards = useMemo(() => (q.data ?? []).map((c) => {
     const match = liveMatchFor(live.data, lines.data, c.f);
-    return { ...c, rows: c.rows.map((r: any) => ({ ...r, standing: fancyStanding(match, r) })) };
+    return { ...c, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
   }), [q.data, live.data, lines.data]);
   return { ready: railReady && !!store && !q.isLoading && !!q.data, cards, error: q.isError };
 }
