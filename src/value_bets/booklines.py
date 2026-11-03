@@ -106,23 +106,20 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
         return [x for kind in kinds for x in src.get(kind) or []]
 
     test_names = {x.get("match") for x in rows_of(prev) + rows_of(book) if x.get("fmt") == "Test"}
-    stamp = {}
+    starts: dict[str, list] = {}  # per Test pairing, every (start, raw) seen: the next Test of a series (same pair) is a window of its own
     for m in test_names:
-        best = None
         for x in rows_of(prev) + rows_of(book):
-            if x.get("match") != m:
-                continue
-            st = parse_ts(x.get("start_utc"))
-            if st and (best is None or st < best[0]):
-                best = (st, x.get("start_utc"))
-        if best:
-            stamp[m] = best[1]
+            st = parse_ts(x.get("start_utc")) if x.get("match") == m else None
+            if st:
+                starts.setdefault(m, []).append((st, x.get("start_utc")))
 
     def restamp(row: dict) -> dict:
         row = dict(row)
-        m = row.get("match")
-        if m in stamp and stamp[m]:
-            row["start_utc"] = stamp[m]
+        st = parse_ts(row.get("start_utc"))
+        if st and row.get("match") in starts:
+            first = min((c for c in starts[row["match"]] if dt.timedelta(0) <= st - c[0] < testend.TEST_WINDOW), default=None)
+            if first:
+                row["start_utc"] = first[1]
         return row
 
     def is_test(row: dict) -> bool:
