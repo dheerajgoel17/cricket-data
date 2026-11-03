@@ -27,8 +27,9 @@ test("the key and the host list are the only way in: no key, a wrong key, an unl
   assert.equal((await call({ headers: {}, query: { u: url } }, f)).code, 403);
   assert.equal((await call({ headers: { "x-relay-key": "nope" }, query: { u: url } }, f)).code, 403);
   assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://evil.example/a" } }, f)).code, 403);
+  assert.match((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://evil.example/a" } }, f)).body.toString(), /^host not allowed:evil\.example$/);
   assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://book.example.evil.example/a" } }, f)).code, 403);
-  assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "http://api.book.example/a" } }, f)).code, 403);
+  assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "http://api.book.example/a" } }, f)).code, 400);
   assert.equal((await call({ headers: { "x-relay-key": "k-123" }, query: { u: "not a url" } }, f)).code, 400);
   delete process.env.RELAY_KEY;
   assert.equal((await call({ headers: { "x-relay-key": "" }, query: { u: url } }, f)).code, 403, "no key configured: nothing is allowed");

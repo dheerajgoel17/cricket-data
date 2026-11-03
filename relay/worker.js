@@ -16,7 +16,7 @@ export const same = (a, b) => {
   return d === 0;
 };
 
-export const allowList = (env) => [env?.RELAY_ALLOW, env?.RELAY_ALLOW_EXTRA].filter(Boolean).join(",");
+export const allowList = (env) => [env?.RELAY_ALLOW, env?.RELAY_ALLOW_EXTRA, env?.RELAY_ALLOW_FEEDG].filter(Boolean).join(",");
 
 export const allowed = (host, list) => String(list || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).some((d) => host === d || host.endsWith(`.${d}`));
 
@@ -68,7 +68,10 @@ export default {
 
     let url;
     try { url = new URL(here.searchParams.get("u") || ""); } catch { return new Response("bad url", { status: 400 }); }
-    if (url.protocol !== "https:" || !allowed(url.hostname.toLowerCase(), allowList(env))) return new Response("host not allowed", { status: 403 });
+    if (url.protocol !== "https:") return new Response("bad url", { status: 400 });
+    const host = url.hostname.toLowerCase();
+    if (!allowed(host, allowList(env))) return new Response(`host not allowed:${host}`, { status: 403 });
+
     const post = request.method === "POST";
     try {
       const r = await fetchImpl(url, {
