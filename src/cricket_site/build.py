@@ -22,7 +22,7 @@ from concurrent.futures import ProcessPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import identity, testend
+from . import identity, profiles, testend
 from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
@@ -899,6 +899,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     names = player_names(zpath)
     cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "l": {}, "names": {}, "index": {"players": [], "teams": []}}
     ident, review = link_identity(cx, names, vb_dir, data_dir)
+    pdoc = profiles.build_json(profiles.load(data_dir), ident["s"])  # role / batting hand / bowling style per player, from data/profiles (fetched by cricket_site.profiles)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
     newest = max((m["date"] for m in canonical), default="")
@@ -907,9 +908,10 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "newest_base": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
         "provisional_rows_linked": pstat.get("rows_linked_by_crex", 0),
-        "identity_linked": len(ident["s"]), "identity_review": len(review),
+        "identity_linked": len(ident["s"]), "identity_review": len(review), "profiles": len(pdoc["p"]),
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     (out / "identity.json").write_text(json.dumps(ident, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    (out / "profiles.json").write_text(json.dumps(pdoc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     if review:
         (out / "identity_review.json").write_text(json.dumps(review, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")  # for the job summary; not deployed
     else:
