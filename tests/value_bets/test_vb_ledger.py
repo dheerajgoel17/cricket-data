@@ -119,3 +119,45 @@ def test_upsert_noop_without_secrets(monkeypatch):
     monkeypatch.delenv("SUPABASE_SERVICE_KEY", raising=False)
     assert ledger.upsert_model([{"event_key": "e", "market_type": "batter_runs", "selection": "x",
                                  "line": 1, "side": "over", "best_odds": 2}])["skipped"] is True
+
+
+def test_parse_alert_key_and_history_to_value():
+    key = "male|Bangladesh|Zimbabwe|2026-10-17|batter_sixes||Najmul Hossain Shanto over 0.5|0.5|over"
+    p = ledger.parse_alert_key(key)
+    assert p["event_key"] == "male|Bangladesh|Zimbabwe|2026-10-17"
+    assert p["market_type"] == "batter_sixes" and p["line"] == 0.5 and p["side"] == "over"
+    assert ledger.player_name_from_selection(p["selection"]) == "Najmul Hossain Shanto"
+    v = ledger.history_to_value({
+        "alert_id": "abc", "alert_key": key, "alerted_at_ist": "2026-10-17 12:04 IST",
+        "match": "Bangladesh vs Zimbabwe", "start_ist": "2026-10-17 17:00 IST",
+        "market": "sixes", "selection": p["selection"], "best_odds": 3.4, "best_source": "s",
+        "fair_odds": 3.046, "edge_pct": 11.62, "why": "x",
+    })
+    assert v["start_utc"] == "2026-10-17T11:30:00Z"
+    assert v["stat"] == "sixes" and v["edge"] == 0.1162
+    assert ledger.bet_key(v) == key
+
+
+def test_resolve_player_id_from_archive_name():
+    arc = {"lines": [
+        {"pid": "p1", "stat": "sixes", "player": "Najmul Hossain Shanto", "book_name": "Shanto"},
+        {"pid": "p2", "stat": "sixes", "player": "Other", "book_name": "Other"},
+    ], "results": {}}
+    row = {"selection": "Najmul Hossain Shanto over 0.5", "stat": "sixes"}
+    assert ledger.resolve_player_id(row, arc) == "p1"
+    assert ledger.resolve_player_id({**row, "player_id": "px"}, arc) == "px"
+
+
+def test_backfill_history_file(tmp_path, monkeypatch):
+    p = tmp_path / "alerts_history.jsonl"
+    key = "male|A|B|2026-10-17|batter_runs||X over 24.5|24.5|over"
+    p.write_text(json.dumps({
+        "alert_id": "1", "alert_key": key, "alerted_at_ist": "2026-10-17 12:00 IST",
+        "match": "A vs B", "start_ist": "2026-10-17 17:00 IST", "market": "runs",
+        "selection": "X over 24.5", "best_odds": 1.9, "best_source": "s",
+        "fair_odds": 1.8, "edge_pct": 5.0, "why": "",
+    }) + "\n")
+    monkeypatch.delenv("SUPABASE_URL", raising=False)
+    monkeypatch.delenv("SUPABASE_SERVICE_KEY", raising=False)
+    out = ledger.backfill_history(p)
+    assert out["parsed"] == 1 and out["unique"] == 1 and out["skipped"] is True
