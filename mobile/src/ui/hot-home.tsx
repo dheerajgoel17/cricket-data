@@ -14,7 +14,7 @@ import { liveQuery } from "@/lib/queries";
 import { fixtureState } from "@/lib/rail";
 import { useFancyCards } from "@/lib/fancy";
 import { fixturePath, push } from "@/lib/nav";
-import { homeProps } from "@/lib/home-props";
+import { homeProps } from "@cricket/engine/props-view.js";
 import { useHotView } from "@/lib/use-hot";
 import { OverviewRow } from "@/ui/fancy-row";
 import { ChevronRight } from "@/ui/icons";
@@ -22,9 +22,9 @@ import { InfoButton } from "@/ui/info-button";
 import { MarketTape, type TapeRow } from "@/ui/market-tape";
 import { Working } from "@/ui/motion";
 import { PropRow } from "@/ui/prop-row";
-import { color, radius, space, tonal, type } from "@/ui/tokens";
+import { color, space, type } from "@/ui/tokens";
 
-const SHOWN = 4; // rows on Home; the Player props tab carries the rest
+const SHOWN = 4; // fancy rows on Home; the Player props tab carries the rest (the props list is the shared `homeProps`: four, and more when more have an edge)
 
 export function SectionHead({ title, to, info }: { title: string; to: string; info?: string }) {
   return (
@@ -47,8 +47,8 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   const { cards, ready: fancyReady } = useFancyCards(!isLoading && !scoring);
   const fancy = useMemo(() => cards.flatMap(({ f, rows: rs }: any) => rs.map((r: any) => ({ r, f }))).filter(({ f }: any) => !phase || phaseOf(stateOf(f)) === phase)
     .sort((x: any, y: any) => hotOrder({ live: stateOf(x.f) === "live", p: 0, edge: x.r.edge }, { live: stateOf(y.f) === "live", p: 0, edge: y.r.edge })).slice(0, SHOWN), [cards, phase, live.data]);
-  // Home is for what is current: undecided lines first, a resulted one only for 6 hours after its match, and only when no undecided line takes its place (the Player props tab keeps all of the day)
-  const props = useMemo(() => homeProps(rows.filter((r) => r.l10.played >= 6), soFarOf, Date.now(), SHOWN), [rows, soFarOf]);
+  // the shared rule: undecided lines first, a resulted one for 12 hours after its match is expected to be over, four rows and more when more have an edge (`engine/props-view.js`)
+  const props = useMemo(() => homeProps(rows.filter((r) => r.l10.played >= 6), soFarOf, { now: Date.now() }) as typeof rows, [rows, soFarOf]);
   const tape = useMemo<TapeRow[]>(() => rows.map((r) => {
     const s = soFarOf(r);
     return { idx: r.idx, pid: r.pid, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
@@ -95,10 +95,9 @@ export function HotHome({ phase }: { phase: HomePhase }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: space.stack, paddingTop: space.group },
+  wrap: { gap: space.group, paddingTop: space.group },
   pad: { paddingHorizontal: space.gutter },
-  // Player props and Fancy each sit in their own card under the "Hot props" heading
-  section: { ...tonal, borderRadius: radius.card, marginHorizontal: space.gutter, paddingVertical: space.snug, gap: space.snug, overflow: "hidden" },
+  section: { gap: space.snug },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   display: { ...type.title, fontSize: 22, lineHeight: 26, color: color.foreground },
   head: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },

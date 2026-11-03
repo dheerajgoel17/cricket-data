@@ -2,8 +2,8 @@
 @import "tw-animate-css";
 @import "@ionic/core/css/core.css"; /* variables and utility classes only; used by the phone tab bar */
 @import "@fontsource-variable/inter";
-@import "@fontsource/barlow-semi-condensed/400.css";
-@import "@fontsource/barlow-semi-condensed/500.css";
+@import "@fontsource/sofia-sans-condensed/500.css";
+@import "@fontsource/sofia-sans-condensed/600.css";
 @import "@fontsource/bebas-neue";
 @import "./tokens.generated.css"; /* colours, sizes, type scale, spacing: generated from packages/tokens/tokens.json (npm run tokens) */
 
@@ -65,7 +65,7 @@
 
 /* Type pairing. Props.Cash sets text in Diatype (400/500/700) and every number and label in Diatype Condensed 500 at text size; both are paid fonts, so the free stand-ins are:
  *   Inter 400/500/700        names, headings, body, buttons (Diatype's three weights: 500 for body-size emphasis, 700 for titles and big figures; never 600 or 800)                         (neo-grotesque, the closest free match to Diatype)
- *   Barlow Semi Condensed    numbers (hit rates, odds, edge, stat values) and small uppercase labels (label-cap), at text size, 500 only (Props.Cash uses Condensed 500, never bolder)
+ *   Sofia Sans Condensed     numbers (hit rates, odds, edge, stat values) and small uppercase labels (label-cap), at text size, 500 (600 for the largest scores); same family as the app
  *   Bebas Neue               brand moments only (--font-brand), never data
  * Condensed stays small (15-20 px): it is for scanning figures, not for display sizes. */
 @utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
@@ -73,7 +73,7 @@
 
 @theme inline {
   --font-sans: var(--font-sans-stack);
-  --font-condensed: "Barlow Semi Condensed", "Arial Narrow", sans-serif;
+  --font-condensed: "Sofia Sans Condensed", "Arial Narrow", sans-serif;
   --font-brand: "Bebas Neue", Impact, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);

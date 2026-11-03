@@ -6,10 +6,10 @@ import { Text } from "@/ui/text";
 import Animated from "react-native-reanimated";
 import { SCOPE_LABEL } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
-import { abbr, odds } from "@site/lib/format";
+import { odds, shortVenue } from "@site/lib/format";
+import { groundNote } from "@cricket/engine/props-view.js";
 import type { Quote, Row } from "@/lib/hot";
 import { openPlayer } from "@/lib/nav";
-import { propNotes } from "@/lib/prop-context";
 import { BookBadge } from "@/ui/book-badge";
 import { Collapsible, TurnChevron } from "@/ui/collapsible";
 import { MiniBars } from "@/ui/mini-bars";
@@ -72,7 +72,7 @@ export function PropRow({ r, i, soFar, out }: { r: Row; i: number; soFar: Standi
   const label = (STATS as any)[r.stat]?.label;
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const [open, setOpen] = useState(false);
-  const notes = propNotes(r, abbr(r.opp));
+  const ground = groundNote(r.ven) as { hits: number; played: number; tone: "good" | "bad" | "plain" } | null; // his record at this ground: from two games, coloured when lopsided (as on the site)
   return (
     <Animated.View entering={i < 8 ? enter(i) : undefined}>
       <Press scale={1} onPress={() => openPlayer(r)} accessibilityRole="link" accessibilityLabel={`${r.name}, ${r.line} ${label}${r.over > 1 ? `, over ${odds(r.over)}` : ""}${r.under > 1 ? `, under ${odds(r.under)}` : ""}${r.edge != null ? `, model edge ${(r.edge * 100).toFixed(0)} percent on the ${r.side}` : ""}`} style={({ pressed }) => [styles.row, i > 0 && styles.sep, out && styles.out, pressed && styles.pressed]}>
@@ -91,9 +91,9 @@ export function PropRow({ r, i, soFar, out }: { r: Row; i: number; soFar: Standi
             </Text>
             {soFar ? <StandingMark standing={soFar} line={r.line} /> : null}
           </View>
-          {notes.length ? (
+          {ground ? (
             <Text style={styles.context} numberOfLines={1}>
-              {notes.map((n, k) => <Text key={n.label}>{k ? "   " : ""}{n.label} · <Text style={styles.contextStrong}>{n.record}</Text></Text>)}
+              <Text style={[styles.contextStrong, ground.tone === "good" && { color: color.primary }, ground.tone === "bad" && { color: color.miss }]}>{ground.hits}/{ground.played}</Text> at {shortVenue(r.venue)}
             </Text>
           ) : null}
           <PriceLine quotes={r.quotes} line={r.line} price={r.over} open={open} onToggle={() => setOpen((o) => !o)} />

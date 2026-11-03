@@ -13,7 +13,7 @@ import { StandingMark, Tick } from "./tick";
 import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
-import { sideEdge } from "@cricket/engine/stats.js";
+import { edgeTag, groundNote, modelSide } from "@cricket/engine/props-view.js";
 import { fmtIndex } from "@cricket/engine/util.js";
 import { venueStem } from "@cricket/engine/markets.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
@@ -55,11 +55,11 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
-interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; last: { v: number | null; s: string }[]; max: number }
+interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
- * year's, vs today's opponent, and the edge of the best over price: the hit rate of the window shown pulled toward the market's no-vig chance (`sideEdge`, `engine/stats.js`).
+ * year's, vs today's opponent, and the model's edge on the better side (`modelSide`, `engine/props-view.js`): the hit rate of the window shown pulled toward the market's no-vig chance, for the over and for the under.
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
 export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
@@ -89,7 +89,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         const chip = matchChipId(l.match, l.start_utc, l.fmt);
         const b = bookLinesFor({ lines: todays.lines.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
         if (idx < 0 || !b) return;
-        const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
+        const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: inns === "all" ? null : inns }, split_by: [] }, { playerIdx: idx });
         const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
         if (!entries.length) return;
@@ -104,7 +104,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
@@ -139,7 +139,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug">
         <span className={cn("whitespace-nowrap", top.best && "font-medium text-primary")}>
-          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} <Tick value={top.over}>{odds(top.over)}</Tick>{top.underAt && <> · U {top.underAt.line} {odds(top.underAt.price)}</>}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
+          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} <Tick value={top.over}>{odds(top.over)}</Tick>{top.underAt ? <> · U {top.underAt.line} {odds(top.underAt.price)}</> : top.under != null ? <> · U {odds(top.under)}</> : null}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
@@ -167,19 +167,20 @@ export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win;
           <ItemMedia><PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" /></ItemMedia>
           <ItemContent className="min-w-0 gap-hair">
             <ItemTitle className="max-w-full text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="text-callout text-primary">O {r.line} <span className="text-muted-foreground">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!r.quotes.length && <> · <Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
+            <ItemDescription className="text-callout text-muted-foreground"><span className="font-medium tabular-nums text-foreground">{r.line}</span> <span>{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!r.quotes.length && <> · <Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
           </ItemContent>
           <ItemActions className="self-start items-center gap-tight">
             <span className="grid justify-items-end text-right">
-              <span className="label-cap text-footnote text-muted-foreground">Edge</span>
+              <span className="label-cap text-footnote text-muted-foreground">Model</span>
               <span className={cn("font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+              {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
             </span>
           </ItemActions>
           {r.quotes.length > 0 && <BookQuotes quotes={r.quotes} className="basis-full pl-[calc(var(--control)+var(--spacing-snug))]" />}
           <div className="flex basis-full items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
             <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-caption tabular-nums">
               <span className={cn("font-medium", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
-              {win !== "ven" && r.ven?.played >= 2 && <span className={cn("truncate", (r.ven.p ?? 0) >= 0.75 ? "font-medium text-primary" : (r.ven.p ?? 1) <= 0.25 ? "font-medium text-miss" : "text-muted-foreground")} title={r.venue}>{r.ven.hits}/{r.ven.played} at {shortVenue(r.venue)}</span>}
+              {win !== "ven" && (() => { const g = groundNote(r.ven); return g && <span className={cn("truncate", g.tone === "good" ? "font-medium text-primary" : g.tone === "bad" ? "font-medium text-miss" : "text-muted-foreground")} title={r.venue}>{g.hits}/{g.played} at {shortVenue(r.venue)}</span>; })()}
             </span>
             {bars && <Spark r={r} />}
           </div>
@@ -218,11 +219,11 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
           <tr className="border-b border-hairline">
             <ColHead label="Lines" win={win} onWin={onWin} className="pl-[calc(var(--control)+var(--spacing-snug)*2)]" />
             {bars ? <ColHead id="l10" label="L10 chart" win={win} onWin={onWin} /> : null}
-            <ColHead label="Odds" win={win} onWin={onWin} />
+            <ColHead label="Over / under" win={win} onWin={onWin} />
             <ColHead id="season" label={year} win={win} onWin={onWin} />
             <ColHead id="h2h" label="H2H" win={win} onWin={onWin} />
             <ColHead id="ven" label="Ground" win={win} onWin={onWin} />
-            <ColHead label="Edge" win={win} onWin={onWin} align="right" />
+            <ColHead label="Model edge" win={win} onWin={onWin} align="right" />
             <th className="w-10"><span className="sr-only">Watchlist</span></th>
           </tr>
         </thead>
@@ -240,17 +241,17 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0">
                       <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
-                      <span className="truncate text-callout text-muted-foreground">O {r.line} {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</span>
+                      <span className="truncate text-callout text-muted-foreground"><span className="font-medium tabular-nums text-foreground">{r.line}</span> {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
                     </span>
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-body font-medium tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick></td>
+                <td className="px-snug py-snug font-condensed text-body font-medium tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-normal text-muted-foreground">U {odds(r.under)}</span>}</td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</td>
+                <td className={cn("px-snug py-snug text-right font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-normal text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
                 <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
@@ -316,7 +317,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   }, [data]);
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
-  const scored = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r[win].hits, r[win].played, r.prior, r.over), live: matchOf(r)?.status === "live" }))
+  const scored = useMemo(() => (data || []).map((r) => ({ ...r, ...modelSide(r[win], r.prior, r.over, r.under), live: matchOf(r)?.status === "live" }))
     .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need),
   [data, stat, win, need, day, teams, start, fmt, live.data, pick]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => order(narrow(scored, sc), sc).slice(0, MAX_ROWS), [scored, sc]);

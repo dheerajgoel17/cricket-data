@@ -2,6 +2,7 @@
 // The Props screener's filter state: what the URL says, what is on by default, which filters are active and how rows are narrowed and ordered. Pure (no React,
 // no DOM), so it is tested on its own and a native app can reuse it. Only filters the rows can answer exist: nothing here approximates a missing field.
 import { hotOrder, norm } from "@/lib/hot-lines";
+import { sideRate } from "@cricket/engine/props-view.js";
 
 export type Win = "season" | "h2h" | "ven" | "l5" | "l10";
 export type Sort = "hit" | "edge" | "price";
@@ -85,17 +86,17 @@ export function narrow<T extends FilterRow>(rows: T[], s: Screener): T[] {
     if (s.team !== "all" && norm(r.team) !== norm(s.team)) return false;
     if (s.comp !== "all" && (r.comp || "") !== s.comp) return false;
     if (s.value && !((r.edge ?? 0) > 0)) return false;
-    if (s.min) { const p = (r as any)[s.win]?.p; if (p == null || p * 100 < s.min) return false; }
+    if (s.min) { const p = sideRate((r as any)[s.win]?.p ?? null, (r as any).side); if (p == null || p * 100 < s.min) return false; }
     return true;
   });
 }
 
 /** Order rows: a match in play first (as the home rail does), then by the chosen sort, ties by the others. */
 export function order<T extends FilterRow>(rows: T[], s: Screener): T[] {
-  const key = (r: T) => ({ live: !!r.live, p: (r as any)[s.win]?.p ?? null, edge: r.edge });
+  const key = (r: T) => ({ live: !!r.live, p: sideRate((r as any)[s.win]?.p ?? null, (r as any).side), edge: r.edge }); // an under row ranks by how often the line was not cleared
   const by: Record<Sort, (x: T, y: T) => number> = {
     hit: (x, y) => hotOrder(key(x), key(y)),
-    edge: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.edge ?? -Infinity) - (x.edge ?? -Infinity) || ((y as any)[s.win]?.p ?? 0) - ((x as any)[s.win]?.p ?? 0),
+    edge: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.edge ?? -Infinity) - (x.edge ?? -Infinity) || (sideRate((y as any)[s.win]?.p ?? null, (y as any).side) ?? 0) - (sideRate((x as any)[s.win]?.p ?? null, (x as any).side) ?? 0),
     price: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.over || 0) - (x.over || 0) || hotOrder(key(x), key(y)),
   };
   return [...rows].sort(by[s.sort]);
