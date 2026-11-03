@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-11-02T11:21:16",
+ "afghanistan_enumerated_at": "2026-11-03T11:03:24",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
@@ -148,6 +148,10 @@
   {
    "canonical_id": "804201",
    "key": "2015-05-24-Warwickshire-Sussex"
+  },
+  {
+   "canonical_id": "710305",
+   "key": "2014-03-04-Bangladesh-Pakistan"
   }
  ],
  "batch_size": 30,
@@ -2858,6 +2862,144 @@
    "key": "2015-01-17-Afghanistan-Ireland",
    "match_id": "crex-afg-vs-ire-5th-match-dubai-triangular-series-2015-match-updates-4JX",
    "saved_at": "2026-11-02T11:44:34"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-zim-3rd-t20i-afghanistan-vs-zimbabwe-in-uae-2026-match-updates-13TO",
+   "key": "2026-11-01-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-3rd-t20i-afghanistan-vs-zimbabwe-in-uae-2026-match-updates-13TO",
+   "saved_at": "2026-11-03T11:03:31"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ban-3rd-match-asia-cup-2022-match-updates-FH2",
+   "key": "2022-08-30-Afghanistan-Bangladesh",
+   "match_id": "crex-afg-vs-ban-3rd-match-asia-cup-2022-match-updates-FH2",
+   "saved_at": "2026-11-03T11:03:45"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-match-dubai-triangular-series-2015-match-updates-4JU",
+   "key": "2015-01-10-Afghanistan-Ireland",
+   "match_id": "crex-afg-vs-ire-2nd-match-dubai-triangular-series-2015-match-updates-4JU",
+   "saved_at": "2026-11-03T11:03:57"
+  },
+  {
+   "crex_url": "/cricket-live-score/pak-w-vs-sl-w-1st-odi-pakistan-women-v-sri-lanka-women-in-uae-2015-match-updates-J0Y",
+   "key": "2015-01-09-Pakistan-Sri Lanka",
+   "match_id": "crex-pak-w-vs-sl-w-1st-odi-pakistan-women-v-sri-lanka-women-in-uae-2015-match-updates-J0Y",
+   "saved_at": "2026-11-03T11:04:09"
+  },
+  {
+   "crex_url": "/cricket-live-score/hbh-vs-syt-21st-match-big-bash-league-2014-15-match-updates-3FP",
+   "key": "2015-01-09-Sydney Thunder-Hobart Hurricanes",
+   "match_id": "crex-hbh-vs-syt-21st-match-big-bash-league-2014-15-match-updates-3FP",
+   "saved_at": "2026-11-03T11:04:22"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-uae-4th-odi-afghanistan-tour-of-uae-2014-match-updates-2WM",
+   "key": "2014-12-04-Afghanistan-United Arab Emirates",
+   "match_id": "crex-afg-vs-uae-4th-odi-afghanistan-tour-of-uae-2014-match-updates-2WM",
+   "saved_at": "2026-11-03T11:05:39"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-uae-3rd-odi-afghanistan-tour-of-uae-2014-match-updates-2WJ",
+   "key": "2014-12-02-Afghanistan-United Arab Emirates",
+   "match_id": "crex-afg-vs-uae-3rd-odi-afghanistan-tour-of-uae-2014-match-updates-2WJ",
+   "saved_at": "2026-11-03T11:05:52"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-3rd-odi-south-africa-women-tour-of-india-2014-match-updates-DWN",
+   "key": "2014-11-28-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-3rd-odi-south-africa-women-tour-of-india-2014-match-updates-DWN",
+   "saved_at": "2026-11-03T11:06:35"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-2nd-odi-south-africa-women-tour-of-india-2014-match-updates-DWM",
+   "key": "2014-11-26-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-2nd-odi-south-africa-women-tour-of-india-2014-match-updates-DWM",
+   "saved_at": "2026-11-03T11:07:18"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-only-test-south-africa-women-tour-of-india-2014-match-updates-DWK",
+   "key": "2014-11-16-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-only-test-south-africa-women-tour-of-india-2014-match-updates-DWK",
+   "saved_at": "2026-11-03T11:08:05"
+  },
+  {
+   "crex_url": "/cricket-live-score/sur-vs-sus-7th-match-t20-blast-2014-match-updates-51E",
+   "key": "2014-05-16-Surrey-Sussex",
+   "match_id": "crex-sur-vs-sus-7th-match-t20-blast-2014-match-updates-51E",
+   "saved_at": "2026-11-03T11:11:29"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
+   "key": "2014-03-03-Afghanistan-Sri Lanka",
+   "match_id": "crex-afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
+   "saved_at": "2026-11-03T11:12:42"
+  },
+  {
+   "crex_url": "/cricket-live-score/nz-w-vs-wi-w-3rd-odi-west-indies-women-tour-of-new-zealand-2014-match-updates-J3I",
+   "key": "2014-02-26-New Zealand-West Indies",
+   "match_id": "crex-nz-w-vs-wi-w-3rd-odi-west-indies-women-tour-of-new-zealand-2014-match-updates-J3I",
+   "saved_at": "2026-11-03T11:12:54"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sl-w-3rd-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3C",
+   "key": "2014-01-23-India-Sri Lanka",
+   "match_id": "crex-ind-w-vs-sl-w-3rd-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3C",
+   "saved_at": "2026-11-03T11:13:37"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sl-w-2nd-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3B",
+   "key": "2014-01-21-India-Sri Lanka",
+   "match_id": "crex-ind-w-vs-sl-w-2nd-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3B",
+   "saved_at": "2026-11-03T11:13:54"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sl-w-1st-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3A",
+   "key": "2014-01-19-India-Sri Lanka",
+   "match_id": "crex-ind-w-vs-sl-w-1st-odi-sri-lanka-women-tour-of-india-2014-match-updates-J3A",
+   "saved_at": "2026-11-03T11:14:07"
+  },
+  {
+   "crex_url": "/cricket-live-score/ads-vs-prs-10th-match-big-bash-league-2013-14-match-updates-386",
+   "key": "2013-12-31-Adelaide Strikers-Perth Scorchers",
+   "match_id": "crex-ads-vs-prs-10th-match-big-bash-league-2013-14-match-updates-386",
+   "saved_at": "2026-11-03T11:16:40"
+  },
+  {
+   "crex_url": "/cricket-live-score/nz-w-vs-wi-w-3rd-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5C",
+   "key": "2013-10-10-West Indies-New Zealand",
+   "match_id": "crex-nz-w-vs-wi-w-3rd-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5C",
+   "saved_at": "2026-11-03T11:18:44"
+  },
+  {
+   "crex_url": "/cricket-live-score/nz-w-vs-wi-w-2nd-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5B",
+   "key": "2013-10-08-West Indies-New Zealand",
+   "match_id": "crex-nz-w-vs-wi-w-2nd-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5B",
+   "saved_at": "2026-11-03T11:18:57"
+  },
+  {
+   "crex_url": "/cricket-live-score/nz-w-vs-wi-w-1st-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5A",
+   "key": "2013-10-06-West Indies-New Zealand",
+   "match_id": "crex-nz-w-vs-wi-w-1st-odi-new-zealand-women-tour-of-west-indies-2013-match-updates-J5A",
+   "saved_at": "2026-11-03T11:19:09"
+  },
+  {
+   "crex_url": "/cricket-live-score/ken-vs-sco-10th-match-world-cricket-league-championship-2012-13-match-updates-A1Z",
+   "key": "2013-06-30-Scotland-Kenya",
+   "match_id": "crex-ken-vs-sco-10th-match-world-cricket-league-championship-2012-13-match-updates-A1Z",
+   "saved_at": "2026-11-03T11:19:57"
+  },
+  {
+   "crex_url": "/cricket-live-score/ned-vs-sa-1st-odi-south-africa-tour-of-netherlands-2013-match-updates-3KL",
+   "key": "2013-05-31-Netherlands-South Africa",
+   "match_id": "crex-ned-vs-sa-1st-odi-south-africa-tour-of-netherlands-2013-match-updates-3KL",
+   "saved_at": "2026-11-03T11:20:19"
+  },
+  {
+   "crex_url": "/cricket-live-score/can-vs-ken-9th-match-world-cricket-league-championship-2012-13-match-updates-A1Y",
+   "key": "2013-03-13-Kenya-Canada",
+   "match_id": "crex-can-vs-ken-9th-match-world-cricket-league-championship-2012-13-match-updates-A1Y",
+   "saved_at": "2026-11-03T11:20:52"
   }
  ],
  "failed": [],
@@ -11772,2336 +11914,951 @@
    "checked_at": "2026-11-02T11:44:55",
    "key": "2015-01-14-Afghanistan-Scotland",
    "reason": "afg-vs-sco-4th-match-dubai-triangular-series-2015-match-updates-4JW is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:27",
+   "key": "2015-01-08-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-1st-match-dubai-triangular-series-2015-match-updates-4JT is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:32",
+   "key": "2015-01-02-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2015-01-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:37",
+   "key": "2015-01-02-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2015-01-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:42",
+   "key": "2015-01-02-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2015-01-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:47",
+   "key": "2014-12-27-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2014-12-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:52",
+   "key": "2014-12-27-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2014-12-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:04:57",
+   "key": "2014-12-27-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2014-12-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:02",
+   "key": "2014-12-12-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-12-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:07",
+   "key": "2014-12-12-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2014-12-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:12",
+   "key": "2014-12-12-Canterbury-Otago",
+   "reason": "no Source A match within a day of 2014-12-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:17",
+   "key": "2014-12-07-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2014-12-07 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:22",
+   "key": "2014-12-06-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-12-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:27",
+   "key": "2014-12-05-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2014-12-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:05:57",
+   "key": "2014-11-30-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:02",
+   "key": "2014-11-30-Auckland-Northern Districts",
+   "reason": "no Source A match within a day of 2014-11-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:07",
+   "key": "2014-11-30-Otago-Wellington",
+   "reason": "no Source A match within a day of 2014-11-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:12",
+   "key": "2014-11-30-Afghanistan-United Arab Emirates",
+   "reason": "afg-vs-uae-2nd-odi-afghanistan-tour-of-uae-2014-match-updates-2WI is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:17",
+   "key": "2014-11-29-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2014-11-29 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:22",
+   "key": "2014-11-29-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-29 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:40",
+   "key": "2014-11-28-Otago-Auckland",
+   "reason": "no Source A match within a day of 2014-11-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:45",
+   "key": "2014-11-28-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2014-11-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:50",
+   "key": "2014-11-28-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:06:55",
+   "key": "2014-11-28-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:00",
+   "key": "2014-11-28-Afghanistan-United Arab Emirates",
+   "reason": "afg-vs-uae-1st-odi-afghanistan-tour-of-uae-2014-match-updates-2WH is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:05",
+   "key": "2014-11-27-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2014-11-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:23",
+   "key": "2014-11-24-India-South Africa",
+   "reason": "no Source A match within a day of 2014-11-24 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:28",
+   "key": "2014-11-23-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2014-11-23 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:33",
+   "key": "2014-11-23-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2014-11-23 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:38",
+   "key": "2014-11-22-Central Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-11-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:43",
+   "key": "2014-11-22-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:48",
+   "key": "2014-11-21-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2014-11-21 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:07:53",
+   "key": "2014-11-20-Canterbury-Otago",
+   "reason": "no Source A match within a day of 2014-11-20 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:11",
+   "key": "2014-11-16-Cape Cobras-Titans",
+   "reason": "no Source A match within a day of 2014-11-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:16",
+   "key": "2014-11-16-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:21",
+   "key": "2014-11-16-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-11-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:26",
+   "key": "2014-11-16-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2014-11-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:31",
+   "key": "2014-11-15-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:36",
+   "key": "2014-11-14-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2014-11-14 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:41",
+   "key": "2014-11-13-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-13 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:46",
+   "key": "2014-11-13-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-13 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:51",
+   "key": "2014-11-09-Hong Kong-Papua New Guinea",
+   "reason": "no Source A match within a day of 2014-11-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:08:56",
+   "key": "2014-11-09-Lions-Knights",
+   "reason": "no Source A match within a day of 2014-11-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:01",
+   "key": "2014-11-09-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2014-11-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:06",
+   "key": "2014-11-09-Otago-Wellington",
+   "reason": "no Source A match within a day of 2014-11-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:11",
+   "key": "2014-11-08-Hong Kong-Papua New Guinea",
+   "reason": "no Source A match within a day of 2014-11-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:16",
+   "key": "2014-11-08-Auckland-Otago",
+   "reason": "no Source A match within a day of 2014-11-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:21",
+   "key": "2014-11-08-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:26",
+   "key": "2014-11-07-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-07 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:31",
+   "key": "2014-11-02-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-11-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:36",
+   "key": "2014-11-02-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2014-11-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:41",
+   "key": "2014-11-01-Auckland-Otago",
+   "reason": "no Source A match within a day of 2014-11-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:46",
+   "key": "2014-11-01-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2014-11-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:51",
+   "key": "2014-10-15-Sri Lanka-South Africa",
+   "reason": "no Source A match within a day of 2014-10-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:09:56",
+   "key": "2014-09-19-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2014-09-19 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:01",
+   "key": "2014-09-17-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2014-09-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:06",
+   "key": "2014-09-14-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2014-09-14 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:11",
+   "key": "2014-09-12-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2014-09-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:16",
+   "key": "2014-09-09-Gloucestershire-Leicestershire",
+   "reason": "no Source A match within a day of 2014-09-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:21",
+   "key": "2014-08-31-Somerset-Northamptonshire",
+   "reason": "no Source A match within a day of 2014-08-31 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:26",
+   "key": "2014-08-31-Lancashire-Yorkshire",
+   "reason": "no Source A match within a day of 2014-08-31 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:31",
+   "key": "2014-08-28-Australia-Pakistan",
+   "reason": "no Source A match within a day of 2014-08-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:36",
+   "key": "2014-08-21-Australia-Pakistan",
+   "reason": "no Source A match within a day of 2014-08-21 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:41",
+   "key": "2014-08-15-Essex-Glamorgan",
+   "reason": "no Source A match within a day of 2014-08-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:46",
+   "key": "2014-08-15-Durham-Lancashire",
+   "reason": "no Source A match within a day of 2014-08-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:51",
+   "key": "2014-07-25-Antigua Hawksbills-Barbados Tridents",
+   "reason": "no Source A match within a day of 2014-07-25 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:10:56",
+   "key": "2014-07-17-Red Steel-Guyana Amazon Warriors",
+   "reason": "no Source A match within a day of 2014-07-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:01",
+   "key": "2014-07-12-St Lucia Zouks-Jamaica Tallawahs",
+   "reason": "no Source A match within a day of 2014-07-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:07",
+   "key": "2014-07-10-Middlesex-Somerset",
+   "reason": "no Source A match within a day of 2014-07-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:12",
+   "key": "2014-06-06-Durham-Warwickshire",
+   "reason": "no Source A match within a day of 2014-06-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:17",
+   "key": "2014-06-01-Nottinghamshire-Sussex",
+   "reason": "no Source A match within a day of 2014-06-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:34",
+   "key": "2014-05-16-Somerset-Gloucestershire",
+   "reason": "no Source A match within a day of 2014-05-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:39",
+   "key": "2014-05-11-Lancashire-Middlesex",
+   "reason": "no Source A match within a day of 2014-05-11 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:44",
+   "key": "2014-05-04-Surrey-Kent",
+   "reason": "no Source A match within a day of 2014-05-04 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:49",
+   "key": "2014-05-04-Yorkshire-Durham",
+   "reason": "no Source A match within a day of 2014-05-04 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:54",
+   "key": "2014-05-04-Essex-Leicestershire",
+   "reason": "no Source A match within a day of 2014-05-04 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:11:59",
+   "key": "2014-04-27-Yorkshire-Middlesex",
+   "reason": "no Source A match within a day of 2014-04-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:04",
+   "key": "2014-04-20-Essex-Surrey",
+   "reason": "no Source A match within a day of 2014-04-20 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:09",
+   "key": "2014-04-13-Nottinghamshire-Middlesex",
+   "reason": "no Source A match within a day of 2014-04-13 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:14",
+   "key": "2014-04-06-Surrey-Glamorgan",
+   "reason": "no Source A match within a day of 2014-04-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:19",
+   "key": "2014-04-06-Nottinghamshire-Lancashire",
+   "reason": "no Source A match within a day of 2014-04-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:24",
+   "key": "2014-03-18-Afghanistan-Hong Kong",
+   "reason": "afg-vs-hk-5th-match-t20-world-cup-2014-match-updates-377 is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:29",
+   "key": "2014-03-06-Bangladesh-Pakistan",
+   "reason": "no Source A match within a day of 2014-03-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:12:59",
+   "key": "2014-02-24-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2014-02-24 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:04",
+   "key": "2014-02-22-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2014-02-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:09",
+   "key": "2014-02-01-Scotland-United Arab Emirates",
+   "reason": "no Source A match within a day of 2014-02-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:14",
+   "key": "2014-01-30-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2014-01-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:19",
+   "key": "2014-01-26-Lions-Titans",
+   "reason": "no Source A match within a day of 2014-01-26 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:24",
+   "key": "2014-01-26-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2014-01-26 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:13:42",
+   "key": "2014-01-22-Dolphins-Lions",
+   "reason": "no Source A match within a day of 2014-01-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:12",
+   "key": "2014-01-17-South Africa-Pakistan",
+   "reason": "no Source A match within a day of 2014-01-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:17",
+   "key": "2014-01-17-Auckland-Otago",
+   "reason": "no Source A match within a day of 2014-01-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:22",
+   "key": "2014-01-17-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2014-01-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:27",
+   "key": "2014-01-17-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2014-01-17 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:32",
+   "key": "2014-01-15-South Africa-Pakistan",
+   "reason": "no Source A match within a day of 2014-01-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:37",
+   "key": "2014-01-15-Warriors-Titans",
+   "reason": "no Source A match within a day of 2014-01-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:42",
+   "key": "2014-01-14-Ireland-South Africa",
+   "reason": "no Source A match within a day of 2014-01-14 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:47",
+   "key": "2014-01-14-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2014-01-14 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:52",
+   "key": "2014-01-13-Ireland-Pakistan",
+   "reason": "no Source A match within a day of 2014-01-13 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:14:57",
+   "key": "2014-01-12-South Africa-Pakistan",
+   "reason": "no Source A match within a day of 2014-01-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:02",
+   "key": "2014-01-12-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-01-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:07",
+   "key": "2014-01-10-England-Australia",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:12",
+   "key": "2014-01-10-Ireland-Pakistan",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:17",
+   "key": "2014-01-10-Auckland-Northern Districts",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:22",
+   "key": "2014-01-10-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:27",
+   "key": "2014-01-10-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:32",
+   "key": "2014-01-10-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2014-01-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:37",
+   "key": "2014-01-08-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2014-01-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:42",
+   "key": "2014-01-08-Otago-Wellington",
+   "reason": "no Source A match within a day of 2014-01-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:47",
+   "key": "2014-01-05-Cape Cobras-Knights",
+   "reason": "no Source A match within a day of 2014-01-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:52",
+   "key": "2014-01-05-Central Districts-Otago",
+   "reason": "no Source A match within a day of 2014-01-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:15:57",
+   "key": "2014-01-05-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2014-01-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:02",
+   "key": "2014-01-04-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2014-01-04 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:07",
+   "key": "2014-01-02-Central Districts-Otago",
+   "reason": "no Source A match within a day of 2014-01-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:12",
+   "key": "2014-01-02-Canterbury-Northern Districts",
+   "reason": "no Source A match within a day of 2014-01-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:17",
+   "key": "2014-01-01-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2014-01-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:23",
+   "key": "2014-01-01-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2014-01-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:28",
+   "key": "2014-01-01-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2014-01-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:45",
+   "key": "2013-12-30-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2013-12-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:50",
+   "key": "2013-12-27-Auckland-Otago",
+   "reason": "no Source A match within a day of 2013-12-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:16:55",
+   "key": "2013-12-27-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2013-12-27 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:00",
+   "key": "2013-12-20-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2013-12-20 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:05",
+   "key": "2013-12-12-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2013-12-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:10",
+   "key": "2013-12-12-Otago-Wellington",
+   "reason": "no Source A match within a day of 2013-12-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:15",
+   "key": "2013-12-06-Central Districts-Auckland",
+   "reason": "no Source A match within a day of 2013-12-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:20",
+   "key": "2013-12-06-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2013-12-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:25",
+   "key": "2013-11-30-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2013-11-30 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:31",
+   "key": "2013-11-29-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2013-11-29 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:36",
+   "key": "2013-11-23-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2013-11-23 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:41",
+   "key": "2013-11-22-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2013-11-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:46",
+   "key": "2013-11-19-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2013-11-19 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:51",
+   "key": "2013-11-16-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2013-11-16 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:17:56",
+   "key": "2013-11-15-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2013-11-15 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:01",
+   "key": "2013-11-09-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2013-11-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:06",
+   "key": "2013-11-03-West Indies-England",
+   "reason": "no Source A match within a day of 2013-11-03 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:11",
+   "key": "2013-11-02-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2013-11-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:16",
+   "key": "2013-11-01-West Indies-England",
+   "reason": "no Source A match within a day of 2013-11-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:21",
+   "key": "2013-11-01-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2013-11-01 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:26",
+   "key": "2013-10-29-West Indies-England",
+   "reason": "no Source A match within a day of 2013-10-29 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:18:31",
+   "key": "2013-10-24-South Africa-Sri Lanka",
+   "reason": "no Source A match within a day of 2013-10-24 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:15",
+   "key": "2013-09-22-South Africa-Bangladesh",
+   "reason": "no Source A match within a day of 2013-09-22 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:20",
+   "key": "2013-09-08-Ireland-Scotland",
+   "reason": "no Source A match within a day of 2013-09-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:25",
+   "key": "2013-09-03-Scotland-Australia",
+   "reason": "no Source A match within a day of 2013-09-03 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:30",
+   "key": "2013-08-08-Barbados Tridents-St Lucia Zouks",
+   "reason": "no Source A match within a day of 2013-08-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:35",
+   "key": "2013-07-10-Ireland-Pakistan",
+   "reason": "no Source A match within a day of 2013-07-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:40",
+   "key": "2013-07-09-Netherlands-Ireland",
+   "reason": "no Source A match within a day of 2013-07-09 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:19:45",
+   "key": "2013-07-02-Scotland-Kenya",
+   "reason": "no Source A match within a day of 2013-07-02 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:02",
+   "key": "2013-06-05-Nottinghamshire-Yorkshire",
+   "reason": "no Source A match within a day of 2013-06-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:07",
+   "key": "2013-06-05-Middlesex-Sussex",
+   "reason": "no Source A match within a day of 2013-06-05 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:24",
+   "key": "2013-04-12-India-Bangladesh",
+   "reason": "no Source A match within a day of 2013-04-12 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:29",
+   "key": "2013-04-10-India-Bangladesh",
+   "reason": "no Source A match within a day of 2013-04-10 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:34",
+   "key": "2013-04-08-India-Bangladesh",
+   "reason": "no Source A match within a day of 2013-04-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:39",
+   "key": "2013-03-19-Titans-Lions",
+   "reason": "no Source A match within a day of 2013-03-19 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:20:57",
+   "key": "2013-03-08-Warriors-Titans",
+   "reason": "no Source A match within a day of 2013-03-08 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:21:02",
+   "key": "2013-03-06-Cape Cobras-Warriors",
+   "reason": "no Source A match within a day of 2013-03-06 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:21:07",
+   "key": "2013-03-06-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-6th-match-world-cricket-league-championship-2012-13-match-updates-A1V is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:21:12",
+   "key": "2013-03-04-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-2nd-t20-afghanistan-v-scotland-t20is-at-sharjah-2013-match-updates-3SU is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-03T11:21:17",
+   "key": "2013-03-03-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-1st-t20-afghanistan-v-scotland-t20is-at-sharjah-2013-match-updates-3SR is no longer in the Source A sitemap"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ire-2nd-match-dubai-triangular-series-2015-match-updates-4JU",
-   "date": "2015-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2015-01-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2015-01-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Sydney Thunder",
-   "team_b": "Hobart Hurricanes"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-1st-match-dubai-triangular-series-2015-match-updates-4JT",
-   "date": "2015-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2015-01-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2015-01-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2015-01-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-12-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-uae-4th-odi-afghanistan-tour-of-uae-2014-match-updates-2WM",
-   "date": "2014-12-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-uae-3rd-odi-afghanistan-tour-of-uae-2014-match-updates-2WJ",
-   "date": "2014-12-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-uae-2nd-odi-afghanistan-tour-of-uae-2014-match-updates-2WI",
-   "date": "2014-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-uae-1st-odi-afghanistan-tour-of-uae-2014-match-updates-2WH",
-   "date": "2014-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Cape Cobras",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Hong Kong",
-   "team_b": "Papua New Guinea"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Knights"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Hong Kong",
-   "team_b": "Papua New Guinea"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-10-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-09-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-09-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-09-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-09-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-09-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Gloucestershire",
-   "team_b": "Leicestershire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Somerset",
-   "team_b": "Northamptonshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Lancashire",
-   "team_b": "Yorkshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Essex",
-   "team_b": "Glamorgan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-08-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Durham",
-   "team_b": "Lancashire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-07-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Antigua Hawksbills",
-   "team_b": "Barbados Tridents"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-07-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Red Steel",
-   "team_b": "Guyana Amazon Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-07-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "St Lucia Zouks",
-   "team_b": "Jamaica Tallawahs"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-07-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Middlesex",
-   "team_b": "Somerset"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-06-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Durham",
-   "team_b": "Warwickshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-06-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Sussex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Surrey",
-   "team_b": "Sussex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Somerset",
-   "team_b": "Gloucestershire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Lancashire",
-   "team_b": "Middlesex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Surrey",
-   "team_b": "Kent"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Yorkshire",
-   "team_b": "Durham"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-05-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Essex",
-   "team_b": "Leicestershire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-04-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Yorkshire",
-   "team_b": "Middlesex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-04-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Essex",
-   "team_b": "Surrey"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-04-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Middlesex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-04-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Surrey",
-   "team_b": "Glamorgan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-04-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Lancashire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-hk-5th-match-t20-world-cup-2014-match-updates-377",
-   "date": "2014-03-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Hong Kong"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-03-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-03-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sl-7th-match-asia-cup-2014-match-updates-3CD",
-   "date": "2014-03-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-02-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-02-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-02-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-02-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Lions",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Dolphins",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Cape Cobras",
-   "team_b": "Knights"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2014-01-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Adelaide Strikers",
-   "team_b": "Perth Scorchers"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-12-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-11-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-10-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-10-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-10-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-10-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-10-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-09-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-09-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-09-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-08-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "List A",
-   "rejected_ids": [],
-   "team_a": "Barbados Tridents",
-   "team_b": "St Lucia Zouks"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-07-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-07-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-07-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-06-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-06-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Nottinghamshire",
-   "team_b": "Yorkshire"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-06-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "FC",
-   "rejected_ids": [],
-   "team_a": "Middlesex",
-   "team_b": "Sussex"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-05-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-04-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-04-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-04-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-03-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Titans",
-   "team_b": "Lions"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-03-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-03-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Warriors",
-   "team_b": "Titans"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2013-03-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Cape Cobras",
-   "team_b": "Warriors"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-6th-match-world-cricket-league-championship-2012-13-match-updates-A1V",
-   "date": "2013-03-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-2nd-t20-afghanistan-v-scotland-t20is-at-sharjah-2013-match-updates-3SU",
-   "date": "2013-03-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-1st-t20-afghanistan-v-scotland-t20is-at-sharjah-2013-match-updates-3SR",
-   "date": "2013-03-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
