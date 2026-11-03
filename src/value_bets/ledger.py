@@ -5,14 +5,17 @@ Settles flat 1u paper P&L against archive results where we can (player O/U, mile
 Service role only; never shown on the site. Rows are never deleted.
 
     python -m value_bets.ledger --upsert-fancy value_bets/out/fancy_alerts.json
+    python -m value_bets.ledger --backfill-history
     python -m value_bets.ledger --settle
     python -m value_bets.ledger --summary
 """
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import os
+import re
 import sys
 import urllib.error
 import urllib.parse
@@ -20,7 +23,7 @@ import urllib.request
 from pathlib import Path
 
 from . import archive, booklines, config, store
-from .util import now_utc, parse_ts
+from .util import IST, UTC, now_utc, parse_ts
 
 API_UA = "cricket-props-hub-ledger/0.1 (server)"
 # Archive/book ``stat`` for every settleable model market (OU, milestones, top).
@@ -83,7 +86,8 @@ def model_row(v: dict, *, seen_at: str) -> dict:
     """One Supabase row from a pipeline value bet (odds + full market-rate snapshot)."""
     mt = v.get("market_type") or ""
     stat = SETTLE_STAT.get(mt) or v.get("stat")
-    settleable = mt in SETTLE_STAT and bool(v.get("player_id"))
+    # settleable markets stay open even without player_id (history backfill resolves the id from archive names)
+    settleable = mt in SETTLE_STAT
     status = "open" if settleable else "unsettled"
     odds = v.get("best_odds")
     rates = {k: v.get(k) for k in ("kelly_quarter_stake_pct", "n_sources", "rain_risk", "weather", "model_detail",
@@ -258,6 +262,139 @@ def upsert_fancy(alerts: list[dict] | None = None, path: Path | None = None) -> 
     return _upsert_rows([fancy_row(a, seen_at=seen) for a in alerts if a.get("alert_id")])
 
 
+def parse_alert_key(key: str) -> dict | None:
+    """Split a history ``alert_key`` (``gender|a|b|date|market_type|scope|selection|line|side``)."""
+    parts = (key or "").split("|")
+    if len(parts) < 9:
+        return None
+    # selection can itself contain "|"; line and side are always the last two
+    side, line_s, selection = parts[-1], parts[-2], "|".join(parts[6:-2]) if len(parts) > 9 else parts[6]
+    try:
+        line = float(line_s) if line_s not in ("", "None") else None
+    except ValueError:
+        line = None
+    return {
+        "event_key": "|".join(parts[:4]),
+        "gender": parts[0],
+        "format": "",
+        "market_type": parts[4],
+        "team_scope": parts[5],
+        "selection": selection,
+        "line": line,
+        "side": side or None,
+    }
+
+
+def player_name_from_selection(selection: str) -> str:
+    """``Najmul Hossain Shanto over 0.5`` / ``X 50+ yes`` -> player name."""
+    s = (selection or "").strip()
+    m = re.match(r"^(.+?)\s+(?:over|under)\s+\d", s, re.I)
+    if m:
+        return m.group(1).strip()
+    m = re.match(r"^(.+?)\s+\d+\+?\s+(?:yes|no)\b", s, re.I)
+    if m:
+        return m.group(1).strip()
+    return s
+
+
+def _name_key(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def _ist_to_utc(start_ist: str | None) -> str | None:
+    """``2026-10-17 17:00 IST`` -> ISO UTC."""
+    if not start_ist:
+        return None
+    s = str(start_ist).replace(" IST", "").strip()
+    try:
+        local = dt.datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=IST)
+    except ValueError:
+        try:
+            local = dt.datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST)
+        except ValueError:
+            return None
+    return local.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def history_to_value(a: dict) -> dict | None:
+    """Rebuild a pipeline-like value dict from one ``alerts_history.jsonl`` line."""
+    parsed = parse_alert_key(a.get("alert_key") or "")
+    if not parsed:
+        return None
+    odds = a.get("best_odds")
+    fair_odds = a.get("fair_odds")
+    edge_pct = a.get("edge_pct")
+    try:
+        fair_prob = round(1 / float(fair_odds), 4) if fair_odds else None
+    except (TypeError, ValueError, ZeroDivisionError):
+        fair_prob = None
+    edge = round(float(edge_pct) / 100.0, 4) if edge_pct is not None else None
+    start_utc = _ist_to_utc(a.get("start_ist"))
+    mt = parsed["market_type"]
+    return {
+        **parsed,
+        "match": a.get("match") or "",
+        "start_utc": start_utc,
+        "start_ist": a.get("start_ist"),
+        "market": a.get("market") or "",
+        "player_id": None,  # resolved from archive lines at settle time
+        "player_matched_as": player_name_from_selection(parsed["selection"]),
+        "stat": SETTLE_STAT.get(mt),
+        "inn": 0,
+        "best_odds": odds,
+        "best_source": a.get("best_source") or "",
+        "effective_odds_after_commission": odds,
+        "fair_odds": fair_odds,
+        "fair_prob": fair_prob,
+        "implied_prob": _implied(odds),
+        "model_prob": None,
+        "market_prob": None,
+        "edge": edge,
+        "edge_pct": edge_pct,
+        "fair_basis": "history backfill",
+        "confidence": "",
+        "why": a.get("why") or "",
+        "notes": f"backfill alert_id={a.get('alert_id') or ''}",
+        "kelly_quarter_stake_pct": a.get("kelly_quarter_stake_pct"),
+        "alerted_at_ist": a.get("alerted_at_ist"),
+    }
+
+
+def backfill_history(path: Path | None = None) -> dict:
+    """Upsert every line of ``alerts_history.jsonl`` (past recommended tips) into the ledger."""
+    p = path or (config.OUT / "alerts_history.jsonl")
+    if not p.is_file():
+        return {"upserted": 0, "reason": "no alerts_history.jsonl"}
+    values, bad = [], 0
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            a = json.loads(line)
+        except ValueError:
+            bad += 1
+            continue
+        v = history_to_value(a)
+        if not v:
+            bad += 1
+            continue
+        seen = _ist_to_utc(a.get("alerted_at_ist")) or now_utc().strftime("%Y-%m-%dT%H:%M:%SZ")
+        # freeze first_seen to the original alert time
+        row = model_row(v, seen_at=seen)
+        values.append(row)
+    # dedupe by bet_key keeping earliest first_seen
+    best: dict[str, dict] = {}
+    for r in values:
+        prev = best.get(r["bet_key"])
+        if prev is None or (r.get("first_seen_at") or "") < (prev.get("first_seen_at") or ""):
+            best[r["bet_key"]] = r
+    out = _upsert_rows(list(best.values()))
+    out["parsed"] = len(values)
+    out["bad"] = bad
+    out["unique"] = len(best)
+    return out
+
+
 def _archive_index(root: Path) -> list[dict]:
     """Each archive file with sides, start, player results and priced lines (for top/team filter)."""
     out = []
@@ -302,9 +439,31 @@ def _settle_ou_ms(row: dict, value) -> dict | None:
     return {"status": status, "result_value": value, "pnl_u": pnl_u(status, odds)}
 
 
+def resolve_player_id(row: dict, arc: dict) -> str | None:
+    """Use stored player_id, else match selection / matched-as name to an archive line of the same stat."""
+    if row.get("player_id"):
+        return row["player_id"]
+    stat = row.get("stat")
+    name = player_name_from_selection(row.get("selection") or "") or (row.get("rates") or {}).get("player_matched_as") or ""
+    nk = _name_key(name)
+    if not (stat and nk):
+        return None
+    hits = []
+    for ln in arc.get("lines") or []:
+        if ln.get("stat") != stat or not ln.get("pid"):
+            continue
+        for field in ("player", "book_name"):
+            if _name_key(ln.get(field) or "") == nk:
+                hits.append(ln["pid"])
+                break
+    # unique pid only (ambiguous names stay unresolved)
+    uniq = list(dict.fromkeys(hits))
+    return uniq[0] if len(uniq) == 1 else None
+
+
 def _settle_top(row: dict, arc: dict) -> dict | None:
     """Won if this player's result equals the best of the match (or team) for that stat."""
-    pid, stat, inn = row.get("player_id"), row.get("stat"), int(row.get("inn") or 0)
+    pid, stat, inn = resolve_player_id(row, arc), row.get("stat"), int(row.get("inn") or 0)
     if not (pid and stat):
         return None
     mine = arc["results"].get((pid, stat, inn))
@@ -385,16 +544,26 @@ def settle(root: Path | None = None) -> dict:
             continue
         upd = None
         if mt in OU_OR_MS:
-            pid, stat, inn = row.get("player_id"), row.get("stat"), int(row.get("inn") or 0)
+            pid = resolve_player_id(row, arc)
+            stat, inn = row.get("stat"), int(row.get("inn") or 0)
             if not (pid and stat):
-                n["left_open"] += 1
-                continue
-            if (pid, stat, inn) in arc["results"]:
+                # archive has finals but we still cannot place the player: void
+                if arc.get("has_results"):
+                    upd = {"status": "void", "result_value": None, "pnl_u": 0.0}
+                else:
+                    n["left_open"] += 1
+                    continue
+            elif (pid, stat, inn) in arc["results"]:
                 upd = _settle_ou_ms(row, arc["results"][(pid, stat, inn)])
+                upd["player_id"] = pid  # fill in for history backfills
             elif arc["has_results"]:
-                upd = {"status": "void", "result_value": None, "pnl_u": 0.0}
+                upd = {"status": "void", "result_value": None, "pnl_u": 0.0, "player_id": pid}
         elif mt in TOP_MKTS:
             upd = _settle_top(row, arc)
+            if upd and not row.get("player_id"):
+                pid = resolve_player_id(row, arc)
+                if pid:
+                    upd = {**upd, "player_id": pid}
         if not upd:
             n["left_open"] += 1
             continue
@@ -449,6 +618,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--upsert-fancy", metavar="FILE", nargs="?", const=str(config.OUT / "fancy_alerts.json"),
                     help="upsert fancy alerts from FILE (default out/fancy_alerts.json)")
+    ap.add_argument("--backfill-history", metavar="FILE", nargs="?", const=str(config.OUT / "alerts_history.jsonl"),
+                    help="upsert past tips from alerts_history.jsonl (default out/alerts_history.jsonl)")
     ap.add_argument("--settle", action="store_true", help="settle open model rows from the archive")
     ap.add_argument("--summary", action="store_true", help="write out/edge_pnl_summary.json")
     ap.add_argument("--archive", default="", help="archive root (default value_bets/archive)")
@@ -456,11 +627,13 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if a.upsert_fancy is not None:
             print(json.dumps(upsert_fancy(path=Path(a.upsert_fancy))))
+        if a.backfill_history is not None:
+            print(json.dumps(backfill_history(path=Path(a.backfill_history))))
         if a.settle:
             print(json.dumps(settle(Path(a.archive) if a.archive else None)))
         if a.summary:
             print(json.dumps(summary()))
-        if a.upsert_fancy is None and not a.settle and not a.summary:
+        if a.upsert_fancy is None and a.backfill_history is None and not a.settle and not a.summary:
             ap.print_help()
             return 2
     except (urllib.error.URLError, OSError, ValueError) as exc:

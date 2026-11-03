@@ -81,8 +81,10 @@ def _append_history(alerts, keep=3000):
     """out/alerts_history.jsonl: one line per alert ever sent (stable alert_id), newest last, capped."""
     p = config.OUT / "alerts_history.jsonl"
     lines = p.read_text().splitlines() if p.exists() else []
-    lines += [json.dumps({k: a.get(k) for k in ("alert_id", "alert_key", "alerted_at_ist", "match", "start_ist",
-                                                 "market", "selection", "best_odds", "best_source", "fair_odds",
-                                                 "edge_pct", "kelly_quarter_stake_pct", "why", "realert")}, default=str)
-              for a in alerts]
+    lines += [json.dumps({k: a.get(k) for k in (
+        "alert_id", "alert_key", "alerted_at_ist", "match", "start_ist", "start_utc", "format", "gender",
+        "market_type", "market", "selection", "line", "side", "player_id", "stat", "inn",
+        "best_odds", "best_source", "fair_odds", "fair_prob", "model_prob", "market_prob",
+        "edge", "edge_pct", "kelly_quarter_stake_pct", "why", "realert",
+    )}, default=str) for a in alerts]
     p.write_text("\n".join(lines[-keep:]) + ("\n" if lines else ""))
