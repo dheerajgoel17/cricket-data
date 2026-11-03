@@ -34,7 +34,7 @@ env:
   EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
 
 permissions:
-  contents: read
+  contents: write  # the profiles step commits data/profiles (never on a pull request)
   pull-requests: write  # to comment the preview URL
 
 concurrency:
@@ -118,6 +118,20 @@ jobs:
           if [ -f site/public/data/identity_review.json ]; then
             { echo "### Player identity: names to review"; python -m cricket_site.identity site/public/data/identity_review.json; } >> "$GITHUB_STEP_SUMMARY"
             rm -f site/public/data/identity_review.json
+          fi
+      - name: Player profiles (role, batting hand, bowling style; resumable, polite, fails soft)
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          PROFILES_LIMIT: ${{ vars.PROFILES_LIMIT || '250' }}
+        run: |
+          python -m cricket_site.profiles --site site/public/data --data data --value-bets value_bets/out --limit "$PROFILES_LIMIT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/profiles
+          if git diff --cached --quiet; then echo "No new profiles."; else
+            git commit -m "data: player profiles $(date -u +%F)"
+            git pull --rebase -q && git push
           fi
       - name: Keep our own copy of Source A images and id maps (Supabase Storage + Postgres)
         continue-on-error: true
