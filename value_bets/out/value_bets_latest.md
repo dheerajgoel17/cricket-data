@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-04 02:00 IST
+# Cricket value bets - 2026-11-04 03:03 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1788 prices
-- **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
-- **smarkets**: ok, 391 prices
+- **feedg**: error - HTTP 403: cloudflare challenge from the book (datacenter IP blocked — use the India runner)
+- **moviodds_bet365**: ok, 1784 prices
+- **smarkets**: ok, 465 prices
 - **feedk**: ok, 156 prices, 4 events
-- **feedf**: ok, 410 prices, 6 events
-- **feede**: ok, 508 prices, 15 events
-- **feedh**: ok, 1075 prices, 47 events
+- **feedf**: ok, 230 prices, 3 events
+- **feede**: ok, 406 prices, 15 events
+- **feedh**: ok, 1038 prices, 47 events
 
-Matches starting in next 168h: **40**, markets priced: **340**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **39**, markets priced: **323**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -20,10 +20,10 @@ Matches starting in next 168h: **40**, markets priced: **340**, value bets: **3*
 | 11-04 07:30 IST | New Zealand vs India | 1st innings - Mitchell, Daryl to score 50 | Daryl Mitchell 50+ no | 1.60 @ feedf_p | 1.49 | 0.704 | 7.4% | 2.00% | medium |
 
 ### Why / notes per bet
-- **New Zealand vs India / Virat Kohli To Score 50 / Virat Kohli 50+ no** - why: Model 68% vs market 61% for 50+ runs; form 53.7 runs/inn recency-weighted ODI (n_eff 24.2; last 5: 0, 29, 139, 74, 65), bats in 95% of games played; at Eden Park, Auckland: 1 inns avg 15.0; vs New Zealand: 25 inns avg 54.6; weather: rain chance up to 48%, high humidity 81%. Notes: 4 market source(s) for fair price; model 0.678 vs market 0.610; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
-- **New Zealand vs India / 1st innings - Gill, Shubman to score 50 / Shubman Gill 50+ no** - why: Model 66% vs market 61% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: rain chance up to 48%, high humidity 81%. Notes: 4 market source(s) for fair price; model 0.661 vs market 0.605; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
-- **New Zealand vs India / 1st innings - Mitchell, Daryl to score 50 / Daryl Mitchell 50+ no** - why: Model 70% vs market 64% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.1; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: rain chance up to 48%, high humidity 81%. Notes: 4 market source(s) for fair price; model 0.704 vs market 0.644; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / Virat Kohli To Score 50 / Virat Kohli 50+ no** - why: Model 68% vs market 61% for 50+ runs; form 53.7 runs/inn recency-weighted ODI (n_eff 24.2; last 5: 0, 29, 139, 74, 65), bats in 95% of games played; at Eden Park, Auckland: 1 inns avg 15.0; vs New Zealand: 25 inns avg 54.6; weather: rain chance up to 48%, high humidity 82%. Notes: 4 market source(s) for fair price; model 0.678 vs market 0.610; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / 1st innings - Gill, Shubman to score 50 / Shubman Gill 50+ no** - why: Model 66% vs market 61% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: rain chance up to 48%, high humidity 82%. Notes: 4 market source(s) for fair price; model 0.661 vs market 0.605; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / 1st innings - Mitchell, Daryl to score 50 / Daryl Mitchell 50+ no** - why: Model 70% vs market 64% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.1; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: rain chance up to 48%, high humidity 82%. Notes: 4 market source(s) for fair price; model 0.704 vs market 0.644; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Central (male), Chandigarh (W) (female), Chhattisgarh (W) (female), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Vidarbha (W) (female)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Chandigarh (W) (female), Chhattisgarh (W) (female), Easterns (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 146.0s. Snapshot: `odds_20261103T203052Z.jsonl.gz`
+Runtime 127.2s. Snapshot: `odds_20261103T213319Z.jsonl.gz`
