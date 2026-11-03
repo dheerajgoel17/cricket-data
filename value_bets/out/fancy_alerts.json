@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-03T06:34:02Z",
+ "generated_at_utc": "2026-11-03T07:33:32Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -326,29 +326,6 @@
    "chance": 0.6383,
    "edge": 0.17,
    "edge_pct": 17,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-03-biratnagar-kings-v-janakpur-bolts|overs_1|Janakpur Bolts|0|over",
-   "fixture_id": "2026-11-03-biratnagar-kings-v-janakpur-bolts",
-   "match": "Biratnagar Kings vs Janakpur Bolts",
-   "format": "T20",
-   "series": "Nepal Premier League 2026",
-   "start_utc": "2026-11-03T06:45:00Z",
-   "start_ist": "2026-11-03 12:15 IST",
-   "key": "overs_1",
-   "team": "Janakpur Bolts",
-   "inn": 0,
-   "side": "over",
-   "line": 4.5,
-   "best_odds": 1.61,
-   "best_source": "Dafabet",
-   "hits": 16,
-   "played": 20,
-   "window": 20,
-   "chance": 0.7251,
-   "edge": 0.1674,
-   "edge_pct": 16.7,
    "bat_first": false
   },
   {
