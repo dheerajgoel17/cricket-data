@@ -14,6 +14,7 @@ import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { LeagueBadge } from "@/ui/team-badge";
 import { color, font, space, type, tonal } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** Every competition in the data with eight matches or more, the biggest first, with a search over the names. */
 export default function Competitions() {
@@ -40,6 +41,7 @@ export default function Competitions() {
           ) : <Text style={styles.empty}>No competition matches “{text.trim()}”.</Text>}
         </ScrollView>
       )}
+      <TabFade />
     </View>
   );
 }

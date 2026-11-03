@@ -10,8 +10,8 @@ import { initials } from "@/lib/format";
 import { photosQuery } from "@/lib/queries";
 import { color, font } from "@/ui/tokens";
 
-/** Round team badge: the source's logo when we know the team, else the national flag, else initials (the site's `TeamBadge`). */
-export function TeamBadge({ name, size = 40 }: { name: string; size?: number }) {
+/** Round team badge (or, with `bare`, the logo alone with no circle): the source's logo when we know the team, else the national flag, else initials (the site's `TeamBadge`). */
+export function TeamBadge({ name, size = 40, bare }: { name: string; size?: number; bare?: boolean }) {
   const { data: photos } = useQuery(photosQuery);
   const urls = useMemo(
     () => ([...teamLogos(photos, name), flagUrl(name, size > 40 ? 160 : 80)].filter(Boolean) as string[]).map(abs),
@@ -19,6 +19,8 @@ export function TeamBadge({ name, size = 40 }: { name: string; size?: number }) 
   );
   const [failed, setFailed] = useState(0);
   const uri = urls[failed];
+  if (bare && uri) return <Image source={{ uri }} style={{ width: size, height: size }} contentFit="contain" onError={() => setFailed((n) => n + 1)} accessibilityLabel={name} />;
+  if (bare) return <Text style={[styles.initials, { fontSize: size * 0.5 }]}>{initials(name)}</Text>; // no logo and no flag: the initials alone, no circle
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
       {uri ? (

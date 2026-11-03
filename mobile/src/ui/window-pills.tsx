@@ -38,5 +38,5 @@ const styles = StyleSheet.create({
   hit: { flex: 1 },
   cell: { alignItems: "center", justifyContent: "center", borderRadius: radius.chip, paddingVertical: 6 },
   label: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  value: { fontSize: 18, lineHeight: 22, fontFamily: font.cond, fontVariant: ["tabular-nums"] },
+  value: { fontSize: 18, lineHeight: 22, fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

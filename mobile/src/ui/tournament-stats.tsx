@@ -15,7 +15,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, num, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   facts: { flexDirection: "row", ...tonal, borderRadius: radius.card, paddingVertical: space.snug },
   fact: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug },
   factSep: { borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: color.hairline },
-  factNum: { ...num, fontSize: 24, lineHeight: 28, color: color.foreground },
+  factNum: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   loading: { gap: space.snug },
   track: { height: 4, borderRadius: 2, backgroundColor: color.hairline, overflow: "hidden", marginHorizontal: space.stack },
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   leader: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
   leaderRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leaderName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  leaderNum: { ...num, fontSize: 30, lineHeight: 32, color: color.primary },
+  leaderNum: { ...numLg, fontSize: 30, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   subSmall: { ...type.caption, color: color["muted-foreground"] },
   card: { ...tonal, borderRadius: radius.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   trSep: { minHeight: 52, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   th: { ...type.caption, ...cap, color: color["muted-foreground"] },
   numCol: { width: 52, textAlign: "right" },
-  rank: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   who: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   value: { ...num, fontSize: 17, color: color.foreground },

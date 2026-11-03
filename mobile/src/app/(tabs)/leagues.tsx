@@ -18,6 +18,7 @@ import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
 import { cap, color, font, radius, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
 const PIN_FIRST = ["big bash"];
@@ -34,14 +35,12 @@ export default function Leagues() {
 
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
-      <AppHeader />
+      <AppHeader title="Leagues" action={
+        <Press onPress={() => push("/competitions")} accessibilityRole="button" hitSlop={8} style={styles.all}>
+          <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={14} />
+        </Press>
+      } />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>Leagues</Text>
-          <Press onPress={() => push("/competitions")} accessibilityRole="button" hitSlop={8} style={styles.all}>
-            <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={14} />
-          </Press>
-        </View>
         {!store ? <Working label="Loading leagues…" fill /> : e == null ? <Text style={styles.empty}>No leagues to show yet.</Text> : (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
@@ -69,14 +68,13 @@ export default function Leagues() {
           </>
         )}
       </ScrollView>
+      <TabFade />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  titleRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.gutter, paddingTop: space.stack, paddingBottom: space.snug },
-  title: { ...type.display, color: color.foreground },
   all: { flexDirection: "row", alignItems: "center", gap: 2 },
   allText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },
   empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
@@ -85,7 +83,7 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: color.foreground },
   chipText: { ...type.callout, color: color.foreground, maxWidth: 180 },
   tag: { borderRadius: 999, paddingHorizontal: 6, height: 16, justifyContent: "center" },
-  tagText: { ...cap, fontFamily: font.cond, fontSize: 10, color: color.background },
+  tagText: { ...cap, fontFamily: font.data, fontSize: 10, color: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
   leagueHead: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leagueName: { ...type.title, color: color.foreground, flex: 1 },

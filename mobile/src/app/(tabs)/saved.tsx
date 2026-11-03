@@ -17,6 +17,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
 import { color, space, type, tonal } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** Everything kept on this device (no account): watchlist props, saved players and teams, and the players opened lately. */
 export default function Saved() {
@@ -69,18 +70,17 @@ export default function Saved() {
 
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
-      <AppHeader />
+      <AppHeader title="Saved" />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Saved</Text>
         {body()}
       </ScrollView>
+      <TabFade />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  title: { ...type.display, color: color.foreground, paddingHorizontal: space.gutter, paddingTop: space.stack, paddingBottom: space.snug },
   sections: { gap: space.group, paddingHorizontal: space.gutter, paddingTop: space.snug },
   intro: { ...type.callout, color: color["muted-foreground"], ...tonal, borderRadius: 16, padding: space.stack },
   line: { color: color.primary },

@@ -4,7 +4,7 @@ import { Press } from "@/ui/press";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { AnimatedText } from "@/ui/text";
-import { color, control, radius, space, type } from "@/ui/tokens";
+import { color, control, radius, space, type, font } from "@/ui/tokens";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled (the fill fades between chips); each carries how many matches it holds. */
 export function Chips({ items, value, onChange }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
@@ -36,5 +36,5 @@ const styles = StyleSheet.create({
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
   label: { ...type.body, fontSize: 15 },
-  count: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

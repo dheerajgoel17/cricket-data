@@ -46,13 +46,14 @@ export function Note({ title, items }: { title: string; items: ReactNode[] }) {
 }
 
 /** A small-caps label over a value (the site's `Metric`): the strip of numbers at the top of a player page. */
-export function Metric({ k, children, tone, text, cols = 3 }: { k: string; children: ReactNode; tone?: "up" | "down"; text?: boolean; cols?: 2 | 3 }) {
+/** One labelled figure. `compact` is the player page's small grid (a 10 pt label over a 16 pt value, as in the reference app). */
+export function Metric({ k, children, tone, text, cols = 3, compact }: { k: string; children: ReactNode; tone?: "up" | "down"; text?: boolean; cols?: 2 | 3; compact?: boolean }) {
   return (
-    <View style={[styles.metric, cols === 2 && { width: "50%" }]}>
+    <View style={[styles.metric, cols === 2 && { width: "50%" }, compact && styles.metricSm]}>
       <Text style={styles.metricKey} numberOfLines={1}>{k}</Text>
-      <View style={styles.metricValue}>
+      <View style={[styles.metricValue, compact && { minHeight: 20 }]}>
         {typeof children === "string" || typeof children === "number"
-          ? <Text style={[text ? styles.metricText : styles.metricNum, tone === "up" && { color: color.primary }, tone === "down" && { color: color.miss }]} numberOfLines={text ? 2 : 1}>{children}</Text>
+          ? <Text style={[text ? (compact ? styles.metricTextSm : styles.metricText) : compact ? styles.metricNumSm : styles.metricNum, tone === "up" && { color: color.primary }, tone === "down" && { color: color.miss }]} numberOfLines={text ? 2 : 1}>{children}</Text>
           : children}
       </View>
     </View>
@@ -63,10 +64,10 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", minHeight: 44, gap: space.tight },
   on: { backgroundColor: "rgba(58,58,60,0.45)", marginHorizontal: -space.tight, paddingHorizontal: space.tight, borderRadius: 8 },
   pill: { borderRadius: 7, paddingVertical: 3, alignItems: "center" },
-  pillText: { fontFamily: font.cond, fontSize: 15, fontVariant: ["tabular-nums"] },
+  pillText: { fontFamily: font.data, fontSize: 15, fontVariant: ["tabular-nums"] },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   head: { ...type.caption, color: color["muted-foreground"], ...cap },
-  cell: { ...type.callout, fontFamily: font.cond, fontSize: 15, color: color.foreground, fontVariant: ["tabular-nums"] },
+  cell: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground, fontVariant: ["tabular-nums"] },
   first: { fontFamily: font.regular, fontSize: 14, lineHeight: 18 },
   note: { flexDirection: "row", gap: space.snug, borderLeftWidth: 2, borderLeftColor: color.hairline, paddingLeft: space.snug },
   noteTitle: { ...type.callout, color: "rgba(255,255,255,0.8)", ...cap },
@@ -74,6 +75,9 @@ const styles = StyleSheet.create({
   metric: { width: "33.33%", gap: 4, paddingRight: space.tight },
   metricKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
   metricValue: { minHeight: 24, justifyContent: "center" },
-  metricNum: { fontSize: 24, lineHeight: 28, fontFamily: font.cond, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricText: { ...type.body, color: color.foreground },
+  metricNum: { fontSize: 24, lineHeight: 28, letterSpacing: -0.48, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricText: { ...type.body, fontFamily: font.data, fontSize: 18, color: color.foreground },
+  metricSm: { gap: 2 },
+  metricNumSm: { fontSize: 16, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: 17, lineHeight: 20, color: color.foreground },
 });

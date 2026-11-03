@@ -6,15 +6,18 @@ import tokens from "@cricket/tokens/tokens.json";
 export const color = tokens.color;
 
 /**
- * The site's fonts: Inter for text, one family name per weight (React Native has no variable-weight lookup for bundled fonts), and Barlow Semi Condensed, medium only, for
- * numbers (hit rates, odds, edge, stat values) and small uppercase labels (docs/SITE.md). Loaded in `app/_layout.tsx`.
+ * The site's fonts: Inter for text, in four weights (one family name per weight, since React Native has no variable-weight lookup for bundled fonts) with -2% tracking, as exa.ai sets it;
+ * Newsreader (a light serif) for the large page titles; Sofia Sans Condensed (the free match for the reference app's Diatype Condensed) for numbers (odds, rates, table cells, scores) in
+ * SemiBold, with figures of equal width, and for the 11 pt uppercase labels. Big figures (20 pt and up) are SemiBold with -2% tracking. Loaded in `app/_layout.tsx`.
  */
-export const font = { regular: "Inter_400Regular", medium: "Inter_500Medium", semibold: "Inter_600SemiBold", bold: "Inter_700Bold", cond: "BarlowSemiCondensed_500Medium" } as const;
+export const font = { regular: "Inter_400Regular", medium: "Inter_500Medium", semibold: "Inter_600SemiBold", bold: "Inter_700Bold", serif: "Newsreader_400Regular", data: "SofiaSansCondensed_600SemiBold", dataLight: "SofiaSansCondensed_500Medium" } as const;
 
-/** The site's `label-cap`: a small uppercase label in the condensed face (spread after a `type` role: `{ ...type.footnote, ...cap }`). */
-export const cap = { fontFamily: font.cond, textTransform: "uppercase" as const, letterSpacing: 0.6 };
-/** The site's `num-cond`: a number in the condensed face with figures of equal width. */
-export const num = { fontFamily: font.cond, fontVariant: ["tabular-nums" as const] };
+/** The site's `label-cap`: an 11 pt uppercase label in Sofia Sans Condensed with +6% tracking (spread after a `type` role: `{ ...type.footnote, ...cap }`). */
+export const cap = { fontFamily: font.data, textTransform: "uppercase" as const, fontSize: 11, lineHeight: 14, letterSpacing: 0.66 };
+/** A small number (up to 17 pt) in Sofia Sans Condensed SemiBold, with figures of equal width. */
+export const num = { fontFamily: font.data, fontVariant: ["tabular-nums" as const] };
+/** A big figure (20 pt and up) in Sofia Sans Condensed Medium; give it a tracking of -2% of its size. */
+export const numLg = { fontFamily: font.dataLight, fontVariant: ["tabular-nums" as const] };
 
 /**
  * A tonal surface (a card): a faint light wash over the black with a thin ring whose top edge is the brightest, as if lit from above. Quieter than a grey block and it reads as raised.
@@ -28,13 +31,16 @@ export const space = { hair: 4, tight: 6, snug: 10, stack: 16, group: 20, sectio
 export const radius = { card: 16, chip: 999, sheet: 24 };
 
 export const type = {
-  display: { fontFamily: font.bold, fontSize: 28, lineHeight: 34, letterSpacing: -0.4 },
+  display: { fontFamily: font.serif, fontSize: 32, lineHeight: 36, letterSpacing: -0.48 },
   title: { fontFamily: font.bold, fontSize: 18, lineHeight: 22, letterSpacing: -0.3 },
-  body: { fontFamily: font.medium, fontSize: 16, lineHeight: 21 },
-  callout: { fontFamily: font.medium, fontSize: 14, lineHeight: 19 },
-  footnote: { fontFamily: font.medium, fontSize: 12, lineHeight: 16 },
+  body: { fontFamily: font.medium, fontSize: 16, lineHeight: 21, letterSpacing: -0.32 },
+  callout: { fontFamily: font.medium, fontSize: 14, lineHeight: 19, letterSpacing: -0.28 },
+  footnote: { fontFamily: font.medium, fontSize: 12, lineHeight: 16, letterSpacing: -0.24 },
   caption: { fontFamily: font.medium, fontSize: 10.5, lineHeight: 13 },
 };
+
+/** The widest the app gets in a browser (`ui/web-frame.tsx`), and so the width its text is fitted to there. */
+export const WEB_MAX_WIDTH = 560;
 
 /** Web `--control` (36 pt), `--header-h` (56 pt). */
 export const control = 36;

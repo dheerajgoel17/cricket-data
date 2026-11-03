@@ -7,6 +7,7 @@ import { hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@site/lib/home-phase";
 import { storeQuery } from "@/lib/data";
 import { scoreHotRows, type Row } from "@/lib/hot";
+import { sideRate, withModelSide } from "@/lib/model-side";
 import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
 
 /** The scored rows (see `scoreHotRows`) for a day (`{ day }`) or one match (`{ teams }`), put in the cache as they come. `scoring` is true while more are still arriving. */
@@ -40,9 +41,9 @@ export function useHotView(scope?: HotScope, phase?: HomePhase, doc?: any) {
   const day = scope && "day" in scope ? scope.day : -1;
   const rows = useMemo(
     () => (hot.data || [])
-      .map((r) => ({ ...r, edge: sideEdge(r.l10.hits, r.l10.played, r.prior, r.over) as number | null }))
+      .map((r) => withModelSide(r))
       .filter((r) => (day < 0 || r.day === day) && (!phase || lineHomePhase(r, live.data) === phase))
-      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: x.l10.p, edge: x.edge }, { live: matchOf(y)?.status === "live", p: y.l10.p, edge: y.edge })),
+      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y), edge: y.edge })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hot.data, live.data, phase, day],
   );

@@ -71,5 +71,5 @@ const styles = StyleSheet.create({
   mark: { width: 28, height: 28, borderRadius: 7, alignItems: "center", justifyContent: "center" },
   vs: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   muted: { ...type.footnote, color: color["muted-foreground"] },
-  own: { ...type.footnote, fontFamily: font.medium, color: color.foreground, fontVariant: ["tabular-nums"] },
+  own: { ...type.footnote, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

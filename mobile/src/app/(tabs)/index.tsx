@@ -4,7 +4,7 @@ import { Text } from "@/ui/text";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import type { HomePhase } from "@site/lib/home-phase";
 import { seriesName, shortSeries } from "@/lib/format";
-import { EMPTY_PHASE, phaseView, type RailItem } from "@/lib/rail";
+import { EMPTY_PHASE, phaseView, seriesChips, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
@@ -16,9 +16,13 @@ import { useScreenInsets } from "@/ui/insets";
 import { enter, Skeleton } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
 import { color, FIXTURE_CARD_SHARE, radius, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 export default function Fixtures() {
-  const { ready, items, error, refetch, refreshing } = useRail();
+  const { ready, items, error, refetch } = useRail();
+  // the pull-to-refresh spinner follows only a pull: the 15 s live poll refetches on its own and must not open it
+  const [pulling, setPulling] = useState(false);
+  const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
   const now = useNow();
   const inset = useScreenInsets();
   const { width } = useWindowDimensions();
@@ -26,11 +30,7 @@ export default function Fixtures() {
   const [series, setSeries] = useState("all");
 
   const { counts, phase, shown: inPhase } = useMemo(() => phaseView(items, asked), [items, asked]);
-  const seriesCounts = useMemo(() => {
-    const c = new Map<string, number>();
-    inPhase.forEach((i) => c.set(seriesName(i.fixture), (c.get(seriesName(i.fixture)) || 0) + 1));
-    return [...c.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])); // every series in the rail, the biggest first
-  }, [inPhase]);
+  const seriesCounts = useMemo(() => seriesChips(inPhase, seriesName), [inPhase]); // every series in the bucket: those with props first, then the biggest
   const sel = seriesCounts.some(([n]) => n === series) ? series : "all";
   const shown = useMemo(() => (sel === "all" ? inPhase : inPhase.filter((i) => seriesName(i.fixture) === sel)), [inPhase, sel]);
   const chips = useMemo<[string, string, number][]>(() => [["all", "All", inPhase.length], ...seriesCounts.map(([n, k]) => [n, shortSeries(n), k] as [string, string, number])], [inPhase, seriesCounts]);
@@ -45,7 +45,7 @@ export default function Fixtures() {
       <AppHeader />
       <ScrollView
         contentContainerStyle={{ paddingBottom: inset.bottom + 96 }}
-        refreshControl={Platform.OS !== "ios" ? undefined : <RefreshControl refreshing={refreshing && ready} onRefresh={() => void refetch()} tintColor={color.foreground} />}
+        refreshControl={Platform.OS !== "ios" ? undefined : <RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} />}
         showsVerticalScrollIndicator={false}>
         {ready && inPhase.length > 0 ? <Chips items={chips} value={sel} onChange={setSeries} /> : null}
         {!ready ? (
@@ -76,6 +76,7 @@ export default function Fixtures() {
         )}
         {ready ? <HotHome phase={phase} /> : null}
       </ScrollView>
+      <TabFade />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
     </View>
   );

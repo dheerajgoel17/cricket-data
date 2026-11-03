@@ -5,9 +5,10 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { odds } from "@site/lib/format";
 import { BookBadge } from "@/ui/book-badge";
+import { Collapsible, TurnChevron } from "@/ui/collapsible";
 import { MiniBars } from "@/ui/mini-bars";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
-import { cap, color, font, num, space, type } from "@/ui/tokens";
+import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
 
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 
@@ -18,18 +19,23 @@ export function BookList({ books, shown }: { books: { source: string; over: numb
   if (!rest.length) return null;
   return (
     <View style={{ gap: 2 }}>
-      <Press onPress={() => setOpen((v) => !v)} hitSlop={8} accessibilityRole="button" accessibilityState={{ expanded: open }}>
+      <Press onPress={() => setOpen((v) => !v)} hitSlop={8} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.moreBtn}>
         <Text style={styles.more}>{open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}</Text>
+        <TurnChevron open={open} />
       </Press>
-      {open ? rest.map((b) => (
-        <View key={b.source} style={styles.bookRow}><BookBadge source={b.source} /><Text style={styles.bookPrice}>O {odds(b.over)}</Text><Text style={styles.bookPrice}>U {odds(b.under)}</Text></View>
-      )) : null}
+      <Collapsible open={open}>
+        <View style={{ gap: 6, paddingTop: 4 }}>
+          {rest.map((b) => (
+            <View key={b.source} style={styles.bookRow}><BookBadge source={b.source} /><Text style={styles.bookPrice}>O {odds(b.over)}</Text><Text style={styles.bookPrice}>U {odds(b.under)}</Text></View>
+          ))}
+        </View>
+      </Collapsible>
     </View>
   );
 }
 
 /**
- * One market's row, in the props-list style: its name, how the ground has gone, the book's line and price(s), the better side's edge with the last ten results as bars, and the other
+ * One market's row, in the props-list style: its name, how the ground has gone, the book's line and price(s), the model's edge on the better side (and which side) with the last ten results as bars, and the other
  * books behind "+N books". `standing` is the 15 s live so-far, the same words as a player prop.
  */
 export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string }) {
@@ -43,7 +49,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOp
         <View style={styles.left}>
           <Text style={styles.label} numberOfLines={2}>{r.label}</Text>
           {sub ? <Text style={styles.at} numberOfLines={1}>{sub}</Text> : null}
-          {r.at ? <Text style={styles.at}>At the ground · <Text style={{ color: r.at.side === r.side && r.edge != null ? color.primary : color.foreground, fontFamily: font.medium }}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</Text></Text> : null}
+          {r.at ? <Text style={styles.at}>At the ground · <Text style={{ color: color.foreground, fontFamily: font.medium }}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</Text></Text> : null}
           <View style={styles.prices}>
             {split ? (
               <>
@@ -63,8 +69,9 @@ export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOp
         </View>
         <View style={styles.side}>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.edgeLabel}>{r.edge == null ? "Edge" : r.side}</Text>
+            <Text style={styles.edgeLabel}>Model</Text>
             <Text style={[styles.edgeValue, { color: edgeColor }]}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</Text>
+            {r.edge != null ? <Text style={styles.edgeSide}>{r.edge > 0 ? r.side : "No edge"}</Text> : null}
           </View>
           <MiniBars last={r.last} line={r.line} />
         </View>
@@ -83,12 +90,14 @@ const styles = StyleSheet.create({
   at: { ...type.footnote, color: color["muted-foreground"] },
   prices: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.snug, rowGap: 2 },
   price: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  line: { ...type.callout, color: color.primary, fontVariant: ["tabular-nums"] },
+  line: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   odds: { ...type.callout, ...num, fontSize: 15, color: color.foreground },
   side: { alignItems: "flex-end", gap: space.snug },
   edgeLabel: { ...type.caption, ...cap, color: color["muted-foreground"] },
-  edgeValue: { ...num, fontSize: 24, lineHeight: 26 },
+  edgeSide: { ...type.footnote, ...cap, fontSize: 10, color: color["muted-foreground"] },
+  edgeValue: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 26 },
+  moreBtn: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start" },
   more: { ...type.footnote, fontFamily: font.medium, color: "rgba(255,255,255,0.7)" },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  bookPrice: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  bookPrice: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

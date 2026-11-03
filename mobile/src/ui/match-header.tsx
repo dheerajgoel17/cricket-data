@@ -12,7 +12,7 @@ import type { RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { LiveDot } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
 
 /**
  * The match at the top of its page, in a container (the site's `MatchHeader`): its state and format with a share button, both sides with their crests and, when it is on or
@@ -35,16 +35,16 @@ export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () =>
         </View>
         {onShare ? (
           <Press accessibilityRole="button" accessibilityLabel="Share" onPress={() => { void Haptics.selectionAsync(); onShare(); }} style={({ pressed }) => [styles.round, pressed && { opacity: 0.6 }]}>
-            <Ionicons name="share-outline" size={20} color={color.foreground} />
+            <Ionicons name="share-outline" size={18} color={color.foreground} />
           </Press>
         ) : null}
       </View>
 
       <View style={styles.sides}>
-        <View style={{ flex: 1, gap: space.stack }}>
+        <View style={{ flex: 1, gap: space.snug }}>
           {m.sides.map((s) => (
             <View key={s.name} style={styles.side}>
-              <TeamBadge name={s.name} size={48} />
+              <TeamBadge name={s.name} size={34} />
               <Text style={[styles.team, s.lost && { color: color["muted-foreground"] }]} numberOfLines={1}>{s.name}</Text>
               {m.hasScore || m.live ? (
                 <View style={styles.score}>
@@ -70,20 +70,20 @@ export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () =>
 }
 
 const styles = StyleSheet.create({
-  box: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.stack },
+  box: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.snug },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   state: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  round: { width: 34, height: 34, borderRadius: 17, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   sides: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  team: { ...type.title, fontSize: 20, color: color.foreground, flexShrink: 1 },
+  team: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   score: { marginLeft: "auto", flexDirection: "row", alignItems: "baseline", gap: space.tight },
-  total: { fontSize: 20, fontFamily: font.bold, color: color.foreground, fontVariant: ["tabular-nums"] },
+  total: { fontSize: 18, letterSpacing: -0.36, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"] },
   when: { alignItems: "flex-end", gap: 2 },
   whenDay: { ...type.callout, color: color["muted-foreground"] },
-  clock: { ...num, fontSize: 30, lineHeight: 34, color: color.foreground },
+  clock: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   status: { ...type.callout, color: color.foreground },
-  series: { ...type.callout, color: color["muted-foreground"] },
+  series: { ...type.footnote, color: color["muted-foreground"] },
 });

@@ -1,15 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { BarlowSemiCondensed_500Medium } from "@expo-google-fonts/barlow-semi-condensed";
+import { SofiaSansCondensed_500Medium, SofiaSansCondensed_600SemiBold } from "@expo-google-fonts/sofia-sans-condensed";
+import { Newsreader_400Regular } from "@expo-google-fonts/newsreader";
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { watchAppState } from "@/lib/queries";
+import { AnimatedSplash } from "@/ui/animated-splash";
+import { WebFrame } from "@/ui/web-frame";
 import { color, font } from "@/ui/tokens";
 
 void SplashScreen.preventAutoHideAsync();
@@ -24,13 +27,16 @@ const theme = {
 
 export default function RootLayout() {
   const [fonts, fontError] = useFonts({
-    [font.regular]: Inter_400Regular, [font.medium]: Inter_500Medium, [font.semibold]: Inter_600SemiBold, [font.bold]: Inter_700Bold, [font.cond]: BarlowSemiCondensed_500Medium,
+    [font.regular]: Inter_400Regular, [font.medium]: Inter_500Medium, [font.semibold]: Inter_600SemiBold, [font.bold]: Inter_700Bold, [font.serif]: Newsreader_400Regular, [font.data]: SofiaSansCondensed_600SemiBold, [font.dataLight]: SofiaSansCondensed_500Medium,
   });
   useEffect(watchAppState, []);
-  useEffect(() => { if (fonts || fontError) void SplashScreen.hideAsync(); }, [fonts, fontError]); // a failed font load shows the system font rather than a blank screen
-  if (!fonts && !fontError) return null;
+  const [splashDone, setSplashDone] = useState(false);
+  const ready = !!(fonts || fontError); // a failed font load shows the system font rather than a blank screen
+  // the system splash is plain black and is taken down by `AnimatedSplash` as it draws; the app is mounted behind it as soon as its fonts are in, so its data loads while the mark is on screen
+  // (one parent for both, so the splash is never remounted, which would restart its drawing)
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: color.background }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: ready ? color.background : "#000000" }}>
+    {ready ? (<WebFrame>
     <SafeAreaProvider>
       <QueryClientProvider client={client}>
         <ThemeProvider value={theme}>
@@ -48,6 +54,8 @@ export default function RootLayout() {
         </ThemeProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
+    </WebFrame>) : null}
+    {splashDone ? null : <AnimatedSplash ready={ready} onDone={() => setSplashDone(true)} />}
     </GestureHandlerRootView>
   );
 }

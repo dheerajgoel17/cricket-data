@@ -1,18 +1,19 @@
 import type { ComponentRef, Ref } from "react";
 import { Dimensions, Platform, StyleSheet, Text as RNText, TextInput as RNTextInput, type StyleProp, type TextInputProps, type TextProps, type TextStyle } from "react-native";
 import Animated from "react-native-reanimated";
+import { fit, layoutWidth } from "@/lib/fit";
 
 /**
  * The one text component of the app (import `Text` and `TextInput` from here, not from react-native), so the sizes are tuned in one place:
  * - the system font size setting is ignored (`allowFontScaling` off): a phone set to a larger or smaller font than the default broke the rows and made the same screen look different on every
  *   phone. Sizes are the design's, scaled only by the screen's width (below);
- * - on a narrower phone than the design's (a 360 dp Android), sizes shrink a little (`FIT`, never below 0.9) so the same rows fit;
+ * - on a narrower screen than the design's (a 360 dp Android, a 320 dp one, a phone set to a larger display size) sizes shrink in proportion (`FIT`, never below 0.85, never above 1) so the same
+ *   rows fit; it follows the window (a fold, a rotation, a resized browser) for what is drawn after the change; in a browser the width counts only up to the app's column;
  * - on Android the font's extra top and bottom padding is off, which otherwise sits text low in its box and makes it look larger than on iOS, and lines break the simple (greedy) way
  *   iOS does, not by Android's slower balancing "high quality" strategy.
  */
-const DESIGN_WIDTH = 390;
-export const fit = (width: number) => Math.min(1, Math.max(0.9, width / DESIGN_WIDTH));
-const FIT = fit(Dimensions.get("window").width);
+let FIT = fit(layoutWidth(Dimensions.get("window").width, Platform.OS));
+Dimensions.addEventListener("change", ({ window }: { window: { width: number } }) => { FIT = fit(layoutWidth(window.width, Platform.OS)); });
 
 const NO_PAD: TextStyle = { includeFontPadding: false };
 

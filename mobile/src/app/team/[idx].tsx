@@ -20,6 +20,7 @@ import { Segmented } from "@/ui/segmented";
 import { StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { color, font, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
 
@@ -97,6 +98,7 @@ export default function Team() {
           )}
         </ScrollView>
       )}
+      <TabFade />
     </View>
   );
 }
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
-  name: { ...type.display, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  name: { ...type.display, color: color.foreground, flex: 1 },
   bleed: { marginHorizontal: -space.gutter },
   headline: { ...type.body, color: color.foreground },
   tableTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },

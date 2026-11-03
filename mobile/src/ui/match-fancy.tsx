@@ -30,7 +30,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
 import { router } from "expo-router";
 
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
@@ -286,14 +286,14 @@ const styles = StyleSheet.create({
   live: { ...type.callout, color: color.primary },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },
   statKey: { ...type.footnote, color: color["muted-foreground"] },
-  statNum: { ...num, fontSize: 24, lineHeight: 28, color: color.foreground },
+  statNum: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   stepRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug },
   lineBtn: { height: 36, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary },
   lineBtnText: { ...type.callout, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
-  sideNum: { ...num, fontSize: 28, lineHeight: 32, color: color.foreground },
+  sideNum: { ...numLg, fontSize: 28, letterSpacing: -0.56, lineHeight: 32, color: color.foreground },
   sideBook: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.tight },
   sidePrice: { ...num, fontSize: 16, color: color.primary },
   meter: { height: 6, borderRadius: 3, backgroundColor: color.hairline, overflow: "hidden" },

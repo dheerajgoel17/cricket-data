@@ -13,6 +13,7 @@ import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
 import { PropRow } from "@/ui/prop-row";
 import { color, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** Player props: every line the books price for a day, scored against the player's history and ranked (matches in play, hit rate, edge). Today by default; the chips pick another of the next ten days. */
 export default function PlayerProps() {
@@ -23,16 +24,13 @@ export default function PlayerProps() {
   const shown = rows.slice(0, MAX_ROWS);
   const header = (
     <View>
-      <View style={styles.titleBox}>
-        <View style={styles.titleRow}><Text style={styles.title}>Player props</Text><InfoButton topic="player-props" /></View>
-      </View>
       <Chips items={days} value={day} onChange={setDay} />
     </View>
   );
   // A recycling list (FlashList): only the rows on screen exist, however many there are, and a row scrolled away is reused for the next one.
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
-      <AppHeader />
+      <AppHeader title="Player props" info={<InfoButton topic="player-props" />} />
       <FlashList
         data={isLoading ? [] : shown}
         keyExtractor={(r) => `${r.idx}${r.stat}${r.start}${r.inn}`}
@@ -50,6 +48,7 @@ export default function PlayerProps() {
         refreshing={false}
         onRefresh={Platform.OS === "ios" ? () => void refetch() : undefined}
       />
+      <TabFade />
     </View>
   );
 }
@@ -63,8 +62,5 @@ function useHotViewWithRefetch(day: number) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  titleBox: { paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.tight },
-  title: { ...type.display, color: color.foreground },
-  titleRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   empty: { ...type.callout, color: color["muted-foreground"], paddingVertical: space.section, paddingHorizontal: space.gutter },
 });

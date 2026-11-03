@@ -17,6 +17,7 @@ import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { color, font, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"]];
 
@@ -92,6 +93,7 @@ export default function Search() {
           </>
         )}
       </ScrollView>
+      <TabFade />
     </View>
   );
 }

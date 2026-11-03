@@ -38,6 +38,7 @@ import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
 import { cap, color, control, font, radius, space, type, tonal } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
 const HOME_AWAY: [string, string][] = [["", "any"], ["home", "home"], ["away", "away"], ["neutral", "neutral"]];
@@ -97,12 +98,11 @@ export default function PlayerPage() {
                 <Animated.View style={[styles.heroLeft, nameFx]}>
                   <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
                   <View style={styles.teamLine}>
-                    <TeamBadge name={s.team} size={24} />
+                    <View style={styles.logoCrop}><TeamBadge name={s.team} size={56} bare /></View>
                     <Text style={styles.sub} numberOfLines={1}>{s.team}</Text>
                   </View>
-                  <Text style={styles.sub}>{s.fmts.map(([, f]) => f).join(" · ")}</Text>
                 </Animated.View>
-                {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.next?.team || params.team || s.team} test={s.fmt === "Test"} width={144} /></Animated.View> : null}
+                {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.next?.team || params.team || s.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
               </View>
               {loading ? (
                 <View style={[styles.pad, { gap: space.snug, paddingTop: space.stack }]}><Working label="Reading his games…" /><Skeleton style={{ height: 120 }} /><Skeleton style={{ height: 240 }} /></View>
@@ -133,6 +133,7 @@ export default function PlayerPage() {
           </Animated.View>
         </BlurBar>
       </View>
+      <TabFade />
     </View>
   );
 }
@@ -149,7 +150,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
   const { book, next, fmt, stat, idx, pid, name } = s;
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<"over" | "under">(c ? c.side : "over");
-  const [win, setWin] = useState<number>(entries.length >= 20 ? 20 : 0);
+  const [win, setWin] = useState<number>(entries.length > 10 ? 10 : 0);
   const [tab, setTab] = useState("lines");
   const [logCount, setLogCount] = useState(30);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -194,7 +195,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
 
   if (!entries.length || !cur) {
     return (
-      <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
+      <View style={[styles.pad, { gap: space.stack, paddingTop: space.snug }]}>
         {!book ? <Unpriced label={label} /> : null}
         {next ? <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
         <Text style={styles.empty}>No {res.sample?.unit || "games"} match {active.length ? "these filters" : "this selection"}. Relax a filter to see a sample.</Text>
@@ -207,22 +208,16 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
     <View style={{ gap: space.stack }}>
       <Animated.View entering={enter(0)} style={[styles.pad, { gap: space.snug }]}>
         <View style={styles.metrics}>
+          <View style={styles.metricGrid}>
+            <Metric compact k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
+            <Metric compact k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
+            <Metric compact text k="Prop">{label}</Metric>
+            <Metric compact k="Hit rate"><View style={styles.countRow}>{arrow(cur.p == null ? null : cur.p >= 0.5)}{cur.p == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={Math.round(cur.p * 100)} suffix="%" style={styles.metricNum} />}</View></Metric>
+            <Metric compact k="Fair price">{cur.p ? <CountUp value={1 / cur.p} digits={2} style={styles.metricNum} /> : "–"}</Metric>
+            <Metric compact k="Opponent">{next?.opp ? <View style={styles.oppRow}><Text style={styles.metricTextSm}>{abbr(next.opp)}</Text><MatchStatus phase={next.phase || "upcoming"} start={next.start} /></View> : <Text style={styles.metricTextSm}>–</Text>}</Metric>
+          </View>
           <View style={styles.gaugeCard}>
             {slices.length >= 3 ? <OutcomeDonut caption={`${cur.label} hit rate`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={slices} /> : <Gauge p={cur.p} caption={`${cur.label} hit rate`} />}
-          </View>
-          <View style={styles.metricGrid}>
-            <Metric cols={2} k="Hit rate"><View style={styles.countRow}>{arrow(cur.p == null ? null : cur.p >= 0.5)}{cur.p == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={Math.round(cur.p * 100)} suffix="%" style={styles.metricNum} />}</View></Metric>
-            <Metric cols={2} k="Fair price">{cur.p ? <CountUp value={1 / cur.p} digits={2} style={styles.metricNum} /> : "–"}</Metric>
-            <Metric cols={2} k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
-            <Metric cols={2} k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
-          </View>
-        </View>
-        <View style={styles.facts}>
-          <View style={styles.fact}><Text style={styles.factKey}>Prop</Text><Text style={styles.factVal} numberOfLines={1}>{label}{book ? "" : " · not listed"}</Text></View>
-          <View style={styles.factSep} />
-          <View style={styles.fact}>
-            <Text style={styles.factKey}>Opponent</Text>
-            {next?.opp ? <View style={styles.factRow}><Text style={styles.factVal} numberOfLines={1}>{abbr(next.opp)}</Text><MatchStatus phase={next.phase || "upcoming"} start={next.start} /></View> : <Text style={styles.factVal}>–</Text>}
           </View>
         </View>
       </Animated.View>
@@ -241,25 +236,23 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         {book && book.lines.length > 1 ? (
           <Accordion title="Alt lines" badge={book.lines.length} value={edge != null ? `Edge ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}%` : undefined}>
             <View style={{ paddingBottom: space.snug }}>
+              <View style={styles.altHead}><View style={styles.altBadge} /><Text style={[styles.altCol, styles.altPrice]}>Over</Text><Text style={[styles.altCol, styles.altPrice]}>Under</Text></View>
               {book.lines.map((l: any) => {
                 const hist = windowRate(entries, cur.n, l.line, "over");
                 const bestO = Math.max(0, ...l.books.map((b: any) => b.over || 0));
                 return (
                   <Press scale={1} key={l.line} onPress={() => { void Haptics.selectionAsync(); setLine(l.line); }} accessibilityRole="button" accessibilityLabel={`Use line ${l.line}`} style={({ pressed }) => [styles.altRow, line === l.line && styles.altOn, pressed && { opacity: 0.6 }]}>
-                    <View style={{ flex: 1, gap: 2 }}>
+                    <View style={styles.altTop}>
                       <Text style={styles.altLine}>O/U {l.line}{l === book.main ? <Text style={styles.main}>  MAIN</Text> : null}</Text>
-                      {l.books.map((b: any) => (
-                        <View key={b.source} style={styles.altBook}>
-                          <BookBadge source={b.source} />
-                          <Tick value={b.over} style={{ ...type.callout, color: l.books.length > 1 && b.over === bestO ? color.primary : color["muted-foreground"] }}>{odds(b.over)}</Tick>
-                          <Text style={styles.sub}>/ {odds(b.under)}</Text>
-                        </View>
-                      ))}
+                      <Text style={styles.altRates}>MKT <Text style={styles.strong}>{l.prob == null ? "–" : pc(l.prob)}</Text>   {cur.label.toUpperCase()} <Text style={styles.strong}>{hist.p == null ? "–" : pc(hist.p)}</Text></Text>
                     </View>
-                    <View style={{ alignItems: "flex-end", gap: 2 }}>
-                      <Text style={styles.sub}>Mkt <Text style={styles.strong}>{l.prob == null ? "–" : pc(l.prob)}</Text></Text>
-                      <Text style={styles.sub}>{cur.label} <Text style={styles.strong}>{hist.p == null ? "–" : pc(hist.p)}</Text></Text>
-                    </View>
+                    {l.books.map((b: any) => (
+                      <View key={b.source} style={styles.altBook}>
+                        <View style={styles.altBadge}><BookBadge source={b.source} /></View>
+                        <Tick value={b.over} style={{ ...styles.altPrice, color: l.books.length > 1 && b.over === bestO ? color.primary : color.foreground }}>{odds(b.over)}</Tick>
+                        <Text style={[styles.altPrice, { color: color["muted-foreground"] }]}>{odds(b.under)}</Text>
+                      </View>
+                    ))}
                   </Press>
                 );
               })}
@@ -327,7 +320,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         {all ? (
           <View style={styles.glanceCard}>
             <View style={styles.glance}>
-              <View style={styles.glanceCell}><Text style={styles.glanceKey}>Cleared</Text><View style={styles.countRow}><CountUp value={all.hits} style={styles.glanceNum} /><Text style={[styles.glanceNum, styles.glanceOf]}> / {all.played}</Text></View></View>
+              <View style={styles.glanceCell}><Text style={styles.glanceKey}>Cleared</Text><Text style={styles.glanceNum} numberOfLines={1}>{all.hits}<Text style={styles.glanceOf}>/{all.played}</Text></Text></View>
               <View style={styles.glanceRule} />
               <View style={styles.glanceCell}><Text style={styles.glanceKey}>Hit rate</Text><Text style={[styles.glanceNum, { color: all.p == null ? color.foreground : all.p >= 0.6 ? color.primary : all.p <= 0.4 ? color.miss : color.amber }]}>{all.p == null ? "–" : `${(all.p * 100).toFixed(1)}%`}</Text></View>
               <View style={styles.glanceRule} />
@@ -420,32 +413,41 @@ const styles = StyleSheet.create({
   subInner: { gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   pad: { paddingHorizontal: space.gutter },
   empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },
-  hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.stack, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
-  name: { ...type.display, color: color.foreground },
+  name: { ...type.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
-  strong: { color: color.foreground, fontFamily: font.medium, fontVariant: ["tabular-nums"] },
-  teamLine: { flexDirection: "row", alignItems: "center", gap: space.tight, marginTop: space.hair },
+  strong: { color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  teamLine: { alignItems: "flex-start", gap: 2 },
+  logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" }, // the logo files carry transparent padding: crop it so the mark sits tight to the name
   metrics: { flexDirection: "row", alignItems: "center", gap: space.snug },
   metricGrid: { flex: 1, flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
-  facts: { flexDirection: "row", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingVertical: space.snug },
+  facts: { flexDirection: "row", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingVertical: space.tight },
   fact: { flex: 1, gap: 2, paddingHorizontal: space.tight },
   factSep: { width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: color.hairline },
   factKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  factVal: { ...type.body, color: color.foreground, flexShrink: 1 },
+  factVal: { ...type.callout, color: color.foreground, flexShrink: 1 },
+  oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
   factRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   countRow: { flexDirection: "row", alignItems: "center" },
-  metricNum: { fontSize: 26, lineHeight: 30, fontFamily: font.cond, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricNum: { fontSize: 16, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   metricText: { ...type.body, color: color.foreground },
-  gaugeCard: { width: 112, alignItems: "center", justifyContent: "center", borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, backgroundColor: color.card, paddingVertical: space.snug },
+  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: 17, lineHeight: 20, color: color.foreground },
+  gaugeCard: { width: 84, alignItems: "center", justifyContent: "center", borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, backgroundColor: color.card, paddingVertical: space.tight },
   rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: space.gutter },
   controls: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   controlsRight: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  altRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  altOn: { backgroundColor: "rgba(58,58,60,0.6)" },
-  altLine: { ...type.body, color: color.foreground },
+  altRow: { gap: 6, paddingHorizontal: space.snug, paddingVertical: space.snug + 2, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, borderLeftWidth: 2, borderLeftColor: "transparent" },
+  altOn: { backgroundColor: "rgba(255,255,255,0.05)", borderLeftColor: color.primary },
+  altTop: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
+  altRates: { ...type.footnote, ...cap, color: color["muted-foreground"] },
+  altPrice: { ...type.callout, fontFamily: font.data, width: 52, textAlign: "right" },
+  altLine: { ...type.body, fontFamily: font.data, fontSize: 18, color: color.foreground },
   main: { ...type.caption, ...cap, color: color.primary },
   altBook: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  altBadge: { flex: 1 },
+  altHead: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, paddingBottom: 6 },
+  altCol: { ...cap, fontSize: 10, color: color["muted-foreground"] },
   bookRow: { flexDirection: "row", flexWrap: "wrap", gap: space.stack },
   windowRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   counted: { flexDirection: "row", alignItems: "center", gap: space.tight },
@@ -456,8 +458,8 @@ const styles = StyleSheet.create({
   glanceCell: { flex: 1, alignItems: "center", gap: 2 },
   glanceRule: { width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: color.hairline },
   glanceKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  glanceNum: { fontSize: 28, lineHeight: 32, fontFamily: font.cond, color: color.foreground, fontVariant: ["tabular-nums"] },
-  glanceOf: { ...type.body, fontFamily: font.regular, color: color["muted-foreground"] },
+  glanceNum: { fontSize: 22, lineHeight: 26, letterSpacing: -0.44, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"] },
+  glanceOf: { fontSize: 14, fontFamily: font.data, letterSpacing: 0, color: color["muted-foreground"] },
   glanceFoot: { ...type.footnote, color: color["muted-foreground"], textAlign: "center" },
   dataLine: { ...type.footnote, color: color["muted-foreground"], textAlign: "center" },
   noteText: { ...type.footnote, lineHeight: 17, color: color["muted-foreground"] },
@@ -474,7 +476,7 @@ const styles = StyleSheet.create({
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   logOpp: { ...type.body, color: color.foreground },
   valuePill: { minWidth: 56, borderRadius: 8, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
-  valueText: { ...type.callout, fontFamily: font.bold, fontVariant: ["tabular-nums"] },
+  valueText: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 12, padding: space.snug },
   unpricedText: { ...type.callout, flex: 1, color: color["muted-foreground"] },
 });
