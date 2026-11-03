@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-04 01:01 IST
+# Cricket value bets - 2026-11-04 01:13 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
-- **moviodds_bet365**: ok, 1777 prices
+- **moviodds_bet365**: ok, 1788 prices
 - **smarkets**: ok, 395 prices
-- **feedh**: error - RemoteDisconnected: Remote end closed connection without response
 - **feedk**: ok, 156 prices, 4 events
 - **feedf**: ok, 410 prices, 6 events
 - **feede**: ok, 508 prices, 14 events
+- **feedh**: ok, 1063 prices, 46 events
 
-Matches starting in next 168h: **31**, markets priced: **260**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **39**, markets priced: **335**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **31**, markets priced: **260**, value bets: **3*
 - **New Zealand vs India / 1st innings - Gill, Shubman to score 50 / Shubman Gill 50+ no** - why: Model 66% vs market 61% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: rain chance up to 48%, high humidity 82%. Notes: 4 market source(s) for fair price; model 0.661 vs market 0.605; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 - **New Zealand vs India / 1st innings - Mitchell, Daryl to score 50 / Daryl Mitchell 50+ no** - why: Model 70% vs market 64% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.1; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: rain chance up to 48%, high humidity 82%. Notes: 4 market source(s) for fair price; model 0.704 vs market 0.644; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Chandigarh (W) (female), Chhattisgarh (W) (female), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Central (male), Chandigarh (W) (female), Chhattisgarh (W) (female), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 108.9s. Snapshot: `odds_20261103T193107Z.jsonl.gz`
+Runtime 154.6s. Snapshot: `odds_20261103T194342Z.jsonl.gz`
