@@ -23,10 +23,21 @@ scraper files, so it never merges value-bet changes.
 | `value_bets/out/alerts_history.jsonl` | one line per alert ever raised (last 3000), so a reader can dedupe on `alert_id` |
 | `value_bets/out/value_bets_latest.json` / `.md` | full current run: sources, events in window, all value bets, filter counts, model-vs-market diagnostics |
 | `value_bets/out/backtest_props.json` / `.md` | prop-model backtest (baseline vs new) |
+| `value_bets/out/edge_pnl_summary.json` | internal aggregate of settled ledger P&L (by kind/format/market); not wired into the site |
 | `value_bets/state/alerted.json` | dedupe state (re-alert only if edge grows ≥ 3 pp; pruned when the match starts) |
 | `value_bets/state/prop_model.json` | fitted model coefficients |
 | `value_bets/mappings/venue_geo.csv` | venue → lat/lon from the Open-Meteo geocoder (blank = not located or rejected) |
 | `value_bets/mappings/venue_weather_daily.csv.gz` | Open-Meteo ERA5 daily weather per located venue × match day (2021+ T20/ODI), used by the backtest |
+
+## Internal edge-bet P&L ledger (Supabase)
+Every recommended edge we scrape is stored for model review — **not** shown on the site or in Telegram P&L messages.
+
+* **What:** all pipeline value bets that clear the filters (player O/U, milestones, top markets, and any other market that makes `values[]`), plus fancy-edge alerts from `fancy_alerts.json`. Full market-rate snapshot at last pre-match sighting (best/lay/effective odds, implied & market & model & fair probs, fair odds, overround, liquidity, edge, notes; fancy also stores hits/played/window); flat **1u** paper stake. Extra fields (weather, kelly, n_sources, …) sit in `rates` jsonb.
+* **Where:** Supabase table `public.edge_bets` (migration `supabase/migrations/20261104_edge_bets.sql`). Service role only (no anon/authenticated policies). Rows are never deleted.
+* **When:** hourly `value-bets.yml` upserts model rows from the pipeline, upserts fancy after `fancy-alerts.mjs`, then `python -m value_bets.ledger --settle --summary` after archive results.
+* **Settlement:** player O/U and milestones from archive `results` (same cleared/missed/push rule as `lineVerdict`); top batter/bowler from the best archive result in that match/team. Fancy rows stay `open` until a market-total settle pass exists. Markets with no player/stat join land as `unsettled`.
+* **P&L:** won `+odds−1`, lost `−1`, push/void `0`. Aggregates in `value_bets/out/edge_pnl_summary.json`.
+* **Module:** `src/value_bets/ledger.py`. Needs `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` (no-op when unset).
 
 Raw URL once merged: `https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/new_alerts.json`
 

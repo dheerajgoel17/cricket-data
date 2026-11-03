@@ -84,6 +84,9 @@ jobs:
         run: python -m value_bets.backtest
       - name: Find value bets
         if: github.event.schedule != '0 7 * * 0'
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           export CV_SNAPSHOTS="$RUNNER_TEMP/snapshots"
           timeout 600 python -m value_bets.pipeline | tee value_bets_run.log
@@ -135,6 +138,16 @@ jobs:
           SITE_URL: ${{ vars.SITE_URL }}
           DATA_WRAP_KEY: ${{ secrets.DATA_WRAP_KEY }}
         run: python -m value_bets.archive --results "${SITE_URL%/}/api/live"
+      - name: Edge-bet ledger (fancy upsert + settle + summary)
+        # internal Supabase edge_bets: every recommended model/fancy edge; flat 1u P&L; never shown on the site
+        if: github.event.schedule != '0 7 * * 0'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          python -m value_bets.ledger --upsert-fancy value_bets/out/fancy_alerts.json
+          python -m value_bets.ledger --settle --summary
       - name: Commit outputs
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)
         run: |

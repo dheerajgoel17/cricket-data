@@ -12,7 +12,7 @@ from collections import defaultdict
 
 from cricket_site import testend
 
-from . import archive, booklines, config, fancy, history, store, strategy, weather
+from . import archive, booklines, config, fancy, history, ledger, store, strategy, weather
 from .adapters import (
     betfair,
     feede,
@@ -750,15 +750,22 @@ def run():
                 "start_ist": r0["start_ist"], "format": c["fmt"], "gender": c["gender"], "market_type": mt,
                 "market": x["market_raw"], "team_scope": r0["team_scope"],
                 "selection": x["selection"], "player_matched_as": x.get("player_hist_name"),
+                "player_id": r0.get("player_id") or x.get("player_id"),
+                "player_team": r0.get("player_team") or x.get("player_team"),
+                "stat": ledger.SETTLE_STAT.get(mt) or booklines.STAT.get(mt),
+                "inn": r0.get("inn") or x.get("inn") or 0,
                 "line": x.get("line"), "side": x.get("side"),
                 "best_odds": round(o, 3), "best_source": x["source"],
                 "effective_odds_after_commission": round(effective_odds(o, x["source"]), 3),
                 "lay_odds": x.get("lay"), "back_liquidity": x.get("back_size") or x.get("liquidity"),
+                "overround": round(x["overround"], 4) if x.get("overround") is not None else None,
+                "implied_prob": round(1 / o, 4) if o else None,
                 "fair_odds": round(1 / pf, 3), "fair_prob": round(pf, 4),
                 "model_prob": round(pm, 4) if pm is not None else None,
                 "market_prob": round(pc, 4) if pc is not None else None, "fair_basis": basis,
                 "edge": round(e, 4), "edge_pct": round(100 * e, 2),
                 "kelly_quarter_stake_pct": round(kelly_pct(pf, o, x["source"]), 2),
+                "n_sources": n_src,
                 "confidence": conf, "why": why, "notes": "; ".join(notes), "model_detail": mi,
                 "rain_risk": rain_risk, "weather": wx_out,
             })
@@ -787,6 +794,10 @@ def run():
                      "corr": _corr(a)}
     stats["model_vs_market"] = calib
     alerts = store.new_alerts(values)
+    try:  # internal P&L ledger: every recommended edge (odds + edge); never block the run
+        log(f"ledger upsert model: {ledger.upsert_model(values)}")
+    except Exception as e:
+        log(f"ledger upsert failed: {e!r}")
 
     unmatched_players = sorted({r["player"] for r in rows if r.get("player") and not r.get("player_id")
                                 and parse_ts(r["start_utc"]) and win_lo <= parse_ts(r["start_utc"]) <= win_hi})
