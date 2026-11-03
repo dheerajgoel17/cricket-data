@@ -39,6 +39,9 @@ export const type = {
   caption: { fontFamily: font.medium, fontSize: 10.5, lineHeight: 13 },
 };
 
+/** The widest the app gets in a browser (`ui/web-frame.tsx`), and so the width its text is fitted to there. */
+export const WEB_MAX_WIDTH = 560;
+
 /** Web `--control` (36 pt), `--header-h` (56 pt). */
 export const control = 36;
 export const HEADER_HEIGHT = 56;

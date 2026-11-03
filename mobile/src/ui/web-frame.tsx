@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import { color } from "@/ui/tokens";
+import { color, WEB_MAX_WIDTH } from "@/ui/tokens";
 
-/** The widest the app gets in a browser: a phone-sized column, so a desktop window shows the app as designed instead of stretching rows and chips edge to edge. */
-export const WEB_MAX_WIDTH = 560;
+// In a browser the app is a phone-sized column (WEB_MAX_WIDTH), so a desktop window shows it as designed instead of stretching rows and chips edge to edge.
 
 /** In a browser, the app centred in a column with a hairline either side on a black page; on a phone it is just its children. */
 export function WebFrame({ children }: { children: ReactNode }) {
