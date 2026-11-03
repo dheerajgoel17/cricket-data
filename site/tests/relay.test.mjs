@@ -1,11 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { allowed, same } from "../../relay/worker.js";
+import worker, { allowed, same, upstreamHeaders } from "../../relay/worker.js";
 
 const envOf = () => ({ RELAY_KEY: process.env.RELAY_KEY, RELAY_ALLOW: process.env.RELAY_ALLOW, RELAY_ALLOW_EXTRA: process.env.RELAY_ALLOW_EXTRA });
 const call = async (req, fetchImpl) => {
   const url = new URL("https://relay.invalid/");
   if (req.query?.u) url.searchParams.set("u", req.query.u);
+  if (req.query?.health) url.searchParams.set("health", req.query.health);
   const headers = new Headers(req.headers || {});
   const r = new Request(url, { method: req.method || "GET", headers, body: req.body });
   const res = await worker.fetch(r, envOf(), { fetch: fetchImpl });
@@ -47,6 +48,34 @@ test("a POST carries its body and content type to the book", async () => {
   const res = await call({ method: "POST", headers: { "x-relay-key": "k-123", "content-type": "application/x-www-form-urlencoded" }, query: { u: "https://hub.example/ws/getMarketDataNew" }, body: "market_ids[]=1&market_ids[]=2" }, f);
   assert.equal(res.code, 200);
   assert.equal(seen.init.method, "POST"); assert.equal(Buffer.from(seen.init.body).toString(), "market_ids[]=1&market_ids[]=2"); assert.equal(seen.init.headers["Content-Type"], "application/x-www-form-urlencoded");
+});
+
+test("upstream calls look like an Indian Chromium XHR (Origin, Referer, Accept-Language, Sec-CH)", async () => {
+  let seen;
+  const f = async (_u, init) => { seen = init; return new Response("{}", { status: 200, headers: { "set-cookie": "sid=1; Path=/" } }); };
+  const res = await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://api.book.example/list" } }, f);
+  assert.equal(res.code, 200);
+  assert.match(seen.headers["User-Agent"], /Chrome\/131/);
+  assert.equal(seen.headers["Accept-Language"], "en-IN,en;q=0.9,hi;q=0.8");
+  assert.equal(seen.headers.Origin, "https://api.book.example");
+  assert.equal(seen.headers.Referer, "https://api.book.example/");
+  assert.equal(seen.headers["Sec-Fetch-Mode"], "cors");
+  assert.match(res.headers["x-relay-set-cookie"] || "", /sid=1/);
+  // caller overrides win
+  const h = upstreamHeaders(new URL("https://api.book.example/x"), new Request("https://relay.invalid/", { headers: { "x-relay-referer": "https://www.book.example/match", "x-relay-origin": "https://www.book.example", "x-relay-cookie": "a=b" } }), false);
+  assert.equal(h.Referer, "https://www.book.example/match");
+  assert.equal(h.Origin, "https://www.book.example");
+  assert.equal(h.Cookie, "a=b");
+});
+
+test("health=1 needs the key and reports colo without calling upstream", async () => {
+  let fetched = 0;
+  const f = async () => { fetched++; return new Response("x"); };
+  assert.equal((await call({ headers: {}, query: { health: "1" } }, f)).code, 403);
+  const ok = await call({ headers: { "x-relay-key": "k-123" }, query: { health: "1" } }, f);
+  assert.equal(ok.code, 200);
+  assert.equal(JSON.parse(ok.body.toString()).ok, true);
+  assert.equal(fetched, 0);
 });
 
 test("allowed() and same() compare as they should", () => {

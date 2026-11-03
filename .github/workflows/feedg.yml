@@ -1,0 +1,124 @@
+name: Feed G probe
+
+# Dispatch only: try ReddyBook (Feed G) through the Mumbai Worker with a few header variants; nothing committed.
+# A pull request never runs this (the repository is public). Prints status + a short body so a 403 is readable (book vs host-not-allowed).
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: feedg-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      FEEDG_NAME: ${{ secrets.FEEDG_NAME }}
+      FEEDG_API: ${{ secrets.FEEDG_API }}
+      FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+      FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Relay health (colo)
+        run: |
+          python - <<'PY'
+          import json, os, urllib.error, urllib.request
+          addr = os.environ["FEEDG_RELAY"].strip().rstrip("/")
+          key = os.environ["FEEDG_RELAY_KEY"].strip()
+          req = urllib.request.Request(f"{addr}?health=1", headers={"x-relay-key": key})
+          try:
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  body = r.read().decode()
+                  print("health", r.status, body)
+          except urllib.error.HTTPError as e:
+              print("health", e.code, e.read()[:200])
+              raise
+          PY
+      - name: Try event_list strategies
+        run: |
+          python - <<'PY'
+          import json, os, urllib.error, urllib.parse, urllib.request
+          from urllib.parse import urlparse
+
+          api = os.environ["FEEDG_API"].strip().rstrip("/")
+          addr = os.environ["FEEDG_RELAY"].strip().rstrip("/")
+          key = os.environ["FEEDG_RELAY_KEY"].strip()
+          host = urlparse(api).hostname or ""
+          # www twin of an api.* host (many white-labels serve the SPA there)
+          www = ("www." + host.split(".", 1)[-1]) if host.startswith("api.") else host
+          target = f"{api}/api/guest/event_list"
+          # Warm the SPA origin once: some books mint a cookie before guest JSON answers.
+          cookie = ""
+          try:
+              home = f"https://{www}/"
+              req = urllib.request.Request(
+                  f"{addr}?u={urllib.parse.quote(home, safe='')}",
+                  headers={"x-relay-key": key, "x-relay-origin": f"https://{www}", "x-relay-referer": f"https://{www}/"},
+              )
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  cookie = (r.headers.get("x-relay-set-cookie") or "").split(";")[0].strip()
+                  print(f"warmup www: HTTP {r.status} cookie={bool(cookie)}")
+          except urllib.error.HTTPError as e:
+              print(f"warmup www: HTTP {e.code} body={e.read()[:80]!r}")
+          except Exception as e:  # noqa: BLE001
+              print(f"warmup www: {type(e).__name__}: {e}")
+
+          strategies = [
+              ("default", {"x-relay-origin": f"https://{host}", "x-relay-referer": f"https://{host}/"}),
+              ("www-referer", {"x-relay-origin": f"https://{www}", "x-relay-referer": f"https://{www}/"}),
+              ("www-match", {"x-relay-origin": f"https://{www}", "x-relay-referer": f"https://{www}/sports/cricket"}),
+              ("mobile-ua", {
+                  "x-relay-origin": f"https://{www}",
+                  "x-relay-referer": f"https://{www}/",
+                  "x-relay-ua": "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+              }),
+          ]
+          if cookie:
+              strategies.append(("www+cookie", {
+                  "x-relay-origin": f"https://{www}",
+                  "x-relay-referer": f"https://{www}/",
+                  "x-relay-cookie": cookie,
+              }))
+          lines = []
+          for name, extra in strategies:
+              q = urllib.parse.quote(target, safe="")
+              req = urllib.request.Request(f"{addr}?u={q}", headers={"x-relay-key": key, **extra})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      raw = r.read()
+                      code, text = r.status, raw[:120].decode("utf-8", "replace")
+                      upstream = r.headers.get("x-relay-upstream-status", "")
+              except urllib.error.HTTPError as e:
+                  raw = e.read()
+                  code, text = e.code, raw[:120].decode("utf-8", "replace")
+                  upstream = e.headers.get("x-relay-upstream-status", "") if e.headers else ""
+              ok = code == 200 and b"events" in raw[:2000]
+              line = f"{name}: HTTP {code} upstream={upstream or '-'} ok={ok} body={text!r}"
+              print(line)
+              lines.append(line)
+          # Full adapter path (same as hourly): surfaces the improved reason string
+          from value_bets.adapters import feedg
+          from value_bets.util import iso, now_utc
+          try:
+              rows, raw = feedg.fetch(iso(now_utc()), use_state=False)
+              info = next(iter(raw["books"].values()))
+              summary = f"adapter: ok events={info.get('events')} rows={len(rows)} fancy={len(raw.get('fancy') or [])}"
+          except Exception as e:  # noqa: BLE001
+              summary = f"adapter: FAIL {type(e).__name__}: {e}"
+          print(summary)
+          lines.append(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "w", encoding="utf-8") as f:
+              f.write("## Feed G probe\n\n```\n" + "\n".join(lines) + "\n```\n")
+          if not any("ok=True" in x or x.startswith("adapter: ok") for x in lines):
+              raise SystemExit(1)
+          PY
