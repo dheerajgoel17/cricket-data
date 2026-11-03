@@ -2,3 +2,4 @@
 .wrangler
 .dev.vars
 .env*
+.relay_key*

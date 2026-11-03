@@ -1,3 +1,4 @@
+import random
 import re
 import time
 
@@ -20,15 +21,19 @@ def row(**kw):
 
 
 class Pace:
-    """One request at a time, at least ``gap`` seconds apart. ``get`` is the adapter's own fetch (one attempt, no retries), looked up at call time."""
+    """One request at a time, at least ``gap`` seconds apart, plus a small random jitter so pulls do not look metronomic.
+    ``get`` is the adapter's own fetch (one attempt, no retries), looked up at call time."""
 
     def __init__(self, gap: float, get):
         self.gap, self.last, self._get = gap, 0.0, get
 
     def get(self, url: str):
         wait = self.last + self.gap - time.monotonic()
+        jitter = random.uniform(0.05, max(0.15, self.gap * 0.35)) if self.gap > 0 else 0.0
         if wait > 0:
-            time.sleep(wait)
+            time.sleep(wait + jitter)
+        elif jitter:
+            time.sleep(jitter * 0.5)
         try:
             return self._get(url)
         finally:

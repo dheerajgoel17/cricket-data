@@ -86,7 +86,7 @@ def test_settle_ou_from_archive(tmp_path, monkeypatch):
     def fake_patch(base, key, bet_key, upd, settled_at):
         patches.append((bet_key, upd))
 
-    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("SUPABASE_URL", "https://db.example.invalid")
     monkeypatch.setenv("SUPABASE_SERVICE_KEY", "sb_secret_test")
     monkeypatch.setattr(ledger, "_list_open", fake_list)
     monkeypatch.setattr(ledger, "_patch_settled", fake_patch)
@@ -101,7 +101,7 @@ def test_settle_skips_when_no_archive_result(tmp_path, monkeypatch):
     (tmp_path / "archive" / "2026-11" / "x.json").write_text(json.dumps({
         "match": "Alpha vs Beta", "start_utc": "2026-11-01T10:00:00Z", "lines": [], "results": [],
     }))
-    monkeypatch.setenv("SUPABASE_URL", "https://example.supabase.co")
+    monkeypatch.setenv("SUPABASE_URL", "https://db.example.invalid")
     monkeypatch.setenv("SUPABASE_SERVICE_KEY", "sb_secret_test")
     monkeypatch.setattr(ledger, "_list_open", lambda *a: [{
         "bet_key": "k", "kind": "model", "match": "Alpha vs Beta", "start_utc": "2026-11-01T10:00:00Z",

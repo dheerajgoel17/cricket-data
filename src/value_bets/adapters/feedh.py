@@ -3,7 +3,7 @@
 The book and its host are deployment configuration, never code (docs/OPERATIONS.md): ``FEEDH_URL`` is the sportsbook root and
 ``FEEDH_NAME`` is the name its prices are published under. Unset, the source is skipped. It never runs on a laptop: ``fetch`` raises
 ``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it always goes through the Cloudflare Worker relay
-(``FEEDH_RELAY`` or Feed G's pair); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing, then every
+(``FEEDH_RELAY`` / ``FEEDH_RELAY_KEY``, or Feed G's pair when those still point at the Worker); there is no direct call, so a home IP is never on the book's logs. Polite: one sport listing, then every
 in-horizon game and competition page (internationals first), ``FEEDH_SPACING_SECS`` apart, one attempt each; a 429 ends the run and
 ``FEEDH_BUDGET_SECS`` stops new pages.
 
@@ -123,8 +123,19 @@ def _http_body(err: urllib.error.HTTPError) -> str:
         return ""
 
 
+def _relay_headers(url: str, key: str) -> dict[str, str]:
+    """Key + Origin/Referer of the book host so the hop looks like a same-site XHR."""
+    host = urllib.parse.urlparse(url).hostname or ""
+    origin = f"https://{host}" if host else ""
+    return {
+        "x-relay-key": key,
+        "x-relay-origin": origin,
+        "x-relay-referer": f"{origin}/",
+    }
+
+
 def request(url: str):
-    """One GET through the Mumbai relay. Direct only for test hosts. A laptop never reaches a real book."""
+    """One GET through the free Mumbai Worker hop. Direct only for test hosts. A laptop never reaches a real book."""
     if not on_runner() and not lab(url):
         raise Skip("Feed H does not run on a local machine")
     rl = relay()
@@ -133,7 +144,11 @@ def request(url: str):
             return http_json(url, retries=0)[0]
         raise Skip("FEEDH_RELAY not set (never call the book directly)")
     try:
-        return http_json(f"{rl[0]}?u={urllib.parse.quote(url, safe='')}", headers={"x-relay-key": rl[1]}, retries=0)[0]
+        return http_json(
+            f"{rl[0]}?u={urllib.parse.quote(url, safe='')}",
+            headers=_relay_headers(url, rl[1]),
+            retries=0,
+        )[0]
     except urllib.error.HTTPError as e:
         raise urllib.error.HTTPError(e.url, e.code, _http_body(e) or e.reason, e.hdrs, None) from e
 
