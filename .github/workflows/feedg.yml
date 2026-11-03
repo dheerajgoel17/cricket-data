@@ -1,6 +1,6 @@
 name: Feed G probe
 
-# Dispatch only: try ReddyBook (Feed G) through the Mumbai Worker with a few header variants; nothing committed.
+# Dispatch only: try ReddyBook (Feed G) through the Mumbai hop (Vercel bom1, or Worker) with a few header variants; nothing committed.
 # A pull request never runs this (the repository is public). Prints status + a short body so a 403 is readable (book vs host-not-allowed).
 on:
   workflow_dispatch:
@@ -32,17 +32,21 @@ jobs:
       - name: Relay health (colo)
         run: |
           python - <<'PY'
-          import json, os, urllib.error, urllib.request
+          import os, urllib.error, urllib.request
           addr = os.environ["FEEDG_RELAY"].strip().rstrip("/")
           key = os.environ["FEEDG_RELAY_KEY"].strip()
+          # Worker answers ?health=1 with colo; Vercel bom1 has no health route (400/403) — skip, event_list is the check.
           req = urllib.request.Request(f"{addr}?health=1", headers={"x-relay-key": key})
           try:
               with urllib.request.urlopen(req, timeout=20) as r:
-                  body = r.read().decode()
-                  print("health", r.status, body)
+                  print("health", r.status, r.read().decode()[:300])
           except urllib.error.HTTPError as e:
-              print("health", e.code, e.read()[:200])
-              raise
+              body = e.read()[:200]
+              print("health", e.code, body)
+              if b'"colo"' not in body and e.code in (400, 403, 404):
+                  print("health: no Worker colo (Vercel hop) — continuing")
+              else:
+                  raise
           PY
       - name: Try event_list strategies
         run: |
