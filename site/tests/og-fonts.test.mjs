@@ -14,7 +14,9 @@ test("the share card's font files are installed and listed for the function", ()
   for (const f of [...satoshi, ...condensed]) assert.ok(existsSync(new URL(`../${f}`, import.meta.url)), `${f} is installed`);
   const vercel = JSON.parse(readFileSync(new URL("../vercel.json", import.meta.url), "utf8"));
   const inc = vercel.functions["api/og.js"].includeFiles;
-  assert.match(inc, /fonts\/satoshi\/Satoshi-/);
+  // Vercel caps includeFiles at 256 chars; keep fonts as globs under that limit.
+  assert.ok(inc.length <= 256, `api/og.js includeFiles is ${inc.length} chars (max 256)`);
+  assert.match(inc, /fonts\/satoshi\//);
   assert.match(inc, /barlow-condensed/);
 });
 
