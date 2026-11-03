@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -88,6 +88,20 @@ test("the nearest upcoming match wins; a match that started long ago is ignored"
   assert.equal(r.match, "sooner");
   assert.equal(r.lines.length, 1);
   assert.equal(bookLinesFor({ lines: [L(5.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" })] }, "ab12", "runs", "T20", NOW), null);
+});
+
+test("prefer line/start picks the international when a club List A of the same format is sooner (Nicholls-style)", () => {
+  // ODI format buckets List A: Canterbury Ford Trophy at 21:30, NZ vs India at 02:00 next day — a fixture link with line 28.5 must not open on Canterbury 34.5
+  const now = Date.parse("2026-11-03T20:00:00Z");
+  const club = L(34.5, 1.83, 1.83, { fmt: "ODI", match: "Otago Volts vs Canterbury Kings", team: "Canterbury", start_utc: "2026-11-03T21:30:00Z" });
+  const intl = L(28.5, 1.85, 1.85, { fmt: "ODI", match: "New Zealand vs India", team: "New Zealand", start_utc: "2026-11-04T02:00:00Z" });
+  const doc = { lines: [club, intl] };
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "ODI", now, BOOK_KEEP_MS).match, "Otago Volts vs Canterbury Kings", "no prefer: soonest");
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "ODI", now, BOOK_KEEP_MS, 0, { line: 28.5 }).match, "New Zealand vs India");
+  assert.equal(bookLinesFor(doc, "ab12", "runs", "ODI", now, BOOK_KEEP_MS, 0, { start: "2026-11-04T02:00:00Z" }).team, "New Zealand");
+  assert.deepEqual(bookStatsFor(doc, "ab12", "ODI", now, BOOK_KEEP_MS, { line: 28.5 }), ["runs"]);
+  assert.equal(ofBookMatch([club, intl], { line: 34.5 })[0].team, "Canterbury");
+  assert.equal(ofBookMatch([club, intl], { line: 99.5 })[0].match, "Otago Volts vs Canterbury Kings", "unknown line falls back to soonest");
 });
 
 test("keepMsFor is 24 hours, 6 days for a Test; the player page's window still has a match that started a few hours ago", () => {

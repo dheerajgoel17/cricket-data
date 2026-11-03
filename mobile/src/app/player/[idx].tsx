@@ -56,18 +56,19 @@ const FILTER_GROUPS: { key: keyof Filters; label: string; options?: [string, str
 
 /**
  * A player, as on the site: the stat chips and format switch in a blurred bar that tucks away while you scroll down and returns when you scroll up; the player, his numbers, the
- * chart against a line he can step, the match he plays next, filters, and the lines, game log and splits. Opened from a prop row on its line (`?stat=&line=&fmt=&scope=`).
+ * chart against a line he can step, the match he plays next, filters, and the lines, game log and splits. Opened from a prop row on its line (`?stat=&line=&fmt=&scope=&start=`).
  */
 export default function PlayerPage() {
-  const params = useLocalSearchParams<{ idx: string; stat?: string; line?: string; fmt?: string; scope?: string; team?: string }>();
+  const params = useLocalSearchParams<{ idx: string; stat?: string; line?: string; fmt?: string; scope?: string; team?: string; start?: string }>();
   const idx = Number(params.idx);
   const inset = useScreenInsets(false);
   const [stat, setStat] = useState(params.stat ?? "");
   const [fmt, setFmt] = useState<number | undefined>(params.fmt !== undefined && params.fmt !== "" ? Number(params.fmt) : undefined);
   const [scope, setScope] = useState<number | undefined>(params.scope ? Number(params.scope) : undefined);
   const [lineQ, setLineQ] = useState<number | undefined>(params.line !== undefined && params.line !== "" && Number.isFinite(Number(params.line)) ? Number(params.line) : undefined);
+  const [startQ] = useState(params.start || undefined); // kick-off of the priced match the link opened from (sticky for kit / lines when two games share a format)
   const [filters, setFilters] = useState<Filters>({});
-  const s = usePlayerScreen(idx, { stat, fmt, scope, line: lineQ, filters });
+  const s = usePlayerScreen(idx, { stat, fmt, scope, line: lineQ, start: startQ, filters });
   const profile = profileParts(useQuery(profilesQuery).data, s.pid).join(" · ");
   useEffect(() => { if (s.ok) pushRecentPlayer(idx); }, [idx, s.ok]);
   const pricedSet = useMemo(() => new Set(s.pricedStats), [s.pricedStats]);

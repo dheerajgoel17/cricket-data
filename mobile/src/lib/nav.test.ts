@@ -7,6 +7,7 @@ describe("links", () => {
   test("a player link carries the site's parameters, the format as its number", () => {
     expect(playerPath({ idx: 4421, stat: "runs", line: 24.5, fmt: "T20" })).toBe("/player/4421?stat=runs&line=24.5&fmt=0");
     expect(playerPath({ idx: 7, stat: "wickets", line: 1.5, fmt: "Test", inn: 2, team: "New Zealand" })).toBe("/player/7?stat=wickets&line=1.5&fmt=2&scope=2&team=New%20Zealand");
+    expect(playerPath({ idx: 197, stat: "runs", line: 28.5, fmt: "ODI", start: "2026-11-04T02:00:00Z" })).toBe("/player/197?stat=runs&line=28.5&fmt=1&start=2026-11-04T02%3A00%3A00Z");
   });
 
   test("a fixture link is the fixture's id", () => {

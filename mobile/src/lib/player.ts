@@ -17,7 +17,7 @@ import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
 import { fixtureStart } from "@/lib/rail";
 
 export interface Filters { opp?: string; venue?: string; vt?: string; inn?: string; pos?: string; lvl?: string; last?: string }
-export interface PlayerQuery { stat?: string; fmt?: number; scope?: number; line?: number; filters: Filters }
+export interface PlayerQuery { stat?: string; fmt?: number; scope?: number; line?: number; start?: string; filters: Filters }
 export const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
 
 /** The page's state for a player: stat, format, innings scope, the line the link carried, and the filters. */
@@ -39,13 +39,15 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
   const fmtVal = q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0);
   const fmt: string = FORMATS[fmtVal];
   const keep = keepMsFor(fmt);
-  const pricedStats: string[] = doc ? bookStatsFor(doc, pid, fmt, undefined, keep) : [];
+  // a prop-row link carries line and often start so two priced games of this format (NZ ODI and a List A) open on the one that was tapped
+  const prefer = useMemo(() => ({ start: q.start || undefined, line: q.line, stat: askedStat || undefined }), [q.start, q.line, askedStat]);
+  const pricedStats: string[] = doc ? bookStatsFor(doc, pid, fmt, undefined, keep, prefer) : [];
   const stat = pricedStats.includes(askedStat) || (STATS as any)[askedStat] ? askedStat : pricedStats[0] || "runs";
   // a Test batter has three views, each its own lines and chart, never mixed: both innings combined, his side's 1st innings, its 2nd (scope 0, 1, 2)
   const testBat = fmt === "Test" && (STATS as any)[stat]?.side === "bat";
-  const pricedScopes: number[] = doc && testBat ? bookScopesFor(doc, pid, stat, fmt, undefined, keep) : [];
+  const pricedScopes: number[] = doc && testBat ? bookScopesFor(doc, pid, stat, fmt, undefined, keep, prefer) : [];
   const scope = !testBat ? 0 : q.scope != null && [0, 1, 2].includes(q.scope) ? q.scope : pricedScopes.length && !pricedScopes.includes(0) ? pricedScopes[0] : 0;
-  const book = doc ? bookLinesFor(doc, pid, stat, fmt, undefined, keep, scope) : null;
+  const book = doc ? bookLinesFor(doc, pid, stat, fmt, undefined, keep, scope, prefer) : null;
   const bookDefault = !!book && q.line === undefined;
   const f = q.filters;
   const plan = {
@@ -62,19 +64,19 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
     queryFn: (): Promise<any> => runPlan(store, rz, plan, { playerIdx: idx }),
   });
   const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
-  const next = useMemo(() => nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures: fixtures.data || [], live: live.data }), [store, doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data]);
+  const next = useMemo(() => nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures: fixtures.data || [], live: live.data, prefer }), [store, doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, prefer]);
   // kit, crest and hero label follow the match side; profile team only when there is no match
   const side = matchSide(next?.team, team);
   return { ok, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
 }
 
 /**
- * The match the page shows: the nearest booked line still in the keep window (upcoming, in play, or just finished), else the schedule's next unpriced match of his team in
- * this format. The opponent and ground are the schedule's spelling. Null when there is none.
+ * The match the page shows: the booked line `prefer` names (shared link), else the soonest still in the keep window (upcoming, in play, or just finished), else the
+ * schedule's next unpriced match of his team in this format. The opponent and ground are the schedule's spelling. Null when there is none.
  */
-export function nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures, live, now = Date.now() }: { store: any; doc: any; pid: string; idx: number; fmt: string; team: string; lastGame?: any; fixtures: any[]; live: any; now?: number }) {
+export function nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures, live, prefer = null, now = Date.now() }: { store: any; doc: any; pid: string; idx: number; fmt: string; team: string; lastGame?: any; fixtures: any[]; live: any; prefer?: { start?: string; line?: number; stat?: string } | null; now?: number }) {
   if (!store) return null;
-  const priced = pickPricedMatch(doc, pid, fmt, now);
+  const priced = pickPricedMatch(doc, pid, fmt, now, prefer);
   let match: string, start: string, competition: string, club = "", row: any, phase: "upcoming" | "live" | "final" = "upcoming";
   // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
   let lastSide = "";

@@ -151,7 +151,14 @@ function PlayerScreen({ idx }: { idx: number }) {
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
   const keep = keepMsFor(FORMATS[fmtVal]);
-  const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep) : [];
+  // a fixture / Hot props link carries ?line= and often ?start= so a player priced on two games of this format (NZ ODI and a List A) opens on that match, not the sooner club one
+  const preferLine = q.line !== undefined && q.line !== "" ? Number(q.line) : undefined;
+  const prefer = useMemo(() => ({
+    start: q.start || undefined,
+    line: Number.isFinite(preferLine as number) ? preferLine : undefined,
+    stat: askedStat || undefined,
+  }), [q.start, preferLine, askedStat]);
+  const pricedStats = lines.data ? bookStatsFor(lines.data, pid, FORMATS[fmtVal], undefined, keep, prefer) : [];
   const pricedSet = new Set(pricedStats);
   // Every prop category stays on the rail. Listed ones read at full weight; the rest are muted and open the same chart with no book line.
   const statItems: [string, ReactNode][] = STAT_OPTIONS.map(([k, label]) => [k, pricedSet.has(k) ? label : <span className="opacity-70">{label}</span>]);
@@ -160,11 +167,16 @@ function PlayerScreen({ idx }: { idx: number }) {
   // 2nd. `?scope=` is 0, 1 or 2; with none, the page opens on the combined view when the books price it, else on the first scope they do price. The switch is always shown for a
   // Test batting stat (T20 and ODI have one innings a player), so a scope no book prices still charts that innings. The sheet's "batted first / chasing" filter is another thing.
   const testBat = FORMATS[fmtVal] === "Test" && (STATS as any)[stat]?.side === "bat";
-  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep) : [];
+  const priced: number[] = lines.data && testBat ? bookScopesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep, prefer) : [];
   const asked = q.scope === undefined || q.scope === "" ? null : Number(q.scope);
   const scope = !testBat ? 0 : asked != null && [0, 1, 2].includes(asked) ? asked : priced.length && !priced.includes(0) ? priced[0] : 0;
-  const book = lines.data ? bookLinesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep, scope) : null;
+  const book = lines.data ? bookLinesFor(lines.data, pid, stat, FORMATS[fmtVal], undefined, keep, scope, prefer) : null;
   const bookDefault = !!book && (q.line === undefined || q.line === "");
+  // once a match is chosen, keep its kick-off in the URL so changing the prop category does not flip the kit to the other game
+  useEffect(() => {
+    if (!book?.start_utc || q.start === book.start_utc) return;
+    navigateWith({ start: book.start_utc });
+  }, [book?.start_utc]); // eslint-disable-line react-hooks/exhaustive-deps
   const plan = {
     kind: "player_prop", stat, line: q.line !== undefined && q.line !== "" ? Number(q.line) : bookDefault ? book.main.line : null, side: q.side || "over",
     competition: q.comp || null, split_by: SPLITS,
@@ -174,7 +186,7 @@ function PlayerScreen({ idx }: { idx: number }) {
   };
   const res = useRunPlan(plan, { playerIdx: idx }, !lines.isLoading);
   const lastGame = res.data?.ok ? res.data.chart?.entries?.at(-1) : undefined;
-  const nextMatch = useNextMatch(lines.data, pid, idx, FORMATS[fmtVal], team, lastGame);
+  const nextMatch = useNextMatch(lines.data, pid, idx, FORMATS[fmtVal], team, lastGame, prefer);
   // kit, crest and hero label follow the match side (India vs NZ → India; IPL → Sunrisers); profile team only when there is no match
   const side = matchSide(nextMatch?.team, team);
   const sideIx = teamIndexByName(store.teams, side, store.P.tm[idx]);
@@ -195,7 +207,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
         <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
       </div>
-      {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
+      {fmts.length > 1 && <PillGroup segmented layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })} items={fmts.map(([i, f]) => [String(i), f])} />}
       {testBat && <PillGroup segmented layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
         items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />}
       <PlayerHeader {...{ idx, name, fmts, share }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
@@ -207,19 +219,19 @@ function PlayerScreen({ idx }: { idx: number }) {
 }
 
 /**
- * The match the player page should show: the nearest booked line still in the keep window (upcoming, in play, or just
- * finished), else the schedule's next unpriced match of his team in this format. The opponent and ground are the
- * schedule's spelling. Null when there is none. A finished listed match is not replaced by the next unpriced one while
- * Hot props still has it.
+ * The match the player page should show: the booked line still in the keep window that `prefer` (from the shared link)
+ * names, else the soonest (upcoming, in play, or just finished), else the schedule's next unpriced match of his team in
+ * this format. The opponent and ground are the schedule's spelling. Null when there is none. A finished listed match is
+ * not replaced by the next unpriced one while Hot props still has it.
  */
-function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string, lastGame?: any) {
+function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: string, lastGame?: any, prefer?: { start?: string; line?: number; stat?: string } | null) {
   const { store } = useData();
   const fixtures = useFixtures();
   const live = useLiveDoc();
   const state = useQuery(stateQuery);
   return useMemo(() => {
     const now = Date.now(), fx = fixtures.data || [];
-    const priced = pickPricedMatch(doc, pid, fmt, now);
+    const priced = pickPricedMatch(doc, pid, fmt, now, prefer);
     let match: string, start: string, competition: string, club = "", row: any, phase: "upcoming" | "live" | "final" = "upcoming";
     // the side he last played for in this format (his profile team is often his country, and his next club game is the one that matters)
     let lastSide = "";
@@ -249,7 +261,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
     return { match, start, competition, team: mine, opp, ground, known, priced: !!priced, phase };
-  }, [doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, state.data, store]);
+  }, [doc, pid, idx, fmt, team, lastGame, prefer, fixtures.data, live.data, state.data, store]);
 }
 
 function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigateWith, scope, fmt }: any) {

@@ -49,7 +49,7 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
         {list.slice(0, 4).map((r) => (
           <li key={`${r.idx}${r.stat}${r.line}${r.fmt}`} className="border-t border-hairline first:border-t-0">
             <Link
-              to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}
+              to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
               onClick={() => track("tape_row", { kind, stat: r.stat })}
               className="flex min-h-row items-center gap-snug py-tight transition-colors active:bg-accent"
             >

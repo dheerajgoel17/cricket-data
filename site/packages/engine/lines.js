@@ -64,16 +64,17 @@ export function bookQuotes(lines) {
 }
 
 /**
- * The lines on offer for this player and stat in this format, for the nearest match that has not started more than `graceMs` ago, in one scope. `inn` is 0 for the
- * whole match's lines (the default: what every caller that does not chart one innings wants), 1 or 2 for a Test's first or second innings: a first-innings line is a
- * different bet from a match total and is never mixed into it. The match is the nearest one any scope prices, so the scopes of one page are always one match's.
+ * The lines on offer for this player and stat in this format, for the match `ofBookMatch` picks (nearest open, or the one a shared link named via `prefer`), in one scope.
+ * `inn` is 0 for the whole match's lines (the default: what every caller that does not chart one innings wants), 1 or 2 for a Test's first or second innings: a
+ * first-innings line is a different bet from a match total and is never mixed into it. The match is the one any scope prices under that pick, so the scopes of one
+ * page are always one match's. `prefer` is `{ start?, line? }` from the player URL (a fixture row's kick-off and/or the line it opened with).
  * Returns null when there are none, else { match, competition, start_utc, lines: [{line, books, prob}], main } where `main` is the line priced closest to evens
  * (the line a book hangs as "the" line), ties going to the lower line.
  */
-export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, inn = 0) {
+export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, inn = 0, prefer = null) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
   if (!all.length) return null;
-  const here = ofNearestMatch(all).filter((l) => lineScope(l) === inn);
+  const here = ofBookMatch(all, prefer).filter((l) => lineScope(l) === inn);
   if (!here.length) return null;
   const byLine = new Map();
   for (const l of here) {
@@ -90,12 +91,38 @@ export function bookLinesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 
 
 const startOf = (l) => (l.start_utc ? Date.parse(l.start_utc) : Infinity);
 
-/** The nearest open line's match, plus any other of the same two sides whose start is within the book window (14 h, 6 days for a Test). Books stamp one fixture minutes apart. */
-function ofNearestMatch(lines) {
+/**
+ * The open lines of one match: by default the soonest still in the keep window (plus any other stamp of the same two sides within the book window).
+ * When a player is priced on two games of the same format at once (NZ ODI and a Ford Trophy List A), a shared link from one of them must not land on the other:
+ * `prefer.start` (the fixture's kick-off) wins when it is within the book window of some open line; else `prefer.line` picks the match that prices that exact line;
+ * else the soonest. Books stamp one fixture minutes apart, so those stamps stay one match via `sameBookMatch`.
+ */
+export function ofBookMatch(lines, prefer = null) {
   if (!lines.length) return [];
-  const first = Math.min(...lines.map(startOf));
-  const nearest = lines.find((l) => startOf(l) === first);
-  return lines.filter((l) => sameBookMatch(l, nearest));
+  let anchor = null;
+  const preferStart = prefer?.start ? Date.parse(prefer.start) : NaN;
+  if (Number.isFinite(preferStart)) {
+    // exact kick-off, or another stamp of the same fixture a few minutes off — not a different game hours away
+    const exact = lines.find((l) => startOf(l) === preferStart);
+    if (exact) anchor = exact;
+    else {
+      const near = lines.reduce((best, l) => (!Number.isFinite(startOf(l)) ? best : !best || Math.abs(startOf(l) - preferStart) < Math.abs(startOf(best) - preferStart) ? l : best), null);
+      if (near && Math.abs(startOf(near) - preferStart) < 2 * 3600e3) anchor = near;
+    }
+  }
+  if (!anchor && prefer?.line != null && Number.isFinite(+prefer.line)) {
+    const want = +prefer.line;
+    const hit = lines.filter((l) => Math.abs(l.line - want) < 0.01);
+    if (hit.length) {
+      const first = Math.min(...hit.map(startOf));
+      anchor = hit.find((l) => startOf(l) === first);
+    }
+  }
+  if (!anchor) {
+    const first = Math.min(...lines.map(startOf));
+    anchor = lines.find((l) => startOf(l) === first);
+  }
+  return lines.filter((l) => sameBookMatch(l, anchor));
 }
 
 /** Same two sides, same format, starts within the book window. Falls back to an exact start when a row has no pair of names. */
@@ -119,21 +146,22 @@ function openLines(doc, pid, stat, fmt, now, graceMs) {
 /**
  * Stats a book prices for this player in this format, on the same match `bookLinesFor` picks. Empty when none
  * (the player page then hides the prop-category chips instead of offering a median line as if it were listed).
+ * `prefer` is the same `{ start?, line? }` the lines helper takes, so the prop rail and the kit stay on one match.
  */
-export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
+export function bookStatsFor(doc, pid, fmt, now = Date.now(), graceMs = 3 * 3600e3, prefer = null) {
   const all = openPlayerLines(doc, pid, fmt, now, graceMs);
   if (!all.length) return [];
-  return [...new Set(ofNearestMatch(all).map((l) => l.stat))];
+  return [...new Set(ofBookMatch(all, prefer).map((l) => l.stat))];
 }
 
 /**
  * The scopes the books price this player's stat in, for the same match `bookLinesFor` picks: a sorted list of 0 (the whole match), 1 and 2 (a Test's first and second
  * innings). Empty when there are no lines. The player page offers a switch between them.
  */
-export function bookScopesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3) {
+export function bookScopesFor(doc, pid, stat, fmt, now = Date.now(), graceMs = 3 * 3600e3, prefer = null) {
   const all = openLines(doc, pid, stat, fmt, now, graceMs);
   if (!all.length) return [];
-  return [...new Set(ofNearestMatch(all).map(lineScope))].sort((a, b) => a - b);
+  return [...new Set(ofBookMatch(all, prefer).map(lineScope))].sort((a, b) => a - b);
 }
 
 /**

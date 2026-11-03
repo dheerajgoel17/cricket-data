@@ -19,9 +19,9 @@ export function fancyMarketPath(id: string, o: { fm: string; sc?: number | strin
   return `${fixturePath(id)}/fancy${s ? `?${s}` : ""}`;
 }
 
-/** The player link: the site's own parameters (`stat`, `line`, `fmt` as the format's number, `scope` for a Test side's innings), plus `team` for the shirt. */
-export const playerPath = (r: { idx: number; stat: string; line: number; fmt: string; inn?: number; team?: string }) =>
-  `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}${r.team ? `&team=${encodeURIComponent(r.team)}` : ""}`;
+/** The player link: the site's own parameters (`stat`, `line`, `fmt` as the format's number, `scope` for a Test side's innings, `start` for which priced match), plus `team` for the shirt. */
+export const playerPath = (r: { idx: number; stat: string; line: number; fmt: string; inn?: number; team?: string; start?: string }) =>
+  `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}${r.team ? `&team=${encodeURIComponent(r.team)}` : ""}`;
 
 let lastPush = 0;
 /**

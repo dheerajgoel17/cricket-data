@@ -25,14 +25,35 @@ export function teamIndexByName(teams, name, fallback = -1) {
 }
 
 /**
- * The nearest booked match still in the keep window (24 h, 6 days for a Test), including one that has started
- * or just finished. Null when none. Same window Hot props uses, so the two pages agree.
+ * The booked match the player page should show still in the keep window (24 h, 6 days for a Test), including one that
+ * has started or just finished. Null when none. Same window Hot props uses, so the two pages agree.
+ * When he is priced on two games of this format at once (international ODI and a List A club game), `prefer` from the
+ * shared link (`{ start?, line?, stat? }`) picks the match that link opened from: kick-off first, else the line (and
+ * optionally that stat), else the soonest — same rule as `ofBookMatch` in lines.js.
  */
-export function pickPricedMatch(doc, pid, fmt, now = Date.now()) {
+export function pickPricedMatch(doc, pid, fmt, now = Date.now(), prefer = null) {
   const keep = keepMsFor(fmt);
-  return (doc?.lines || [])
-    .filter((l) => l.pid === pid && l.fmt === fmt && l.books?.length && l.start_utc && Date.parse(l.start_utc) > now - keep)
-    .sort((x, y) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0] || null;
+  const open = (doc?.lines || []).filter((l) => l.pid === pid && l.fmt === fmt && l.books?.length && l.start_utc && Date.parse(l.start_utc) > now - keep);
+  if (!open.length) return null;
+  let pool = open;
+  if (prefer?.stat) {
+    const s = open.filter((l) => l.stat === prefer.stat);
+    if (s.length) pool = s;
+  }
+  const preferStart = prefer?.start ? Date.parse(prefer.start) : NaN;
+  if (Number.isFinite(preferStart)) {
+    // exact kick-off, or another stamp of the same fixture a few minutes off — not a different game hours away (club List A vs the international)
+    const exact = pool.find((l) => Date.parse(l.start_utc) === preferStart);
+    if (exact) return exact;
+    const near = pool.reduce((best, l) => (!best || Math.abs(Date.parse(l.start_utc) - preferStart) < Math.abs(Date.parse(best.start_utc) - preferStart) ? l : best), null);
+    if (near && Math.abs(Date.parse(near.start_utc) - preferStart) < 2 * 3600e3) return near;
+  }
+  if (prefer?.line != null && Number.isFinite(+prefer.line)) {
+    const want = +prefer.line;
+    const hit = pool.filter((l) => Math.abs(l.line - want) < 0.01);
+    if (hit.length) return hit.sort((x, y) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0];
+  }
+  return pool.sort((x, y) => Date.parse(x.start_utc) - Date.parse(y.start_utc))[0] || null;
 }
 
 /**
