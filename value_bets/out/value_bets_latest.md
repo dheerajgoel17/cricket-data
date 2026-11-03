@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-03 17:43 IST
+# Cricket value bets - 2026-11-03 18:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -7,11 +7,11 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **moviodds_bet365**: ok, 1772 prices
 - **smarkets**: ok, 442 prices
 - **feedk**: ok, 164 prices, 5 events
-- **feede**: ok, 478 prices, 14 events
+- **feede**: ok, 478 prices, 13 events
 - **feedf**: ok, 466 prices, 8 events
 - **feedh**: ok, 1126 prices, 40 events
 
-Matches starting in next 168h: **37**, markets priced: **396**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **36**, markets priced: **396**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -29,4 +29,4 @@ Matches starting in next 168h: **37**, markets priced: **396**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Central (male), Chandigarh (W) (female), Chhattisgarh (W) (female), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 112.1s. Snapshot: `odds_20261103T121328Z.jsonl.gz`
+Runtime 137.9s. Snapshot: `odds_20261103T123032Z.jsonl.gz`
