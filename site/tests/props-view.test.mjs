@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { edgeTag, expectedEnd, groundNote, homeProps, modelSide, seriesChips, sideRate } from "@cricket/engine/props-view.js";
+import { profileParts, edgeTag, expectedEnd, groundNote, homeProps, modelSide, seriesChips, sideRate } from "@cricket/engine/props-view.js";
 
 // shrunk chance = (hits + 10 * market chance) / (played + 10); edge = chance * price - 1 (stats.js sideEdge)
 
@@ -91,4 +91,12 @@ test("seriesChips: a series with props first, then more priced, then more listed
   assert.deepEqual(names([it("Big", false), it("Big", false), it("Big", false), it("Small")]), ["Small", "Big"]);
   assert.deepEqual(names([it("B"), it("B"), it("A"), it("A"), it("A", false), it("C"), it("D", false)]), ["A", "B", "C", "D"]);
   assert.deepEqual(names([it("Zed"), it("Alpha")]), ["Alpha", "Zed"]);
+});
+
+test("profileParts: role, hand, bowling style, only what the source gave", () => {
+  const doc = { l: { r: { ar: "All-rounder", bat: "Batter" }, w: { os: "Off-spin" } }, p: { a: { r: "ar", b: "RHB", w: "os" }, b: { r: "bat", b: "LHB" }, c: {} } };
+  assert.deepEqual(profileParts(doc, "a"), ["All-rounder", "RHB", "Off-spin"]);
+  assert.deepEqual(profileParts(doc, "b"), ["Batter", "LHB"]);
+  assert.deepEqual(profileParts(doc, "c"), []);
+  assert.deepEqual(profileParts(null, "a"), []);
 });

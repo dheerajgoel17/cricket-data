@@ -16,7 +16,8 @@ import { STATS } from "@cricket/engine/rules.js";
 import { sideEdge } from "@cricket/engine/stats.js";
 import { FORMATS, fmtIndex } from "@cricket/engine/util.js";
 import { barState, windowRate, windowRates } from "@cricket/engine/windows.js";
-import { useData } from "@/lib/data";
+import { profileParts } from "@cricket/engine/props-view.js";
+import { loadJson, useData } from "@/lib/data";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { freshState, linesQuery, stateQuery } from "@/lib/queries";
 import { abbr, fixtureStart, localTime, localWhen, num, odds, pc, shortDate } from "@/lib/format";
@@ -106,13 +107,15 @@ function PlayerHeader({ idx, name, team, kitTeam, test, fmts, share }: { idx: nu
   const { store } = useData();
   const nav = useNavigate();
   const teamIx = store.P.tm[idx];
+  const profiles = useQuery({ queryKey: ["profiles"], queryFn: () => loadJson("/data/profiles.json"), staleTime: 60 * 60_000 });
+  const profile = profileParts(profiles.data, store.P.id[idx]).join(" · ");
   // Name, team and formats in two grey lines, then the team badge, star and share as round buttons; the photo stands on the rule under them (no container).
   return (
     <section className="flex items-end justify-between gap-snug border-b border-hairline">
       <div className="grid min-w-0 flex-1 content-start gap-tight pt-stack">
         <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/players"))} className="hidden size-control place-items-center rounded-full bg-secondary text-primary lg:grid"><ChevronLeftIcon className="size-5" /></button>
         <h1 className="text-display font-bold leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
-        <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span><span className="block">{fmts.map(([, f]) => f).join(" · ")}</span></p>
+        <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span><span className="block">{fmts.map(([, f]) => f).join(" · ")}</span>{profile && <span className="block">{profile}</span>}</p>
         <div className="flex items-center gap-snug py-stack">
           <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid size-(--touch) place-items-center rounded-full bg-secondary active:opacity-70"><TeamBadge name={team} size="sm" /></Link>
           <StarButton kind="player" idx={idx} className="size-(--touch)" />
@@ -255,7 +258,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
   const entries: any[] = c ? c.entries : [];
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<string>(c ? c.side : "over");
-  const [win, setWin] = useState<number>(entries.length >= 20 ? 20 : 0);
+  const [win, setWin] = useState<number>(entries.length >= 10 ? 10 : 0) // the last 10 games first;
   const [tab, setTab] = useState<string>(["lines", "logs", "splits"].includes(q.tab) ? q.tab : "lines");
   const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);

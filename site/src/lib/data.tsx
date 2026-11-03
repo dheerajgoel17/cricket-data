@@ -10,7 +10,7 @@ import { AppSkeleton } from "@/components/app/skeletons";
 export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string> }
 const Ctx = createContext<Data | null>(null);
 
-async function loadJson(url: string) {
+export async function loadJson(url: string) {
   try {
     const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
     if (!r.ok) return null;

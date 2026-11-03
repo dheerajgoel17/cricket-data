@@ -66,3 +66,14 @@ export function seriesChips(items, nameOf, priced) {
   }
   return [...total.entries()].sort((a, b) => (pr.get(b[0]) || 0) - (pr.get(a[0]) || 0) || b[1] - a[1] || a[0].localeCompare(b[0]));
 }
+
+/** The parts of a player's profile line from `profiles.json` (`{ l: { r, b, w: code -> label }, p: { id: { r?, b?, w? } } }`): role label, batting hand code, bowling-style label, each only when the source gave it. */
+export function profileParts(doc, pid) {
+  const p = pid ? doc?.p?.[pid] : null;
+  if (!p) return [];
+  const l = doc?.l || {}, parts = [];
+  if (p.r) parts.push(l.r?.[p.r] || p.r);
+  if (p.b) parts.push(p.b);
+  if (p.w) parts.push(l.w?.[p.w] || p.w);
+  return parts;
+}
