@@ -40,6 +40,7 @@ import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
 import { color, font, radius, space, type } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** A match, as on the site: its header in a container (state, sides, kick-off with a live countdown or the score) and the player props priced for it, scored against each player's games. The stat chips sit in a blurred bar that tucks away while you scroll down. */
 export default function FixturePage() {
@@ -159,6 +160,7 @@ export default function FixturePage() {
           ) : null}
         </BlurBar>
       </View>
+      <TabFade />
     </View>
   );
 }

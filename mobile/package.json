@@ -4,6 +4,8 @@
   "main": "index.js",
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/newsreader": "^0.4.1",
+    "@expo-google-fonts/sofia-sans-condensed": "^0.4.2",
     "@expo/metro-runtime": "~58.0.16",
     "@expo/ui": "~58.0.26",
     "@expo/vector-icons": "^15.0.2",

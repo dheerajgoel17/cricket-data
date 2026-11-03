@@ -17,7 +17,7 @@ import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   th: { ...type.caption, ...cap, color: color["muted-foreground"] },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   hit: { ...num, fontSize: 15, textAlign: "center", color: color.primary },
-  date: { ...type.caption, fontSize: 10, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  date: { ...type.caption, fontSize: 10, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   value: { minWidth: 32, height: 28, borderRadius: 7, paddingHorizontal: 6, alignItems: "center", justifyContent: "center" },
   valueText: { ...num, fontSize: 15 },
   void: { ...type.caption, fontSize: 9, color: color.amber, borderWidth: 1, borderStyle: "dashed", borderColor: "rgba(245,165,36,0.6)", borderRadius: 5, paddingHorizontal: 3, paddingVertical: 1 },
@@ -153,6 +153,6 @@ const styles = StyleSheet.create({
   trend: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug + 2 },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   desc: { ...type.footnote, color: color["muted-foreground"] },
-  rate: { ...num, fontSize: 22, letterSpacing: -0.44, lineHeight: 24, color: color.primary },
+  rate: { ...numLg, fontSize: 22, letterSpacing: -0.44, lineHeight: 24, color: color.primary },
   fairText: { ...type.caption, color: color["muted-foreground"] },
 });

@@ -73,6 +73,20 @@ export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = n
   return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)].map((f) => ({ fixture: f, state: stateOf(f), live: matchOf(f), noProps: !!f.noProps }));
 }
 
+/**
+ * The series chips for the matches under a bucket, as `[name, matches]`: a series the books price comes before one with no props, then the one with more priced matches, then the one with more
+ * matches listed, then by name. (The matches themselves keep the rail's order: priced first, in play, soon, later; the unpriced after.)
+ */
+export function seriesChips(items: RailItem[], nameOf: (f: any) => string): [string, number][] {
+  const total = new Map<string, number>(), priced = new Map<string, number>();
+  for (const i of items) {
+    const n = nameOf(i.fixture);
+    total.set(n, (total.get(n) || 0) + 1);
+    if (!i.noProps) priced.set(n, (priced.get(n) || 0) + 1);
+  }
+  return [...total.entries()].sort((a, b) => (priced.get(b[0]) || 0) - (priced.get(a[0]) || 0) || b[1] - a[1] || a[0].localeCompare(b[0]));
+}
+
 /** The live feed's match for a fixture, kept only when the books price it too (as the site's `useLiveMatch`). */
 export function liveMatchFor(live: any, lines: any, f: any) {
   const feed = bookFixtures(lines), hit = liveForFixture(live, f);

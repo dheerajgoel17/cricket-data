@@ -17,6 +17,7 @@ import { ChevronRight } from "@/ui/icons";
 import { enter, Working } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
 import { cap, color, font, radius, space, type, tonal } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
 
@@ -27,9 +28,8 @@ export default function Fancy() {
   const shown = cards.filter((c) => c.rows.length > 0); // a match with lines up but nothing to show (no past matches to score them on) is left out
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
-      <AppHeader />
+      <AppHeader title="Fancy" />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Fancy</Text>
         {!ready ? (
           error ? <Text style={styles.empty}>Could not score the fancy lines. Try again in a moment.</Text> : <Working label="Scoring the fancy lines…" rows={4} />
         ) : !shown.length ? (
@@ -40,6 +40,7 @@ export default function Fancy() {
           </View>
         )}
       </ScrollView>
+      <TabFade />
     </View>
   );
 }
@@ -83,7 +84,6 @@ function MatchCard({ f, ms, rows }: Card) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  title: { ...type.display, color: color.foreground, paddingHorizontal: space.gutter, paddingTop: space.stack, paddingBottom: space.snug },
   empty: { ...type.callout, color: color["muted-foreground"], paddingHorizontal: space.gutter, paddingTop: space.snug },
   list: { gap: space.stack, paddingHorizontal: space.gutter },
   card: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   team: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, fontFamily: font.medium, color: color.foreground, fontVariant: ["tabular-nums"] },
+  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   rows: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug + 2, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },

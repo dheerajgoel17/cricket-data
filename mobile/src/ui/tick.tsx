@@ -4,7 +4,7 @@ import { Text } from "@/ui/text";
 import Animated, { Easing, interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
-import { color, space, type } from "@/ui/tokens";
+import { color, space, type, font } from "@/ui/tokens";
 
 const HOLD_MS = 1100;
 
@@ -62,6 +62,6 @@ export function StandingMark({ standing, line }: { standing: Standing | null | u
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 2, borderRadius: 6, paddingHorizontal: 2 },
-  text: { ...type.callout, fontVariant: ["tabular-nums"] },
+  text: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   void: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: color.amber, borderRadius: 4, paddingHorizontal: space.hair, borderStyle: "dashed" },
 });

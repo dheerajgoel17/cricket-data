@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { Easing, runOnJS, useAnimatedProps, useAnimatedStyle, useSharedValue, withDelay, withTiming, type SharedValue } from "react-native-reanimated";
 import Svg, { Circle, Defs, Line, Pattern, Rect } from "react-native-svg";
@@ -10,12 +9,15 @@ import { CountUp, ReText } from "@/ui/count-up";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { barState } from "@cricket/engine/windows.js";
-import { abbr, shortDate } from "@site/lib/format";
+import { abbr, shortDate as shortDateRaw } from "@site/lib/format";
 import { color, font, space, type } from "@/ui/tokens";
 
+/** "06/09" as "6/9": the labels under the bars are short enough to show whole, as in the reference app. */
+const shortDate = (d: string) => String(shortDateRaw(d)).replace(/\b0(\d)/g, "$1");
+
 const HIT = color.hit, MISS = color.miss, AMBER = color.amber;
-// each bar is a vertical gradient (a little lighter at the top) so it reads as a lit solid, not a flat block
-const TONE: Record<string, [string, string]> = { hit: ["#46f0ae", "#1fae76"], miss: ["#ff5a5a", "#c40000"], push: ["#ffc24a", "#d08400"] };
+// each bar is one flat colour: no gradient, square corners
+const TONE: Record<string, string> = { hit: "#2fd68f", miss: "#ef4444", push: "#f5a524" };
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** A ring segment that draws itself from nothing to its length on the UI thread. */
@@ -76,7 +78,7 @@ const GAP = 4, TIP_W = 112;
 
 /**
  * Bar chart of a player's last games against a line (the site's `ChartBars`): the axis names the top and the floor, the line carries its own value, each bar its number, each column its
- * date and opponent. Bars are lit gradients that grow up from the floor, one after another, on the UI thread; a game he did not play is a hatched stub and never counts. Drag a finger
+ * date and opponent. Bars are flat solids that grow up from the floor, one after another, on the UI thread; a game he did not play is a hatched stub and never counts. Drag a finger
  * across the bars to read each game (the others dim, a tip follows, a tick of haptics at every bar). More than 20 games scroll sideways with the newest in view. Tap a bar for that game.
  */
 export function ChartBars({ entries, line, side, height = 240, onSelect }: { entries: any[]; line: number; side: string; height?: number; onSelect?: (e: any, state: string) => void }) {
@@ -139,7 +141,7 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
           <View style={styles.xRow}>
             {entries.map((e, i) => (
               <View key={i} style={[styles.x, col, !wide && i === 0 && { alignItems: "flex-start" }, !wide && i === entries.length - 1 && { alignItems: "flex-end" }]}>
-                {(entries.length - 1 - i) % step === 0 ? <><Text style={styles.xText} numberOfLines={1}>{shortDate(e.date)}</Text>{(e.tag ?? abbr(e.opp)) ? <Text style={styles.xText} numberOfLines={1}>{e.tag ?? abbr(e.opp)}</Text> : null}</> : null}
+                {(entries.length - 1 - i) % step === 0 ? <><Text style={styles.xText} numberOfLines={1} ellipsizeMode="clip">{shortDate(e.date)}</Text>{(e.tag ?? abbr(e.opp)) ? <Text style={styles.xText} numberOfLines={1} ellipsizeMode="clip">{e.tag ?? abbr(e.opp)}</Text> : null}</> : null}
               </View>
             ))}
           </View>
@@ -149,14 +151,13 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
   );
 }
 
-/** One bar: a lit gradient that grows from the floor (staggered), with its value inside; dims while a finger is on another bar. */
+/** One bar: a flat solid that grows from the floor (staggered), with its value inside; dims while a finger is on another bar. */
 function Bar({ i, pct, tone, text, value, active }: { i: number; pct: number; tone: "hit" | "miss" | "push"; text: string; value: number; active: SharedValue<number> }) {
   const g = useSharedValue(0);
   useEffect(() => { g.value = withDelay(Math.min(i * 14, 420), withTiming(1, { duration: 520, easing: Easing.out(Easing.cubic) })); }, [g, i]);
   const style = useAnimatedStyle(() => ({ transform: [{ scaleY: g.value }], opacity: active.value < 0 || active.value === i ? 1 : 0.38 }));
   return (
-    <Animated.View style={[styles.bar, { height: `${pct}%` }, style, { transformOrigin: "bottom" } as any]}>
-      <LinearGradient colors={TONE[tone]} style={StyleSheet.absoluteFill} />
+    <Animated.View style={[styles.bar, { height: `${pct}%`, backgroundColor: TONE[tone] }, style, { transformOrigin: "bottom" } as any]}>
       <Text style={[styles.barText, { color: text }]} numberOfLines={1}>{value}</Text>
     </Animated.View>
   );
@@ -180,19 +181,19 @@ const styles = StyleSheet.create({
   caption: { ...type.caption, color: color["muted-foreground"] },
   chart: { flexDirection: "row", gap: 4 },
   axis: { width: 28, justifyContent: "space-between", alignItems: "flex-end" },
-  tick: { fontSize: 15, lineHeight: 15, fontFamily: font.cond, color: color.foreground, fontVariant: ["tabular-nums"] },
+  tick: { fontSize: 15, lineHeight: 15, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: 1, borderColor: "#fff" },
-  lineLabel: { position: "absolute", left: 0, top: -22, fontSize: 16, fontFamily: font.cond, color: color.foreground, backgroundColor: "rgba(0,0,0,0.75)", paddingHorizontal: 4, borderRadius: 4, overflow: "hidden", fontVariant: ["tabular-nums"] },
+  lineLabel: { position: "absolute", left: 0, top: -22, fontSize: 16, fontFamily: font.data, color: color.foreground, backgroundColor: "rgba(0,0,0,0.75)", paddingHorizontal: 4, borderRadius: 4, overflow: "hidden", fontVariant: ["tabular-nums"] },
   bars: { ...StyleSheet.absoluteFill, flexDirection: "row", alignItems: "flex-end", gap: GAP },
   center: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center" },
-  centerText: { fontSize: 15, lineHeight: 18, fontFamily: font.cond, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
+  centerText: { fontSize: 15, lineHeight: 18, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
   tip: { position: "absolute", top: -4, left: 0, width: TIP_W, alignItems: "center", backgroundColor: "rgba(40,40,44,0.96)", borderRadius: 10, paddingVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.18)", zIndex: 5 },
-  tipText: { fontSize: 14, fontFamily: font.cond, color: color.foreground, textAlign: "center", width: "100%" },
+  tipText: { fontSize: 14, fontFamily: font.data, color: color.foreground, textAlign: "center", width: "100%" },
   slot: { height: "100%", justifyContent: "flex-end" },
   stub: { height: 22, width: "100%" },
-  bar: { width: "100%", justifyContent: "flex-end", alignItems: "center", paddingBottom: 4, borderTopLeftRadius: 5, borderTopRightRadius: 5, overflow: "hidden" },
-  barText: { fontSize: 13, width: "100%", textAlign: "center", fontFamily: font.cond, fontVariant: ["tabular-nums"] },
+  bar: { width: "100%", justifyContent: "flex-end", alignItems: "center", paddingBottom: 4, overflow: "hidden" },
+  barText: { fontSize: 13, width: "100%", textAlign: "center", fontFamily: font.data, fontVariant: ["tabular-nums"] },
   xRow: { flexDirection: "row", gap: 4, paddingTop: 6 },
   x: { alignItems: "center" },
-  xText: { width: 40, textAlign: "center", fontSize: 11, lineHeight: 13, fontFamily: font.cond, color: color["muted-foreground"] },
+  xText: { width: 44, textAlign: "center", fontSize: 10.5, lineHeight: 13, fontFamily: font.medium, color: color["muted-foreground"] },
 });

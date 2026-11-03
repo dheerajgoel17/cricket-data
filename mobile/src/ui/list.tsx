@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   section: { gap: space.snug },
   head: { flexDirection: "row", alignItems: "center", gap: space.snug },
   title: { ...type.footnote, ...cap, color: color["muted-foreground"] },
-  count: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
   empty: { ...type.callout, color: color["muted-foreground"], ...tonal, borderRadius: radius.card, padding: space.stack },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug },

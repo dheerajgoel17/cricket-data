@@ -1,4 +1,5 @@
 import { push } from "@/lib/nav";
+import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
@@ -24,12 +25,22 @@ export function BrandMark({ size = 36 }: { size?: number }) {
   );
 }
 
-/** Top bar: the mark and the wordmark, a hairline underneath. */
-export function AppHeader() {
+/**
+ * Top bar. The Fixtures tab carries the brand (the mark and the wordmark); every other tab puts its own heading here instead (`title`, with `info` beside it and `action` before the search
+ * button), so its page starts straight on its content. A hairline underneath.
+ */
+export function AppHeader({ title, info, action }: { title?: string; info?: ReactNode; action?: ReactNode }) {
   return (
     <View style={styles.bar}>
-      <BrandMark />
-      <Text style={styles.word}>Fancy.cash</Text>
+      {title ? (
+        <View style={styles.titleRow}><Text style={styles.heading} numberOfLines={1}>{title}</Text>{info}</View>
+      ) : (
+        <>
+          <BrandMark />
+          <Text style={styles.word}>Fancy.cash</Text>
+        </>
+      )}
+      {action}
       <Press accessibilityRole="button" accessibilityLabel="Search" hitSlop={8} onPress={() => { void Haptics.selectionAsync(); push("/search"); }} style={({ pressed }) => [styles.search, pressed && { opacity: 0.6 }]}>
         <Ionicons name="search-outline" size={20} color={color.foreground} />
       </Press>
@@ -39,6 +50,8 @@ export function AppHeader() {
 
 const styles = StyleSheet.create({
   bar: { height: HEADER_HEIGHT, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  titleRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.snug },
+  heading: { ...type.display, fontSize: 28, lineHeight: 34, color: color.foreground, flexShrink: 1 },
   word: { ...type.title, color: color.foreground, flex: 1 },
   search: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });

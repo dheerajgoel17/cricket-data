@@ -14,7 +14,7 @@ import { Press } from "@/ui/press";
 import { RecentForm, FormHeadline } from "@/ui/recent-form";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, tonal, type } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, tonal, type } from "@/ui/tokens";
 import { recentForms } from "@/lib/form";
 
 type Side = [string, number];
@@ -92,7 +92,7 @@ function Overs({ overs }: { overs: { balls: string[] }[] }) {
 function BatterEnd({ p, sides, mirror }: { p: any; sides?: Side[]; mirror?: boolean }) {
   return (
     <View style={[styles.end, mirror && { flexDirection: "row-reverse" }]}>
-      <Face name={p.name} photo={p.photo} team={p.team} sides={sides} size={52} />
+      <Face name={p.name} photo={p.photo} team={p.team} sides={sides} size={38} />
       <View style={[styles.endText, mirror && { alignItems: "flex-end" }]}>
         <Who name={p.name} team={p.team} sides={sides} strike={!!p.strike} short />
         <Text style={styles.endScore}><Text style={styles.endRuns}>{p.runs ?? 0}</Text> ({p.balls ?? 0})</Text>
@@ -130,7 +130,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
       ) : null}
       {board.bowler ? (
         <View style={styles.bowler}>
-          <Face name={board.bowler.name} photo={board.bowler.photo} team={board.bowler.team} sides={teams} size={36} />
+          <Face name={board.bowler.name} photo={board.bowler.photo} team={board.bowler.team} sides={teams} size={32} />
           <View style={{ flex: 1, minWidth: 0, gap: 1 }}><Who name={board.bowler.name} team={board.bowler.team} sides={teams} /><Text style={styles.muted}>Bowling</Text></View>
           <Stat k="W-R" v={`${board.bowler.wickets ?? 0}–${board.bowler.conceded ?? 0}`} />
           <Stat k="Overs" v={bowlOv ?? "—"} />
@@ -245,12 +245,12 @@ const styles = StyleSheet.create({
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   muted: { ...type.footnote, color: color["muted-foreground"] },
   strongMuted: { fontFamily: font.medium, color: color.foreground },
-  board: { padding: space.stack, gap: space.snug + 2, marginHorizontal: space.gutter },
+  board: { padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
   pair: { flexDirection: "row", alignItems: "stretch", gap: space.snug },
   end: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   endText: { flex: 1, minWidth: 0, gap: 2 },
-  endScore: { ...type.footnote, color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
-  endRuns: { ...num, fontSize: 22, letterSpacing: -0.44, lineHeight: 24, color: color.foreground },
+  endScore: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  endRuns: { ...num, fontSize: 17, lineHeight: 20, color: color.foreground },
   ship: { alignItems: "center", justifyContent: "space-between", paddingVertical: 2 },
   shipV: { ...num, fontSize: 17, color: color.foreground },
   shipB: { ...type.caption, color: color["muted-foreground"] },
@@ -263,9 +263,9 @@ const styles = StyleSheet.create({
   ball: { minWidth: 34, height: 30, paddingHorizontal: 5, borderRadius: 8, alignItems: "center", justifyContent: "center" },
   ballText: { ...num, fontSize: 13 },
   innTitle: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
-  innScore: { ...type.footnote, fontFamily: font.medium, color: color.foreground, fontVariant: ["tabular-nums"] },
+  innScore: { ...type.footnote, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   th: { flexDirection: "row", alignItems: "center", paddingVertical: space.tight },
   tr: { flexDirection: "row", alignItems: "center", gap: 0, minHeight: 44, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.tight },
   cell: { ...num, fontSize: 14, color: color["muted-foreground"], textAlign: "right" },
-  sum: { ...type.callout, color: color["muted-foreground"], maxWidth: "60%", fontVariant: ["tabular-nums"] },
+  sum: { ...type.callout, color: color["muted-foreground"], maxWidth: "60%", fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

@@ -16,8 +16,8 @@ const PUBLISH_MS = 1200;
 export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
 export interface Row {
   comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string;
-  line: number; fmt: string; match: string; start: string; over: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string;
-  edge: number | null; last: { v: number | null; s: string }[]; max: number;
+  line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string;
+  edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number;
 }
 
 const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
@@ -39,7 +39,7 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
     const chip = matchChipId(l.match, l.start_utc, l.fmt);
     const b = bookLinesFor({ lines: todays.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
     if (idx < 0 || !b) return;
-    const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0));
+    const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
     const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: null }, split_by: [] }, { playerIdx: idx });
     const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
     if (!entries.length) return;
@@ -57,7 +57,7 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
     out.push({
       comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn,
       name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line,
-      fmt: l.fmt, match: b.match, start: b.start_utc, over, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue, prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null,
+      fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue, prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null,
       max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1),
     });
   };

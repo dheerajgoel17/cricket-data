@@ -16,6 +16,7 @@ import { Segmented } from "@/ui/segmented";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
 import { color, space, type, tonal } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** One competition: its season's stats, the summary markets, each side's record and the latest results (the site's `LeaguePage`). */
 export default function League() {
@@ -64,6 +65,7 @@ export default function League() {
           ) : null}
         </ScrollView>
       )}
+      <TabFade />
     </View>
   );
 }

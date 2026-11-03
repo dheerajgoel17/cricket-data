@@ -10,6 +10,9 @@ export const storage = createStorage({
   remove: (k: string) => void mmkv.remove(k),
 });
 
+/** Raw strings, for bodies too big to be worth a JSON round trip (the kept data files, `lib/body-cache.ts`). */
+export const raw = { get: (k: string): string | undefined => mmkv.getString(k), set: (k: string, v: string): void => void mmkv.set(k, v), remove: (k: string): void => void mmkv.remove(k) };
+
 const LIVE_KEY = "live-body-v1";
 /** Old enough that a match could have started or finished since: past this the kept body is not used (same window as the web app). */
 export const LIVE_CACHE_MS = 30 * 60e3;
