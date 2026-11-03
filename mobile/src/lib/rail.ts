@@ -45,10 +45,10 @@ export const keepFinished = (finished: any[], now = Date.now()) =>
   finished.filter((f) => Date.parse(f.start) > now - keepMsFor(f.fmt)).sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
 
 // What the page says when a bucket is empty (site/src/components/app/home-phase-bar.tsx).
-export const EMPTY_PHASE: Record<HomePhase, string> = {
-  live: "Nothing in play. Pre-match lists the next games.",
-  pre: "No pre-match props yet.",
-  final: "No resulted matches still listed.",
+export const EMPTY_PHASE: Record<HomePhase, { title: string; body: string }> = {
+  live: { title: "Nothing in play", body: "Pre-match lists the next games with priced lines." },
+  pre: { title: "No pre-match props yet", body: "Lines usually land a few hours before the toss." },
+  final: { title: "No resulted matches", body: "Finished priced games stay listed for a day after the start." },
 };
 
 export interface RailItem { fixture: any; state: FixtureState; live: any | null; noProps: boolean }

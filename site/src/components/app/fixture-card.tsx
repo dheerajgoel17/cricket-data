@@ -12,7 +12,7 @@ import { useLiveMatch } from "@/hooks/useLive";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
-import { TeamBadge, usePreloadTeams } from "./badges";
+import { TeamAvatar, TeamBadge, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
 
 import { seriesChips } from "@cricket/engine/props-view.js";
@@ -33,8 +33,8 @@ export function LiveScore({ s, size = "md", className }: { s: { display?: string
   const total = scoreLabel(s);
   return (
     <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
-      <span className={cn("font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body font-medium")}>{total}</span>
-      {s.overs != null && <span className="text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
+      <span className={cn("font-condensed font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body")}>{total}</span>
+      {s.overs != null && <span className="font-condensed text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
     </span>
   );
 }
@@ -100,7 +100,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   );
 }
 
-/** Crests + short names + kick-off; sits inside a PillGroup (shadcn ToggleGroup) item. */
+/** Crests + short names + kick-off; sits inside a PillGroup. Uses shadcn AvatarGroup (image fills each Avatar — no nested Circle). */
 export function MatchChip({ f }: { f: any }) {
   const when = fixtureStart(f), timed = hasTime(f);
   const { match } = useLiveMatch(f);
@@ -109,9 +109,9 @@ export function MatchChip({ f }: { f: any }) {
   const sub = session || (match?.status === "live" ? "Live" : timed ? localTime(when) : dayLabel(dayKey(f)));
   return (
     <span className="flex min-w-0 items-center gap-tight">
-      <AvatarGroup className="-space-x-tight">
-        <TeamBadge name={f.a} size="xs" eager />
-        <TeamBadge name={f.b} size="xs" eager />
+      <AvatarGroup className="-space-x-1.5">
+        <TeamAvatar name={f.a} size="xs" eager />
+        <TeamAvatar name={f.b} size="xs" eager />
       </AvatarGroup>
       <span className="grid min-w-0 text-left leading-tight">
         <span className="truncate text-caption font-medium">{abbr(f.a)} v {abbr(f.b)}</span>

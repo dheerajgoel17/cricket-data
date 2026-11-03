@@ -102,12 +102,12 @@ export default function PlayerPage() {
                 <Animated.View style={[styles.heroLeft, nameFx]}>
                   <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
                   <View style={styles.teamLine}>
-                    <View style={styles.logoCrop}><TeamBadge name={s.team} size={56} bare /></View>
-                    <Text style={styles.sub} numberOfLines={1}>{s.team}</Text>
+                    <View style={styles.logoCrop}><TeamBadge name={s.side} size={56} bare /></View>
+                    <Text style={styles.sub} numberOfLines={1}>{s.side}</Text>
                   </View>
                   {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
                 </Animated.View>
-                {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.next?.team || params.team || s.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
+                {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.side || params.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
               </View>
               {loading ? (
                 <View style={[styles.pad, { gap: space.snug, paddingTop: space.stack }]}><Working label="Reading his games…" /><Skeleton style={{ height: 120 }} /><Skeleton style={{ height: 240 }} /></View>
@@ -123,7 +123,7 @@ export default function PlayerPage() {
 
       <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
         <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
-          <PageHeader title={s.name || "Player"} subtitle={s.team || undefined} buttons={2} right={s.ok ? (
+          <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} buttons={2} right={s.ok ? (
             <>
               <StarButton idx={idx} />
               <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
@@ -162,7 +162,6 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
   const [filtersOpen, setFiltersOpen] = useState(false);
   const d = useMemo(() => deriveChart({ entries, line, side, win, summary: res.summary, sameLine: res.plan?.line === line && (res.plan?.side || "over") === side }), [entries, line, side, win, res]);
   const { ws, cur, all, shown, mix } = d;
-  const fr = s.store?.freshness?.();
   const bookAt = book ? book.lines.find((l: any) => l.line === line) : null;
   const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
   const prior = bookAt?.prob == null ? null : side === "over" ? bookAt.prob : 1 - bookAt.prob;
@@ -274,12 +273,15 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
             <Ionicons name="options-outline" size={20} color={active.length ? color.primary : color.foreground} />
           </RoundButton>
         </View>
-        <View style={styles.counted}>
-          <Text style={[styles.sub, cur.played < 5 && { color: color.amber }]}>
-            <Text style={styles.strong}>{cur.played}</Text> {res.sample?.unit || "games"} counted.{cur.played < 5 ? " Too few for a steady read." : ""}
-          </Text>
-          <InfoButton topic="chart" label="About this chart" />
-        </View>
+        {mix.out > 0 || cur.played < 5 ? (
+          <View style={styles.counted}>
+            <Text style={[styles.sub, cur.played < 5 && { color: color.amber }]}>
+              {mix.out > 0 ? <><Text style={styles.strong}>{mix.out}</Text> void or not in the XI left out · <Text style={styles.strong}>{cur.played}</Text> {res.sample?.unit || "games"} counted.</> : null}
+              {cur.played < 5 ? `${mix.out > 0 ? " " : ""}Too few for a steady read.` : ""}
+            </Text>
+            {mix.out > 0 ? <InfoButton topic="chart" label="About this chart" /> : null}
+          </View>
+        ) : null}
         {book && !(bookAt && next?.priced) ? (bookAt ? (
           <View style={styles.bookRow}>
             {bookAt.books.map((b: any) => <View key={b.source} style={styles.altBook}><BookBadge source={b.source} /><Tick value={b.over} style={{ ...type.callout, color: color.foreground }}>{odds(b.over)}</Tick><Text style={styles.sub}>/ {odds(b.under)}</Text></View>)}
@@ -290,13 +292,13 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
       {next ? (
         <View style={[styles.pad, { gap: space.snug }]}>
           <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} />
-          {next.opp || next.known ? <NextFilters next={next} filters={filters} onChange={onFilters} /> : null}
         </View>
       ) : null}
 
       <View style={styles.pad}>
         <Accordion title="Filters" badge={active.length || undefined} value={active.length ? `${active.length} on` : "All matches"} open={filtersOpen} onToggle={setFiltersOpen}>
-          <View style={{ paddingBottom: space.snug }}>
+          <View style={{ paddingBottom: space.snug, gap: space.snug }}>
+            {next && (next.opp || next.known) ? <NextFilters next={next} filters={filters} onChange={onFilters} /> : null}
             {FILTER_GROUPS.map((g) => {
               const options = optionsFor(g.key);
               const chosen = options.find(([v]) => v === (filters[g.key] ?? ""));
@@ -334,7 +336,6 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
             <Text style={styles.glanceFoot}>{name} · {fmt} {label.toLowerCase()} {side} {line} over all {all.played} {res.sample?.unit || "innings"} in this sample.</Text>
           </View>
         ) : null}
-        {fr?.newestProvisional || fr?.newestBase ? <Text style={styles.dataLine}>Data to {fr.newestProvisional || fr.newestBase}</Text> : null}
       </View>
 
       <View style={[styles.pad, { gap: space.stack }]}>
@@ -467,7 +468,6 @@ const styles = StyleSheet.create({
   glanceNum: { fontSize: 22, lineHeight: 26, letterSpacing: -0.44, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"] },
   glanceOf: { fontSize: 14, fontFamily: font.data, letterSpacing: 0, color: color["muted-foreground"] },
   glanceFoot: { ...type.footnote, color: color["muted-foreground"], textAlign: "center" },
-  dataLine: { ...type.footnote, color: color["muted-foreground"], textAlign: "center" },
   noteText: { ...type.footnote, lineHeight: 17, color: color["muted-foreground"] },
   h3: { ...type.body, color: color.foreground },
   cell: { ...type.callout, color: color.foreground },

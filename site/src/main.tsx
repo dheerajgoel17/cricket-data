@@ -6,9 +6,11 @@ import { MotionConfig } from "motion/react";
 import "./index.css";
 import { App } from "./App";
 import { DataProvider } from "@/lib/data";
+import { AuthProvider } from "@/lib/auth";
 import { prefetchFeeds } from "@/lib/queries";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { SignInSheet } from "@/components/app/sign-in-sheet";
 import { reloadOnce } from "@/components/app/error-boundary";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -26,7 +28,10 @@ createRoot(document.getElementById("root")!).render(
       <MotionConfig reducedMotion="user">
         <TooltipProvider>
           <BrowserRouter>
-            <DataProvider><App /></DataProvider>
+            <AuthProvider>
+              <DataProvider><App /></DataProvider>
+              <SignInSheet />
+            </AuthProvider>
           </BrowserRouter>
           <Toaster />
           <Analytics />

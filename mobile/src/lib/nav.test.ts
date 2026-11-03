@@ -1,7 +1,7 @@
 jest.mock("expo-router", () => ({ router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: jest.fn(() => false) } }));
 
 import { router } from "expo-router";
-import { fixturePath, goBack, openFixture, openPlayer, playerPath, push } from "@/lib/nav";
+import { fancyMarketPath, fixturePath, goBack, openFixture, openPlayer, playerPath, push } from "@/lib/nav";
 
 describe("links", () => {
   test("a player link carries the site's parameters, the format as its number", () => {
@@ -11,6 +11,11 @@ describe("links", () => {
 
   test("a fixture link is the fixture's id", () => {
     expect(fixturePath("2026-10-27-south-africa-v-australia")).toBe("/fixture/2026-10-27-south-africa-v-australia");
+  });
+
+  test("a fancy market link carries fm and optional scope", () => {
+    expect(fancyMarketPath("2026-11-04-new-zealand-v-india", { fm: "team_total_fours", sc: 262 })).toBe("/fixture/2026-11-04-new-zealand-v-india/fancy?fm=team_total_fours&sc=262");
+    expect(fancyMarketPath("x", { fm: "match_sixes" })).toBe("/fixture/x/fancy?fm=match_sixes");
   });
 });
 

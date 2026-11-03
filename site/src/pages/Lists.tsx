@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { motion } from "motion/react";
 import { dayKey, dayLabel, fixtureStart, localTime } from "@/lib/format";
+import { fancyMarketPath } from "@/lib/fancy-path";
 import { setTitle } from "@/lib/title";
+import { EmptyState } from "@/components/app/empty-state";
 import { HotProps } from "@/components/app/hot-props";
 import { BookTable } from "@/components/app/book-table";
 import { OverviewRow, fancyFm } from "@/components/app/match-fancy";
@@ -48,10 +50,17 @@ export function FancyPage() {
   return (
     <div className="flex flex-col gap-stack">
       <h1 className="text-title font-bold tracking-tight">Fancy</h1>
-      {!rows.length ? <p className="text-callout text-muted-foreground">No fancy lines with history to show yet. They open a day or two before a match, once there are past matches to score them on.</p> : (
+      {!rows.length ? (
+        <EmptyState
+          icon={<PuzzlePieceIcon />}
+          title="No fancy lines yet"
+          body="They open a day or two before a match, once there are past matches to score them on."
+        />
+      ) : (
         <div className="grid grid-cols-[minmax(0,1fr)] gap-stack md:grid-cols-2 xl:grid-cols-3">
           {rows.map((r: any, i: number) => <FancyCard key={r.f.id || `${r.f.a}${r.f.b}${r.f.start}`} {...r} i={i} />)}
-        </div>)}
+        </div>
+      )}
     </div>
   );
 }
@@ -61,7 +70,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
   const nav = useNavigate();
   const when = fixtureStart(f);
   const ground = String(f.venue || "").split(",")[0].replace(/\(.*\)/, "").trim();
-  const to = (fm?: string) => `/fixture/${f.id}?tab=fancy${fm ? `&fm=${fm}` : ""}`;
+  const to = (fm?: string, sc?: number) => (fm ? fancyMarketPath(f.id, { fm, sc: sc != null && sc >= 0 ? sc : null }) : `/fixture/${f.id}?tab=fancy`);
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
       <div className="h-full border-b border-hairline pb-stack">
@@ -82,7 +91,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           </Link>
           {rows.length ? (
             <ul className="-mx-gutter border-t border-hairline">
-              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.id || r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(fancyFm(r.key, r.inn || 0) + (r.scope >= 0 ? `&sc=${r.scope}` : "")))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
+              {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.id || r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(fancyFm(r.key, r.inn || 0), r.scope))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
             </ul>
           ) : <p className="border-t border-hairline py-snug text-callout text-muted-foreground">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">

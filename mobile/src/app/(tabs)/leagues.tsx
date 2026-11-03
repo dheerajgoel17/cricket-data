@@ -12,6 +12,7 @@ import { DEFAULT_RAIL } from "@site/lib/priority";
 import { storeQuery } from "@/lib/data";
 import { fixturesQuery } from "@/lib/queries";
 import { AppHeader } from "@/ui/brand";
+import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
@@ -41,7 +42,7 @@ export default function Leagues() {
         </Press>
       } />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        {!store ? <Working label="Loading leagues…" fill /> : e == null ? <Text style={styles.empty}>No leagues to show yet.</Text> : (
+        {!store ? <Working label="Loading leagues…" fill /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
               {(featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured]).map((x) => {
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   all: { flexDirection: "row", alignItems: "center", gap: 2 },
   allText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },
-  empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
+  emptyPad: { padding: space.gutter },
   chips: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: 40, flexDirection: "row", alignItems: "center", gap: space.tight, paddingLeft: 8, paddingRight: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.card },
   chipOn: { backgroundColor: color.foreground },

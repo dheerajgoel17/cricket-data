@@ -1,8 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { atGround, matchPhase, nextMatchRates, pickPricedMatch, vsSide } from "@cricket/engine/next-match.js";
+import { atGround, matchPhase, matchSide, nextMatchRates, pickPricedMatch, teamIndexByName, vsSide } from "@cricket/engine/next-match.js";
 
 const e = (value, extra = {}) => ({ value, ...extra });
+
+test("matchSide prefers the match team when present, else the profile team", () => {
+  assert.equal(matchSide("Sunrisers Hyderabad", "India"), "Sunrisers Hyderabad");
+  assert.equal(matchSide("India", "India"), "India");
+  assert.equal(matchSide("", "India"), "India");
+  assert.equal(matchSide(null, "India"), "India");
+  assert.equal(matchSide("  ", "India"), "India");
+  assert.equal(matchSide(undefined, ""), "");
+});
+
+test("teamIndexByName finds a side by display name (Women fold) and falls back when unknown", () => {
+  const teams = [{ n: "India" }, { n: "Sunrisers Hyderabad" }, { n: "Sydney Sixers (W)" }];
+  assert.equal(teamIndexByName(teams, "India", 0), 0);
+  assert.equal(teamIndexByName(teams, "Sunrisers Hyderabad", 0), 1);
+  assert.equal(teamIndexByName(teams, "Sydney Sixers Women", 0), 2);
+  assert.equal(teamIndexByName(teams, "Nowhere XI", 9), 9);
+  assert.equal(teamIndexByName(teams, "", 3), 3);
+});
 
 test("vsSide folds Women / (W) so a WBBL opponent matches the history's short name (hand-computed)", () => {
   const rows = [e(22, { opp: "Sydney Sixers" }), e(10, { opp: "Sydney Sixers (W)" }), e(40, { opp: "Melbourne Stars Women" })];

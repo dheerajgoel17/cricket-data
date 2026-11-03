@@ -58,7 +58,7 @@ function Who({ name, team, sides, strike, short, className }: { name: string; te
 
 function Score({ p }: { p: any }) {
   return (
-    <span className="shrink-0 tabular-nums leading-none">
+    <span className="shrink-0 font-condensed tabular-nums leading-none">
       <span className="text-title font-bold">{p.runs ?? 0}</span>
       <span className="text-callout text-muted-foreground"> ({p.balls ?? 0})</span>
     </span>
@@ -124,7 +124,7 @@ function Stat({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="grid justify-items-end gap-hair">
       <span className="label-cap text-footnote text-muted-foreground">{k}</span>
-      <span className="text-callout font-medium tabular-nums">{v}</span>
+      <span className="font-condensed text-callout font-bold tabular-nums">{v}</span>
     </div>
   );
 }
@@ -323,7 +323,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
           <BatterEnd p={board.batters[0]} sides={teams} />
           <div className="grid shrink-0 content-between justify-items-center py-hair">
             <span className="label-cap text-footnote text-muted-foreground">P’ship</span>
-            <span className="text-body font-bold tabular-nums leading-none">
+            <span className="font-condensed text-body font-bold tabular-nums leading-none">
               {board.partnership ? <>{board.partnership.runs ?? 0} <span className="text-footnote font-medium text-muted-foreground">({board.partnership.balls ?? 0})</span></> : "—"}
             </span>
           </div>
@@ -349,8 +349,8 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
       {!!board.overs.length && <Overs overs={board.overs} />}
       {(board.crr != null || board.rrr != null) && (
         <div className="flex flex-wrap items-center gap-x-stack gap-y-tight">
-          {board.crr != null && <span className="text-footnote font-medium tabular-nums text-muted-foreground">CRR {board.crr.toFixed(2)}</span>}
-          {board.rrr != null && <span className="text-footnote font-medium tabular-nums text-muted-foreground">RRR {board.rrr.toFixed(2)}</span>}
+          {board.crr != null && <span className="font-condensed text-footnote font-medium tabular-nums text-muted-foreground">CRR {board.crr.toFixed(2)}</span>}
+          {board.rrr != null && <span className="font-condensed text-footnote font-medium tabular-nums text-muted-foreground">RRR {board.rrr.toFixed(2)}</span>}
         </div>
       )}
     </section>

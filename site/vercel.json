@@ -31,11 +31,11 @@
     },
     "api/og.js": {
       "maxDuration": 15,
-      "includeFiles": "{public/data/*.json,public/data/p/*.json,public/books/*,public/icon-192.png,node_modules/@fontsource/barlow-condensed/files/*.woff}"
+      "includeFiles": "{public/data/index.json,public/data/photos.json,public/data/lines.json,public/data/fixtures.json,public/books/*,public/icon-192.png,fonts/satoshi/Satoshi-Medium.woff,fonts/satoshi/Satoshi-Bold.woff,node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff,node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-900-normal.woff}"
     },
     "api/share.js": {
       "maxDuration": 10,
-      "includeFiles": "public/data/*.json"
+      "includeFiles": "{public/data/index.json,public/data/photos.json,public/data/lines.json,public/data/fixtures.json}"
     },
     "api/state.js": {
       "maxDuration": 10

@@ -1,0 +1,11 @@
+/** Path to one fancy market's page (like `/player/:id` for a prop). Query carries the market, scope, sample window and ground switch. */
+export function fancyMarketPath(id: string, o: { fm: string; sc?: number | string | null; mw?: number | string | null; mv?: string | null; ml?: number | string | null }) {
+  const q = new URLSearchParams();
+  if (o.fm) q.set("fm", o.fm);
+  if (o.sc != null && o.sc !== "" && String(o.sc) !== "-1") q.set("sc", String(o.sc));
+  if (o.mw != null && o.mw !== "" && Number(o.mw) !== 20) q.set("mw", String(o.mw));
+  if (o.mv === "1") q.set("mv", "1");
+  if (o.ml != null && o.ml !== "") q.set("ml", String(o.ml));
+  const s = q.toString();
+  return `/fixture/${encodeURIComponent(id)}/fancy${s ? `?${s}` : ""}`;
+}

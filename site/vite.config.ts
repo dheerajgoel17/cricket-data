@@ -4,17 +4,26 @@ import tailwindcss from "@tailwindcss/vite";
 import { loadEnv, type ProxyOptions } from "vite";
 import { defineConfig, type Plugin } from "vitest/config";
 
-/** Drop Secure so the production gate cookie is stored on http://localhost. */
-function localhostCookies(proxy: { on: (ev: string, fn: (proxyRes: { headers: Record<string, string | string[] | undefined> }) => void) => void }) {
-  proxy.on("proxyRes", (proxyRes) => {
+/**
+ * Gate cookie from the production proxy: host-only (drop Domain), and drop Secure only on plain http://localhost.
+ * A phone on a Cloudflare quick tunnel (`*.trycloudflare.com`, HTTPS) must keep Secure and must not get Domain=localhost.
+ */
+function gateCookies(proxy: { on: (ev: string, fn: (...args: any[]) => void) => void }) { // eslint-disable-line @typescript-eslint/no-explicit-any
+  proxy.on("proxyRes", (proxyRes: { headers: Record<string, string | string[] | undefined> }, req: { headers: Record<string, string | string[] | undefined> }) => {
     const sc = proxyRes.headers["set-cookie"];
     if (!sc) return;
-    proxyRes.headers["set-cookie"] = (Array.isArray(sc) ? sc : [sc]).map((c) => c.replace(/;\s*Secure/gi, ""));
+    const host = String(req.headers.host || "").split(":")[0].toLowerCase();
+    const local = host === "localhost" || host === "127.0.0.1";
+    proxyRes.headers["set-cookie"] = (Array.isArray(sc) ? sc : [sc]).map((c) => {
+      let out = c.replace(/;\s*Domain=[^;]*/gi, "");
+      if (local) out = out.replace(/;\s*Secure/gi, "");
+      return out;
+    });
   });
 }
 
 function prodProxy(site: string): ProxyOptions {
-  return { target: site, changeOrigin: true, cookieDomainRewrite: "localhost", configure: localhostCookies };
+  return { target: site, changeOrigin: true, configure: gateCookies };
 }
 
 /** Dev only: serves /api/* with the same handlers Vercel runs, unless SITE_URL is set (then those routes come from production). */
@@ -48,8 +57,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss(), devApi(!useProd)],
     resolve: { alias: [{ find: "@", replacement: path.resolve(import.meta.dirname, "src") }, { find: /^cn$/, replacement: path.resolve(import.meta.dirname, "src/lib/utils.ts") }] },
-    server: { port: 4173, proxy },
-    preview: { port: 4173, proxy },
+    // Quick tunnels send Host: *.trycloudflare.com; Vite blocks unknown hosts unless listed (DNS rebinding guard).
+    server: { port: 4173, proxy, allowedHosts: [".trycloudflare.com"] },
+    preview: { port: 4173, proxy, allowedHosts: [".trycloudflare.com"] },
     build: { outDir: "dist", sourcemap: false, chunkSizeWarningLimit: 600 },
     test: { environment: "jsdom", globals: true, setupFiles: ["./src/test-setup.ts"], include: ["src/**/*.test.{ts,tsx}"] },
   };

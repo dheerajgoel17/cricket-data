@@ -2,7 +2,7 @@
 import { useCallback, useId, useMemo, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
@@ -23,6 +23,7 @@ import { useRail } from "@/hooks/useRail";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
+import { EmptyState } from "./empty-state";
 import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
@@ -30,10 +31,9 @@ import { abbr, odds, shortVenue } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
-import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
+import { TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
 import { MatchChip } from "./fixture-card";
@@ -126,7 +126,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
-/** List row: photo, name + edge, line, bookmaker mark on the third row, then L10 / ground / bars on a fourth. */
+/** List card: face + name, hero OVER line (condensed), book price, model edge. */
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 
 /** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
@@ -136,10 +136,14 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
   const [top, ...rest] = quotes;
   if (!top) return null;
   return (
-    <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
-      <div className="flex flex-wrap items-center gap-x-snug">
-        <span className={cn("whitespace-nowrap", top.best && "font-medium text-primary")}>
-          <BookBadge source={top.source} /> {top.over == null ? `U ${top.line} ${odds(top.under)}` : <>O {top.line} <Tick value={top.over}>{odds(top.over)}</Tick>{top.underAt ? <> · U {top.underAt.line} {odds(top.underAt.price)}</> : top.under != null ? <> · U {odds(top.under)}</> : null}</>}{top.best && <span className="sr-only"> (lowest line, best price)</span>}
+    <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
+      <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
+        <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
+          <BookBadge source={top.source} />{" "}
+          {top.over == null
+            ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
+            : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
+          {top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
@@ -149,43 +153,55 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
         )}
       </div>
       {open && (
-        <table id={id} className="w-full max-w-sm text-left">
+        <table id={id} className="w-full max-w-sm text-left font-condensed">
           <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td>{q.line}</td><td><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
+          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
     </div>
   );
 }
 
-export function PropRow({ r, win, wl, bars, i, soFar, out }: { r: Row; win: Win; wl: string; bars: boolean; i: number; soFar: SoFar | null; out: boolean }) {
+/** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
+export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
+  const label = (STATS as any)[r.stat]?.label as string;
+  const side = r.side === "under" ? "U" : "O";
+  const ground = win !== "ven" ? groundNote(r.ven) : null;
   return (
-    <motion.li className="relative after:absolute after:bottom-0 after:left-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] after:right-0 after:h-px after:bg-hairline last:after:hidden" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    <motion.li className="relative border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Item asChild size="sm" className={cn("min-h-row gap-y-hair rounded-none border-0 py-snug pl-gutter pr-[calc(var(--gutter)+var(--control))] transition-colors active:bg-card", out && "opacity-60")}>
-        <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}>
-          <ItemMedia><PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" /></ItemMedia>
-          <ItemContent className="min-w-0 gap-hair">
-            <ItemTitle className="max-w-full text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</ItemTitle>
-            <ItemDescription className="text-callout text-muted-foreground"><span className="font-medium tabular-nums text-foreground">{r.line}</span> <span>{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{!r.quotes.length && <> · <Tick value={r.over}>{odds(r.over)}</Tick></>}</span>{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</ItemDescription>
-          </ItemContent>
-          <ItemActions className="self-start items-center gap-tight">
-            <span className="grid justify-items-end text-right">
-              <span className="label-cap text-footnote text-muted-foreground">Model</span>
-              <span className={cn("font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-              {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
+      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}
+        className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", out && "opacity-60")}>
+        <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
+        <span className="grid min-w-0 gap-hair">
+          <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
+            <span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span>
+            <TeamFlag name={r.team} />
+            {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
+          </span>
+          <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
+            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
+            <span className="label-cap text-footnote text-primary">{label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}</span>
+          </span>
+          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
+            {soFar != null && <StandingMark standing={soFar} line={r.line} />}
+            {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
+            {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
+            <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
+          </span>
+        </span>
+        <span className="grid justify-items-end gap-hair">
+          <span className="grid justify-items-end gap-hair text-right">
+            <span className="flex items-baseline gap-tight whitespace-nowrap">
+              <span className="label-cap text-caption text-muted-foreground">Model</span>
+              <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
-          </ItemActions>
-          {r.quotes.length > 0 && <BookQuotes quotes={r.quotes} className="basis-full pl-[calc(var(--control)+var(--spacing-snug))]" />}
-          <div className="flex basis-full items-center justify-between gap-snug pl-[calc(var(--control)+var(--spacing-snug))]">
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-caption tabular-nums">
-              <span className={cn("font-medium", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
-              {win !== "ven" && (() => { const g = groundNote(r.ven); return g && <span className={cn("truncate", g.tone === "good" ? "font-medium text-primary" : g.tone === "bad" ? "font-medium text-miss" : "text-muted-foreground")} title={r.venue}>{g.hits}/{g.played} at {shortVenue(r.venue)}</span>; })()}
-            </span>
-            {bars && <Spark r={r} />}
-          </div>
-        </Link>
-      </Item>
+            {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
+          </span>
+          <Spark r={r} />
+        </span>
+      </Link>
       <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
     </motion.li>
   );
@@ -239,19 +255,23 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                 <td className="px-snug py-snug">
                   <span className="flex items-center gap-snug">
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
-                    <span className="grid min-w-0">
+                    <span className="grid min-w-0 gap-hair">
                       <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
-                      <span className="truncate text-callout text-muted-foreground"><span className="font-medium tabular-nums text-foreground">{r.line}</span> {(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}{soFar != null && <> · <StandingMark standing={soFar} line={r.line} /></>}</span>
+                      <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
+                        <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
+                        <span className="label-cap text-footnote text-primary">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}</span>
+                        {soFar != null && <StandingMark standing={soFar} line={r.line} />}
+                      </span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
                     </span>
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-body font-medium tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-normal text-muted-foreground">U {odds(r.under)}</span>}</td>
+                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-condensed text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-normal text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
+                <td className={cn("px-snug py-snug text-right font-condensed text-title font-bold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-medium text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
                 <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
@@ -372,11 +392,20 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
       </div>
       <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={sc} onApply={(s) => update({ ...s, stat: sc.stat === s.stat ? sc.stat : s.stat })} choices={choices} />
       <AnimatedHeight>
-        {waiting ? <RowsSkeleton /> : !rows.length ? <p className="px-inset py-stack text-callout text-muted-foreground">{phase ? EMPTY_PHASE[phase] : active.length ? <>No props match these filters. <button type="button" className="font-medium text-primary underline-offset-2 hover:underline" onClick={() => update(clearFilter(sc, "all"))}>Clear filters</button> to see all of them.</> : "No rows in this window. Open Filters to widen it."}</p> : (
+        {waiting ? <RowsSkeleton /> : !rows.length ? (
+          <div className="px-inset py-stack">
+            <EmptyState
+              icon={<ChartBarIcon />}
+              title={phase ? EMPTY_PHASE[phase].title : active.length ? "No props match these filters" : "No rows in this window"}
+              body={phase ? EMPTY_PHASE[phase].body : active.length ? "Clear a filter to see the rest of the day's lines." : "Open Filters to widen the day, match or sample window."}
+              action={active.length ? <button type="button" className="text-callout font-medium text-primary underline-offset-2 hover:underline" onClick={() => update(clearFilter(sc, "all"))}>Clear filters</button> : undefined}
+            />
+          </div>
+        ) : (
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} bars={bars} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
               </AnimatePresence>
             </ul>
             <div className="hidden lg:block">

@@ -13,7 +13,7 @@ export default function AppTabs() {
         tabBarActiveTintColor: color.primary,
         tabBarInactiveTintColor: color["muted-foreground"],
         tabBarStyle: { backgroundColor: "rgba(0,0,0,0.85)", borderTopColor: color.hairline, height: 56 },
-        tabBarLabelStyle: { fontSize: 10, fontFamily: "Inter_500Medium" },
+        tabBarLabelStyle: { fontSize: 10, fontFamily: "Satoshi-Medium" },
         tabBarItemStyle: { paddingHorizontal: 0 },
       }}>
       {TABS.map((t) => (

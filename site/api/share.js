@@ -6,7 +6,7 @@
 // so the response is never cached at the edge); preview bots and anything that is not a browser get the tags page, with an Open button.
 import { cardFields, cardPath, cardText } from "@cricket/engine/card.js";
 import { shareMetas } from "../src/lib/seo.js";
-import { loadData } from "./og.js";
+import { loadData } from "./load-data.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 

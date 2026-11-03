@@ -15,6 +15,7 @@ const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage
 const PropsPage = page(() => import("@/pages/Lists"), "PropsPage"), FancyPage = page(() => import("@/pages/Lists"), "FancyPage"), PairPage = page(() => import("@/pages/Tools"), "PairPage");
 const ToolsPage = page(() => import("@/pages/Simple"), "ToolsPage"), OddsPage = page(() => import("@/pages/Simple"), "OddsPage"), GlossaryPage = page(() => import("@/pages/Simple"), "GlossaryPage");
 const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage = page(() => import("@/pages/Saved"), "SavedPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
+const AuthCallbackPage = page(() => import("@/pages/AuthCallback"), "AuthCallbackPage");
 const PrivacyPage = page(() => import("@/pages/Legal"), "PrivacyPage"), TermsPage = page(() => import("@/pages/Legal"), "TermsPage"), DisclaimerPage = page(() => import("@/pages/Legal"), "DisclaimerPage");
 const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="team" /> })));
 const VenuePage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="venue" /> })));
@@ -56,6 +57,7 @@ export function App() {
             <Route path="odds" element={<OddsPage />} />
             <Route path="glossary" element={<GlossaryPage />} />
             <Route path="saved" element={<SavedPage />} />
+            <Route path="auth/callback" element={<AuthCallbackPage />} />
             <Route path="players" element={<PlayersPage />} />
             <Route path="player/:id" element={<Player />} />
             <Route path="teams" element={<TeamsPage />} />

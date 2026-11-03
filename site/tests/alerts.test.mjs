@@ -148,7 +148,7 @@ test("a player line carries its card (by id, whole-match lines only); a fancy li
 
 test("messages: the picture is the card of the first player line, as an address on the site; no site address, no picture", () => {
   const hits = clearedHits([live()], books);
-  assert.equal(messages(hits, { siteUrl: "https://site.test/" })[0].image, "https://site.test/card/v9/pid/a1/runs/28.5.jpg");
+  assert.equal(messages(hits, { siteUrl: "https://site.test/" })[0].image, "https://site.test/card/v14/pid/a1/runs/28.5.jpg");
   assert.equal(messages(hits)[0].image, "");
   assert.equal(messages(hits.filter((h) => !h.image), { siteUrl: "https://site.test" })[0].image, ""); // only a fancy line: text alone
 });
@@ -160,7 +160,7 @@ test("propAlerts: the card is found by his name, line and stat in the book file;
   assert.equal(propAlerts({ alerts: [{ ...a, market_type: "batter_milestone" }] }, NOW, books)[0].image, undefined);
   assert.equal(propAlerts({ alerts: [{ ...a, player_matched_as: "Nobody" }] }, NOW, books)[0].image, undefined);
   assert.equal(propAlerts({ alerts: [{ ...a, match: "India vs England" }] }, NOW, books)[0].image, undefined); // his line is for another match
-  assert.equal(messages(propAlerts({ alerts: [a] }, NOW, books), { siteUrl: "https://site.test" })[0].image, "https://site.test/card/v9/pid/a1/runs/28.5.jpg");
+  assert.equal(messages(propAlerts({ alerts: [a] }, NOW, books), { siteUrl: "https://site.test" })[0].image, "https://site.test/card/v14/pid/a1/runs/28.5.jpg");
 });
 
 // ---------------------------------------------------------------------------------------------- the run, with a fake claim table and a fake Telegram
@@ -306,7 +306,7 @@ test("with the site address known, a message with a player line goes out as a ph
   const w = world();
   assert.deepEqual(await run(w, { siteUrl: "https://site.test", propsDoc: {} }), { candidates: 3, fresh: 3, sent: 1 });
   assert.equal(w.posts[0].method, "sendPhoto");
-  assert.equal(w.posts[0].photo, "https://site.test/card/v9/pid/a1/runs/28.5.jpg");
+  assert.equal(w.posts[0].photo, "https://site.test/card/v14/pid/a1/runs/28.5.jpg");
   assert.match(w.posts[0].caption, /^✅ <b>High-odds lines cleared<\/b>/);
   assert.equal(w.posts[0].text, undefined);
   const fancyOnly = world();
@@ -321,7 +321,7 @@ test("the prop alert goes out with its player's card", async () => {
   const a = alert({ market_type: "batter_runs", player_matched_as: "A One", line: 28.5, match: "India vs Australia", start_utc: "2026-11-01T12:00:00Z" });
   await run(w, { siteUrl: "https://site.test", matches: [], propsDoc: { alerts: [a] } });
   assert.equal(w.posts[0].method, "sendPhoto");
-  assert.equal(w.posts[0].photo, "https://site.test/card/v9/pid/a1/runs/28.5.jpg");
+  assert.equal(w.posts[0].photo, "https://site.test/card/v14/pid/a1/runs/28.5.jpg");
   assert.match(w.posts[0].caption, /Model edge \+5\.5%/);
 });
 
@@ -346,6 +346,6 @@ test("a text too long for a caption goes as a message with the picture above it"
   await run(w, { siteUrl: "https://site.test", propsDoc: {}, matches: [m], booksDoc: { lines: long, fancy: [] } });
   assert.equal(w.posts[0].method, "sendMessage");
   assert.ok(w.posts[0].text.length > 1024); // over the caption limit
-  assert.equal(w.posts[0].link_preview_options.url, "https://site.test/card/v9/pid/b7/runs/20.5.jpg");
+  assert.equal(w.posts[0].link_preview_options.url, "https://site.test/card/v14/pid/b7/runs/20.5.jpg");
   assert.equal(w.posts[0].link_preview_options.show_above_text, true);
 });

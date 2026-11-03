@@ -19,15 +19,22 @@ export function TeamBadge({ name, size = 40, bare }: { name: string; size?: numb
   );
   const [failed, setFailed] = useState(0);
   const uri = urls[failed];
-  if (bare && uri) return <Image source={{ uri }} style={{ width: size, height: size }} contentFit="contain" onError={() => setFailed((n) => n + 1)} accessibilityLabel={name} />;
-  if (bare) return <Text style={[styles.initials, { fontSize: size * 0.5 }]}>{initials(name)}</Text>; // no logo and no flag: the initials alone, no circle
+  const img = (w: number) => uri ? (
+    <Image
+      source={{ uri }}
+      style={{ width: w, height: w }}
+      contentFit="contain"
+      recyclingKey={uri}
+      cachePolicy="memory-disk"
+      onError={() => setFailed((n) => n + 1)}
+      accessibilityLabel={name}
+    />
+  ) : null;
+  if (bare && uri) return img(size);
+  if (bare) return <Text style={[styles.initials, { fontSize: size * 0.5 }]}>{initials(name)}</Text>;
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-      {uri ? (
-        <Image source={{ uri }} style={{ width: size, height: size }} contentFit="cover" onError={() => setFailed((n) => n + 1)} accessibilityLabel={name} />
-      ) : (
-        <Text style={[styles.initials, { fontSize: size * 0.34 }]}>{initials(name)}</Text>
-      )}
+      {uri ? img(size - 4) : <Text style={[styles.initials, { fontSize: size * 0.34 }]}>{initials(name)}</Text>}
     </View>
   );
 }
@@ -45,7 +52,7 @@ export function LeagueBadge({ name, size = 40 }: { name: string; size?: number }
   const uri = urls[failed];
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-      {uri ? <Image source={{ uri }} style={{ width: size - 4, height: size - 4 }} contentFit="contain" onError={() => setFailed((n) => n + 1)} accessibilityLabel={name} />
+      {uri ? <Image source={{ uri }} style={{ width: size - 4, height: size - 4 }} contentFit="contain" cachePolicy="memory-disk" recyclingKey={uri} onError={() => setFailed((n) => n + 1)} accessibilityLabel={name} />
         : <Text style={[styles.initials, { fontSize: size * 0.34 }]}>{initials(name)}</Text>}
     </View>
   );

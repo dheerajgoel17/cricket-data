@@ -1,6 +1,6 @@
 // GET /card/player/<idx>[/<stat>/<line>].jpg  or  /card/fixture/<id>.jpg (rewritten to this function), or /api/og?p=<player index>[&stat=runs&line=24.5] / ?f=<fixture id>  -> the share card (JPEG, 1200x630) a link preview shows.
 // The words and numbers come from the site's data files shipped with the function (never from a model); the player's photo is fetched from the image host.
-import { createHash } from "node:crypto";
+// L5 form reads matches.json + one player shard over HTTP from this deploy's /data (not bundled: Functions Storage).
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { cardFields, cardQuery, propForm, renderCard } from "@cricket/engine/card.js";
@@ -8,49 +8,45 @@ import { dominantFormat } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { createStore } from "@cricket/engine/store.js";
 import { fmtIndex } from "@cricket/engine/util.js";
+import { bookLogoStem } from "@cricket/engine/books.js";
+import { loadData, unwrapJson } from "./load-data.js";
 
-const FILES = { index: "index.json", photos: "photos.json", lines: "lines.json", fixtures: "fixtures.json" };
-const FONTS = { bold: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff", regular: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-500-normal.woff" };
-const PHOTO_MS = 800; // X gives up after a couple of seconds; a slow photo must not stall the JPEG
+// Same as the site: Satoshi for names/body; Barlow Condensed for figures and the Fancy.cash wordmark.
+const FONTS = {
+  bold: "fonts/satoshi/Satoshi-Bold.woff",
+  regular: "fonts/satoshi/Satoshi-Medium.woff",
+  num: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff",
+  brand: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-900-normal.woff",
+};
+const PHOTO_MS = 1500; // face + kit; still short enough for X, long enough for the CDN
 const FORM_MS = 2500; // L5 from the player shard; skip it rather than miss X's crawl window
-let cache = null;
+const OG_UA = "fancy-cash-og/1.0";
 let storeCache = null;
 
-/** Same XOR-SHA256 wrap as packages/engine/wrap.js, sync so the function can read photos.json / fixtures.json the deploy wrapped. */
-function unwrapJson(doc, secret) {
-  if (!doc || doc.v !== 1 || !doc.ct || !doc.iv || !secret) return doc;
-  const key = createHash("sha256").update(secret, "utf8").digest();
-  const iv = Buffer.from(doc.iv, "base64"), ct = Buffer.from(doc.ct, "base64");
-  const ks = Buffer.alloc(ct.length);
-  for (let i = 0, off = 0; off < ct.length; i++) {
-    const ctr = Buffer.alloc(4); ctr.writeUInt32BE(i);
-    const block = createHash("sha256").update(Buffer.concat([key, iv, ctr])).digest();
-    const n = Math.min(32, ct.length - off);
-    block.copy(ks, off, 0, n); off += n;
-  }
-  const raw = Buffer.alloc(ct.length);
-  for (let i = 0; i < ct.length; i++) raw[i] = ct[i] ^ ks[i];
-  return JSON.parse(raw.toString("utf8"));
+/** Origin that serves /data/*.json for this deploy (tests set SHARE_DATA_BASE). */
+export function dataOrigin() {
+  const base = (process.env.SHARE_DATA_BASE || "").trim();
+  if (base) return base.replace(/\/$/, "");
+  const host = (process.env.VERCEL_URL || "").trim();
+  return host ? `https://${host}` : null;
 }
 
-export const loadData = () => {
-  if (cache) return cache;
-  const dir = process.env.SHARE_DATA_DIR || join(process.cwd(), "public/data");
+/** Fetch one relative path under /data (matches.json or p/NN.json). Not read from disk — keeps player shards out of the function bundle. */
+export async function fetchStoreJson(rel) {
+  const origin = dataOrigin();
+  if (!origin) throw new Error("no data origin");
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
-  cache = Object.fromEntries(Object.entries(FILES).map(([k, f]) => {
-    try { return [k, unwrapJson(JSON.parse(readFileSync(join(dir, f), "utf8")), secret)]; } catch { return [k, null]; }
-  }));
-  return cache;
-};
+  const headers = { "user-agent": OG_UA };
+  if (secret) headers["x-cd-k"] = secret;
+  const r = await fetch(`${origin}/data/${rel}`, { headers, cache: "no-store" });
+  if (!r.ok) throw new Error(`${rel}: HTTP ${r.status}`);
+  return unwrapJson(await r.json(), secret);
+}
 
 async function loadStore() {
   if (storeCache) return storeCache;
-  const dir = process.env.SHARE_DATA_DIR || join(process.cwd(), "public/data");
-  const secret = (process.env.DATA_WRAP_KEY || "").trim();
   try {
-    storeCache = await createStore({
-      fetchJson: async (p) => unwrapJson(JSON.parse(readFileSync(join(dir, p), "utf8")), secret),
-    });
+    storeCache = await createStore({ fetchJson: fetchStoreJson });
     return storeCache;
   } catch { return null; }
 }
@@ -75,22 +71,33 @@ function withTimeout(p, ms, fallback) {
   return Promise.race([p, new Promise((r) => setTimeout(() => r(fallback), ms))]);
 }
 
-/** The book's mark from public/books (same files the site badges use). Stem is [a-z0-9] only so a source string cannot leave that folder. */
+/** The book's mark from public/books (same files the site badges use). Resolves every stem in bookLogoStem. */
 function readBookMark(source) {
-  const stem = String(source || "").replace(/^(.*\S)\s+(Premium|Fancy)$/i, "$1").toLowerCase();
-  if (!/^[a-z0-9]+$/.test(stem)) return null;
+  const stem = bookLogoStem(source);
+  if (!stem) return null;
   for (const ext of ["svg", "png", "jpg", "webp"]) {
     try { return readFileSync(join(process.cwd(), "public/books", `${stem}.${ext}`)); } catch { /* the next extension, or the name */ }
   }
   return null;
 }
 
+export { bookLogoStem as bookStem };
+
 function readBrand() {
   try { return readFileSync(join(process.cwd(), "public/icon-192.png")); } catch { return null; }
 }
 
+/** Absolute image URL: Source CDN paths are host-relative when VITE_IMG_CDN is unset in the function. */
+function absPhotoUrl(u) {
+  const s = String(u || "");
+  if (/^https?:\/\//i.test(s)) return s;
+  const cdn = (process.env.VITE_IMG_CDN || "").replace(/\/$/, "");
+  if (cdn && s.startsWith("/")) return `${cdn}${s}`;
+  return "";
+}
+
 async function firstPhoto(urls) {
-  const list = (urls || []).filter((x) => /^https?:\/\//.test(x));
+  const list = (urls || []).map(absPhotoUrl).filter(Boolean);
   if (!list.length) return null;
   const ac = new AbortController();
   const t = setTimeout(() => ac.abort(), PHOTO_MS);
@@ -143,7 +150,12 @@ export default async function handler(req, res) {
       photo, jersey, teamLogo, oppLogo,
       bookLogo: readBookMark(f.source),
       brandLogo: readBrand(),
-      fonts: { bold: join(process.cwd(), FONTS.bold), regular: join(process.cwd(), FONTS.regular) },
+      fonts: {
+        bold: join(process.cwd(), FONTS.bold),
+        regular: join(process.cwd(), FONTS.regular),
+        num: join(process.cwd(), FONTS.num),
+        brand: join(process.cwd(), FONTS.brand),
+      },
     });
     sendJpeg(res, img);
   } catch {

@@ -36,14 +36,22 @@ function LegalDoc({ title, sub, path, crumbs, children }: { title: string; sub: 
 
 export function PrivacyPage() {
   return (
-    <LegalDoc title="Privacy policy" sub="What this site stores on your device, and what anonymous counts we keep." path="/privacy-policy" crumbs="Privacy">
+    <LegalDoc title="Privacy policy" sub="What an account stores, what stays on your device, and what anonymous counts we keep." path="/privacy-policy" crumbs="Privacy">
       <h2>Who we are</h2>
-      <p>Fancy.cash is a free cricket stats and data website: hit rates, form, grounds and listed market prices shown as context next to that history. There are no accounts and no sign-in. This page describes the little that is stored so the site can run, and the anonymous counts used to see which pages are used.</p>
+      <p>Fancy.cash is a free cricket stats and data website: hit rates, form, grounds and listed market prices shown as context next to that history. You can browse without signing in. A free optional account (email and password, or Google) is used only so Saved items can sync. This page describes what is stored so the site can run, and the anonymous counts used to see which pages are used.</p>
+
+      <h2>Accounts and Saved</h2>
+      <ul>
+        <li>If you create an account or sign in with Google, we store your <b>email</b> (and a display name when Google provides one) and the <b>Saved</b> list you choose: watchlist prop keys, saved players and teams, and named filter combinations.</li>
+        <li>That Saved data lives on our database (Supabase Auth + Postgres) and is readable only by your signed-in session (row-level security). Signing out stops access from that browser until you sign in again.</li>
+        <li>You can remove items from Saved at any time; deleting your account (request via the contact on About) removes the profile and Saved rows.</li>
+      </ul>
 
       <h2>What stays on your device</h2>
       <ul>
-        <li><b>Saved players and teams</b> live in this browser only (the star on a player or team page). Clearing site data removes them. They are never sent to us.</li>
+        <li><b>Recently viewed players</b> stay in this browser only (not part of the account).</li>
         <li><b>Live scores cache</b> keeps the last live snapshot on the device for about 30 minutes so a revisit can paint quickly.</li>
+        <li>The auth session tokens for a signed-in account are kept by the browser (Supabase client) so you stay signed in.</li>
       </ul>
 
       <h2>Cookies we set</h2>
@@ -53,15 +61,15 @@ export function PrivacyPage() {
       </ul>
 
       <h2>Analytics</h2>
-      <p>We count page views and a few named button taps (for example opening extra books, sharing a player). We do not collect a name, email, or account.</p>
+      <p>We count page views and a few named button taps (for example opening extra books, sharing a player). Analytics are separate from your Saved account.</p>
       <ul>
         <li><b>Host analytics</b> (when enabled on the host) counts visits without cookies and without personal data.</li>
-        <li><b>Google Analytics 4</b> loads only when a measurement id is configured at build. Ads cookies stay off. The tag records the path, referrer, device class, language, and an anonymous country/region from the edge request headers. Headless and crawler browsers are flagged as bots. There is no consent banner because ads stay off and there is no account; you can block the tag with a browser privacy tool.</li>
+        <li><b>Google Analytics 4</b> loads only when a measurement id is configured at build. Ads cookies stay off. The tag records the path, referrer, device class, language, and an anonymous country/region from the edge request headers. Headless and crawler browsers are flagged as bots. There is no consent banner because ads stay off; you can block the tag with a browser privacy tool.</li>
       </ul>
 
       <h2>What we do not do</h2>
       <ul>
-        <li>No accounts, no mailing list, no sale of personal data, no advertising network, no affiliate links to place a bet.</li>
+        <li>No paid subscription, no mailing list push, no sale of personal data, no advertising network, no affiliate links to place a bet.</li>
         <li>We do not take wagers. Book names and logos are shown only to say which source a listed price came from.</li>
       </ul>
 
@@ -92,7 +100,7 @@ export function TermsPage() {
       <h2>Your use</h2>
       <ul>
         <li>Do not overload the site, scrape the data files in a way that harms other visitors, or present this service as a licensed betting operator.</li>
-        <li>Saved items stay on your device. You are responsible for that device.</li>
+        <li>Saved items on an account are yours to manage; recently viewed players stay on the device you used.</li>
       </ul>
 
       <h2>Software and data</h2>

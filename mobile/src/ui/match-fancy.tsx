@@ -1,13 +1,14 @@
-import { push } from "@/lib/nav";
+import { fancyMarketPath, push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { Share, StyleSheet, View } from "react-native";
+import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
 import { FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
@@ -24,14 +25,14 @@ import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
 import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
-import { Segmented } from "@/ui/segmented";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
-import { router } from "expo-router";
+import { cap, color, control, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+
 
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
 const WINDOWS = [5, 10, 20, 30];
@@ -42,19 +43,22 @@ const pct1 = (r: number | null) => (r == null ? "–" : `${(r * 100).toFixed(1)}
 const short = (n: number | null | undefined, d = 1) => (n == null ? "–" : Number.isInteger(n) ? String(n) : n.toFixed(d));
 
 /**
- * Match Fancy: whole-match and team-total markets (runs, session overs, extras, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches in this
- * format (the site's `MatchFancy`; the numbers all come from `engine/fancy-edge.js`). A Test side's 1st / 2nd innings total is its own row. "Bookmaker lines" lists every market the books
- * price, one row each in the props-list style; tapping one opens it below with the median, a chart of every recent match against the line, over / under shares and fair prices, and a line ladder.
+ * Match Fancy: whole-match and team-total markets over the teams' last N matches (the site's `MatchFancy`). List mode shows bookmaker lines; tapping one opens
+ * `/fixture/:id/fancy`. Detail mode is that page: chart, over/under and ladder. Filters use the Props pattern (scope chips + Filters sheet for window / ground).
  */
-export function MatchFancy({ fx, teams, fmt, doc, start }: { fx: any; teams: [string, number][]; fmt: string; doc: any; start?: { fm?: string; sc?: string } }) {
+export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: any; teams: [string, number][]; fmt: string; doc: any; start?: { fm?: string; sc?: string; mw?: string; mv?: string }; mode?: "list" | "detail" }) {
   const stats = useQuery(storeQuery), live = useQuery(liveQuery);
   const store: any = stats.data?.store;
   const liveMatch = liveMatchFor(live.data, doc, fx);
-  const [sc, setSc] = useState(start?.sc ?? "-1"), [fmId, setFmId] = useState(start?.fm ?? ""), [win, setWin] = useState(20), [here, setHere] = useState(false), [ml, setMl] = useState<number>();
+  const insets = useSafeAreaInsets();
+  const [sc, setSc] = useState(start?.sc ?? "-1"), [fmId, setFmId] = useState(start?.fm ?? ""), [win, setWin] = useState(WINDOWS.includes(Number(start?.mw)) ? Number(start?.mw) : 20), [here, setHere] = useState(start?.mv === "1"), [ml, setMl] = useState<number>();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [draftWin, setDraftWin] = useState(win), [draftHere, setDraftHere] = useState(here);
   const fxInfo = useMemo(() => fxInfoOf(fx), [fx]);
   const fmtIdx = FORMATS.indexOf(fmt);
   const gender = fx.gender === "female" ? 1 : 0;
   const venueName = String(fx.venue || "").split(",")[0].trim();
+  useEffect(() => { if (filtersOpen) { setDraftWin(win); setDraftHere(here); } }, [filtersOpen, win, here]);
 
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => (FANCY_INNS as number[]).some((inn) => booked(k, teamName, inn)));
@@ -88,9 +92,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start }: { fx: any; teams: [st
     const ground = venueIdx.length ? hereMatches(10) : undefined;
     const inns = scope < 0 ? [0] : (FANCY_INNS as number[]);
     return inns.flatMap((n) => (buildOverview as any)({ store, doc, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys, label: marketLabel, ground, inn: n }))
-      .map((r: any) => ({ ...r, standing: fancyStanding(liveMatch, r) }))
+      .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
-  }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => (fancyByLine(bookedNow) as { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] }[]), [bookedNow]);
   const base = useMemo(() => (!store || !key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,6 +110,14 @@ export function MatchFancy({ fx, teams, fmt, doc, start }: { fx: any; teams: [st
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookHere = book.find((b) => b.line === line);
   const choose = (p: { sc?: string; fm?: string }) => { if (p.sc !== undefined) setSc(p.sc); if (p.fm !== undefined) setFmId(p.fm); setMl(undefined); };
+  const openMarket = (k: string) => {
+    if (mode === "list") {
+      push(fancyMarketPath(fx.id, { fm: k, sc: scope, mw: win, mv: here ? "1" : "" }));
+      return;
+    }
+    choose({ fm: k });
+  };
+  const activeN = (win !== 20 ? 1 : 0) + (here ? 1 : 0);
 
   // how this market has gone at the ground, set against the sample on screen
   const ground = useMemo(() => {
@@ -136,33 +148,69 @@ export function MatchFancy({ fx, teams, fmt, doc, start }: { fx: any; teams: [st
   if (!store) return <Working label="Loading…" />;
   return (
     <View style={styles.root}>
-      <View style={styles.controls}>
-        {scopes.length > 1 ? <Segmented<string> items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v, fm: "" })} label="Scope" /> : null}
-        <Segmented<string> items={WINDOWS.map((n) => [String(n), `L${n}`] as [string, string])} value={String(win)} onChange={(v) => { setWin(Number(v)); setMl(undefined); }} label="Matches" />
-        <Text style={styles.sample}>
-          {scoredMs.length} {fmt} matches{useHere ? ` at ${venueName}` : scope >= 0 ? ` of ${team?.[0]}` : ""}{batFirstNow ? " batting first" : ""}
-          {scoredMs.length ? ` · through ${new Date(`${store.M.d[scoredMs[scoredMs.length - 1]]}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}` : ""}
-        </Text>
-        {venueIdx.length > 0 ? <Segmented<string> items={[["0", "Teams' form"], ["1", `At ${venueName}`]]} value={here ? "1" : "0"} onChange={(v) => { setHere(v === "1"); setMl(undefined); }} label="Matches from" /> : null}
+      <View style={styles.filterRow}>
+        {scopes.length > 1 ? (
+          <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v, fm: mode === "list" ? "" : fm })} /></View>
+        ) : <View style={styles.chipFlex} />}
+        <Press scale={1} onPress={() => setFiltersOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
+          <Ionicons name="options-outline" size={16} color={color.foreground} />
+          <Text style={styles.filterLbl}>L{win}</Text>
+          {activeN > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{activeN}</Text></View> : null}
+        </Press>
       </View>
+      {activeN > 0 ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+          {win !== 20 ? <Press scale={1} onPress={() => { setWin(20); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Window L{win}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
+          {here ? <Press scale={1} onPress={() => { setHere(false); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>At {venueName}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
+          <Press scale={1} onPress={() => { setWin(20); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+        </ScrollView>
+      ) : null}
+      <Modal visible={filtersOpen} animationType="slide" transparent onRequestClose={() => setFiltersOpen(false)}>
+        <Pressable style={styles.sheetBackdrop} onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close filters" />
+        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
+          <View style={styles.sheetHead}>
+            <Text style={styles.h2}>Filters</Text>
+            <Press scale={1} onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close" style={styles.round}><Ionicons name="close" size={20} color={color.foreground} /></Press>
+          </View>
+          <Text style={styles.sheetSec}>Hit-rate window</Text>
+          <View style={styles.sheetChips}>{WINDOWS.map((n) => (
+            <Press key={n} scale={1} onPress={() => setDraftWin(n)} accessibilityRole="button" style={[styles.sheetChip, draftWin === n && styles.sheetChipOn]}>
+              <Text style={[styles.sheetChipTxt, draftWin === n && styles.sheetChipTxtOn]}>L{n}</Text>
+            </Press>
+          ))}</View>
+          {venueIdx.length > 0 ? (
+            <>
+              <Text style={styles.sheetSec}>Matches from</Text>
+              <View style={styles.sheetChips}>
+                <Press scale={1} onPress={() => setDraftHere(false)} accessibilityRole="button" style={[styles.sheetChip, !draftHere && styles.sheetChipOn]}><Text style={[styles.sheetChipTxt, !draftHere && styles.sheetChipTxtOn]}>Teams' form</Text></Press>
+                <Press scale={1} onPress={() => setDraftHere(true)} accessibilityRole="button" style={[styles.sheetChip, draftHere && styles.sheetChipOn]}><Text style={[styles.sheetChipTxt, draftHere && styles.sheetChipTxtOn]}>At {venueName}</Text></Press>
+              </View>
+            </>
+          ) : null}
+          <View style={styles.sheetFoot}>
+            <Press scale={1} onPress={() => { setDraftWin(20); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
+            <Press scale={1} onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
+          </View>
+        </View>
+      </Modal>
 
-      {!ms.length ? <Text style={styles.empty}>No {fmt} matches to base this on.</Text> : (
+      {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {overview.length > 0 ? (
+          {mode === "list" && overview.length > 0 ? (
             <View style={{ gap: space.snug }}>
               <Text style={styles.h2}>Bookmaker lines</Text>
               {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
               <View style={styles.bleed}>
                 {overview.map((r: any, i: number) => (
                   <View key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-                    <OverviewRow r={r} active={fancyFm(r.key, r.inn || 0) === fm} onOpen={() => choose({ fm: fancyFm(r.key, r.inn || 0) })} />
+                    <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} />
                   </View>
                 ))}
               </View>
             </View>
           ) : null}
 
-          <View style={{ gap: space.snug }}>
+          {mode === "detail" ? <View style={{ gap: space.snug }}>
             {keyList.length > 1 ? <View style={styles.bleed}><Chips items={keyList} value={fm} onChange={(v) => choose({ fm: v })} /></View> : null}
             {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep ? (
               <View style={{ gap: space.stack }}>
@@ -224,7 +272,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start }: { fx: any; teams: [st
                 </View>
               </View>
             ) : null}
-          </View>
+          </View> : null}
         </>
       )}
     </View>
@@ -273,8 +321,30 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
 
 const styles = StyleSheet.create({
   root: { gap: space.stack },
-  controls: { gap: space.snug },
-  sample: { ...type.footnote, color: color["muted-foreground"] },
+  filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
+  filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card },
+  filterLbl: { ...type.callout, color: color.foreground },
+  filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
+  filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
+  activeRow: { gap: space.snug, paddingVertical: space.tight },
+  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingLeft: space.snug, paddingRight: space.tight, borderRadius: radius.chip, backgroundColor: "rgba(39,218,142,0.15)" },
+  activeChipTxt: { ...type.callout, color: color.primary },
+  clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
+  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.55)" },
+  sheet: { marginTop: "auto", backgroundColor: color.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.snug },
+  sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
+  sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
+  sheetChips: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
+  sheetChip: { height: control, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, alignItems: "center", justifyContent: "center" },
+  sheetChipOn: { backgroundColor: color.foreground },
+  sheetChipTxt: { ...type.callout, color: color.foreground },
+  sheetChipTxtOn: { color: color.background },
+  sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
+  sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  sheetClearTxt: { ...type.body, color: color.foreground },
+  sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
+  sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
   empty: { ...type.callout, color: color["muted-foreground"] },
   h2: { ...type.title, color: color.foreground },
   h3: { ...type.body, fontFamily: font.medium, color: color.foreground },

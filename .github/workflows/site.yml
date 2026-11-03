@@ -3,7 +3,7 @@ name: Site
 # Rebuilds the stats site's data hourly (Base ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
 # Runs after "Daily update" finishes, daily as a fallback, on demand, and on PRs that touch the site (build + tests, plus a Vercel *preview*
 # deployment whose URL is commented on the PR; only PRs from this repository get one, because fork PRs cannot read the secrets).
-# Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATA_WRAP_KEY, VITE_GA_MEASUREMENT_ID.
+# Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATA_WRAP_KEY, VITE_GA_MEASUREMENT_ID, SUPABASE_ANON_KEY.
 # Without the Vercel trio the job still builds and tests, then skips the deploy. GEMINI_API_KEY is a *Vercel*
 # project environment variable, not a GitHub secret: see docs/SITE.md.
 on:
@@ -52,6 +52,8 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       DATA_WRAP_KEY: ${{ secrets.DATA_WRAP_KEY }}
       VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+      VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,6 +154,8 @@ jobs:
           npx --yes vercel@latest deploy --prod --yes --force --token "$VERCEL_TOKEN" \
             --build-env "DATA_WRAP_KEY=$DATA_WRAP_KEY" \
             --build-env "VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID" \
+            --build-env "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" \
+            --build-env "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY"
       - name: Deploy preview (pull requests from this repository)
         id: preview
@@ -163,6 +167,8 @@ jobs:
           URL=$(npx --yes vercel@latest deploy --yes --force --token "$VERCEL_TOKEN" \
             --build-env "DATA_WRAP_KEY=$DATA_WRAP_KEY" \
             --build-env "VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID" \
+            --build-env "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" \
+            --build-env "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY" | tail -n 1)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "### Preview: $URL" >> "$GITHUB_STEP_SUMMARY"

@@ -12,7 +12,18 @@ describe("book logos", () => {
     expect(bookLogo("LeoVegas")).toBe(BOOK_LOGOS.leovegas);
     expect(bookLogo("bet365")).toBe(BOOK_LOGOS.bet365);
     expect(bookLogo("Dafabet")).toBe(BOOK_LOGOS.dafabet);
+    expect(bookLogo("Reddybook")).toBe(BOOK_LOGOS.reddybook);
+    expect(bookLogo("polymarket")).toBe(BOOK_LOGOS.polymarket);
     expect(bookLogo("nobody")).toBeUndefined();
+  });
+  it("resolves compound and Premium/Fancy feed names for every book we ship", () => {
+    expect(bookLogo("moviodds_bet365")).toBe(BOOK_LOGOS.bet365);
+    expect(bookLogo("feedx_bet365")).toBe(BOOK_LOGOS.bet365);
+    expect(bookLogo("feedg_ladbrokes")).toBe(BOOK_LOGOS.ladbrokes);
+    expect(bookLogo("FairWin247 Premium")).toBe(BOOK_LOGOS.fairwin247);
+    expect(bookLogo("FairWin247 Fancy")).toBe(BOOK_LOGOS.fairwin247);
+    expect(bookLogo("moviodds_leovegas")).toBe(BOOK_LOGOS.leovegas);
+    expect(bookLogo("feed_dafabet")).toBe(BOOK_LOGOS.dafabet);
   });
 });
 
