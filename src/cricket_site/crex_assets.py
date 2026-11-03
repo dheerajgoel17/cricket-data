@@ -26,15 +26,30 @@ def fold(s: str) -> str:
 
 
 _LOWER = {"van", "der", "de", "den", "du", "la", "le", "di", "da", "dos", "bin", "al", "el", "von", "ten", "te", "ul"}
+_VOWELS = set("aeiou")
+
+
+def _initials_token(t: str, nxt: str | None) -> bool:
+    """True when the source slug uses initials as a given name ("ms dhoni", "vvs laxman", "ab de villiers"), not a real word ("adam")."""
+    if not (2 <= len(t) <= 4 and t.isalpha()):
+        return False
+    if not any(c in _VOWELS for c in t):
+        return True  # ms, kl, vvs, bj, jj, ...
+    return len(t) == 2 and nxt in _LOWER  # ab de villiers: two-letter initials before a particle
 
 
 def display_name(slug_name: str) -> str:
     """The source's lower-cased slug name ("bevon john jacobs", "quinton de kock") as a readable full name ("Bevon John Jacobs", "Quinton de Kock").
-    Particles stay lower-case after the first word and "mc" names keep their capital ("McDermott"). It is a display form only, never used to match."""
+    Particles stay lower-case after the first word, "mc" names keep their capital ("McDermott"), and initials-only tokens stay upper
+    ("MS Dhoni", "KL Rahul", "AB de Villiers"). It is a display form only, never used to match."""
+    toks = slug_name.split()
     out = []
-    for i, t in enumerate(slug_name.split()):
+    for i, t in enumerate(toks):
+        nxt = toks[i + 1] if i + 1 < len(toks) else None
         if i and t in _LOWER:
             out.append(t)
+        elif _initials_token(t, nxt):
+            out.append(t.upper())
         elif t.startswith("mc") and len(t) > 2:
             out.append("Mc" + t[2:].capitalize())
         elif t.startswith("o'") and len(t) > 2:
@@ -133,16 +148,22 @@ def match_players(players: list[dict], crex: list[tuple[str, str]], named: dict[
         if len(ranked) > 1 and ranked[0]["n"] < 3 * ranked[1]["n"]:
             continue  # ambiguous: leave the silhouette
         p = ranked[0]
-        if p["idx"] not in best or p["n"] > 0 and best[p["idx"]][0] < len(toks):
+        prev = best.get(p["idx"])
+        # Two different source namesakes at the same strength ("rydham sharma" and "rohit sharma" for "RG Sharma"): do not
+        # keep whichever the sitemap listed first (a wrong face is worse than a silhouette). A longer name still wins.
+        if prev is None or (prev[1] is not None and prev[0] < len(toks)):
             best[p["idx"]] = (len(toks), cid, fold(name))
+        elif prev[1] is not None and prev[0] == len(toks) and prev[2] != fold(name):
+            best[p["idx"]] = (len(toks), None, None)
     if named is not None:
         counts: dict[str, int] = {}
         for _, _, nm in best.values():
-            counts[nm] = counts.get(nm, 0) + 1
+            if nm:
+                counts[nm] = counts.get(nm, 0) + 1
         for i, (_, _, nm) in best.items():
-            if counts[nm] == 1:  # two Base players behind one Source A name would be a guess: leave it out
+            if nm and counts[nm] == 1:  # two Base players behind one Source A name would be a guess: leave it out
                 named[nm] = i
-    return {i: cid for i, (_, cid, _) in best.items()}
+    return {i: cid for i, (_, cid, _) in best.items() if cid}
 
 
 # Base names for franchises that were renamed or spelled differently on Source A (folded names)

@@ -41,7 +41,7 @@ test("a line the books do not price has no price, a player alone is a player car
 });
 
 test("a player URL with no stat still draws his booked line, so the picture is not an empty name card", () => {
-  const future = { ...data, lines: { lines: data.lines.lines.map((l) => ({ ...l, start_utc: "2026-11-02T14:30Z" })) } };
+  const future = { ...data, lines: { lines: data.lines.lines.map((l) => ({ ...l, start_utc: "2099-01-01T14:30Z" })) } };
   const f = cardFields({ p: "0" }, future);
   assert.equal(f.kind, "prop");
   assert.equal(f.stat, "Runs");

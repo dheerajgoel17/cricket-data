@@ -11,7 +11,9 @@ A source id is taken from, in this order (an id is never given to two players):
 2. The photo map: the conservative name match in ``crex_assets`` (surname and first initial agree, an ambiguous name is skipped).
 3. The books: the pipeline already resolved a book line to our id, so for a *priced* player an exact full-name match (his history name or a name the books use
    against the source's full names) is evidence enough, provided exactly one source player has that name and nobody else claims him. It also replaces a photo-map
-   link to a different source player (the initials-and-surname match can pick a namesake), but never takes a source player another player holds.
+   link to a different source player (the initials-and-surname match can pick a namesake), but never takes a source player another player holds. When several source
+   players share that exact name, a photo link that is already one of them stays; a namesake that is not is dropped and reviewed (so "Rydham Sharma" does not stick
+   on RG Sharma while three "Rohit Sharma" ids fight).
 
 Whatever could not be linked comes back as the review list (priced players only: they are the ones the live numbers are read for), each with the source players it
 might be, so a fix is one line in the overrides file. Stdlib only.
@@ -150,6 +152,15 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
         if not hits:
             stuck[pid] = ("no source player has this name", None)
         elif not sid:
+            # Several source players share the book name (three "Rohit Sharma" ids). Keep the photo link only when it is
+            # already one of them; a namesake the initials match picked (Rydham for RG Sharma) is dropped and reviewed,
+            # so the page does not keep showing the wrong full name with nothing in the job summary.
+            cur = link.get(pid)
+            if cur in hits:
+                continue
+            if cur:
+                del owner[cur]
+                del link[pid]
             stuck[pid] = ("several source players have this name", [[s, nm] for s, nm in sitemap if s in hits])
         elif link.get(pid) == sid:
             continue

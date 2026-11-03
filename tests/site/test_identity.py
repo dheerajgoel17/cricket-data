@@ -60,6 +60,20 @@ def test_what_cannot_be_linked_is_reviewed_with_the_reason_and_who_it_might_be()
     assert [r["pid"] for r in review] == ["p9", "p7", "p4", "p6"], "listed by name"
 
 
+def test_several_source_players_with_the_book_name_drop_a_namesake_photo_link_and_review():
+    """Rohit Sharma: three source ids share the name; the photo map had picked Rydham (MJC). Keep a photo link only when it is one of the Rohits."""
+    sitemap = [("MJC", "rydham sharma"), ("2X", "rohit sharma"), ("60H", "rohit sharma"), ("PAR", "rohit sharma")]
+    names = {"rg": "RG Sharma"}
+    books = {"rg": priced("RG Sharma", "Rohit Sharma")}
+    table, review, added = I.build({"rg": "c:MJC"}, sitemap, names, books, {})
+    assert table["s"] == {} and added == {}  # namesake dropped; not replaced by a guess among the three
+    assert len(review) == 1 and review[0]["pid"] == "rg" and review[0]["why"] == "several source players have this name"
+    assert review[0]["suggest"] == [["2X", "rohit sharma"], ["60H", "rohit sharma"], ["PAR", "rohit sharma"]]
+    # a photo link that is already one of the book-name hits stays (no review, no churn)
+    table, review, _ = I.build({"rg": "c:2X"}, sitemap, names, books, {})
+    assert table["s"] == {"rg": "2X"} and review == []
+
+
 def test_two_of_our_players_claiming_one_source_player_get_neither():
     books = {"p5": priced("AM Fernando", "Asitha Fernando"), "p8": priced("Asitha Fernando")}
     table, review, _ = I.build({}, SITEMAP, NAMES, books, {})
@@ -109,4 +123,6 @@ def test_the_committed_overrides_file_gives_each_player_and_each_source_id_once(
     assert all(len(r) >= 3 and r[2].strip() for r in rows), "every link says who he is and why"
     assert len({r[0] for r in rows}) == len(rows) and len({r[1] for r in rows}) == len(rows)
     assert {r[0]: r[1] for r in rows}["85e0cf10"] == "EF"   # M Prasidh Krishna is Prasidh Krishna, not another Krishna
+    by = {r[0]: r[1] for r in rows}
+    assert by["740742ef"] == "2X" and by["d12143bf"] == "IB" and by["89bbc67a"] == "PA" and by["18fac429"] == "1C0"
     assert len(I.load_overrides(f.parents[1])) == len(rows)
