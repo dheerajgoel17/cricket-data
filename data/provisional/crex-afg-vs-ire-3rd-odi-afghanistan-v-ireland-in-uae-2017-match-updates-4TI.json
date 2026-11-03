@@ -2,6 +2,20 @@
   "date": "2017-12-10",
   "event": "Afghanistan v Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 290,
+      "runs": 177,
+      "team": "Afghanistan",
+      "wickets": 10
+    },
+    {
+      "balls": 228,
+      "runs": 180,
+      "team": "Ireland",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-ire-3rd-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TI",
   "match_type": "ODI",
   "player_of_match": "Paul Stirling",

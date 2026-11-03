@@ -2,6 +2,20 @@
   "date": "2018-03-10",
   "event": "World Cup Qualifiers",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 299,
+      "runs": 194,
+      "team": "Nepal",
+      "wickets": 10
+    },
+    {
+      "balls": 232,
+      "runs": 195,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-nep-16th-match-world-cup-qualifiers-2018-match-updates-A2S",
   "match_type": "ODI",
   "player_of_match": "Mohammad Nabi",

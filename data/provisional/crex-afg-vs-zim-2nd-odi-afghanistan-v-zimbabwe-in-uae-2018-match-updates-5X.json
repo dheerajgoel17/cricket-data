@@ -2,6 +2,20 @@
   "date": "2018-02-11",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 333,
+      "team": "Zimbabwe",
+      "wickets": 5
+    },
+    {
+      "balls": 181,
+      "runs": 179,
+      "team": "Afghanistan",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-5X",
   "match_type": "ODI",
   "player_of_match": "Brendan Taylor",

@@ -2,6 +2,20 @@
   "date": "2018-03-08",
   "event": "World Cup Qualifiers",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 241,
+      "team": "Hong Kong",
+      "wickets": 8
+    },
+    {
+      "balls": 276,
+      "runs": 195,
+      "team": "Afghanistan",
+      "wickets": 9
+    }
+  ],
   "match_id": "crex-afg-vs-hk-12th-match-world-cup-qualifiers-2018-match-updates-A2O",
   "match_type": "ODI",
   "player_of_match": "Ehsan Khan",

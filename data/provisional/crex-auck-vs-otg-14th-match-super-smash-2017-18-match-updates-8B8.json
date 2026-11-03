@@ -2,6 +2,20 @@
   "date": "2017-12-28",
   "event": "Super Smash",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 147,
+      "team": "Otago",
+      "wickets": 7
+    },
+    {
+      "balls": 108,
+      "runs": 150,
+      "team": "Auckland",
+      "wickets": 3
+    }
+  ],
   "match_id": "crex-auck-vs-otg-14th-match-super-smash-2017-18-match-updates-8B8",
   "match_type": "T20",
   "player_of_match": "Craig Cachopa",

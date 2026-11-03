@@ -2,6 +2,20 @@
   "date": "2018-02-09",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 333,
+      "team": "Afghanistan",
+      "wickets": 5
+    },
+    {
+      "balls": 208,
+      "runs": 179,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-1st-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-5W",
   "match_type": "ODI",
   "player_of_match": "Rahmat Shah",

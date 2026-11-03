@@ -2,6 +2,20 @@
   "date": "2017-11-25",
   "event": "Scotland v PNG in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 192,
+      "team": "Papua New Guinea",
+      "wickets": 8
+    },
+    {
+      "balls": 278,
+      "runs": 196,
+      "team": "Scotland",
+      "wickets": 6
+    }
+  ],
   "match_id": "crex-png-vs-sco-2nd-odi-scotland-v-png-in-uae-2017-match-updates-4U7",
   "match_type": "ODI",
   "player_of_match": "Kyle Coetzer",

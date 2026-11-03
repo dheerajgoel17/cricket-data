@@ -2,6 +2,20 @@
   "date": "2018-02-19",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 241,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 193,
+      "runs": 95,
+      "team": "Zimbabwe",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-zim-5th-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-60",
   "match_type": "ODI",
   "player_of_match": "Sharafuddin Ashraf",

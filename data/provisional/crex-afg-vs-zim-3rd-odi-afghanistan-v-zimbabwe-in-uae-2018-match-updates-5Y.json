@@ -2,6 +2,20 @@
   "date": "2018-02-13",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 207,
+      "runs": 154,
+      "team": "Zimbabwe",
+      "wickets": 10
+    },
+    {
+      "balls": 165,
+      "runs": 158,
+      "team": "Afghanistan",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-afg-vs-zim-3rd-odi-afghanistan-v-zimbabwe-in-uae-2018-match-updates-5Y",
   "match_type": "ODI",
   "player_of_match": "Rashid Khan",

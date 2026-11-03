@@ -2,6 +2,20 @@
   "date": "2017-11-24",
   "event": "Scotland v PNG in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 266,
+      "runs": 147,
+      "team": "Papua New Guinea",
+      "wickets": 10
+    },
+    {
+      "balls": 229,
+      "runs": 148,
+      "team": "Scotland",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-png-vs-sco-1st-odi-scotland-v-png-in-uae-2017-match-updates-4U6",
   "match_type": "ODI",
   "player_of_match": "Calum MacLeod",

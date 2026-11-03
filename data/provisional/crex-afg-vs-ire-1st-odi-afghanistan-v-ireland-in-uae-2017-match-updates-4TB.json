@@ -2,6 +2,20 @@
   "date": "2017-12-05",
   "event": "Afghanistan v Ireland in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 300,
+      "runs": 238,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 190,
+      "runs": 100,
+      "team": "Ireland",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-afg-vs-ire-1st-odi-afghanistan-v-ireland-in-uae-2017-match-updates-4TB",
   "match_type": "ODI",
   "player_of_match": "Mujeeb Ur Rahman",

@@ -2,6 +2,20 @@
   "date": "2018-02-06",
   "event": "Afghanistan v Zimbabwe in UAE",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 120,
+      "runs": 158,
+      "team": "Afghanistan",
+      "wickets": 9
+    },
+    {
+      "balls": 120,
+      "runs": 141,
+      "team": "Zimbabwe",
+      "wickets": 5
+    }
+  ],
   "match_id": "crex-afg-vs-zim-2nd-t20-afghanistan-v-zimbabwe-in-uae-2018-match-updates-5V",
   "match_type": "T20",
   "player_of_match": "Mohammad Nabi",
