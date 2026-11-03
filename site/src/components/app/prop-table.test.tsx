@@ -25,10 +25,10 @@ describe("PropTable", () => {
     render(<MemoryRouter><PropTable rows={[row]} win="l10" onWin={onWin} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
     expect(screen.getByText("Lines")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /L10 chart/ })).toBeInTheDocument();
-    expect(screen.getByText("Odds")).toBeInTheDocument();
+    expect(screen.getByText("Over / under")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "H2H" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ground" })).toBeInTheDocument();
-    expect(screen.getByText("Edge")).toBeInTheDocument();
+    expect(screen.getByText("Model edge")).toBeInTheDocument();
     expect(screen.queryByText("DVP")).toBeNull();
     expect(screen.queryByText("MATCHUP")).toBeNull();
     expect(screen.getByText("AM Tribe")).toBeInTheDocument();

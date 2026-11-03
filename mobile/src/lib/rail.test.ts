@@ -1,4 +1,4 @@
-import { buildRail, fixtureState, phaseView, seriesChips, type RailItem } from "@/lib/rail";
+import { buildRail, fixtureState, phaseView, type RailItem } from "@/lib/rail";
 
 const NOW = Date.parse("2026-11-01T10:00:00Z");
 const at = (hours: number) => new Date(NOW + hours * 3600e3).toISOString();
@@ -100,24 +100,3 @@ describe("phaseView", () => {
   });
 });
 
-
-describe("seriesChips", () => {
-  const item = (series: string, noProps = false) => ({ fixture: { series }, state: "upcoming", live: null, noProps }) as unknown as RailItem;
-  const names = (items: RailItem[]) => seriesChips(items, (f) => f.series).map(([n]) => n);
-
-  test("a series with props comes before one without, even when the one without has more matches", () => {
-    const items = [item("Big League", true), item("Big League", true), item("Big League", true), item("Small Cup")];
-    expect(names(items)).toEqual(["Small Cup", "Big League"]);
-    expect(seriesChips(items, (f) => f.series)).toEqual([["Small Cup", 1], ["Big League", 3]]);
-  });
-
-  test("among series with props, more priced matches first, then more matches listed, then name", () => {
-    const items = [item("B"), item("B"), item("A"), item("A"), item("A", true), item("C"), item("D", true)];
-    // priced: B 2, A 2, C 1, D 0; A has 3 listed against B's 2
-    expect(names(items)).toEqual(["A", "B", "C", "D"]);
-  });
-
-  test("equal on everything falls back to the name", () => {
-    expect(names([item("Zed"), item("Alpha")])).toEqual(["Alpha", "Zed"]);
-  });
-});

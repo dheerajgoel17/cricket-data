@@ -22,6 +22,7 @@ import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { linesQuery } from "@/lib/queries";
 import { abbr, fixtureStart, num, odds, pc } from "@/lib/format";
+import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { AnimatedHeight } from "./animated-height";
@@ -70,11 +71,12 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
     <span className="grid min-w-0 gap-hair">
                           <span className="truncate text-body font-medium leading-snug">{r.label}</span>{sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
                           {r.at && <span className="text-footnote text-muted-foreground">At the ground · <b className={cn("font-medium", r.at.side === r.side && r.edge != null ? "text-primary" : "text-foreground")}>{r.at.side === "over" ? r.at.over : r.at.under} of {r.at.n} {r.at.side}</b></span>}
-                          <span className="line-clamp-2 text-callout text-primary">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={overSrc} /><Tick value={r.over}>{odds(r.over)}</Tick></span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={underSrc} /><Tick value={r.under}>{odds(r.under)}</Tick></span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over}>{odds(r.over)}</Tick></span> · <span className="whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under}>{odds(r.under)}</Tick></span></span></>}{mark != null && <> · <StandingMark standing={mark} line={r.line} /></>}</span>
+                          <span className="line-clamp-2 text-callout text-muted-foreground">{r.overLine != null && r.underLine != null && r.overLine !== r.underLine ? <>O {r.overLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={overSrc} /><Tick value={r.over}>{odds(r.over)}</Tick></span> · </span>U {r.underLine}<span className="text-muted-foreground"> · <span className="whitespace-nowrap"><BookMark source={underSrc} /><Tick value={r.under}>{odds(r.under)}</Tick></span></span></> : <>O/U {r.line} <span className="text-muted-foreground">· <span className="whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over}>{odds(r.over)}</Tick></span> · <span className="whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under}>{odds(r.under)}</Tick></span></span></>}{mark != null && <> · <StandingMark standing={mark} line={r.line} /></>}</span>
                         </span>
                         <span className="grid justify-items-end text-right">
-                          <span className="text-caption font-medium tracking-wider text-muted-foreground">{r.edge == null ? "EDGE" : r.side === "over" ? "OVER" : "UNDER"}</span>
+                          <span className="label-cap text-caption font-medium text-muted-foreground">Model</span>
                           <span className={cn("text-body font-medium tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+                          {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
                         </span>
                         <MiniBars last={r.last} line={r.line} />
                         <ChevronRightIcon className="size-4 text-muted-foreground" />

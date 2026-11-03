@@ -14,7 +14,7 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
 
   it("shows the best quote up front and the other books in a table behind a toggle, with their line, over and under", () => {
     const { container } = render(<BookQuotes quotes={quotes} />);
-    expect(chips(container)).toEqual(["Ladbrokes O 14.5 1.83 (lowest line, best price)"]);
+    expect(chips(container)).toEqual(["Ladbrokes O 14.5 1.83 · U 1.83 (lowest line, best price)"]);
     expect(screen.queryByRole("table")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "+1 book" }));
     expect(screen.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-expanded", "true");

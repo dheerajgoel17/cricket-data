@@ -15,6 +15,7 @@ import { useNow } from "@/lib/clock";
 import { TeamBadge, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
 
+import { seriesChips } from "@cricket/engine/props-view.js";
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
 /** Short chip label: drops the year, "in <place>" and "tour of <host>" tails so names aren't cut mid-word. */
 const shortSeries = (n: string) => {
@@ -127,9 +128,7 @@ export function FixtureRail({ fx }: { fx: any[] }) {
   usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
   const [sel, setSel] = useState("all");
   const chips = useMemo(() => {
-    const c = new Map<string, number>();
-    fx.forEach((f) => c.set(seriesName(f), (c.get(seriesName(f)) || 0) + 1));
-    return [...c.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])); // every series in the rail (the row scrolls), the biggest first
+    return seriesChips(fx, seriesName, (f: any) => !f.noProps); // series with priced matches first, then the biggest
   }, [fx]);
   const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;

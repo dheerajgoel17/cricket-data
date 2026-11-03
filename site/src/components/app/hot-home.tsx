@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { sideEdge } from "@cricket/engine/stats.js";
+import { homeProps, modelSide, sideRate } from "@cricket/engine/props-view.js";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { useFancyCards } from "@/hooks/useFancyCards";
 import { fixtureState } from "@/hooks/useEngine";
@@ -37,8 +37,11 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const soFarOf = (r: any) => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
   const outOf = (r: any) => lineNotIn(matchOf(r), asLine(r), identity);
   const liveOfFx = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status) === "live";
-  const props = useMemo(() => (data || []).map((r) => ({ ...r, edge: sideEdge(r.l10.hits, r.l10.played, r.prior, r.over) })).filter((r) => r.day === 0 && r.l10.played >= 6 && (!phase || lineHomePhase(r, live.data) === phase))
-    .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: x.l10.p, edge: x.edge }, { live: matchOf(y)?.status === "live", p: y.l10.p, edge: y.edge })).slice(0, SHOWN), [data, live.data, phase]);
+  const props = useMemo(() => {
+    const rows = (data || []).map((r) => ({ ...r, ...modelSide(r.l10, r.prior, r.over, r.under) })).filter((r) => r.day === 0 && r.l10.played >= 6 && (!phase || lineHomePhase(r, live.data) === phase))
+      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x.l10.p, x.side), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y.l10.p, y.side), edge: y.edge }));
+    return homeProps(rows, soFarOf, { now: Date.now() }); // the first four, more when further lines carry an edge; resulted ones stay 12 h after the match
+  }, [data, live.data, identity, phase]);
   const fancy = useMemo(() => cards.flatMap(({ f, rows }: any) => rows.map((r: any) => ({ r, f }))).filter(({ f }: any) => !phase || phaseOf(fixtureState(f, liveForFixture(live.data, f)?.status)) === phase)
     .sort((x: any, y: any) => hotOrder({ live: liveOfFx(x.f), p: 0, edge: x.r.edge }, { live: liveOfFx(y.f), p: 0, edge: y.r.edge })).slice(0, SHOWN), [cards, live.data, phase]);
   const tapeRows = useMemo(() => (data || []).filter((r) => r.day === 0 && (!phase || lineHomePhase(r, live.data) === phase)).map((r) => {
