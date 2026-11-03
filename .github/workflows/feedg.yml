@@ -110,17 +110,72 @@ jobs:
               line = f"{name}: HTTP {code} upstream={upstream or '-'} ok={ok} body={text!r}"
               print(line)
               lines.append(line)
-          # Full adapter path (same as hourly): surfaces the improved reason string
+          # Inventory: every cricket fixture on the book vs what the adapter keeps (not only value-bet alerts).
+          import datetime as dt
+          from value_bets import config
           from value_bets.adapters import feedg
-          from value_bets.util import iso, now_utc
+          from value_bets.util import iso, now_utc, parse_ts
+          listing = feedg.request(f"{api}/api/guest/event_list")
+          now = now_utc()
+          horizon = now + dt.timedelta(hours=config.get("FEEDG_HORIZON_HOURS"))
+          cricket = [e for e in ((listing.get("data") or {}).get("events") or []) if e.get("event_type_id") == feedg.CRICKET]
+          fancy_on = [e for e in cricket if e.get("fancy_active")]
+          def _st(e):
+              return feedg.start_of(e.get("open_date"))
+          started, soon, later, no_start = [], [], [], []
+          for e in fancy_on:
+              st = _st(e)
+              if not st:
+                  no_start.append(e); continue
+              t = parse_ts(st)
+              name = e.get("name") or "?"
+              row = f"{st}  {name}"
+              if t <= now:
+                  started.append(row)
+              elif t < horizon:
+                  soon.append(row)
+              else:
+                  later.append(row)
+          inv = [
+              f"inventory: cricket={len(cricket)} fancy_active={len(fancy_on)} "
+              f"started={len(started)} in_horizon={len(soon)} beyond_horizon={len(later)} no_start={len(no_start)}",
+              "started (in-play / past open_date; adapter skips these):",
+              *([f"  {x}" for x in started[:40]] or ["  (none)"]),
+              "scheduled in horizon (adapter candidates):",
+              *([f"  {x}" for x in sorted(soon)[:40]] or ["  (none)"]),
+              f"beyond horizon: {len(later)} (not pulled)",
+          ]
+          for x in inv:
+              print(x)
+          lines.extend(inv)
+          # Full adapter path (same as hourly book_lines input — all mapped fancy/player lines, not value alerts only)
           try:
-              rows, raw = feedg.fetch(iso(now_utc()), use_state=False)
+              rows, raw = feedg.fetch(iso(now), use_state=False)
               info = next(iter(raw["books"].values()))
-              summary = f"adapter: ok events={info.get('events')} rows={len(rows)} fancy={len(raw.get('fancy') or [])}"
+              fancy = raw.get("fancy") or []
+              by = {}
+              for f in fancy:
+                  by.setdefault(f.get("match"), []).append(f.get("key"))
+              summary = f"adapter: ok events={info.get('events')} rows={len(rows)} fancy={len(fancy)} left_out={sum((info.get('left_out') or {}).values())}"
+              print(summary)
+              lines.append(summary)
+              for m, keys in sorted(by.items(), key=lambda kv: kv[0] or ""):
+                  from collections import Counter
+                  c = Counter(keys)
+                  line = f"  kept: {m}  fancy={len(keys)}  keys={dict(c)}"
+                  print(line)
+                  lines.append(line)
+              if rows:
+                  from collections import Counter as C2
+                  rm = C2(r.get("match") for r in rows)
+                  for m, n in rm.most_common():
+                      line = f"  player_rows: {m}  n={n}"
+                      print(line)
+                      lines.append(line)
           except Exception as e:  # noqa: BLE001
               summary = f"adapter: FAIL {type(e).__name__}: {e}"
-          print(summary)
-          lines.append(summary)
+              print(summary)
+              lines.append(summary)
           with open(os.environ["GITHUB_STEP_SUMMARY"], "w", encoding="utf-8") as f:
               f.write("## Feed G probe\n\n```\n" + "\n".join(lines) + "\n```\n")
           if not any("ok=True" in x or x.startswith("adapter: ok") for x in lines):
