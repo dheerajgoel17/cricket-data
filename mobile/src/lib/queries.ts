@@ -10,6 +10,9 @@ export const fixturesQuery = queryOptions({ queryKey: ["fixtures"], queryFn: ():
 export const linesQuery = queryOptions({ queryKey: ["lines"], queryFn: (): Promise<any> => getJson("/data/lines.json"), staleTime: 10 * 60_000 });
 
 /** Team logos and player photos by name (crests on the cards); the flag is the fallback, so a failed load only costs the logo. */
+/** Role, batting hand and bowling style per player (`lib/profile.ts`); the file is missing until the site has built it once, which only costs the profile line. */
+export const profilesQuery = queryOptions({ queryKey: ["profiles"], queryFn: async (): Promise<any> => { try { return await getJson("/data/profiles.json"); } catch { return null; } }, staleTime: 60 * 60_000 });
+
 export const photosQuery = queryOptions({ queryKey: ["photos"], queryFn: async (): Promise<any> => { try { return await getJson("/data/photos.json"); } catch { return {}; } }, staleTime: 60 * 60_000 });
 
 /** Starts from the last body kept on the device (counted as stale, so the fresh one is asked for at once); a failed poll keeps what is on screen. */

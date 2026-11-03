@@ -18,6 +18,9 @@ import { abbr, num, odds, pc } from "@site/lib/format";
 import { sharePlayerUrl } from "@site/lib/share";
 import { SITE_URL } from "@/lib/config";
 import { deriveChart, STAT_OPTIONS, usePlayerScreen, type Filters } from "@/lib/player";
+import { useQuery } from "@tanstack/react-query";
+import { profileParts } from "@/lib/profile";
+import { profilesQuery } from "@/lib/queries";
 import { Accordion } from "@/ui/accordion";
 import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
 import { BookBadge } from "@/ui/book-badge";
@@ -65,6 +68,7 @@ export default function PlayerPage() {
   const [lineQ, setLineQ] = useState<number | undefined>(params.line !== undefined && params.line !== "" && Number.isFinite(Number(params.line)) ? Number(params.line) : undefined);
   const [filters, setFilters] = useState<Filters>({});
   const s = usePlayerScreen(idx, { stat, fmt, scope, line: lineQ, filters });
+  const profile = profileParts(useQuery(profilesQuery).data, s.pid).join(" · ");
   useEffect(() => { if (s.ok) pushRecentPlayer(idx); }, [idx, s.ok]);
   const pricedSet = useMemo(() => new Set(s.pricedStats), [s.pricedStats]);
 
@@ -101,6 +105,7 @@ export default function PlayerPage() {
                     <View style={styles.logoCrop}><TeamBadge name={s.team} size={56} bare /></View>
                     <Text style={styles.sub} numberOfLines={1}>{s.team}</Text>
                   </View>
+                  {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
                 </Animated.View>
                 {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.next?.team || params.team || s.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
               </View>
@@ -416,6 +421,7 @@ const styles = StyleSheet.create({
   hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
   name: { ...type.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
+  profile: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
   strong: { color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   teamLine: { alignItems: "flex-start", gap: 2 },
