@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-03 20:00 IST
+# Cricket value bets - 2026-11-03 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
 - **moviodds_bet365**: ok, 1777 prices
-- **smarkets**: ok, 427 prices
+- **feedg**: error - blocked (HTTP 403) - likely geo/bot protection from this box's US IP
+- **smarkets**: ok, 387 prices
 - **feedk**: ok, 164 prices, 5 events
-- **feede**: ok, 476 prices, 13 events
-- **feedf**: ok, 462 prices, 8 events
-- **feedh**: ok, 1124 prices, 45 events
+- **feede**: ok, 448 prices, 13 events
+- **feedf**: ok, 434 prices, 7 events
+- **feedh**: ok, 1045 prices, 44 events
 
-Matches starting in next 168h: **36**, markets priced: **397**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **36**, markets priced: **389**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,4 +26,4 @@ Matches starting in next 168h: **36**, markets priced: **397**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Assam (W) (female), Baroda (W) (female), Bengal (W) (female), Central (male), Chandigarh (W) (female), Chhattisgarh (W) (female), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hyderabad (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Karnataka (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 112.1s. Snapshot: `odds_20261103T143037Z.jsonl.gz`
+Runtime 107.5s. Snapshot: `odds_20261103T153033Z.jsonl.gz`
