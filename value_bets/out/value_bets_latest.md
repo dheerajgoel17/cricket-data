@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-03 11:31 IST
+# Cricket value bets - 2026-11-03 12:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -7,11 +7,11 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **moviodds_bet365**: ok, 1520 prices
 - **smarkets**: ok, 348 prices
 - **feedk**: ok, 164 prices, 5 events
-- **feede**: ok, 526 prices, 16 events
-- **feedf**: ok, 466 prices, 10 events
-- **feedh**: ok, 1122 prices, 44 events
+- **feede**: ok, 502 prices, 16 events
+- **feedf**: ok, 466 prices, 9 events
+- **feedh**: ok, 1110 prices, 43 events
 
-Matches starting in next 168h: **37**, markets priced: **376**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **37**, markets priced: **373**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -29,4 +29,4 @@ Matches starting in next 168h: **37**, markets priced: **376**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), Assam (W) (female), BBK Partnership (male), Baroda (W) (female), Cdb A (male), Central (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Goa (W) (female), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Hyderabad (W) (female), Incredibles (W) (female), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kerala (W) (female), Madhya Pradesh (W) (female), Maharashtra (W) (female), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Tamil Nadu (W) (female), Tripura (W) (female), Uttar Pradesh (W) (female), Vidarbha (W) (female)
 
-Runtime 109.7s. Snapshot: `odds_20261103T060141Z.jsonl.gz`
+Runtime 147.8s. Snapshot: `odds_20261103T063033Z.jsonl.gz`
