@@ -63,9 +63,15 @@ def relay() -> tuple[str, str] | None:
 def _http_body(err: urllib.error.HTTPError) -> str:
     """Upstream / Worker body on a 4xx (``host not allowed``, Cloudflare HTML, book JSON), else empty. ``HTTPError.read`` is one-shot."""
     try:
-        return (err.read() or b"").decode("utf-8", "replace").strip()[:240]
+        text = (err.read() or b"").decode("utf-8", "replace").strip()
     except Exception:  # noqa: BLE001
         return ""
+    low = text[:400].lower()
+    if "host not allowed" in low:
+        return text.split("\n", 1)[0][:240]
+    if "<!doctype html" in low or "cf-browser-verification" in low or "just a moment" in low or "cdn-cgi/challenge" in low:
+        return "cloudflare challenge from the book (datacenter IP blocked — use the India runner)"
+    return text[:240]
 
 
 def _relay_headers(url: str, body: bytes | None) -> dict[str, str]:
