@@ -69,7 +69,7 @@ DEFAULTS = {
     "FEEDG_SPACING_SECS": 2.0,     # Feed G (adapters/feedg.py, on whenever FEEDG_NAME and FEEDG_API are set): seconds between its requests
     "FEEDG_MAX_EVENTS": 30,        # ... matches read per run (a catalogue call and an odds call each)
     "FEEDG_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
-    "FEEDG_STATE_MAX_HOURS": 3.0,  # ... how old the India runner's last read may be when GitHub's own servers are refused (state/feedg_latest.json)
+    "FEEDG_STATE_MAX_HOURS": 3.0,  # how old state/feedg_latest.json may be when the live Mumbai hop is refused
     "FEEDG_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDH_SPACING_SECS": 0.5,     # Feed H (adapters/feedh.py, on whenever FEEDH_URL and FEEDH_NAME are set): seconds between its requests
     "FEEDH_MAX_EVENTS": 500,       # ... event/competition pages fetched per run (in-horizon games first, then internationals)

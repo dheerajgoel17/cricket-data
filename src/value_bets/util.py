@@ -1,5 +1,6 @@
 import datetime as dt
 import json
+import random
 import re
 import time
 import urllib.error
@@ -9,7 +10,18 @@ from . import config
 
 UTC = dt.timezone.utc
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30), "IST")
-UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+# Rotate among ordinary Chromium UAs so book pulls are not one sticky fingerprint (free hops only; no paid proxy).
+_UA_POOL = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+)
+UA = _UA_POOL[0]
+
+
+def _ua() -> str:
+    return random.choice(_UA_POOL)
 
 
 def now_utc():
@@ -44,7 +56,7 @@ def ist(d):
 
 
 def http_json(url, method="GET", headers=None, data=None, timeout=None, retries=1):
-    h = {"User-Agent": UA, "Accept": "application/json"}
+    h = {"User-Agent": _ua(), "Accept": "application/json", "Accept-Language": "en-IN,en;q=0.9,hi;q=0.8"}
     h.update(headers or {})
     body = None
     if data is not None:

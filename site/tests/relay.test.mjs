@@ -56,8 +56,8 @@ test("upstream calls look like an Indian Chromium XHR (Origin, Referer, Accept-L
   const f = async (_u, init) => { seen = init; return new Response("{}", { status: 200, headers: { "set-cookie": "sid=1; Path=/" } }); };
   const res = await call({ headers: { "x-relay-key": "k-123" }, query: { u: "https://api.book.example/list" } }, f);
   assert.equal(res.code, 200);
-  assert.match(seen.headers["User-Agent"], /Chrome\/131/);
-  assert.equal(seen.headers["Accept-Language"], "en-IN,en;q=0.9,hi;q=0.8");
+  assert.match(seen.headers["User-Agent"], /Chrome\/\d+/);
+  assert.match(seen.headers["Accept-Language"], /en-IN|hi-IN|hi;/);
   assert.equal(seen.headers.Origin, "https://api.book.example");
   assert.equal(seen.headers.Referer, "https://api.book.example/");
   assert.equal(seen.headers["Sec-Fetch-Mode"], "cors");

@@ -164,7 +164,7 @@ def test_a_stale_read_is_not_used_and_a_refusal_with_no_read_is_an_error(env, mo
     with pytest.raises(urllib.error.HTTPError):
         feedg.fetch("2026-10-28T14:00:00Z")  # four hours old: past the 3 hour limit
     with pytest.raises(urllib.error.HTTPError):
-        feedg.fetch(STAMP, use_state=False)  # the India runner itself never reads the file
+        feedg.fetch(STAMP, use_state=False)  # a live read never falls back to the state file
 
 
 def test_with_a_relay_every_call_goes_through_it_with_the_key_and_the_real_address_in_u(env, monkeypatch):

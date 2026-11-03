@@ -1,10 +1,8 @@
-// Feed G (ReddyBook) Mumbai hop: Vercel Hobby pinned to bom1 (`vercel.json`). Cloudflare Workers still serve Feed H
-// (`relay/worker.js`). This is the path that worked for Feed G in late Oct 2026 before the hop moved to Cloudflare.
-// Forwards one request to a host on RELAY_ALLOW / RELAY_ALLOW_EXTRA and returns the answer as it came. Not an open
-// proxy: wrong x-relay-key or an unlisted host → 403. Hosts and key are Vercel env vars, never in this file.
+// Feed G Mumbai hop: Vercel Hobby pinned to bom1 (`vercel.json`). Free only — no paid VPS / proxy.
+// Cloudflare Workers (`relay/worker.js`) still serve Feed H. Forwards one request to a host on the allow list.
+// Wrong x-relay-key or an unlisted host → 403. Upstream fingerprints rotate per call (`relay/browser.js`).
 import { timingSafeEqual } from "node:crypto";
-
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+import { upstreamHeaders as buildUpstream } from "../browser.js";
 
 export const same = (a, b) => {
   const x = Buffer.from(String(a)), y = Buffer.from(String(b));
@@ -22,27 +20,13 @@ async function readBody(req) {
   return Buffer.concat(parts);
 }
 
+const headerGet = (req) => (name) => {
+  const h = req.headers || {};
+  return h[name] ?? h[name.toLowerCase()] ?? "";
+};
+
 function upstreamHeaders(url, req, post) {
-  const host = url.hostname;
-  const origin = String(req.headers["x-relay-origin"] || "").trim() || `https://${host}`;
-  const referer = String(req.headers["x-relay-referer"] || "").trim() || `${origin}/`;
-  const ua = String(req.headers["x-relay-ua"] || "").trim() || UA;
-  const cookie = String(req.headers["x-relay-cookie"] || "").trim();
-  return {
-    "User-Agent": ua,
-    Accept: "application/json, text/plain, */*",
-    "Accept-Language": "en-IN,en;q=0.9,hi;q=0.8",
-    Origin: origin,
-    Referer: referer,
-    "Sec-CH-UA": `"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"`,
-    "Sec-CH-UA-Mobile": "?0",
-    "Sec-CH-UA-Platform": `"Windows"`,
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site",
-    ...(post && req.headers["content-type"] ? { "Content-Type": req.headers["content-type"] } : {}),
-    ...(cookie ? { Cookie: cookie } : {}),
-  };
+  return buildUpstream(url, headerGet(req), post, post ? (req.headers?.["content-type"] || "") : "");
 }
 
 export default async function handler(req, res, fetchImpl = fetch) {

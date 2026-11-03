@@ -64,9 +64,9 @@ test("Vercel relay: POST body and browser-like Origin reach the book", async () 
   assert.equal(res.code, 200);
   assert.equal(seen.init.method, "POST");
   assert.equal(Buffer.from(seen.init.body).toString(), "market_ids[]=1");
-  assert.match(seen.init.headers["User-Agent"], /Chrome\/131/);
+  assert.match(seen.init.headers["User-Agent"], /Chrome\/\d+/);
   assert.equal(seen.init.headers.Origin, "https://hub.example");
-  assert.equal(seen.init.headers["Accept-Language"], "en-IN,en;q=0.9,hi;q=0.8");
+  assert.match(seen.init.headers["Accept-Language"], /en-IN|hi-IN|hi;/);
 });
 
 test("allowed() and same() for the Vercel hop", () => {

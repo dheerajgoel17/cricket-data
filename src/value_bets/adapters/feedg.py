@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
+import random
 import re
 import time
 import urllib.error
@@ -54,14 +55,35 @@ def settings() -> dict[str, str]:
     return s if all(s.values()) and s["API"].startswith("http") else {}
 
 
+# Ordinary Chromium UAs (also rotated on the hop). Passed as x-relay-ua so Sec-CH stays in sync on the relay.
+_UA_POOL = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36",
+)
+
+
 def relay() -> tuple[str, str] | None:
-    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through the Mumbai hop (relay/api/relay.js on Vercel bom1; Cloudflare Worker is Feed H)."""
+    """(relay address, key) from FEEDG_RELAY and FEEDG_RELAY_KEY when both are set: every request then goes through a free Mumbai hop (Vercel bom1 by default; Cloudflare Worker is Feed H)."""
     addr, key = os.environ.get("FEEDG_RELAY", "").strip(), os.environ.get("FEEDG_RELAY_KEY", "").strip()
     return (addr, key) if addr.startswith("https://") and key else None
 
 
+def relay_targets() -> list[tuple[str, str]]:
+    """Primary hop, then optional ``FEEDG_RELAY_ALT`` (+ ``FEEDG_RELAY_ALT_KEY`` or the primary key) for a free second egress IP."""
+    out: list[tuple[str, str]] = []
+    if primary := relay():
+        out.append(primary)
+    alt = os.environ.get("FEEDG_RELAY_ALT", "").strip()
+    alt_key = os.environ.get("FEEDG_RELAY_ALT_KEY", "").strip() or (out[0][1] if out else "")
+    if alt.startswith("https://") and alt_key and (alt, alt_key) not in out:
+        out.append((alt, alt_key))
+    return out
+
+
 def _http_body(err: urllib.error.HTTPError) -> str:
-    """Upstream / Worker body on a 4xx (``host not allowed``, Cloudflare HTML, book JSON), else empty. ``HTTPError.read`` is one-shot."""
+    """Upstream / hop body on a 4xx (``host not allowed``, Cloudflare HTML, book JSON), else empty. ``HTTPError.read`` is one-shot."""
     try:
         text = (err.read() or b"").decode("utf-8", "replace").strip()
     except Exception:  # noqa: BLE001
@@ -70,18 +92,23 @@ def _http_body(err: urllib.error.HTTPError) -> str:
     if "host not allowed" in low:
         return text.split("\n", 1)[0][:240]
     if "<!doctype html" in low or "cf-browser-verification" in low or "just a moment" in low or "cdn-cgi/challenge" in low:
-        return "cloudflare challenge from the book (datacenter IP blocked — point FEEDG_RELAY at Vercel bom1 or use the India runner)"
+        return "cloudflare challenge from the book (try FEEDG_RELAY on Vercel bom1, or FEEDG_RELAY_ALT on the other free hop)"
     return text[:240]
 
 
-def _relay_headers(url: str, body: bytes | None) -> dict[str, str]:
-    """Key + browser-like Origin/Referer for the target host (the Worker also rebuilds a Chromium UA). Optional FEEDG_RELAY_COOKIE for a warmed session."""
+def _is_challenge(detail: str) -> bool:
+    return "cloudflare challenge" in (detail or "").lower()
+
+
+def _relay_headers(url: str, body: bytes | None, key: str) -> dict[str, str]:
+    """Key + browser-like Origin/Referer/UA for the target host. Optional FEEDG_RELAY_COOKIE for a warmed session."""
     host = urllib.parse.urlparse(url).hostname or ""
     origin = f"https://{host}" if host else ""
     head = {
-        "x-relay-key": relay()[1],  # type: ignore[index]
+        "x-relay-key": key,
         "x-relay-origin": origin,
         "x-relay-referer": f"{origin}/",
+        "x-relay-ua": random.choice(_UA_POOL),
     }
     if body is not None:
         head["Content-Type"] = "application/x-www-form-urlencoded"
@@ -92,24 +119,31 @@ def _relay_headers(url: str, body: bytes | None) -> dict[str, str]:
 
 
 def request(url: str, body: bytes | None = None):
-    """One call to the book: direct, or through the relay when it is configured. ``body`` makes it a form POST.
-    Through the relay, Origin/Referer of the book host go along so the book sees a same-site XHR, not a bare Worker fetch."""
-    rl = relay()
-    if rl is None:
+    """One call to the book: direct, or through a free Mumbai hop when configured. ``body`` makes it a form POST.
+    Through the relay, Origin/Referer/UA of a Chromium-in-India XHR go along. On a Cloudflare challenge, tries ``FEEDG_RELAY_ALT`` once."""
+    targets = relay_targets()
+    if not targets:
         if body is None:
             return http_json(url, retries=0)[0]
         return http_json(url, method="POST", data=body, headers={"Content-Type": "application/x-www-form-urlencoded"}, retries=0)[0]
-    try:
-        return http_json(
-            f"{rl[0]}?u={urllib.parse.quote(url, safe='')}",
-            method="GET" if body is None else "POST",
-            data=body,
-            headers=_relay_headers(url, body),
-            retries=0,
-        )[0]
-    except urllib.error.HTTPError as e:
-        detail = _http_body(e)
-        raise urllib.error.HTTPError(e.url, e.code, detail or e.reason, e.hdrs, None) from e
+    last: urllib.error.HTTPError | None = None
+    for i, (addr, key) in enumerate(targets):
+        try:
+            return http_json(
+                f"{addr}?u={urllib.parse.quote(url, safe='')}",
+                method="GET" if body is None else "POST",
+                data=body,
+                headers=_relay_headers(url, body, key),
+                retries=0,
+            )[0]
+        except urllib.error.HTTPError as e:
+            detail = _http_body(e)
+            last = urllib.error.HTTPError(e.url, e.code, detail or e.reason, e.hdrs, None)
+            if i + 1 < len(targets) and _is_challenge(detail):
+                continue
+            raise last from e
+    assert last is not None
+    raise last
 
 
 def published() -> dict[str, str]:
@@ -226,7 +260,7 @@ BLOCKED = (401, 403, 451)
 
 
 def write_state(rows: list[dict], raw: dict, fetched_at: str, path=None) -> None:
-    """What a read from an allowed network (the India runner, ``python -m value_bets.feedg_run``) found, for the hourly run to use when GitHub's own servers are refused."""
+    """What a successful read (``python -m value_bets.feedg_run``) found, for the hourly run to use when the live hop is refused."""
     p = path or STATE
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps({"fetched_at": fetched_at, "rows": rows, "fancy": raw["fancy"], "books": raw["books"]}, separators=(",", ":")), encoding="utf-8")
@@ -249,7 +283,7 @@ def from_state(fetched_at: str, path=None):
 
 
 def fetch(fetched_at: str, use_state: bool = True):
-    """Read the book now; if it refuses this network (GitHub's US servers are refused with 403) use the last read from the India runner when it is fresh."""
+    """Read the book now; if the hop is refused (403/challenge) use the last ``feedg_latest.json`` when it is fresh."""
     try:
         return _fetch(fetched_at)
     except urllib.error.HTTPError as e:

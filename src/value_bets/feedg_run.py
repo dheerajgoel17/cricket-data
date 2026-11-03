@@ -1,6 +1,6 @@
-"""``python -m value_bets.feedg_run``: read Feed G from this machine and keep the result in ``value_bets/state/feedg_latest.json``.
+"""``python -m value_bets.feedg_run``: read Feed G (usually through ``FEEDG_RELAY``) and keep the result in ``value_bets/state/feedg_latest.json``.
 
-For a machine whose network the book accepts (the India runner, .github/workflows/feedg-india.yml). The hourly value-bets run reads that file when the book refuses GitHub's servers.
+The hourly value-bets run can fall back to that file when the live hop is refused. Free hops only (Vercel bom1 / Cloudflare Worker) — no paid VPS.
 """
 from __future__ import annotations
 
