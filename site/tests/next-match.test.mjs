@@ -78,6 +78,17 @@ test("pickPricedMatch keeps a just-finished T20 (5 h after the start) and prefer
   assert.equal(pickPricedMatch({ lines: [done] }, "ck", "ODI", now), null);
 });
 
+test("pickPricedMatch: prefer line/start opens the NZ ODI, not the sooner Canterbury List A of the same format", () => {
+  const now = Date.parse("2026-11-03T20:00:00Z");
+  const club = { pid: "hn", stat: "runs", fmt: "ODI", line: 34.5, team: "Canterbury", match: "Otago Volts vs Canterbury Kings",
+    start_utc: "2026-11-03T21:30:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 1.83, under: 1.83 }] };
+  const intl = { ...club, line: 28.5, team: "New Zealand", match: "New Zealand vs India", start_utc: "2026-11-04T02:00:00Z" };
+  const doc = { lines: [club, intl] };
+  assert.equal(pickPricedMatch(doc, "hn", "ODI", now).team, "Canterbury", "no prefer: soonest");
+  assert.equal(pickPricedMatch(doc, "hn", "ODI", now, { line: 28.5, stat: "runs" }).team, "New Zealand");
+  assert.equal(pickPricedMatch(doc, "hn", "ODI", now, { start: "2026-11-04T02:00:00Z" }).match, "New Zealand vs India");
+});
+
 test("matchPhase: the live feed's word wins; otherwise the keep window after a T20 start is still in play", () => {
   const start = "2026-10-30T08:10:00Z";
   const now = Date.parse("2026-10-30T13:00:00Z"); // 4 h 50 min after the start

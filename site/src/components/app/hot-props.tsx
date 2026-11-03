@@ -170,7 +170,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
   return (
     <motion.li className="relative border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`}
+      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
         className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", out && "opacity-60")}>
         <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
         <span className="grid min-w-0 gap-hair">
@@ -246,7 +246,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
         <tbody>
           {rows.map((r) => {
             const soFar = soFarOf(r), out = outOf(r);
-            const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.inn ? `&scope=${r.inn}` : ""}`;
+            const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
             const ground = shortVenue(r.venue);
             return (
               <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} tabIndex={0} role="link"

@@ -21,6 +21,7 @@ Rule of thumb: **the chart and hit rates only count games where the bet would ha
 | Two matches between the same sides on consecutive days | both kept | a scraped game one day off a Base game is a duplicate only if the batter-run totals match |
 | Same fixture in Base and scraped | Base wins | deduped on teams + date (+/-1 day) |
 | The Hundred / T10 / 60-over | their own formats | never mixed with T20 or ODI |
+| Same player priced on a club List A and an international ODI at once (e.g. Nicholls: Canterbury + NZ) | kit, lines and next-match follow the link's match | `?line=` / `?start=` via `ofBookMatch` / `pickPricedMatch`; ODI and List A share a format so the soonest alone would steal the shirt |
 | A T20 in a Test series (e.g. Afghanistan vs Zimbabwe) | format on the line vs the fixture | a Test's 6-day book window must not take the T20's fancy |
 | Playing name vs registry surname (Chamari Athapaththu / AC Jayangani) | the same player | `player_aliases.csv` plus `SURNAME_ALIAS`; live matching uses ids first |
 | Afghanistan men's matches (Base withholds them) | kept as scraped, used in Match Fancy when they qualify | `q === 1` (innings from balls, or from the scorecard totals). Totals-only rows stay out so missing fours are not shown as 0 |
