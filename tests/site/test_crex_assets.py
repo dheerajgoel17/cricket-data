@@ -50,6 +50,21 @@ def test_display_name_makes_a_readable_full_name_from_the_slug():
     assert display_name("ben mcdermott") == "Ben McDermott"
     assert display_name("kevin o'brien") == "Kevin O'Brien"
     assert display_name("") == ""
+    # the source sometimes lists a player by initials only; those stay upper, a real given name still capitalises
+    assert display_name("ms dhoni") == "MS Dhoni"
+    assert display_name("kl rahul") == "KL Rahul"
+    assert display_name("vvs laxman") == "VVS Laxman"
+    assert display_name("ab de villiers") == "AB de Villiers"
+    assert display_name("bj watling") == "BJ Watling"
+    assert display_name("adam milne") == "Adam Milne"
+
+
+def test_match_players_leaves_a_silhouette_when_two_source_namesakes_tie():
+    """RG Sharma matches both Rydham and Rohit on first initial + surname; keeping the sitemap's first pick showed the wrong full name."""
+    players = [{"idx": 0, "name": "RG Sharma", "n": 500, "last": "2026-01-01"}]
+    assert ca.match_players(players, [("rydham sharma", "MJC"), ("rohit sharma", "2X")]) == {}
+    assert ca.match_players(players, [("rohit sharma", "2X")]) == {0: "2X"}  # only one namesake: take it
+    assert ca.match_players(players, [("rohit sharma", "2X"), ("rohit sharma", "60H")]) == {0: "2X"}  # same name, two ids: first wins
 
 
 def test_league_logos_are_matched_on_the_leagues_own_words_and_take_the_newest_season():
