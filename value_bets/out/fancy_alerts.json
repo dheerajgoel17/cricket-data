@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-04T00:34:34Z",
+ "generated_at_utc": "2026-11-04T00:51:19Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -42,14 +42,14 @@
    "inn": 0,
    "side": "under",
    "line": 35.5,
-   "best_odds": 1.93,
-   "best_source": "Dafabet",
+   "best_odds": 1.95,
+   "best_source": "FairWin247 Premium",
    "hits": 29,
    "played": 38,
    "window": 20,
-   "chance": 0.7059,
-   "edge": 0.3624,
-   "edge_pct": 36.2,
+   "chance": 0.7055,
+   "edge": 0.3757,
+   "edge_pct": 37.6,
    "bat_first": false
   },
   {
