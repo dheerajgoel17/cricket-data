@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-04T15:34:21Z",
+ "generated_at_utc": "2026-11-04T16:33:18Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -283,6 +283,29 @@
    "bat_first": false
   },
   {
+   "alert_id": "2026-11-05-bangladesh-v-west-indies|team_total_fours|West Indies|0|under",
+   "fixture_id": "2026-11-05-bangladesh-v-west-indies",
+   "match": "Bangladesh vs West Indies",
+   "format": "Test",
+   "series": "West Indies tour of Bangladesh 2026",
+   "start_utc": "2026-11-05T03:30:00Z",
+   "start_ist": "2026-11-05 09:00 IST",
+   "key": "team_total_fours",
+   "team": "West Indies",
+   "inn": 0,
+   "side": "under",
+   "line": 54.5,
+   "best_odds": 1.833,
+   "best_source": "bet365",
+   "hits": 15,
+   "played": 20,
+   "window": 20,
+   "chance": 0.6667,
+   "edge": 0.222,
+   "edge_pct": 22.2,
+   "bat_first": false
+  },
+  {
    "alert_id": "2026-11-05-adelaide-strikers-women-v-brisbane-heat-women|overs_6|Adelaide Strikers Women|0|under",
    "fixture_id": "2026-11-05-adelaide-strikers-women-v-brisbane-heat-women",
    "match": "Adelaide Strikers Women vs Brisbane Heat Women",
@@ -349,29 +372,6 @@
    "chance": 0.6168,
    "edge": 0.1774,
    "edge_pct": 17.7,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-05-bangladesh-v-west-indies|overs_15|Bangladesh|0|under",
-   "fixture_id": "2026-11-05-bangladesh-v-west-indies",
-   "match": "Bangladesh vs West Indies",
-   "format": "Test",
-   "series": "West Indies tour of Bangladesh 2026",
-   "start_utc": "2026-11-05T03:30:00Z",
-   "start_ist": "2026-11-05 09:00 IST",
-   "key": "overs_15",
-   "team": "Bangladesh",
-   "inn": 0,
-   "side": "under",
-   "line": 46.5,
-   "best_odds": 2.34,
-   "best_source": "Dafabet",
-   "hits": 11,
-   "played": 20,
-   "window": 20,
-   "chance": 0.4963,
-   "edge": 0.1614,
-   "edge_pct": 16.1,
    "bat_first": false
   }
  ]
