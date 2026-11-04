@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-03T23:30:39Z",
- "generated_at_ist": "2026-11-04 05:00 IST",
- "runtime_secs": 113.8,
+ "generated_at_utc": "2026-11-04T00:30:38Z",
+ "generated_at_ist": "2026-11-04 06:00 IST",
+ "runtime_secs": 160.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-03",
-  "commit": "107808af75"
+  "commit": "206935e715"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1782,
-   "secs": 0.2
+   "rows": 1810,
+   "secs": 1.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 414,
-   "secs": 2.0
+   "rows": 381,
+   "secs": 2.8
   },
   "feedk": {
    "status": "ok",
    "rows": 156,
-   "secs": 10.4,
+   "secs": 10.9,
    "events": 4
   },
   "feedf": {
    "status": "ok",
    "rows": 230,
-   "secs": 20.9,
+   "secs": 20.7,
    "events": 3
   },
   "feedg": {
    "status": "ok",
    "rows": 32,
-   "secs": 21.5,
+   "secs": 22.4,
    "events": 4
   },
   "feede": {
    "status": "ok",
    "rows": 406,
-   "secs": 42.0,
+   "secs": 43.8,
    "events": 16
   },
   "feedh": {
    "status": "ok",
    "rows": 1038,
-   "secs": 70.9,
+   "secs": 80.9,
    "events": 48
   }
  },
- "snapshot": "odds_20261103T233039Z.jsonl.gz",
+ "snapshot": "odds_20261104T003038Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,14 +120,14 @@
  },
  "stats": {
   "events_in_window": 40,
-  "rows_in_window": 3948,
-  "selections_with_model": 1659,
-  "selections_with_market_fair": 2374,
-  "markets_in_window": 321,
+  "rows_in_window": 3976,
+  "selections_with_model": 1672,
+  "selections_with_market_fair": 2387,
+  "markets_in_window": 324,
   "value_bets": 3,
   "dropped_by_filter": {
    "odds_range": 24,
-   "model_market_gap": 670,
+   "model_market_gap": 678,
    "loose_name_match": 1,
    "model_disagrees": 7,
    "policy_max_odds": 4,
@@ -138,12 +138,12 @@
   "innings_milestones_unmodelled": 56,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 339,
-    "mean_model_p": 0.051,
-    "mean_market_p": 0.064,
-    "mean_logit_diff_model_minus_market": 0.322,
-    "mean_abs_logit_diff": 1.074,
-    "corr": 0.534
+    "n_prices": 346,
+    "mean_model_p": 0.052,
+    "mean_market_p": 0.066,
+    "mean_logit_diff_model_minus_market": 0.313,
+    "mean_abs_logit_diff": 1.095,
+    "corr": 0.518
    },
    "top_bowler_team": {
     "n_prices": 147,
@@ -157,7 +157,7 @@
     "n_prices": 462,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.665,
     "corr": 0.093
    },
@@ -197,7 +197,7 @@
     "n_prices": 145,
     "mean_model_p": 0.307,
     "mean_market_p": 0.357,
-    "mean_logit_diff_model_minus_market": -0.441,
+    "mean_logit_diff_model_minus_market": -0.442,
     "mean_abs_logit_diff": 0.461,
     "corr": 0.983
    },
@@ -505,6 +505,7 @@
    ],
    "sources": [
     "feedh_d",
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -759,16 +760,16 @@
    "implied_prob": 0.578,
    "fair_odds": 1.561,
    "fair_prob": 0.6405,
-   "model_prob": 0.6779,
+   "model_prob": 0.678,
    "market_prob": 0.6099,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.108,
-   "edge_pct": 10.8,
+   "edge": 0.1081,
+   "edge_pct": 10.81,
    "kelly_quarter_stake_pct": 2.0,
    "n_sources": 4,
    "confidence": "medium",
-   "why": "Model 68% vs market 61% for 50+ runs; form 53.7 runs/inn recency-weighted ODI (n_eff 24.2; last 5: 0, 29, 139, 74, 65), bats in 95% of games played; at Eden Park, Auckland: 1 inns avg 15.0; vs New Zealand: 25 inns avg 54.6; weather: high humidity 82%",
-   "notes": "4 market source(s) for fair price; model 0.678 vs market 0.610; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "why": "Model 68% vs market 61% for 50+ runs; form 53.7 runs/inn recency-weighted ODI (n_eff 24.2; last 5: 0, 29, 139, 74, 65), bats in 95% of games played; at Eden Park, Auckland: 1 inns avg 15.0; vs New Zealand: 25 inns avg 54.6; weather: high humidity 86%, cloud cover 78%",
+   "notes": "4 market source(s) for fair price; model 0.678 vs market 0.610; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); RAIN RISK: up to 29% rain chance, 7.1 mm forecast during the match - shortened match or void props possible",
    "model_detail": {
     "n_eff": 24.2,
     "expected": 47.78,
@@ -779,12 +780,12 @@
      "p_bat"
     ]
    },
-   "rain_risk": false,
+   "rain_risk": true,
    "weather": {
     "rain_prob_max_pct": 29,
-    "rain_mm_in_window": 0.7,
-    "humidity_pct": 82,
-    "cloud_pct": 61,
+    "rain_mm_in_window": 7.1,
+    "humidity_pct": 86,
+    "cloud_pct": 78,
     "source": "Open-Meteo forecast"
    }
   },
@@ -818,16 +819,16 @@
    "model_prob": 0.6614,
    "market_prob": 0.6052,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1033,
-   "edge_pct": 10.33,
+   "edge": 0.1034,
+   "edge_pct": 10.34,
    "kelly_quarter_stake_pct": 2.0,
    "n_sources": 4,
    "confidence": "medium",
-   "why": "Model 66% vs market 61% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: high humidity 82%",
-   "notes": "4 market source(s) for fair price; model 0.661 vs market 0.605; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "why": "Model 66% vs market 61% for 50+ runs; form 60.7 runs/inn recency-weighted ODI (n_eff 23.8; last 5: 1, 223, 110, 77, 31), bats in 94% of games played; at Eden Park, Auckland: 1 inns avg 50.0; vs New Zealand: 15 inns avg 50.5; weather: high humidity 86%, cloud cover 78%",
+   "notes": "4 market source(s) for fair price; model 0.661 vs market 0.605; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); RAIN RISK: up to 29% rain chance, 7.1 mm forecast during the match - shortened match or void props possible",
    "model_detail": {
     "n_eff": 23.8,
-    "expected": 51.02,
+    "expected": 51.01,
     "nb_alpha": 1.313,
     "p_bats_or_bowls": 0.943,
     "venue_matched": "eden park",
@@ -835,12 +836,12 @@
      "p_bat"
     ]
    },
-   "rain_risk": false,
+   "rain_risk": true,
    "weather": {
     "rain_prob_max_pct": 29,
-    "rain_mm_in_window": 0.7,
-    "humidity_pct": 82,
-    "cloud_pct": 61,
+    "rain_mm_in_window": 7.1,
+    "humidity_pct": 86,
+    "cloud_pct": 78,
     "source": "Open-Meteo forecast"
    }
   },
@@ -871,7 +872,7 @@
    "implied_prob": 0.625,
    "fair_odds": 1.49,
    "fair_prob": 0.671,
-   "model_prob": 0.704,
+   "model_prob": 0.7041,
    "market_prob": 0.644,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "edge": 0.0736,
@@ -879,11 +880,11 @@
    "kelly_quarter_stake_pct": 2.0,
    "n_sources": 4,
    "confidence": "medium",
-   "why": "Model 70% vs market 64% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.1; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: high humidity 82%",
-   "notes": "4 market source(s) for fair price; model 0.704 vs market 0.644; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "why": "Model 70% vs market 64% for 50+ runs; form 55.0 runs/inn recency-weighted ODI (n_eff 19.1; last 5: 28, 28, 65, 137, 131), bats in 93% of games played; at Eden Park, Auckland: 3 inns avg 20.0; vs India: 11 inns avg 67.4; weather: high humidity 86%, cloud cover 78%",
+   "notes": "4 market source(s) for fair price; model 0.704 vs market 0.644; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); RAIN RISK: up to 29% rain chance, 7.1 mm forecast during the match - shortened match or void props possible",
    "model_detail": {
     "n_eff": 19.1,
-    "expected": 44.98,
+    "expected": 44.97,
     "nb_alpha": 1.313,
     "p_bats_or_bowls": 0.926,
     "venue_matched": "eden park",
@@ -891,12 +892,12 @@
      "p_bat"
     ]
    },
-   "rain_risk": false,
+   "rain_risk": true,
    "weather": {
     "rain_prob_max_pct": 29,
-    "rain_mm_in_window": 0.7,
-    "humidity_pct": 82,
-    "cloud_pct": 61,
+    "rain_mm_in_window": 7.1,
+    "humidity_pct": 86,
+    "cloud_pct": 78,
     "source": "Open-Meteo forecast"
    }
   }
@@ -943,6 +944,7 @@
   "AK Gardner",
   "AM King",
   "AR Patel",
+  "AW Finch",
   "Aaryavir Sehwag",
   "Abdul Qadir",
   "Abidullah Abid",
@@ -961,7 +963,9 @@
   "Ashleigh Gardner",
   "Ayaka Kato Stafford",
   "B Berry",
+  "B McKinney",
   "B Mooney",
+  "BA Mayes",
   "BL Mooney",
   "Ben Stewart McKinney",
   "Beth Mooney",
@@ -972,6 +976,7 @@
   "Buyanda Majola",
   "C Athapaththu",
   "C Dean",
+  "C Harrison",
   "C Moore",
   "C White",
   "CA Henry",
@@ -988,7 +993,9 @@
   "Deandra Dottin",
   "Dewan Marais",
   "E Hunter",
+  "E Jack",
   "E Ragg",
+  "E Singh",
   "E de Broughe",
   "EA Perry",
   "Ella Hayward",
@@ -1024,6 +1031,7 @@
   "Indigo Noble",
   "Ines Mackeon",
   "Isabella Malgioglio",
+  "JA Haynes",
   "Jason Raubenheimer",
   "Jason Smith",
   "Jevano Baron",
@@ -1039,6 +1047,7 @@
   "Kevin Wickham",
   "Kim Garth",
   "L Lee",
+  "L Patterson-White",
   "L Wilson",
   "L Wolvaardt",
   "LK Bell",
@@ -1073,6 +1082,7 @@
   "Muhammad Rohid",
   "N Hancock",
   "N Hasan",
+  "N Sharma",
   "N de Klerk",
   "NJ Carey",
   "Nadine de Klerk",
@@ -1103,6 +1113,7 @@
   "S Molineux",
   "SFM Devine",
   "SL Bates",
+  "SW Currie",
   "Sabelo Mabanga",
   "Saishiv Narayan",
   "Samantha Bates",
@@ -1124,17 +1135,7 @@
   "Srishti Arvind Sharma",
   "Sujata Dey",
   "Suryanshu Koirala",
-  "T Davidge",
-  "TM McGrath",
-  "Tahlia McGrath",
-  "Taniya Bhatia",
-  "Tanusree Makhanlal Sarkar",
-  "Thabiso Lekhoana",
-  "Thomas Rew",
-  "Tiaan Kuhn",
-  "Tim Saulez",
-  "Tladi Bokako",
-  "Tristan Luus"
+  "T Davidge"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1259,22 +1260,22 @@
   }
  },
  "log": [
-  "[05:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[05:00 IST] history: 23891 matches, last 2026-11-03, players 429858",
-  "[05:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1782, 'secs': 0.2}",
-  "[05:02 IST] source smarkets: {'status': 'ok', 'rows': 414, 'secs': 2.0}",
-  "[05:02 IST] source feedk: {'status': 'ok', 'rows': 156, 'secs': 10.4, 'events': 4}",
-  "[05:02 IST] source feedf: {'status': 'ok', 'rows': 230, 'secs': 20.9, 'events': 3}",
-  "[05:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 21.5, 'events': 4}",
-  "[05:02 IST] source feede: {'status': 'ok', 'rows': 406, 'secs': 42.0, 'events': 16}",
-  "[05:02 IST] source feedh: {'status': 'ok', 'rows': 1038, 'secs': 70.9, 'events': 48}",
-  "[05:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[05:02 IST] 90 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[05:02 IST] 56 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[05:02 IST] book lines: 351 player lines from 7 source(s)",
-  "[05:02 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[05:02 IST] weather: forecasts for 9 events, 0 failed",
-  "[05:02 IST] prop model: 1011 prop selections modelled, 316 milestone ladder prices anchored to O/U",
-  "[05:02 IST] ledger upsert failed: InvalidURL('URL can\\'t contain control characters. \\'/rest/v1/edge_bets?select=bet_key,status,first_seen_at&bet_key=in.(\"male|India|New Zealand|2026-11-04|batter_milestone||Virat Kohli 50+ no|49.5|under\",\"male|India|New Zealand|2026-11-04|batter_milestone||Shubman Gill 50+ no|49.5|under\",\"male|India|New Zealand|2026-11-04|batter_milestone||Daryl Mitchell 50+ no|49.5|under\")\\' (found at least \\' \\')')"
+  "[06:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[06:00 IST] history: 23891 matches, last 2026-11-03, players 429858",
+  "[06:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1810, 'secs': 1.5}",
+  "[06:02 IST] source smarkets: {'status': 'ok', 'rows': 381, 'secs': 2.8}",
+  "[06:02 IST] source feedk: {'status': 'ok', 'rows': 156, 'secs': 10.9, 'events': 4}",
+  "[06:02 IST] source feedf: {'status': 'ok', 'rows': 230, 'secs': 20.7, 'events': 3}",
+  "[06:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 22.4, 'events': 4}",
+  "[06:02 IST] source feede: {'status': 'ok', 'rows': 406, 'secs': 43.8, 'events': 16}",
+  "[06:02 IST] source feedh: {'status': 'ok', 'rows': 1038, 'secs': 80.9, 'events': 48}",
+  "[06:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[06:02 IST] 90 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[06:02 IST] 56 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[06:02 IST] book lines: 351 player lines from 7 source(s)",
+  "[06:02 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[06:03 IST] weather: forecasts for 9 events, 0 failed",
+  "[06:03 IST] prop model: 1011 prop selections modelled, 316 milestone ladder prices anchored to O/U",
+  "[06:03 IST] ledger upsert failed: InvalidURL('URL can\\'t contain control characters. \\'/rest/v1/edge_bets?select=bet_key,status,first_seen_at&bet_key=in.(\"male|India|New Zealand|2026-11-04|batter_milestone||Virat Kohli 50+ no|49.5|under\",\"male|India|New Zealand|2026-11-04|batter_milestone||Shubman Gill 50+ no|49.5|under\",\"male|India|New Zealand|2026-11-04|batter_milestone||Daryl Mitchell 50+ no|49.5|under\")\\' (found at least \\' \\')')"
  ]
 }
