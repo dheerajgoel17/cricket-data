@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-04T18:33:53Z",
+ "generated_at_utc": "2026-11-04T19:33:50Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -50,6 +50,29 @@
    "chance": 0.6475,
    "edge": 0.3598,
    "edge_pct": 36,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-05-bangladesh-v-west-indies|team_total_boundaries|West Indies|0|under",
+   "fixture_id": "2026-11-05-bangladesh-v-west-indies",
+   "match": "Bangladesh vs West Indies",
+   "format": "Test",
+   "series": "West Indies tour of Bangladesh 2026",
+   "start_utc": "2026-11-05T03:30:00Z",
+   "start_ist": "2026-11-05 09:00 IST",
+   "key": "team_total_boundaries",
+   "team": "West Indies",
+   "inn": 0,
+   "side": "under",
+   "line": 61.5,
+   "best_odds": 1.833,
+   "best_source": "bet365",
+   "hits": 17,
+   "played": 20,
+   "window": 20,
+   "chance": 0.7333,
+   "edge": 0.3442,
+   "edge_pct": 34.4,
    "bat_first": false
   },
   {
@@ -326,29 +349,6 @@
    "chance": 0.4593,
    "edge": 0.2124,
    "edge_pct": 21.2,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-05-bangladesh-v-west-indies|match_runs||0|under",
-   "fixture_id": "2026-11-05-bangladesh-v-west-indies",
-   "match": "Bangladesh vs West Indies",
-   "format": "Test",
-   "series": "West Indies tour of Bangladesh 2026",
-   "start_utc": "2026-11-05T03:30:00Z",
-   "start_ist": "2026-11-05 09:00 IST",
-   "key": "match_runs",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 1055.5,
-   "best_odds": 1.833,
-   "best_source": "bet365",
-   "hits": 26,
-   "played": 37,
-   "window": 20,
-   "chance": 0.6596,
-   "edge": 0.209,
-   "edge_pct": 20.9,
    "bat_first": false
   }
  ]
