@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from value_bets import archive as arch
-from value_bets.archive import backfill, fixture_id, group, main, match_results, settle, team_key, update
+from value_bets.archive import backfill, fixture_id, group, heal_book, main, match_results, settle, team_key, update
 
 START = "2026-10-27T07:00:00Z"
 SCHED = [{"start_utc": "2026-10-27T07:00Z", "format": "T20", "gender": "male", "team_a": "New Zealand", "team_b": "India", "venue": "Eden Park", "series": "NZ v IND", "status": "Upcoming"}]
@@ -416,3 +416,21 @@ def test_a_file_that_had_its_whole_match_results_before_settled_at_existed_is_le
     filed(t20)
     settle(t20, [{"matches": [live_match([settled("ab12", "runs", 17.5, 31)])]}], NOW)
     assert "settled_at" not in read(t20) and read(t20)["results"], "other formats are untouched"
+
+
+def test_heal_book_restores_lines_a_partial_post_start_pull_wiped(tmp_path):
+    """Archive still has FairWin / Dafabet; the published file only kept bet365 — heal puts the closing lines back."""
+    update(tmp_path, book([
+        line(books=(("bet365", 1.67, 2.1),), ln=20.5, fmt="ODI", start_utc="2026-11-04T02:00:00Z"),
+        line(books=(("FairWin247 Fancy", 2.0, None),), ln=21.5, fmt="ODI", start_utc="2026-11-04T02:00:00Z"),
+        line(books=(("Dafabet", 1.87, 1.83), ("FairWin247 Premium", 1.85, 1.85)), ln=30.5, fmt="ODI", start_utc="2026-11-04T02:00:00Z"),
+    ]), at(20, 3), None, [{**SCHED[0], "start_utc": "2026-11-04T02:00Z", "format": "ODI"}])
+    wiped = book([line(books=(("bet365", 1.67, 2.1),), ln=20.5, fmt="ODI", start_utc="2026-11-04T02:00:00Z")], events=False)
+    # rewrite the match stamp on the wiped pull so sides/start match the archive file
+    for ln in wiped["lines"]:
+        ln["match"], ln["start_utc"] = "New Zealand vs India", "2026-11-04T02:00:00Z"
+    out = heal_book(wiped, tmp_path, dt.datetime(2026, 11, 4, 5, 0, tzinfo=dt.timezone.utc))
+    assert sorted(x["line"] for x in out["lines"]) == [20.5, 21.5, 30.5]
+    by = {x["line"]: [b["source"] for b in x["books"]] for x in out["lines"]}
+    assert by[21.5] == ["FairWin247 Fancy"]
+    assert by[30.5] == ["Dafabet", "FairWin247 Premium"]

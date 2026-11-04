@@ -130,6 +130,44 @@ def test_a_started_match_stays_in_the_file_after_the_books_stop_pricing_it():
         assert [x["match"] for x in out[kind]] == ["India vs NZ", "Afghanistan vs Zimbabwe"], kind  # start order, 2 h 33 min in
 
 
+def test_a_partial_post_start_pull_keeps_other_books_closing_lines():
+    """Books drop off at different times: a later pull that still has only bet365 must not wipe FairWin / Dafabet lines for the same match."""
+    base = {"pid": "p1", "player": "P", "team": "India", "fmt": "ODI", "stat": "points", "match": "New Zealand vs India",
+            "competition": "", "start_utc": "2026-11-04T02:00:00Z"}
+    prev = {"generated_at_utc": "a", "events": [], "fancy": [], "lines": [
+        {**base, "line": 20.5, "books": [{"source": "bet365", "kind": "bookmaker", "over": 1.67, "under": 2.1}]},
+        {**base, "line": 21.5, "books": [{"source": "FairWin247 Fancy", "kind": "bookmaker", "over": 2.0, "under": None}]},
+        {**base, "line": 30.5, "books": [{"source": "Dafabet", "kind": "bookmaker", "over": 1.87, "under": 1.83},
+                                         {"source": "FairWin247 Premium", "kind": "bookmaker", "over": 1.85, "under": 1.85}]},
+    ]}
+    new = {"generated_at_utc": "b", "events": [], "fancy": [], "lines": [
+        {**base, "line": 20.5, "books": [{"source": "bet365", "kind": "bookmaker", "over": 1.67, "under": 2.1}]},
+    ]}
+    out = carry_started(new, prev, dt.datetime(2026, 11, 4, 5, 0, tzinfo=dt.timezone.utc))
+    assert sorted(x["line"] for x in out["lines"]) == [20.5, 21.5, 30.5]
+    by_line = {x["line"]: [b["source"] for b in x["books"]] for x in out["lines"]}
+    assert by_line[20.5] == ["bet365"]
+    assert by_line[21.5] == ["FairWin247 Fancy"]
+    assert by_line[30.5] == ["Dafabet", "FairWin247 Premium"]
+
+
+def test_carry_keeps_a_book_source_on_the_same_line_the_new_pull_dropped():
+    base = {"pid": "p1", "player": "P", "team": "India", "fmt": "ODI", "stat": "points", "match": "New Zealand vs India",
+            "competition": "", "start_utc": "2026-11-04T02:00:00Z", "line": 30.5}
+    prev = {"generated_at_utc": "a", "events": [], "fancy": [], "lines": [
+        {**base, "books": [{"source": "Dafabet", "kind": "bookmaker", "over": 1.87, "under": 1.83},
+                           {"source": "FairWin247 Premium", "kind": "bookmaker", "over": 1.85, "under": 1.85}]},
+    ]}
+    new = {"generated_at_utc": "b", "events": [], "fancy": [], "lines": [
+        {**base, "books": [{"source": "Dafabet", "kind": "bookmaker", "over": 1.9, "under": 1.8}]},
+    ]}
+    out = carry_started(new, prev, dt.datetime(2026, 11, 4, 5, 0, tzinfo=dt.timezone.utc))
+    assert len(out["lines"]) == 1
+    books = {b["source"]: b for b in out["lines"][0]["books"]}
+    assert books["Dafabet"]["over"] == 1.9  # this pull's price wins
+    assert books["FairWin247 Premium"]["over"] == 1.85  # closing price kept
+
+
 def test_upcoming_matches_are_never_revived_and_finished_ones_are_let_go():
     prev = doc(("Later vs Match", "2026-10-27T14:30:00Z", "T20"), ("Old vs Game", "2026-10-25T07:00:00Z", "ODI"))  # 50 h ago: past the 40 h a finished match is kept
     out = carry_started(doc(), prev, NOW)
