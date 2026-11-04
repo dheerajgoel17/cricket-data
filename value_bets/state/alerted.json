@@ -1,17 +1,1 @@
-{
- "male|India|New Zealand|2026-11-04|batter_milestone||Shubman Gill 50+ no|49.5|under": {
-  "edge": 0.1635,
-  "start_utc": "2026-11-04T02:00:00Z",
-  "alerted_at": "2026-11-02T16:33:07.913558+00:00"
- },
- "male|India|New Zealand|2026-11-04|batter_milestone||Virat Kohli 50+ no|49.5|under": {
-  "edge": 0.1547,
-  "start_utc": "2026-11-04T02:00:00Z",
-  "alerted_at": "2026-11-02T16:33:07.913558+00:00"
- },
- "male|India|New Zealand|2026-11-04|batter_milestone||Daryl Mitchell 50+ no|49.5|under": {
-  "edge": 0.0632,
-  "start_utc": "2026-11-04T02:00:00Z",
-  "alerted_at": "2026-11-02T09:32:12.619416+00:00"
- }
-}
+{}
