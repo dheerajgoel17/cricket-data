@@ -97,6 +97,11 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
 
     A Test is one match: books restamp ``start_utc`` each morning, so rows of the same pair within ``TEST_KEEP`` keep the earliest start
     (the first morning) and merge by player / stat / inn / line. A first-innings line is not dropped when a later day's pull only has the match total.
+
+    Player lines (limited-overs too) merge by player / stat / inn / line: books drop off at different times, so a post-start pull that still has
+    one book must not wipe another book's closing line for the same match. Fancy rows merge by market / team / line / source the same way.
+    Events still key by match (and start for limited overs). When the same player line is in both pulls, sources the new pull lacks are kept
+    from the previous one (closing prices); prices the new pull still has win.
     """
     if not prev:
         return book
@@ -142,20 +147,38 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
     def line_key(x: dict):
         return (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0), x.get("line"))
 
+    def fancy_key(x: dict):
+        return (x.get("match"), x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind"))
+
+    def row_key(kind: str, x: dict):
+        if kind == "lines":
+            return line_key(x)
+        if kind == "fancy":
+            return fancy_key(x)
+        return x.get("match") if is_test(x) else (x.get("match"), x.get("start_utc"))
+
+    def merge_books(cur: dict, old: dict) -> dict:
+        books = {(b.get("source"), b.get("kind")): b for b in cur.get("books") or []}
+        for b in old.get("books") or []:
+            k = (b.get("source"), b.get("kind"))
+            if k not in books:
+                books[k] = b
+        return {**cur, "books": [books[k] for k in sorted(books)]}
+
     out = dict(book)
     for kind in kinds:
-        new_rows = [restamp(x) for x in book.get(kind) or []]
-        if kind == "lines":
-            have = {line_key(x) if is_test(x) else (x.get("match"), x.get("start_utc")) for x in new_rows}
-        else:
-            have = {x.get("match") if is_test(x) else (x.get("match"), x.get("start_utc")) for x in new_rows}
-        old = []
+        by: dict = {}
+        for x in book.get(kind) or []:
+            y = restamp(x)
+            by[row_key(kind, y)] = y
         for x in prev.get(kind) or []:
             y = restamp(x)
             if not alive(y):
                 continue
-            k = (line_key(y) if is_test(y) else (y.get("match"), y.get("start_utc"))) if kind == "lines" else (y.get("match") if is_test(y) else (y.get("match"), y.get("start_utc")))
-            if k not in have:
-                old.append(y)
-        out[kind] = sorted([*new_rows, *old], key=order)
+            k = row_key(kind, y)
+            if k not in by:
+                by[k] = y
+            elif kind == "lines":
+                by[k] = merge_books(by[k], y)
+        out[kind] = sorted(by.values(), key=order)
     return public(out)

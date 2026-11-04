@@ -833,6 +833,10 @@ def run():
         ended = []
         log(f"archive: ended Tests not read: {e!r}")
     book = booklines.carry_started(book, prev_book, now, ended)  # a match stays in the file while it is being played
+    try:  # closing lines a partial post-start pull wiped: the archive still has them; heal before publish
+        book = archive.heal_book(book, config.ARCHIVE, now, ended)
+    except Exception as e:
+        log(f"archive heal failed: {e!r}")
     (config.OUT / "book_lines.json").write_text(json.dumps(book, separators=(",", ":")))
     (config.OUT / "new_alerts.json").write_text(json.dumps({"generated_at_ist": ist(now), "alerts": alerts},
                                                           indent=1, default=str))

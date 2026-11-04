@@ -189,6 +189,63 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
     return written, bad
 
 
+def _wanted_matches(book: dict) -> list[dict]:
+    """Unique (sides, start) pairs still listed in the published book file."""
+    out: list[dict] = []
+    for kind in ("events", "lines", "fancy"):
+        for x in book.get(kind) or []:
+            a, b = _sides(x)
+            st = parse_ts(x.get("start_utc"))
+            if not (a and b and st):
+                continue
+            k = frozenset((team_key(a), team_key(b)))
+            if any(g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME for g in out):
+                continue
+            out.append({"k": k, "start": st, "match": x.get("match") or f"{a} vs {b}",
+                        "start_utc": x["start_utc"], "competition": x.get("competition")})
+    return out
+
+
+def _prev_from_archive(book: dict, root: Path) -> dict:
+    """Archive rows for matches still in ``book``, shaped like a previous ``book_lines`` pull (lines get match/start back)."""
+    wanted = _wanted_matches(book)
+    prev: dict = {"events": [], "lines": [], "fancy": []}
+    if not wanted or not root.exists():
+        return prev
+    for path in sorted(root.glob("*/*.json")):
+        try:
+            d = _read(path)
+        except (ValueError, OSError):
+            continue
+        if not d:
+            continue
+        g = next((g for g in wanted if _same_match(d, g["k"], g["start"])), None)
+        if not g:
+            continue
+        shared = {"match": d.get("match") or g["match"], "competition": d.get("competition") or g.get("competition"),
+                  "start_utc": d.get("start_utc") or g["start_utc"]}
+        prev["events"].extend(d.get("events") or [])
+        prev["fancy"].extend(d.get("fancy") or [])
+        prev["lines"].extend([{**shared, **ln} for ln in d.get("lines") or []])
+    return prev
+
+
+def heal_book(book: dict, root: Path, now: dt.datetime, ended: list | None = None) -> dict:
+    """Re-add closing lines and fancy a partial post-start pull wiped, from the permanent archive.
+
+    Only matches still listed in ``book`` and still in the carry window are healed (finished matches that left the
+    file stay out). Uses ``booklines.carry_started`` so the same merge rules apply: missing player/stat/lines come
+    back, and book sources a line still has in the archive but not in the published file are added without
+    overwriting prices the published file still carries.
+    """
+    from .booklines import carry_started  # late: archive is imported by the pipeline before booklines finishes loading
+
+    prev = _prev_from_archive(book, root)
+    if not any(prev.get(k) for k in ("events", "lines", "fancy")):
+        return book
+    return carry_started(book, prev, now, ended)
+
+
 def book_names(root: Path, *books: dict) -> dict[str, str]:
     """{player id: the name the books use} for every player the archive and the given book files know by exactly one such name (two spellings: left out)."""
     seen: dict[str, set[str]] = {}
