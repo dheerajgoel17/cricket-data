@@ -205,12 +205,13 @@ def _fetch_by_keys(base: str, key: str, keys: list[str]) -> dict[str, dict]:
     out: dict[str, dict] = {}
     if not keys:
         return out
-    # PostgREST ``in`` filter; chunk to keep URLs short
+    # PostgREST ``in`` filter; chunk to keep URLs short. Quote the whole ``in.(...)`` value:
+    # fancy keys carry team names with spaces, and a raw space raises ``http.client.InvalidURL``.
     for i in range(0, len(keys), 50):
         chunk = keys[i:i + 50]
-        # PostgREST ``in`` list: bet_key=in.("a","b")
         q = ",".join('"' + k.replace("\\", "\\\\").replace('"', '\\"') + '"' for k in chunk)
-        url = f"{base}/rest/v1/edge_bets?select=bet_key,status,first_seen_at&bet_key=in.({q})"
+        filt = urllib.parse.quote(f"in.({q})", safe="")
+        url = f"{base}/rest/v1/edge_bets?select=bet_key,status,first_seen_at&bet_key={filt}"
         _, body = _req("GET", url, key)
         for row in json.loads(body):
             out[row["bet_key"]] = row
@@ -636,7 +637,7 @@ def main(argv: list[str] | None = None) -> int:
         if a.upsert_fancy is None and a.backfill_history is None and not a.settle and not a.summary:
             ap.print_help()
             return 2
-    except (urllib.error.URLError, OSError, ValueError) as exc:
+    except Exception as exc:  # noqa: BLE001 — best effort: InvalidURL / HTTP / JSON must not sink the job
         detail = ""
         if isinstance(exc, urllib.error.HTTPError):
             try:
@@ -644,7 +645,7 @@ def main(argv: list[str] | None = None) -> int:
             except OSError:
                 pass
         print(f"ledger failed: {exc}{detail}", file=sys.stderr)
-        return 0  # best effort: never fail the value-bets job on ledger errors
+        return 0
     return 0
 
 

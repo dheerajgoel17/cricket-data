@@ -161,3 +161,24 @@ def test_backfill_history_file(tmp_path, monkeypatch):
     monkeypatch.delenv("SUPABASE_SERVICE_KEY", raising=False)
     out = ledger.backfill_history(p)
     assert out["parsed"] == 1 and out["unique"] == 1 and out["skipped"] is True
+
+
+def test_fetch_by_keys_url_encodes_spaces():
+    """Fancy bet_keys carry team names with spaces; a raw space crashes http.client (InvalidURL)."""
+    seen = []
+
+    def fake_req(method, url, key, data=None, headers=None, timeout=60):
+        seen.append(url)
+        return 200, b"[]"
+
+    ledger._req, prev = fake_req, ledger._req
+    try:
+        out = ledger._fetch_by_keys(
+            "https://db.example.invalid", "k",
+            ["fancy|2026-11-05-a-v-b|team_total_runs|Adelaide Strikers Women|0|under"],
+        )
+    finally:
+        ledger._req = prev
+    assert out == {} and len(seen) == 1
+    assert " " not in seen[0].split("?", 1)[1]  # query string has no raw spaces
+    assert "Adelaide%20Strikers%20Women" in seen[0]
