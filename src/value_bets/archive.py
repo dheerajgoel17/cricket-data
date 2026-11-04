@@ -238,7 +238,9 @@ def heal_book(book: dict, root: Path, now: dt.datetime, ended: list | None = Non
     back, and book sources a line still has in the archive but not in the published file are added without
     overwriting prices the published file still carries.
     """
-    from .booklines import carry_started  # late: archive is imported by the pipeline before booklines finishes loading
+    from .booklines import (
+        carry_started,  # late: archive is imported by the pipeline before booklines finishes loading
+    )
 
     prev = _prev_from_archive(book, root)
     if not any(prev.get(k) for k in ("events", "lines", "fancy")):
