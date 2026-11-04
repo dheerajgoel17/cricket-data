@@ -1,24 +1,26 @@
+import { View, StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { TABS } from "@/lib/tabs";
+import { FloatingTabBar } from "@/components/floating-tab-bar";
 import { color } from "@/ui/tokens";
 
-// The browser preview (`npm run web`): there is no native tab bar in a browser, so this is a plain bottom bar in the site's colours. Not a shipped target.
+/**
+ * Browser preview (`npm run web` on :8082): same floating capsule footer as Android, so you can
+ * check how the app tab bar looks without a device. iOS still uses the system bar (`app-tabs.tsx`).
+ */
 export default function AppTabs() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        sceneStyle: { backgroundColor: color.background },
-        tabBarActiveTintColor: color.primary,
-        tabBarInactiveTintColor: color["muted-foreground"],
-        tabBarStyle: { backgroundColor: "rgba(0,0,0,0.85)", borderTopColor: color.hairline, height: 56 },
-        tabBarLabelStyle: { fontSize: 10, fontFamily: "Satoshi-Medium" },
-        tabBarItemStyle: { paddingHorizontal: 0 },
-      }}>
-      {TABS.map((t) => (
-        <Tabs.Screen key={t.name} name={t.name} options={{ title: t.label, tabBarIcon: ({ color: c, focused }) => <Ionicons name={focused ? t.on : t.icon} size={22} color={String(c)} /> }} />
-      ))}
-    </Tabs>
+    <View style={styles.root}>
+      <View style={styles.root}>
+        <Tabs screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: color.background } }} tabBar={() => null}>
+          {TABS.map((t) => <Tabs.Screen key={t.name} name={t.name} />)}
+        </Tabs>
+      </View>
+      <FloatingTabBar />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: color.background },
+});

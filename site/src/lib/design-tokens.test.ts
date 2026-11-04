@@ -7,8 +7,9 @@ const GOVERNED = [
   "components/app/pill-group.tsx", "components/app/grid.tsx", "components/app/skeletons.tsx", "components/app/mini-bars.tsx", "components/app/live-feed.tsx",
   "components/app/tick.tsx", "components/app/market-tape.tsx", "components/app/next-match.tsx",
   "components/app/line-stepper.tsx", "components/app/viz.tsx",
-  "components/layout/Shell.tsx", "components/layout/Header.tsx", "components/layout/GlobalSearch.tsx", "pages/Fixtures.tsx", "pages/Home.tsx", "pages/Player.tsx", "pages/Lists.tsx", "components/app/hot-home.tsx", "components/app/home-phase-bar.tsx",
+  "components/layout/Shell.tsx", "components/layout/Header.tsx", "components/layout/GlobalSearch.tsx", "components/layout/IosTabBar.tsx", "pages/Fixtures.tsx", "pages/Home.tsx", "pages/Player.tsx", "pages/Lists.tsx", "components/app/hot-home.tsx", "components/app/home-phase-bar.tsx",
   "components/app/alt-lines.tsx", "components/app/chip.tsx", "components/app/match-status.tsx", "components/app/note.tsx", "components/app/player-name.tsx", "components/app/odds-table.tsx", "components/app/screener-filters.tsx", "pages/Saved.tsx", "components/app/tournament-stats.tsx", "pages/Leagues.tsx",
+  "components/app/fixture-ground.tsx", "components/app/ground-filters.tsx", "pages/Contact.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";

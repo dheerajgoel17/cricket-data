@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, useMemo, useState, type ReactNode } from "react";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
@@ -90,20 +90,45 @@ function Ball({ b }: { b: string }) {
   );
 }
 
-/** Delivery chips, grouped by over. A hairline marks the over break. */
-function Overs({ overs }: { overs: { balls: string[] }[] }) {
+/** "Ball by ball" fixed on the left; overs scroll beside it (oldest left → current on the right). Left fade sits between the label and the tape so earlier overs stay obvious. */
+function Overs({ overs }: { overs: { n?: number | null; balls: string[] }[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [fadeLeft, setFadeLeft] = useState(false);
   const groups = (overs || []).filter((o) => o.balls.length);
+  const sig = groups.map((o) => `${o.n ?? ""}:${o.balls.join(",")}`).join("|");
+  const syncFade = () => {
+    const el = ref.current;
+    if (!el) return;
+    setFadeLeft(el.scrollLeft > 2);
+  };
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollLeft = el.scrollWidth;
+    syncFade();
+  }, [sig]);
   if (!groups.length) return null;
   return (
-    <div className="flex flex-wrap items-center gap-snug" aria-label={`Deliveries ${groups.map((o) => o.balls.join(" ")).join(", end of over, ")}`}>
-      {groups.map((o, i) => (
-        <span key={i} className="flex items-center gap-snug">
-          {i > 0 && <span role="separator" aria-hidden className="h-5 w-px shrink-0 bg-muted-foreground/40" />}
-          <span className="flex flex-nowrap items-center gap-hair">
-            {o.balls.map((b, j) => <Ball key={`${b}-${j}`} b={b} />)}
-          </span>
-        </span>
-      ))}
+    <div className="flex min-w-0 items-center gap-snug" aria-label={`Ball by ball: ${groups.map((o) => `${o.n != null ? `over ${o.n} ` : ""}${o.balls.join(" ")}`).join(", ")}. Scroll left for earlier overs.`}>
+      <span className="label-cap shrink-0 text-footnote text-muted-foreground">Ball by ball</span>
+      <div className="relative min-w-0 flex-1">
+        {fadeLeft ? <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background to-transparent" /> : null}
+        <div
+          ref={ref}
+          onScroll={syncFade}
+          className="flex flex-nowrap items-center gap-snug overflow-x-auto overscroll-x-contain [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        >
+          {groups.map((o, i) => (
+            <span key={o.n ?? i} className="flex shrink-0 items-center gap-snug">
+              {i > 0 && <span role="separator" aria-hidden className="h-5 w-px shrink-0 bg-muted-foreground/40" />}
+              <span className="shrink-0 text-callout font-medium tabular-nums text-muted-foreground" title={o.n != null ? `Over ${o.n}` : undefined}>{o.n != null ? o.n : "·"}</span>
+              <span className="flex flex-nowrap items-center gap-hair">
+                {o.balls.map((b, j) => <Ball key={`${b}-${j}`} b={b} />)}
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -202,9 +227,14 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
                   {inn.batters.map((p: any) => (
                     <tr key={p.id || p.name} className="border-t border-hairline">
                       <td className="py-snug pr-snug">
-                        <Who name={p.name} team={p.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
-                        {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
-                        <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
+                        <div className="flex min-w-0 items-center gap-snug">
+                          <Face name={p.name} photo={p.photo} team={p.team || inn.team} sides={teams} size="sm" />
+                          <div className="min-w-0">
+                            <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
+                            {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
+                            <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
+                          </div>
+                        </div>
                       </td>
                       <Num className="font-medium text-foreground">{p.runs ?? 0}</Num>
                       <Num>{p.balls ?? 0}</Num>
@@ -256,7 +286,12 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
                 <tbody>
                   {inn.bowlers.map((p: any) => (
                     <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className="py-snug pr-snug"><Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" /></td>
+                      <td className="py-snug pr-snug">
+                        <div className="flex min-w-0 items-center gap-snug">
+                          <Face name={p.name} photo={p.photo} team={p.team || (teams?.find(([n]) => n !== inn.team)?.[0])} sides={teams} size="sm" />
+                          <Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" />
+                        </div>
+                      </td>
                       <Num>{fmtOv(p.overs)}</Num>
                       <Num>{p.maidens ?? 0}</Num>
                       <Num>{p.conceded ?? 0}</Num>

@@ -10,4 +10,5 @@ export const TABS: { name: string; href: string; label: string; icon: Icon; on: 
   { name: "fancy", href: "/fancy", label: "Fancy", icon: "dice-outline", on: "dice" },
   { name: "leagues", href: "/leagues", label: "Leagues", icon: "trophy-outline", on: "trophy" },
   { name: "saved", href: "/saved", label: "Saved", icon: "bookmark-outline", on: "bookmark" },
+  { name: "contact", href: "/contact", label: "Contact", icon: "mail-outline", on: "mail" },
 ];

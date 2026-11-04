@@ -9,6 +9,7 @@ const ICONS = {
   fancy: { default: require("../../assets/tab-icons/dice-outline.png"), selected: require("../../assets/tab-icons/dice.png") },
   leagues: { default: require("../../assets/tab-icons/trophy-outline.png"), selected: require("../../assets/tab-icons/trophy.png") },
   saved: { default: require("../../assets/tab-icons/bookmark-outline.png"), selected: require("../../assets/tab-icons/bookmark.png") },
+  contact: { default: require("../../assets/tab-icons/mail-outline.png"), selected: require("../../assets/tab-icons/mail.png") },
 };
 
 // iOS: the system tab bar, which is liquid glass on iOS 26 and later and the classic translucent bar before that. Android has its own file (app-tabs.android.tsx).
@@ -34,6 +35,10 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="saved">
         <NativeTabs.Trigger.Label>Saved</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon src={ICONS.saved} renderingMode="template" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="contact">
+        <NativeTabs.Trigger.Label>Contact</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon src={ICONS.contact} renderingMode="template" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

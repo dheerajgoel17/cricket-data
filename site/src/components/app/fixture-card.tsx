@@ -10,7 +10,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { liveBlurb, scoreLabel, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { playState } from "@/lib/play-state";
-import { abbr, dayKey, dayLabel, fixtureStart, localTime, pretty } from "@/lib/format";
+import { abbr, dayKey, dayLabel, fixtureStart, localTime, matchDateLabel, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamAvatar, TeamBadge, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
@@ -48,19 +48,23 @@ export function startsIn(ms: number) {
   return h >= 1 ? `Starts in ${h}h${m % 60 ? ` ${m % 60}m` : ""}` : `Starts in ${m}m`;
 }
 
-/** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge. */
+/** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge.
+ *  `f.cardScores` (optional): precomputed side scores from history when the live feed has none — same shape as `teamScore`. */
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const now = useNow(30000);
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const { match } = useLiveMatch(f);
-  const scores = [teamScore(match, f.a), teamScore(match, f.b)];
-  const { state, hasScore } = playState(f, match, now);
-  const [final, delayed, live, started] = [state === "final", state === "delayed", state === "live", state === "started"]; // in play only on evidence; a started match with no word on play has no LIVE badge and no score columns
+  const liveScores = [teamScore(match, f.a), teamScore(match, f.b)];
+  const scores = (f.cardScores?.[0]?.display || f.cardScores?.[1]?.display) ? f.cardScores : liveScores;
+  const play = playState(f, match, now);
+  const hasScore = play.hasScore || !!(scores?.[0]?.display || scores?.[1]?.display);
+  const [final, delayed, live, started] = [play.state === "final", play.state === "delayed", play.state === "live", play.state === "started"]; // in play only on evidence; a started match with no word on play has no LIVE badge and no score columns
   const blurb = liveBlurb(match);
   const session = sessionLabel(blurb) || match?.session || "";
   const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
+  const cta = f.noProps ? (final ? "Match" : "No props live yet") : "Props";
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
@@ -71,7 +75,11 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
             {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
-            {city(f.venue) && <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>}
+            {final ? (
+              <span className="ml-auto shrink-0 tabular-nums">{matchDateLabel(f.start)}</span>
+            ) : city(f.venue) ? (
+              <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>
+            ) : null}
           </div>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
             {[f.a, f.b].map((t: string, k: number) => (
@@ -91,7 +99,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
           </div>
           <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
             <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
-            {f.noProps ? <span className="shrink-0 text-footnote text-muted-foreground">No props live yet</span> : <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">Props<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
+            {f.noProps && !final ? <span className="shrink-0 text-footnote text-muted-foreground">{cta}</span> : <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">{cta}<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
           </div>
         </div>
       </Card>

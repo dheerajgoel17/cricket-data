@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatOf, buildMatch, keepGapRow, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
+  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeOversTape, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseOvers, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "@cricket/engine/live.js";
 import { identityIndex } from "@cricket/engine/identity.js";
 
@@ -243,7 +243,33 @@ test("parseMatchPage current batters and bowler (hand-computed)", () => {
   assert.equal(board.crr, 6.8);
   assert.equal(board.rrr, null);
   assert.deepEqual(board.thisOver, ["0", "1", "1"]);
-  assert.deepEqual(board.overs, [{ balls: ["1", "0", "4", "W", "0", "1"] }, { balls: ["0", "1", "1"] }], "deliveries stay grouped by over");
+  assert.deepEqual(board.overs, [{ n: 17, balls: ["1", "0", "4", "W", "0", "1"] }, { n: 18, balls: ["0", "1", "1"] }], "deliveries stay grouped by over with over numbers");
+});
+
+test("parseOvers reads Over N labels; ensureOverNumbers fills gaps from batting overs", () => {
+  assert.deepEqual(
+    parseOvers([{ over: "Over 8", overinfo: ["1", "0", "4"] }, { over: "Over 9", overinfo: ["6", "W"] }], 8.2),
+    [{ n: 8, balls: ["1", "0", "4"] }, { n: 9, balls: ["6", "W"] }],
+  );
+  assert.deepEqual(
+    ensureOverNumbers([{ balls: ["1", "0"] }, { balls: ["4", "6", "W"] }], 17.3),
+    [{ n: 17, balls: ["1", "0"] }, { n: 18, balls: ["4", "6", "W"] }],
+    "older /api/live bodies without n still get sequential numbers ending at the current over",
+  );
+  assert.deepEqual(
+    mergeOversTape([{ n: 7, balls: ["0", "1"] }], [{ n: 7, balls: ["0", "1", "4"] }, { n: 8, balls: ["1"] }]),
+    [{ n: 7, balls: ["0", "1", "4"] }, { n: 8, balls: ["1"] }],
+  );
+});
+
+test("liveBoard renumbers overs when the live body omitted n", () => {
+  const board = liveBoard({
+    status: "live",
+    teams: [{ name: "A", runs: 40, wkts: 1, overs: 5.2, batting: true }, { name: "B" }],
+    players: [{ name: "X", team: "A", runs: 10, balls: 8, strike: true }],
+    overs: [{ balls: ["1", "0", "0", "0", "1", "4"] }, { balls: ["0", "2"] }],
+  });
+  assert.deepEqual(board.overs, [{ n: 5, balls: ["1", "0", "0", "0", "1", "4"] }, { n: 6, balls: ["0", "2"] }]);
 });
 
 test("cardPageUrl appends /match-scorecard", () => {

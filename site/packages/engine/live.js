@@ -311,9 +311,49 @@ function overBalls(over) {
   return (over?.overinfo || []).map((x) => String(x || "").trim()).filter(Boolean);
 }
 
-/** Source A lastovers as over groups. Delivery-wise; do not flatten across the over break. */
-function parseOvers(lastovers) {
-  return (lastovers || []).map((o) => ({ balls: overBalls(o) })).filter((o) => o.balls.length);
+/** Over number from Source A's `over: "Over 17"` (or a numeric `n`). */
+export function overNum(o) {
+  if (o == null) return null;
+  if (typeof o.n === "number" && Number.isFinite(o.n)) return o.n;
+  const m = String(o.over ?? o.n ?? "").match(/(\d+)/);
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * Source A lastovers as over groups with over numbers. Delivery-wise; do not flatten across the over break.
+ * `batOvers` (e.g. 40.2) fills missing numbers so the last group is the current over.
+ */
+export function parseOvers(lastovers, batOvers) {
+  const raw = (lastovers || []).map((o) => {
+    const balls = overBalls(o);
+    if (!balls.length) return null;
+    return { n: overNum(o), balls };
+  }).filter(Boolean);
+  if (!raw.length) return [];
+  if (raw.every((o) => o.n != null)) return raw;
+  const cur = batOvers != null && Number.isFinite(batOvers) ? Math.floor(batOvers) + 1 : raw.length;
+  return raw.map((o, i) => (o.n != null ? o : { ...o, n: cur - (raw.length - 1 - i) }));
+}
+
+/** Merge over tapes by over number (later snapshot wins a shared over). Keeps the full innings as polls only send a recent window. */
+export function mergeOversTape(prev, next) {
+  const map = new Map();
+  for (const o of prev || []) if (o?.balls?.length && o.n != null) map.set(o.n, o.balls);
+  for (const o of next || []) if (o?.balls?.length && o.n != null) map.set(o.n, o.balls);
+  if (!map.size) return next?.length ? next : (prev || []);
+  return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([n, balls]) => ({ n, balls }));
+}
+
+/**
+ * Guarantee every over group has `n` for the UI. Source A sends `over: "Over 8"`; an older /api/live body may omit `n`.
+ * Falls back from batting overs (40.2 → current over 41) when labels are missing.
+ */
+export function ensureOverNumbers(overs, batOvers) {
+  const list = (overs || []).filter((o) => o?.balls?.length);
+  if (!list.length) return [];
+  if (list.every((o) => o.n != null && Number.isFinite(o.n))) return list;
+  const cur = batOvers != null && Number.isFinite(+batOvers) ? Math.floor(+batOvers) + 1 : list.length;
+  return list.map((o, i) => ({ ...o, n: o.n != null && Number.isFinite(o.n) ? o.n : cur - (list.length - 1 - i) }));
 }
 
 /** Source A schedule page (the schedule page, robots Allow). Every live and upcoming game in one HTML response: URL, format, start, team scores (the page is cached ~5 min). */
@@ -403,9 +443,10 @@ export function parseMatchPage(html) {
       out: false, current: true, photo: sv.b3image || "",
     });
   }
-  const overs = parseOvers(sv.lastovers);
-  const thisOver = overs.length ? overs[overs.length - 1].balls : [];
   const inn = batIsA ? t1 : t2;
+  const overs = parseOvers(sv.lastovers, inn.overs);
+  const thisOver = overs.length ? overs[overs.length - 1].balls : [];
+
   const crr = nFloat(sv.crr), rrr = nFloat(sv.rrr);
   const text = (x) => String(x || "").replace(/<[^>]*>/g, "").replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, "").replace(/\s+/g, " ").trim();
   // `status` is the schedule's own code (0 not started, 1 in play, 2 finished); `B` is the line the page shows under the score ("Sri Lanka won by 8 wickets")
@@ -591,11 +632,22 @@ function flagLive(players, flags) {
   return out;
 }
 
+/** True when the batting side or the overs clock moved back: a new innings, so the ball tape must not keep the previous innings' overs. */
+function oversTapeReset(prior, teams) {
+  if (!prior?.overs?.length) return true;
+  const bat = (teams || []).find((t) => t.batting);
+  const was = (prior.teams || []).find((t) => t.batting);
+  if (!bat || !was) return false;
+  if (!(teamKey(bat.name) === teamKey(was.name) || (!!bat.abbr && teamKey(bat.abbr) === teamKey(was.abbr)))) return true;
+  return bat.overs != null && was.overs != null && bat.overs < was.overs - 0.05;
+}
+
 /**
  * One live row from the three Source A pages. `row` is the schedule entry (id, URL, format, start; scores up to ~5 min old), `live` the match page
  * (fresh scores, current pair, partnership, run rates), `card` the scorecard (every innings). Either page may be null: the row then keeps what it has.
+ * `prior` is the previous published row for this match: its over tape is merged in, because each match-page poll only carries a recent window of deliveries.
  */
-export function buildMatch(row, live, card) {
+export function buildMatch(row, live, card, prior = null) {
   const same = (a, b) => teamKey(a.name) === teamKey(b.name) || (!!a.abbr && teamKey(a.abbr) === teamKey(b.abbr));
   const teams = (row.teams || []).map((t) => {
     const o = (live?.teams || []).find((x) => same(x, t));
@@ -624,6 +676,8 @@ export function buildMatch(row, live, card) {
   const summary = raw && !/^live$/i.test(raw) ? raw
     : (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final") ? "Close of play" : raw);
   const badge = sessionLabel(rawLive) || sessionLabel(rawRow) || (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final" || /close of play/i.test(summary)) ? "Stumps" : "");
+  const freshOvers = live?.overs || [];
+  const overs = oversTapeReset(prior, lined) ? freshOvers : mergeOversTape(prior?.overs, freshOvers);
   return {
     ...row,
     status,
@@ -637,7 +691,7 @@ export function buildMatch(row, live, card) {
     crr: live?.crr ?? null,
     rrr: live?.rrr ?? null,
     thisOver: live?.thisOver || [],
-    overs: live?.overs || [],
+    overs,
   };
 }
 
@@ -788,9 +842,10 @@ export function liveBoard(match) {
   const bowler = withEcon(bowling.find((p) => p.current) || (bowling.length === 1 ? bowling[0] : null));
   if (!batters.length && !outs.length && !bowler) return null;
   const pr = match.partnership;
-  const overs = Array.isArray(match.overs) && match.overs.length
+  const rawOvers = Array.isArray(match.overs) && match.overs.length
     ? match.overs
     : (Array.isArray(match.thisOver) && match.thisOver.length ? [{ balls: match.thisOver }] : []);
+  const overs = ensureOverNumbers(rawOvers, bat?.overs);
   return {
     batters,
     lastWicket,

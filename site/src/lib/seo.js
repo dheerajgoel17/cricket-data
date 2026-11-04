@@ -62,6 +62,7 @@ export const ROUTES = {
   about: { title: "Rules, data and how it works", description: "Where the numbers come from, how void and settlement rules work, and what the site does not do." },
   pair: { title: "Batting partnerships", description: "Who is dismissed first, how big the stands are and how a pair does by format, opposition and venue." },
   saved: { title: "Saved", description: DEFAULT_DESC, noindex: true },
+  contact: { title: "Contact Fancy.cash", description: "Email Fancy.cash for business, tech issues, privacy or general questions: tech@fancy.cash." },
 };
 
 /** Typed URLs only (`/privacy-policy`, `/terms-of-use`, `/docs`). Not in ROUTES, so they are not prebuilt, listed in the sitemap, or linked from crawler nav. */

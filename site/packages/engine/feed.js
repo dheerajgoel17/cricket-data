@@ -42,7 +42,11 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
       }));
       // the public body names no source: match URLs stay on the server. A match the schedule no longer lists is kept when its own page was read, or while it is still live,
       // and each match carries where its priced lines stand (the books' player lines, settled with the identity table)
-      const matches = rows.filter((m) => !gaps.includes(m) || keepGapRow(m, pages.get(m)?.live)).map((m) => { const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card) : m; return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) }; });
+      const priorById = new Map((memo.body?.matches || []).map((x) => [String(x.id), x]));
+      const matches = rows.filter((m) => !gaps.includes(m) || keepGapRow(m, pages.get(m)?.live)).map((m) => {
+        const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card, priorById.get(String(m.id))) : m;
+        return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) };
+      });
       const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, linked: idn.size, matches };
       memo = { t: now(), body, books: booksDoc };
       return body;

@@ -4,7 +4,7 @@ import { defineCustomElement as defineLabel } from "@ionic/core/components/ion-l
 import { defineCustomElement as defineTabBar } from "@ionic/core/components/ion-tab-bar.js";
 import { defineCustomElement as defineTabButton } from "@ionic/core/components/ion-tab-button.js";
 import { defineCustomElement as defineIcon } from "ionicons/components/ion-icon.js";
-import { bookmark, bookmarkOutline, calendar, calendarOutline, dice, diceOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
+import { bookmark, bookmarkOutline, calendar, calendarOutline, dice, diceOutline, mail, mailOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
 import { TAB_NAV } from "./nav";
 
 // Ionic's own iOS tab bar (web components, MIT), not a copy of it: the classic iOS bar, translucent with the hairline on top, 49 pt plus the safe area,
@@ -13,7 +13,7 @@ initialize({ mode: "ios" });
 for (const define of [defineLabel, defineTabBar, defineTabButton, defineIcon]) define();
 
 const ICON: Record<string, [string, string]> = {
-  "/": [calendarOutline, calendar], "/props": [statsChartOutline, statsChart], "/fancy": [diceOutline, dice], "/leagues": [trophyOutline, trophy], "/saved": [bookmarkOutline, bookmark],
+  "/": [calendarOutline, calendar], "/props": [statsChartOutline, statsChart], "/fancy": [diceOutline, dice], "/leagues": [trophyOutline, trophy], "/saved": [bookmarkOutline, bookmark], "/contact": [mailOutline, mail],
 };
 
 /** Phones and tablets (below lg). Fixed to the bottom; the page keeps clear of it with `--tabbar-h` (see Shell). */
