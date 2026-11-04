@@ -1,0 +1,31 @@
+{
+ "generated_at_utc": "2026-11-04T10:30:58Z",
+ "n": 15,
+ "pnl_u": 4.64,
+ "by": {
+  "model|?|batter_fours": {
+   "n": 2,
+   "won": 1,
+   "lost": 1,
+   "push": 0,
+   "void": 0,
+   "pnl_u": 0.2
+  },
+  "model|?|batter_runs": {
+   "n": 7,
+   "won": 5,
+   "lost": 1,
+   "push": 0,
+   "void": 1,
+   "pnl_u": 3.076
+  },
+  "model|?|batter_milestone": {
+   "n": 6,
+   "won": 5,
+   "lost": 1,
+   "push": 0,
+   "void": 0,
+   "pnl_u": 1.364
+  }
+ }
+}
