@@ -44,7 +44,7 @@ export function PrivacyPage() {
       <ul>
         <li>If you create an account or sign in with Google, we store your <b>email</b> (and a display name when Google provides one) and the <b>Saved</b> list you choose: watchlist prop keys, saved players and teams, and named filter combinations.</li>
         <li>That Saved data lives on our database (Supabase Auth + Postgres) and is readable only by your signed-in session (row-level security). Signing out stops access from that browser until you sign in again.</li>
-        <li>You can remove items from Saved at any time; deleting your account (request via the contact on About) removes the profile and Saved rows.</li>
+        <li>You can remove items from Saved at any time; deleting your account (request via <Link to="/contact">Contact</Link> / tech@fancy.cash) removes the profile and Saved rows.</li>
       </ul>
 
       <h2>What stays on your device</h2>

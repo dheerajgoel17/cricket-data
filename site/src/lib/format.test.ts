@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { abbr, dayLabel, fixtureWhen, fixtureStart, fromIst, initials, localTime, num, odds, pc, shortDate, shortVenue } from "./format";
+import { abbr, dayLabel, fixtureWhen, fixtureStart, fromIst, initials, localTime, matchDateLabel, num, odds, pc, shortDate, shortVenue } from "./format";
 
 describe("format helpers", () => {
   it("formats odds, percentages and numbers, with a dash for missing values", () => {
@@ -43,6 +43,10 @@ describe("format helpers", () => {
     const now = new Date(), next = new Date(Date.now() + 864e5);
     expect(dayLabel(k(now))).toBe("Today");
     expect(dayLabel(k(next))).toBe("Tomorrow");
+  });
+  it("shows match dates as 11 Sep in the same year, with the year otherwise", () => {
+    expect(matchDateLabel("2026-09-11", 2026)).toBe("11 Sep");
+    expect(matchDateLabel("2024-09-11T14:00:00Z", 2026)).toBe("11 Sep 2024");
   });
   it("shows kick-off times in the viewer's own zone and never invents a time for date-only fixtures", () => {
     const utc = "2026-12-09T23:00:00Z";

@@ -20,7 +20,7 @@ import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
-const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"]];
+const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"], ["Contact", "/contact"]];
 
 /** Search players (typo tolerant, the engine's resolver), teams, matches and leagues. Two letters start it; with an empty field it offers the tabs and the players opened lately. */
 export default function Search() {

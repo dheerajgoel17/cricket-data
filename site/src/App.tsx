@@ -18,7 +18,8 @@ const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage =
 const AuthCallbackPage = page(() => import("@/pages/AuthCallback"), "AuthCallbackPage");
 const PrivacyPage = page(() => import("@/pages/Legal"), "PrivacyPage"), TermsPage = page(() => import("@/pages/Legal"), "TermsPage"), DisclaimerPage = page(() => import("@/pages/Legal"), "DisclaimerPage");
 const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="team" /> })));
-const VenuePage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="venue" /> })));
+const VenuePage = lazy(() => import("@/components/app/fixture-ground").then((m) => ({ default: m.VenueGroundPage })));
+const ContactPage = page(() => import("@/pages/Contact"), "ContactPage");
 
 /** Old links used hash routes (#/player/12?stat=runs): send them to the same path. */
 function LegacyHash() {
@@ -62,11 +63,13 @@ export function App() {
             <Route path="player/:id" element={<Player />} />
             <Route path="teams" element={<TeamsPage />} />
             <Route path="team/:id" element={<TeamPage />} />
+            <Route path="venue/:id/preview" element={<Navigate to=".." relative="path" replace />} />
             <Route path="venue/:id" element={<VenuePage />} />
             <Route path="pair" element={<PairPage />} />
             <Route path="props" element={<PropsPage />} /><Route path="fancy" element={<FancyPage />} />
             <Route path="ask" element={<Navigate to="/" replace />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
             <Route path="privacy-policy" element={<PrivacyPage />} />
             <Route path="privacy" element={<Navigate to="/privacy-policy" replace />} />
             <Route path="terms-of-use" element={<TermsPage />} />

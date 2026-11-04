@@ -69,6 +69,13 @@ export function dayLabel(k: string) {
   const diff = Math.round((d.getTime() - new Date(`${t.toLocaleDateString("en-CA")}T12:00:00`).getTime()) / 864e5);
   return diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
 }
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** Card date: "11 Sep" when the year matches today (or `refYear`); "11 Sep 2024" otherwise. */
+export function matchDateLabel(start: string, refYear = new Date().getFullYear()) {
+  const d = fixtureStart({ start });
+  const day = `${d.getDate()} ${MONTH_SHORT[d.getMonth()]}`;
+  return d.getFullYear() === refYear ? day : `${day} ${d.getFullYear()}`;
+}
 
 /** Kick-off in the viewer's time zone; a fixture that only has a date (no time yet) shows the date alone, never an invented time. */
 export const fixtureWhen = (f: { start: string }, opts: Intl.DateTimeFormatOptions = DEFAULT_WHEN) =>

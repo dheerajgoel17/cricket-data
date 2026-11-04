@@ -17,7 +17,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { clockStartedMs, liveBlurb, teamScore } from "@cricket/engine/live.js";
+import { clockStartedMs, liveBlurb, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
@@ -35,6 +35,7 @@ import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
 import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
 import { LiveFeed } from "@/components/app/live-feed";
+import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton, ScorecardSkeleton } from "@/components/app/skeletons";
@@ -46,7 +47,7 @@ const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
-const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]];
+const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"], ["ground", "Ground"]];
 
 /** Where the match is in time: label (Upcoming / Started / Completed) and the ticking value, from the shared 1 s clock. The clock never says Live. */
 function useMatchClock(when: Date, timed: boolean, fmt?: string) {
@@ -67,6 +68,9 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const { state, hasScore } = playState(f, match);
   const [final, delayed, on, started] = [state === "final", state === "delayed", state === "live", state === "started"]; // in play only on evidence, never on the clock
   const blurb = liveBlurb(match) || (final ? f.result || "" : started ? NO_SCORE : "");
+  const session = sessionLabel(blurb) || match?.session || ""; // Rain delay / Stumps / Lunch — same badge as the home card; never a Live pulse over a session break
+  const badge = session || (on ? "Live" : final ? "Final" : delayed ? "Delayed" : started ? "Started" : clock.label);
+  const livePulse = on && !session;
   const team = (name: string, ix: number) => {
     const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
@@ -76,8 +80,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
     <section className="flex flex-col gap-stack">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className="flex items-center gap-snug">
-        <span className={cn("label-cap text-footnote", on ? "text-miss" : "text-muted-foreground")}>
-          {on && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{on ? "Live" : final ? "Final" : delayed ? "Delayed" : started ? "Started" : clock.label}
+        <span className={cn("label-cap text-footnote", livePulse ? "text-miss" : session ? "text-destructive" : "text-muted-foreground")}>
+          {livePulse && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{badge}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
         {live && <LiveFeed className="ml-auto" />}
@@ -102,7 +106,10 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
           </div>
         </div>
       )}
-      <p className="text-callout text-muted-foreground">{[blurb, f.series, f.venue].filter(Boolean).join(" · ") || "Match details to be confirmed"}</p>
+      <div className="flex flex-col gap-hair">
+        {(blurb || f.series) ? <p className="text-callout text-muted-foreground">{[blurb, f.series].filter(Boolean).join(" · ")}</p> : null}
+        {f.venue ? <FixtureVenue venue={f.venue} fixtureId={f.id} /> : (!blurb && !f.series ? <p className="text-callout text-muted-foreground">Match details to be confirmed</p> : null)}
+      </div>
       {hasScore && !final && <LiveBoard match={match} teams={sides} />}
     </section>
   );
@@ -113,7 +120,8 @@ export function FixturePage() {
   const nav = useNavigate();
   const { "*": raw = "" } = useParams();
   const fancyDetail = /\/fancy\/?$/.test(raw);
-  const id = fancyDetail ? raw.replace(/\/fancy\/?$/, "") : raw;
+  const groundDetail = /\/ground\/?$/.test(raw);
+  const id = fancyDetail ? raw.replace(/\/fancy\/?$/, "") : groundDetail ? raw.replace(/\/ground\/?$/, "") : raw;
   const [q, setQ] = useQ();
   const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
   const { fx, doc, archived, isLoading } = useFixtureBooks(id);
@@ -124,7 +132,7 @@ export function FixturePage() {
   const stat = (STATS as any)[q.stat] ? q.stat : "sixes";
   const line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
   const games = [5, 10, 15, 20, 30].includes(Number(q.n)) ? Number(q.n) : 10;
-  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : true));
+  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : k === "ground" ? fixtureHasGround(store, fx?.venue) : true));
   const wanted = q.tab === "markets" ? "fancy" : q.tab; // old links used ?tab=markets
   const tab = tabs.some(([k]) => k === wanted) ? wanted : tabs[0][0];
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";
@@ -138,8 +146,13 @@ export function FixturePage() {
   useEffect(() => {
     if (!fancyDetail && tab === "fancy" && q.fm) nav(fancyMarketPath(id, { fm: q.fm, sc: q.sc, mw: q.mw, mv: q.mv, ml: q.ml }), { replace: true });
   }, [fancyDetail, tab, q.fm, q.sc, q.mw, q.mv, q.ml, id, nav]);
+  // Ground is its own page (like `/fixture/:id/fancy`), not an in-tab panel
+  useEffect(() => {
+    if (!groundDetail && !fancyDetail && tab === "ground") nav(`/fixture/${id}/ground`, { replace: true });
+  }, [groundDetail, fancyDetail, tab, id, nav]);
   // switching tabs: if the page is scrolled past the top of the tab body, bring the new body into view (smoothly) instead of stranding the reader mid-way
   const switchTab = (t: string) => {
+    if (t === "ground") { nav(`/fixture/${id}/ground`); return; }
     setQ({ tab: t });
     const align = () => { const el = bodyRef.current; if (el && el.getBoundingClientRect().top < 128) el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" }); };
     align();
@@ -166,6 +179,9 @@ export function FixturePage() {
         <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />
       </div>
     );
+  }
+  if (groundDetail) {
+    return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />;
   }
   return (
     <div className="flex flex-col gap-section">
