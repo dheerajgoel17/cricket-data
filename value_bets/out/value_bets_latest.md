@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-05 03:00 IST
+# Cricket value bets - 2026-11-05 03:37 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1550 prices
-- **smarkets**: ok, 395 prices
+- **moviodds_bet365**: ok, 1552 prices
+- **smarkets**: ok, 365 prices
 - **feedk**: ok, 152 prices, 6 events
 - **feedg**: ok, 48 prices, 6 events
 - **feedf**: ok, 256 prices, 7 events
-- **feede**: ok, 660 prices, 22 events
-- **feedh**: ok, 1456 prices, 76 events
+- **feede**: ok, 660 prices, 23 events
+- **feedh**: ok, 1456 prices, 77 events
 
-Matches starting in next 168h: **47**, markets priced: **386**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **48**, markets priced: **384**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **47**, markets priced: **386**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), BBK Partnership (male), Baroda (W) (female), Boland (W) (female), Cdb A (male), Central (male), Champions (W) (female), Colombo Aces (male), Dpgc (male), Easterns (male), Fairfirst Insurance (male), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Kei Women (female), Madhya Pradesh (W) (female), Mountaineers (male), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Sudurpaschim Royals (male), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Uttarakhand (W) (female)
 
-Runtime 291.2s. Snapshot: `odds_20261104T213035Z.jsonl.gz`
+Runtime 208.2s. Snapshot: `odds_20261104T220718Z.jsonl.gz`
