@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-05T05:33:30Z",
+ "generated_at_utc": "2026-11-05T06:33:02Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -211,29 +211,6 @@
    "chance": 0.6667,
    "edge": 0.2333,
    "edge_pct": 23.3,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-05-afghanistan-v-zimbabwe|match_runs||0|under",
-   "fixture_id": "2026-11-05-afghanistan-v-zimbabwe",
-   "match": "Afghanistan vs Zimbabwe",
-   "format": "Test",
-   "series": "Afghanistan vs Zimbabwe in UAE 2026",
-   "start_utc": "2026-11-05T06:00:00Z",
-   "start_ist": "2026-11-05 11:30 IST",
-   "key": "match_runs",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 1021.5,
-   "best_odds": 1.833,
-   "best_source": "bet365",
-   "hits": 19,
-   "played": 27,
-   "window": 20,
-   "chance": 0.6486,
-   "edge": 0.189,
-   "edge_pct": 18.9,
    "bat_first": false
   }
  ]

@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-05 11:00 IST
+# Cricket value bets - 2026-11-05 12:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 973 prices
-- **smarkets**: ok, 311 prices
+- **moviodds_bet365**: ok, 966 prices
+- **smarkets**: ok, 327 prices
 - **feedk**: ok, 73 prices, 4 events
-- **feedg**: ok, 24 prices, 3 events
-- **feede**: ok, 562 prices, 18 events
-- **feedf**: ok, 336 prices, 12 events
-- **feedh**: ok, 1170 prices, 75 events
+- **feedg**: ok, 16 prices, 3 events
+- **feede**: ok, 530 prices, 18 events
+- **feedf**: ok, 304 prices, 11 events
+- **feedh**: ok, 1150 prices, 75 events
 
-Matches starting in next 168h: **40**, markets priced: **272**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **39**, markets priced: **261**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **40**, markets priced: **272**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), BBK Partnership (male), Baroda (W) (female), Boland (W) (female), Cdb A (male), Central (male), Champions (W) (female), Chhattisgarh (W) (female), Colombo Aces (male), Dpgc (male), Easterns (male), Fairfirst Insurance (male), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kei Women (female), Madhya Pradesh (W) (female), Mountaineers (male), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Sudurpaschim Royals (male), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Uttarakhand (W) (female)
 
-Runtime 113.2s. Snapshot: `odds_20261105T053034Z.jsonl.gz`
+Runtime 104.7s. Snapshot: `odds_20261105T063032Z.jsonl.gz`
