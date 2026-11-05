@@ -25,3 +25,14 @@ test("deferMatches returns the index before matches.json and attaches it on read
   assert.equal(store.n, 1);
   assert.equal(store.M.id[0], "m1");
 });
+
+test("a failed index does not leave matches.json as an unhandled rejection", async () => {
+  const fetchJson = async (p) => {
+    if (p === "matches.json") return Promise.reject(new Error("no data origin"));
+    if (p === "meta.json") return Promise.reject(new Error("no data origin"));
+    if (p === "index.json") return Promise.reject(new Error("no data origin"));
+    return [];
+  };
+  await assert.rejects(() => createStore({ fetchJson }), /no data origin/);
+  await new Promise((r) => setImmediate(r));
+});

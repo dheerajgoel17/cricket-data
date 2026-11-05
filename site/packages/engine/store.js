@@ -15,8 +15,16 @@ export async function createStore({ base = "data/", fetchJson, wrapKey, deferMat
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
     return await unwrap(await r.json(), wrapKey);
   });
+  // Start matches with the index so home can paint sooner, but if meta/index fail first the floating
+  // matches promise must not become an unhandledRejection (og card load with no data origin).
   const matchesP = get("matches.json");
-  const [meta, index] = await Promise.all([get("meta.json"), get("index.json")]);
+  let meta, index;
+  try {
+    [meta, index] = await Promise.all([get("meta.json"), get("index.json")]);
+  } catch (e) {
+    matchesP.catch(() => {});
+    throw e;
+  }
   const store = new Store(meta, index, deferMatches ? null : await matchesP, get);
   store.ready = matchesP.then((doc) => {
     store.M = doc;
