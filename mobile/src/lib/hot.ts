@@ -5,14 +5,15 @@ import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cr
 import { venueStem } from "@cricket/engine/markets.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
+import { prioritizeHotGroups, shouldPublishHot } from "@/lib/hot-priority";
 import { span } from "@/lib/perf";
 import { byShard, hotDay, hotLines, matchChipId, norm, pool, type HotScope } from "@site/lib/hot-lines";
 
 export const MAX_ROWS = 30;
 /** Player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early. */
 const SHARDS_AT_ONCE = 8;
-/** Rows already scored are shown at most this often while the rest are still coming. */
-const PUBLISH_MS = 1200;
+/** The first scored row is shown at once; after that, rows already scored are shown at most this often while the rest are still coming. */
+const PUBLISH_MS = 600;
 
 export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
 export interface Row {
@@ -70,12 +71,13 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   };
   // A file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between so the screen stays alive while the batch runs.
   let published = 0, sliceStart = Date.now();
-  await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
+  // matches already on come first, so the rows the screen leads with are the first scored
+  await pool(prioritizeHotGroups(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now), SHARDS_AT_ONCE, async (g) => {
     const ts = Date.now();
     await store.shard(g.shard).catch(() => {});
     shardMs += Date.now() - ts; // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen
     for (const l of g.lines) { await score(l); if (Date.now() - sliceStart >= FRAME_MS) { await rest(); sliceStart = Date.now(); } }
-    if (out.length >= MAX_ROWS && Date.now() - published >= PUBLISH_MS) { published = Date.now(); onRows?.([...out]); }
+    if (shouldPublishHot(out.length, published, Date.now(), 1, PUBLISH_MS)) { published = Date.now(); onRows?.([...out]); }
   });
   span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} runPlanMs=${plan} shardWaitMs(sum)=${shardMs}`);
   return out;

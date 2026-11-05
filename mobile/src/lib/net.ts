@@ -1,6 +1,6 @@
 // The app's way into the site's gated data: ask /api/gate for the cookie and the unwrap key, send the cookie by hand (a native client has no browser cookie jar to lean on), unwrap what comes back.
 import { isWrapped } from "@cricket/engine/wrap.js";
-import { cacheGet, cachePut, cacheRetag, cacheTag } from "@/lib/body-cache";
+import { cacheAge, cacheGet, cachePut, cacheTag, cacheTouch } from "@/lib/body-cache";
 import { unwrapText } from "@/lib/unwrap-fast";
 import { SITE_URL, USER_AGENT } from "@/lib/config";
 import { span } from "@/lib/perf";
@@ -49,7 +49,7 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
   let r = await ask();
   if (r.status === 403) { await gateKey(true); r = await ask(); } // the cookie lapsed
   const t1 = Date.now();
-  if (r.status === 304 && kept) { if (pinned) cacheRetag(path, dataTag!); const o = JSON.parse(kept.text); span(`get ${path} 304 parse`, t1, `net=${t1 - t0}ms chars=${kept.text.length}`); return o; }
+  if (r.status === 304 && kept) { cacheTouch(path, pinned ? dataTag : undefined); const o = JSON.parse(kept.text); span(`get ${path} 304 parse`, t1, `net=${t1 - t0}ms chars=${kept.text.length}`); return o; }
   if (!r.ok) throw new Error(`${path}: HTTP ${r.status}`);
   const text = await r.text();
   const t2 = Date.now();
@@ -68,3 +68,17 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
   if (etag) cachePut(path, etag, body, pinned ? dataTag : undefined);
   return out;
 }
+
+/**
+ * The kept copy of a file if it was current within `maxAgeMs`, parsed, else undefined; no request. For a screen that paints from what the last launch saw while the real answer is
+ * being asked for (react-query `initialData`, which marks it stale so it is asked for at once).
+ */
+export function peekJson(path: string, maxAgeMs: number): any { // eslint-disable-line @typescript-eslint/no-explicit-any
+  if (cacheAge(path) > maxAgeMs) return undefined;
+  const kept = cacheGet(path);
+  if (!kept) return undefined;
+  try { return JSON.parse(kept.text); } catch { return undefined; }
+}
+
+/** Whether a kept copy of the file, current within `maxAgeMs`, is on the device. */
+export const hasKept = (path: string, maxAgeMs: number): boolean => cacheAge(path) <= maxAgeMs;
