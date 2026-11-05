@@ -7,6 +7,10 @@ import { fmtIndex } from "@cricket/engine/util.js";
 
 export const fixturePath = (id: string) => `/fixture/${encodeURIComponent(id)}`;
 
+/** A match's ground page (the site's `/fixture/:id/ground`) and a ground by its stats index (`/venue/:idx`). */
+export const groundPath = (id: string) => `${fixturePath(id)}/ground`;
+export const venuePath = (idx: number) => `/venue/${idx}`;
+
 /** One fancy market's page (the site's `/fixture/:id/fancy?fm=&sc=`). */
 export function fancyMarketPath(id: string, o: { fm: string; sc?: number | string | null; mw?: number | string | null; mv?: string | null; ml?: number | string | null }) {
   const q = new URLSearchParams();

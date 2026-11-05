@@ -76,4 +76,11 @@ describe("playState (mirrors the site's play-state tests)", () => {
   test("delayed when the feed lists the match as not started although its time has passed", () => {
     expect(stateOf(fixture({ status: "Upcoming", start: at(-1) }), feed("upcoming"))).toBe("delayed");
   });
+
+  test("a past game at a ground shows its stored scores (cardScores) and its result", () => {
+    const f = fixture({ status: "Completed", start: "2025-03-01", result: "India won", cardScores: [{ display: "191/8", runs: 191, wkts: 8, overs: 20 }, { display: "162/9", runs: 162, wkts: 9, overs: 20 }] });
+    const m = cardModel({ fixture: f, live: null }, NOW);
+    expect(m).toMatchObject({ final: true, hasScore: true, status: "India won" });
+    expect(m.sides.map((x) => x.score?.display)).toEqual(["191/8", "162/9"]);
+  });
 });

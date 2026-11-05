@@ -55,6 +55,7 @@ export default function RootLayout() {
               <Stack.Screen name="team/[idx]" />
               <Stack.Screen name="competitions" />
               <Stack.Screen name="league/[id]" />
+              <Stack.Screen name="venue/[idx]" />
               <Stack.Screen name="info/[topic]" options={{ presentation: "formSheet", sheetAllowedDetents: [0.5, 0.85], sheetInitialDetentIndex: 0, sheetGrabberVisible: true, sheetCornerRadius: 24 }} />
             </Stack>
             <SignInSheet />

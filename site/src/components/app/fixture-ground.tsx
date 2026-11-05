@@ -10,13 +10,13 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
 import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon, CloudIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
-import { MATCH_MARKETS, marketReport, selectMatches, topBatters, venueIndices, venueStem } from "@cricket/engine/markets.js";
-import { ballsToOvers } from "@cricket/engine/live.js";
+import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
 import { useNow } from "@/lib/clock";
-import { matchDateLabel, odds, pc, pretty } from "@/lib/format";
+import { odds, pc } from "@/lib/format";
+import { filterGames, genderFilterLabel, groundGames, majorityFormat, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter, type TourStatus } from "@/lib/ground";
 import { setTitle } from "@/lib/title";
 import { fetchVenueWx, groundClock } from "@/lib/venue-wx";
 import { Button } from "@/components/ui/button";
@@ -27,53 +27,16 @@ import { EmptyNote } from "@/components/app/page";
 import { ListSkeleton } from "@/components/app/skeletons";
 import { AnimatedNumber } from "@/components/app/animated-number";
 import { ValueBars } from "@/components/app/mini-bars";
-import { genderFilterLabel, GroundGenderSheet, type GenderFilter } from "@/components/app/ground-filters";
+import { GroundGenderSheet } from "@/components/app/ground-filters";
 import { cn } from "@/lib/utils";
 
-export { genderFilterLabel } from "@/components/app/ground-filters";
-export type { GenderFilter } from "@/components/app/ground-filters";
+export { fixtureHasGround, genderFilterLabel, tourDatesAtGround, tourStatusAtGround } from "@/lib/ground";
+export type { GenderFilter } from "@/lib/ground";
 
-const slug = (s: string) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const pairKey = (date: string, a: string, b: string) => `${String(date).slice(0, 10)}|${[slug(a), slug(b)].sort().join("|")}`;
-const seriesName = (f: { series?: string; gender?: string }) => (
-  f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`
-);
 const EASE = [0.22, 1, 0.36, 1] as const;
 const pct1 = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-const MARKET_CHIPS: [string, string][] = [
-  ["match_runs", "Match runs"], ["match_sixes", "Match sixes"], ["match_fours", "Match fours"],
-  ["match_50s", "50s"], ["highest_over", "Highest over"], ["top_score", "Top score"], ["top_batter", "Top batter"],
-];
-
-/** Stadium + city from a "Ground, City, …" venue string. */
-function venueParts(v: string) {
-  const parts = String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
-  return { ground: parts[0] || v || "Ground", city: parts.slice(1).join(", ") };
-}
-
-/**
- * Status of this series' games at this ground (not the whole tour elsewhere).
- * Priority: any still live/started → In progress; else any not yet started → Upcoming;
- * else only finished games (history rows, or status completed/final) → Completed.
- */
-export function tourStatusAtGround(games: { start: string; status?: string; source?: string }[], now = Date.now()): "Upcoming" | "In progress" | "Completed" {
-  let anyLive = false, anyUpcoming = false, anyDone = false;
-  for (const g of games) {
-    const st = String(g.status || "").toLowerCase();
-    const done = g.source === "history" || st === "completed" || st === "final";
-    if (done) { anyDone = true; continue; }
-    const started = g.start.length > 10 ? Date.parse(g.start) <= now : false;
-    if (st === "live" || st === "started" || started) anyLive = true;
-    else anyUpcoming = true;
-  }
-  if (anyLive) return "In progress";
-  if (anyUpcoming) return "Upcoming";
-  if (anyDone) return "Completed";
-  return "Upcoming";
-}
-
-function TourStatusMark({ status }: { status: "Upcoming" | "In progress" | "Completed" }) {
+function TourStatusMark({ status }: { status: TourStatus }) {
   if (status === "In progress") {
     return (
       <span className="inline-flex shrink-0 items-center gap-tight label-cap text-caption font-medium text-miss" role="status">
@@ -95,99 +58,11 @@ function TourStatusMark({ status }: { status: "Upcoming" | "In progress" | "Comp
   return <span className="shrink-0 label-cap text-caption text-muted-foreground">Upcoming</span>;
 }
 
-/** Date span of series games at this ground: "11 Sep" or "11 Sep – 2 Nov". */
-export function tourDatesAtGround(games: { start: string }[], refYear = new Date().getFullYear()) {
-  if (!games.length) return "";
-  const starts = games.map((g) => g.start).filter(Boolean).sort();
-  const a = matchDateLabel(starts[0], refYear), b = matchDateLabel(starts[starts.length - 1], refYear);
-  return a === b ? a : `${a} – ${b}`;
-}
-
-function sideScore(inn: any[] | undefined, teamIx: number) {
-  const rows = (inn || []).filter((r: any) => r && r[0] === teamIx);
-  if (!rows.length) return null;
-  const bit = (row: any) => {
-    const runs = row[1], wkts = row[2];
-    if (runs == null) return "";
-    return wkts != null && wkts < 10 ? `${runs}/${wkts}` : String(runs);
-  };
-  const parts = rows.map(bit).filter(Boolean);
-  if (!parts.length) return null;
-  const last = rows[rows.length - 1];
-  return { display: parts.join(" & "), runs: last[1], wkts: last[2], overs: ballsToOvers(last[3]) };
-}
-
-function resultOf(store: any, m: number): string {
-  const r = store.M.r[m], w = store.M.w[m];
-  if (r === 1) return "Match tied";
-  if (r === 3) return "Match drawn";
-  if (r === 2 || w < 0) return "No result";
-  return `${store.teamName(w)} won`;
-}
-
-/** Past matches at this ground from the stats store, shaped like schedule fixtures for FixtureCard. */
-function historyAtVenue(store: any, venue: string): any[] {
-  const ixs = venueIndices(store, venue);
-  if (!ixs.length) return [];
-  const want = new Set(ixs);
-  const out: any[] = [];
-  for (let m = 0; m < store.n; m++) {
-    if (!want.has(store.M.v[m])) continue;
-    const aIx = store.M.a[m], bIx = store.M.b[m];
-    const a = store.teamName(aIx), b = store.teamName(bIx);
-    const date = store.M.d[m];
-    const e = store.M.e[m];
-    const fmt = FORMATS[store.M.f[m]] || "T20";
-    const gender = store.M.g[m] ? "female" : "male";
-    const inn = store.M.inn[m];
-    out.push({
-      id: `${date.slice(0, 10)}-${slug(a)}-v-${slug(b)}`,
-      start: date,
-      a, b, a_ix: aIx, b_ix: bIx,
-      fmt, gender,
-      venue: store.venueName(store.M.v[m]),
-      series: e != null && e >= 0 ? store.events[e] : "",
-      status: "Completed",
-      result: resultOf(store, m),
-      noProps: true,
-      source: "history",
-      cardScores: [sideScore(inn, aIx), sideScore(inn, bIx)],
-      _key: pairKey(date, a, b),
-    });
-  }
-  return out.sort((x, y) => (x.start < y.start ? 1 : x.start > y.start ? -1 : 0));
-}
-
 function useVenueGround(venue?: string) {
   const { store } = useData();
   const { data: fixtures, isLoading } = useFixtures();
-  const ixs = useMemo(() => (venue ? venueIndices(store, venue) : []), [store, venue]);
-  const primary = useMemo(() => {
-    if (!ixs.length) return -1;
-    let best = 0, bestN = -1;
-    for (let k = 0; k < ixs.length; k++) {
-      let n = 0;
-      for (let m = 0; m < store.n; m++) if (store.M.v[m] === ixs[k]) n++;
-      if (n > bestN) { bestN = n; best = k; }
-    }
-    return ixs[best];
-  }, [store, ixs]);
-  const label = primary >= 0 ? store.venues[primary] : (venue || "");
-  const want = venueStem(venue || "");
-  const scheduled = useMemo(() => {
-    if (!want) return [];
-    return (fixtures || [])
-      .filter((f: any) => venueStem(f.venue) === want)
-      .map((f: any) => ({ ...f, _key: pairKey(f.start, f.a, f.b), source: f.source || "schedule" }));
-  }, [fixtures, want]);
-  const history = useMemo(() => (venue ? historyAtVenue(store, venue) : []), [store, venue]);
-  const atGround = useMemo(() => {
-    const seen = new Set(scheduled.map((f: any) => f._key));
-    const past = history.filter((f) => !seen.has(f._key));
-    const liveish = scheduled.slice().sort((a: any, b: any) => (a.start < b.start ? 1 : a.start > b.start ? -1 : 0));
-    return [...liveish, ...past];
-  }, [scheduled, history]);
-  return { primary, label, known: primary >= 0 || atGround.length > 0, atGround, isLoading };
+  const g = useMemo(() => groundGames(store, fixtures, venue), [store, fixtures, venue]);
+  return { ...g, isLoading };
 }
 
 function Metric({ k, v }: { k: string; v: ReactNode }) {
@@ -243,12 +118,6 @@ function GroundFilterBar({ fx, fmt, gender, onFmt, onGender }: {
       {both ? <GroundGenderSheet open={open} onOpenChange={setOpen} gender={gender} onApply={onGender} /> : null}
     </div>
   );
-}
-
-function filterFx(fx: any[], fmt: string, gender: GenderFilter) {
-  return fx.filter((f) =>
-    (!fmt || (f.fmt || "T20") === fmt)
-    && (!gender || f.gender === gender || (!f.gender && gender === "male")));
 }
 
 type FromFx = { a: string; b: string; series?: string; start?: string; status?: string; gender?: string };
@@ -405,15 +274,11 @@ export function FixtureGroundPanel({ venue, fixtureId, from }: {
   const reduce = useReducedMotion();
   const { store } = useData();
   const { primary, label, known, atGround, isLoading } = useVenueGround(venue);
-  const majorityFmt = useMemo(() => {
-    const c = new Map<string, number>();
-    for (const f of atGround) { const k = f.fmt || "T20"; c.set(k, (c.get(k) || 0) + 1); }
-    return FORMATS.filter((f) => c.has(f)).sort((a, b) => (c.get(b)! - c.get(a)!))[0] || "T20";
-  }, [atGround]);
+  const majorityFmt = useMemo(() => majorityFormat(atGround), [atGround]);
   const [fmt, setFmt] = useState("");
   const activeFmt = FORMATS.includes(fmt) ? fmt : majorityFmt;
   const [gender, setGender] = useState<GenderFilter>("");
-  const shown = useMemo(() => filterFx(atGround, activeFmt, gender), [atGround, activeFmt, gender]);
+  const shown = useMemo(() => filterGames(atGround, activeFmt, gender), [atGround, activeFmt, gender]);
   const name = label || venue || "Ground";
   const { ground, city } = venueParts(name);
   const wxQ = useQuery({ queryKey: ["venue-wx", name], queryFn: () => fetchVenueWx(name), staleTime: 10 * 60_000, enabled: !!name });
@@ -524,10 +389,6 @@ export function VenueGroundPage() {
   const idx = Number(id);
   if (!(idx >= 0 && idx < store.venues.length)) return <EmptyNote>Unknown ground.</EmptyNote>;
   return <FixtureGroundPanel venue={store.venues[idx]} />;
-}
-
-export function fixtureHasGround(store: any, venue?: string): boolean {
-  return !!(venue && (venueIndices(store, venue).length || venueStem(venue)));
 }
 
 /** Venue line on the match header: opens the fixture's ground page (not a sheet). */

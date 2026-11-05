@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, useMemo, useState, type ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { Fragment, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
@@ -73,18 +73,23 @@ function Ball({ b }: { b: string }) {
   return <View style={[styles.ball, { backgroundColor: w ? "rgba(255,0,0,0.2)" : four ? "rgba(39,218,142,0.2)" : color.secondary }]}><Text style={[styles.ballText, { color: w ? color.miss : four ? color.primary : color.foreground }]}>{b}</Text></View>;
 }
 
-/** The last six deliveries in one row (the over in progress, and the end of the one before when it has just begun), with a thin line where an over ends. */
-function Overs({ overs }: { overs: { balls: string[] }[] }) {
-  const flat = (overs || []).filter((o) => o.balls.length).flatMap((o, over) => o.balls.map((b) => ({ b, over }))).slice(-6);
-  if (!flat.length) return null;
+/** "Ball by ball" fixed on the left; the overs scroll beside it, oldest to the left and the current over at the right (the site's `Overs`). Each over carries its number, with a thin line where one ends. */
+function Overs({ overs }: { overs: { n?: number | null; balls: string[] }[] }) {
+  const groups = (overs || []).filter((o) => o.balls.length);
+  const ref = useRef<ComponentRef<typeof ScrollView>>(null);
+  if (!groups.length) return null;
   return (
-    <View style={styles.overs} accessibilityLabel={`Last deliveries ${flat.map((x) => x.b).join(" ")}`}>
-      {flat.map((x, i) => (
-        <View key={i} style={styles.overGroup}>
-          {i > 0 && x.over !== flat[i - 1].over ? <View style={styles.overBreak} /> : null}
-          <Ball b={x.b} />
-        </View>
-      ))}
+    <View style={styles.tape} accessibilityLabel={`Ball by ball: ${groups.map((o) => `${o.n != null ? `over ${o.n} ` : ""}${o.balls.join(" ")}`).join(", ")}`}>
+      <Text style={styles.tapeLabel}>Ball by ball</Text>
+      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={styles.overs} onContentSizeChange={() => ref.current?.scrollToEnd({ animated: false })}>
+        {groups.map((o, i) => (
+          <View key={o.n ?? i} style={styles.overGroup}>
+            {i > 0 ? <View style={styles.overBreak} /> : null}
+            <Text style={styles.overNum}>{o.n != null ? o.n : "·"}</Text>
+            {o.balls.map((b, k) => <Ball key={k} b={b} />)}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -257,7 +262,10 @@ const styles = StyleSheet.create({
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   bowler: { flexDirection: "row", alignItems: "center", gap: space.snug },
   statV: { ...num, fontSize: 15, color: color.foreground },
-  overs: { flexDirection: "row", flexWrap: "nowrap", alignItems: "center", gap: 6 },
+  tape: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  tapeLabel: { ...type.footnote, ...cap, color: color["muted-foreground"] },
+  overs: { flexDirection: "row", flexWrap: "nowrap", alignItems: "center", gap: 6, paddingRight: 2 },
+  overNum: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
   overGroup: { flexDirection: "row", alignItems: "center", gap: 6 },
   overBreak: { width: StyleSheet.hairlineWidth, height: 20, backgroundColor: "rgba(142,142,147,0.5)", marginRight: 3 },
   ball: { minWidth: 34, height: 30, paddingHorizontal: 5, borderRadius: 8, alignItems: "center", justifyContent: "center" },

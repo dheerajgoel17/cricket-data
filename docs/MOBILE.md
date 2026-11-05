@@ -66,7 +66,8 @@ Stay on Expo/RN; speed comes from less JS work and virtualized lists, not a nati
 
 ## State and what is left
 Phase 0 (this): the Home tab as described under Look (pull to refresh, last live body kept on the device), native tab bars with glass, the data path above, and the Fixture and Player pages. Every tab is built.
-* Missing compared with the site: the More button in the phase bar, the Props screener's filters and saved filter combinations, and venue pages (search does not list grounds).
+* **Ground page** (`ui/ground-page.tsx`; routes `/fixture/<id>/ground` and `/venue/<idx>`): the site's ground page. The venue line on a match header opens it; hero with weather and the ground's local time (`site/src/lib/venue-wx.ts`), the series here as a row back to the match, format chips and a gender control, the games at the ground as fixture cards (past games carry `cardScores`, read by `cardModel`), and Markets from those games. The rules (which games count, tour status, filters) are `site/src/lib/ground.ts`, shared with the site, not copied. Match-header "Ball by ball" in `ui/live-board.tsx` scrolls over by over with the over numbers, as the site's.
+* Missing compared with the site: the More button in the phase bar, the Props screener's filters and saved filter combinations, and a venues list (search does not list grounds; the ground page is reached from a match).
 * Phase 1 (rest): those, and the Home Fancy teaser's own match filter; then move the rail, card, player and fancy-card logic into the engine so the site and the app share one copy (`collectOverview` and its labels already are).
 * Phase 2: teams, venues, pair, trends, competitions, tools, odds, glossary, legal.
 * Phase 3: links from shared URLs that open the app, share cards, icons at store size, VoiceOver / TalkBack, offline, TestFlight and Play closed testing.

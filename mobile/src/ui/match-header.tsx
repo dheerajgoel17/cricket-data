@@ -18,7 +18,7 @@ import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/t
  * The match at the top of its page, in a container (the site's `MatchHeader`): its state and format with a share button, both sides with their crests and, when it is on or
  * over, their scores, otherwise the kick-off and a live countdown; then the status line, and the series and ground.
  */
-export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () => void }) {
+export function MatchHeader({ item, onShare, onGround }: { item: RailItem; onShare?: () => void; onGround?: () => void }) {
   const now = useNow(1000); // only this header ticks every second; the page under it does not re-render
   const f = item.fixture, m = cardModel(item, now);
   const place = shortVenue(f.venue) || f.venue;
@@ -64,7 +64,14 @@ export function MatchHeader({ item, onShare }: { item: RailItem; onShare?: () =>
       </View>
 
       {m.live || m.final || m.delayed || m.started ? <Text style={styles.status}>{m.status}</Text> : null}
-      <Text style={styles.series}>{seriesName(f)}{place ? ` · ${place}` : ""}</Text>
+      <Text style={styles.series}>{seriesName(f)}{place && !onGround ? ` · ${place}` : ""}</Text>
+      {place && onGround ? (
+        <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onGround(); }} accessibilityRole="link" accessibilityLabel={`Ground: ${f.venue}`} style={({ pressed }) => [styles.ground, pressed && { opacity: 0.6 }]}>
+          <Ionicons name="location-outline" size={14} color={color["muted-foreground"]} />
+          <Text style={styles.series} numberOfLines={1}>{place}</Text>
+          <Ionicons name="chevron-forward" size={14} color={color["muted-foreground"]} />
+        </Press>
+      ) : null}
     </View>
   );
 }
@@ -86,4 +93,5 @@ const styles = StyleSheet.create({
   clock: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   status: { ...type.callout, color: color.foreground },
   series: { ...type.footnote, color: color["muted-foreground"] },
+  ground: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", maxWidth: "100%" },
 });
