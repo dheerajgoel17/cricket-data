@@ -25,7 +25,7 @@ export const alertMode = (env, want = "post") => (want === "preview" ? "preview"
 export async function run(env, { alerts = "post" } = {}) {
   for (const k of ["LIVE_SOURCE_BASE", "SUPABASE_URL", "SUPABASE_ANON_KEY", "STATE_WRITE_TOKEN"]) if (!env?.[k]) throw new Error(`${k} is not set`);
   const base = String(env.LIVE_SOURCE_BASE).replace(/\/+$/, "");
-  const feed = createFeed({ base: () => base, getJson: (u) => json(u, "json"), getText: (u) => text(u), getHtml: (u) => html(u), loadIdentity: async () => NO_IDENTITY });
+  const feed = createFeed({ base: () => base, getJson: (u) => json(u, "json"), getText: (u) => text(u), getHtml: (u) => html(u), loadIdentity: async () => NO_IDENTITY, cardBudgetMs: Infinity });
   const { matches } = await feed.snapshot();
   const db = { base: String(env.SUPABASE_URL).replace(/\/+$/, ""), key: env.SUPABASE_ANON_KEY, token: env.STATE_WRITE_TOKEN }, mode = alertMode(env, alerts);
   // the two are independent: a Telegram or alert-file problem never stops the state table, and the other way round

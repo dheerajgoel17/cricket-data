@@ -346,6 +346,27 @@ test("India's chase has started: the board, scores and card follow the second in
   assert.equal(liveStat(livePlayer(m, "Daryl Mitchell"), "runs"), 89, "first-innings players stay available for props");
 });
 
+test("a chase's negative partnership is not the stand: 0 wickets is the innings, a wicket is the innings minus the last fall", () => {
+  // Adelaide 13/0 off 1.1 (7 balls). The source's partnerruns/partnerballs is a signed chase margin, not the pair.
+  const html = pageHtml({ [LIVE]: {
+    team1_f_n: "Adelaide Strikers Women", team2_f_n: "Brisbane Heat Women", team1short: "ADS-W", team2short: "BH-W",
+    score1: "13-0", over1: "1.1", score2: "184-4", over2: "20.0", inning: 2, status: 1,
+    player_full_name1: "Laura Wolvaardt", run1: "13", ball1: "(6)",
+    player_full_name2: "Maia Bouchier", run2: "0", ball2: "(1)",
+    bowler_full_name: "Charli Knott", bwr: "0-2", bover: "0.1",
+    partnerruns: -143, partnerballs: -103,
+  } });
+  assert.deepEqual(liveBoard(parseMatchPage(html)).partnership, { runs: 13, balls: 7 });
+  // 40/1 off 5.0 (30 balls), last man out at 22 off 16: the new stand is 18 off 14
+  const board = liveBoard({
+    teams: [{ name: "Adelaide Strikers Women", batting: true, runs: 40, wkts: 1, overs: 5 }],
+    players: [{ name: "Laura Wolvaardt", team: "Adelaide Strikers Women", runs: 18, balls: 14, out: false }],
+    card: [{ team: "Adelaide Strikers Women", fow: [{ name: "Madeline Penna", runs: 22, balls: 16, wkts: 1 }] }],
+    partnership: { runs: -10, balls: -4 },
+  });
+  assert.deepEqual(board.partnership, { runs: 18, balls: 14 });
+});
+
 test("chase totals across both innings (hand-computed)", () => {
   const m = chase();
   assert.equal(liveMarket(m, "match_runs"), 240); // 198 + 42
@@ -1043,6 +1064,18 @@ test("settleLines: a first innings in progress is live until he is out, then his
   assert.deepEqual(summarise(settleLines(dismissed, [line], TEST_IDN)), [["tz", "runs", 31.5, 1, 31, "out", "missed"]]);
   const over = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 31, 40, 4, 0, false)] }], { status: "final" });
   assert.deepEqual(summarise(settleLines(over, [line], TEST_IDN)), [["tz", "runs", 31.5, 1, 31, "final", "missed"]], "a match that is over settles every innings");
+});
+
+test("settleLines: a next-innings XI stub on the card does not settle the current innings (batter still in)", () => {
+  // Source pre-lists the bowling side's XI under n=2 with yet-to-bat / xi and null totals while the first innings is still being played.
+  const stub = { n: 2, team: "West Indies", batters: [], yetToBat: ["Kraigg Brathwaite", "John Campbell"], xi: [{ id: "B1", name: "Kraigg Brathwaite" }], runs: null, wkts: null, overs: null };
+  const live = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 25, 31, 3, 0, false)], runs: 104, wkts: 1, overs: 27.5 }, stub]);
+  const line = TEST_LINES(1, "tz", "Tanzid Hasan", "Bangladesh", "runs", 28.5);
+  assert.deepEqual(summarise(settleLines(live, [line], TEST_IDN)), [["tz", "runs", 28.5, 1, 25, "live", null]], "25 not out stays live / so far, not Missed");
+  const begun = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 25, 31, 3, 0, false)], runs: 104, wkts: 1, overs: 27.5 }, { ...stub, batters: [bat("B1", "Kraigg Brathwaite", 0, 1, 0, 0, false)], runs: 0, wkts: 0, overs: 0.1 }]);
+  assert.deepEqual(summarise(settleLines(begun, [line], TEST_IDN)), [["tz", "runs", 28.5, 1, 25, "final", "missed"]], "once the next side has faced a ball, the first innings is final");
+  const allOut = testMatch([{ n: 1, team: "Bangladesh", batters: [bat("T1", "Tanzid Hasan", 25, 31, 3, 0, false)], runs: 180, wkts: 10, overs: 55.2 }, stub]);
+  assert.deepEqual(summarise(settleLines(allOut, [line], TEST_IDN)), [["tz", "runs", 28.5, 1, 25, "final", "missed"]], "all out settles even before the next innings has a batter");
 });
 
 test("settleLines: an innings that has not happened, or that he did not bat in, has no entry", () => {

@@ -21,7 +21,7 @@ const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as a
  * Cards follow the home rail: matches in play first, then standing. Live so-far is overlaid from the 15 s poll (`fancyStanding`), not baked into the 10-minute scored rows.
  */
 export function useFancyCards() {
-  const { store } = useData();
+  const { store, matchesReady } = useData();
   const { fixtures: all, ready, doc } = usePricedFixtures();
   const live = useLiveDoc();
   // a finished match has nothing left to bet on: fancy lists the matches in play and to come (a finished match keeps its own page and its archive)
@@ -29,7 +29,7 @@ export function useFancyCards() {
   const ids = fixtures.map((f: any) => f.id || `${f.a}${f.b}${f.start}`).join("|");
   const q = useQuery({
     queryKey: ["fancy-cards", doc?.generated_at_utc ?? "", ids],
-    enabled: ready && !!doc,
+    enabled: ready && !!doc && matchesReady !== false,
     staleTime: 10 * 60_000,
     queryFn: async () => {
       const out: any[] = [];

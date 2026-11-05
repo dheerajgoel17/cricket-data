@@ -10,7 +10,7 @@ const ARCHIVE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/ma
 
 async function bundled(file: string): Promise<any | null> {
   try {
-    const r = await fetch(`/data/${file}`, { credentials: "same-origin", cache: "no-store" });
+    const r = await fetch(`/data/${file}`, { credentials: "same-origin" });
     if (!r.ok) return null;
     return await readJson(r);
   } catch { return null; }

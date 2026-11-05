@@ -7,12 +7,12 @@ import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string> }
+export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string>; /** false until matches.json has joined the store; the home rail does not wait for it */ matchesReady: boolean }
 const Ctx = createContext<Data | null>(null);
 
 export async function loadJson(url: string) {
   try {
-    const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+    const r = await fetch(url, { credentials: "same-origin" });
     if (!r.ok) return null;
     return await readJson(r);
   } catch { return null; }
@@ -26,14 +26,14 @@ async function loadIdentity(base: string) {
 async function boot(): Promise<Data> {
   const k = await gateKey();
   setWrapKey(k);
-  const store = await createStore({ base: "/data/", wrapKey: k });
+  const store = await createStore({ base: "/data/", wrapKey: k, deferMatches: true });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
   const [photos, identity, names] = await Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
     loadIdentity("/data/"),
     loadJson("/data/names.json").then((n) => (n && typeof n === "object" ? n : {}) as Record<string, string>),
   ]);
-  return { store, rz: new Resolver(store), photos, identity, names };
+  return { store, rz: new Resolver(store), photos, identity, names, matchesReady: false };
 }
 
 const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
@@ -57,6 +57,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           out = await boot();
         }
         if (live) setData(out);
+        out.store.ready.then(() => { if (live) setData((d) => (d && d.store === out.store ? { ...d, matchesReady: true } : d)); })
+          .catch((e: unknown) => { if (live) setError((e as Error).message); });
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };

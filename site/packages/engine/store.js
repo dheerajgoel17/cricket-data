@@ -4,15 +4,35 @@ import { teamInningNo } from "./filters.js";
 import { norm } from "./util.js";
 import { unwrap } from "./wrap.js";
 
-/** @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, wrapKey?: string }} [opts] */
-export async function createStore({ base = "data/", fetchJson, wrapKey } = {}) {
+/**
+ * @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, wrapKey?: string, deferMatches?: boolean }} [opts]
+ * `deferMatches`: return once the index is in and keep `matches.json` on `store.ready`. The home rail only needs fixtures;
+ * player, team and fancy pages wait for `ready` (it attaches `M` and `n`).
+ */
+export async function createStore({ base = "data/", fetchJson, wrapKey, deferMatches = false } = {}) {
   const get = fetchJson || (async (p) => {
-    const r = await fetch(base + p, { credentials: "same-origin", cache: "no-store" });
+    const r = await fetch(base + p, { credentials: "same-origin" });
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
     return await unwrap(await r.json(), wrapKey);
   });
-  const [meta, index, M] = await Promise.all([get("meta.json"), get("index.json"), get("matches.json")]);
-  return new Store(meta, index, M, get);
+  // Start matches with the index so home can paint sooner, but if meta/index fail first the floating
+  // matches promise must not become an unhandledRejection (og card load with no data origin).
+  const matchesP = get("matches.json");
+  let meta, index;
+  try {
+    [meta, index] = await Promise.all([get("meta.json"), get("index.json")]);
+  } catch (e) {
+    matchesP.catch(() => {});
+    throw e;
+  }
+  const store = new Store(meta, index, deferMatches ? null : await matchesP, get);
+  store.ready = matchesP.then((doc) => {
+    store.M = doc;
+    store.n = doc.id.length;
+    return store;
+  });
+  if (!deferMatches) await store.ready;
+  return store;
 }
 
 export class Store {
@@ -27,7 +47,8 @@ export class Store {
     this.teams = index.teams;
     this.venues = index.venues;
     this.events = index.events;
-    this.n = M.id.length;
+    this.n = M?.id?.length || 0;
+    this.ready = Promise.resolve(this);
     this.fixtures = null;
     this._eventNorm = this.events.map(norm);
   }

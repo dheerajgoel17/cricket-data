@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { AppSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
+import { useData } from "@/lib/data";
 import { initGa, track, trackPage } from "@/lib/ga";
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
@@ -39,6 +40,13 @@ function Analytics() {
   return null;
 }
 
+/** Every page except home reads matches.json. Home paints the rail from the fixture file while that download finishes. */
+function HistoryGate() {
+  const { matchesReady } = useData();
+  if (matchesReady === false) return <AppSkeleton />;
+  return <Outlet />;
+}
+
 export function App() {
   return (
     <>
@@ -48,6 +56,7 @@ export function App() {
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<HomePage />} />
+            <Route element={<HistoryGate />}>
             <Route path="fixtures" element={<Navigate to="/" replace />} />
             <Route path="fixture/*" element={<FixturePage />} />
             <Route path="trends" element={<TrendsPage />} />
@@ -78,6 +87,7 @@ export function App() {
             <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
             <Route path="responsible" element={<Navigate to="/docs" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
           </Route>
         </Routes>
       </Suspense></ErrorBoundary>
