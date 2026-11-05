@@ -1,3 +1,5 @@
+import { mark } from "@/lib/perf";
+import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -23,7 +25,8 @@ import { TabFade } from "@/ui/tab-fade";
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
 
 /** Fancy: every priced match with its best-edge markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. Matches in play lead, as on the Home rail. */
-export default function Fancy() {
+function Fancy() {
+  mark("render:Fancy");
   const inset = useScreenInsets();
   const { cards, ready, error } = useFancyCards();
   const shown = cards.filter((c) => c.rows.length > 0); // a match with lines up but nothing to show (no past matches to score them on) is left out
@@ -105,3 +108,5 @@ const styles = StyleSheet.create({
   linkRow: { flexDirection: "row", alignItems: "center", gap: 2 },
   link: { ...type.footnote, fontFamily: font.medium, color: color.primary },
 });
+
+export default lazyTab(Fancy);

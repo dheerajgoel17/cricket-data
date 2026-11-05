@@ -11,7 +11,7 @@ import { liveForFixture } from "@cricket/engine/live.js";
 import { useQuery } from "@tanstack/react-query";
 import { mixHomeRows } from "@site/lib/hot-lines";
 import { phaseOf } from "@site/lib/home-phase";
-import { mark } from "@/lib/perf";
+import { mark, timed } from "@/lib/perf";
 import { liveQuery } from "@/lib/queries";
 import { fixtureState } from "@/lib/rail";
 import { useFancyCards } from "@/lib/fancy";
@@ -63,7 +63,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
     return m;
   }, [cards, phase, live.data]);
 
-  const blocks = useMemo(() => {
+  const blocks = useMemo(() => timed("hotHome blocks", () => {
     const priced = rail.filter((i) => !i.noProps && (!phase || phaseOf(i.state) === phase)).map((i) => i.fixture);
     const out: FxBlock[] = [];
     for (const f of priced) {
@@ -77,16 +77,16 @@ export function HotHome({ phase }: { phase: HomePhase }) {
       if (items.length) out.push({ f, items });
     }
     return out;
-  }, [rail, props, fancyById, live.data, phase]);
+  }), [rail, props, fancyById, live.data, phase]);
 
   const [pick, setPick] = useState("");
   const sel = blocks.some((b) => b.f.id === pick) ? pick : (blocks[0]?.f.id || "");
   const block = blocks.find((b) => b.f.id === sel) || null;
 
-  const tape = useMemo<TapeRow[]>(() => d0.rows.map((r) => {
+  const tape = useMemo<TapeRow[]>(() => timed("hotHome tape", () => d0.rows.map((r) => {
     const s = soFarOf(r);
     return { idx: r.idx, pid: r.pid, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
-  }), [d0.rows, soFarOf]);
+  })), [d0.rows, soFarOf]);
 
   const loading = isLoading || !fancyReady;
   if (rows.length) mark("first-hot-rows", `n=${rows.length}`);

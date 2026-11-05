@@ -1,3 +1,5 @@
+import { mark } from "@/lib/perf";
+import { lazyTab } from "@/ui/lazy-tab";
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
@@ -25,7 +27,8 @@ import { TabFade } from "@/ui/tab-fade";
 const PIN_FIRST = ["big bash"];
 
 /** Leagues: pick one (live ones and those about to start first, Big Bash on top), then its season's leaders, lists and trends. Any other league is under "All competitions". */
-export default function Leagues() {
+function Leagues() {
+  mark("render:Leagues");
   const inset = useScreenInsets();
   const stats = useQuery(storeQuery), fx = useQuery(fixturesQuery);
   const store: any = stats.data?.store;
@@ -89,3 +92,5 @@ const styles = StyleSheet.create({
   leagueHead: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leagueName: { ...type.title, color: color.foreground, flex: 1 },
 });
+
+export default lazyTab(Leagues);

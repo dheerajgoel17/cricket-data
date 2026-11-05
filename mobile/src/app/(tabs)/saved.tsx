@@ -1,3 +1,5 @@
+import { mark } from "@/lib/perf";
+import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -21,7 +23,8 @@ import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Account Saved (server). Recently viewed stays on this device. */
-export default function Saved() {
+function Saved() {
+  mark("render:Saved");
   const inset = useScreenInsets();
   const stats = useQuery(storeQuery);
   const { user, loading, openSignIn, signOut } = useAuth();
@@ -112,3 +115,5 @@ const styles = StyleSheet.create({
   signLabel: { ...type.body, fontFamily: font.semibold, color: color["primary-foreground"] },
   account: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });
+
+export default lazyTab(Saved);

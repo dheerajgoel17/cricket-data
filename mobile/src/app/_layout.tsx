@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Profiler, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
-import { mark } from "@/lib/perf";
+import { mark, onRender, PROFILE } from "@/lib/perf";
 import { watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
 import { SignInSheet } from "@/ui/sign-in-sheet";
@@ -49,6 +49,7 @@ export default function RootLayout() {
         <AuthProvider>
           <ThemeProvider value={theme}>
             <StatusBar style="light" />
+            <Profiler id="stack" onRender={onRender}>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.background }, animation: Platform.OS === "android" ? "ios_from_right" : "default" }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="fixture/[id]" />
@@ -60,6 +61,7 @@ export default function RootLayout() {
               <Stack.Screen name="venue/[idx]" />
               <Stack.Screen name="info/[topic]" options={{ presentation: "formSheet", sheetAllowedDetents: [0.5, 0.85], sheetInitialDetentIndex: 0, sheetGrabberVisible: true, sheetCornerRadius: 24 }} />
             </Stack>
+            </Profiler>
             <SignInSheet />
           </ThemeProvider>
         </AuthProvider>

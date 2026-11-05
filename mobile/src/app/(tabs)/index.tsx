@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { Profiler, useMemo, useState } from "react";
+import { mark, onRender } from "@/lib/perf";
 import { RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import type { HomePhase } from "@site/lib/home-phase";
@@ -19,6 +20,7 @@ import { color, FIXTURE_CARD_SHARE, radius, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 export default function Fixtures() {
+  mark("render:Fixtures");
   const { ready, items, error, refetch } = useRail();
   // the pull-to-refresh spinner follows only a pull: the 15 s live poll refetches on its own and must not open it
   const [pulling, setPulling] = useState(false);
@@ -74,7 +76,7 @@ export default function Fixtures() {
             showsHorizontalScrollIndicator={false}
           />
         )}
-        {ready ? <HotHome phase={phase} /> : null}
+        {ready ? <Profiler id="hothome" onRender={onRender}><HotHome phase={phase} /></Profiler> : null}
       </ScrollView>
       <TabFade />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />

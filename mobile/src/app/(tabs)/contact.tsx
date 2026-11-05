@@ -1,3 +1,5 @@
+import { mark } from "@/lib/perf";
+import { lazyTab } from "@/ui/lazy-tab";
 import { Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Press } from "@/ui/press";
@@ -21,7 +23,8 @@ function mailTo(subject: string) {
 }
 
 /** Sixth tab: contact — same inbox as the site, mailto only (no form backend). */
-export default function ContactScreen() {
+function ContactScreen() {
+  mark("render:ContactScreen");
   const inset = useScreenInsets();
   const open = (url: string) => { void Linking.openURL(url); };
   return (
@@ -80,3 +83,5 @@ const styles = StyleSheet.create({
   secondaryTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   note: { ...type.callout, color: color["muted-foreground"] },
 });
+
+export default lazyTab(ContactScreen);

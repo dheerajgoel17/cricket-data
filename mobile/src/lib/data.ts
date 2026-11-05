@@ -4,7 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { identityIndex } from "@cricket/engine/identity.js";
 import { Resolver } from "@cricket/engine/resolve.js";
 import { createStore } from "@cricket/engine/store.js";
-import { getJson } from "@/lib/net";
+import { getJson, setDataBuild } from "@/lib/net";
 import { mark, span } from "@/lib/perf";
 
 export interface StatsData { store: any; rz: any; identity: ReturnType<typeof identityIndex>; /** full names by player id, when the data build has made them */ names: Record<string, string> }
@@ -18,7 +18,10 @@ export const storeQuery = queryOptions({
   queryFn: async (): Promise<StatsData> => {
     mark("store-start");
     let t = Date.now();
-    const store = await createStore({ fetchJson: (p: string) => getJson(`/data/${p}`) });
+    // the build first (a few hundred bytes, always asked for): the big files are read from the device while it is the one they were kept under
+    const meta = await getJson("/data/meta.json");
+    setDataBuild(meta?.built_at ? `${meta.built_at}|${meta.schema ?? ""}` : undefined);
+    const store = await createStore({ fetchJson: (p: string) => (p === "meta.json" ? Promise.resolve(meta) : getJson(`/data/${p}`)) });
     if (!store?.P?.id?.length) throw new Error("index.json: empty");
     // the player-identity table (our id <-> the live source's id, the books' names); a missing file just means nobody is linked and names decide
     span("createStore", t); t = Date.now();

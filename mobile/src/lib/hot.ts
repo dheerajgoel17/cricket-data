@@ -22,9 +22,9 @@ export interface Row {
 }
 
 const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
-// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS, so on a slow phone the JS thread is busy a third of the time at most and
+// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS, so on a slow phone the JS thread is busy two thirds of the time at most and
 // touches, scrolls and re-renders always get their turn (the lines take longer to all arrive, and the rows appear as they do).
-const FRAME_MS = 6, REST_MS = 12;
+const FRAME_MS = 8, REST_MS = 4;
 
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
 export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Date.now(), onRows }: { store: any; rz: any; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void }): Promise<Row[]> {
@@ -34,13 +34,15 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l);
   const year = String(new Date().getFullYear());
   const out: Row[] = [];
+  const byChip = new Map<string, any[]>();
+  for (const x of todays) { const c = matchChipId(x.match, x.start_utc, x.fmt); (byChip.get(c) ?? byChip.set(c, []).get(c)!).push(x); }
   let plan = 0, shardMs = 0;
   const tAll = Date.now();
   const score = async (l: any) => {
     const idx = store.P.id.indexOf(l.pid);
     const inn = lineScope(l);
     const chip = matchChipId(l.match, l.start_utc, l.fmt);
-    const b = bookLinesFor({ lines: todays.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
+    const b = bookLinesFor({ lines: byChip.get(chip) ?? [] }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
     if (idx < 0 || !b) return;
     const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
     const tp = Date.now();

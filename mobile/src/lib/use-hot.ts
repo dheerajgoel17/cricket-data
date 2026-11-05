@@ -5,7 +5,9 @@ import { sideEdge } from "@cricket/engine/stats.js";
 import { lineNotIn, lineStanding, liveForFixture } from "@cricket/engine/live.js";
 import { hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@site/lib/home-phase";
+import { timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
+import { hotSnapKey, readHotSnap, writeHotSnap } from "@/lib/hot-cache";
 import { scoreHotRows, type Row } from "@/lib/hot";
 import { sideRate, withModelSide } from "@/lib/model-side";
 import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
@@ -16,12 +18,24 @@ export function useHotRows(scope?: HotScope, doc?: any) {
   const lines = { data: doc ?? linesQ.data }; // `doc`: the book doc with an archived match added, for that match's own page
   const qc = useQueryClient();
   const what = !scope ? "none" : "day" in scope ? scope.day : scope.teams.join("|");
-  const key = ["hot-rows", what, new Date().toDateString(), lines.data?.generated_at_utc, doc ? lines.data?.lines?.length : ""];
+  const stamp = new Date().toDateString();
+  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, doc ? lines.data?.lines?.length : ""];
+  // a day's rows kept from the last launch (not for one match's own page, which adds an archived match to the lines)
+  const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
+  const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
+  const generated = String(lines.data?.generated_at_utc ?? "");
   const rows = useQuery({
     queryKey: key,
-    enabled: !!scope && !!stats.data && !!lines.data && fixtures.isSuccess,
+    enabled: !!scope && !!lines.data && fixtures.isSuccess && (!!stats.data || !!snap),
     staleTime: 10 * 60_000,
-    queryFn: () => scoreHotRows({ ...stats.data!, lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, onRows: (r) => qc.setQueryData(key, r) }),
+    placeholderData: (prev: Row[] | undefined) => prev ?? snap?.rows, // the last launch's rows until the first pass of this one is in
+    queryFn: async () => {
+      if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows; // the same books file: those rows are the answer
+      const data = stats.data ?? (await qc.ensureQueryData(storeQuery));
+      const out = await scoreHotRows({ ...data, lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, onRows: (r) => qc.setQueryData(key, r) });
+      if (snapKey) writeHotSnap(snapKey, generated, out);
+      return out;
+    },
   });
   const day = scope && "day" in scope ? scope.day : -1;
   const otherDay = useMemo(() => (day >= 0 ? otherHotCount(lines.data?.lines || [], day) : 0), [lines.data, day]); // other days' lines, only counted
@@ -40,10 +54,10 @@ export function useHotView(scope?: HotScope, phase?: HomePhase, doc?: any) {
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
   const day = scope && "day" in scope ? scope.day : -1;
   const rows = useMemo(
-    () => (hot.data || [])
+    () => timed(`hotView rows day=${day}`, () => (hot.data || [])
       .map((r) => withModelSide(r))
       .filter((r) => (day < 0 || r.day === day) && (!phase || lineHomePhase(r, live.data) === phase))
-      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y), edge: y.edge })),
+      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y), edge: y.edge }))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hot.data, live.data, phase, day],
   );

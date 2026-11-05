@@ -10,6 +10,21 @@ export function mark(name: string, extra?: string): void {
   console.log(`[perf] ${name} ${Date.now() - t0}${extra ? ` ${extra}` : ""}`);
 }
 
+/** React commits that took 12 ms or more (`<Profiler onRender={onRender}>`; render time of the subtree, including its children). */
+export function onRender(id: string, phase: string, actual: number): void {
+  if (ON && actual >= 12) console.log(`[perf-render] ${id} ${phase} ${Math.round(actual)}ms at ${Date.now() - t0}`);
+}
+export const PROFILE = ON;
+
+/** Runs `fn`, reporting it when it took 15 ms or more. */
+export function timed<T>(name: string, fn: () => T): T {
+  if (!ON) return fn();
+  const t = Date.now();
+  const v = fn();
+  if (Date.now() - t >= 15) span(name, t);
+  return v;
+}
+
 /** Every duration worth reporting (a network read, an unwrap), not once per name. */
 export function span(name: string, since: number, extra?: string): void {
   if (ON) console.log(`[perf-span] ${name} ${Date.now() - since}ms at ${Date.now() - t0}${extra ? ` ${extra}` : ""}`);

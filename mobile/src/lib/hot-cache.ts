@@ -1,18 +1,19 @@
-// Last scored Hot props rows kept on the device so Home / Props can paint before the next scoring pass finishes.
+// Last scored Hot props rows kept on the device, so Home / Props paint at once on a launch instead of waiting for the stats data and a scoring pass (several seconds on a phone).
+// A snapshot from the books file's current generation is the answer itself (nothing is scored again); an older one is shown while a fresh pass runs.
 import { raw } from "@/lib/storage";
 import type { Row } from "@/lib/hot";
 
-const PREFIX = "hot-rows-v1:";
-/** Drop a snapshot older than this (a new day of lines is a different key anyway). */
-const MAX_AGE_MS = 6 * 60 * 60e3;
+const PREFIX = "hot-rows-v2:";
+/** Older than this a snapshot is not shown at all: its prices are too far from the books'. */
+const MAX_AGE_MS = 3 * 60 * 60e3;
 /** Cap JSON size so a huge day cannot fill MMKV. */
-const MAX_CHARS = 800_000;
+const MAX_CHARS = 3_000_000;
 
 export type HotSnap = { t: number; generated: string; rows: Row[] };
 
-/** One snapshot per local day list and the books file's generation stamp. */
-export function hotSnapKey(dayOrTeams: string, generated: string, dayStamp: string): string {
-  return `${PREFIX}${dayStamp}|${dayOrTeams}|${generated || "-"}`;
+/** One snapshot per local day and list (`day` number or match teams). */
+export function hotSnapKey(what: string | number, dayStamp: string): string {
+  return `${PREFIX}${dayStamp}|${what}`;
 }
 
 export function readHotSnap(key: string, now = Date.now()): HotSnap | null {
