@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-05T09:30:35Z",
- "generated_at_ist": "2026-11-05 15:00 IST",
- "runtime_secs": 151.7,
+ "generated_at_utc": "2026-11-05T10:30:29Z",
+ "generated_at_ist": "2026-11-05 16:00 IST",
+ "runtime_secs": 111.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-05",
-  "commit": "9f03f2797e"
+  "commit": "270b764ced"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 653,
-   "secs": 1.3
+   "secs": 0.4
   },
   "smarkets": {
    "status": "ok",
-   "rows": 400,
-   "secs": 3.2
+   "rows": 457,
+   "secs": 2.9
   },
   "feedk": {
    "status": "ok",
    "rows": 41,
-   "secs": 8.6,
+   "secs": 7.9,
    "events": 3
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 11.3,
+   "secs": 11.1,
    "events": 2
   },
   "feede": {
    "status": "ok",
    "rows": 522,
-   "secs": 43.0,
+   "secs": 42.2,
    "events": 16
   },
   "feedf": {
    "status": "ok",
    "rows": 228,
-   "secs": 48.9,
+   "secs": 47.1,
    "events": 10
   },
   "feedh": {
    "status": "ok",
    "rows": 953,
-   "secs": 77.8,
+   "secs": 80.8,
    "events": 70
   }
  },
- "snapshot": "odds_20261105T093035Z.jsonl.gz",
+ "snapshot": "odds_20261105T103029Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,14 +120,14 @@
  },
  "stats": {
   "events_in_window": 36,
-  "rows_in_window": 2642,
-  "selections_with_model": 1048,
+  "rows_in_window": 2679,
+  "selections_with_model": 1050,
   "selections_with_market_fair": 1522,
   "markets_in_window": 213,
   "value_bets": 1,
   "dropped_by_filter": {
    "odds_range": 8,
-   "model_market_gap": 618,
+   "model_market_gap": 628,
    "model_only_no_market": 117,
    "policy_max_odds": 3,
    "loose_name_match": 1,
@@ -185,12 +185,12 @@
     "corr": 0.985
    },
    "top_batter_team": {
-    "n_prices": 247,
-    "mean_model_p": 0.053,
+    "n_prices": 278,
+    "mean_model_p": 0.062,
     "mean_market_p": 0.065,
-    "mean_logit_diff_model_minus_market": 0.327,
-    "mean_abs_logit_diff": 0.979,
-    "corr": 0.642
+    "mean_logit_diff_model_minus_market": 0.53,
+    "mean_abs_logit_diff": 1.02,
+    "corr": 0.687
    },
    "top_bowler_team": {
     "n_prices": 100,
@@ -300,7 +300,7 @@
    ]
   },
   {
-   "event": "female|Delhi Capitals|jharkhand|2026-11-06",
+   "event": "female|sikkim|tripura|2026-11-06",
    "start_ist": "2026-11-06 09:00 IST",
    "format": "T20",
    "format_source": "name",
@@ -310,7 +310,7 @@
    ]
   },
   {
-   "event": "female|sikkim|tripura|2026-11-06",
+   "event": "female|Delhi Capitals|jharkhand|2026-11-06",
    "start_ist": "2026-11-06 09:00 IST",
    "format": "T20",
    "format_source": "name",
@@ -636,6 +636,21 @@
    ]
   },
   {
+   "event": "male|Auckland Aces|Wellington Firebirds|2026-11-07",
+   "start_ist": "2026-11-08 03:00 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "Auckland Aces",
+    "Wellington Firebirds"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedh_d",
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|Canterbury|Central Stags|2026-11-07",
    "start_ist": "2026-11-08 03:00 IST",
    "format": "ODI",
@@ -647,20 +662,6 @@
    "sources": [
     "feede_lb",
     "smarkets"
-   ]
-  },
-  {
-   "event": "male|Auckland Aces|Wellington Firebirds|2026-11-07",
-   "start_ist": "2026-11-08 03:00 IST",
-   "format": "ODI",
-   "format_source": "name",
-   "teams_matched": [
-    "Auckland Aces",
-    "Wellington Firebirds"
-   ],
-   "sources": [
-    "feede_lb",
-    "feedh_d"
    ]
   },
   {
@@ -1059,20 +1060,20 @@
   }
  },
  "log": [
-  "[15:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[15:00 IST] history: 23921 matches, last 2026-11-05, players 430527",
-  "[15:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 653, 'secs': 1.3}",
-  "[15:02 IST] source smarkets: {'status': 'ok', 'rows': 400, 'secs': 3.2}",
-  "[15:02 IST] source feedk: {'status': 'ok', 'rows': 41, 'secs': 8.6, 'events': 3}",
-  "[15:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.3, 'events': 2}",
-  "[15:02 IST] source feede: {'status': 'ok', 'rows': 522, 'secs': 43.0, 'events': 16}",
-  "[15:02 IST] source feedf: {'status': 'ok', 'rows': 228, 'secs': 48.9, 'events': 10}",
-  "[15:02 IST] source feedh: {'status': 'ok', 'rows': 953, 'secs': 77.8, 'events': 70}",
-  "[15:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[15:02 IST] 28 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[15:02 IST] book lines: 208 player lines from 7 source(s)",
-  "[15:03 IST] weather: forecasts for 10 events, 0 failed",
-  "[15:03 IST] prop model: 680 prop selections modelled, 121 milestone ladder prices anchored to O/U",
-  "[15:03 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[16:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[16:00 IST] history: 23921 matches, last 2026-11-05, players 430527",
+  "[16:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 653, 'secs': 0.4}",
+  "[16:02 IST] source smarkets: {'status': 'ok', 'rows': 457, 'secs': 2.9}",
+  "[16:02 IST] source feedk: {'status': 'ok', 'rows': 41, 'secs': 7.9, 'events': 3}",
+  "[16:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.1, 'events': 2}",
+  "[16:02 IST] source feede: {'status': 'ok', 'rows': 522, 'secs': 42.2, 'events': 16}",
+  "[16:02 IST] source feedf: {'status': 'ok', 'rows': 228, 'secs': 47.1, 'events': 10}",
+  "[16:02 IST] source feedh: {'status': 'ok', 'rows': 953, 'secs': 80.8, 'events': 70}",
+  "[16:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[16:02 IST] 28 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[16:02 IST] book lines: 208 player lines from 7 source(s)",
+  "[16:02 IST] weather: forecasts for 11 events, 0 failed",
+  "[16:02 IST] prop model: 680 prop selections modelled, 121 milestone ladder prices anchored to O/U",
+  "[16:02 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }

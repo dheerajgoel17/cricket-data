@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-05T09:33:55Z",
+ "generated_at_utc": "2026-11-05T10:32:58Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -99,29 +99,6 @@
    "bat_first": false
   },
   {
-   "alert_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women|team_total_sixes|Sydney Sixers Women|0|under",
-   "fixture_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women",
-   "match": "Melbourne Stars Women vs Sydney Sixers Women",
-   "format": "T20",
-   "series": "Womens Big Bash League 2026",
-   "start_utc": "2026-11-06T08:10:00Z",
-   "start_ist": "2026-11-06 13:40 IST",
-   "key": "team_total_sixes",
-   "team": "Sydney Sixers Women",
-   "inn": 0,
-   "side": "under",
-   "line": 2.5,
-   "best_odds": 2,
-   "best_source": "bet365",
-   "hits": 14,
-   "played": 20,
-   "window": 20,
-   "chance": 0.6211,
-   "edge": 0.2423,
-   "edge_pct": 24.2,
-   "bat_first": false
-  },
-  {
    "alert_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women|team_total_runs|Sydney Sixers Women|0|under",
    "fixture_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women",
    "match": "Melbourne Stars Women vs Sydney Sixers Women",
@@ -142,6 +119,29 @@
    "chance": 0.6667,
    "edge": 0.2333,
    "edge_pct": 23.3,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women|match_sixes||0|under",
+   "fixture_id": "2026-11-06-melbourne-stars-women-v-sydney-sixers-women",
+   "match": "Melbourne Stars Women vs Sydney Sixers Women",
+   "format": "T20",
+   "series": "Womens Big Bash League 2026",
+   "start_utc": "2026-11-06T08:10:00Z",
+   "start_ist": "2026-11-06 13:40 IST",
+   "key": "match_sixes",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 5.5,
+   "best_odds": 1.727,
+   "best_source": "bet365",
+   "hits": 27,
+   "played": 37,
+   "window": 20,
+   "chance": 0.6886,
+   "edge": 0.1893,
+   "edge_pct": 18.9,
    "bat_first": false
   }
  ]

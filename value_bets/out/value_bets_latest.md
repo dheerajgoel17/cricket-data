@@ -1,10 +1,10 @@
-# Cricket value bets - 2026-11-05 15:00 IST
+# Cricket value bets - 2026-11-05 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 653 prices
-- **smarkets**: ok, 400 prices
+- **smarkets**: ok, 457 prices
 - **feedk**: ok, 41 prices, 3 events
 - **feedg**: ok, 16 prices, 2 events
 - **feede**: ok, 522 prices, 16 events
@@ -22,4 +22,4 @@ Matches starting in next 168h: **36**, markets priced: **213**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), BBK Partnership (male), Baroda (W) (female), Boland (W) (female), Central (male), Chhattisgarh (W) (female), Dpgc (male), Easterns (male), Fairfirst Insurance (male), Gujarat CA (W) (female), Haryana (W) (female), Himachal Pradesh (W) (female), Hnb A (male), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kei Women (female), MID West Rhinos (male), Madhya Pradesh (W) (female), Mountaineers (male), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Sudurpaschim Royals (male), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Uttarakhand (W) (female)
 
-Runtime 151.7s. Snapshot: `odds_20261105T093035Z.jsonl.gz`
+Runtime 111.9s. Snapshot: `odds_20261105T103029Z.jsonl.gz`
