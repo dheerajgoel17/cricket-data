@@ -131,6 +131,27 @@ export function mixHomeRows<T extends HotKey & { kind: string }>(rows: T[], n: n
   return picked.sort(hotOrder);
 }
 
+/**
+ * Order shard groups so lines from matches that have already started are scored before later kickoffs.
+ * Within a file, started lines come first too, so the open match's rows land before the rest of that file.
+ */
+export function prioritizeHotGroups<T extends { lines: { start_utc?: string }[] }>(groups: T[], now = Date.now()): T[] {
+  const started = (l: { start_utc?: string }) => {
+    const t = Date.parse(String(l.start_utc || ""));
+    return Number.isFinite(t) && t <= now ? 1 : 0;
+  };
+  return groups
+    .map((g) => ({
+      ...g,
+      lines: [...g.lines].sort((a, b) => started(b) - started(a) || Date.parse(String(a.start_utc || "")) - Date.parse(String(b.start_utc || ""))),
+    }))
+    .sort((a, b) => {
+      const aN = a.lines.reduce((n, l) => n + started(l), 0);
+      const bN = b.lines.reduce((n, l) => n + started(l), 0);
+      return bN - aN || b.lines.length - a.lines.length;
+    });
+}
+
 /** The lines grouped by the player file (shard) their player is in, the file with the most lines first (the most rows are ready when it lands). Lines of players the data does not know are left out. */
 export function byShard(lines: any[], indexOf: (pid: string) => number, shardOf: (idx: number) => number): { shard: number; lines: any[] }[] {
   const groups = new Map<number, any[]>();

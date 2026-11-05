@@ -825,6 +825,26 @@ function withEcon(p) {
   return { ...p, econ: Math.round((p.conceded / (p.ballsBowled / 6)) * 100) / 100 };
 }
 
+/**
+ * The stand at the crease. The source's `partnerruns` / `partnerballs` is that stand while a side bats first, and a signed
+ * chase margin once they chase (negative runs and balls, which are not a partnership). A figure that is negative or bigger
+ * than this innings is dropped. With no wicket down the stand is the innings itself. After a wicket it is the innings minus
+ * the last fall.
+ */
+export function livePartnership(match, bat, falls) {
+  const innRuns = bat?.runs;
+  const innBalls = bat?.overs != null ? oversToBalls(bat.overs) : null;
+  const pr = match?.partnership;
+  const fits = pr && pr.runs >= 0 && pr.balls >= 0 && (innRuns == null || pr.runs <= innRuns) && (innBalls == null || pr.balls <= innBalls);
+  if (fits) return { runs: pr.runs, balls: pr.balls };
+  if (bat?.runs == null) return null;
+  if ((bat.wkts || 0) === 0) return { runs: bat.runs, balls: innBalls ?? 0 };
+  const last = falls?.length ? falls[falls.length - 1] : null;
+  if (!last || last.runs == null || last.balls == null || innBalls == null) return null;
+  const runs = bat.runs - last.runs, balls = innBalls - last.balls;
+  return runs >= 0 && balls >= 0 ? { runs, balls } : null;
+}
+
 /** Compact scoreboard: the batting side's not-out pair, last wicket, current bowler. A finished innings' not-out batters never show as the pair. */
 export function liveBoard(match) {
   const players = match?.players || [];
@@ -841,7 +861,6 @@ export function liveBoard(match) {
   const bowling = players.filter((p) => p.wickets != null || p.conceded != null);
   const bowler = withEcon(bowling.find((p) => p.current) || (bowling.length === 1 ? bowling[0] : null));
   if (!batters.length && !outs.length && !bowler) return null;
-  const pr = match.partnership;
   const rawOvers = Array.isArray(match.overs) && match.overs.length
     ? match.overs
     : (Array.isArray(match.thisOver) && match.thisOver.length ? [{ balls: match.thisOver }] : []);
@@ -850,7 +869,7 @@ export function liveBoard(match) {
     batters,
     lastWicket,
     bowler,
-    partnership: pr && (pr.runs != null || pr.balls != null) ? pr : null,
+    partnership: livePartnership(match, bat, falls),
     crr: Number.isFinite(match.crr) ? match.crr : null,
     rrr: Number.isFinite(match.rrr) ? match.rrr : null,
     thisOver: Array.isArray(match.thisOver) ? match.thisOver : [],
@@ -915,9 +934,17 @@ export function lineVerdict(value, line, state = "live") {
 }
 
 /**
+ * Has this card innings actually started? The source often pre-lists the next side's XI (yet-to-bat / xi, no batters, null totals) while the current innings is still on;
+ * that stub must not count as "begun" or a first-innings line settles Missed while the batter is still at the crease.
+ */
+function cardInningsBegun(inn) {
+  return !!inn && ((inn.batters || []).length > 0 || inn.runs != null || inn.wkts != null || inn.overs != null);
+}
+
+/**
  * A Test batter's innings of his own side's `inn`-th turn (1 = first, 2 = second) off the card, as `{p, state}` (his row in it, and "live" / "out" / "final") or null when the side has not had that turn or he did
  * not bat in it. The card lists the match's innings in batting order, so the side's turns are the entries with its name. The innings is over, and what he made in it
- * cannot move, once the side's next one (or the other side's) has begun or the match is over; before that it is "out" when he is dismissed and "live" when he is not.
+ * cannot move, once a later card innings has begun (batters or totals, not an XI-only stub), the side is all out, or the match is over; before that it is "out" when he is dismissed and "live" when he is not.
  */
 function inningsRow(match, l, idn, books, sid) {
   const card = match?.card || [];
@@ -925,7 +952,7 @@ function inningsRow(match, l, idn, books, sid) {
   if (!turn) return null;
   const p = livePlayer({ players: (turn.batters || []).map((b) => ({ ...b, team: turn.team })) }, l.player, l.stat, books, sid, idn.isLinked);
   if (!p) return null;
-  const over = match.status === "final" || card.some((i) => i.n > turn.n);
+  const over = match.status === "final" || turn.wkts === 10 || card.some((i) => i.n > turn.n && cardInningsBegun(i));
   return { p, state: over ? "final" : p.out ? "out" : "live" };
 }
 

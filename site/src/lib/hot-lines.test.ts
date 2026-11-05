@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, mixHomeRows, norm, otherHotCount, pool, sameMatch } from "./hot-lines";
+import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, mixHomeRows, norm, otherHotCount, pool, prioritizeHotGroups, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -110,6 +110,18 @@ describe("byShard", () => {
     expect(g.flatMap((x) => x.lines).map((l) => l.pid)).not.toContain("ghost");
   });
   it("needs no file for no lines", () => { expect(byShard([], indexOf, shardOf)).toEqual([]); });
+});
+
+describe("prioritizeHotGroups", () => {
+  const now = Date.parse("2026-11-05T04:00:00Z");
+  const line = (start_utc: string) => ({ start_utc });
+  it("scores files that hold a started match before files of later kickoffs", () => {
+    const later = { shard: 1, lines: [line("2026-11-05T12:00:00Z"), line("2026-11-05T10:00:00Z")] };
+    const live = { shard: 2, lines: [line("2026-11-05T02:00:00Z")] };
+    const ordered = prioritizeHotGroups([later, live], now);
+    expect(ordered.map((g) => g.shard)).toEqual([2, 1]);
+    expect(ordered[1].lines[0].start_utc < ordered[1].lines[1].start_utc).toBe(true);
+  });
 });
 
 describe("pool", () => {

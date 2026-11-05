@@ -25,7 +25,7 @@ import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { EmptyState } from "./empty-state";
 import { EMPTY_PHASE } from "./home-phase-bar";
-import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool } from "@/lib/hot-lines";
+import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, prioritizeHotGroups } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { abbr, odds, shortVenue } from "@/lib/format";
 import { linesQuery } from "@/lib/queries";
@@ -48,8 +48,8 @@ import { propKey } from "@/lib/saved";
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "ven" | "l5" | "l10";
 const WINS: [Win, string, number][] = [["season", String(new Date().getFullYear()), 6], ["h2h", "H2H", 2], ["ven", "Venue", 2], ["l5", "L5", 5], ["l10", "L10", 6]]; // [key, label, games needed to rank]
-const SHARDS_AT_ONCE = 8; // player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early
-const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming, and only once there are a full page of them (a shorter list would only be reshuffled)
+const SHARDS_AT_ONCE = 8; // after the first file, player files fetched at a time: several at once (they are latency-bound)
+const PUBLISH_MS = 300; // rows already scored are shown at most this often while the rest are still coming
 const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`);
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
@@ -63,7 +63,7 @@ interface Row { comp: string; day: number; idx: number; pid: string; inn: number
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
 export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
-  const { store, rz } = useData();
+  const { store, rz, matchesReady } = useData();
   const qc = useQueryClient();
   const lines = useQuery(linesQuery);
   const fixtures = useFixtures(); // each match's ground, for the venue window
@@ -72,7 +72,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
     queryKey: key,
-    enabled: !!doc.data && !fixtures.isLoading,
+    enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
@@ -107,15 +107,22 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
-      // The player files come several at a time and a file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between: on a phone the
-      // whole batch is seconds of work, and typing in search waited behind it. The rows so far are put in the cache as they come (not all at the end).
+      // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
+      // Later files come several at a time. A few plans run at once, giving the main thread back in between. Rows are published as they land.
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
       let published = 0;
-      await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
+      const publish = () => {
+        if (!out.length || (published && Date.now() - published < PUBLISH_MS)) return;
+        published = Date.now();
+        qc.setQueryData(key, [...out]);
+      };
+      const groups = prioritizeHotGroups(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now);
+      const scoreGroup = async (g: { shard: number; lines: any[] }) => {
         await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the page
-        for (let i = 0; i < g.lines.length; i += 4) { await Promise.all(g.lines.slice(i, i + 4).map(score)); await yieldToMain(); }
-        if (out.length >= MAX_ROWS && Date.now() - published >= PUBLISH_MS) { published = Date.now(); qc.setQueryData(key, [...out]); }
-      });
+        for (let i = 0; i < g.lines.length; i += 4) { await Promise.all(g.lines.slice(i, i + 4).map(score)); publish(); await yieldToMain(); }
+      };
+      if (groups[0]) await scoreGroup(groups[0]);
+      await pool(groups.slice(1), SHARDS_AT_ONCE, scoreGroup);
       return out;
     },
   });

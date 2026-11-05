@@ -80,13 +80,13 @@ describe("useHotRows batting innings", () => {
 });
 
 describe("useHotRows", () => {
-  it("asks for the player files the selected day's lines need, several at once (not one after the other)", async () => {
+  it("asks for the player files the selected day's lines need, the first file alone and then several at once", async () => {
     const { result } = run(0);
     await flush();
-    expect(env.store.requested).toEqual([0, 1, 2, 3, 4, 5, 6, 7]); // eight files in flight before any has landed
+    expect(env.store.requested).toEqual([0]); // the first file, so its rows can show before the rest
     env.store.land(0);
     await flush();
-    expect(env.store.requested).toHaveLength(9); // a free slot starts the next file
+    expect(env.store.requested).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]); // that file landed: the next eight start together
     landAll();
     await settle();
     expect([...env.store.requested].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
@@ -111,27 +111,23 @@ describe("useHotRows", () => {
     expect(env.plans).toHaveLength(36);
     rerender({ day: 1 });
     await flush();
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data!.map((r) => r.idx)).toEqual([36]); // tomorrow's first file is on screen before its other file
+    expect(result.current.scoring).toBe(true);
     await settle();
     expect(result.current.data!.map((r) => r.idx).sort((a, b) => a - b)).toEqual([36, 37]);
     expect(result.current.otherDay).toBe(58); // today's 36 plus the third day's 22, counted so the day switch stays
   });
 
-  it("puts the rows on screen while the last files are still on their way, once there is a page of them", async () => {
+  it("puts the first file's rows on screen while the other files are still on their way", async () => {
     const { result } = run(0);
     await flush();
     expect(result.current.isLoading).toBe(true);
-    for (const n of [3, 4, 5]) env.store.land(n); // nine rows: not yet a page
-    await settle();
-    expect(result.current.isLoading).toBe(true);
-    for (const n of [0, 1, 2, 6, 7, 8, 9, 10]) env.store.land(n); // 33 rows, file 11 still out
+    env.store.land(0); // three rows from the first file; the other eleven are not in yet
     await settle();
     expect(result.current.isLoading).toBe(false);
     expect(result.current.scoring).toBe(true);
-    expect(result.current.data!.length).toBeGreaterThanOrEqual(30);
-    expect(result.current.data!.length).toBeLessThan(36);
-    env.store.land(11);
+    expect(result.current.data!.map((r) => r.idx).sort((a, b) => a - b)).toEqual([0, 12, 24]);
+    landAll();
     await settle();
     expect(result.current.data).toHaveLength(36);
     expect(result.current.scoring).toBe(false);
