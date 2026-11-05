@@ -58,8 +58,11 @@ export interface RailItem { fixture: any; state: FixtureState; live: any | null;
  * games the books price first, the unpriced ones after.
  */
 export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = null, now = Date.now() }: { fixtures: any[]; lines: any; live: any; rail?: RailConfig; home?: string | null; now?: number }): RailItem[] {
-  const feed = bookFixtures(lines);
-  const stateOf = (f: any) => fixtureState(f, liveForFixture(live, f)?.status, now);
+  const feed = feedOf(lines);
+  // the ranking asks for a fixture's state many times, and each ask looks through the live matches: once per fixture is enough
+  const liveHit = new Map<any, any>(), states = new Map<any, FixtureState>();
+  const liveOf = (f: any) => { if (!liveHit.has(f)) liveHit.set(f, liveForFixture(live, f)); return liveHit.get(f); };
+  const stateOf = (f: any): FixtureState => { let s = states.get(f); if (!s) { s = fixtureState(f, liveOf(f)?.status, now); states.set(f, s); } return s; };
   const soon = (f: any) => fixtureStart(f).getTime() < now + NO_PROPS_DAYS * 86400e3;
   const list = feed.length
     ? shownFixtures(fixtures, stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true }))
@@ -70,16 +73,20 @@ export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = n
   const upcoming = new Set(arranged.filter((f) => stateOf(f) === "upcoming" && Date.parse(f.start) < now + SHOW_AHEAD_MS));
   const shown = arranged.filter((f) => stateOf(f) !== "upcoming" || upcoming.has(f));
   // the card's live match is the feed's, kept only when the books price the fixture too (`useLiveMatch`)
-  const matchOf = (f: any) => { const hit = liveForFixture(live, f); return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null; };
+  const matchOf = (f: any) => { const hit = liveOf(f); return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null; };
   return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)].map((f) => ({ fixture: f, state: stateOf(f), live: matchOf(f), noProps: !!f.noProps }));
 }
 
 /** The series chips for the matches under a bucket (the shared `seriesChips`): a series the books price first, then by matches. */
 export const seriesChips = (items: RailItem[], nameOf: (f: any) => string): [string, number][] => sharedSeriesChips(items, (i: RailItem) => nameOf(i.fixture), (i: RailItem) => !i.noProps);
 
+// the fixtures the books price, worked out once per books file (it is asked for once per card)
+let lastFeed: { lines: any; feed: ReturnType<typeof bookFixtures> } | null = null;
+const feedOf = (lines: any) => (lastFeed && lastFeed.lines === lines ? lastFeed.feed : (lastFeed = { lines, feed: bookFixtures(lines) }).feed);
+
 /** The live feed's match for a fixture, kept only when the books price it too (as the site's `useLiveMatch`). */
 export function liveMatchFor(live: any, lines: any, f: any) {
-  const feed = bookFixtures(lines), hit = liveForFixture(live, f);
+  const feed = feedOf(lines), hit = liveForFixture(live, f);
   return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null;
 }
 

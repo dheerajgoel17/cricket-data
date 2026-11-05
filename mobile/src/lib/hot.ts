@@ -5,13 +5,15 @@ import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cr
 import { venueStem } from "@cricket/engine/markets.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
+import { prioritizeHotGroups, shouldPublishHot } from "@/lib/hot-priority";
+import { span } from "@/lib/perf";
 import { byShard, hotDay, hotLines, matchChipId, norm, pool, type HotScope } from "@site/lib/hot-lines";
 
 export const MAX_ROWS = 30;
 /** Player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early. */
 const SHARDS_AT_ONCE = 8;
-/** Rows already scored are shown at most this often while the rest are still coming. */
-const PUBLISH_MS = 1200;
+/** The first scored row is shown at once; after that, rows already scored are shown at most this often while the rest are still coming. */
+const PUBLISH_MS = 600;
 
 export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
 export interface Row {
@@ -21,9 +23,9 @@ export interface Row {
 }
 
 const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
-// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS, so on a slow phone the JS thread is busy a third of the time at most and
+// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS, so on a slow phone the JS thread is busy two thirds of the time at most and
 // touches, scrolls and re-renders always get their turn (the lines take longer to all arrive, and the rows appear as they do).
-const FRAME_MS = 6, REST_MS = 12;
+const FRAME_MS = 8, REST_MS = 4;
 
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
 export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Date.now(), onRows }: { store: any; rz: any; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void }): Promise<Row[]> {
@@ -33,14 +35,20 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l);
   const year = String(new Date().getFullYear());
   const out: Row[] = [];
+  const byChip = new Map<string, any[]>();
+  for (const x of todays) { const c = matchChipId(x.match, x.start_utc, x.fmt); (byChip.get(c) ?? byChip.set(c, []).get(c)!).push(x); }
+  let plan = 0, shardMs = 0;
+  const tAll = Date.now();
   const score = async (l: any) => {
     const idx = store.P.id.indexOf(l.pid);
     const inn = lineScope(l);
     const chip = matchChipId(l.match, l.start_utc, l.fmt);
-    const b = bookLinesFor({ lines: todays.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
+    const b = bookLinesFor({ lines: byChip.get(chip) ?? [] }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
     if (idx < 0 || !b) return;
     const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
+    const tp = Date.now();
     const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: null }, split_by: [] }, { playerIdx: idx });
+    plan += Date.now() - tp;
     const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
     if (!entries.length) return;
     const [a, c] = String(b.match).split(/\s+vs\s+/i);
@@ -63,10 +71,14 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   };
   // A file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between so the screen stays alive while the batch runs.
   let published = 0, sliceStart = Date.now();
-  await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
-    await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen
+  // matches already on come first, so the rows the screen leads with are the first scored
+  await pool(prioritizeHotGroups(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now), SHARDS_AT_ONCE, async (g) => {
+    const ts = Date.now();
+    await store.shard(g.shard).catch(() => {});
+    shardMs += Date.now() - ts; // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen
     for (const l of g.lines) { await score(l); if (Date.now() - sliceStart >= FRAME_MS) { await rest(); sliceStart = Date.now(); } }
-    if (out.length >= MAX_ROWS && Date.now() - published >= PUBLISH_MS) { published = Date.now(); onRows?.([...out]); }
+    if (shouldPublishHot(out.length, published, Date.now(), 1, PUBLISH_MS)) { published = Date.now(); onRows?.([...out]); }
   });
+  span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} runPlanMs=${plan} shardWaitMs(sum)=${shardMs}`);
   return out;
 }

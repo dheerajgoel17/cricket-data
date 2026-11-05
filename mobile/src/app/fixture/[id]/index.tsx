@@ -14,11 +14,12 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { collectGrid } from "@site/lib/grid";
 import { matchShareText } from "@cricket/engine/share-text.js";
 import { shortVenue } from "@site/lib/format";
+import { fixtureHasGround } from "@site/lib/ground";
 import { shareFixtureUrl } from "@site/lib/share";
 import { SITE_URL } from "@/lib/config";
 import { dayLabel, localTime, seriesName } from "@/lib/format";
 import { MAX_ROWS } from "@/lib/hot";
-import { fancyMarketPath, goBack } from "@/lib/nav";
+import { fancyMarketPath, goBack, groundPath, push } from "@/lib/nav";
 import { linesQuery, liveQuery } from "@/lib/queries";
 import { useFixtureBooks } from "@/lib/archive";
 import { fixtureState, fixtureStart, liveMatchFor, type RailItem } from "@/lib/rail";
@@ -105,7 +106,7 @@ export default function FixturePage() {
             </View>
           ) : (
             <>
-              <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} /></Animated.View>
+              <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
               {item.live?.status === "live" ? <View style={{ paddingTop: space.snug }}><LiveBoard match={item.live} teams={known} /></View> : null}
               {f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} /> : null}
               {f.fmt === "FC" ? (

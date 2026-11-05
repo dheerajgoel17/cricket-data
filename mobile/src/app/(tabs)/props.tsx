@@ -1,3 +1,5 @@
+import { mark } from "@/lib/perf";
+import { lazyTab } from "@/ui/lazy-tab";
 import { useMemo, useState } from "react";
 import { Platform, RefreshControl, StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
@@ -16,7 +18,8 @@ import { color, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Player props: every line the books price for a day, scored against the player's history and ranked (matches in play, hit rate, edge). Today by default; the chips pick another of the next ten days. */
-export default function PlayerProps() {
+function PlayerProps() {
+  mark("render:PlayerProps");
   const inset = useScreenInsets();
   const [day, setDay] = useState("0");
   const [pulling, setPulling] = useState(false);
@@ -74,3 +77,5 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
 });
+
+export default lazyTab(PlayerProps);

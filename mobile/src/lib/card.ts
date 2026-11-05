@@ -35,8 +35,11 @@ export interface CardModel { live: boolean; final: boolean; delayed: boolean; st
 export function cardModel(item: Pick<RailItem, "fixture" | "live">, now = Date.now()): CardModel {
   const f = item.fixture, match = item.live;
   const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
-  const scores = [teamScore(match, f.a), teamScore(match, f.b)];
-  const { state, hasScore } = playState(f, match, now);
+  const liveScores = [teamScore(match, f.a), teamScore(match, f.b)];
+  // `cardScores`: side scores precomputed from history (a ground page's past games) when the live feed has none, same as the site's FixtureCard
+  const scores = f.cardScores?.[0]?.display || f.cardScores?.[1]?.display ? f.cardScores : liveScores;
+  const played = playState(f, match, now);
+  const state = played.state, hasScore = played.hasScore || scores !== liveScores;
   const [final, delayed, live, started] = [state === "final", state === "delayed", state === "live", state === "started"];
   const blurb = liveBlurb(match);
   const session = sessionLabel(blurb) || match?.session || "";

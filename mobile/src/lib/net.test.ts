@@ -5,7 +5,7 @@ jest.mock("react-native-mmkv", () => {
 });
 
 import { wrap } from "@cricket/engine/wrap.js";
-import { getJson } from "@/lib/net";
+import { getJson, hasKept, peekJson, setDataBuild } from "@/lib/net";
 
 type Call = { url: string; headers: Record<string, string> };
 const calls: Call[] = [];
@@ -56,5 +56,68 @@ describe("getJson keeps what it reads", () => {
   test("a failed request throws", async () => {
     files = {};
     await expect(getJson("/data/missing.json")).rejects.toThrow("HTTP 404");
+  });
+});
+
+describe("the stats files are pinned to a data build", () => {
+  const ask = (path: string) => calls.filter((c) => c.url.endsWith(path));
+  afterEach(() => setDataBuild(undefined));
+
+  test("under the same build a kept stats file is read from the device with no request", async () => {
+    files = { "/data/p/07.json": { etag: '"p1"', body: JSON.stringify({ bat: [1] }) } };
+    setDataBuild("b1");
+    expect(await getJson("/data/p/07.json")).toEqual({ bat: [1] }); // first read: downloaded, kept under b1
+    expect(await getJson("/data/p/07.json")).toEqual({ bat: [1] });
+    expect(ask("/data/p/07.json")).toHaveLength(1);
+  });
+
+  test("a new build asks again (a 304 keeps the copy and pins it to the new build)", async () => {
+    files = { "/data/p/08.json": { etag: '"p1"', body: JSON.stringify({ n: 1 }) } };
+    setDataBuild("b1");
+    await getJson("/data/p/08.json");
+    setDataBuild("b2");
+    expect(await getJson("/data/p/08.json")).toEqual({ n: 1 });
+    expect(ask("/data/p/08.json")).toHaveLength(2);
+    expect(ask("/data/p/08.json")[1].headers["if-none-match"]).toBe('"p1"');
+    await getJson("/data/p/08.json"); // pinned to b2 now
+    expect(ask("/data/p/08.json")).toHaveLength(2);
+  });
+
+  test("a new build with changed content replaces the kept copy", async () => {
+    files = { "/data/p/09.json": { etag: '"a"', body: '{"v":1}' } };
+    setDataBuild("b1");
+    await getJson("/data/p/09.json");
+    files["/data/p/09.json"] = { etag: '"b"', body: '{"v":2}' };
+    setDataBuild("b2");
+    expect(await getJson("/data/p/09.json")).toEqual({ v: 2 });
+  });
+
+  test("fixtures, lines and the live feed are never pinned: they are asked for every time", async () => {
+    files = { "/data/lines.json": { etag: '"l1"', body: '{"lines":[]}' } };
+    setDataBuild("b1");
+    await getJson("/data/lines.json");
+    await getJson("/data/lines.json");
+    expect(ask("/data/lines.json")).toHaveLength(2);
+  });
+
+  test("without a known build nothing is pinned", async () => {
+    files = { "/data/matches.json": { etag: '"m"', body: '{"id":[]}' } };
+    await getJson("/data/matches.json");
+    await getJson("/data/matches.json");
+    expect(ask("/data/matches.json")).toHaveLength(2);
+  });
+});
+
+describe("a kept copy can paint a screen before the request is back", () => {
+  test("peekJson returns what was read, only while it is recent enough", async () => {
+    files = { "/data/fixtures.json": { etag: '"f"', body: '[{"id":"x"}]' } };
+    expect(peekJson("/data/fixtures.json", 60_000)).toBeUndefined();
+    expect(hasKept("/data/fixtures.json", 60_000)).toBe(false);
+    await getJson("/data/fixtures.json");
+    expect(peekJson("/data/fixtures.json", 60_000)).toEqual([{ id: "x" }]);
+    expect(hasKept("/data/fixtures.json", 60_000)).toBe(true);
+    const now = Date.now;
+    Date.now = () => now() + 61_000;
+    try { expect(peekJson("/data/fixtures.json", 60_000)).toBeUndefined(); } finally { Date.now = now; }
   });
 });

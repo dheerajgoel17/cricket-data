@@ -4,15 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Chip } from "./chip";
+import type { GenderFilter } from "@/lib/ground";
 
-export type GenderFilter = "" | "male" | "female";
-
-/** Label on the Filters chip (same place Match Fancy shows L20). */
-export function genderFilterLabel(g: GenderFilter): string {
-  if (g === "female") return "Women";
-  if (g === "male") return "Men";
-  return "All";
-}
+export type { GenderFilter } from "@/lib/ground";
 
 /** Ground gender filter sheet — same chrome as Props / Match Fancy filters. Edits held until Apply. */
 export function GroundGenderSheet({ open, onOpenChange, gender, onApply }: {

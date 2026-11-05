@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
@@ -68,7 +68,7 @@ function AllBooks({ quotes, line }: { quotes: Quote[]; line: number }) {
 }
 
 /** Same chrome as Match Fancy's OverviewRow: title, condensed line, books, model edge (site PropRow). */
-export function PropRow({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing | null; out: boolean }) {
+function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing | null; out: boolean }) {
   const label = (STATS as any)[r.stat]?.label;
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const [open, setOpen] = useState(false);
@@ -154,3 +154,7 @@ const styles = StyleSheet.create({
   edgeSide: { ...type.footnote, ...cap, fontSize: 10, color: color["muted-foreground"] },
   edgeValue: { ...numLg, fontSize: 20, letterSpacing: -0.4, lineHeight: 22 },
 });
+
+type PropRowProps = Parameters<typeof PropRowView>[0];
+/** Re-rendered only when its row, place, or the live standing on it changed: a live poll that moved some other match leaves it alone. */
+export const PropRow = memo(PropRowView, (a: PropRowProps, b: PropRowProps) => a.r === b.r && a.i === b.i && a.out === b.out && JSON.stringify(a.soFar) === JSON.stringify(b.soFar));

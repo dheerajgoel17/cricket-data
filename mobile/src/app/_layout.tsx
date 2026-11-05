@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Profiler, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
+import { mark, onRender, PROFILE } from "@/lib/perf";
 import { watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
 import { SignInSheet } from "@/ui/sign-in-sheet";
@@ -36,7 +37,8 @@ export default function RootLayout() {
   });
   useEffect(watchAppState, []);
   const [splashDone, setSplashDone] = useState(false);
-  const ready = !!(fonts || fontError); // a failed font load shows the system font rather than a blank screen
+  const ready = !!(fonts || fontError);
+  if (ready) mark("fonts-ready"); // a failed font load shows the system font rather than a blank screen
   // the system splash is plain black and is taken down by `AnimatedSplash` as it draws; the app is mounted behind it as soon as its fonts are in, so its data loads while the mark is on screen
   // (one parent for both, so the splash is never remounted, which would restart its drawing)
   return (
@@ -47,6 +49,7 @@ export default function RootLayout() {
         <AuthProvider>
           <ThemeProvider value={theme}>
             <StatusBar style="light" />
+            <Profiler id="stack" onRender={onRender}>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.background }, animation: Platform.OS === "android" ? "ios_from_right" : "default" }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="fixture/[id]" />
@@ -55,15 +58,17 @@ export default function RootLayout() {
               <Stack.Screen name="team/[idx]" />
               <Stack.Screen name="competitions" />
               <Stack.Screen name="league/[id]" />
+              <Stack.Screen name="venue/[idx]" />
               <Stack.Screen name="info/[topic]" options={{ presentation: "formSheet", sheetAllowedDetents: [0.5, 0.85], sheetInitialDetentIndex: 0, sheetGrabberVisible: true, sheetCornerRadius: 24 }} />
             </Stack>
+            </Profiler>
             <SignInSheet />
           </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>
     </WebFrame>) : null}
-    {splashDone ? null : <AnimatedSplash ready={ready} onDone={() => setSplashDone(true)} />}
+    {splashDone ? null : <AnimatedSplash ready={ready} onDone={() => { mark("splash-done"); setSplashDone(true); }} />}
     </GestureHandlerRootView>
   );
 }

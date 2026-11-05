@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { collectOverview, fancyInputs } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { fixtureBooks } from "@cricket/engine/lines.js";
+import { span, timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
 import { linesQuery, liveQuery } from "@/lib/queries";
 import { fixtureStart, liveMatchFor } from "@/lib/rail";
@@ -33,16 +34,18 @@ export function useFancyCards(enabled = true) {
     queryFn: async (): Promise<FancyCard[]> => {
       const out: FancyCard[] = [];
       for (const f of fixtures) {
+        const t = Date.now();
         const { ms, ground, teams } = fancyInputs(store, f);
         out.push({ f, ms, rows: collectOverview({ store, doc: lines.data, fxInfo: fxInfoOf(f), ms, teams, ground }) });
+        span("fancy card", t);
         await yieldToMain();
       }
       return out;
     },
   });
-  const cards = useMemo(() => (q.data ?? []).map((c) => {
+  const cards = useMemo(() => timed("fancy cards overlay", () => (q.data ?? []).map((c) => {
     const match = liveMatchFor(live.data, lines.data, c.f);
     return { ...c, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
-  }), [q.data, live.data, lines.data]);
+  })), [q.data, live.data, lines.data]);
   return { ready: railReady && !!store && !q.isLoading && !!q.data, cards, error: q.isError };
 }
