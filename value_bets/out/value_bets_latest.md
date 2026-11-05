@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-05 09:00 IST
+# Cricket value bets - 2026-11-05 10:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1292 prices
-- **smarkets**: ok, 326 prices
+- **smarkets**: ok, 297 prices
 - **feedk**: ok, 141 prices, 6 events
-- **feedg**: ok, 40 prices, 5 events
-- **feede**: ok, 642 prices, 22 events
-- **feedf**: ok, 390 prices, 15 events
-- **feedh**: ok, 1391 prices, 77 events
+- **feedg**: ok, 28 prices, 4 events
+- **feede**: ok, 608 prices, 22 events
+- **feedf**: ok, 312 prices, 14 events
+- **feedh**: ok, 1170 prices, 71 events
 
-Matches starting in next 168h: **49**, markets priced: **341**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **44**, markets priced: **302**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **49**, markets priced: **341**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Andhra (W) (female), BBK Partnership (male), Baroda (W) (female), Boland (W) (female), Cdb A (male), Central (male), Champions (W) (female), Chhattisgarh (W) (female), Colombo Aces (male), Dpgc (male), Easterns (male), Fairfirst Insurance (male), Gujarat CA (W) (female), Haryana (W) (female), Hayleys Group A (male), Himachal Pradesh (W) (female), Hnb A (male), Jammu And Kashmir (W) (female), Jharkhand (W) (female), Kei Women (female), Madhya Pradesh (W) (female), Mountaineers (male), Odisha (W) (female), Pondicherry (W) (female), Punjab (W) (female), Railways (W) (female), Rajasthan (W) (female), Saurashtra (W) (female), Sikkim (W) (female), Sudurpaschim Royals (male), Tamil Nadu (W) (female), Tripura (W) (female), UAE U19 (male), Uttar Pradesh (W) (female), Uttarakhand (W) (female)
 
-Runtime 169.0s. Snapshot: `odds_20261105T033038Z.jsonl.gz`
+Runtime 161.8s. Snapshot: `odds_20261105T043038Z.jsonl.gz`
