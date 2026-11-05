@@ -1,5 +1,6 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { storeQuery } from "@/lib/data";
 import * as Localization from "expo-localization";
 import { homeTeam } from "@site/lib/priority";
 import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
@@ -24,6 +25,9 @@ export function useRail(): { ready: boolean; items: RailItem[]; error: boolean; 
     () => (ready ? railFor(fx.data!, lines.data, live.data, home) : []),
     [ready, fx.data, lines.data, live.data, home],
   );
+  const qc = useQueryClient();
+  // the stats data (the longest wait) starts once the cards can be drawn, so its 9 MB does not hold the first screen back
+  useEffect(() => { if (ready) void qc.prefetchQuery(storeQuery); }, [ready, qc]);
   if (ready) mark("rail-ready", `items=${items.length}`);
   return {
     ready, items, error: fx.isError && !fx.data,

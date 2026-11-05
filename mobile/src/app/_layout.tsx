@@ -10,9 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
 import { mark, onRender, PROFILE } from "@/lib/perf";
-import { storeQuery } from "@/lib/data";
-import { hasKept } from "@/lib/net";
-import { KEPT_MS, watchAppState } from "@/lib/queries";
+import { watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
 import { SignInSheet } from "@/ui/sign-in-sheet";
 import { WebFrame } from "@/ui/web-frame";
@@ -21,9 +19,6 @@ import { color, font } from "@/ui/tokens";
 void SplashScreen.preventAutoHideAsync();
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
-// A first launch has nothing kept to paint from, so the stats data (the longest wait) starts loading now, beside the schedule and the lines, not after they are in. When the last launch left
-// them on the device Home paints from those and the stats data loads after the first screen.
-if (!hasKept("/data/fixtures.json", KEPT_MS)) void client.prefetchQuery(storeQuery);
 
 // Dark only, in the site's colours. Setting the theme here also avoids a white flash behind the iOS 26 tab bar.
 const theme = {

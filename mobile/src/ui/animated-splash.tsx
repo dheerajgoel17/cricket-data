@@ -8,7 +8,7 @@ import { color } from "@/ui/tokens";
 /** The mark's drawing units (the site's `BrandMark`: a 64-unit tile) and the size it is drawn at. */
 const SIZE = 112, U = SIZE / 64;
 /** The shortest the splash stays up, so the drawing is seen through, and how long it takes to dissolve into the app. */
-const MIN_MS = 1600, FADE_MS = 300;
+const MIN_MS = 1100, FADE_MS = 300;
 const GREEN = color.primary;
 
 const out = Easing.out(Easing.cubic);
