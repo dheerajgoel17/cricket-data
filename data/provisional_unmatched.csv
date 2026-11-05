@@ -2818,6 +2818,17 @@ date,match_id,team,player,reason,candidates
 2026-11-01,crex-lio-vs-tit-62nd-t20-csa-pro-t20-cup-2026-match-updates-150A,Lions,Neil Timmers,no_candidate,
 2026-11-01,crex-lio-vs-tit-62nd-t20-csa-pro-t20-cup-2026-match-updates-150A,Lions,Siya Plaatjie,no_candidate,
 2026-11-02,crex-bb-vs-mw-2nd-semi-final-global-t20-canada-2026-match-updates-1503,,Fahad Ahmed,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Abhishek Desai,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Kerala,Abhishek P Nair,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Kerala,Aditya Sarwate,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Amit Desai,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Jaymeet Patel,ambiguous,AR Patel=2e171977;RV Patel=60500956;HP Patel=8254ea06;SN Patel=f0f0f668
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Manan Hingrajia,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Kerala,NP Basil,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,,Priyesh Patel,ambiguous,AR Patel=2e171977;RV Patel=60500956;SJ Patel=6a091f62;SB Patel=b24e0ffd;AY Patel=fbd4f01f
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Siddharth Desai,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Gujarat,Vedant Trivedi,no_candidate,
+2026-11-02,crex-guj-vs-ker-53rd-first-class-ranji-trophy-elite-2026-27-match-updates-147O,Kerala,Vyshak Chandran,no_candidate,
 2026-11-02,crex-kmg-vs-kny-10th-t20-nepal-premier-league-2026-match-updates-14H7,Kathmandu Gurkhas,David Warner,no_candidate,
 2026-11-02,crex-kmg-vs-kny-10th-t20-nepal-premier-league-2026-match-updates-14H7,Kathmandu Gurkhas,Dev Shah,no_candidate,
 2026-11-02,crex-kmg-vs-kny-10th-t20-nepal-premier-league-2026-match-updates-14H7,Kathmandu Gurkhas,Jahandad Khan,no_candidate,
@@ -2837,3 +2848,5 @@ date,match_id,team,player,reason,candidates
 2026-11-04,crex-oma-vs-uae-145th-odi-mens-cwc-league-2-2023-27-match-updates-14VG,United Arab Emirates,Khuzaima Bin Tanvir,no_candidate,
 2026-11-05,crex-ads-w-vs-bh-w-10th-t20-womens-big-bash-league-2026-match-updates-12XD,Brisbane Heat Women,Catherine White,no_candidate,
 2026-11-05,crex-ads-w-vs-bh-w-10th-t20-womens-big-bash-league-2026-match-updates-12XD,Brisbane Heat Women,Lucy Hamilton,ambiguous,LK Hamilton=85c47c19;LK Hamilton=c347ffe6
+2026-11-05,crex-jkb-vs-lbl-14th-t20-nepal-premier-league-2026-match-updates-14HB,Janakpur Bolts,Parvez Hossain Emon,no_candidate,
+2026-11-05,crex-jkb-vs-lbl-14th-t20-nepal-premier-league-2026-match-updates-14HB,,Santosh Karki,no_candidate,
