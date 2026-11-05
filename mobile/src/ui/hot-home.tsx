@@ -11,6 +11,7 @@ import { liveForFixture } from "@cricket/engine/live.js";
 import { useQuery } from "@tanstack/react-query";
 import { mixHomeRows } from "@site/lib/hot-lines";
 import { phaseOf } from "@site/lib/home-phase";
+import { mark } from "@/lib/perf";
 import { liveQuery } from "@/lib/queries";
 import { fixtureState } from "@/lib/rail";
 import { useFancyCards } from "@/lib/fancy";
@@ -88,6 +89,11 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   }), [d0.rows, soFarOf]);
 
   const loading = isLoading || !fancyReady;
+  if (rows.length) mark("first-hot-rows", `n=${rows.length}`);
+  if (props.length) mark("first-props", `n=${props.length}`);
+  if (blocks.length) mark("first-prop-block", `n=${blocks[0].items.length}`);
+  if (rows.length && !scoring) mark("scoring-done", `rows=${rows.length}`);
+  if (fancyReady) mark("fancy-ready");
   return (
     <View style={styles.wrap}>
       {!isLoading && tape.length ? <View style={styles.pad}><MarketTape rows={tape} /></View> : null}

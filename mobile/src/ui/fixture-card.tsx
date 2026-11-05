@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { mark } from "@/lib/perf";
 import { StyleSheet, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Press } from "@/ui/press";
@@ -27,6 +28,7 @@ function LiveScore({ s, dim }: { s: any | null; dim?: boolean }) {
 
 /** The site's match card: state and format, venue; the two sides with crests and scores (or the start time); the status line, the series, and Props. */
 export function FixtureCard({ item, now, link = true }: { item: RailItem; now: number; link?: boolean }) {
+  mark("first-fixture-card");
   const f = item.fixture, m = cardModel(item, now);
   const place = city(f.venue);
   return (

@@ -5,6 +5,7 @@ import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cr
 import { venueStem } from "@cricket/engine/markets.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
+import { span } from "@/lib/perf";
 import { byShard, hotDay, hotLines, matchChipId, norm, pool, type HotScope } from "@site/lib/hot-lines";
 
 export const MAX_ROWS = 30;
@@ -33,6 +34,8 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l);
   const year = String(new Date().getFullYear());
   const out: Row[] = [];
+  let plan = 0, shardMs = 0;
+  const tAll = Date.now();
   const score = async (l: any) => {
     const idx = store.P.id.indexOf(l.pid);
     const inn = lineScope(l);
@@ -40,7 +43,9 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
     const b = bookLinesFor({ lines: todays.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
     if (idx < 0 || !b) return;
     const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
+    const tp = Date.now();
     const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: null }, split_by: [] }, { playerIdx: idx });
+    plan += Date.now() - tp;
     const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
     if (!entries.length) return;
     const [a, c] = String(b.match).split(/\s+vs\s+/i);
@@ -64,9 +69,12 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
   // A file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between so the screen stays alive while the batch runs.
   let published = 0, sliceStart = Date.now();
   await pool(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), SHARDS_AT_ONCE, async (g) => {
-    await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen
+    const ts = Date.now();
+    await store.shard(g.shard).catch(() => {});
+    shardMs += Date.now() - ts; // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen
     for (const l of g.lines) { await score(l); if (Date.now() - sliceStart >= FRAME_MS) { await rest(); sliceStart = Date.now(); } }
     if (out.length >= MAX_ROWS && Date.now() - published >= PUBLISH_MS) { published = Date.now(); onRows?.([...out]); }
   });
+  span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} runPlanMs=${plan} shardWaitMs(sum)=${shardMs}`);
   return out;
 }
