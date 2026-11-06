@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-11-04T11:04:15",
+ "afghanistan_enumerated_at": "2026-11-06T11:02:37",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
@@ -160,6 +160,70 @@
   {
    "canonical_id": "504779",
    "key": "2011-06-28-Scotland-Netherlands"
+  },
+  {
+   "canonical_id": "464723",
+   "key": "2010-09-07-Ireland-Canada"
+  },
+  {
+   "canonical_id": "450107",
+   "key": "2010-07-15-Ireland-Bangladesh"
+  },
+  {
+   "canonical_id": "423792",
+   "key": "2010-03-07-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "423792",
+   "key": "2010-03-06-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "423791",
+   "key": "2010-03-03-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "345970",
+   "key": "2009-07-07-England-Australia"
+  },
+  {
+   "canonical_id": "383283",
+   "key": "2009-06-30-England-Australia"
+  },
+  {
+   "canonical_id": "366628",
+   "key": "2009-03-17-India-New Zealand"
+  },
+  {
+   "canonical_id": "351691",
+   "key": "2009-02-08-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "351690",
+   "key": "2009-02-06-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "351689",
+   "key": "2009-02-01-New Zealand-Australia"
+  },
+  {
+   "canonical_id": "385025",
+   "key": "2009-02-01-Kenya-Zimbabwe"
+  },
+  {
+   "canonical_id": "345672",
+   "key": "2008-11-05-Australia-India"
+  },
+  {
+   "canonical_id": "325576",
+   "key": "2008-08-24-Ireland-Kenya"
+  },
+  {
+   "canonical_id": "296912",
+   "key": "2008-08-08-England-South Africa"
+  },
+  {
+   "canonical_id": "296912",
+   "key": "2008-08-06-England-South Africa"
   }
  ],
  "batch_size": 30,
@@ -3128,6 +3192,108 @@
    "key": "2011-04-29-Sri Lanka-Netherlands",
    "match_id": "crex-ned-w-vs-sl-w-5th-match-womens-odi-quadrangular-series-in-sri-lanka-2011-match-updates-J8E",
    "saved_at": "2026-11-04T11:25:37"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E69",
+   "key": "2022-06-12-Afghanistan-Zimbabwe",
+   "match_id": "crex-afg-vs-zim-2nd-t20-afghanistan-tour-of-zimbabwe-2022-match-updates-E69",
+   "saved_at": "2026-11-06T11:02:43"
+  },
+  {
+   "crex_url": "/cricket-live-score/ned-w-vs-pak-w-4th-match-womens-odi-quadrangular-series-in-sri-lanka-2011-match-updates-J8D",
+   "key": "2011-04-28-Netherlands-Pakistan",
+   "match_id": "crex-ned-w-vs-pak-w-4th-match-womens-odi-quadrangular-series-in-sri-lanka-2011-match-updates-J8D",
+   "saved_at": "2026-11-06T11:03:08"
+  },
+  {
+   "crex_url": "/cricket-live-score/ire-w-vs-ned-w-1st-match-womens-odi-quadrangular-series-in-sri-lanka-2011-match-updates-J8A",
+   "key": "2011-04-26-Ireland-Netherlands",
+   "match_id": "crex-ire-w-vs-ned-w-1st-match-womens-odi-quadrangular-series-in-sri-lanka-2011-match-updates-J8A",
+   "saved_at": "2026-11-06T11:03:19"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-eng-w-3rd-odi-womens-ashes-2011-match-updates-J8J",
+   "key": "2011-01-09-Australia-England",
+   "match_id": "crex-aus-w-vs-eng-w-3rd-odi-womens-ashes-2011-match-updates-J8J",
+   "saved_at": "2026-11-06T11:04:07"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-eng-w-1st-odi-womens-ashes-2011-match-updates-J8H",
+   "key": "2011-01-05-Australia-England",
+   "match_id": "crex-aus-w-vs-eng-w-1st-odi-womens-ashes-2011-match-updates-J8H",
+   "saved_at": "2026-11-06T11:04:24"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-sl-w-2nd-odi-england-women-tour-of-sri-lanka-2010-match-updates-J7Y",
+   "key": "2010-11-17-Sri Lanka-England",
+   "match_id": "crex-eng-w-vs-sl-w-2nd-odi-england-women-tour-of-sri-lanka-2010-match-updates-J7Y",
+   "saved_at": "2026-11-06T11:06:56"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-sl-w-1st-odi-england-women-tour-of-sri-lanka-2010-match-updates-J7X",
+   "key": "2010-11-15-Sri Lanka-England",
+   "match_id": "crex-eng-w-vs-sl-w-1st-odi-england-women-tour-of-sri-lanka-2010-match-updates-J7X",
+   "saved_at": "2026-11-06T11:07:07"
+  },
+  {
+   "crex_url": "/cricket-live-score/ire-vs-zim-3rd-odi-ireland-in-zimbabwe-odi-series-2010-match-updates-ACY",
+   "key": "2010-09-30-Zimbabwe-Ireland",
+   "match_id": "crex-ire-vs-zim-3rd-odi-ireland-in-zimbabwe-odi-series-2010-match-updates-ACY",
+   "saved_at": "2026-11-06T11:08:44"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2010-match-updates-AYF",
+   "key": "2010-08-17-Afghanistan-Scotland",
+   "match_id": "crex-afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2010-match-updates-AYF",
+   "saved_at": "2026-11-06T11:09:06"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
+   "key": "2010-07-10-Afghanistan-Netherlands",
+   "match_id": "crex-afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
+   "saved_at": "2026-11-06T11:10:18"
+  },
+  {
+   "crex_url": "/cricket-live-score/ban-vs-sl-1st-test-sri-lanka-in-bangladesh-test-series-2008-09-match-updates-9D3",
+   "key": "2008-12-26-Bangladesh-Sri Lanka",
+   "match_id": "crex-ban-vs-sl-1st-test-sri-lanka-in-bangladesh-test-series-2008-09-match-updates-9D3",
+   "saved_at": "2026-11-06T11:24:24"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-ind-w-5th-odi-india-women-tour-of-australia-2008-match-updates-JFN",
+   "key": "2008-11-09-India-Australia",
+   "match_id": "crex-aus-w-vs-ind-w-5th-odi-india-women-tour-of-australia-2008-match-updates-JFN",
+   "saved_at": "2026-11-06T11:25:05"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-ind-w-4th-odi-india-women-tour-of-australia-2008-match-updates-JFM",
+   "key": "2008-11-08-Australia-India",
+   "match_id": "crex-aus-w-vs-ind-w-4th-odi-india-women-tour-of-australia-2008-match-updates-JFM",
+   "saved_at": "2026-11-06T11:25:27"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-ind-w-2nd-odi-india-women-tour-of-australia-2008-match-updates-JFK",
+   "key": "2008-11-01-Australia-India",
+   "match_id": "crex-aus-w-vs-ind-w-2nd-odi-india-women-tour-of-australia-2008-match-updates-JFK",
+   "saved_at": "2026-11-06T11:25:53"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-ind-w-2nd-odi-india-women-tour-of-australia-2008-match-updates-JFK",
+   "key": "2008-10-31-India-Australia",
+   "match_id": "crex-aus-w-vs-ind-w-2nd-odi-india-women-tour-of-australia-2008-match-updates-JFK",
+   "saved_at": "2026-11-06T11:26:04"
+  },
+  {
+   "crex_url": "/cricket-live-score/ban-vs-nz-3rd-odi-new-zealand-in-bangladesh-2008-match-updates-BP9",
+   "key": "2008-10-14-Bangladesh-New Zealand",
+   "match_id": "crex-ban-vs-nz-3rd-odi-new-zealand-in-bangladesh-2008-match-updates-BP9",
+   "saved_at": "2026-11-06T11:26:31"
+  },
+  {
+   "crex_url": "/cricket-live-score/ire-w-vs-sa-w-1st-odi-ireland-women-v-south-africa-women-in-england-2008-match-updates-JG5",
+   "key": "2008-07-31-Ireland-South Africa",
+   "match_id": "crex-ire-w-vs-sa-w-1st-odi-ireland-women-v-south-africa-women-in-england-2008-match-updates-JG5",
+   "saved_at": "2026-11-06T11:28:02"
   }
  ],
  "failed": [],
@@ -14228,3870 +14394,1605 @@
    "checked_at": "2026-11-04T11:25:25",
    "key": "2011-05-28-Ireland-Pakistan",
    "reason": "no Source A match within a day of 2011-05-28 with plausible teams (sitemap covers 2002-01-21..2026-11-03)"
+  },
+  {
+   "checked": [
+    "J8D"
+   ],
+   "checked_at": "2026-11-06T11:02:49",
+   "key": "2011-04-29-Ireland-Pakistan",
+   "reason": "rendered 1 candidate page(s) for 2011-04-29; none confirmed"
+  },
+  {
+   "checked": [
+    "J8E"
+   ],
+   "checked_at": "2026-11-06T11:02:56",
+   "key": "2011-04-28-Sri Lanka-Ireland",
+   "reason": "rendered 1 candidate page(s) for 2011-04-28; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:24",
+   "key": "2011-04-26-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2011-04-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:29",
+   "key": "2011-04-21-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2011-04-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:34",
+   "key": "2011-01-19-India-West Indies",
+   "reason": "no Source A match within a day of 2011-01-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:39",
+   "key": "2011-01-18-India-West Indies",
+   "reason": "no Source A match within a day of 2011-01-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:45",
+   "key": "2011-01-15-India-West Indies",
+   "reason": "no Source A match within a day of 2011-01-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:50",
+   "key": "2011-01-13-India-West Indies",
+   "reason": "no Source A match within a day of 2011-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:03:55",
+   "key": "2011-01-10-India-West Indies",
+   "reason": "no Source A match within a day of 2011-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:12",
+   "key": "2011-01-07-Australia-England",
+   "reason": "no Source A match within a day of 2011-01-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:29",
+   "key": "2011-01-02-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2011-01-02 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:34",
+   "key": "2010-12-29-Canterbury-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-29 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:39",
+   "key": "2010-12-29-Otago-Wellington",
+   "reason": "no Source A match within a day of 2010-12-29 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:44",
+   "key": "2010-12-29-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2010-12-29 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:49",
+   "key": "2010-12-27-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-12-27 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:54",
+   "key": "2010-12-27-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2010-12-27 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:04:59",
+   "key": "2010-12-23-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2010-12-23 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:04",
+   "key": "2010-12-23-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2010-12-23 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:09",
+   "key": "2010-12-21-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2010-12-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:14",
+   "key": "2010-12-21-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:19",
+   "key": "2010-12-19-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2010-12-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:24",
+   "key": "2010-12-18-Auckland-Otago",
+   "reason": "no Source A match within a day of 2010-12-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:29",
+   "key": "2010-12-17-Canterbury-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:34",
+   "key": "2010-12-15-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2010-12-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:39",
+   "key": "2010-12-14-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2010-12-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:44",
+   "key": "2010-12-12-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2010-12-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:49",
+   "key": "2010-12-12-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2010-12-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:54",
+   "key": "2010-12-12-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-12-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:05:59",
+   "key": "2010-12-10-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2010-12-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:04",
+   "key": "2010-12-10-Auckland-Otago",
+   "reason": "no Source A match within a day of 2010-12-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:09",
+   "key": "2010-12-09-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-12-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:14",
+   "key": "2010-12-08-Otago-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:19",
+   "key": "2010-12-05-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2010-12-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:24",
+   "key": "2010-12-05-Auckland-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:29",
+   "key": "2010-12-04-Otago-Wellington",
+   "reason": "no Source A match within a day of 2010-12-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:34",
+   "key": "2010-12-03-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2010-12-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:39",
+   "key": "2010-12-02-Central Districts-Northern Districts",
+   "reason": "no Source A match within a day of 2010-12-02 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:06:44",
+   "key": "2010-11-24-Afghanistan-Hong Kong",
+   "reason": "afg-vs-hk-7th-match-asian-games-mens-t20-competition-2010-match-updates-U9E is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:12",
+   "key": "2010-10-12-Ireland-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-10-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:17",
+   "key": "2010-10-12-South Africa-Netherlands",
+   "reason": "no Source A match within a day of 2010-10-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:22",
+   "key": "2010-10-12-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2010-10-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:27",
+   "key": "2010-10-11-Afghanistan-Kenya",
+   "reason": "afg-vs-ken-3rd-match-afghanistan-in-kenya-odi-series-2010-match-updates-AY8 is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:32",
+   "key": "2010-10-10-Ireland-Netherlands",
+   "reason": "no Source A match within a day of 2010-10-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:37",
+   "key": "2010-10-10-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-10-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:42",
+   "key": "2010-10-10-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2010-10-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:47",
+   "key": "2010-10-09-South Africa-Ireland",
+   "reason": "no Source A match within a day of 2010-10-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:52",
+   "key": "2010-10-09-Netherlands-Pakistan",
+   "reason": "no Source A match within a day of 2010-10-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:07:57",
+   "key": "2010-10-09-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2010-10-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:02",
+   "key": "2010-10-09-Afghanistan-Kenya",
+   "reason": "afg-vs-ken-2nd-match-afghanistan-in-kenya-odi-series-2010-match-updates-AY7 is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:07",
+   "key": "2010-10-07-Ireland-West Indies",
+   "reason": "no Source A match within a day of 2010-10-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:13",
+   "key": "2010-10-07-Netherlands-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-10-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:18",
+   "key": "2010-10-07-South Africa-Pakistan",
+   "reason": "no Source A match within a day of 2010-10-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:23",
+   "key": "2010-10-06-Ireland-Pakistan",
+   "reason": "no Source A match within a day of 2010-10-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:28",
+   "key": "2010-10-06-Netherlands-West Indies",
+   "reason": "no Source A match within a day of 2010-10-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:33",
+   "key": "2010-10-06-South Africa-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-10-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:49",
+   "key": "2010-09-28-Zimbabwe-Ireland",
+   "reason": "no Source A match within a day of 2010-09-28 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:08:54",
+   "key": "2010-09-26-Zimbabwe-Ireland",
+   "reason": "no Source A match within a day of 2010-09-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:11",
+   "key": "2010-08-16-Ireland-Netherlands",
+   "reason": "no Source A match within a day of 2010-08-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:16",
+   "key": "2010-08-16-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-1st-odi-afghanistan-tour-of-scotland-2010-match-updates-AYE is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:21",
+   "key": "2010-08-11-Ireland-Netherlands",
+   "reason": "no Source A match within a day of 2010-08-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:26",
+   "key": "2010-07-20-England-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-20 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:31",
+   "key": "2010-07-20-Bangladesh-Netherlands",
+   "reason": "no Source A match within a day of 2010-07-20 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:36",
+   "key": "2010-07-19-Scotland-Bangladesh",
+   "reason": "no Source A match within a day of 2010-07-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:41",
+   "key": "2010-07-17-England-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:46",
+   "key": "2010-07-15-England-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:51",
+   "key": "2010-07-12-England-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:09:56",
+   "key": "2010-07-10-England-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:01",
+   "key": "2010-07-10-Ireland-Scotland",
+   "reason": "no Source A match within a day of 2010-07-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:06",
+   "key": "2010-07-10-Canada-Kenya",
+   "reason": "no Source A match within a day of 2010-07-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:23",
+   "key": "2010-07-09-Canada-Kenya",
+   "reason": "no Source A match within a day of 2010-07-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [
+    "1388"
+   ],
+   "checked_at": "2026-11-06T11:10:29",
+   "key": "2010-07-09-Netherlands-Ireland",
+   "reason": "rendered 1 candidate page(s) for 2010-07-09; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:34",
+   "key": "2010-07-07-England-Ireland",
+   "reason": "no Source A match within a day of 2010-07-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:39",
+   "key": "2010-07-07-Kenya-Scotland",
+   "reason": "no Source A match within a day of 2010-07-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:44",
+   "key": "2010-07-07-Afghanistan-Netherlands",
+   "reason": "afg-vs-ned-12th-match-world-cricket-league-division-one-2010-match-updates-1383 is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:49",
+   "key": "2010-07-05-Ireland-Scotland",
+   "reason": "no Source A match within a day of 2010-07-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:54",
+   "key": "2010-07-05-Netherlands-Canada",
+   "reason": "no Source A match within a day of 2010-07-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:10:59",
+   "key": "2010-07-04-Ireland-New Zealand",
+   "reason": "no Source A match within a day of 2010-07-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:04",
+   "key": "2010-07-03-Canada-Scotland",
+   "reason": "no Source A match within a day of 2010-07-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:09",
+   "key": "2010-07-03-Netherlands-Kenya",
+   "reason": "no Source A match within a day of 2010-07-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:14",
+   "key": "2010-07-01-Ireland-Kenya",
+   "reason": "no Source A match within a day of 2010-07-01 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:19",
+   "key": "2010-07-01-Netherlands-Scotland",
+   "reason": "no Source A match within a day of 2010-07-01 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:24",
+   "key": "2010-06-19-Scotland-England",
+   "reason": "no Source A match within a day of 2010-06-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:29",
+   "key": "2010-06-15-Netherlands-Scotland",
+   "reason": "no Source A match within a day of 2010-06-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:34",
+   "key": "2010-04-20-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-04-20 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:39",
+   "key": "2010-04-18-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2010-04-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:45",
+   "key": "2010-04-15-West Indies-Ireland",
+   "reason": "no Source A match within a day of 2010-04-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:50",
+   "key": "2010-04-13-West Indies-Canada",
+   "reason": "no Source A match within a day of 2010-04-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:11:55",
+   "key": "2010-03-01-India-England",
+   "reason": "no Source A match within a day of 2010-03-01 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:00",
+   "key": "2010-02-26-India-England",
+   "reason": "no Source A match within a day of 2010-02-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:05",
+   "key": "2010-02-24-India-England",
+   "reason": "no Source A match within a day of 2010-02-24 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:10",
+   "key": "2010-02-21-India-England",
+   "reason": "no Source A match within a day of 2010-02-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:15",
+   "key": "2010-02-19-India-England",
+   "reason": "no Source A match within a day of 2010-02-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:20",
+   "key": "2010-02-18-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2010-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:25",
+   "key": "2010-02-18-Kenya-Netherlands",
+   "reason": "no Source A match within a day of 2010-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:30",
+   "key": "2010-02-17-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2010-02-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:35",
+   "key": "2010-02-16-Kenya-Netherlands",
+   "reason": "no Source A match within a day of 2010-02-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:40",
+   "key": "2010-02-14-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2010-02-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:45",
+   "key": "2010-02-12-Afghanistan-Netherlands",
+   "reason": "afg-vs-ned-13th-match-world-twenty20-qualifier-2010-match-updates-11WI is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:50",
+   "key": "2010-02-11-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2010-02-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:12:55",
+   "key": "2010-02-11-Afghanistan-United States of America",
+   "reason": "afg-vs-usa-10th-match-world-twenty20-qualifier-2010-match-updates-11WF is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:00",
+   "key": "2010-02-10-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2010-02-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:05",
+   "key": "2010-02-10-Afghanistan-Scotland",
+   "reason": "afg-vs-sco-5th-match-world-twenty20-qualifier-2010-match-updates-11WA is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:10",
+   "key": "2010-01-31-Central Districts-Auckland",
+   "reason": "no Source A match within a day of 2010-01-31 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:15",
+   "key": "2010-01-30-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-30 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:20",
+   "key": "2010-01-26-Wellington-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:25",
+   "key": "2010-01-26-Northern Districts-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:30",
+   "key": "2010-01-26-Auckland-Otago",
+   "reason": "no Source A match within a day of 2010-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:35",
+   "key": "2010-01-24-Canterbury-Auckland",
+   "reason": "no Source A match within a day of 2010-01-24 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:40",
+   "key": "2010-01-24-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-24 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:45",
+   "key": "2010-01-24-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-01-24 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:50",
+   "key": "2010-01-22-Auckland-Northern Districts",
+   "reason": "no Source A match within a day of 2010-01-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:13:55",
+   "key": "2010-01-22-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:00",
+   "key": "2010-01-22-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:05",
+   "key": "2010-01-17-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:10",
+   "key": "2010-01-17-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:15",
+   "key": "2010-01-15-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:20",
+   "key": "2010-01-15-Wellington-Northern Districts",
+   "reason": "no Source A match within a day of 2010-01-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:25",
+   "key": "2010-01-15-Auckland-Otago",
+   "reason": "no Source A match within a day of 2010-01-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:30",
+   "key": "2010-01-13-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2010-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:35",
+   "key": "2010-01-13-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:40",
+   "key": "2010-01-12-Otago-Northern Districts",
+   "reason": "no Source A match within a day of 2010-01-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:45",
+   "key": "2010-01-10-Central Districts-Auckland",
+   "reason": "no Source A match within a day of 2010-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:50",
+   "key": "2010-01-10-Canterbury-Northern Districts",
+   "reason": "no Source A match within a day of 2010-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:14:55",
+   "key": "2010-01-10-Otago-Wellington",
+   "reason": "no Source A match within a day of 2010-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:00",
+   "key": "2010-01-08-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:05",
+   "key": "2010-01-08-Central Districts-Northern Districts",
+   "reason": "no Source A match within a day of 2010-01-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:10",
+   "key": "2010-01-08-Auckland-Wellington",
+   "reason": "no Source A match within a day of 2010-01-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:15",
+   "key": "2010-01-06-Central Districts-Otago",
+   "reason": "no Source A match within a day of 2010-01-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:20",
+   "key": "2010-01-06-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2010-01-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:25",
+   "key": "2010-01-04-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:30",
+   "key": "2010-01-03-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2010-01-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:36",
+   "key": "2010-01-03-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-01-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:41",
+   "key": "2010-01-03-Central Districts-Wellington",
+   "reason": "no Source A match within a day of 2010-01-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:46",
+   "key": "2010-01-03-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2010-01-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:51",
+   "key": "2010-01-02-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2010-01-02 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:15:56",
+   "key": "2010-01-02-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2010-01-02 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:01",
+   "key": "2009-12-31-Auckland-Central Districts",
+   "reason": "no Source A match within a day of 2009-12-31 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:06",
+   "key": "2009-12-31-Wellington-Otago",
+   "reason": "no Source A match within a day of 2009-12-31 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:11",
+   "key": "2009-12-29-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2009-12-29 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:16",
+   "key": "2009-12-11-Northern Districts-Otago",
+   "reason": "no Source A match within a day of 2009-12-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:21",
+   "key": "2009-12-11-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2009-12-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:26",
+   "key": "2009-12-11-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2009-12-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:31",
+   "key": "2009-12-04-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2009-12-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:36",
+   "key": "2009-12-04-Otago-Auckland",
+   "reason": "no Source A match within a day of 2009-12-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:41",
+   "key": "2009-12-04-Central Districts-Northern Districts",
+   "reason": "no Source A match within a day of 2009-12-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:46",
+   "key": "2009-11-07-West Indies-England",
+   "reason": "no Source A match within a day of 2009-11-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:51",
+   "key": "2009-11-05-West Indies-England",
+   "reason": "no Source A match within a day of 2009-11-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:16:56",
+   "key": "2009-11-04-West Indies-England",
+   "reason": "no Source A match within a day of 2009-11-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:01",
+   "key": "2009-10-23-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2009-10-23 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:06",
+   "key": "2009-10-18-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2009-10-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:11",
+   "key": "2009-10-18-Zimbabwe-Kenya",
+   "reason": "no Source A match within a day of 2009-10-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:16",
+   "key": "2009-10-17-Zimbabwe-Kenya",
+   "reason": "no Source A match within a day of 2009-10-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:21",
+   "key": "2009-10-16-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2009-10-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:26",
+   "key": "2009-10-15-Zimbabwe-Kenya",
+   "reason": "no Source A match within a day of 2009-10-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:31",
+   "key": "2009-10-13-Zimbabwe-Kenya",
+   "reason": "no Source A match within a day of 2009-10-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:36",
+   "key": "2009-10-12-Zimbabwe-Kenya",
+   "reason": "no Source A match within a day of 2009-10-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:41",
+   "key": "2009-09-01-Afghanistan-Netherlands",
+   "reason": "afg-vs-ned-2nd-odi-afghanistan-in-netherlands-odi-series-2009-match-updates-C1U is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:46",
+   "key": "2009-08-30-Afghanistan-Netherlands",
+   "reason": "afg-vs-ned-1st-odi-afghanistan-in-netherlands-odi-series-2009-match-updates-C1T is no longer in the Source A sitemap"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:51",
+   "key": "2009-08-28-Scotland-Australia",
+   "reason": "no Source A match within a day of 2009-08-28 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:17:56",
+   "key": "2009-08-22-Scotland-Ireland",
+   "reason": "no Source A match within a day of 2009-08-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:01",
+   "key": "2009-08-22-Canada-Kenya",
+   "reason": "no Source A match within a day of 2009-08-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:06",
+   "key": "2009-08-05-Ireland-Netherlands",
+   "reason": "no Source A match within a day of 2009-08-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:11",
+   "key": "2009-07-12-Ireland-Kenya",
+   "reason": "no Source A match within a day of 2009-07-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:16",
+   "key": "2009-07-11-Netherlands-Canada",
+   "reason": "no Source A match within a day of 2009-07-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:21",
+   "key": "2009-07-11-Ireland-Kenya",
+   "reason": "no Source A match within a day of 2009-07-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:26",
+   "key": "2009-07-09-Ireland-Kenya",
+   "reason": "no Source A match within a day of 2009-07-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:31",
+   "key": "2009-07-08-Scotland-Canada",
+   "reason": "no Source A match within a day of 2009-07-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:36",
+   "key": "2009-07-07-Scotland-Canada",
+   "reason": "no Source A match within a day of 2009-07-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:41",
+   "key": "2009-07-05-England-Australia",
+   "reason": "no Source A match within a day of 2009-07-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:46",
+   "key": "2009-07-03-England-Australia",
+   "reason": "no Source A match within a day of 2009-07-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:51",
+   "key": "2009-05-26-Ireland-Pakistan",
+   "reason": "no Source A match within a day of 2009-05-26 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:18:56",
+   "key": "2009-04-19-Canada-Ireland",
+   "reason": "no Source A match within a day of 2009-04-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:01",
+   "key": "2009-04-19-Kenya-Netherlands",
+   "reason": "no Source A match within a day of 2009-04-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:06",
+   "key": "2009-04-08-Bermuda-Netherlands",
+   "reason": "no Source A match within a day of 2009-04-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:11",
+   "key": "2009-04-06-Bermuda-Kenya",
+   "reason": "no Source A match within a day of 2009-04-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:16",
+   "key": "2009-04-06-Canada-Ireland",
+   "reason": "no Source A match within a day of 2009-04-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:21",
+   "key": "2009-04-01-Kenya-Netherlands",
+   "reason": "no Source A match within a day of 2009-04-01 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:26",
+   "key": "2009-03-22-England-New Zealand",
+   "reason": "no Source A match within a day of 2009-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:31",
+   "key": "2009-03-21-Australia-India",
+   "reason": "no Source A match within a day of 2009-03-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:36",
+   "key": "2009-03-21-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2009-03-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:41",
+   "key": "2009-03-19-Australia-England",
+   "reason": "no Source A match within a day of 2009-03-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:46",
+   "key": "2009-03-19-India-West Indies",
+   "reason": "no Source A match within a day of 2009-03-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:51",
+   "key": "2009-03-19-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2009-03-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:19:57",
+   "key": "2009-03-17-England-West Indies",
+   "reason": "no Source A match within a day of 2009-03-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:02",
+   "key": "2009-03-16-Australia-Pakistan",
+   "reason": "no Source A match within a day of 2009-03-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:07",
+   "key": "2009-03-14-South Africa-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-03-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:12",
+   "key": "2009-03-14-Australia-India",
+   "reason": "no Source A match within a day of 2009-03-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:17",
+   "key": "2009-03-14-England-New Zealand",
+   "reason": "no Source A match within a day of 2009-03-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:22",
+   "key": "2009-03-14-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2009-03-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:27",
+   "key": "2009-03-12-Australia-West Indies",
+   "reason": "no Source A match within a day of 2009-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:32",
+   "key": "2009-03-12-England-Pakistan",
+   "reason": "no Source A match within a day of 2009-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:37",
+   "key": "2009-03-12-India-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:42",
+   "key": "2009-03-12-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2009-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:47",
+   "key": "2009-03-10-Australia-South Africa",
+   "reason": "no Source A match within a day of 2009-03-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:52",
+   "key": "2009-03-10-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2009-03-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:20:57",
+   "key": "2009-03-09-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-03-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:02",
+   "key": "2009-03-08-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2009-03-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:07",
+   "key": "2009-03-08-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2009-03-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:12",
+   "key": "2009-03-07-England-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-03-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:17",
+   "key": "2009-03-07-India-Pakistan",
+   "reason": "no Source A match within a day of 2009-03-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:22",
+   "key": "2009-02-22-Otago-Auckland",
+   "reason": "no Source A match within a day of 2009-02-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:27",
+   "key": "2009-02-22-Central Districts-Canterbury",
+   "reason": "no Source A match within a day of 2009-02-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:32",
+   "key": "2009-02-22-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2009-02-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:37",
+   "key": "2009-02-18-Canterbury-Northern Districts",
+   "reason": "no Source A match within a day of 2009-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:42",
+   "key": "2009-02-18-Central Districts-Otago",
+   "reason": "no Source A match within a day of 2009-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:47",
+   "key": "2009-02-18-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2009-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:52",
+   "key": "2009-02-17-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-02-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:21:57",
+   "key": "2009-02-15-Wellington-Auckland",
+   "reason": "no Source A match within a day of 2009-02-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:02",
+   "key": "2009-02-15-Canterbury-Central Districts",
+   "reason": "no Source A match within a day of 2009-02-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:07",
+   "key": "2009-02-15-Otago-Northern Districts",
+   "reason": "no Source A match within a day of 2009-02-15 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:12",
+   "key": "2009-02-13-Canterbury-Wellington",
+   "reason": "no Source A match within a day of 2009-02-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:17",
+   "key": "2009-02-13-Auckland-Otago",
+   "reason": "no Source A match within a day of 2009-02-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:22",
+   "key": "2009-02-12-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-02-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:27",
+   "key": "2009-02-11-Central Districts-Northern Districts",
+   "reason": "no Source A match within a day of 2009-02-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:32",
+   "key": "2009-02-08-Auckland-Canterbury",
+   "reason": "no Source A match within a day of 2009-02-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:37",
+   "key": "2009-02-08-Otago-Central Districts",
+   "reason": "no Source A match within a day of 2009-02-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:42",
+   "key": "2009-02-08-Northern Districts-Wellington",
+   "reason": "no Source A match within a day of 2009-02-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:47",
+   "key": "2009-02-07-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-02-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:52",
+   "key": "2009-02-06-Northern Districts-Canterbury",
+   "reason": "no Source A match within a day of 2009-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:22:57",
+   "key": "2009-02-06-Central Districts-Auckland",
+   "reason": "no Source A match within a day of 2009-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:02",
+   "key": "2009-02-06-Otago-Wellington",
+   "reason": "no Source A match within a day of 2009-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:07",
+   "key": "2009-02-04-Kenya-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:12",
+   "key": "2009-02-04-Northern Districts-Auckland",
+   "reason": "no Source A match within a day of 2009-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:17",
+   "key": "2009-02-04-Wellington-Central Districts",
+   "reason": "no Source A match within a day of 2009-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:22",
+   "key": "2009-02-04-Otago-Canterbury",
+   "reason": "no Source A match within a day of 2009-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:27",
+   "key": "2009-02-03-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2009-02-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:32",
+   "key": "2009-01-29-Kenya-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-01-29 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:37",
+   "key": "2009-01-27-Kenya-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-01-27 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:42",
+   "key": "2009-01-21-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-01-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:47",
+   "key": "2009-01-19-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-01-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:52",
+   "key": "2009-01-16-Bangladesh-Sri Lanka",
+   "reason": "no Source A match within a day of 2009-01-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:23:57",
+   "key": "2009-01-13-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2009-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:02",
+   "key": "2009-01-12-Sri Lanka-Zimbabwe",
+   "reason": "no Source A match within a day of 2009-01-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:07",
+   "key": "2009-01-10-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2009-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:12",
+   "key": "2009-01-03-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2009-01-03 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:29",
+   "key": "2008-12-19-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2008-12-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:34",
+   "key": "2008-12-11-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2008-12-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:39",
+   "key": "2008-11-28-Zimbabwe-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-28 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:44",
+   "key": "2008-11-16-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2008-11-16 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:49",
+   "key": "2008-11-12-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-12 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:24:54",
+   "key": "2008-11-11-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:25:11",
+   "key": "2008-11-09-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:25:16",
+   "key": "2008-11-09-South Africa-Bangladesh",
+   "reason": "no Source A match within a day of 2008-11-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:25:32",
+   "key": "2008-11-07-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:25:37",
+   "key": "2008-11-05-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2008-11-05 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:25:42",
+   "key": "2008-11-02-South Africa-Kenya",
+   "reason": "no Source A match within a day of 2008-11-02 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:09",
+   "key": "2008-10-19-Kenya-Zimbabwe",
+   "reason": "no Source A match within a day of 2008-10-19 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:14",
+   "key": "2008-10-18-Kenya-Ireland",
+   "reason": "no Source A match within a day of 2008-10-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:19",
+   "key": "2008-10-17-Bangladesh-New Zealand",
+   "reason": "no Source A match within a day of 2008-10-17 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:36",
+   "key": "2008-10-11-Bangladesh-New Zealand",
+   "reason": "no Source A match within a day of 2008-10-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:41",
+   "key": "2008-10-09-Bangladesh-New Zealand",
+   "reason": "no Source A match within a day of 2008-10-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:46",
+   "key": "2008-09-09-India-England",
+   "reason": "no Source A match within a day of 2008-09-09 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:51",
+   "key": "2008-09-07-India-England",
+   "reason": "no Source A match within a day of 2008-09-07 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:26:56",
+   "key": "2008-09-04-India-England",
+   "reason": "no Source A match within a day of 2008-09-04 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:01",
+   "key": "2008-09-01-India-England",
+   "reason": "no Source A match within a day of 2008-09-01 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:06",
+   "key": "2008-08-30-India-England",
+   "reason": "no Source A match within a day of 2008-08-30 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:11",
+   "key": "2008-08-24-Canada-West Indies",
+   "reason": "no Source A match within a day of 2008-08-24 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:16",
+   "key": "2008-08-22-Canada-West Indies",
+   "reason": "no Source A match within a day of 2008-08-22 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:21",
+   "key": "2008-08-21-Netherlands-Kenya",
+   "reason": "no Source A match within a day of 2008-08-21 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:26",
+   "key": "2008-08-20-Bermuda-West Indies",
+   "reason": "no Source A match within a day of 2008-08-20 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:31",
+   "key": "2008-08-18-Scotland-England",
+   "reason": "no Source A match within a day of 2008-08-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:36",
+   "key": "2008-08-18-Canada-Bermuda",
+   "reason": "no Source A match within a day of 2008-08-18 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:41",
+   "key": "2008-08-14-South Africa-England",
+   "reason": "no Source A match within a day of 2008-08-14 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:46",
+   "key": "2008-08-11-England-South Africa",
+   "reason": "no Source A match within a day of 2008-08-11 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-06T11:27:51",
+   "key": "2008-08-08-Netherlands-Bermuda",
+   "reason": "no Source A match within a day of 2008-08-08 with plausible teams (sitemap covers 1955-01-15..2026-11-06)"
   }
  ],
  "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-04-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2011-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-23",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-12-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-hk-7th-match-asian-games-mens-t20-competition-2010-match-updates-U9E",
-   "date": "2010-11-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20I",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Hong Kong"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-11-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-11-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ken-3rd-match-afghanistan-in-kenya-odi-series-2010-match-updates-AY8",
-   "date": "2010-10-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ken-2nd-match-afghanistan-in-kenya-odi-series-2010-match-updates-AY7",
-   "date": "2010-10-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-10-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-09-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-09-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-09-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-09-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-2nd-odi-afghanistan-tour-of-scotland-2010-match-updates-AYF",
-   "date": "2010-08-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-08-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-1st-odi-afghanistan-tour-of-scotland-2010-match-updates-AYE",
-   "date": "2010-08-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-08-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ned-3rd-place-playoff-world-cricket-league-division-one-2010-match-updates-1388",
-   "date": "2010-07-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ned-12th-match-world-cricket-league-division-one-2010-match-updates-1383",
-   "date": "2010-07-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-07-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-06-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-06-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-04-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-04-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-04-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-04-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-03-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-03-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-03-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-03-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ned-13th-match-world-twenty20-qualifier-2010-match-updates-11WI",
-   "date": "2010-02-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-usa-10th-match-world-twenty20-qualifier-2010-match-updates-11WF",
-   "date": "2010-02-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "United States of America"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-02-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-sco-5th-match-world-twenty20-qualifier-2010-match-updates-11WA",
-   "date": "2010-02-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2010-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-31",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-31",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-12-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-11-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-11-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-11-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-10-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ned-2nd-odi-afghanistan-in-netherlands-odi-series-2009-match-updates-C1U",
-   "date": "2009-09-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_withheld",
-   "crex_url": "/cricket-live-score/afg-vs-ned-1st-odi-afghanistan-in-netherlands-odi-series-2009-match-updates-C1T",
-   "date": "2009-08-30",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Afghanistan",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-08-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-08-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-08-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-08-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Canada"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-07-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-06-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-05-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bermuda",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bermuda",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-04-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-03-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Canterbury",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Otago"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Northern Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Auckland",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Central Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Wellington"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Northern Districts",
-   "team_b": "Auckland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Wellington",
-   "team_b": "Central Districts"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "T20",
-   "rejected_ids": [],
-   "team_a": "Otago",
-   "team_b": "Canterbury"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-02-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2009-01-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-12-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-12-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-05",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-11-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-31",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Kenya",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-10-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-09-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-09-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-09-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-09-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bermuda",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Canada",
-   "team_b": "Bermuda"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Bermuda"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-08-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2008-07-31",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "South Africa"
-  },
   {
    "attempts": 0,
    "category": "cricsheet_missing",
