@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-06T11:30:35Z",
- "generated_at_ist": "2026-11-06 17:00 IST",
- "runtime_secs": 122.2,
+ "generated_at_utc": "2026-11-06T12:30:34Z",
+ "generated_at_ist": "2026-11-06 18:00 IST",
+ "runtime_secs": 117.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-06",
-  "commit": "d4ca9e3f5b"
+  "commit": "98734b659e"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1041,
-   "secs": 0.7
+   "rows": 1045,
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 474,
-   "secs": 3.0
+   "rows": 463,
+   "secs": 2.6
   },
   "feedg": {
    "status": "ok",
    "rows": 8,
-   "secs": 5.8,
+   "secs": 5.0,
    "events": 1
   },
   "feedk": {
    "status": "ok",
    "rows": 144,
-   "secs": 19.3,
+   "secs": 17.7,
    "events": 7
   },
   "feede": {
    "status": "ok",
    "rows": 498,
-   "secs": 46.3,
+   "secs": 43.6,
    "events": 17
   },
   "feedf": {
    "status": "ok",
-   "rows": 442,
-   "secs": 67.8,
+   "rows": 384,
+   "secs": 62.8,
    "events": 11
   },
   "feedh": {
    "status": "ok",
    "rows": 1106,
-   "secs": 81.5,
-   "events": 60
+   "secs": 78.4,
+   "events": 62
   }
  },
- "snapshot": "odds_20261106T113035Z.jsonl.gz",
+ "snapshot": "odds_20261106T123034Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -119,15 +119,15 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 30,
-  "rows_in_window": 3652,
+  "events_in_window": 32,
+  "rows_in_window": 3602,
   "selections_with_model": 1798,
   "selections_with_market_fair": 2115,
   "markets_in_window": 306,
   "value_bets": 0,
   "dropped_by_filter": {
-   "model_market_gap": 886,
-   "odds_range": 8,
+   "model_market_gap": 846,
+   "odds_range": 7,
    "loose_name_match": 1,
    "policy_max_odds": 2,
    "model_only_no_market": 219,
@@ -141,25 +141,25 @@
     "n_prices": 427,
     "mean_model_p": 0.061,
     "mean_market_p": 0.069,
-    "mean_logit_diff_model_minus_market": 0.347,
-    "mean_abs_logit_diff": 0.922,
-    "corr": 0.731
+    "mean_logit_diff_model_minus_market": 0.349,
+    "mean_abs_logit_diff": 0.93,
+    "corr": 0.728
    },
    "top_bowler_team": {
     "n_prices": 168,
     "mean_model_p": 0.11,
     "mean_market_p": 0.107,
     "mean_logit_diff_model_minus_market": -0.011,
-    "mean_abs_logit_diff": 0.382,
-    "corr": 0.616
+    "mean_abs_logit_diff": 0.38,
+    "corr": 0.618
    },
    "batter_runs": {
-    "n_prices": 580,
+    "n_prices": 562,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.679,
-    "corr": 0.195
+    "mean_abs_logit_diff": 0.666,
+    "corr": 0.201
    },
    "batter_sixes": {
     "n_prices": 46,
@@ -167,7 +167,7 @@
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
     "mean_abs_logit_diff": 0.481,
-    "corr": 0.835
+    "corr": 0.834
    },
    "batter_fours": {
     "n_prices": 46,
@@ -186,12 +186,12 @@
     "corr": 0.903
    },
    "batter_milestone": {
-    "n_prices": 625,
-    "mean_model_p": 0.438,
-    "mean_market_p": 0.462,
-    "mean_logit_diff_model_minus_market": -0.179,
-    "mean_abs_logit_diff": 1.125,
-    "corr": 0.98
+    "n_prices": 593,
+    "mean_model_p": 0.435,
+    "mean_market_p": 0.46,
+    "mean_logit_diff_model_minus_market": -0.188,
+    "mean_abs_logit_diff": 1.063,
+    "corr": 0.981
    },
    "bowler_milestone": {
     "n_prices": 110,
@@ -205,17 +205,17 @@
     "n_prices": 206,
     "mean_model_p": 0.018,
     "mean_market_p": 0.034,
-    "mean_logit_diff_model_minus_market": -0.095,
-    "mean_abs_logit_diff": 1.023,
-    "corr": 0.7
+    "mean_logit_diff_model_minus_market": -0.094,
+    "mean_abs_logit_diff": 1.03,
+    "corr": 0.698
    },
    "top_bowler_match": {
     "n_prices": 136,
     "mean_model_p": 0.049,
     "mean_market_p": 0.051,
-    "mean_logit_diff_model_minus_market": -0.007,
-    "mean_abs_logit_diff": 0.56,
-    "corr": 0.405
+    "mean_logit_diff_model_minus_market": -0.006,
+    "mean_abs_logit_diff": 0.558,
+    "corr": 0.407
    }
   }
  },
@@ -371,6 +371,16 @@
    ]
   },
   {
+   "event": "female|boland|kei|2026-11-07",
+   "start_ist": "2026-11-07 13:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "female|Warriors|titans|2026-11-07",
    "start_ist": "2026-11-07 13:30 IST",
    "format": "ODI",
@@ -378,16 +388,6 @@
    "teams_matched": null,
    "sources": [
     "feede_lb",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|boland|kei|2026-11-07",
-   "start_ist": "2026-11-07 13:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
     "smarkets"
    ]
   },
@@ -544,6 +544,19 @@
    ]
   },
   {
+   "event": "male|Canterbury|Central Districts|2026-11-07",
+   "start_ist": "2026-11-08 03:00 IST",
+   "format": "ODI",
+   "format_source": "name",
+   "teams_matched": [
+    "Canterbury",
+    "Central Districts"
+   ],
+   "sources": [
+    "moviodds_bet365"
+   ]
+  },
+  {
    "event": "male|Northern Districts|Otago Volts|2026-11-07",
    "start_ist": "2026-11-08 03:00 IST",
    "format": "ODI",
@@ -556,6 +569,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -585,7 +599,6 @@
    ],
    "sources": [
     "feede_lb",
-    "feedf_p",
     "smarkets"
    ]
   },
@@ -607,6 +620,19 @@
    "teams_matched": [
     "Sydney Sixers Women",
     "Sydney Thunder Women"
+   ],
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Melbourne Stars Women|Perth Scorchers Women|2026-11-08",
+   "start_ist": "2026-11-08 11:40 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Melbourne Stars Women",
+    "Perth Scorchers Women"
    ],
    "sources": [
     "smarkets"
@@ -984,20 +1010,20 @@
   }
  },
  "log": [
-  "[17:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[17:00 IST] history: 23949 matches, last 2026-11-06, players 431152",
-  "[17:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1041, 'secs': 0.7}",
-  "[17:02 IST] source smarkets: {'status': 'ok', 'rows': 474, 'secs': 3.0}",
-  "[17:02 IST] source feedg: {'status': 'ok', 'rows': 8, 'secs': 5.8, 'events': 1}",
-  "[17:02 IST] source feedk: {'status': 'ok', 'rows': 144, 'secs': 19.3, 'events': 7}",
-  "[17:02 IST] source feede: {'status': 'ok', 'rows': 498, 'secs': 46.3, 'events': 17}",
-  "[17:02 IST] source feedf: {'status': 'ok', 'rows': 442, 'secs': 67.8, 'events': 11}",
-  "[17:02 IST] source feedh: {'status': 'ok', 'rows': 1106, 'secs': 81.5, 'events': 60}",
-  "[17:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[17:02 IST] 38 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[17:02 IST] book lines: 278 player lines from 7 source(s)",
-  "[17:02 IST] weather: forecasts for 11 events, 0 failed",
-  "[17:02 IST] prop model: 992 prop selections modelled, 293 milestone ladder prices anchored to O/U",
-  "[17:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[18:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:00 IST] history: 23951 matches, last 2026-11-06, players 431197",
+  "[18:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1045, 'secs': 0.8}",
+  "[18:02 IST] source smarkets: {'status': 'ok', 'rows': 463, 'secs': 2.6}",
+  "[18:02 IST] source feedg: {'status': 'ok', 'rows': 8, 'secs': 5.0, 'events': 1}",
+  "[18:02 IST] source feedk: {'status': 'ok', 'rows': 144, 'secs': 17.7, 'events': 7}",
+  "[18:02 IST] source feede: {'status': 'ok', 'rows': 498, 'secs': 43.6, 'events': 17}",
+  "[18:02 IST] source feedf: {'status': 'ok', 'rows': 384, 'secs': 62.8, 'events': 11}",
+  "[18:02 IST] source feedh: {'status': 'ok', 'rows': 1106, 'secs': 78.4, 'events': 62}",
+  "[18:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:02 IST] 38 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[18:02 IST] book lines: 278 player lines from 7 source(s)",
+  "[18:02 IST] weather: forecasts for 11 events, 0 failed",
+  "[18:02 IST] prop model: 992 prop selections modelled, 293 milestone ladder prices anchored to O/U",
+  "[18:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
  ]
 }
