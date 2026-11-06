@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-07 04:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-07 05:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-08",
+   "match": "Sydney Sixers vs Sydney Thunder",
+   "start_utc": "2026-11-08T02:40:00Z",
+   "start_ist": "2026-11-08 08:10 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_runs",
+   "market": "Ellyse Perry - Over/Under 29.5 Runs",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 29.5",
+   "player_matched_as": "Ellyse Perry",
+   "player_id": "be150fc8",
+   "player_team": "Sydney Sixers Women",
+   "stat": "runs",
+   "inn": 0,
+   "line": 29.5,
+   "side": "under",
+   "best_odds": 1.83,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 1.83,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0929,
+   "implied_prob": 0.5464,
+   "fair_odds": 1.728,
+   "fair_prob": 0.5787,
+   "model_prob": 0.6306,
+   "market_prob": 0.5362,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.059,
+   "edge_pct": 5.9,
+   "kelly_quarter_stake_pct": 1.78,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 63% vs market 54% for under 29.5 runs; form 31.4 runs/inn recency-weighted T20 (n_eff 74.1; last 5: 84, 3, 58, 11, 52), bats in 95% of games played; at North Sydney Oval: 37 inns avg 38.6; context adj: team H2H context +1%; weather: rain chance up to 88%",
+   "notes": "2 market source(s) for fair price; model 0.631 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 88% rain chance, 0.7 mm forecast during the match - shortened match or void props possible",
+   "model_detail": {
+    "n_eff": 74.1,
+    "expected": 30.84,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.953,
+    "venue_matched": "north sydney oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": true,
+   "weather": {
+    "rain_prob_max_pct": 88,
+    "rain_mm_in_window": 0.7,
+    "humidity_pct": 56,
+    "cloud_pct": 42,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "6a4bb0b4f319a960",
+   "alert_key": "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-08|batter_runs||Ellyse Perry under 29.5|29.5|under",
+   "alerted_at_ist": "2026-11-07 05:03 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
