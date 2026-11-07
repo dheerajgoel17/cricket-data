@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-07 07:00 IST
+# Cricket value bets - 2026-11-07 08:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1577 prices
-- **smarkets**: ok, 519 prices
-- **feedg**: ok, 16 prices, 3 events
-- **feedk**: ok, 200 prices, 12 events
-- **feede**: ok, 570 prices, 24 events
-- **feedh**: ok, 1203 prices, 77 events
-- **feedf**: ok, 292 prices, 14 events
+- **moviodds_bet365**: ok, 1809 prices
+- **smarkets**: ok, 488 prices
+- **feedg**: ok, 16 prices, 2 events
+- **feedk**: ok, 144 prices, 11 events
+- **feede**: ok, 510 prices, 23 events
+- **feedh**: ok, 1203 prices, 69 events
+- **feedf**: ok, 436 prices, 18 events
 
-Matches starting in next 168h: **41**, markets priced: **390**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **40**, markets priced: **373**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **41**, markets priced: **390**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Arabian Aces (male), Boland (W) (female), Central (male), Dolphins (W) (female), Dolphins (female), Easterns (male), Emirates Eagles (male), Kei Women (female), Lions (W) (female), Lions (female), Mpumalanga Rhinos (W) (female), Royal Champs (male), Royal Desert Champions (male), South Western Districts (male), Titans (W) (female), Titans (female), UAE Bulls (male), USA (W) (female), United Tigers (male)
 
-Runtime 143.7s. Snapshot: `odds_20261107T013030Z.jsonl.gz`
+Runtime 133.7s. Snapshot: `odds_20261107T023027Z.jsonl.gz`
