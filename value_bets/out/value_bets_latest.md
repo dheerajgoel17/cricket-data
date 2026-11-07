@@ -1,14 +1,14 @@
-# Cricket value bets - 2026-11-07 14:00 IST
+# Cricket value bets - 2026-11-07 15:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 860 prices
 - **feedg**: ok, 0 prices, 0 events
-- **smarkets**: ok, 483 prices
+- **smarkets**: ok, 467 prices
+- **moviodds_bet365**: ok, 843 prices
 - **feedk**: ok, 80 prices, 7 events
 - **feede**: ok, 398 prices, 17 events
-- **feedh**: ok, 913 prices, 51 events
+- **feedh**: ok, 913 prices, 50 events
 - **feedf**: ok, 284 prices, 14 events
 
 Matches starting in next 168h: **26**, markets priced: **253**, value bets: **1** (new alerts: 0). Min edge 5%.
@@ -22,4 +22,4 @@ Matches starting in next 168h: **26**, markets priced: **253**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Arabian Aces (male), Boland (W) (female), Central (male), Dolphins (W) (female), Easterns (male), Emirates Eagles (male), Kei Women (female), Lions (W) (female), Mpumalanga Rhinos (W) (female), Royal Champs (male), Royal Desert Champions (male), South Western Districts (male), Titans (W) (female), UAE Bulls (male), USA (W) (female), United Tigers (male)
 
-Runtime 123.2s. Snapshot: `odds_20261107T083036Z.jsonl.gz`
+Runtime 153.7s. Snapshot: `odds_20261107T093032Z.jsonl.gz`
