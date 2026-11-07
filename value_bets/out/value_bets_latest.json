@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-07T21:30:27Z",
- "generated_at_ist": "2026-11-08 03:00 IST",
- "runtime_secs": 150.8,
+ "generated_at_utc": "2026-11-07T22:30:36Z",
+ "generated_at_ist": "2026-11-08 04:00 IST",
+ "runtime_secs": 154.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-07",
-  "commit": "1f75bbfe89"
+  "commit": "73233011c3"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1282,
-   "secs": 0.7
+   "rows": 1276,
+   "secs": 2.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 520,
-   "secs": 2.3
+   "rows": 569,
+   "secs": 2.5
   },
   "feedg": {
    "status": "ok",
    "rows": 32,
-   "secs": 25.5,
+   "secs": 22.8,
    "events": 4
   },
   "feedk": {
    "status": "ok",
    "rows": 116,
-   "secs": 25.8,
+   "secs": 26.8,
    "events": 10
   },
   "feedf": {
    "status": "ok",
    "rows": 226,
-   "secs": 43.4,
+   "secs": 50.5,
    "events": 8
   },
   "feede": {
    "status": "ok",
    "rows": 436,
-   "secs": 58.2,
+   "secs": 59.4,
    "events": 22
   },
   "feedh": {
    "status": "ok",
    "rows": 1218,
-   "secs": 85.1,
-   "events": 70
+   "secs": 78.5,
+   "events": 58
   }
  },
- "snapshot": "odds_20261107T213027Z.jsonl.gz",
+ "snapshot": "odds_20261107T223036Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -127,7 +127,7 @@
   "value_bets": 0,
   "dropped_by_filter": {
    "odds_range": 11,
-   "model_market_gap": 670,
+   "model_market_gap": 671,
    "model_disagrees": 2,
    "model_only_no_market": 154,
    "loose_name_match": 4,
@@ -378,6 +378,19 @@
    ]
   },
   {
+   "event": "male|Dolphins|Lions|2026-11-08",
+   "start_ist": "2026-11-08 12:30 IST",
+   "format": "T20",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Dolphins",
+    "Lions"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
    "event": "female|dolphins|lions|2026-11-08",
    "start_ist": "2026-11-08 13:00 IST",
    "format": "T20",
@@ -412,14 +425,24 @@
    ]
   },
   {
-   "event": "male|Dolphins|Lions|2026-11-08",
+   "event": "male|Titans|Warriors|2026-11-08",
    "start_ist": "2026-11-08 13:00 IST",
    "format": "T20",
    "format_source": "last-meeting",
    "teams_matched": [
-    "Dolphins",
-    "Lions"
+    "Titans",
+    "Warriors"
    ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Warriors|easterns|2026-11-08",
+   "start_ist": "2026-11-08 13:00 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
    "sources": [
     "feedh_d"
    ]
@@ -461,29 +484,6 @@
    "teams_matched": null,
    "sources": [
     "smarkets"
-   ]
-  },
-  {
-   "event": "male|Titans|Warriors|2026-11-08",
-   "start_ist": "2026-11-08 13:30 IST",
-   "format": "T20",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Titans",
-    "Warriors"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
-   "event": "male|Warriors|easterns|2026-11-08",
-   "start_ist": "2026-11-08 13:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "feedh_d"
    ]
   },
   {
@@ -533,6 +533,16 @@
    ]
   },
   {
+   "event": "male|Delhi|bangla tigers|2026-11-08",
+   "start_ist": "2026-11-08 18:45 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
    "event": "male|UAE Bulls|United Tigers|2026-11-08",
    "start_ist": "2026-11-08 19:15 IST",
    "format": null,
@@ -545,16 +555,6 @@
     "feede_lb",
     "feedf_p",
     "smarkets"
-   ]
-  },
-  {
-   "event": "male|Delhi|bangla tigers|2026-11-08",
-   "start_ist": "2026-11-08 19:15 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "feedh_d"
    ]
   },
   {
@@ -1092,22 +1092,22 @@
   }
  },
  "log": [
-  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:00 IST] history: 23966 matches, last 2026-11-07, players 431532",
-  "[03:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1282, 'secs': 0.7}",
-  "[03:02 IST] source smarkets: {'status': 'ok', 'rows': 520, 'secs': 2.3}",
-  "[03:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 25.5, 'events': 4}",
-  "[03:02 IST] source feedk: {'status': 'ok', 'rows': 116, 'secs': 25.8, 'events': 10}",
-  "[03:02 IST] source feedf: {'status': 'ok', 'rows': 226, 'secs': 43.4, 'events': 8}",
-  "[03:02 IST] source feede: {'status': 'ok', 'rows': 436, 'secs': 58.2, 'events': 22}",
-  "[03:02 IST] source feedh: {'status': 'ok', 'rows': 1218, 'secs': 85.1, 'events': 70}",
-  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:02 IST] 42 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[03:02 IST] 40 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[03:02 IST] book lines: 335 player lines from 7 source(s)",
-  "[03:02 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[03:02 IST] weather: forecasts for 11 events, 0 failed",
-  "[03:02 IST] prop model: 1042 prop selections modelled, 343 milestone ladder prices anchored to O/U",
-  "[03:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[04:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[04:00 IST] history: 23966 matches, last 2026-11-07, players 431532",
+  "[04:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1276, 'secs': 2.5}",
+  "[04:02 IST] source smarkets: {'status': 'ok', 'rows': 569, 'secs': 2.5}",
+  "[04:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 22.8, 'events': 4}",
+  "[04:02 IST] source feedk: {'status': 'ok', 'rows': 116, 'secs': 26.8, 'events': 10}",
+  "[04:02 IST] source feedf: {'status': 'ok', 'rows': 226, 'secs': 50.5, 'events': 8}",
+  "[04:02 IST] source feede: {'status': 'ok', 'rows': 436, 'secs': 59.4, 'events': 22}",
+  "[04:02 IST] source feedh: {'status': 'ok', 'rows': 1218, 'secs': 78.5, 'events': 58}",
+  "[04:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[04:02 IST] 42 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[04:02 IST] 40 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[04:02 IST] book lines: 335 player lines from 7 source(s)",
+  "[04:02 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[04:03 IST] weather: forecasts for 11 events, 0 failed",
+  "[04:03 IST] prop model: 1042 prop selections modelled, 343 milestone ladder prices anchored to O/U",
+  "[04:03 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
  ]
 }
