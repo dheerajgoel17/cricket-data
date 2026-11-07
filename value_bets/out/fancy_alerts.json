@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-07T10:32:59Z",
+ "generated_at_utc": "2026-11-07T11:32:52Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -149,7 +149,7 @@
    "fixture_id": "2026-11-08-titans-v-dolphins",
    "match": "Titans vs Dolphins",
    "format": "T20",
-   "series": "CSA T20 2026",
+   "series": "CSA Pro T20 Cup 2026",
    "start_utc": "2026-11-08T10:30:00Z",
    "start_ist": "2026-11-08 16:00 IST",
    "key": "match_runouts",
@@ -165,6 +165,29 @@
    "chance": 0.5473,
    "edge": 0.1712,
    "edge_pct": 17.1,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-09-pakistan-v-sri-lanka|overs_10|Sri Lanka|0|over",
+   "fixture_id": "2026-11-09-pakistan-v-sri-lanka",
+   "match": "Pakistan vs Sri Lanka",
+   "format": "Test",
+   "series": "SL vs PAK 2026",
+   "start_utc": "2026-11-09T05:00:00Z",
+   "start_ist": "2026-11-09 10:30 IST",
+   "key": "overs_10",
+   "team": "Sri Lanka",
+   "inn": 0,
+   "side": "over",
+   "line": 24.5,
+   "best_odds": 1.36,
+   "best_source": "Dafabet",
+   "hits": 18,
+   "played": 19,
+   "window": 20,
+   "chance": 0.8517,
+   "edge": 0.1583,
+   "edge_pct": 15.8,
    "bat_first": false
   }
  ]
