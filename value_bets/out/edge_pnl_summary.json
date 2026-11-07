@@ -1,7 +1,7 @@
 {
- "generated_at_utc": "2026-11-07T09:35:18Z",
- "n": 15,
- "pnl_u": 4.64,
+ "generated_at_utc": "2026-11-07T10:34:16Z",
+ "n": 16,
+ "pnl_u": 5.89,
  "by": {
   "model|?|batter_fours": {
    "n": 2,
@@ -26,6 +26,14 @@
    "push": 0,
    "void": 0,
    "pnl_u": 1.364
+  },
+  "model|?|bowler_wickets": {
+   "n": 1,
+   "won": 1,
+   "lost": 0,
+   "push": 0,
+   "void": 0,
+   "pnl_u": 1.25
   }
  }
 }
