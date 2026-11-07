@@ -5,13 +5,14 @@ import { norm } from "./util.js";
 import { unwrap } from "./wrap.js";
 
 /**
- * @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, wrapKey?: string, deferMatches?: boolean }} [opts]
+ * @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, urlFor?: (url: string) => string, wrapKey?: string, deferMatches?: boolean }} [opts]
+ * `urlFor`: maps each file's URL before it is fetched (the site adds a content version, so the browser can keep the file for good).
  * `deferMatches`: return once the index is in and keep `matches.json` on `store.ready`. The home rail only needs fixtures;
  * player, team and fancy pages wait for `ready` (it attaches `M` and `n`).
  */
-export async function createStore({ base = "data/", fetchJson, wrapKey, deferMatches = false } = {}) {
+export async function createStore({ base = "data/", fetchJson, urlFor, wrapKey, deferMatches = false } = {}) {
   const get = fetchJson || (async (p) => {
-    const r = await fetch(base + p, { credentials: "same-origin" });
+    const r = await fetch(urlFor ? urlFor(base + p) : base + p, { credentials: "same-origin" });
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
     return await unwrap(await r.json(), wrapKey);
   });
