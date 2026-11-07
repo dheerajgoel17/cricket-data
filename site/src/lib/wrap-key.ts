@@ -15,7 +15,10 @@ export function getWrapKey() {
 export async function gateKey(): Promise<string | undefined> {
   if (key) return key;
   try {
-    const r = await fetch("/api/gate", { credentials: "same-origin", cache: "no-store" });
+    // the page's head already asked (`scripts/data-manifest.mjs` `headScript`): use that answer once, ask again only if it failed
+    const early = typeof window !== "undefined" ? window.__gate : undefined;
+    if (typeof window !== "undefined") window.__gate = undefined;
+    const r = (early && (await early)) || (await fetch("/api/gate", { credentials: "same-origin", cache: "no-store" }));
     if (!r.ok) return undefined;
     const body = await r.json().catch(() => ({} as { k?: string }));
     key = r.headers.get("x-cd-k") || body.k || undefined;

@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { loadEnv, type ProxyOptions } from "vite";
 import { defineConfig, type Plugin } from "vitest/config";
+import { dataManifest, headScript } from "./scripts/data-manifest.mjs";
 
 /**
  * Gate cookie from the production proxy: host-only (drop Domain), and drop Secure only on plain http://localhost.
@@ -24,6 +25,17 @@ function gateCookies(proxy: { on: (ev: string, fn: (...args: any[]) => void) => 
 
 function prodProxy(site: string): ProxyOptions {
   return { target: site, changeOrigin: true, configure: gateCookies };
+}
+
+/** Build only: puts every data file's content hash and the early gate request in the page head (`scripts/data-manifest.mjs`, `src/lib/data-url.ts`). */
+function dataVersion(): Plugin {
+  let manifest: Record<string, string> = {};
+  return {
+    name: "data-version",
+    apply: "build",
+    buildStart() { manifest = dataManifest(path.resolve(import.meta.dirname, "public/data")); },
+    transformIndexHtml: { order: "post", handler: (html) => html.replace("</head>", `${headScript(manifest)}</head>`) },
+  };
 }
 
 /** Dev only: serves /api/* with the same handlers Vercel runs, unless SITE_URL is set (then those routes come from production). */
@@ -55,7 +67,7 @@ export default defineConfig(({ mode }) => {
   if (useProd) console.info(`[vite] ${site} for /data, /api/gate, /api/live`);
   const proxy = useProd ? { "/data": prodProxy(site), "/api/gate": prodProxy(site), "/api/live": prodProxy(site) } : undefined;
   return {
-    plugins: [react(), tailwindcss(), devApi(!useProd)],
+    plugins: [react(), tailwindcss(), dataVersion(), devApi(!useProd)],
     resolve: { alias: [{ find: "@", replacement: path.resolve(import.meta.dirname, "src") }, { find: /^cn$/, replacement: path.resolve(import.meta.dirname, "src/lib/utils.ts") }] },
     // Quick tunnels send Host: *.trycloudflare.com; Vite blocks unknown hosts unless listed (DNS rebinding guard).
     server: { port: 4173, proxy, allowedHosts: [".trycloudflare.com"] },
