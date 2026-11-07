@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-07 20:30 IST
+# Cricket value bets - 2026-11-07 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **smarkets**: ok, 422 prices
-- **feedg**: ok, 8 prices, 1 events
+- **smarkets**: ok, 383 prices
 - **moviodds_bet365**: error - HTTPError: HTTP Error 503: Service Unavailable
-- **feedk**: ok, 72 prices, 6 events
-- **feede**: ok, 494 prices, 18 events
-- **feedf**: ok, 352 prices, 11 events
-- **feedh**: ok, 1193 prices, 52 events
+- **feedg**: ok, 16 prices, 2 events
+- **feedk**: ok, 72 prices, 5 events
+- **feede**: ok, 456 prices, 18 events
+- **feedf**: ok, 362 prices, 9 events
+- **feedh**: ok, 1106 prices, 50 events
 
-Matches starting in next 168h: **23**, markets priced: **230**, value bets: **0** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **24**, markets priced: **218**, value bets: **0** (new alerts: 0). Min edge 5%.
 
 _No value bets passed the filters this run._
 
-Unmatched team names (add to mappings/teams.csv): Arabian Aces (male), Central (male), Easterns (male), Emirates Eagles (male), MID West Rhinos (male), Mid West Rhinos (male), Mountaineers (male), Royal Champs (male), United Tigers (male)
+Unmatched team names (add to mappings/teams.csv): Arabian Aces (male), Central (male), Dolphins (W) (female), Easterns (male), Emirates Eagles (male), Lions (W) (female), MID West Rhinos (male), Mid West Rhinos (male), Mountaineers (male), Royal Champs (male), United Tigers (male)
 
-Runtime 111.0s. Snapshot: `odds_20261107T150052Z.jsonl.gz`
+Runtime 122.8s. Snapshot: `odds_20261107T153035Z.jsonl.gz`

@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-07T15:03:45Z",
+ "generated_at_utc": "2026-11-07T15:33:41Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -219,8 +219,8 @@
    "match": "Pakistan vs Sri Lanka",
    "format": "Test",
    "series": "SL vs PAK 2026",
-   "start_utc": "2026-11-09T05:00:00Z",
-   "start_ist": "2026-11-09 10:30 IST",
+   "start_utc": "2026-11-09T04:30:00Z",
+   "start_ist": "2026-11-09 10:00 IST",
    "key": "overs_10",
    "team": "Sri Lanka",
    "inn": 0,
