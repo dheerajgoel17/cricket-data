@@ -62,6 +62,40 @@
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow, nosnippet"
         }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "v"
+        }
+      ]
+    },
+    {
+      "source": "/data/(.*)",
+      "has": [
+        {
+          "type": "query",
+          "key": "v"
+        }
+      ],
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, max-age=31536000, immutable"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, nosnippet"
+        }
+      ]
+    },
+    {
+      "source": "/books/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
       ]
     },
     {

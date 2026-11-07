@@ -1,3 +1,4 @@
+import { dataUrl } from "@/lib/data-url";
 // Free image sources, loaded lazily in the browser: Source A's public image CDN (ids matched at build time, see photos.ts),
 // flagcdn.com flags for national sides, Wikimedia Commons photos via Wikidata, then initials / a silhouette.
 export { leagueLogos, playerPhotos, teamLogos } from "@cricket/engine/photos.js";
@@ -26,5 +27,5 @@ export const flagUrl = (name: string, w = 80) => {
 };
 
 export async function loadPhotos(base = "/data/"): Promise<Photos> {
-  try { return await (await fetch(`${base}photos.json`)).json(); } catch { return {}; }
+  try { return await (await fetch(dataUrl(`${base}photos.json`))).json(); } catch { return {}; }
 }
