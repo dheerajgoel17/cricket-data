@@ -13,8 +13,11 @@ finds are information it lacks, such as XIs, batting order, pitch or injuries.
 | tests | `pytest -q tests/value_bets` (skipped automatically if the `value-bets` extra isn't installed) |
 
 The workflow is independent of the data workflows. It has its own concurrency group, never touches `data/`, and commits with
-`[skip ci]` and a rebase-retry push. `auto-merge-scraper-fixes.yml` only merges PRs labelled `scraper-fix` that touch nothing but
-scraper files, so it never merges value-bet changes.
+`[skip ci]` and a rebase-retry push. When the scheduler Worker and GitHub's own cron both fire the same hour, the second run
+waits, checks out tip of `main`, and on a push clash prefers this run's `value_bets/out` + archive tree (`git pull --rebase -X theirs`,
+then re-land those paths on `origin/main` if a conflict still sticks) so nobody has to clear it by hand.
+`auto-merge-scraper-fixes.yml` only merges PRs labelled `scraper-fix` that touch nothing but scraper files, so it never merges
+value-bet changes.
 
 ## Committed outputs (small)
 | file | what |
