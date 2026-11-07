@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { createStore } from "@cricket/engine/store.js";
 import { Resolver } from "@cricket/engine/resolve.js";
 import { identityIndex } from "@cricket/engine/identity.js";
-import { dataUrl } from "@/lib/data-url";
 import { gateKey, readJson, setWrapKey } from "@/lib/wrap-key";
 import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
@@ -13,7 +12,7 @@ const Ctx = createContext<Data | null>(null);
 
 export async function loadJson(url: string) {
   try {
-    const r = await fetch(dataUrl(url), { credentials: "same-origin" });
+    const r = await fetch(url, { credentials: "same-origin" });
     if (!r.ok) return null;
     return await readJson(r);
   } catch { return null; }
@@ -27,7 +26,7 @@ async function loadIdentity(base: string) {
 async function boot(): Promise<Data> {
   const k = await gateKey();
   setWrapKey(k);
-  const store = await createStore({ base: "/data/", urlFor: dataUrl, wrapKey: k, deferMatches: true });
+  const store = await createStore({ base: "/data/", wrapKey: k, deferMatches: true });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
   const [photos, identity, names] = await Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),

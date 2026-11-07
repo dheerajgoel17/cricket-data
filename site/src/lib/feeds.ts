@@ -2,7 +2,6 @@
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
 import { isFixtureId } from "@cricket/engine/lines.js";
 import { saveLive } from "@/lib/live-cache";
-import { dataUrl } from "@/lib/data-url";
 import { readJson } from "@/lib/wrap-key";
 
 const RAW = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out";
@@ -11,7 +10,7 @@ const ARCHIVE = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/ma
 
 async function bundled(file: string): Promise<any | null> {
   try {
-    const r = await fetch(dataUrl(`/data/${file}`), { credentials: "same-origin" });
+    const r = await fetch(`/data/${file}`, { credentials: "same-origin" });
     if (!r.ok) return null;
     return await readJson(r);
   } catch { return null; }
