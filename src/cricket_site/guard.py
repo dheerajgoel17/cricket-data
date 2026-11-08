@@ -156,7 +156,8 @@ def recount_bat_first(M: dict, ids: list[str]) -> tuple[int, float | None]:
         if k is not None and M["r"][k] == 0 and M["w"][k] >= 0 and M["fi"][k] >= 0:
             decided += 1
             wins += M["w"][k] == M["fi"][k]
-    return decided, (round(100 * wins / decided, 1) if decided else None)
+    # Round exact half-tenths up, as the engine does (9/16 is 56.25%, shown as 56.3%).
+    return decided, ((2000 * wins + decided) // (2 * decided) / 10 if decided else None)
 
 
 def check_bat_first(M: dict, editions: list[dict] | None) -> Check:

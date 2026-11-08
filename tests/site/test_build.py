@@ -523,6 +523,20 @@ def test_a_priced_test_the_schedule_has_dropped_is_started_until_its_fixture_has
     assert by(datetime(2026, 11, 3, 10, 0, tzinfo=timezone.utc)) == {}
 
 
+def test_a_priced_test_expires_from_the_start_it_publishes(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "out"
+    start = "2026-11-02T03:00Z"
+    _archive_test(arc, "2026-11-02-a-v-b", "A vs B", "2026-11-02T08:00Z", fixture={"start": start, "fmt": "Test"})
+    before = datetime(2026, 11, 8, 2, 59, tzinfo=timezone.utc)
+    assert [(r["start"], r["status"]) for r in B._unscheduled_priced(vb, [], now=before)] == [(start, "Started")]
+    after = datetime(2026, 11, 8, 4, 50, tzinfo=timezone.utc)
+    assert B._unscheduled_priced(vb, [], now=after) == []
+
+
 def test_a_scheduled_test_leaves_the_fixtures_a_day_after_it_ended_and_nothing_else_does(tmp_path):
     from datetime import datetime, timezone
 

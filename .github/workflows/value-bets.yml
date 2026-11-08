@@ -71,6 +71,9 @@ jobs:
       BETFAIR_API_URL: ${{ secrets.BETFAIR_API_URL }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # A queued writer must start from the branch tip after the previous writer has finished.
+          ref: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)) && github.ref || github.sha }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -159,7 +162,12 @@ jobs:
           if git diff --cached --quiet; then echo "No changes."; exit 0; fi
           git commit -q -m "value-bets: $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"
           for i in 1 2 3; do
-            git pull --rebase -q && git push -q && exit 0
+            if git pull --rebase -q; then
+              git push -q && exit 0
+            elif git rebase --abort; then
+              echo "::error::Concurrent edits conflict with generated outputs; run again from the current branch tip"
+              exit 1
+            fi
             sleep $((i * 10))
           done
           echo "::error::push failed after retries"; exit 1
