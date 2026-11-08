@@ -3,5 +3,10 @@
   "edge": 0.059,
   "start_utc": "2026-11-08T02:40:00Z",
   "alerted_at": "2026-11-06T23:33:07.441556+00:00"
+ },
+ "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-08|batter_runs||Ellyse Perry under 25.5|25.5|under": {
+  "edge": 0.0633,
+  "start_utc": "2026-11-08T02:40:00Z",
+  "alerted_at": "2026-11-08T02:33:06.164553+00:00"
  }
 }
