@@ -166,7 +166,7 @@ export default function FixturePage() {
           ) : null}
         </BlurBar>
       </View>
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }

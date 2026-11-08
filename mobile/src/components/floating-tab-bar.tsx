@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { router, usePathname } from "expo-router";
@@ -42,6 +42,7 @@ function TabButton({ t, on }: { t: (typeof TABS)[number]; on: boolean }) {
 export function FloatingTabBar() {
   const path = usePathname();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const index = Math.max(0, TABS.findIndex((t) => path === t.href));
   const [w, setW] = useState(0);
   const tabW = w ? (w - PAD * 2 - GAP * (TABS.length - 1)) / TABS.length : 0;
@@ -49,7 +50,7 @@ export function FloatingTabBar() {
   useEffect(() => { x.value = withSpring(index, { damping: 18, stiffness: 260, mass: 0.85 }); }, [index, x]);
   const glide = useAnimatedStyle(() => ({ transform: [{ translateX: x.value * (tabW + GAP) }] }));
   return (
-    <View style={[styles.bar, { bottom: insets.bottom + 12 }]} pointerEvents="box-none">
+    <View style={[styles.bar, { bottom: insets.bottom + 12, left: width < 360 ? 8 : 16, right: width < 360 ? 8 : 16 }]} pointerEvents="box-none">
       <View style={styles.row} onLayout={(e) => setW(e.nativeEvent.layout.width)}>
         {tabW ? <Animated.View pointerEvents="none" style={[styles.thumb, { width: tabW }, glide]} /> : null}
         {TABS.map((t, i) => <TabButton key={t.name} t={t} on={i === index} />)}
@@ -59,9 +60,9 @@ export function FloatingTabBar() {
 }
 
 const styles = StyleSheet.create({
-  bar: { position: "absolute", left: 16, right: 16, height: TAB_BAR_HEIGHT, borderRadius: TAB_BAR_HEIGHT / 2, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.16)", backgroundColor: "rgba(34,34,36,0.97)", zIndex: 50 },
+  bar: { position: "absolute", height: TAB_BAR_HEIGHT, borderRadius: TAB_BAR_HEIGHT / 2, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.16)", backgroundColor: "rgba(34,34,36,0.97)", zIndex: 50 },
   row: { flex: 1, flexDirection: "row", padding: PAD, gap: GAP },
   thumb: { position: "absolute", left: PAD, top: PAD, bottom: PAD, borderRadius: TAB_BAR_HEIGHT / 2 - PAD, backgroundColor: "rgba(120,120,128,0.30)" },
-  tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 1 },
-  label: { ...type.caption, fontFamily: font.semibold },
+  tab: { flex: 1, minWidth: 0, alignItems: "center", justifyContent: "center", gap: 1 },
+  label: { ...type.caption, fontFamily: font.semibold, maxWidth: "100%" },
 });

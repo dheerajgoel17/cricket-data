@@ -65,7 +65,7 @@ export default function League() {
           ) : null}
         </ScrollView>
       )}
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }

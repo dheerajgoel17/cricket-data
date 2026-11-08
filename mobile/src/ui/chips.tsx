@@ -22,11 +22,12 @@ function Chip({ label, count, on, muted, onPress }: { label: string; count?: num
   useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 200 }); }, [on, p]);
   const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.foreground]) }));
   const text = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color.background]) }));
+  const countColor = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], color.background]) }));
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
       <Animated.View style={[styles.chip, box, muted && !on && { opacity: 0.7 }]}>
         <AnimatedText style={[styles.label, text]}>{label}</AnimatedText>
-        {count != null ? <AnimatedText style={styles.count}>{count}</AnimatedText> : null}
+        {count != null ? <AnimatedText style={[styles.count, countColor]}>{count}</AnimatedText> : null}
       </Animated.View>
     </Press>
   );
@@ -36,5 +37,5 @@ const styles = StyleSheet.create({
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
   label: { ...type.body, fontSize: 15 },
-  count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  count: { ...type.footnote, fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

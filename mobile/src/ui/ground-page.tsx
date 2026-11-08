@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { layoutWidth } from "@/lib/fit";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
@@ -140,7 +141,7 @@ function TourChip({ from, fixtureId, atGround, now }: { from: any; fixtureId: st
 
 /** Match-Fancy-shaped markets from the games at this ground: median / mean / range, bars, over / under at a line, and the ladder. One format (the chips above). */
 function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx: number; fmt: string; gender: GenderFilter }) {
-  const { width } = useWindowDimensions();
+  const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [market, setMarket] = useState("match_runs"), [line, setLine] = useState<number | null>(null);
   const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
   useEffect(() => { setLine(null); }, [fmtName, market]);

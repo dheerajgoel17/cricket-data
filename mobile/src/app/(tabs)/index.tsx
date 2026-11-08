@@ -1,7 +1,8 @@
 import { Profiler, useMemo, useState } from "react";
 import { mark, onRender } from "@/lib/perf";
-import { RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { layoutWidth } from "@/lib/fit";
+import Animated from "react-native-reanimated";
 import type { HomePhase } from "@site/lib/home-phase";
 import { seriesName, shortSeries } from "@/lib/format";
 import { EMPTY_PHASE, phaseView, seriesChips, type RailItem } from "@/lib/rail";
@@ -12,7 +13,6 @@ import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
 import { HotHome } from "@/ui/hot-home";
-import { RailCard } from "@/ui/rail-card";
 import { useScreenInsets } from "@/ui/insets";
 import { enter, Skeleton } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
@@ -25,9 +25,8 @@ export default function Fixtures() {
   // the pull-to-refresh spinner follows only a pull: the 15 s live poll refetches on its own and must not open it
   const [pulling, setPulling] = useState(false);
   const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
-  const now = useNow();
   const inset = useScreenInsets();
-  const { width } = useWindowDimensions();
+  const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [asked, setAsked] = useState<HomePhase>();
   const [series, setSeries] = useState("all");
 
@@ -38,8 +37,6 @@ export default function Fixtures() {
   const chips = useMemo<[string, string, number][]>(() => [["all", "All", inPhase.length], ...seriesCounts.map(([n, k]) => [n, shortSeries(n), k] as [string, string, number])], [inPhase, seriesCounts]);
 
   const cardW = Math.round(width * FIXTURE_CARD_SHARE);
-  const railX = useSharedValue(0);
-  const onRail = useAnimatedScrollHandler((e) => { railX.value = e.contentOffset.x; });
   const gap = space.snug;
 
   return (
@@ -60,19 +57,16 @@ export default function Fixtures() {
             horizontal
             data={shown}
             keyExtractor={(i) => `${i.fixture.id}${i.fixture.a}${i.fixture.b}`}
-            renderItem={({ item, index }) => <Animated.View entering={enter(index)} style={{ width: cardW }}><RailCard x={railX} index={index} step={cardW + gap}><FixtureCard item={item} now={now} /></RailCard></Animated.View>}
-            onScroll={onRail}
-            scrollEventThrottle={16}
+            renderItem={({ item, index }) => <Animated.View entering={enter(index)} style={{ width: cardW }}><TimedFixtureCard item={item} /></Animated.View>}
             ItemSeparatorComponent={() => <View style={{ width: gap }} />}
             getItemLayout={(_, index) => ({ length: cardW + gap, offset: (cardW + gap) * index, index })}
             initialNumToRender={2}
             windowSize={3}
             maxToRenderPerBatch={2}
-            removeClippedSubviews
             snapToInterval={cardW + gap}
             snapToAlignment="start"
             decelerationRate="fast"
-            contentContainerStyle={{ paddingHorizontal: space.gutter, paddingTop: space.snug }}
+            contentContainerStyle={{ paddingLeft: space.gutter, paddingRight: Math.max(space.gutter, width - cardW - space.gutter), paddingTop: space.snug }}
             showsHorizontalScrollIndicator={false}
           />
         )}
@@ -82,6 +76,11 @@ export default function Fixtures() {
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
     </View>
   );
+}
+
+function TimedFixtureCard({ item }: { item: RailItem }) {
+  const now = useNow();
+  return <FixtureCard item={item} now={now} />;
 }
 
 function RailSkeleton({ width }: { width: number }) {
@@ -96,6 +95,6 @@ function RailSkeleton({ width }: { width: number }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
-  skeletonRow: { flexDirection: "row", gap: space.snug, paddingTop: space.snug, paddingHorizontal: space.gutter },
-  skeleton: { height: 190, borderRadius: radius.card },
+  skeletonRow: { overflow: "hidden", flexDirection: "row", gap: space.snug, paddingTop: space.snug, paddingHorizontal: space.gutter },
+  skeleton: { flexShrink: 0, height: 190, borderRadius: radius.card },
 });

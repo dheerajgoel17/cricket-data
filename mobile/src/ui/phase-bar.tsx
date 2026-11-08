@@ -1,4 +1,5 @@
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions, View } from "react-native";
+import { layoutWidth } from "@/lib/fit";
 import { HOME_PHASES, type HomePhase } from "@site/lib/home-phase";
 import { GlassSurface } from "@/ui/glass";
 import { useScreenInsets } from "@/ui/insets";
@@ -13,7 +14,7 @@ const PAD = 4;
  */
 export function PhaseBar({ value, counts, onChange }: { value: HomePhase; counts: Record<HomePhase, number>; onChange: (p: HomePhase) => void }) {
   const { bottom } = useScreenInsets();
-  const { width } = useWindowDimensions();
+  const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const items = HOME_PHASES.map(([id, label]) => [id, `${label} ${counts[id]}`] as [HomePhase, string]);
   const outer = Math.min(width - 2 * space.gutter, 380);
   return (

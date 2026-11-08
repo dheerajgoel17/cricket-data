@@ -98,7 +98,7 @@ export default function Team() {
           )}
         </ScrollView>
       )}
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }
