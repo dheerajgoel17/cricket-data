@@ -24,7 +24,7 @@ More: [Getting started](docs/GETTING_STARTED.md) · [Contributing](CONTRIBUTING.
 
 ## Support
 
-This project is free and ad-free. If it's useful to you, you can support it:
+This project is free. If it's useful to you, you can support it:
 
 <p align="center">
   <a href="https://buymeacoffee.com/meghnaad">

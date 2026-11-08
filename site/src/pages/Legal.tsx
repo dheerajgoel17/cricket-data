@@ -64,12 +64,13 @@ export function PrivacyPage() {
       <p>We count page views and a few named button taps (for example opening extra books, sharing a player). Analytics are separate from your Saved account.</p>
       <ul>
         <li><b>Host analytics</b> (when enabled on the host) counts visits without cookies and without personal data.</li>
-        <li><b>Google Analytics 4</b> loads only when a measurement id is configured at build. Ads cookies stay off. The tag records the path, referrer, device class, language, and an anonymous country/region from the edge request headers. Headless and crawler browsers are flagged as bots. There is no consent banner because ads stay off; you can block the tag with a browser privacy tool.</li>
+        <li><b>Google Analytics 4</b> loads only when a measurement id is configured at build. The tag records the path, referrer, device class, language, and an anonymous country/region from the edge request headers. Headless and crawler browsers are flagged as bots. You can block the tag with a browser privacy tool.</li>
+        <li><b>Google AdSense</b> shows ads on the site. Google and its partners may use cookies or similar identifiers to serve and measure ads, including ads based on your earlier visits to this and other sites. Where the law requires it (for example in the EEA and the UK) ads load only after you choose in the consent message. You can manage ad personalisation at Google's ad settings page or opt out with a browser privacy tool.</li>
       </ul>
 
       <h2>What we do not do</h2>
       <ul>
-        <li>No paid subscription, no mailing list push, no sale of personal data, no advertising network, no affiliate links to place a bet.</li>
+        <li>No paid subscription, no mailing list push, no sale of personal data, no affiliate links to place a bet.</li>
         <li>We do not take wagers. Book names and logos are shown only to say which source a listed price came from.</li>
       </ul>
 
