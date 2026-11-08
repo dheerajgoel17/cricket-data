@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-08 20:01 IST
+# Cricket value bets - 2026-11-08 20:07 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -17,4 +17,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Ajk Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Faisalabad Region (male), Fata Region (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), MID West Rhinos (male), Mountaineers (male), Multan Region (male), Peshawar Blues (male), Peshawar Whites (male), Quetta Region (male), Rawalpindi Region (male), Royal Champs (male), Sialkot Blues (male), Sialkot Region (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
 
-Runtime 157.2s. Snapshot: `odds_20261108T143117Z.jsonl.gz`
+Runtime 104.8s. Snapshot: `odds_20261108T143736Z.jsonl.gz`
