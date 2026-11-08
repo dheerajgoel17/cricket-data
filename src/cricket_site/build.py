@@ -761,8 +761,8 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         if mins > now_min:
             if fx:
                 continue  # already linked to a schedule row; the upcoming stop-gap is only for a match the page has not reached yet
-        elif mins < now_min - keep_min:
-            continue
+        elif _minutes((fx.get("start") or start)[:16] + "Z") < now_min - keep_min:
+            continue  # counted from the start the row publishes (the fixture's), the clock the data guard uses; the books' start can be hours later
         elif fmt == "Test" and (end := testend.end_of(d)) and testend.gone(end, now):
             continue  # it has a result and ended more than a day ago; its fixture page opens from the archive
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
@@ -810,6 +810,18 @@ def _drop_ended_tests(rows: list[dict], vb_dir: Path | None, now: datetime) -> l
     return [r for r in rows if not over(r)]
 
 
+UNTRACKED = Path(__file__).resolve().parents[2] / "config" / "untracked.json"
+
+
+def _untracked(path: Path = UNTRACKED) -> tuple[set[str], list[str]]:
+    """Formats and series (lower-case substrings) kept in the data and the archive but not published as fixtures, until the books price enough markets for them (``config/untracked.json``)."""
+    try:
+        c = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return set(), []
+    return set(c.get("formats") or []), [str(x).lower() for x in c.get("series") or []]
+
+
 def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict, now: datetime | None = None) -> list[dict]:
     """Fixtures and start times come from Source A's schedule only (data/fixtures/upcoming.csv).
 
@@ -829,6 +841,8 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict, now: date
     now = now or datetime.now(timezone.utc)
     rows += _unscheduled_priced(vb_dir, rows, now)
     rows = _drop_ended_tests(rows, vb_dir, now)
+    skip_fmt, skip_series = _untracked()
+    rows = [r for r in rows if r["fmt"] not in skip_fmt and not any(x in (r.get("series") or "").lower() for x in skip_series)]
     out, seen = [], set()
     canon = {(_norm_team(t), gg): t for (t, gg) in team_ix}
     for r in sorted(rows, key=lambda r: r["start"]):
