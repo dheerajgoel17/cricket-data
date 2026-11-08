@@ -76,9 +76,11 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
     return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
   };
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
+  const board = hasScore && !final;
   return (
-    <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
+    <section className="flex flex-col gap-stack lg:grid lg:grid-cols-12 lg:gap-x-section lg:rounded-2xl lg:bg-card lg:p-inset lg:ring-1 lg:ring-hairline">
+      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="lg:col-span-12 -ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
+      <div className={cn("flex min-w-0 flex-col gap-stack", board ? "lg:col-span-5" : "lg:col-span-12")}>
       <div className="flex items-center gap-snug">
         <span className={cn("label-cap text-footnote", livePulse ? "text-miss" : session ? "text-destructive" : "text-muted-foreground")}>
           {livePulse && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{badge}
@@ -110,7 +112,8 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
         {(blurb || f.series) ? <p className="text-callout text-muted-foreground">{[blurb, f.series].filter(Boolean).join(" · ")}</p> : null}
         {f.venue ? <FixtureVenue venue={f.venue} fixtureId={f.id} /> : (!blurb && !f.series ? <p className="text-callout text-muted-foreground">Match details to be confirmed</p> : null)}
       </div>
-      {hasScore && !final && <LiveBoard match={match} teams={sides} />}
+      </div>
+      {board && <div className="min-w-0 lg:col-span-7 lg:border-l lg:border-hairline lg:pl-section"><LiveBoard match={match} teams={sides} /></div>}
     </section>
   );
 }
@@ -183,16 +186,17 @@ export function FixturePage() {
   if (groundDetail) {
     return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />;
   }
-  // desktop: the match (score, ball by ball, scorecard, form) is a sticky side panel and the sections fill the wide column; on a phone it is the usual stack, match first
+  // desktop: the match is a card across the top (score, who is batting, ball by ball); under it the sections fill a wide card and the scorecard and form are a sticky side column. A phone keeps the one stack.
   return (
-    <div className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-section">
-      <div className="flex min-w-0 flex-col gap-section lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))] lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-h-[calc(100dvh-var(--header-h)-var(--space-section))] lg:overflow-y-auto lg:overscroll-contain">
-        <MatchHeader f={fx} live={live} />
-        <MatchAccordions match={match} teams={known} fmt={fmt} />
-      </div>
-      {!ready ? <div className="flex flex-col gap-stack lg:col-span-7 lg:col-start-1 lg:row-start-1"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
-        <div className="flex min-w-0 flex-col gap-stack lg:col-span-7 lg:col-start-1 lg:row-start-1">
-          <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
+    <div className="flex flex-col gap-section">
+      <MatchHeader f={fx} live={live} />
+      <div className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-section">
+        <div className="min-w-0 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))] lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:max-h-[calc(100dvh-var(--header-h)-var(--space-section))] lg:overflow-y-auto lg:overscroll-contain">
+          <MatchAccordions match={match} teams={known} fmt={fmt} />
+        </div>
+      {!ready ? <div className="flex flex-col gap-stack lg:col-span-8 lg:col-start-1 lg:row-start-1"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
+        <div className="flex min-w-0 flex-col gap-stack lg:col-span-8 lg:col-start-1 lg:row-start-1 lg:rounded-2xl lg:bg-card lg:p-gutter lg:ring-1 lg:ring-hairline">
+          <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight lg:bg-card/80 backdrop-blur-xl backdrop-saturate-150">
             <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
           <div ref={bodyRef} className="scroll-mt-32">
@@ -231,6 +235,7 @@ export function FixturePage() {
           </AnimatedHeight>
           </div>
         </div>)}
+      </div>
     </div>
   );
 }

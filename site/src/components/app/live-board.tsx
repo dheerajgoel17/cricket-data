@@ -316,11 +316,12 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
   const card = match ? cardInns(match) : [];
   const form = recentForms(store, teams, fmt);
   const showForm = form.some((f) => f.games.length);
+  const [open, setOpen] = useState<string[]>(() => (typeof window !== "undefined" && window.matchMedia?.("(min-width: 1024px)").matches ? ["scorecard", "form"] : [])); // desktop shows both, a phone keeps them closed so props stay first
   if (!card.length && !showForm) return null;
   return (
-    <Accordion type="multiple" className="w-full">
+    <Accordion type="multiple" value={open} onValueChange={setOpen} className="flex w-full flex-col lg:gap-stack">
       {!!card.length && (
-        <AccordionItem value="scorecard" className="border-hairline">
+        <AccordionItem value="scorecard" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <span className="flex min-w-0 flex-1 items-center gap-snug">
               <span className="truncate text-body font-medium">Scorecard</span>
@@ -333,7 +334,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
         </AccordionItem>
       )}
       {showForm && (
-        <AccordionItem value="form" className="border-hairline">
+        <AccordionItem value="form" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <FormHeadline teams={teams} fmt={fmt} />
           </AccordionTrigger>
