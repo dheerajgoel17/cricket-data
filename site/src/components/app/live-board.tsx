@@ -321,7 +321,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
   return (
     <Accordion type="multiple" value={open} onValueChange={setOpen} className="flex w-full flex-col lg:gap-stack">
       {!!card.length && (
-        <AccordionItem value="scorecard" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline">
+        <AccordionItem value="scorecard" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline lg:[--gutter:0.75rem] lg:[--spacing-gutter:0.75rem]">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <span className="flex min-w-0 flex-1 items-center gap-snug">
               <span className="truncate text-body font-medium">Scorecard</span>
@@ -334,7 +334,7 @@ export function MatchAccordions({ match, teams, fmt }: { match?: any; teams: Sid
         </AccordionItem>
       )}
       {showForm && (
-        <AccordionItem value="form" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline">
+        <AccordionItem value="form" className="border-hairline lg:rounded-2xl lg:border-b-0 lg:bg-card lg:px-gutter lg:ring-1 lg:ring-hairline lg:[--gutter:0.75rem] lg:[--spacing-gutter:0.75rem]">
           <AccordionTrigger className="gap-snug py-snug hover:no-underline">
             <FormHeadline teams={teams} fmt={fmt} />
           </AccordionTrigger>

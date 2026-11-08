@@ -78,7 +78,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   const board = hasScore && !final;
   return (
-    <section className="flex flex-col gap-stack lg:grid lg:grid-cols-12 lg:gap-x-section lg:rounded-2xl lg:bg-card lg:p-inset lg:ring-1 lg:ring-hairline">
+    <section className="flex flex-col gap-stack lg:grid lg:grid-cols-12 lg:gap-x-section lg:rounded-2xl lg:bg-card lg:p-gutter lg:ring-1 lg:ring-hairline lg:[--gutter:0.75rem] lg:[--spacing-gutter:0.75rem]">
       <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="lg:col-span-12 -ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
       <div className={cn("flex min-w-0 flex-col gap-stack", board ? "lg:col-span-5" : "lg:col-span-12")}>
       <div className="flex items-center gap-snug">
@@ -195,7 +195,7 @@ export function FixturePage() {
           <MatchAccordions match={match} teams={known} fmt={fmt} />
         </div>
       {!ready ? <div className="flex flex-col gap-stack lg:col-span-8 lg:col-start-1 lg:row-start-1"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
-        <div className="flex min-w-0 flex-col gap-stack lg:col-span-8 lg:col-start-1 lg:row-start-1 lg:rounded-2xl lg:bg-card lg:p-gutter lg:ring-1 lg:ring-hairline">
+        <div className="flex min-w-0 flex-col gap-stack lg:col-span-8 lg:col-start-1 lg:row-start-1 lg:rounded-2xl lg:bg-card lg:p-gutter lg:ring-1 lg:ring-hairline lg:[--gutter:0.75rem] lg:[--spacing-gutter:0.75rem]">
           <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight lg:bg-card/80 backdrop-blur-xl backdrop-saturate-150">
             <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
