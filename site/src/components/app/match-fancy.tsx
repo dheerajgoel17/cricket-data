@@ -16,7 +16,7 @@ import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
-import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
+import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -144,7 +144,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
   const scope = scopes.some(([v]) => v === wantSc) ? Number(wantSc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
-  const keyList = (scope < 0 ? MATCH_KEYS : TEAM_KEYS).flatMap(([k, lab]) => (scope < 0 ? [0] : FANCY_INNS).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn), lab].filter(Boolean).join(" · ")] as [string, string]));
+  const keyList = (scope < 0 ? MATCH_KEYS : TEAM_KEYS).flatMap(([k, lab]) => (scope < 0 ? [0] : FANCY_INNS).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null, inn), inn, scope) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
   const wantFm = String(q.fm || "");
   const fm = keyList.some(([k]) => k === wantFm) ? wantFm : keyList[0]?.[0] || "";
   const { key, inn } = parseFm(fm);
@@ -199,7 +199,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     const lean = pO != null && pU != null && pO !== pU ? (pO > pU ? "over" : "under") : null;
     const vms = venueIdx.length ? (batFirstNow ? firstInnsMs(store, hereMatches(10), scope) : hereMatches(10)) : [];
     const url = shareFixtureUrl(location.origin, fx.id);
-    const text = fancyShareText({ a: fx.a, b: fx.b, label: [innTag(inn), team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
+    const text = fancyShareText({ a: fx.a, b: fx.b, label: [innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
     void sendShare(text || url, `${fx.a} v ${fx.b}`, () => toast("Copied"));
   };
   // how this market has gone at the ground, set against the sample on screen: a ground can sit far from the teams' form (a small, slow one)
@@ -283,7 +283,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                     <>
                       <section className="flex flex-col gap-stack">
-                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
+                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
                         {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                         <div className="flex items-end gap-group">
                           <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
