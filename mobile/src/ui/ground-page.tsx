@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { layoutWidth } from "@/lib/fit";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
+import { sameFixture } from "@cricket/engine/lines.js";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
-import { odds, pc } from "@site/lib/format";
-import { filterGames, genderFilterLabel, groundGames, majorityFormat, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
+import { matchDateLabel, odds, pc } from "@site/lib/format";
+import { genderFilterLabel, groundGames, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
 import { fetchVenueWx, groundClock } from "@site/lib/venue-wx";
+import { groundMatchFilters } from "@/lib/ground-filters";
 import { storeQuery } from "@/lib/data";
 import { openFixture, openPlayer } from "@/lib/nav";
-import { fixturesQuery } from "@/lib/queries";
-import { fixtureState, type RailItem } from "@/lib/rail";
+import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
+import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { Chips } from "@/ui/chips";
 import { DataTable, Metric } from "@/ui/data-table";
@@ -28,7 +31,7 @@ import { Text } from "@/ui/text";
 import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
-const PAGE = 20;
+const PAGE = 8;
 const pct1 = (n: number | null) => (n == null ? "–" : `${(n * 100).toFixed(1)}%`);
 const short = (n: number | null | undefined, d = 1) => (n == null ? "–" : Number.isInteger(n) ? String(n) : n.toFixed(d));
 
@@ -38,85 +41,111 @@ const short = (n: number | null | undefined, d = 1) => (n == null ? "–" : Numb
  */
 export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixtureId?: string; from?: any }) {
   const inset = useScreenInsets(false);
-  const now = useNow(30_000);
   const stats = useQuery(storeQuery), fixtures = useQuery(fixturesQuery);
   const store: any = stats.data?.store;
   const g = useMemo(() => (store ? groundGames(store, fixtures.data, venue) : null), [store, fixtures.data, venue]);
-  const [fmt, setFmt] = useState(""), [gender, setGender] = useState<GenderFilter>(""), [shown, setShown] = useState(PAGE);
+  const [fmt, setFmt] = useState(from?.fmt ?? ""), [gender, setGender] = useState<GenderFilter>("");
+  const [section, setSection] = useState<"matches" | "markets">("matches");
+  const filters = useMemo(() => g && groundMatchFilters(g.atGround, fmt, gender), [g, fmt, gender]);
   const name = g?.label || venue || "Ground";
   const { ground, city } = venueParts(name);
   const wx = useQuery({ queryKey: ["venue-wx", name], queryFn: () => fetchVenueWx(name), staleTime: 10 * 60_000, enabled: !!venue });
-  const head = <PageHeader title={ground} subtitle="Ground" />;
+  const head = <PageHeader title="Ground" />;
 
   if (!venue) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></View>;
-  if (!g || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" /></View>;
+  if ((!g && stats.isError) || (fixtures.isError && !fixtures.data)) return (
+    <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={[styles.pad, styles.stack]}>
+      <EmptyState title="Could not load ground" body="Try again to see the matches and market history." />
+      <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
+    </View></View>
+  );
+  if (!g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" /></View>;
   if (!g.known) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></View>;
 
-  const activeFmt = FORMATS.includes(fmt) ? fmt : majorityFormat(g.atGround);
-  const list = filterGames(g.atGround, activeFmt, gender);
-  const formats = FORMATS.map((f) => [f, g.atGround.filter((x: any) => (x.fmt || "T20") === f && (!gender || x.gender === gender || (!x.gender && gender === "male"))).length] as const).filter(([, n]) => n > 0);
-  const both = g.atGround.some((f: any) => f.gender !== "female") && g.atGround.some((f: any) => f.gender === "female");
-  const w = wx.data;
-  const local = w?.timeZone ? groundClock(w.timeZone, now) : w?.localTime || "";
-
+  const { activeFmt, formats, list, both } = filters;
+  const activeSection = g.primary < 0 ? "matches" : section;
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       {head}
-      <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24, gap: space.section }} showsVerticalScrollIndicator={false}>
-        <View style={[styles.pad, { gap: space.stack }]}>
+      <ScrollView stickyHeaderIndices={g.primary >= 0 ? [1] : undefined} contentContainerStyle={{ paddingBottom: inset.bottom + space.section }} showsVerticalScrollIndicator={false}>
+        <View style={[styles.pad, styles.stack, styles.intro]}>
           <View style={styles.hero}>
-            <View style={styles.pin}><Ionicons name="location" size={28} color={color.primary} /></View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.kicker}>Ground</Text>
-              <Text style={styles.name} numberOfLines={2}>{ground}</Text>
-              {city ? <Text style={styles.city} numberOfLines={1}>{city}</Text> : null}
+            <View style={styles.heroHead}>
+              <View style={styles.pin}><Ionicons name="location-outline" size={22} color={color.primary} /></View>
+              <View style={styles.heroText}>
+                <Text style={styles.kicker}>Venue overview</Text>
+                <Text style={styles.name} accessibilityRole="header">{ground}</Text>
+                {city ? <Text style={styles.city}>{city}</Text> : null}
+              </View>
             </View>
+            <GroundConditions count={g.atGround.length} weather={wx.data} loading={wx.isLoading} unavailable={wx.isError} />
           </View>
-          <View style={styles.metrics}>
-            <Metric k="Matches">{g.atGround.length}</Metric>
-            <Metric k="Weather">{wx.isLoading ? "…" : w ? `${w.temp}°` : "–"}</Metric>
-            <Metric k="Local">{wx.isLoading ? "…" : local || "–"}</Metric>
-          </View>
-          {w ? <Text style={styles.note}>{w.label} · ground local time{w.city && w.city !== city ? ` · ${w.city}` : ""}</Text> : wx.isError ? <Text style={styles.note}>Weather unavailable for this ground</Text> : null}
-          {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={g.atGround} now={now} /> : null}
+          {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={g.atGround} /> : null}
         </View>
 
-        <View style={{ gap: space.snug }}>
-          <Chips items={formats.map(([f, n]) => [f, f, n])} value={activeFmt} onChange={(v) => { setFmt(v); setShown(PAGE); }} />
-          {both ? (
-            <View style={styles.pad}>
-              <Segmented<GenderFilter> label="Gender" value={gender} onChange={(v) => { setGender(v); setShown(PAGE); }} items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]]} />
-            </View>
-          ) : null}
+        {g.primary >= 0 ? <View style={[styles.pad, styles.sectionBar]}>
+          <Segmented<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} height={44} items={[["matches", "Matches"], ["markets", "Markets"]]} />
+        </View> : null}
+
+        <View style={styles.filters}>
+          <View style={[styles.pad, styles.titleRow]}><Text style={styles.kicker}>Match filters</Text><Text style={styles.note}>{activeFmt} · {genderFilterLabel(gender)}</Text></View>
+          <Chips items={formats} value={activeFmt} onChange={setFmt} />
+          {both ? <View style={styles.pad}>
+            <Segmented<GenderFilter> label="Gender" value={gender} onChange={setGender} items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]]} />
+          </View> : null}
         </View>
 
-        <View style={[styles.pad, { gap: space.snug }]}>
-          <View style={styles.titleRow}><Text style={styles.h2}>Matches</Text><Text style={styles.count}>{list.length}</Text></View>
-          {!list.length ? (
-            <EmptyState compact title="No matches" body="Nothing at this ground for the filters you picked." />
-          ) : (
-            <>
-              {list.slice(0, shown).map((f: any) => {
-                const item: RailItem = { fixture: f, state: fixtureState(f, undefined, now), live: null, noProps: !!f.noProps };
-                return <FixtureCard key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} item={item} now={now} link={f.source !== "history"} />;
-              })}
-              {list.length > shown ? (
-                <Press accessibilityRole="button" onPress={() => setShown((n) => n + PAGE)} style={styles.more}>
-                  <Text style={styles.moreText}>Show more · {list.length - shown} left</Text>
-                </Press>
-              ) : null}
-            </>
-          )}
-        </View>
-
-        {g.primary >= 0 ? <GroundMarkets store={store} venueIdx={g.primary} fmt={activeFmt} gender={gender} /> : null}
+        {activeSection === "markets"
+          ? <GroundMarkets store={store} venueIdx={g.primary} fmt={activeFmt} gender={gender} />
+          : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
       </ScrollView>
     </View>
   );
 }
 
+function GroundConditions({ count, weather, loading, unavailable }: { count: number; weather?: Awaited<ReturnType<typeof fetchVenueWx>>; loading: boolean; unavailable: boolean }) {
+  const now = useNow(30_000);
+  const local = weather?.timeZone ? groundClock(weather.timeZone, now) : weather?.localTime;
+  return (
+    <View style={styles.conditions}>
+      <View style={styles.metrics}>
+        <Metric k="Listed matches">{count}</Metric>
+        <Metric k="Temperature">{loading ? "…" : weather ? `${weather.temp}°` : "–"}</Metric>
+        <Metric k="Local time">{loading ? "…" : local || "–"}</Metric>
+      </View>
+      {weather || unavailable ? <Text style={styles.note}>{weather?.label || "Weather unavailable"}{weather?.city ? ` · ${weather.city}` : ""}</Text> : null}
+    </View>
+  );
+}
+
+function GroundMatches({ list }: { list: any[] }) {
+  const [shown, setShown] = useState(PAGE);
+  const scores = useQuery(liveQuery), lines = useQuery(linesQuery);
+  const now = useNow(30_000);
+  return (
+    <View style={[styles.pad, styles.stack]}>
+      <View style={styles.titleRow}><Text style={styles.h2} accessibilityRole="header">Matches at this ground</Text><Text style={styles.count}>{list.length}</Text></View>
+      {!list.length ? <EmptyState compact title="No matches" body="Try another format or gender filter." /> : list.slice(0, shown).map((f) => {
+        const historical = f.source === "history";
+        const match = historical ? null : liveMatchFor(scores.data, lines.data, f);
+        // The live lookup can fall back to a different game between the same teams.
+        const live = match?.start && sameFixture({ match: `${f.a} vs ${f.b}`, start_utc: match.start, fmt: match.fmt }, f) ? match : null;
+        const item: RailItem = { fixture: f, state: fixtureState(f, live?.status, now), live, noProps: !historical && !!f.noProps };
+        return <View key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} style={styles.match}>
+          <Text style={styles.note}>{matchDateLabel(f.start)}</Text>
+          <FixtureCard item={item} now={now} link={!historical} />
+        </View>;
+      })}
+      {list.length > shown ? <Press accessibilityRole="button" onPress={() => setShown((n) => n + PAGE)} style={styles.more}>
+        <Text style={styles.moreText}>Show more matches · {list.length - shown} left</Text>
+      </Press> : null}
+    </View>
+  );
+}
+
 /** The series' games at this ground as one row back to the match: crests, dates here, status. */
-function TourChip({ from, fixtureId, atGround, now }: { from: any; fixtureId: string; atGround: any[]; now: number }) {
+function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string; atGround: any[] }) {
+  const now = useNow(30_000);
   const series = seriesName(from);
   const same = useMemo(() => {
     const hits = atGround.filter((f) => seriesName(f) === series);
@@ -132,7 +161,7 @@ function TourChip({ from, fixtureId, atGround, now }: { from: any; fixtureId: st
         <Text style={styles.tourName} numberOfLines={1}>{series}</Text>
         <Text style={styles.note} numberOfLines={1}>{sub}</Text>
       </View>
-      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Live" : status === "Completed" ? "Done" : "Upcoming"}</Text>
+      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Ongoing" : status === "Completed" ? "Done" : "Upcoming"}</Text>
       <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
     </Press>
   );
@@ -140,21 +169,21 @@ function TourChip({ from, fixtureId, atGround, now }: { from: any; fixtureId: st
 
 /** Match-Fancy-shaped markets from the games at this ground: median / mean / range, bars, over / under at a line, and the ladder. One format (the chips above). */
 function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx: number; fmt: string; gender: GenderFilter }) {
-  const { width } = useWindowDimensions();
+  const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [market, setMarket] = useState("match_runs"), [line, setLine] = useState<number | null>(null);
   const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
-  useEffect(() => { setLine(null); }, [fmtName, market]);
+  useEffect(() => { setLine(null); }, [venueIdx, fmtName, gender, market]);
   const ms = useMemo(() => selectMatches(store, { fmt: FORMATS.indexOf(fmtName), venue: venueIdx, gender: gender === "female" ? 1 : gender === "male" ? 0 : null }) as number[], [store, venueIdx, fmtName, gender]);
   const isTop = market === "top_batter";
   const rep = useMemo(() => (isTop || !ms.length ? null : marketReport(store, ms, market)), [store, ms, market, isTop]);
   const tops = useMemo(() => (isTop && ms.length ? (topBatters as any)(store, ms, { scope: "match" }) : null), [store, ms, isTop]);
   const ladder: any[] = rep?.ladder?.filter((l: any) => l.n) || [];
-  const active = line ?? ladder[Math.floor(ladder.length / 2)]?.line ?? ladder[0]?.line ?? null;
+  const active = (ladder.some((l) => l.line === line) ? line : ladder[Math.floor(ladder.length / 2)]?.line) ?? null;
   const at = active == null ? null : ladder.find((l) => l.line === active);
   const s = rep?.summary;
   return (
     <View style={{ gap: space.stack }}>
-      <View style={[styles.pad, styles.titleRow]}><Text style={styles.h2}>Markets</Text><Text style={styles.note}>{ms.length} matches</Text></View>
+      <View style={[styles.pad, styles.titleRow]}><Text style={styles.h2} accessibilityRole="header">Ground markets</Text><Text style={styles.note}>Historical results</Text></View>
       <Chips items={MARKET_CHIPS.map(([k, l]) => [k, l])} value={market} onChange={setMarket} />
       <View style={[styles.pad, { gap: space.stack }]}>
         {!ms.length ? (
@@ -177,7 +206,7 @@ function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx:
             {!tops.rows.length ? <Text style={styles.note}>Not enough matches.</Text> : null}
           </View>
         ) : rep && s && active != null && at ? (
-          <View style={{ gap: space.stack }}>
+          <View style={styles.marketCard}>
             <View style={styles.titleRow}>
               <Text style={styles.h3}>{(MATCH_MARKETS as any)[market]?.label || market}</Text>
               <Text style={styles.note}>{rep.n} matches · void excluded</Text>
@@ -187,7 +216,7 @@ function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx:
               <Stat k="Mean" v={s.mean == null ? "–" : s.mean.toFixed(1)} />
               <Stat k="Range" v={s.min == null || s.max == null ? "–" : `${Math.round(s.min)}–${Math.round(s.max)}`} />
             </View>
-            <MiniBars last={(rep.values as number[]).slice(-40).map((v) => ({ v, s: v > active ? "hit" : "miss" }))} line={active} width={width - space.gutter * 2} />
+            <MiniBars last={(rep.values as number[]).slice(-40).map((v) => ({ v, s: v > active ? "hit" : "miss" }))} line={active} width={width - 2 * (space.gutter + space.inset + 1)} />
             <View style={styles.cards}>
               {(["over", "under"] as const).map((side) => {
                 const p: number | null = at[side === "over" ? "pOver" : "pUnder"] ?? null, fair = at[side === "over" ? "fairOver" : "fairUnder"], hit = at[side];
@@ -201,6 +230,7 @@ function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx:
               })}
             </View>
             {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
+            <Text style={styles.h3}>Compare lines</Text>
             <DataTable
               columns={["Line", "Over", "Under"]}
               flex={[1, 1.3, 1.3]}
@@ -227,8 +257,17 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter },
-  hero: { ...tonal, borderRadius: radius.card, padding: space.inset, flexDirection: "row", alignItems: "center", gap: space.snug },
-  pin: { width: 56, height: 56, borderRadius: 16, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  stack: { gap: space.stack },
+  intro: { paddingTop: space.tight, paddingBottom: space.stack },
+  hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
+  heroHead: { flexDirection: "row", alignItems: "flex-start", gap: space.snug },
+  heroText: { flex: 1, minWidth: 0, gap: space.hair },
+  sectionBar: { backgroundColor: color.background, paddingVertical: space.hair },
+  filters: { paddingTop: space.stack, paddingBottom: space.group },
+  conditions: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug, gap: space.hair },
+  match: { gap: space.hair },
+  marketCard: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
+  pin: { width: 42, height: 42, borderRadius: 12, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   kicker: { ...type.footnote, ...cap, color: color.primary },
   name: { ...type.display, color: color.foreground },
   city: { ...type.body, color: color["muted-foreground"] },
@@ -240,7 +279,7 @@ const styles = StyleSheet.create({
   status: { ...cap },
   titleRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
   h2: { ...type.title, color: color.foreground },
-  h3: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  h3: { flexShrink: 1, ...type.body, fontFamily: font.medium, color: color.foreground },
   count: { ...num, fontSize: 15, color: color["muted-foreground"] },
   more: { ...tonal, borderRadius: radius.card, height: 44, alignItems: "center", justifyContent: "center" },
   moreText: { ...type.callout, color: color.foreground },
