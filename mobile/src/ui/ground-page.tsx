@@ -4,6 +4,7 @@ import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from "rea
 import { layoutWidth } from "@/lib/fit";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
+import { sameFixture } from "@cricket/engine/lines.js";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { matchDateLabel, odds, pc } from "@site/lib/format";
@@ -12,8 +13,8 @@ import { fetchVenueWx, groundClock } from "@site/lib/venue-wx";
 import { groundMatchFilters } from "@/lib/ground-filters";
 import { storeQuery } from "@/lib/data";
 import { openFixture, openPlayer } from "@/lib/nav";
-import { fixturesQuery } from "@/lib/queries";
-import { fixtureState, type RailItem } from "@/lib/rail";
+import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
+import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { Chips } from "@/ui/chips";
 import { DataTable, Metric } from "@/ui/data-table";
@@ -52,7 +53,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
   const head = <PageHeader title="Ground" />;
 
   if (!venue) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></View>;
-  if (!g && stats.isError || fixtures.isError && !fixtures.data) return (
+  if ((!g && stats.isError) || (fixtures.isError && !fixtures.data)) return (
     <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={[styles.pad, styles.stack]}>
       <EmptyState title="Could not load ground" body="Try again to see the matches and market history." />
       <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
@@ -119,15 +120,20 @@ function GroundConditions({ count, weather, loading, unavailable }: { count: num
 
 function GroundMatches({ list }: { list: any[] }) {
   const [shown, setShown] = useState(PAGE);
+  const scores = useQuery(liveQuery), lines = useQuery(linesQuery);
   const now = useNow(30_000);
   return (
     <View style={[styles.pad, styles.stack]}>
       <View style={styles.titleRow}><Text style={styles.h2} accessibilityRole="header">Matches at this ground</Text><Text style={styles.count}>{list.length}</Text></View>
       {!list.length ? <EmptyState compact title="No matches" body="Try another format or gender filter." /> : list.slice(0, shown).map((f) => {
-        const item: RailItem = { fixture: f, state: fixtureState(f, undefined, now), live: null, noProps: !!f.noProps };
+        const historical = f.source === "history";
+        const match = historical ? null : liveMatchFor(scores.data, lines.data, f);
+        // The live lookup can fall back to a different game between the same teams.
+        const live = match?.start && sameFixture({ match: `${f.a} vs ${f.b}`, start_utc: match.start, fmt: match.fmt }, f) ? match : null;
+        const item: RailItem = { fixture: f, state: fixtureState(f, live?.status, now), live, noProps: !historical && !!f.noProps };
         return <View key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} style={styles.match}>
           <Text style={styles.note}>{matchDateLabel(f.start)}</Text>
-          <FixtureCard item={item} now={now} link={f.source !== "history"} />
+          <FixtureCard item={item} now={now} link={!historical} />
         </View>;
       })}
       {list.length > shown ? <Press accessibilityRole="button" onPress={() => setShown((n) => n + PAGE)} style={styles.more}>
@@ -155,7 +161,7 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
         <Text style={styles.tourName} numberOfLines={1}>{series}</Text>
         <Text style={styles.note} numberOfLines={1}>{sub}</Text>
       </View>
-      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Live" : status === "Completed" ? "Done" : "Upcoming"}</Text>
+      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Ongoing" : status === "Completed" ? "Done" : "Upcoming"}</Text>
       <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
     </Press>
   );
