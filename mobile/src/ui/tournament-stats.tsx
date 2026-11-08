@@ -1,7 +1,8 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { layoutWidth } from "@/lib/fit";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { router } from "expo-router";
@@ -85,7 +86,7 @@ function Loading({ done, total }: { done: number; total: number }) {
 }
 
 function Lists({ ed, result }: { ed: any; result: any }) {
-  const { width } = useWindowDimensions();
+  const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const groups = result.groups.filter((g: any) => g.boards.length);
   const [tab, setTab] = useState("bat");
   const group = groups.find((g: any) => g.id === tab) ?? groups[0];

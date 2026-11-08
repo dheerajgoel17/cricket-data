@@ -94,7 +94,7 @@ export default function Search() {
           </>
         )}
       </ScrollView>
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }

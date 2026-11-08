@@ -139,7 +139,7 @@ export default function PlayerPage() {
           </Animated.View>
         </BlurBar>
       </View>
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }

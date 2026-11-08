@@ -41,7 +41,7 @@ export default function Competitions() {
           ) : <Text style={styles.empty}>No competition matches “{text.trim()}”.</Text>}
         </ScrollView>
       )}
-      <TabFade />
+      <TabFade withTabBar={false} />
     </View>
   );
 }

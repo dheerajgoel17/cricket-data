@@ -1,4 +1,30 @@
-# Cricket Data
+<p align="center"><img src="mobile/assets/images/icon.png" alt="Fancy.cash app icon" width="88" /></p>
+
+<h1 align="center">Fancy.cash</h1>
+
+<p align="center">Live cricket scores, player form, ground stats, and historical match data.</p>
+
+<p align="center">
+  <a href="#download">Download Android APK</a> ·
+  <a href="https://fancy.cash">Open the website</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#quick-start">Developer quick start</a>
+</p>
+
+## Download
+
+Get the latest Android APK from [GitHub Releases](https://github.com/dheerajgoel17/cricket-data/releases/latest). On your phone, open the release, download the `.apk` under **Assets**, and open it to install. Android may ask you to allow installs from your browser.
+
+You can also use [Fancy.cash on the web](https://fancy.cash). See the [mobile app guide](docs/MOBILE.md) for local iOS and Android builds.
+
+## Features
+
+- **Live cricket** — scores, innings summaries, and upcoming fixtures.
+- **Player form** — recent results, historical hit rates, and comparisons by opponent and venue.
+- **Ground pages** — match history, live fixtures, and historical market distributions with format filters.
+- **Cricket dataset** — downloadable match and player records, with a command-line tool for analysis.
+
+## Cricket dataset
 
 A free cricket dataset. Matches and per-player performance for **23,000+ matches since 2001**:
 men's and women's, internationals and leagues. Updated daily, including the latest games.
