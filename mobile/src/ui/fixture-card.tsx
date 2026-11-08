@@ -64,7 +64,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
       </View>
       <View style={styles.foot}>
         <View style={styles.status}>
-          <Text style={styles.statusText} numberOfLines={1}>{m.status}</Text>
+          <Text style={styles.statusText} numberOfLines={2}>{m.status}</Text>
           <Text style={styles.series} numberOfLines={1}>{seriesName(f)}</Text>
         </View>
         {item.noProps ? <Text style={styles.noProps}>No props live yet</Text> : link ? <View style={styles.propsLink}><Text style={styles.props}>Props</Text><ChevronRight color={color.primary} /></View> : null}
@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
   whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight },
-  status: { flex: 1 },
+  status: { flex: 1, minWidth: 0 },
   statusText: { ...type.footnote, color: color.foreground },
   series: { ...type.caption, color: color["muted-foreground"] },
   propsLink: { flexDirection: "row", alignItems: "center" },
   props: { ...type.footnote, color: color.primary },
-  noProps: { ...type.footnote, color: color["muted-foreground"] },
+  noProps: { maxWidth: "32%", textAlign: "right", ...type.footnote, color: color["muted-foreground"] },
 });
