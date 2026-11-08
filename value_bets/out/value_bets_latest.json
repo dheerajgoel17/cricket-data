@@ -1,16 +1,16 @@
 {
- "generated_at_utc": "2026-11-08T21:30:32Z",
- "generated_at_ist": "2026-11-09 03:00 IST",
- "runtime_secs": 138.1,
+ "generated_at_utc": "2026-11-08T22:30:30Z",
+ "generated_at_ist": "2026-11-09 04:00 IST",
+ "runtime_secs": 107.3,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-08",
-  "commit": "90b5dc8bb6"
+  "commit": "7aeb76537d"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1082,
+   "rows": 1166,
    "secs": 0.2
   },
   "smarkets": {
@@ -21,35 +21,35 @@
   "feedk": {
    "status": "ok",
    "rows": 86,
-   "secs": 10.8,
+   "secs": 10.6,
    "events": 4
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 15.5,
+   "secs": 15.3,
    "events": 3
   },
   "feedf": {
    "status": "ok",
    "rows": 122,
-   "secs": 34.9,
+   "secs": 35.3,
    "events": 7
   },
   "feede": {
    "status": "ok",
    "rows": 526,
-   "secs": 60.6,
+   "secs": 61.5,
    "events": 24
   },
   "feedh": {
    "status": "ok",
    "rows": 1451,
-   "secs": 68.6,
+   "secs": 72.9,
    "events": 46
   }
  },
- "snapshot": "odds_20261108T213032Z.jsonl.gz",
+ "snapshot": "odds_20261108T223030Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -119,23 +119,25 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 45,
-  "rows_in_window": 3715,
+  "events_in_window": 46,
+  "rows_in_window": 3799,
   "selections_with_model": 1769,
-  "selections_with_market_fair": 2438,
-  "markets_in_window": 350,
+  "selections_with_market_fair": 2492,
+  "markets_in_window": 352,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_market_gap": 715,
-   "odds_range": 11,
+   "odds_range": 13,
    "model_only_no_market": 100,
+   "suspect_edge": 1,
+   "top_wide_book": 1,
    "policy_min_edge": 2,
    "policy_max_odds": 1,
    "loose_name_match": 1,
    "model_disagrees": 1
   },
-  "suspect_edges": 0,
-  "innings_milestones_unmodelled": 50,
+  "suspect_edges": 1,
+  "innings_milestones_unmodelled": 52,
   "model_vs_market": {
    "batter_runs": {
     "n_prices": 486,
@@ -463,7 +465,21 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "moviodds_bet365",
     "smarkets"
+   ]
+  },
+  {
+   "event": "male|Royal Desert Champions|United Tigers|2026-11-09",
+   "start_ist": "2026-11-09 21:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Royal Desert Champions",
+    "United Tigers"
+   ],
+   "sources": [
+    "moviodds_bet365"
    ]
   },
   {
@@ -792,7 +808,23 @@
   }
  ],
  "value_bets": [],
- "suspect_not_alerted": [],
+ "suspect_not_alerted": [
+  {
+   "match": "Emirates Eagles vs Arabian Aces",
+   "start_ist": "2026-11-09 19:15 IST",
+   "market_type": "top_batter_team",
+   "market": "Top Batsman - Arabian Aces",
+   "selection": "Moeen Ali",
+   "odds": 12.5,
+   "source": "feedh_d",
+   "fair_prob": 0.118,
+   "model_prob": null,
+   "market_prob": 0.118,
+   "edge_pct": 47.55,
+   "fair_basis": "market consensus only (no model)",
+   "market_fair_from": null
+  }
+ ],
  "unmatched_teams": [
   "Abbottabad Region (male)",
   "Ajk Region (male)",
@@ -829,6 +861,11 @@
   "USA (W) (female)"
  ],
  "unmatched_players_in_window": [
+  "A Ali",
+  "A Javed",
+  "A Raza",
+  "A Shetty",
+  "A de Silva",
   "AR Patel",
   "AW Finch",
   "Aaryavir Sehwag",
@@ -865,6 +902,7 @@
   "Azmatullah Omarzai",
   "B Berry",
   "B McKinney",
+  "BA King",
   "BA Mayes",
   "BI Kellaway",
   "Banele Cele",
@@ -888,6 +926,10 @@
   "Chamari Athapaththu",
   "Charles Stobo",
   "Chris Jordan",
+  "D Parashar",
+  "D Pretorius",
+  "D Wiese",
+  "DN Wellalage",
   "Dane Paterson",
   "Daniel Smith",
   "David Warner",
@@ -923,6 +965,9 @@
   "Grace Parsons",
   "Gulbadin Naib",
   "Gus Atkinson",
+  "H Kaushik",
+  "H Nawaz",
+  "Habibur Rahman",
   "Hammad Islam",
   "Hamza Sheraz",
   "Hanno Jacobs",
@@ -942,6 +987,7 @@
   "Imam-ul-Haq",
   "Imran Butt",
   "Imran Shah",
+  "Imran Tahir",
   "Indigo Noble",
   "Ines Mackeon",
   "Israrullah",
@@ -1014,21 +1060,7 @@
   "ME Clark",
   "MS Crane",
   "Maaz Sadaqat",
-  "Mackenzie Harvey",
-  "Maddy Darke",
-  "Maggie Clark",
-  "Mahedi Hasan",
-  "Malhar Rasool",
-  "Matthew Boast",
-  "Matthew Gilkes",
-  "Michael Kruiskamp",
-  "Mihlali Mpongwana",
-  "Mikayla Friday",
-  "Milan Rathnayake",
-  "Modiri Litheko",
-  "Modise Maloka",
-  "Mohammad Ammar",
-  "Mohammad Faiq"
+  "Mackenzie Harvey"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1153,22 +1185,22 @@
   }
  },
  "log": [
-  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:00 IST] history: 23975 matches, last 2026-11-08, players 431730",
-  "[03:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1082, 'secs': 0.2}",
-  "[03:01 IST] source smarkets: {'status': 'ok', 'rows': 466, 'secs': 1.8}",
-  "[03:01 IST] source feedk: {'status': 'ok', 'rows': 86, 'secs': 10.8, 'events': 4}",
-  "[03:01 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 15.5, 'events': 3}",
-  "[03:01 IST] source feedf: {'status': 'ok', 'rows': 122, 'secs': 34.9, 'events': 7}",
-  "[03:01 IST] source feede: {'status': 'ok', 'rows': 526, 'secs': 60.6, 'events': 24}",
-  "[03:01 IST] source feedh: {'status': 'ok', 'rows': 1451, 'secs': 68.6, 'events': 46}",
-  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:02 IST] 59 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[03:02 IST] 50 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[03:02 IST] book lines: 282 player lines from 6 source(s)",
-  "[03:02 IST] 34 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[03:02 IST] weather: forecasts for 12 events, 0 failed",
-  "[03:02 IST] prop model: 915 prop selections modelled, 230 milestone ladder prices anchored to O/U",
-  "[03:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[04:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[04:00 IST] history: 23975 matches, last 2026-11-08, players 431730",
+  "[04:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1166, 'secs': 0.2}",
+  "[04:01 IST] source smarkets: {'status': 'ok', 'rows': 466, 'secs': 1.8}",
+  "[04:01 IST] source feedk: {'status': 'ok', 'rows': 86, 'secs': 10.6, 'events': 4}",
+  "[04:01 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 15.3, 'events': 3}",
+  "[04:01 IST] source feedf: {'status': 'ok', 'rows': 122, 'secs': 35.3, 'events': 7}",
+  "[04:01 IST] source feede: {'status': 'ok', 'rows': 526, 'secs': 61.5, 'events': 24}",
+  "[04:01 IST] source feedh: {'status': 'ok', 'rows': 1451, 'secs': 72.9, 'events': 46}",
+  "[04:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[04:02 IST] 92 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[04:02 IST] 52 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[04:02 IST] book lines: 282 player lines from 6 source(s)",
+  "[04:02 IST] 34 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[04:02 IST] weather: forecasts for 12 events, 0 failed",
+  "[04:02 IST] prop model: 915 prop selections modelled, 230 milestone ladder prices anchored to O/U",
+  "[04:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
  ]
 }
