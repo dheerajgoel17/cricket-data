@@ -70,7 +70,12 @@ jobs:
       BETFAIR_SSO_URL: ${{ secrets.BETFAIR_SSO_URL }}
       BETFAIR_API_URL: ${{ secrets.BETFAIR_API_URL }}
     steps:
+      # a run queued behind another value-bets job keeps the SHA from when it was created; after
+      # concurrency waits, tip of main already has that sibling's commit — check it out so we do not
+      # rebuild on a stale base. PRs keep the PR ref (dry run, never commits).
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.ref || 'main' }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -150,6 +155,9 @@ jobs:
           python -m value_bets.ledger --backfill-history
           python -m value_bets.ledger --settle --summary
       - name: Commit outputs
+        # Worker dispatch + GitHub cron can both fire the same hour; concurrency serialises them, but a
+        # sibling may still push archive/out while we rebase. Prefer this run's tree (-X theirs on
+        # rebase); if a conflict still sticks, abort, re-land our paths on tip of main, and retry.
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.commit)
         run: |
           git config user.name "github-actions[bot]"
@@ -157,9 +165,21 @@ jobs:
           git add -A value_bets/out value_bets/state value_bets/archive  # .gitignore keeps caches/snapshots out; the archive is never deleted
           git add -A value_bets/mappings/venue_geo.csv value_bets/mappings/venue_weather_daily.csv.gz
           if git diff --cached --quiet; then echo "No changes."; exit 0; fi
-          git commit -q -m "value-bets: $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"
+          MSG="value-bets: $(TZ=Asia/Kolkata date '+%F %H:%M IST') [skip ci]"
+          git commit -q -m "$MSG"
+          OUR=$(git rev-parse HEAD)
           for i in 1 2 3; do
-            git pull --rebase -q && git push -q && exit 0
+            if git pull --rebase -X theirs -q && git push -q; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+            git checkout "$OUR" -- value_bets/out value_bets/state value_bets/archive \
+              value_bets/mappings/venue_geo.csv value_bets/mappings/venue_weather_daily.csv.gz
+            git add -A value_bets/out value_bets/state value_bets/archive \
+              value_bets/mappings/venue_geo.csv value_bets/mappings/venue_weather_daily.csv.gz
+            if git diff --cached --quiet; then echo "Already on main."; exit 0; fi
+            git commit -q -m "$MSG"
+            OUR=$(git rev-parse HEAD)
             sleep $((i * 10))
           done
           echo "::error::push failed after retries"; exit 1
