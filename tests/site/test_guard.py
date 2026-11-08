@@ -134,6 +134,13 @@ def test_c_an_edition_that_counts_only_the_matches_that_qualify_is_caught():
     assert G.check_bat_first(M, [{**right, "decided": 6}]).problems  # the right percentage over the wrong count
 
 
+def test_c_bat_first_win_rate_accepts_the_engines_half_up_rounding():
+    M = matches(*[{"fi": 0, "w": int(i >= 9)} for i in range(16)])
+    edition = {"event": "Women's Big Bash League", "name": "2026", "ids": M["id"], "decided": 16, "pct": 56.3}
+    assert G.check_bat_first(M, [edition]).problems == []
+    assert G.check_bat_first(M, [{**edition, "pct": 56.4}]).problems
+
+
 @pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
 def test_c_the_real_engine_agrees_with_the_recount_on_built_data(tmp_path):
     src = ROOT / "site" / "tests" / "fixtures" / "data"
