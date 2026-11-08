@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-08T18:30:28Z",
- "generated_at_ist": "2026-11-09 00:00 IST",
- "runtime_secs": 140.3,
+ "generated_at_utc": "2026-11-08T18:59:41Z",
+ "generated_at_ist": "2026-11-09 00:29 IST",
+ "runtime_secs": 161.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-08",
-  "commit": "4f9922b60d"
+  "commit": "9fad48f8f0"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 989,
-   "secs": 1.1
+   "secs": 0.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 427,
-   "secs": 2.5
+   "rows": 466,
+   "secs": 2.2
   },
   "feedk": {
    "status": "ok",
    "rows": 86,
-   "secs": 5.9,
-   "events": 2
+   "secs": 11.3,
+   "events": 4
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 16.3,
+   "secs": 16.1,
    "events": 3
   },
   "feedf": {
    "status": "ok",
    "rows": 104,
-   "secs": 27.4,
+   "secs": 25.8,
    "events": 4
   },
   "feede": {
    "status": "ok",
-   "rows": 508,
-   "secs": 61.1,
-   "events": 23
+   "rows": 526,
+   "secs": 62.8,
+   "events": 24
   },
   "feedh": {
    "status": "ok",
-   "rows": 1398,
-   "secs": 73.9,
-   "events": 45
+   "rows": 1451,
+   "secs": 78.8,
+   "events": 46
   }
  },
- "snapshot": "odds_20261108T183028Z.jsonl.gz",
+ "snapshot": "odds_20261108T185941Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -119,11 +119,11 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 43,
-  "rows_in_window": 3494,
+  "events_in_window": 45,
+  "rows_in_window": 3604,
   "selections_with_model": 1746,
-  "selections_with_market_fair": 2318,
-  "markets_in_window": 342,
+  "selections_with_market_fair": 2389,
+  "markets_in_window": 348,
   "value_bets": 0,
   "dropped_by_filter": {
    "model_market_gap": 696,
@@ -467,6 +467,27 @@
    ]
   },
   {
+   "event": "male|United Tigers|royal champs|2026-11-09",
+   "start_ist": "2026-11-09 21:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "feede_lb",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|bangla tigers|royal champs|2026-11-09",
+   "start_ist": "2026-11-09 21:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": null,
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
    "event": "male|England|West Indies A|2026-11-09",
    "start_ist": "2026-11-09 23:30 IST",
    "format": "ODI",
@@ -776,6 +797,7 @@
   "Amzet Lanka (male)",
   "BBK Partnership (male)",
   "Bahawalpur Region (male)",
+  "Bangla Tigers (male)",
   "Cdb A (male)",
   "Colombo Aces (male)",
   "Dm Jamali Region (male)",
@@ -796,6 +818,7 @@
   "Peshawar Whites (male)",
   "Quetta Region (male)",
   "Rawalpindi Region (male)",
+  "Royal Champs (male)",
   "Sialkot Blues (male)",
   "Sialkot Region (male)",
   "South Australia Redbacks (male)",
@@ -806,18 +829,21 @@
  "unmatched_players_in_window": [
   "AR Patel",
   "Aaryavir Sehwag",
+  "Aayan Khan",
   "Abdul Basit",
   "Abdul Fasih",
   "Abdul Qadir",
   "Abdullah Shafique",
   "Abidullah Nadarjan",
   "Abubakar Khan",
+  "Adhitya Shetty",
   "Affan Ishaq",
   "Agha Salman",
   "Ahmed Khudadad",
   "Aibaad Khan",
   "Akif Javed",
   "Ali Imran",
+  "Ali Naseer",
   "Ali Shabbir",
   "Ali Zaryab",
   "Amshi De Silva",
@@ -829,8 +855,11 @@
   "Asakhe Tsaka",
   "Ashir Mehmood",
   "Asim Ali",
+  "Avishka Fernando",
+  "Awais Ali Shah",
   "Ayaan Misbah",
   "Azeem Bari",
+  "Azmatullah Omarzai",
   "B Berry",
   "Banele Cele",
   "Ben Dwarshuis",
@@ -852,13 +881,16 @@
   "Catherine White",
   "Chamari Athapaththu",
   "Charles Stobo",
+  "Chris Jordan",
   "Dane Paterson",
   "Daniel Smith",
   "David Warner",
   "David Wiese",
   "Dawood Khan",
+  "Dhruv Parashar",
   "Duan Jansen",
   "Dunith Nethmika Wellalage",
+  "Dushmantha Chameera",
   "Dwaine Pretorius",
   "E Hayward",
   "E Hunter",
@@ -873,12 +905,15 @@
   "Ethan John Cunningham",
   "Evan Jones",
   "Faham ul-Haq",
+  "Faheem Ashraf",
+  "Fakhar Zaman",
   "Faridullah Ihsas",
   "G Lyons",
   "George Linde",
   "Gerald Coetzee",
   "Gideon Peters",
   "Grace Parsons",
+  "Gulbadin Naib",
   "Gus Atkinson",
   "Hammad Islam",
   "Hamza Sheraz",
@@ -895,6 +930,7 @@
   "Hilal Afghan",
   "I Noble",
   "IY McKeon",
+  "Iftikhar Ahmed",
   "Imam-ul-Haq",
   "Imran Butt",
   "Imran Shah",
@@ -911,11 +947,13 @@
   "Jake Scott",
   "Jake Weatherald",
   "James Matthew Coles",
+  "Janith Liyanage",
   "Jason Raubenheimer",
   "Jason Rowles",
   "Jason Sangha",
   "Jevano Baron",
   "Jiveshan Pillay",
+  "Joe Clarke",
   "Joel Davies",
   "Josh Breed",
   "Josh Philippe",
@@ -926,6 +964,7 @@
   "Kashief Jospeh",
   "Kate Pelle",
   "Keacy Carty",
+  "Keemo Paul",
   "Kevlon Anderson",
   "Kirk Mckenzie",
   "Kristian Clarke",
@@ -948,6 +987,7 @@
   "Linsey Smith",
   "Lloyd Pope",
   "Lucy Hamilton",
+  "Luke Wood",
   "Luqman Faisal",
   "M Darke",
   "M Friday",
@@ -959,6 +999,7 @@
   "Mackenzie Harvey",
   "Maddy Darke",
   "Maggie Clark",
+  "Mahedi Hasan",
   "Malhar Rasool",
   "Matthew Boast",
   "Matthew Gilkes",
@@ -979,31 +1020,13 @@
   "Mohammad Taha",
   "Mohammad Usman",
   "Mohib Bhatti",
+  "Morawakage Maheesh Theekshana",
+  "Muhammad Abbas Afridi",
   "Muhammad Amir Barki",
   "Muhammad Manack",
   "N Hancock",
   "NGRP Jayasuriya",
-  "Nabi Gul",
-  "Nandre Burger",
-  "Nasir Khan",
-  "Nathan Engelbrecht",
-  "Nathan John McAndrew",
-  "Nathan McSweeney",
-  "Neil Timmers",
-  "Nhlakanipho Mpungose",
-  "Nic Maddinson",
-  "Nicola Hancock",
-  "Noah McFadyen",
-  "Noor Ahmad",
-  "O Porter",
-  "Oliver Davies",
-  "Oliver Whitehead",
-  "Olivia Porter",
-  "Omair Yousuf",
-  "Omar Tauqir",
-  "P Sooriyabandara",
-  "Pheku Moletsane",
-  "Prashiddha Jaishi"
+  "Nabi Gul"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1128,22 +1151,22 @@
   }
  },
  "log": [
-  "[00:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:00 IST] history: 23975 matches, last 2026-11-08, players 431730",
-  "[00:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 989, 'secs': 1.1}",
-  "[00:01 IST] source smarkets: {'status': 'ok', 'rows': 427, 'secs': 2.5}",
-  "[00:01 IST] source feedk: {'status': 'ok', 'rows': 86, 'secs': 5.9, 'events': 2}",
-  "[00:01 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 16.3, 'events': 3}",
-  "[00:01 IST] source feedf: {'status': 'ok', 'rows': 104, 'secs': 27.4, 'events': 4}",
-  "[00:01 IST] source feede: {'status': 'ok', 'rows': 508, 'secs': 61.1, 'events': 23}",
-  "[00:01 IST] source feedh: {'status': 'ok', 'rows': 1398, 'secs': 73.9, 'events': 45}",
-  "[00:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:02 IST] 37 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[00:02 IST] 50 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[00:02 IST] book lines: 282 player lines from 6 source(s)",
-  "[00:02 IST] 34 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[00:02 IST] weather: forecasts for 12 events, 0 failed",
-  "[00:02 IST] prop model: 892 prop selections modelled, 210 milestone ladder prices anchored to O/U",
-  "[00:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[00:29 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[00:29 IST] history: 23975 matches, last 2026-11-08, players 431730",
+  "[00:31 IST] source moviodds_bet365: {'status': 'ok', 'rows': 989, 'secs': 0.6}",
+  "[00:31 IST] source smarkets: {'status': 'ok', 'rows': 466, 'secs': 2.2}",
+  "[00:31 IST] source feedk: {'status': 'ok', 'rows': 86, 'secs': 11.3, 'events': 4}",
+  "[00:31 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 16.1, 'events': 3}",
+  "[00:31 IST] source feedf: {'status': 'ok', 'rows': 104, 'secs': 25.8, 'events': 4}",
+  "[00:31 IST] source feede: {'status': 'ok', 'rows': 526, 'secs': 62.8, 'events': 24}",
+  "[00:31 IST] source feedh: {'status': 'ok', 'rows': 1451, 'secs': 78.8, 'events': 46}",
+  "[00:31 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[00:31 IST] 37 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[00:31 IST] 50 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[00:31 IST] book lines: 282 player lines from 6 source(s)",
+  "[00:31 IST] 34 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[00:32 IST] weather: forecasts for 12 events, 0 failed",
+  "[00:32 IST] prop model: 892 prop selections modelled, 210 milestone ladder prices anchored to O/U",
+  "[00:32 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
  ]
 }

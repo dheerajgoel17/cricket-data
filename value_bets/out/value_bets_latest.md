@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-09 00:00 IST
+# Cricket value bets - 2026-11-09 00:29 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 989 prices
-- **smarkets**: ok, 427 prices
-- **feedk**: ok, 86 prices, 2 events
+- **smarkets**: ok, 466 prices
+- **feedk**: ok, 86 prices, 4 events
 - **feedg**: ok, 16 prices, 3 events
 - **feedf**: ok, 104 prices, 4 events
-- **feede**: ok, 508 prices, 23 events
-- **feedh**: ok, 1398 prices, 45 events
+- **feede**: ok, 526 prices, 24 events
+- **feedh**: ok, 1451 prices, 46 events
 
-Matches starting in next 168h: **43**, markets priced: **342**, value bets: **0** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **45**, markets priced: **348**, value bets: **0** (new alerts: 0). Min edge 5%.
 
 _No value bets passed the filters this run._
 
-Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Ajk Region (male), Amzet Lanka (male), BBK Partnership (male), Bahawalpur Region (male), Cdb A (male), Colombo Aces (male), Dm Jamali Region (male), Dpgc (male), Fairfirst Insurance (male), Faisalabad Region (male), Fata Region (male), Hayleys Group A (male), Hnb A (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), Multan Region (male), Peshawar Blues (male), Peshawar Whites (male), Quetta Region (male), Rawalpindi Region (male), Sialkot Blues (male), Sialkot Region (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Ajk Region (male), Amzet Lanka (male), BBK Partnership (male), Bahawalpur Region (male), Bangla Tigers (male), Cdb A (male), Colombo Aces (male), Dm Jamali Region (male), Dpgc (male), Fairfirst Insurance (male), Faisalabad Region (male), Fata Region (male), Hayleys Group A (male), Hnb A (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), Multan Region (male), Peshawar Blues (male), Peshawar Whites (male), Quetta Region (male), Rawalpindi Region (male), Royal Champs (male), Sialkot Blues (male), Sialkot Region (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
 
-Runtime 140.3s. Snapshot: `odds_20261108T183028Z.jsonl.gz`
+Runtime 161.9s. Snapshot: `odds_20261108T185941Z.jsonl.gz`
