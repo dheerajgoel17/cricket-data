@@ -183,12 +183,15 @@ export function FixturePage() {
   if (groundDetail) {
     return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />;
   }
+  // desktop: the match (score, ball by ball, scorecard, form) is a sticky side panel and the sections fill the wide column; on a phone it is the usual stack, match first
   return (
-    <div className="flex flex-col gap-section">
-      <MatchHeader f={fx} live={live} />
-      <MatchAccordions match={match} teams={known} fmt={fmt} />
-      {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
-        <div className="flex min-w-0 flex-col gap-stack">
+    <div className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-section">
+      <div className="flex min-w-0 flex-col gap-section lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))] lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:max-h-[calc(100dvh-var(--header-h)-var(--space-section))] lg:overflow-y-auto lg:overscroll-contain">
+        <MatchHeader f={fx} live={live} />
+        <MatchAccordions match={match} teams={known} fmt={fmt} />
+      </div>
+      {!ready ? <div className="flex flex-col gap-stack lg:col-span-7 lg:col-start-1 lg:row-start-1"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
+        <div className="flex min-w-0 flex-col gap-stack lg:col-span-7 lg:col-start-1 lg:row-start-1">
           <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
             <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
