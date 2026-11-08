@@ -558,3 +558,12 @@ def test_the_weather_flag_is_published_per_match_for_the_data_guard(tmp_path):
     M, _ = _load(out)
     assert len(M["dls"]) == len(M["id"]) and set(M["dls"]) <= {0, 1}
     assert (M["dls"][M["id"].index("prov-wet")], M["dls"][M["id"].index("prov-dry")]) == (1, 0)
+
+
+def test_untracked_formats_and_series_are_not_published(tmp_path):
+    """Matches in config/untracked.json stay in the data and the archive but get no fixture row; emptying the file turns them back on."""
+    cfg = tmp_path / "u.json"
+    cfg.write_text('{"formats": ["FC"], "series": ["Ranji"]}', encoding="utf-8")
+    assert B._untracked(cfg) == ({"FC"}, ["ranji"])
+    assert B._untracked(tmp_path / "missing.json") == (set(), [])
+    assert "FC" in B._untracked()[0]  # the shipped config hides first-class

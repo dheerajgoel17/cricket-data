@@ -32,7 +32,7 @@ const NAV = [["/", "Fixtures and hot props"], ["/players", "Players"], ["/teams"
 
 /** A short text body for crawlers; the app replaces it as soon as it starts. */
 export function bodyHtml(h1, text) {
-  return `<main style="max-width:44rem;margin:2rem auto;padding:0 1rem;font-family:system-ui,sans-serif;color:#eee"><h1>${esc(h1)}</h1><p>${esc(text)}</p><nav aria-label="Main"><ul>${NAV.map(([h, l]) => `<li><a href="${h}">${esc(l)}</a></li>`).join("")}</ul></nav></main>`;
+  return `<main style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap"><h1>${esc(h1)}</h1><p>${esc(text)}</p><nav aria-label="Main"><ul>${NAV.map(([h, l]) => `<li><a href="${h}">${esc(l)}</a></li>`).join("")}</ul></nav></main>`;
 }
 
 export function render(template, page) {

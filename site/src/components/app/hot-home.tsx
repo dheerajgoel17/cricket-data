@@ -20,7 +20,7 @@ import { PillGroup } from "./pill-group";
 import { mixHomeRows } from "@/lib/hot-lines";
 import { fancyMarketPath } from "@/lib/fancy-path";
 import { lineHomePhase, phaseOf, type HomePhase } from "@/lib/home-phase";
-import { RowsSkeleton } from "./skeletons";
+import { RowsSkeleton, TapeSkeleton } from "./skeletons";
 
 const PER = 6; // mixed player + fancy rows in the selected fixture's card
 
@@ -87,7 +87,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const loading = isLoading || !ready;
   return (
     <section aria-label="Props" className="flex flex-col gap-stack">
-      <div className="empty:hidden">{!isLoading ? <MarketTape rows={tapeRows} /> : null}</div>
+      <div className="empty:hidden">{isLoading ? <TapeSkeleton /> : <MarketTape rows={tapeRows} />}</div>
       <div className="flex flex-wrap items-baseline justify-between gap-snug">
         <h2 className="text-title font-bold tracking-tight">Props</h2>
         <span className="flex items-center gap-stack text-footnote font-medium">
