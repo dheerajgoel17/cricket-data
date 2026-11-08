@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { headTags, pages, render } from "../scripts/seo.mjs";
 import { ROUTES, UNLISTED, fullTitle, pageMeta, clipDesc, shareMetas, THEME, CARD_W, CARD_H } from "../src/lib/seo.js";
 
@@ -64,6 +65,16 @@ test("the home page has no canonical link (the app shell also serves unknown pat
   assert.doesNotMatch(home, /rel="canonical"/);
   assert.match(home, /"@type":"WebSite"/);
   assert.match(home, /og:image" content="https:\/\/fancy.cash\/og.png"/);
+});
+
+test("rendered homepage exposes the same AdSense publisher as ads.txt", () => {
+  const template = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const ads = readFileSync(new URL("../public/ads.txt", import.meta.url), "utf8");
+  const publisher = ads.match(/^google\.com, (pub-\d+), DIRECT,/m)?.[1];
+  assert.ok(publisher);
+  const [home] = pages({ site: SITE, index, fixtures: [], sitemap: [] });
+  const head = render(template, home[1]).split("</head>")[0];
+  assert.ok(head.includes(`<meta name="google-adsense-account" content="ca-${publisher}"`));
 });
 
 test("markup in a name cannot break out of the tags, and a template without the markers is an error", () => {
