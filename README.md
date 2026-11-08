@@ -1,28 +1,38 @@
-<p align="center"><img src="mobile/assets/images/icon.png" alt="Fancy.cash app icon" width="88" /></p>
-
-<h1 align="center">Fancy.cash</h1>
-
-<p align="center">Live cricket scores, player form, ground stats, and historical match data.</p>
+<p align="center"><img src="docs/readme/banner.svg" alt="Fancy.cash — live cricket, player form and ground stats" width="100%" /></p>
 
 <p align="center">
-  <a href="#download">Download Android APK</a> ·
-  <a href="https://fancy.cash">Open the website</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#quick-start">Developer quick start</a>
+  <a href="https://github.com/dheerajgoel17/cricket-data/releases/latest"><img src="docs/readme/android-download.svg" alt="Download for Android" width="240" /></a>
 </p>
 
-## Download
+<p align="center">
+  <a href="https://fancy.cash"><b>Open Fancy.cash</b></a> ·
+  <a href="#screenshots"><b>Screenshots</b></a> ·
+  <a href="#features"><b>Features</b></a> ·
+  <a href="https://github.com/dheerajgoel17/cricket-data/releases"><b>All releases</b></a>
+</p>
 
-Get the latest Android APK from [GitHub Releases](https://github.com/dheerajgoel17/cricket-data/releases/latest). On your phone, open the release, download the `.apk` under **Assets**, and open it to install. Android may ask you to allow installs from your browser.
+## Screenshots
 
-You can also use [Fancy.cash on the web](https://fancy.cash). See the [mobile app guide](docs/MOBILE.md) for local iOS and Android builds.
+<p align="center">
+  <img src="docs/readme/live.png" alt="Live fixtures and player form on the Fancy.cash home screen" width="225" />
+  &nbsp;
+  <img src="docs/readme/ground.png" alt="The ground page showing the venue, match filters and live score" width="225" />
+</p>
 
 ## Features
 
-- **Live cricket** — scores, innings summaries, and upcoming fixtures.
-- **Player form** — recent results, historical hit rates, and comparisons by opponent and venue.
-- **Ground pages** — match history, live fixtures, and historical market distributions with format filters.
-- **Cricket dataset** — downloadable match and player records, with a command-line tool for analysis.
+- **Follow live cricket.** See scores, innings summaries, and what’s coming up.
+- **Explore player form.** Compare recent performances against an opponent or at a venue.
+- **Get to know a ground.** Browse past matches, filter by format, and explore scoring patterns.
+
+## Download
+
+On your Android phone, open the [latest release](https://github.com/dheerajgoel17/cricket-data/releases/latest), tap the `.apk` under **Assets**, and open it to install. Android may ask you to allow installs from your browser.
+
+You can also use [Fancy.cash in your browser](https://fancy.cash). For local iOS and Android builds, see the [mobile app guide](docs/MOBILE.md).
+
+<details>
+<summary><b>Cricket dataset and developer documentation</b></summary>
 
 ## Cricket dataset
 
@@ -81,3 +91,5 @@ Use `cricket-data query NAME --canonical-only` to ignore them. `cricket-data lin
 names it cannot match unambiguously go to `data/provisional_unmatched.csv` and can be fixed in
 `data/mappings/player_aliases.csv`. `cricket-data freshness` exits 1 when the newest canonical match is more
 than 3 days old; the daily update then opens a `data-stale` issue.
+
+</details>

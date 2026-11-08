@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-labelledby="title">
+  <title id="title">Fancy.cash · Live cricket, player form and ground stats</title>
+  <defs>
+    <linearGradient id="base" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#080e0b"/>
+      <stop offset="1" stop-color="#10291e"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop stop-color="#27da8e" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#27da8e" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M30 0H0v30" fill="none" stroke="#77b397" stroke-opacity=".12"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="500" rx="30" fill="url(#base)"/>
+  <rect x="1" y="1" width="1198" height="498" rx="29" fill="none" stroke="#315845" stroke-width="2"/>
+  <rect x="690" y="45" width="450" height="410" rx="24" fill="url(#grid)"/>
+  <ellipse cx="915" cy="238" rx="265" ry="227" fill="url(#glow)"/>
+  <g transform="translate(917 245) rotate(-19)" fill="none">
+    <ellipse rx="198" ry="152" stroke="#50e3a3" stroke-opacity=".55" stroke-width="2"/>
+    <ellipse rx="171" ry="127" stroke="#6beab4" stroke-opacity=".3" stroke-width="2"/>
+    <ellipse rx="112" ry="87" stroke="#78ecc0" stroke-opacity=".5" stroke-width="2" stroke-dasharray="4 7"/>
+    <rect x="-22" y="-59" width="44" height="118" rx="5" fill="#27da8e" fill-opacity=".15" stroke="#7ef3bd" stroke-width="2"/>
+    <path d="M-33 -42h66m-66 84h66M-9 -48v-10m9 10v-10m9 10v-10M-9 48v10m9-10v10m9-10v10" stroke="#a1f8cc" stroke-width="2" stroke-linecap="round"/>
+    <path d="M-68 66Q-36 4 84 -57" stroke="#6dfbb6" stroke-width="2" stroke-dasharray="4 6"/>
+    <circle cx="84" cy="-57" r="10" fill="#43f0a0"/>
+    <circle cx="84" cy="-57" r="20" stroke="#43f0a0" stroke-opacity=".4" stroke-width="2"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="68" y="74" width="19" height="19" rx="6" fill="#27da8e"/>
+    <text x="100" y="91" fill="#7beeb7" font-size="23" font-weight="700" letter-spacing="3">FANCY.CASH</text>
+    <text x="64" y="197" fill="#f3fff8" font-size="76" font-weight="700" letter-spacing="-3">Live cricket.</text>
+    <text x="64" y="285" fill="#54e5a2" font-size="65" font-weight="700" letter-spacing="-2">Player &amp; ground stats.</text>
+    <text x="68" y="365" fill="#b6ccbf" font-size="27">Follow matches, explore form, and</text>
+    <text x="68" y="405" fill="#b6ccbf" font-size="27">see how each venue plays.</text>
+  </g>
+</svg>
