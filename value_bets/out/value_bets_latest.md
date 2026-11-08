@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-09 02:00 IST
+# Cricket value bets - 2026-11-09 03:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -7,7 +7,7 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **smarkets**: ok, 466 prices
 - **feedk**: ok, 86 prices, 4 events
 - **feedg**: ok, 16 prices, 3 events
-- **feedf**: ok, 104 prices, 4 events
+- **feedf**: ok, 122 prices, 7 events
 - **feede**: ok, 526 prices, 24 events
 - **feedh**: ok, 1451 prices, 46 events
 
@@ -17,4 +17,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Ajk Region (male), Amzet Lanka (male), BBK Partnership (male), Bahawalpur Region (male), Bangla Tigers (male), Cdb A (male), Colombo Aces (male), Dm Jamali Region (male), Dpgc (male), Fairfirst Insurance (male), Faisalabad Region (male), Fata Region (male), Hayleys Group A (male), Hnb A (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), Multan Region (male), Peshawar Blues (male), Peshawar Whites (male), Quetta Region (male), Rawalpindi Region (male), Royal Champs (male), Sialkot Blues (male), Sialkot Region (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
 
-Runtime 157.9s. Snapshot: `odds_20261108T203035Z.jsonl.gz`
+Runtime 138.1s. Snapshot: `odds_20261108T213032Z.jsonl.gz`
