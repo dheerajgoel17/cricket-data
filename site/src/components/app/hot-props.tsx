@@ -10,7 +10,7 @@ import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { MarketTape } from "./market-tape";
 import { StandingMark, Tick } from "./tick";
-import { SCOPE_LABEL, bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cricket/engine/lines.js";
+import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { edgeTag, groundNote, modelSide } from "@cricket/engine/props-view.js";
@@ -188,7 +188,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
             <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
-            <span className="label-cap text-footnote text-primary">{label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}</span>
+            <span className="label-cap text-footnote text-primary">{[label, scopeTag(r.fmt, r.inn)].filter(Boolean).join(" · ")}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
@@ -266,7 +266,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                       <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
-                        <span className="label-cap text-footnote text-primary">{(STATS as any)[r.stat]?.label}{r.inn ? ` · ${SCOPE_LABEL[r.inn]}` : ""}</span>
+                        <span className="label-cap text-footnote text-primary">{[(STATS as any)[r.stat]?.label, scopeTag(r.fmt, r.inn)].filter(Boolean).join(" · ")}</span>
                         {soFar != null && <StandingMark standing={soFar} line={r.line} />}
                       </span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}

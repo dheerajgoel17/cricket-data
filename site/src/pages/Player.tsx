@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, teamKey } from "@cricket/engine/lines.js";
+import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, scopeTag, teamKey } from "@cricket/engine/lines.js";
 import { BookBadge } from "@/components/app/book-badge";
 import { SPLITS } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
@@ -411,7 +411,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, bookDefault, navigat
         <section className="hidden flex-col gap-snug lg:flex lg:col-span-4 lg:col-start-9 lg:row-start-2 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]">
           <div className="flex items-baseline justify-between gap-snug">
             <h2 className="flex items-center gap-tight text-title font-bold tracking-tight">
-              Lines{scope ? ` · ${SCOPE_LABEL[scope]}` : ""}
+              Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="button" className="text-muted-foreground" aria-label="About these lines"

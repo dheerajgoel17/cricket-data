@@ -402,3 +402,23 @@ test("an exchange's No on its own line is quoted beside its Yes, and an under-on
   const doc = { lines: lines.map((l) => ({ ...l, pid: "p", stat: "points", fmt: "T20", start_utc: "2099-01-01T00:00:00Z", match: "A vs B" })) };
   assert.equal(bookLinesFor(doc, "p", "points", "T20").main.line, 43.5);
 });
+
+test("a Test line is tagged with its innings or the complete match", async () => {
+  const { scopeTag } = await import("../packages/engine/lines.js");
+  const { innTag } = await import("../packages/engine/fancy-edge.js");
+  assert.equal(scopeTag("Test", 0), "Complete match");
+  assert.equal(scopeTag("Test", 1), "1st innings");
+  assert.equal(scopeTag("Test", 2), "2nd innings");
+  assert.equal(scopeTag("T20", 0), "");
+  assert.equal(innTag(0, true, "match_runs"), "Complete match");
+  assert.equal(innTag(0, true, "first_innings_runs"), "");
+  assert.equal(innTag(2, true, "team_total_runs"), "2nd inns");
+  assert.equal(innTag(0, false, "match_runs"), "");
+});
+
+test("a team line that only stands if the side bats first says so", async () => {
+  const { BAT_FIRST_TAG, batFirstBooked } = await import("../packages/engine/fancy-edge.js");
+  assert.equal(BAT_FIRST_TAG, "If bats first");
+  assert.equal(batFirstBooked([{ bat_first: true }], 0, 1), true);
+  assert.equal(batFirstBooked([{ bat_first: true }, {}], 0, 1), false);
+});
