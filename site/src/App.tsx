@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
+import { syncAds } from "@/lib/ads";
 import { AppSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
@@ -33,6 +34,7 @@ function Analytics() {
   const { pathname, search } = useLocation();
   useEffect(() => { initGa(); }, []);
   useEffect(() => { trackPage(pathname + search); }, [pathname, search]);
+  useEffect(() => { syncAds(pathname); }, [pathname]);
   useEffect(() => {
     if (pathname.startsWith("/player/")) track("player_view", { page_path: pathname });
   }, [pathname]);
