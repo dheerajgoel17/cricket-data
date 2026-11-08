@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-08T12:23:22Z",
+ "generated_at_utc": "2026-11-08T12:32:45Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -96,29 +96,6 @@
    "chance": 0.588,
    "edge": 0.1759,
    "edge_pct": 17.6,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-08-titans-v-dolphins|match_runouts||0|under",
-   "fixture_id": "2026-11-08-titans-v-dolphins",
-   "match": "Titans vs Dolphins",
-   "format": "T20",
-   "series": "CSA Pro T20 Cup 2026",
-   "start_utc": "2026-11-08T12:30:00Z",
-   "start_ist": "2026-11-08 18:00 IST",
-   "key": "match_runouts",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 0.5,
-   "best_odds": 2.14,
-   "best_source": "Dafabet",
-   "hits": 11,
-   "played": 18,
-   "window": 20,
-   "chance": 0.5473,
-   "edge": 0.1712,
-   "edge_pct": 17.1,
    "bat_first": false
   },
   {
