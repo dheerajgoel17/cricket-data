@@ -73,9 +73,9 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
   const to = (fm?: string, sc?: number) => (fm ? fancyMarketPath(f.id, { fm, sc: sc != null && sc >= 0 ? sc : null }) : `/fixture/${f.id}?tab=fancy`);
   return (
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <div className="h-full border-b border-hairline pb-stack">
+      <div className="h-full border-b border-hairline pb-stack md:overflow-hidden md:rounded-2xl md:border-b-0 md:bg-card md:pb-0 md:ring-1 md:ring-hairline">
         <div className="flex h-full flex-col gap-snug">
-          <Link to={to()} className="flex flex-col gap-snug outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Link to={to()} className="flex flex-col gap-snug outline-none focus-visible:ring-2 focus-visible:ring-ring md:px-gutter md:pt-gutter">
             <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
               <span className="label-cap text-footnote">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
               {ground && <span className="ml-auto min-w-0 truncate" title={f.venue}>{ground}</span>}
@@ -90,11 +90,11 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
             </div>
           </Link>
           {rows.length ? (
-            <ul className="-mx-gutter border-t border-hairline">
+            <ul className="-mx-gutter border-t border-hairline md:mx-0">
               {rows.slice(0, SHOWN_ROWS).map((r: any) => <li key={r.id || r.key} className="border-t border-hairline first:border-t-0"><OverviewRow r={r} onOpen={() => nav(to(fancyFm(r.key, r.inn || 0), r.scope))} /><BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" /></li>)}
             </ul>
-          ) : <p className="border-t border-hairline py-snug text-callout text-muted-foreground">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
-          <Link to={to()} className="mt-auto flex items-center justify-between gap-snug pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          ) : <p className="border-t border-hairline py-snug text-callout text-muted-foreground md:px-gutter">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
+          <Link to={to()} className="mt-auto flex items-center justify-between gap-snug pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring md:px-gutter md:pb-gutter">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
             <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
           </Link>
