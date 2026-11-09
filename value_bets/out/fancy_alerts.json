@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-09T09:33:16Z",
+ "generated_at_utc": "2026-11-09T10:33:44Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -195,7 +195,7 @@
    "fixture_id": "2026-11-10-hobart-hurricanes-women-v-adelaide-strikers-women",
    "match": "Hobart Hurricanes Women vs Adelaide Strikers Women",
    "format": "T20",
-   "series": "WBBL 2026",
+   "series": "Womens Big Bash League 2026",
    "start_utc": "2026-11-10T08:10:00Z",
    "start_ist": "2026-11-10 13:40 IST",
    "key": "match_sixes",
@@ -257,6 +257,29 @@
    "chance": 0.6768,
    "edge": 0.1689,
    "edge_pct": 16.9,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-12-melbourne-stars-women-v-brisbane-heat-women|match_sixes||0|under",
+   "fixture_id": "2026-11-12-melbourne-stars-women-v-brisbane-heat-women",
+   "match": "Melbourne Stars Women vs Brisbane Heat Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-12T04:40:00Z",
+   "start_ist": "2026-11-12 10:10 IST",
+   "key": "match_sixes",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 5.5,
+   "best_odds": 2,
+   "best_source": "bet365",
+   "hits": 23,
+   "played": 38,
+   "window": 20,
+   "chance": 0.5757,
+   "edge": 0.1514,
+   "edge_pct": 15.1,
    "bat_first": false
   }
  ]
