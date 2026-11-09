@@ -7,7 +7,7 @@ Everything here is stdlib-only. Output (all JSON, columnar, deterministic):
   index.json     players / teams / venues / events tables
   matches.json   one column per field, one entry per match (+ per-innings market aggregates)
   p/NN.json      player shards: batting rows, bowling spells, partnerships keyed by the lower player index
-  pp/NN.json     batting progression (runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced), same shard number, read only by the live "from here" panel
+  pp/NN.json     batting progression (runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced), same shard number, read only by the live rows of the tables
   fixtures.json  upcoming fixtures
 """
 from __future__ import annotations
@@ -384,7 +384,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
 
 MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq", "dls")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
-# progression shard (`pp/NN.json`, read only by the live "from here" panel): one row per batting innings of 10+ balls, with the runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced (null if he was out or not there yet)
+# progression shard (`pp/NN.json`, read only by the live rows of the tables): one row per batting innings of 10+ balls, with the runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced (null if he was out or not there yet)
 PROG_KEYS = ("p", "m", "i", "b", "r", "x1", "x2", "x3", "x4", "x5", "x6", "x7")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
 FLD_KEYS = ("p", "m", "i", "t", "q", "ct", "st")

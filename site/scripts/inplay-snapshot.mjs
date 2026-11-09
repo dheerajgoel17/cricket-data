@@ -1,7 +1,9 @@
 // Keeps the latest in-play lines in Supabase while a match is on. A GitHub run (the scheduler Worker starts it every minute, .github/workflows/inplay.yml) reads the price feed a few times,
 // about 15 s apart, and each time replaces the one row of `inplay_lines` (service key; api/inplay.js reads it with the public key). Nothing is kept and nothing touches the pre-match files.
+// INPLAY_EXTRA_FILE, when set, holds the other books' started matches for the minute (written once by scripts/inplay_extra.py) and is merged into every round.
 // Needs PRICE_FEED_URL, SUPABASE_URL and SUPABASE_SERVICE_KEY in the environment (never printed). With nothing in play it writes one empty body and stops, so a quiet minute is a short run.
-import { parseInplayFeed } from "../packages/engine/inplay-lines.js";
+import { readFileSync } from "node:fs";
+import { mergeMatches, parseInplayFeed } from "../packages/engine/inplay-lines.js";
 
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
 // Supabase refuses a secret key from anything that looks like a browser ("Forbidden use of secret API key in browser"), so its calls carry a plain server agent, not the feed read's Mozilla one.
@@ -9,6 +11,28 @@ const DB_UA = "cricket-props-hub-inplay/0.1 (server)";
 export const ROUNDS = 4, GAP_MS = 15_000;
 
 const sleepMs = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** The other books' started matches for the minute, or [] when the file is unset or unreadable. */
+export function loadExtra(path, read = readFileSync) {
+  if (!path) return [];
+  try {
+    const doc = JSON.parse(read(path, "utf8"));
+    return Array.isArray(doc?.matches) ? doc.matches : [];
+  } catch {
+    return [];
+  }
+}
+
+/** One read of the price feed with the other books' matches merged in. A feed failure keeps the other books' matches when there are any (and says so), else it is the round's failure. */
+export async function readRound(url, extra, fetchImpl = fetch, log = console.log) {
+  try {
+    return mergeMatches(await readFeed(url, fetchImpl), extra);
+  } catch (e) {
+    if (!extra.length) throw e;
+    log(`::warning::price feed read failed, keeping the other books' matches: ${String(e.message || e).slice(0, 120)}`);
+    return mergeMatches(extra);
+  }
+}
 
 /** One read of the feed, as the list of started matches with the lines we keep. */
 export async function readFeed(url, fetchImpl = fetch) {
@@ -66,7 +90,8 @@ export async function run({ read, save, sleep = sleepMs, rounds = ROUNDS, gapMs 
 async function main() {
   const url = String(process.env.PRICE_FEED_URL || ""), base = String(process.env.SUPABASE_URL || "").replace(/\/+$/, ""), key = String(process.env.SUPABASE_SERVICE_KEY || "").trim();
   if (!url || !base || !key) { console.log("inplay-snapshot: PRICE_FEED_URL / SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping"); return; }
-  const out = await run({ read: () => readFeed(url), save: (body) => saveBody({ base, key, body }) });
+  const extra = loadExtra(process.env.INPLAY_EXTRA_FILE || "");
+  const out = await run({ read: () => readRound(url, extra), save: (body) => saveBody({ base, key, body }) });
   console.log(JSON.stringify(out));
 }
 

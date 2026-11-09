@@ -21,7 +21,7 @@ import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndi
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
-import { linesQuery } from "@/lib/queries";
+import { useLinesLive } from "@/hooks/useLinesLive";
 import { abbr, fixtureStart, num, odds, pc, shortVenue } from "@/lib/format";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,9 @@ import { FancyFilters } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
+import { LiveTag, TeamSpot } from "./live-spot";
+import { LiveMarketRow } from "./live-markets";
+import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
 import { EmptyNote } from "./page";
 import { PillGroup } from "./pill-group";
@@ -82,6 +85,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
         <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
           <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
+          {r.live && <LiveTag />}
           {r.at && (() => {
             const ground = shortVenue(r.venue);
             const hits = r.at.side === "over" ? r.at.over : r.at.under;
@@ -134,7 +138,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const nav = useNavigate();
   const { match: liveMatch } = useLiveMatch(fx);
   const reduce = useReducedMotion();
-  const lines = useQuery(linesQuery);
+  const lines = useLinesLive();
   const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
   const [filtersOpen, setFiltersOpen] = useState(false);
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
@@ -189,6 +193,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     const extra = book.filter((b) => !have.has(b.line)).map((b) => run(key, b.line).summary);
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
+  const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc.data, { a: fx.a, b: fx.b }) : []), [doc.data, fx.a, fx.b, mode]);
   const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
   // the shared text: the pick (the side the sample favours, at its best listed price), how the ground has gone and the recent matches; the link is the match's card
@@ -257,7 +262,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
 
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
         <>
-          {mode === "list" && overview.length > 0 && (
+          {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <h2 className="text-title font-bold">Bookmaker lines</h2>
               {liveMatch?.status === "live" && <p className="text-footnote text-muted-foreground">So far this match, delayed up to about 20 seconds. Not used for settlement.</p>}
@@ -269,7 +274,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                       className="border-t border-hairline first:border-t-0">
                       <OverviewRow r={r} onOpen={() => open(rowFm(r))} />
                       <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
+                      <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug" />
                     </motion.li>))}
+                  {liveList.map((m, i) => <li key={`live-${i}-${m.market}`} className="border-t border-hairline first:border-t-0"><LiveMarketRow m={m} /></li>)}
                 </AnimatePresence>
               </ul>
             </section>)}

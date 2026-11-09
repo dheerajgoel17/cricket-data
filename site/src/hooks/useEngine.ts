@@ -7,6 +7,7 @@ import { runPlan } from "@cricket/engine/plan.js";
 import { useData } from "@/lib/data";
 import { loadArchive } from "@/lib/feeds";
 import { linesQuery } from "@/lib/queries";
+import { useLinesLive } from "@/hooks/useLinesLive";
 import { useLiveDoc } from "@/hooks/useLive";
 import { fixtureStart } from "@/lib/format";
 
@@ -28,7 +29,7 @@ export function useFixtures() {
 export function useFixtureBooks(id: string) {
   const { store } = useData();
   const fixtures = useFixtures();
-  const lines = useQuery(linesQuery);
+  const lines = useLinesLive();
   const listed = (fixtures.data || []).find((f) => f.id === id) ?? (fixtures.data || []).find((f) => sameFixtureId(f.id, id));
   const books = listed ? fixtureBooks(lines.data, listed) : { props: false, fancy: false };
   const need = !fixtures.isLoading && !lines.isLoading && (!listed || (!books.props && !books.fancy));
