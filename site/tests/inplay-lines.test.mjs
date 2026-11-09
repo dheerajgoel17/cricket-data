@@ -67,6 +67,8 @@ test("the route fetches the feed once per window, lists started matches, and is 
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
   const { default: handler, snapshot } = await import("../api/inplay.js");
   const call = async () => { let out; await handler({ method: "GET" }, { setHeader() {}, status(c) { return { json(b) { out = { c, b }; } }; } }); return out; };
+  const wrapKey = process.env.DATA_WRAP_KEY; // CI sets one; the route wraps its body with it, and this test reads the plain body
+  delete process.env.DATA_WRAP_KEY;
   try {
     delete process.env.PRICE_FEED_URL;
     assert.deepEqual((await call()).b.matches, []); // no feed configured: empty, not an error
@@ -83,5 +85,5 @@ test("the route fetches the feed once per window, lists started matches, and is 
     assert.equal(r.c, 200);
     assert.equal(r.b.source, "inplay");
     assert.equal(405, (await (async () => { let c; await handler({ method: "POST" }, { setHeader() {}, status(x) { c = x; return { json() {} }; } }); return { c }; })()).c);
-  } finally { server.close(); delete process.env.PRICE_FEED_URL; }
+  } finally { server.close(); delete process.env.PRICE_FEED_URL; if (wrapKey !== undefined) process.env.DATA_WRAP_KEY = wrapKey; }
 });
