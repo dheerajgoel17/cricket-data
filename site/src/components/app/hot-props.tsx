@@ -28,7 +28,7 @@ import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, prioritizeHotGroups } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
 import { abbr, odds, shortVenue } from "@/lib/format";
-import { linesQuery } from "@/lib/queries";
+import { useLinesLive } from "@/hooks/useLinesLive";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +41,7 @@ import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
+import { BatterSpot, LiveTag } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 import { propKey } from "@/lib/saved";
@@ -54,7 +55,7 @@ const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
-type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
+type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
 interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 
 /**
@@ -65,7 +66,7 @@ interface Row { comp: string; day: number; idx: number; pid: string; inn: number
 export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
   const { store, rz, matchesReady } = useData();
   const qc = useQueryClient();
-  const lines = useQuery(linesQuery);
+  const lines = useLinesLive();
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
@@ -146,7 +147,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
         <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
-          <BookBadge source={top.source} />{" "}
+          {top.live && <LiveTag />}<BookBadge source={top.source} />{" "}
           {top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
             : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
@@ -191,6 +192,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className="label-cap text-footnote text-primary">{[label, scopeTag(r.fmt, r.inn)].filter(Boolean).join(" · ")}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {soFar != null && <StandingMark standing={soFar} line={r.line} />}
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GAP_MS, ROUNDS, describeKey, readFeed, run, saveBody } from "../scripts/inplay-snapshot.mjs";
+import { GAP_MS, ROUNDS, describeKey, loadExtra, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
 
 const q = (group_name, label, handicap, odds_dec) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec });
 const DOC = { matches: [
@@ -73,4 +73,25 @@ test("a refused save says what the key is and what Supabase answered, never the 
   assert.equal(describeKey("sb_secret_abcdef"), "a secret key, length 16");
   const jwt = `h.${Buffer.from('{"role":"service_role"}').toString("base64url")}.s`;
   assert.equal(describeKey(jwt), "a JWT with role service_role");
+});
+
+const EXTRA = [{ home: "Bangladesh", away: "West Indies", league: "", kickoff: null, lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8, book: "BookK" }] }];
+
+test("the other books' file is read when it is there and is [] when unset, unreadable or not a list", () => {
+  assert.deepEqual(loadExtra("", () => { throw new Error("must not be read"); }), []);
+  assert.deepEqual(loadExtra("x.json", () => JSON.stringify({ matches: EXTRA })), EXTRA);
+  assert.deepEqual(loadExtra("x.json", () => { throw new Error("ENOENT"); }), []);
+  assert.deepEqual(loadExtra("x.json", () => "not json"), []);
+  assert.deepEqual(loadExtra("x.json", () => JSON.stringify({ matches: "no" })), []);
+});
+
+test("a round is the price feed's matches with the other books' joined in; a failing feed keeps theirs with a warning, and fails when there is nothing else", async () => {
+  const both = await readRound("http://feed.invalid/", EXTRA, json(DOC));
+  assert.equal(both.length, 1); // the same match once
+  assert.deepEqual(both[0].lines.map((l) => [l.kind, l.book || ""]), [["player_runs", ""], ["team_runs", "BookK"]]); // the feed's batter line, joined with BookK's innings line
+  const logs = [];
+  const kept = await readRound("http://feed.invalid/", EXTRA, json({}, 503), (m) => logs.push(m));
+  assert.equal(kept.length, 1);
+  assert.match(logs[0], /^::warning::price feed read failed, keeping the other books' matches: feed HTTP 503/);
+  await assert.rejects(readRound("http://feed.invalid/", [], json({}, 503)), /feed HTTP 503/);
 });
