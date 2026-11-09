@@ -12,6 +12,10 @@ Once a match is over its file also gets ``results``: ``[{pid, stat, value}]``, w
 The run that first stores a Test's whole-match results also records ``settled_at`` (a field added once, never changed; other formats have none): when the Test was first
 seen over, which is what lets it go from the lists a day later instead of after its 6 days (``cricket_site.testend``).
 
+A file may also carry ``held_in_play``: ``{reason, held_on, lines, fancy, results}``, the records of lines first priced after their match had started (a Test re-listed between days
+with prices that know the score) that were taken out of ``lines`` / ``fancy`` / ``results`` by hand and kept here, so nothing is lost and no reader (the site, ``settle``, the identity table,
+``heal_book``) takes one for a pre-match price: they read the three named keys only. ``update`` carries it unchanged and never files one of its keys back as a line.
+
 A Test's first-innings line (``inn``: 1, see ``booklines``) is a line of its own: the same player, stat and number as a match-total line is a different bet, so ``inn`` is
 part of the key of a line and of its result (``{pid, stat, inn, value}``). A line or result with no ``inn`` is the whole match's, which is every one filed before the
 field existed, and those files read and sort exactly as they did.
@@ -154,6 +158,12 @@ def _read(path: Path) -> dict | None:
     return d
 
 
+def _held_keys(old: dict | None) -> dict[str, set]:
+    """The keys of what ``held_in_play`` holds, by kind (empty when the file has none)."""
+    h = (old or {}).get("held_in_play") or {}
+    return {k: {KEY[k](x) for x in h.get(k) or [] if isinstance(x, dict)} for k in ("lines", "fancy")} if h else {}
+
+
 def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, schedule: list[dict] | None = None, force: bool = False) -> tuple[list[str], list[str]]:
     """Archive one pull of ``book_lines`` (before ``carry_started`` adds the old rows back). Returns (ids written, ids left alone because unreadable).
 
@@ -170,11 +180,15 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
             bad.append(fid)
             continue
         refresh = force or g["start"] - CLOSE <= now
+        held = _held_keys(old)
+        if held:  # a line a past clean-up moved to ``held_in_play`` is never filed back as a price
+            g = {**g, **{k: [x for x in g[k] if KEY[k](x) not in held[k]] for k in ("lines", "fancy")}}
         new = {"id": fid, "match": (old or g)["match"], "competition": (old or {}).get("competition") or g["competition"], "start_utc": (old or g)["start_utc"],
                "fixture": _fixture_record(f, fid) if f else (old or {}).get("fixture"),
                "first_seen": (old or {}).get("first_seen") or now.strftime("%Y-%m-%dT%H:%M:%SZ"),
                **{k: _merge(k, (old or {}).get(k, []), [_slim(x) if k == "lines" else x for x in g[k]], refresh) for k in KINDS},
                **({"results": old["results"]} if (old or {}).get("results") else {}),  # stored by ``settle``, never touched here
+               **({"held_in_play": old["held_in_play"]} if (old or {}).get("held_in_play") else {}),  # set aside by hand, carried as it is
                **({"settled_at": old["settled_at"]} if (old or {}).get("settled_at") else {})}
         if not new.get("catalogue") and not (old or {}).get("catalogue"):
             new.pop("catalogue", None)  # do not rewrite every older file just to add an empty key

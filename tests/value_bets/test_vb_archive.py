@@ -468,3 +468,65 @@ def test_a_tests_in_play_line_never_reaches_the_archive_or_the_published_file(tm
     d = read(tmp_path, "2026-11-09-pakistan-v-sri-lanka")
     assert [x["line"] for x in d["lines"]] == [31.5]
     assert [x["line"] for x in published["lines"]] == [31.5]
+
+
+# ---- held_in_play: lines set aside by hand stay in the file and are never read as prices
+
+def _held_file(tmp_path):
+    """A Test's file with one real pre-match line and one in-play line moved to ``held_in_play`` (with its result), as the clean-up leaves it."""
+    first = "2026-11-09T04:00:00Z"
+
+    def tl(pid, ln, src="Ladbrokes"):
+        return {"pid": pid, "player": pid.upper(), "book_name": pid.upper(), "team": "Pakistan", "fmt": "Test", "stat": "runs", "line": ln, "inn": 1, "match": "Pakistan vs Sri Lanka",
+                "competition": "", "start_utc": first, "books": [{"source": src, "kind": "bookmaker", "over": 1.85, "under": 1.85}]}
+
+    sched = [{"start_utc": "2026-11-09T04:30Z", "format": "Test", "gender": "male", "team_a": "Pakistan", "team_b": "Sri Lanka", "venue": "", "series": "", "status": "Live"}]
+    update(tmp_path, {"generated_at_utc": "a", "events": [], "fancy": [], "lines": [tl("sk", 31.5), tl("ab", 95.5, "LeoVegas")]}, dt.datetime(2026, 11, 9, 3, 0, tzinfo=dt.timezone.utc), None, sched)
+    path = tmp_path / "2026-11" / "2026-11-09-pakistan-v-sri-lanka.json"
+    d = json.loads(path.read_text())
+    moved = [x for x in d["lines"] if x["line"] == 95.5]
+    d["lines"] = [x for x in d["lines"] if x["line"] != 95.5]
+    d["held_in_play"] = {"reason": "first priced after the match had started", "held_on": "2026-11-10", "lines": moved, "fancy": [], "results": [{"pid": "ab", "stat": "runs", "inn": 1, "value": 80}]}
+    path.write_text(json.dumps(d, separators=(",", ":")))
+    return path, tl, sched
+
+
+def test_held_in_play_is_carried_by_a_later_pull_and_a_held_line_is_never_filed_back(tmp_path):
+    path, tl, sched = _held_file(tmp_path)
+    now = dt.datetime(2026, 11, 9, 11, 59, tzinfo=dt.timezone.utc)
+    pull = {"generated_at_utc": "b", "events": [], "fancy": [], "lines": [tl("sk", 31.5), tl("ab", 95.5, "LeoVegas"), tl("zz", 20.5)]}   # a pull that still offers the held line (and a genuinely new one)
+    update(tmp_path, pull, now, None, sched)
+    d = json.loads(path.read_text())
+    assert sorted(x["line"] for x in d["lines"]) == [20.5, 31.5]  # 95.5 stays out of lines
+    assert [x["line"] for x in d["held_in_play"]["lines"]] == [95.5] and d["held_in_play"]["held_on"] == "2026-11-10"
+    update(tmp_path, pull, now, None, sched)  # nothing changes: no rewrite
+    assert json.loads(path.read_text()) == d
+
+
+def test_readers_of_the_archive_never_take_a_held_line_for_a_price_or_a_result(tmp_path):
+    path, tl, sched = _held_file(tmp_path)
+    now = dt.datetime(2026, 11, 9, 11, 59, tzinfo=dt.timezone.utc)
+    # settle: a final card with both players; only the priced (non-held) one gets a result, the held one is not "priced"
+    m = live_match([settled("sk", "runs", 31.5, 40, inn=1), settled("ab", "runs", 95.5, 80, inn=1)], start="2026-11-09T04:30:00.000Z", sides=("Pakistan", "Sri Lanka"))
+    settle(tmp_path, [{"matches": [m]}, {"matches": [m]}], now)
+    d = json.loads(path.read_text())
+    assert [(r["pid"], r["stat"], r["inn"], r["value"]) for r in d.get("results", [])] == [("sk", "runs", 1, 40)]
+    assert d["held_in_play"]["results"] == [{"pid": "ab", "stat": "runs", "inn": 1, "value": 80}]  # carried untouched
+    # heal_book builds a previous pull from the archive: the held line is not in it
+    wiped = {"generated_at_utc": "c", "events": [], "fancy": [], "lines": []}
+    healed = heal_book({**wiped, "lines": [tl("sk", 31.5)]}, tmp_path, now)
+    assert [x["line"] for x in healed["lines"]] == [31.5]
+    # the name backfill rewrites the file whole and keeps the key
+    backfill(tmp_path, {"lines": [{"pid": "sk", "book_name": "SK"}]})
+    assert json.loads(path.read_text())["held_in_play"]["lines"][0]["line"] == 95.5
+    # the site builder's stop-gap rows and the identity table read the file with the extra key
+    import shutil
+
+    from cricket_site import build as B
+    from cricket_site import identity as I
+
+    vb = tmp_path / "site_side" / "out"
+    vb.mkdir(parents=True)
+    shutil.copytree(path.parent, vb.parent / "archive" / path.parent.name)
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["Pakistan"]
+    assert set(I.collect_books(vb)) == {"sk"}  # the held player is not read as one the books priced
