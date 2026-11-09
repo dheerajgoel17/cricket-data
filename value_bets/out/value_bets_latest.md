@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-09 11:00 IST
+# Cricket value bets - 2026-11-09 12:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1182 prices
 - **smarkets**: ok, 466 prices
-- **feedk**: ok, 120 prices, 5 events
 - **feedg**: ok, 16 prices, 2 events
-- **feede**: ok, 478 prices, 17 events
-- **feedf**: ok, 232 prices, 8 events
-- **feedh**: ok, 1246 prices, 30 events
+- **feedk**: ok, 120 prices, 5 events
+- **feedf**: ok, 234 prices, 7 events
+- **feede**: ok, 454 prices, 17 events
+- **feedh**: ok, 1234 prices, 28 events
 
-Matches starting in next 168h: **30**, markets priced: **331**, value bets: **0** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **30**, markets priced: **324**, value bets: **0** (new alerts: 0). Min edge 5%.
 
 _No value bets passed the filters this run._
 
@@ -20,4 +20,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), BBK Partnership (male), Bangla Tigers (male), Cdb A (male), Colombo Aces (male), Dpgc (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Royal Champs (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
 
-Runtime 152.6s. Snapshot: `odds_20261109T053043Z.jsonl.gz`
+Runtime 104.5s. Snapshot: `odds_20261109T063033Z.jsonl.gz`
