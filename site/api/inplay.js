@@ -1,29 +1,37 @@
-// GET /api/inplay -> {asOf, source: "inplay", matches[]} (wrapped with DATA_WRAP_KEY when set), cached ~15 s with one fetch in flight at a time.
-// The in-play lines the price feed lists for matches that have started (player innings runs, a side's innings total), as `parseInplayFeed` reads them. Nothing is stored:
-// pre-match lines and the archive stay as the hourly pipeline writes them, an in-play price is only ever shown while it is live.
-// Where the feed lives is configuration, not code: PRICE_FEED_URL comes from the deployment's environment variables; without it the body is an empty list.
+// GET /api/inplay -> {asOf, source: "inplay", matches[]} (wrapped with DATA_WRAP_KEY when set), cached ~15 s with one read in flight at a time.
+// The in-play lines the price feed lists for matches that have started (player innings runs, a side's innings total). A GitHub run keeps the latest copy in Supabase while a match is on
+// (scripts/inplay-snapshot.mjs, started every minute by the scheduler Worker); this route only reads that row with the project's public key, so the feed's address never leaves GitHub.
+// A copy older than STALE_MS is not shown (an old price is worse than none), and without SUPABASE_URL / SUPABASE_ANON_KEY the list is empty. Nothing is stored here or in the pre-match files.
 import { LIVE_TTL_MS } from "@cricket/engine/live.js";
-import { parseInplayFeed } from "@cricket/engine/inplay-lines.js";
 import { wire } from "@cricket/engine/wrap.js";
 
-const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
-const FETCH_MS = 8000;
+const UA = "cricket-props-hub-inplay/0.1 (server)";
+const FETCH_MS = 6000;
+/** A snapshot is written about every 15 s while a match is on; past this it is a dead writer, not a live price. */
+export const STALE_MS = 90_000;
 
 let last = null, inflight = null;
+const empty = (extra = {}) => ({ asOf: new Date().toISOString(), source: "inplay", matches: [], ...extra });
 
-async function fetchFeed() {
-  const url = String(process.env.PRICE_FEED_URL || "");
-  if (!url) return { asOf: new Date().toISOString(), source: "inplay", matches: [] };
-  const r = await fetch(url, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(FETCH_MS) });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const doc = await r.json();
-  return { asOf: new Date().toISOString(), source: "inplay", matches: parseInplayFeed(Array.isArray(doc) ? doc[0] : doc) };
+/** The row as the route serves it: its matches while fresh, an empty list when the copy is stale or missing. */
+export function fromRow(row, now = Date.now()) {
+  const at = Date.parse(row?.as_of || "");
+  if (!Number.isFinite(at) || now - at > STALE_MS || !Array.isArray(row?.body?.matches)) return empty();
+  return { asOf: new Date(at).toISOString(), source: "inplay", matches: row.body.matches };
 }
 
-/** One fetch at a time and a body no older than the cache window: a burst of viewers is one request to the feed. */
+async function readRow(now) {
+  const base = String(process.env.SUPABASE_URL || "").replace(/\/+$/, ""), key = String(process.env.SUPABASE_ANON_KEY || "").trim();
+  if (!base || !key) return empty();
+  const r = await fetch(`${base}/rest/v1/inplay_lines?select=as_of,body&id=eq.1`, { headers: { apikey: key, Accept: "application/json", "User-Agent": UA }, signal: AbortSignal.timeout(FETCH_MS) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return fromRow((await r.json())[0], now);
+}
+
+/** One read at a time and a body no older than the cache window: a burst of viewers is one request to Supabase. */
 export async function snapshot(now = Date.now()) {
   if (last && now - last.t < LIVE_TTL_MS) return last.body;
-  inflight ||= fetchFeed().then((body) => { last = { t: now, body }; return body; }).finally(() => { inflight = null; });
+  inflight ||= readRow(now).then((body) => { last = { t: now, body }; return body; }).finally(() => { inflight = null; });
   return inflight;
 }
 export const lastBody = () => last?.body || null;
@@ -40,6 +48,6 @@ export default async function handler(req, res) {
   } catch (e) {
     if (lastBody()) return send(res, 200, { ...lastBody(), stale: true });
     const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
-    return send(res, 502, { error: msg, asOf: new Date().toISOString(), source: "inplay", matches: [] });
+    return send(res, 502, empty({ error: msg }));
   }
 }

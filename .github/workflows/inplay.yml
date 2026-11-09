@@ -1,0 +1,36 @@
+name: In-play snapshot
+
+# While a match is on: read the price feed's in-play lines about every 15 s for a minute and keep the latest in Supabase (one row, replaced each time) for api/inplay.js.
+# The scheduler Worker starts it every minute (GitHub's own cron is hours late and runs no more often than every 5 minutes, so the schedule below is only the fallback).
+# Nothing is committed and the pre-match files are untouched. With nothing in play a run is one read and one write.
+on:
+  schedule:
+    - cron: "* * * * *"
+  workflow_dispatch:
+
+# Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
+env:
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: inplay
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            site/packages/engine
+            site/scripts/inplay-snapshot.mjs
+          sparse-checkout-cone-mode: false
+      - name: Snapshot
+        run: node site/scripts/inplay-snapshot.mjs

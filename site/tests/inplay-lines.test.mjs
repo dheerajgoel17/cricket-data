@@ -61,29 +61,38 @@ test("a fixture finds its match either way round, and the line nearest even mone
   assert.equal(playerLine(m, "Litton Das"), null);
 });
 
-test("the route fetches the feed once per window, lists started matches, and is empty without a feed", async () => {
-  let hits = 0;
-  const server = createServer((req, res) => { hits++; res.setHeader("content-type", "application/json"); res.end(JSON.stringify({ matches: [{ home: "Bangladesh", away: "West Indies", in_play: true, quotes: QUOTES }] })); });
+test("the route serves the Supabase row while it is fresh, an empty list when it is stale or there is none, and reads once per window", async () => {
+  let hits = 0, row = null;
+  const server = createServer((req, res) => { hits++; assert.equal(req.headers.apikey, "anon-key"); assert.match(req.url, /^\/rest\/v1\/inplay_lines\?select=as_of,body&id=eq\.1$/); res.setHeader("content-type", "application/json"); res.end(JSON.stringify(row ? [row] : [])); });
   await new Promise((r) => server.listen(0, "127.0.0.1", r));
-  const { default: handler, snapshot } = await import("../api/inplay.js");
-  const call = async () => { let out; await handler({ method: "GET" }, { setHeader() {}, status(c) { return { json(b) { out = { c, b }; } }; } }); return out; };
+  const { default: handler, fromRow, snapshot, STALE_MS } = await import("../api/inplay.js");
+  const call = async (method = "GET") => { let out; await handler({ method }, { setHeader() {}, status(c) { return { json(b) { out = { c, b }; } }; } }); return out; };
   const wrapKey = process.env.DATA_WRAP_KEY; // CI sets one; the route wraps its body with it, and this test reads the plain body
   delete process.env.DATA_WRAP_KEY;
+  const saved = { u: process.env.SUPABASE_URL, k: process.env.SUPABASE_ANON_KEY };
   try {
-    delete process.env.PRICE_FEED_URL;
-    assert.deepEqual((await call()).b.matches, []); // no feed configured: empty, not an error
-    process.env.PRICE_FEED_URL = `http://127.0.0.1:${server.address().port}/`;
-    const t0 = Date.now() + 60e6; // past the empty body's window
+    delete process.env.SUPABASE_URL; delete process.env.SUPABASE_ANON_KEY;
+    assert.deepEqual((await call()).b.matches, []); // not configured: empty, not an error
+    process.env.SUPABASE_URL = `http://127.0.0.1:${server.address().port}`; process.env.SUPABASE_ANON_KEY = "anon-key";
+    const t0 = Date.now() + 600e6; // past the empty body's window
+    row = { as_of: new Date(t0 - 10_000).toISOString(), body: { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.833, under: 1.833 }] }] } };
     const a = await snapshot(t0);
     assert.equal(a.matches.length, 1);
-    assert.equal(a.matches[0].lines.length, 4);
+    assert.equal(a.matches[0].lines[0].line, 33.5);
     await snapshot(t0 + 5_000);
     assert.equal(hits, 1); // inside 15 s: no second request
-    await snapshot(t0 + 20_000);
+    row = { as_of: new Date(t0 - STALE_MS - 1000).toISOString(), body: { matches: a.matches } };
+    assert.deepEqual((await snapshot(t0 + 20_000)).matches, []); // the writer stopped: an old price is not shown
     assert.equal(hits, 2);
+    assert.deepEqual(fromRow(null).matches, []);
+    assert.deepEqual(fromRow({ as_of: "not a date", body: { matches: [{}] } }).matches, []);
+    assert.deepEqual(fromRow({ as_of: new Date().toISOString(), body: {} }).matches, []);
     const r = await call();
     assert.equal(r.c, 200);
     assert.equal(r.b.source, "inplay");
-    assert.equal(405, (await (async () => { let c; await handler({ method: "POST" }, { setHeader() {}, status(x) { c = x; return { json() {} }; } }); return { c }; })()).c);
-  } finally { server.close(); delete process.env.PRICE_FEED_URL; if (wrapKey !== undefined) process.env.DATA_WRAP_KEY = wrapKey; }
+    assert.equal((await call("POST")).c, 405);
+  } finally {
+    server.close();
+    for (const [k, v] of [["SUPABASE_URL", saved.u], ["SUPABASE_ANON_KEY", saved.k], ["DATA_WRAP_KEY", wrapKey]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
 });

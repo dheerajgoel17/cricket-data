@@ -49,7 +49,7 @@ export function decide(job, runs, now) {
   return { slot, action: "dispatch" };
 }
 
-export function createScheduler({ fetchImpl = (...a) => globalThis.fetch(...a) } = {}) {
+export function createScheduler({ fetchImpl = (...a) => globalThis.fetch(...a), jobs: JOB_LIST = JOBS } = {}) {
   const memo = new Map(); // file -> { handled: slot ms, retryAt: ms }: this instance's memory, so a handled slot costs no further calls (a fresh instance just asks once more)
   const last = new Map(); // file -> what the latest tick did for it
   const stats = { since: null, ticks: 0, dispatched: 0, skipped: 0, failed: 0 };
@@ -88,7 +88,7 @@ export function createScheduler({ fetchImpl = (...a) => globalThis.fetch(...a) }
       console.error(`scheduler: ${cfg.error}`);
       return { ok: false, at, error: cfg.error, counts: { dispatched: 0, skipped: 0, failed: 0 }, jobs: [] };
     }
-    const jobs = await Promise.all(JOBS.map((j) => runJob(j, cfg, now).catch((e) => ({ workflow: j.file, action: "failed", error: short(e) }))));
+    const jobs = await Promise.all(JOB_LIST.map((j) => runJob(j, cfg, now).catch((e) => ({ workflow: j.file, action: "failed", error: short(e) }))));
     const counts = { dispatched: 0, skipped: 0, failed: 0 };
     for (const j of jobs) if (counts[j.action] != null) counts[j.action]++;
     for (const k of Object.keys(counts)) stats[k] += counts[k];
@@ -102,7 +102,7 @@ export function createScheduler({ fetchImpl = (...a) => globalThis.fetch(...a) }
   async function status(env, now = Date.now()) {
     if (cache && now - cache.at < STATUS_TTL_MS) return cache.body;
     const cfg = config(env), call = cfg.error ? null : api(cfg, fetchImpl);
-    const jobs = await Promise.all(JOBS.map(async (job) => {
+    const jobs = await Promise.all(JOB_LIST.map(async (job) => {
       const slot = slotStart(job, now), row = { workflow: job.file, cron: job.cron, slot: new Date(slot).toISOString(), next_slot: new Date(nextSlot(job, now)).toISOString(), last_tick: last.get(job.file) || null, last_dispatched_run: null, latest_run: null };
       if (!call) return row;
       const [d, l] = await Promise.allSettled([call("GET", runsPath(job.file, cfg, "&event=workflow_dispatch")), call("GET", runsPath(job.file, cfg))]);
