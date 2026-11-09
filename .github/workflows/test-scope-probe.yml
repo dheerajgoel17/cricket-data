@@ -2,6 +2,8 @@ name: Test scope probe
 
 # Read-only diagnostic (by hand): how a book writes a Test's player markets. Names and fields only, never a host. Commits nothing.
 on:
+  pull_request:
+    paths: ["scripts/probe_test_scope.py", ".github/workflows/test-scope-probe.yml"]
   workflow_dispatch:
 
 env:
