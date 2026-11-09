@@ -112,7 +112,7 @@ export class Store {
   }
 
   /**
-   * One player's batting progression, innings of ten balls or more: `{ m, i, b, r, x }` with `x` his runs after 10 / 20 / 30 balls faced (null where he was out or still short of it).
+   * One player's batting progression, innings of ten balls or more: `{ m, i, b, r, x }` with `x` his runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced (null where he was out or still short of it).
    * Read from the progression shard (`pp/NN.json`) only when asked, so the player files stay as they were; [] when the data has none (an older build, or he never faced ten balls).
    */
   async playerProgression(pidx) {
@@ -120,7 +120,7 @@ export class Store {
     let d;
     try { d = await this.progShard(this.shardOf(pidx)); } catch { return []; }
     const out = [];
-    for (let k = 0; k < (d?.p?.length || 0); k++) if (d.p[k] === pidx) out.push({ m: d.m[k], i: d.i[k], b: d.b[k], r: d.r[k], x: [d.x1[k], d.x2[k], d.x3[k]] });
+    for (let k = 0; k < (d?.p?.length || 0); k++) if (d.p[k] === pidx) out.push({ m: d.m[k], i: d.i[k], b: d.b[k], r: d.r[k], x: [1, 2, 3, 4, 5, 6, 7].map((n) => d[`x${n}`]?.[k] ?? null) }); // an older build has only x1-x3
     return out;
   }
 

@@ -84,12 +84,13 @@ def test_progression_shard_has_one_row_per_innings_of_ten_balls_and_agrees_with_
     for k in mine:
         runs, balls = final[(pr["p"][k], pr["m"][k], pr["i"][k])]
         assert (pr["r"][k], pr["b"][k]) == (runs, balls) and balls >= 10
-        marks = [pr["x1"][k], pr["x2"][k], pr["x3"][k]]
+        at = (10, 20, 30, 50, 75, 100, 150)
+        marks = [pr[f"x{i + 1}"][k] for i in range(len(at))]
         assert marks[0] is not None and marks[0] <= runs
         assert all(a is None or (0 <= a <= runs) for a in marks)
         seen = [a for a in marks if a is not None]
         assert seen == sorted(seen)  # runs only go up
-        assert (marks[1] is not None) == (balls >= 20) and (marks[2] is not None) == (balls >= 30)
+        assert all((m is not None) == (balls >= b) for m, b in zip(marks, at, strict=True))  # a mark is there exactly when he faced that many balls
 
 
 def _prov(match_id, date, team_a, team_b, players, **kw):
