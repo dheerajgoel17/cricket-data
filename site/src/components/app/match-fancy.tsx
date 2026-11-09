@@ -85,7 +85,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
         <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
           <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
-          {r.live && <LiveTag />}
+          {r.live && <LiveTag opened={r.opened} line={r.line} />}
           {r.at && (() => {
             const ground = shortVenue(r.venue);
             const hits = r.at.side === "over" ? r.at.over : r.at.under;

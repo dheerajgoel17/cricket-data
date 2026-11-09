@@ -35,6 +35,7 @@ describe("TeamSpot", () => {
     render(<TeamSpot r={row()} fx={fx} teams={sides} />);
     expect(screen.getByText(/Same spot \(60\/1 after 6.0 ov, 54–66 runs in 9 past T20 innings\)/)).toBeInTheDocument();
     expect(screen.getByText("6 over, 3 under 190.5")).toBeInTheDocument();
+    expect(screen.getByText(/median finish 200/)).toBeInTheDocument(); // the nine finished 180 x3, 200 x4, 220 x2
     expect(screen.queryByText(/small sample/)).not.toBeInTheDocument();
   });
 
@@ -57,6 +58,7 @@ describe("BatterSpot", () => {
     render(wrap(<BatterSpot r={{ pid: "pid1", name: "Opener", team: "Alpha", opp: "Beta", fmt: "T20", start: "2026-11-09T10:00:00Z", line: 49.5 }} />));
     expect(await screen.findByText(/Same spot \(30 off 20, 3 of his innings\)/)).toBeInTheDocument();
     expect(screen.getByText("2 over, 1 under 49.5")).toBeInTheDocument();
+    expect(screen.getByText(/median finish 55/)).toBeInTheDocument(); // 41, 55, 62
     expect(screen.getByText(/small sample/)).toBeInTheDocument(); // 3 < 6
   });
 
@@ -64,6 +66,19 @@ describe("BatterSpot", () => {
     match = live({ players: [{ name: "Opener", team: "Alpha", runs: 8, balls: 6, out: false, strike: true }] });
     const { container } = render(wrap(<BatterSpot r={{ pid: "pid1", name: "Opener", team: "Alpha", opp: "Beta", fmt: "T20", line: 49.5 }} />));
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("LiveTag", () => {
+  it("says where the line opened when it has moved, and nothing more when it has not", () => {
+    const { rerender } = render(<LiveTag opened={25.5} line={33.5} />);
+    expect(screen.getByText("opened 25.5 · +8")).toBeInTheDocument();
+    rerender(<LiveTag opened={40.5} line={33.5} />);
+    expect(screen.getByText("opened 40.5 · −7")).toBeInTheDocument();
+    rerender(<LiveTag opened={33.5} line={33.5} />);
+    expect(screen.queryByText(/opened/)).not.toBeInTheDocument();
+    rerender(<LiveTag />);
+    expect(screen.queryByText(/opened/)).not.toBeInTheDocument();
   });
 });
 

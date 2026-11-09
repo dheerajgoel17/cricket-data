@@ -14,9 +14,15 @@ const conditionalReport = conditional as (store: any, ms: number[], o: { team?: 
 const playerConditional = playerCond as (store: any, rows: any[], o: { fmt: number; state: { balls: number; runs: number }; line?: number | null }) => any;
 const overs = (o: number) => (Number.isInteger(o) ? o.toFixed(1) : String(o));
 
-/** The small red mark on a line that is a live price. */
-export function LiveTag({ className }: { className?: string }) {
-  return <span className={cn("label-cap text-caption font-bold text-miss", className)}>Live</span>;
+/** The small red mark on a line that is a live price; with `opened`, where the line stood before the match ("opened 25.5") when it has moved. */
+export function LiveTag({ className, opened, line }: { className?: string; opened?: number | null; line?: number | null }) {
+  const moved = opened != null && line != null && opened !== line;
+  return (
+    <span className={cn("inline-flex items-baseline gap-tight", className)}>
+      <span className="label-cap text-caption font-bold text-miss">Live</span>
+      {moved && <span className="text-footnote font-normal text-muted-foreground">opened {opened} · {line! > opened! ? "+" : "−"}{Math.round(Math.abs(line! - opened!) * 10) / 10}</span>}
+    </span>
+  );
 }
 
 /**
@@ -39,7 +45,7 @@ export function TeamSpot({ r, fx, teams, className }: { r: any; fx: any; teams: 
   return (
     <p className={cn("text-footnote text-muted-foreground", className)}>
       Same spot ({inn!.runs}/{inn!.wkts} after {overs(inn!.overs)} ov, {lo}–{hi} runs in {rep.n} past {fx.fmt} innings): <span className="font-medium text-foreground">{rep.summary.over} over, {rep.summary.under} under {r.line}</span>
-      {rep.n < MIN_SAMPLE ? " · small sample" : ""}
+      {" · "}median finish {rep.summary.median}{rep.n < MIN_SAMPLE ? " · small sample" : ""}
     </p>
   );
 }
@@ -57,7 +63,7 @@ export function BatterSpot({ r, className }: { r: any; className?: string }) {
   return (
     <span className={cn("text-footnote text-muted-foreground", className)}>
       Same spot ({bat.runs} off {bat.balls}, {rep.n} of his innings): <span className="font-medium text-foreground">{rep.summary.over} over, {rep.summary.under} under {r.line}</span>
-      {rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+      {" · "}median finish {rep.summary.median}{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
     </span>
   );
 }

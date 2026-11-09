@@ -52,7 +52,7 @@ export function bookQuotes(lines) {
       if (b.under > 1 && !(unders.get(b.source)?.line >= l.line)) unders.set(b.source, { line: l.line, price: b.under });
       continue;
     }
-    const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null, ...(b.live ? { live: true } : {}) };
+    const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null, ...(b.live ? { live: true, ...(b.opened != null ? { opened: b.opened } : {}) } : {}) };
     const cur = mine.get(b.source);
     if (!cur || far(q) < far(cur) - 1e-9 || (Math.abs(far(q) - far(cur)) <= 1e-9 && q.line < cur.line)) mine.set(b.source, q);
   }
@@ -264,7 +264,7 @@ export function fancyFor(doc, fixture, key, team = null, inn = 0) {
   return (doc?.fancy || []).filter((l) => {
     if (l.key !== key || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
     return sameFixture(l, fixture, doc);
-  }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true } : {}) })).sort((x, y) => x.line - y.line);
+  }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true, ...(l.opened != null ? { opened: l.opened } : {}) } : {}) })).sort((x, y) => x.line - y.line);
 }
 
 /** The best price of a side among the books quoting it, or null when none does (an exchange quotes Yes and No on lines a gap apart, so a line can be one-sided). */

@@ -59,7 +59,7 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
   const at = gs && gs.n >= GROUND_MIN ? { n: gs.n, over: gs.over, under: gs.under, side: gs.under > gs.over ? "under" : "over" } : null;
   const mine = side === "over" ? so : su, hits = mine ? (side === "over" ? mine.over : mine.under) : 0, played = mine ? mine.over + mine.under : 0;
   return { key: k, inn, scope, team: teamName, batFirst, line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks,
-    overBook: src(lo, "over"), underBook: src(lu, "under"), live: shownBooks.some((x) => x.live), side, edge: side === "over" ? eo : eu, hits, played, chance: shrunkProb(hits, played, side === "over" ? po : pu),
+    overBook: src(lo, "over"), underBook: src(lu, "under"), live: shownBooks.some((x) => x.live), opened: shownBooks.find((x) => x.opened != null)?.opened ?? null, side, edge: side === "over" ? eo : eu, hits, played, chance: shrunkProb(hits, played, side === "over" ? po : pu),
     at, last: rep.values.slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) };
 }
 
