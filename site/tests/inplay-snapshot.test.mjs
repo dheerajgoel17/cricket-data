@@ -27,6 +27,7 @@ test("the row is replaced through the REST upsert with the service key, and a re
   assert.equal(calls[0].init.headers.apikey, "svc");
   assert.equal(calls[0].init.headers.Authorization, "Bearer svc");
   assert.equal(calls[0].init.headers.Prefer, "resolution=merge-duplicates,return=minimal");
+  assert.ok(!/mozilla/i.test(calls[0].init.headers["User-Agent"])); // a secret key from a browser-looking agent is refused by Supabase
   assert.deepEqual(JSON.parse(calls[0].init.body), [{ id: 1, as_of: "2026-11-09T07:00:00.000Z", body }]);
   await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401 .* \(key: an unrecognised key, length 3\)/);
   // a new-style secret key is sent as `apikey` only: as a bearer token the API refuses it
