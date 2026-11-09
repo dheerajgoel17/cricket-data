@@ -1,7 +1,7 @@
 import datetime as dt
 import json
 
-from value_bets.booklines import book_lines, carry_started, prop_events, public
+from value_bets.booklines import book_lines, carry_started, hold_started, prop_events, public
 
 
 def row(**kw):
@@ -314,3 +314,105 @@ def test_earlier_complete_match_lines_of_books_that_do_not_quote_the_total_are_c
     assert rescope_prev({"lines": [], "events": [], "fancy": []}) == {"lines": [], "events": [], "fancy": []}
     carried = carry_started({"generated_at_utc": "b", "events": [], "fancy": [], "lines": []}, prev, dt.datetime(2026, 10, 27, 9, 33, tzinfo=dt.timezone.utc))
     assert not any(x["fmt"] == "Test" and x.get("inn", 0) == 0 and any(y["source"] == "Dafabet" for y in x["books"]) for x in carried["lines"])
+
+
+# --- hold_started: the file is pre-match prices, so a started match takes no line it did not already have ---
+
+TEST_FIRST = "2026-11-09T04:00:00Z"
+TEST_DAY2 = "2026-11-10T04:30:00Z"  # the book re-lists the Test under the next morning at stumps, "not started"
+
+
+def tline(pid, line, books, start=TEST_FIRST, inn=1, match="Pakistan vs Sri Lanka", fmt="Test", **kw):
+    return {"pid": pid, "player": pid.upper(), "team": "Pakistan", "fmt": fmt, "stat": "runs", "line": line, **({"inn": inn} if inn else {}), "match": match,
+            "competition": "", "start_utc": start, "books": [{"source": s, "kind": "bookmaker", "over": 1.9, "under": 1.8} for s in books], **kw}
+
+
+def pull(*lines, fancy=()):
+    return {"generated_at_utc": "x", "events": [], "lines": list(lines), "fancy": list(fancy)}
+
+
+def utc(*a):
+    return dt.datetime(*a, tzinfo=dt.timezone.utc)
+
+
+def test_a_started_tests_day_two_line_is_held_back_but_the_pre_match_one_stays():
+    """Day 1 at stumps (11:59Z) the book re-lists the Test for 10 Nov and prices a batter on 57 not out at 95.5 for his innings. His 31.5 is the real pre-match line."""
+    prev = pull(tline("sk", 31.5, ["Dafabet", "Ladbrokes"]))
+    new = pull(tline("sk", 31.5, ["Ladbrokes"], TEST_DAY2), tline("sk", 95.5, ["LeoVegas"], TEST_DAY2), tline("ab", 40.5, ["LeoVegas"], TEST_DAY2))
+    now = utc(2026, 11, 9, 11, 59)
+    kept, held = hold_started(new, prev, now)
+    assert held == {"lines": 2, "fancy": 0}
+    assert [x["line"] for x in kept["lines"]] == [31.5]
+    out = carry_started(kept, prev, now)
+    assert [(x["pid"], x["line"], x["start_utc"], [b["source"] for b in x["books"]]) for x in out["lines"]] == [("sk", 31.5, TEST_FIRST, ["Dafabet", "Ladbrokes"])]
+
+
+def test_the_same_pull_without_the_rule_is_what_leaked():
+    """The leak, kept as a check on the test above: carry_started alone restamps the 10 Nov rows to the first morning and files 95.5 as one of the pre-match lines."""
+    prev = pull(tline("sk", 31.5, ["Dafabet", "Ladbrokes"]))
+    new = pull(tline("sk", 95.5, ["LeoVegas"], TEST_DAY2))
+    out = carry_started(new, prev, utc(2026, 11, 9, 11, 59))
+    assert sorted(x["line"] for x in out["lines"]) == [31.5, 95.5]
+
+
+def test_a_second_innings_line_priced_after_the_first_innings_is_held_too():
+    prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
+    new = pull(tline("sk", 31.5, ["Ladbrokes"], "2026-11-11T04:30:00Z"), tline("sk", 28.5, ["LeoVegas"], "2026-11-11T04:30:00Z", inn=2))
+    kept, held = hold_started(new, prev, utc(2026, 11, 10, 12, 0))
+    assert held["lines"] == 1 and [(x.get("inn"), x["line"]) for x in kept["lines"]] == [(1, 31.5)]
+
+
+def test_a_test_not_yet_started_takes_every_new_line():
+    prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
+    new = pull(tline("sk", 31.5, ["Ladbrokes"]), tline("sk", 36.5, ["Dafabet"]), tline("ab", 40.5, ["Dafabet"]))
+    kept, held = hold_started(new, prev, utc(2026, 11, 8, 20, 0))   # 8 h to the first ball
+    assert held == {"lines": 0, "fancy": 0} and len(kept["lines"]) == 3
+
+
+def test_the_next_test_of_a_series_is_priced_pre_match_while_the_first_is_being_played():
+    """A second Test 8 days after the first is a window of its own: its new lines are pre-match until it starts, whatever the first one is doing."""
+    nxt = "2026-11-17T04:00:00Z"
+    prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
+    new = pull(tline("sk", 33.5, ["Dafabet"], nxt), tline("sk", 95.5, ["LeoVegas"], TEST_DAY2))
+    kept, held = hold_started(new, prev, utc(2026, 11, 10, 12, 0))
+    assert held["lines"] == 1 and [x["line"] for x in kept["lines"]] == [33.5]
+
+
+def test_a_started_limited_overs_match_takes_no_new_line_and_keeps_the_old_ones():
+    prev = pull(tline("p1", 17.5, ["bet365"], "2026-11-09T07:00:00Z", inn=0, fmt="T20", match="A vs B"))
+    new = pull(tline("p1", 17.5, ["bet365", "Dafabet"], "2026-11-09T07:00:00Z", inn=0, fmt="T20", match="A vs B"),   # an existing line: kept, books and prices as pulled
+               tline("p1", 30.5, ["bet365"], "2026-11-09T07:00:00Z", inn=0, fmt="T20", match="A vs B"),            # a new line after the start: held
+               tline("p9", 22.5, ["bet365"], "2026-11-09T09:00:00Z", inn=0, fmt="T20", match="C vs D"))            # another match, not started: kept
+    kept, held = hold_started(new, prev, utc(2026, 11, 9, 7, 30))
+    assert held == {"lines": 1, "fancy": 0}
+    assert [(x["match"], x["line"]) for x in kept["lines"]] == [("A vs B", 17.5), ("C vs D", 22.5)]
+    assert [b["source"] for b in kept["lines"][0]["books"]] == ["bet365", "Dafabet"]
+
+
+def test_a_book_newly_quoting_an_existing_line_is_kept_only_the_line_key_counts():
+    prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
+    kept, held = hold_started(pull(tline("sk", 31.5, ["Ladbrokes", "Dafabet"], TEST_DAY2)), prev, utc(2026, 11, 9, 12, 0))
+    assert held["lines"] == 0 and [b["source"] for b in kept["lines"][0]["books"]] == ["Ladbrokes", "Dafabet"]
+
+
+def test_no_previous_file_holds_nothing_back():
+    new = pull(tline("sk", 95.5, ["LeoVegas"], TEST_DAY2))
+    assert hold_started(new, None, utc(2026, 11, 9, 12, 0)) == (new, {"lines": 0, "fancy": 0})
+    assert hold_started(new, pull(), utc(2026, 11, 9, 12, 0)) == (new, {"lines": 0, "fancy": 0})
+
+
+def test_fancy_lines_follow_the_same_rule_and_events_are_left_alone():
+    def fx(line, source, start, **kw):
+        return {"match": "Pakistan vs Sri Lanka", "start_utc": start, "key": "team_total_runs", "scope": "team", "team": "Pakistan", "line": line, "inn": 1, "source": source, "kind": "bookmaker", **kw}
+    prev = {**pull(tline("sk", 31.5, ["Ladbrokes"]), fancy=[fx(310.5, "Ladbrokes", TEST_FIRST)])}
+    ev = {"match": "Pakistan vs Sri Lanka", "start_utc": TEST_DAY2, "markets": ["batter_runs"], "sources": ["LeoVegas"], "n": 4}
+    new = {**pull(tline("sk", 31.5, ["Ladbrokes"], TEST_DAY2), fancy=[fx(310.5, "Ladbrokes", TEST_DAY2), fx(395.5, "LeoVegas", TEST_DAY2)]), "events": [ev]}
+    kept, held = hold_started(new, prev, utc(2026, 11, 9, 12, 0))
+    assert held == {"lines": 0, "fancy": 1}
+    assert [x["line"] for x in kept["fancy"]] == [310.5] and kept["events"] == [ev]
+
+
+def test_a_line_with_no_usable_start_is_not_treated_as_started():
+    prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
+    kept, held = hold_started(pull(tline("sk", 36.5, ["Ladbrokes"], None)), prev, utc(2026, 11, 9, 12, 0))
+    assert held["lines"] == 0 and len(kept["lines"]) == 1
