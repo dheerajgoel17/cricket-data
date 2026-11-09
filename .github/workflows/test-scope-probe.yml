@@ -1,0 +1,30 @@
+name: Test scope probe
+
+# Read-only diagnostic (by hand): how a book writes a Test's player markets. Names and fields only, never a host. Commits nothing.
+on:
+  workflow_dispatch:
+
+env:
+  FEEDH_URL: ${{ secrets.FEEDH_URL }}
+  FEEDH_NAME: ${{ secrets.FEEDH_NAME }}
+  FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+  FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
+  FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+  FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Probe
+        run: python scripts/probe_test_scope.py 2>&1 | tee -a "$GITHUB_STEP_SUMMARY"
