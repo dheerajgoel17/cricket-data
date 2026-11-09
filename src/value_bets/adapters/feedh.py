@@ -45,6 +45,28 @@ WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
 VS = re.compile(r"\s+vs\.?\s+", re.I)
 INNINGS = re.compile(r"\b(1st|2nd|first|second)\s+innings?\b", re.I)
 COMBO = re.compile(r"\band\b|\+", re.I)
+# A market's innings is written in the period field ("1st Innings") or at either end of its name ("1st Innings - Batsman Runs - X", "Batsman Runs - X (2nd Innings)"); it is read from all three.
+INN_WORD = r"(?:in\s+)?(?P<n>1st|2nd|first|second)\s+innings?"
+INNINGS_LEAD = re.compile(rf"^\s*{INN_WORD}\s*[-:]\s*", re.I)
+INNINGS_TAIL = re.compile(rf"\s*[-:(]?\s*{INN_WORD}\)?\s*$", re.I)
+INNINGS_NO = {"1st": 1, "first": 1, "2nd": 2, "second": 2}
+
+
+def strip_innings(name: str) -> tuple[str, int | None]:
+    """(the market name without an innings at its start or end, that innings as 1 or 2 or None)."""
+    inn = None
+    for rx in (INNINGS_LEAD, INNINGS_TAIL):
+        m = rx.search(name)
+        if m:
+            inn = inn or INNINGS_NO[m["n"].lower()]
+            name = rx.sub("", name, count=1)
+    return name.strip(), inn
+
+
+def period_inn(market: dict) -> int | None:
+    """The innings the market's own period names ("1st Innings"), else None."""
+    m = INNINGS.search(str((market.get("period") or {}).get("fullDescription") or ""))
+    return INNINGS_NO[m.group(1).lower()] if m else None
 
 BATSMAN_RUNS = re.compile(r"^Batsman Runs - (?P<p>.+)$", re.I)
 BATSMAN_SIXES = re.compile(r"^Batsman Sixes - (?P<p>.+)$", re.I)
@@ -242,6 +264,7 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
     common = dict(source=src, source_type="bookmaker", event_id=str(ev.get("id")), match=f"{home} vs {away}", team_a=home, team_b=away,
                   gender_hint=female, competition=competition, start_utc=start, in_play=False, fetched_at=fetched_at, fmt=fmt)
     rows, fancy, catalogue, left = [], [], [], Counter()
+    hint = [None]  # the innings the market in hand names (its period or either end of its name)
 
     def add_ou(name, player, team, mapped, mt=None, fancy_key=None, scope="match", inn=None, ms_scope=None):
         got = _ou(m)
@@ -263,10 +286,12 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
         for side, price in (("over", ov), ("under", un)):
             rows.append(row(**{k: v for k, v in common.items() if k != "fmt"}, market_type=mt, market_raw=name, group_key=gk,
                             selection=f"{player} {side} {line}" if player else name, player=player, team=team, line=line, side=side,
-                            back=price, inn=inn, ms_scope=ms_scope))
+                            back=price, inn=inn, ms_scope=ms_scope, inn_hint=hint[0]))
 
     for m in ev.get("markets") or []:
-        name = (m.get("description") or "").strip()
+        raw_name = (m.get("description") or "").strip()
+        name, hint[0] = strip_innings(raw_name)
+        hint[0] = hint[0] or period_inn(m)
         if not name or (m.get("status") or "open").lower() != "open":
             if name:
                 left[name] += 1
@@ -275,7 +300,7 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
         for rx, mt in PLAYER_OU:
             mm = rx.match(name)
             if mm and not COMBO.search(mm["p"]):
-                if multi and not INNINGS.search(name):
+                if multi and not INNINGS.search(raw_name):
                     add_ou(name, flip(mm["p"]), None, None)  # a Test's unscoped line is not the match total
                 else:
                     add_ou(name, flip(mm["p"]), None, mt, mt=mt)
