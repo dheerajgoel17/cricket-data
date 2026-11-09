@@ -82,6 +82,14 @@ def parse_series(xml: str) -> list[tuple[str, str]]:
     return out
 
 
+def merge_remembered(current: list[tuple[str, str]], remembered: list[tuple[str, str]]) -> tuple[list[tuple[str, str]], int]:
+    """The source's list can lose a player from one day to the next while his page and image stay up (a link to a player we hold a photo of vanished from 1500+ of our players).
+    `current` wins; an id only `remembered` has is appended. -> (the merged list, how many were remembered only). Both are [(name tokens joined by space, source id)]."""
+    have = {cid for _, cid in current}
+    extra = [(nm, cid) for nm, cid in remembered if cid and nm and cid not in have]
+    return current + extra, len(extra)
+
+
 def fetch_sitemap(kind: str) -> str:
     req = urllib.request.Request(f"{host('LIVE_SOURCE_BASE')}/{host('LIVE_SITEMAP_DIR')}/{kind}.xml", headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=60) as r:

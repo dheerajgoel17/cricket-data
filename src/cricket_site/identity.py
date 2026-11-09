@@ -15,6 +15,12 @@ A source id is taken from, in this order (an id is never given to two players):
    players share that exact name, a photo link that is already one of them stays; a namesake that is not is dropped and reviewed (so "Rydham Sharma" does not stick
    on RG Sharma while three "Rohit Sharma" ids fight).
 
+A second id for a person who already has a link is the *photo-only* kind (``also``): our data can hold one human under two ids (a minted id from a scraped scorecard next to the
+Base id that has his initials-and-surname name; two Base ids for one player). A priced player with no Base name whose exact full name picks one source player is the same person as
+the Base player holding that link when that player's name is compatible with the full name (``match_players``' own rule: surname and first initial), so he gets the same face.
+The identity link (``s``) stays one source id to one of our ids; the other id only gets the picture. A line of the overrides file that repeats a source id says the same
+by hand ("these ids are one person"): the first line holds the link, later ones the face. Hand-checked, so it also covers two Base ids whose names share no initial.
+
 Whatever could not be linked comes back as the review list (priced players only: they are the ones the live numbers are read for), each with the source players it
 might be, so a fix is one line in the overrides file. Stdlib only.
 """
@@ -27,7 +33,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from .crex_assets import fold
+from .crex_assets import fold, match_players
 
 OVERRIDES = Path("mappings") / "player_identity.csv"  # under the data folder: player_id,source_id,note
 
@@ -101,8 +107,13 @@ def suggest(names: list[str], sitemap: list[tuple[str, str]], taken: set[str], l
     return out[:limit]
 
 
-def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[str, str], books: dict[str, dict], overrides: dict[str, str]) -> tuple[dict, list[dict], dict[str, str]]:
-    """-> (the table, the review list, {our id: source id} for the links the photo map did not already have or had differently).
+def _same_person(base_name: str, source_name: str, sid: str) -> bool:
+    """True when the photo matcher's own rule (surname and first initial agree, no ambiguity) would give this Base name that source player."""
+    return bool(base_name) and match_players([{"idx": 0, "name": base_name, "n": 1, "last": ""}], [(source_name, sid)]) == {0: sid}
+
+
+def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[str, str], books: dict[str, dict], overrides: dict[str, str]) -> tuple[dict, list[dict], dict[str, str], dict[str, str]]:
+    """-> (the table, the review list, {our id: source id} for the links the photo map did not already have or had differently, {our id: source id} for second ids that only share a face).
 
     photo_p: the photo map ({our id: "c:<source id>" | "w:<file>"}); sitemap: [(source id, full name)]; names: our name per id; books: ``collect_books``;
     overrides: ``load_overrides``. With no sitemap (an offline build) overrides are taken on trust and the other routes find nothing.
@@ -111,8 +122,10 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
     by_name: dict[str, set[str]] = defaultdict(set)
     for sid, nm in sitemap:
         by_name[fold(nm)].add(sid)
+    full = dict(sitemap)
     link: dict[str, str] = {}
     owner: dict[str, str] = {}
+    also: dict[str, str] = {}
     review: list[dict] = []
 
     def item(pid: str, why: str, *, cands: list | None = None) -> None:
@@ -121,17 +134,22 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
         review.append({"pid": pid, "name": names.get(pid) or b.get("hist") or pid, "books": b.get("names", []), "why": why,
                        "suggest": cands if cands is not None else suggest(mine, sitemap, set(owner))})
 
-    for pid, sid in sorted(overrides.items()):
+    for pid, sid in overrides.items():  # file order: the first line for a source id holds the link
         if known and sid not in known:
             item(pid, f"the override names source id {sid}, which the source's list does not have")
             continue
         if sid in owner:
-            item(pid, f"the override gives source id {sid}, which another override already gave to {owner[sid]}")
+            also[pid] = sid  # the same person under a second id: the face, not the link
             continue
         link[pid], owner[sid] = sid, pid
-    hand = set(link)
+    hand = set(link) | set(also)
+    late: dict[str, str] = {}
     for pid, v in sorted(photo_p.items()):
-        if v.startswith("c:") and pid not in link and v[2:] not in owner:
+        if not v.startswith("c:") or pid in hand:
+            continue
+        if known and pid not in names:
+            late[pid] = v[2:]  # a minted id (no Base name) waits: Base players and the books' exact names get their pick of the source players first
+        elif v[2:] not in owner:
             link[pid], owner[v[2:]] = v[2:], pid
     # The books: a priced player's names against the source's full names. Exactly one source player with that name is stronger evidence than the photo map's
     # initials-and-surname match (which gave Axar Patel to a source "Ajaz Patel"), so it replaces that link, but never takes a source player another player holds.
@@ -167,19 +185,33 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
         elif len(claims[sid]) > 1:
             stuck[pid] = (f"source player {sid} is claimed by {len(claims[sid])} of our players: " + ", ".join(claims[sid]), None)
         elif sid in owner:
+            q = owner[sid]
+            if pid not in link and pid not in names and q not in hand and _same_person(names.get(q, ""), full[sid], sid):
+                also[pid] = sid  # a minted id for the person Base lists by initials: one face for both
+                continue
             mine = f"; his own link {link[pid]} came from a name match" if pid in link else ""
-            stuck[pid] = (f"the source player with this name ({sid}) is already linked to {owner[sid]}{mine}", None)
+            stuck[pid] = (f"the source player with this name ({sid}) is already linked to {q}{mine}", None)
         else:
             if pid in link:
                 del owner[link[pid]]  # the photo map's match gives way to the exact name
             link[pid], owner[sid] = sid, pid
+    for pid, sid in sorted(late.items()):
+        if pid in link:
+            continue
+        if sid not in owner:
+            link[pid], owner[sid] = sid, pid
+        elif owner[sid] not in hand and _same_person(names.get(owner[sid], ""), full.get(sid, ""), sid):
+            also[pid] = sid  # his full name picked the page a Base player holds by his initials: the same person
     for pid, (reason, cands) in stuck.items():
+        if pid in also:
+            continue
         if pid not in link or "his own link" in reason:  # a player left unlinked, or linked by a name match the books contradict
             item(pid, reason, cands=cands)
+    also = {p: s for p, s in also.items() if p not in link}  # a hand line or the books may have given him a link of his own after all
     added = {p: s for p, s in link.items() if photo_p.get(p) != "c:" + s}
     table = {"v": 1, "s": dict(sorted(link.items())),
              "b": {p: [n for n in b["names"] if n != b["hist"]] for p, b in sorted(books.items()) if any(n != b["hist"] for n in b["names"])}}
-    return table, sorted(review, key=lambda r: (r["name"], r["pid"])), added
+    return table, sorted(review, key=lambda r: (r["name"], r["pid"])), added, dict(sorted(also.items()))
 
 
 def to_markdown(review: list[dict]) -> str:

@@ -86,3 +86,11 @@ def test_league_logos_are_matched_on_the_leagues_own_words_and_take_the_newest_s
     }                                               # a league the source does not list, and a qualifier it lists under another name, are left out
     assert ca.league_key("Women's Big Bash League 2025-26") == ca.league_key("womens-big-bash-league") != ca.league_key("Big Bash League")
     assert ca.league_key("ICC Men's Cricket World Cup League 2") != ca.league_key("ICC Cricket World Cup")   # a number inside the name is kept, only a season goes
+
+
+def test_a_remembered_source_player_is_added_only_when_todays_list_lacks_his_id():
+    cur = [("harry brook", "1IG"), ("virat kohli", "4I")]
+    merged, kept = ca.merge_remembered(cur, [("harry brook", "1IG"), ("jomel warrican", "HX"), ("", "NN"), ("blank id", "")])
+    assert merged == cur + [("jomel warrican", "HX")] and kept == 1
+    assert ca.merge_remembered(cur, []) == (cur, 0), "no memory, no change"
+    assert ca.merge_remembered(cur, [("harri brook", "1IG")])[0] == cur, "today's spelling wins for an id both have"

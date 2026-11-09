@@ -69,6 +69,41 @@ def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
         start += 1000
 
 
+PLACEHOLDER_COPIES = 20  # one picture stored for this many different players is the source's stock avatar, not anybody's face
+
+
+def placeholder_ids(base: str, key: str, http=_req) -> set[str]:
+    """Source player ids whose stored picture is shared by PLACEHOLDER_COPIES or more players. The source serves its stock helmet-and-grey-head avatar under every
+    player id it has no photo for (3 pictures, about half of everything we had stored), and a copy of it looks like a photo to a map of ids. Found by content, from the
+    hashes the `assets` table already keeps, so a new variant is recognised once enough players carry it and no hash is written down."""
+    rows: list[tuple[str, str]] = []
+    start = 0
+    while True:
+        _, _, body = http("GET", f"{base}/rest/v1/assets?select=ref,sha256&kind=eq.player&order=ref&limit=1000&offset={start}", key)
+        page = json.loads(body)
+        rows += [(r["ref"], r["sha256"]) for r in page if r.get("ref") and r.get("sha256")]
+        if len(page) < 1000:
+            break
+        start += 1000
+    counts: dict[str, int] = {}
+    for _, sha in rows:
+        counts[sha] = counts.get(sha, 0) + 1
+    return {ref for ref, sha in rows if counts[sha] >= PLACEHOLDER_COPIES}
+
+
+def remembered_players(base: str, key: str, http=_req) -> list[tuple[str, str]]:
+    """[(name tokens, source id)] for every source player any earlier build saw (the `crex_players` table; names and ids only, never its stored link: those are rebuilt each time)."""
+    out: list[tuple[str, str]] = []
+    start = 0
+    while True:
+        _, _, body = http("GET", f"{base}/rest/v1/crex_players?select=crex_id,name&order=crex_id&limit=1000&offset={start}", key)
+        rows = json.loads(body)
+        out += [(r["name"], r["crex_id"]) for r in rows if r.get("name") and r.get("crex_id")]
+        if len(rows) < 1000:
+            return out
+        start += 1000
+
+
 KITS = ("limited", "test")  # a team's two shirt pictures: the coloured limited-overs kit and the white Test one
 PLACEHOLDER_KIT = "AD"  # the source's own plain shirt, used by its pages when a team has none
 

@@ -571,20 +571,45 @@ def load_cricinfo(path: Path | None) -> dict[str, str]:
     return out
 
 
-def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str], wikidata: bool = True, chunk: int = 400) -> dict:
+def provisional_people(data_dir: Path, names: dict[str, str]) -> dict[str, dict]:
+    """{player id: {"name": the full name the scorecard prints, "n": rows, "last": newest date}} for the players only the scraped matches know (a minted id, or a Base id Base has not
+    named yet). Base's names are initials plus surname and the people register has no row for them, so without this the photo matcher never sees them: 800+ players with a source
+    page under their full name had a silhouette."""
+    from cricket_data.registry import pending_provisional
+    from cricket_data.store import Store
+
+    out: dict[str, dict] = {}
+    for d in pending_provisional(Store(data_dir)):
+        for p in d.get("players", []):
+            pid, nm = p.get("player_id") or "", (p.get("player") or "").strip()
+            if not pid or not nm or pid in names:
+                continue
+            e = out.setdefault(pid, {"name": nm, "n": 0, "last": ""})
+            e["n"] += 1
+            e["last"] = max(e["last"], d.get("date", ""))
+            if len(nm.split()) > len(e["name"].split()):  # the fullest spelling seen
+                e["name"] = nm
+    return out
+
+
+def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str], wikidata: bool = True, chunk: int = 400,
+               extra: dict[str, dict] | None = None, remembered: list[tuple[str, str]] | None = None, placeholders: set[str] | None = None) -> dict:
     """Match Source A's players and teams to ours, keyed by Base player id (never by array index: indices shift between builds).
 
     {"p": {pid: "c:<Source A id>" | "w:<Commons file>"}, "t": {folded team name: Source A id}, "names": {folded Source A full name: pid},
      "index": {"players": [[crex id, name, pid|None]], "teams": [[crex id, name, folded]]}}.
     Source A first (public sitemaps), Wikidata (P2697 Source B id -> P18, free licences) as the photo fallback. Best effort: a network failure
     yields less, never an error. Teams are matched on the Base team names seen in `canonical`.
+    `extra`: players only the scraped matches know (``provisional_people``), matched by the full name they carry. `remembered`: the sitemap entries earlier builds saw
+    (``assets_sync.remembered_players``): the source's list drifts, and a player who drops off it must not lose a face we already hold.
+    `placeholders`: source ids whose picture is the stock avatar; those players are also looked up on Wikidata, and the Commons photo goes in `w` (``faces`` applies it).
     """
     import urllib.parse
     import urllib.request
 
     from . import crex_assets as ca
 
-    out: dict = {"p": {}, "t": {}, "l": {}, "names": {}, "index": {"players": [], "teams": []}}
+    out: dict = {"p": {}, "t": {}, "l": {}, "w": {}, "names": {}, "index": {"players": [], "teams": []}}
     stat: dict[str, list] = {}
     teams = set()
     for m in canonical:
@@ -593,13 +618,34 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
             s[0] += 1
             s[1] = max(s[1], m["date"])
         teams.update((t, m["gender"]) for t in m["teams"])
+    for pid, e in (extra or {}).items():
+        if pid not in stat:
+            stat[pid] = [e["n"], e["last"]]
     pids = sorted(stat)
     try:
-        players = [{"idx": i, "name": names.get(p, p), "n": stat[p][0], "last": stat[p][1]} for i, p in enumerate(pids)]
-        crex_players = ca.parse_sitemap(ca.fetch_sitemap("player"), "player")
+        players = [{"idx": i, "name": names.get(p) or (extra or {}).get(p, {}).get("name") or p, "n": stat[p][0], "last": stat[p][1]} for i, p in enumerate(pids)]
+        current = ca.parse_sitemap(ca.fetch_sitemap("player"), "player")
+        crex_players, kept = ca.merge_remembered(current, remembered or [])
+        print(f"crex: {len(current)} players in the source's list, {kept} more remembered from earlier builds, {len(extra or {})} players only scraped matches know", file=sys.stderr)
         crex_teams = ca.parse_sitemap(ca.fetch_sitemap("team"), "team")
         named: dict[str, int] = {}
-        matched = ca.match_players(players, crex_players, named)
+        # Pass 1 is what the build always did (Base players, today's list), so nothing remembered or scraped can change a link that works. The later passes only add.
+        base = [p for p in players if pids[p["idx"]] not in (extra or {})]
+        matched = ca.match_players(base, current, named)
+        ghosts = {cid for _, cid in crex_players[len(current):]}
+        if ghosts:  # a Base player the list no longer has (or never matched) keeps the face of a source player earlier builds saw; ambiguity is judged against everything
+            late_named: dict[str, int] = {}
+            late = ca.match_players([p for p in base if p["idx"] not in matched], crex_players, late_named)
+            held = set(matched.values())
+            matched.update({i: c for i, c in late.items() if c in ghosts and c not in held})
+            named.update({nm: i for nm, i in late_named.items() if matched.get(i) in ghosts and nm not in named})
+        if extra:  # players only scraped matches know, by the full name the scorecard prints, against the source players nobody has yet
+            held = set(matched.values())
+            free = [(nm, cid) for nm, cid in crex_players if cid not in held]
+            minted_named: dict[str, int] = {}
+            minted = ca.match_players([p for p in players if pids[p["idx"]] in extra], free, minted_named)
+            matched.update(minted)
+            named.update({nm: i for nm, i in minted_named.items() if i in minted and nm not in named})
         out["p"] = {pids[i]: "c:" + c for i, c in matched.items()}
         out["names"] = {nm: pids[i] for nm, i in named.items()}
         out["t"] = ca.match_teams([{"name": t, "g": g} for t, g in sorted(teams)], crex_teams)
@@ -612,7 +658,8 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
         out["l"] = ca.match_leagues(sorted({m["event"] for m in canonical if m.get("event")}), ca.parse_series(ca.fetch_sitemap("series")))
     except Exception as exc:  # noqa: BLE001 - logos are optional: the site falls back to initials
         print(f"crex: series sitemap failed: {exc}", file=sys.stderr)
-    by_ci = {c: p for p, c in cricinfo.items() if p in stat and p not in out["p"]} if wikidata else {}
+    stock = placeholders or set()
+    by_ci = {c: p for p, c in cricinfo.items() if p in stat and (p not in out["p"] or out["p"][p][2:] in stock)} if wikidata else {}
     ids = sorted(by_ci)
     for i in range(0, len(ids), chunk):
         values = " ".join(f'"{x}"' for x in ids[i:i + chunk])
@@ -623,35 +670,75 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 for b in json.load(r)["results"]["bindings"]:
-                    out["p"].setdefault(by_ci[b["id"]["value"]], "w:" + urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1]))
+                    pid, img = by_ci[b["id"]["value"]], "w:" + urllib.parse.unquote(b["img"]["value"].rsplit("/", 1)[-1])
+                    if pid in out["p"]:
+                        out["w"][pid] = img  # his source picture is the stock avatar: kept as a link, shown only if this is missing
+                    else:
+                        out["p"][pid] = img
         except Exception as exc:  # noqa: BLE001 - photos are optional
             print(f"crex: wikidata chunk {i} failed: {exc}", file=sys.stderr)
     return out
 
 
-def crex_cached(cache_dir: Path | None, canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str]) -> dict:
+def crex_cached(cache_dir: Path | None, canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str],
+                extra: dict[str, dict] | None = None, remembered: list[tuple[str, str]] | None = None, placeholders: set[str] | None = None) -> dict:
     """crex_match() cached for the day in cache_dir/crex_match.json (an empty result is never cached)."""
     f = cache_dir / "crex_match.json" if cache_dir else None
     if f and f.exists():
         return json.loads(f.read_text(encoding="utf-8"))
-    res = crex_match(canonical, names, cricinfo)
+    res = crex_match(canonical, names, cricinfo, extra=extra, remembered=remembered, placeholders=placeholders)
     if f and res["p"]:
         f.parent.mkdir(parents=True, exist_ok=True)
         f.write_text(json.dumps(res, separators=(",", ":")), encoding="utf-8")
     return res
 
 
-def link_identity(cx: dict, names: dict[str, str], vb_dir: Path | None, data_dir: Path) -> tuple[dict, list[dict]]:
+def source_memory() -> tuple[list[tuple[str, str]], set[str]]:
+    """What earlier builds stored in our Postgres copy (public read): the source's player list as they saw it, and the ids whose stored picture is the source's stock avatar.
+    Empty without SUPABASE_URL / SUPABASE_ANON_KEY or when it cannot be read: the build then works from today's list and treats every picture as a face."""
+    import os
+
+    from .assets_sync import placeholder_ids, remembered_players
+
+    base, key = os.environ.get("SUPABASE_URL", "").strip().rstrip("/"), os.environ.get("SUPABASE_ANON_KEY", "").strip()
+    if not base or not key:
+        return [], set()
+    try:
+        players, stock = remembered_players(base, key), placeholder_ids(base, key)
+        print(f"crex: remembered {len(players)} source players, {len(stock)} ids whose picture is the stock avatar", file=sys.stderr)
+        return players, stock
+    except Exception as exc:  # noqa: BLE001 - best effort
+        print(f"crex: remembered players unavailable ({type(exc).__name__})", file=sys.stderr)
+        return [], set()
+
+
+def faces(cx: dict, keep: set[str], placeholders: set[str]) -> dict[str, str]:
+    """The photo map the site reads. A player whose source picture is the stock avatar has no photo there: he gets the Commons photo when Wikidata has one and
+    otherwise none, so the site shows its own silhouette instead of passing the source's off as a face. The identity table keeps his source id either way."""
+    out: dict[str, str] = {}
+    for p, v in cx["p"].items():
+        if p not in keep:
+            continue
+        if v.startswith("c:") and v[2:] in placeholders:
+            v = cx.get("w", {}).get(p, "")
+        if v:
+            out[p] = v
+    return out
+
+
+def link_identity(cx: dict, names: dict[str, str], vb_dir: Path | None, data_dir: Path, stock: set[str] | None = None) -> tuple[dict, list[dict], dict]:
     """Build the player-identity table (``identity.py``) and hand its links to everything that matched players by name before:
     the photo map (a linked player gets his source photo), the source-id index (who holds which id) and the scraped-name linker."""
     sitemap = [(cid, nm) for cid, nm, _ in cx["index"]["players"]]
-    table, review, added = identity.build(cx["p"], sitemap, names, identity.collect_books(vb_dir), identity.load_overrides(data_dir))
+    books = identity.collect_books(vb_dir)
+    table, review, added, also = identity.build(cx["p"], sitemap, names, books, identity.load_overrides(data_dir))
     owner = {sid: pid for pid, sid in table["s"].items()}
-    cx["p"] = {**{p: v for p, v in cx["p"].items() if v.startswith("w:")}, **{p: "c:" + s for p, s in table["s"].items()}}
+    # a second id of one person (a minted id beside the Base id) shares the face but never the identity link
+    cx["p"] = {**{p: v for p, v in cx["p"].items() if v.startswith("w:")}, **{p: "c:" + s for p, s in table["s"].items()}, **{p: "c:" + s for p, s in also.items()}}
     cx["index"]["players"] = [[cid, nm, owner.get(cid)] for cid, nm, _ in cx["index"]["players"]]
     full = dict(sitemap)
     cx["names"].update({fold_name(full[s]): p for p, s in added.items() if s in full})
-    return table, review
+    return table, review, {"photo_shared": len(also), "priced_players": len(books), "priced_with_photo": len(faces(cx, set(books), stock or set()))}
 
 
 def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo: dict[str, str] | None = None) -> dict:
@@ -922,8 +1009,9 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
           crex_cache: Path | None = None) -> dict:
     canonical = parse_zip(zpath, workers)
     names = player_names(zpath)
-    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path)) if photos else {"p": {}, "t": {}, "l": {}, "names": {}, "index": {"players": [], "teams": []}}
-    ident, review = link_identity(cx, names, vb_dir, data_dir)
+    remembered, stock = source_memory() if photos else ([], set())
+    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path), provisional_people(data_dir, names), remembered, stock) if photos else {"p": {}, "t": {}, "l": {}, "w": {}, "names": {}, "index": {"players": [], "teams": []}}
+    ident, review, cover = link_identity(cx, names, vb_dir, data_dir, stock)
     pdoc = profiles.build_json(profiles.load(data_dir), ident["s"])  # role / batting hand / bowling style per player, from data/profiles (fetched by cricket_site.profiles)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
@@ -933,7 +1021,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         "newest_base": newest, "provisional_matches": len(prov), "newest_provisional": newest_prov,
         "provisional_included": bool(prov), "provisional_rows_unlinked": pstat["rows_unlinked"],
         "provisional_rows_linked": pstat.get("rows_linked_by_crex", 0),
-        "identity_linked": len(ident["s"]), "identity_review": len(review), "profiles": len(pdoc["p"]),
+        "identity_linked": len(ident["s"]), "identity_review": len(review), "profiles": len(pdoc["p"]), **cover,
         "zip_matches": len(canonical)}, load_cricinfo(people_path))
     (out / "identity.json").write_text(json.dumps(ident, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "profiles.json").write_text(json.dumps(pdoc, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
@@ -946,7 +1034,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     build_sitemap(out, A, names, site_url, fx)
     if photos:
         keep = set(A["pids"])
-        (out / "photos.json").write_text(json.dumps({"p": {p: v for p, v in cx["p"].items() if p in keep}, "t": cx["t"], "l": cx.get("l", {})}, separators=(",", ":")), encoding="utf-8")
+        (out / "photos.json").write_text(json.dumps({"p": faces(cx, keep, stock), "t": cx["t"], "l": cx.get("l", {})}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
         # full names for wide layouts: our names are initials plus surname ("P Rathnayake"); the source lists the full name for every linked player
         full = {pid: ca_display_name(nm) for _cid, nm, pid in cx["index"]["players"] if pid in keep and nm}

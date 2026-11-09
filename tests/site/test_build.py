@@ -606,3 +606,69 @@ def test_untracked_formats_and_series_are_not_published(tmp_path):
     assert B._untracked(cfg) == ({"FC"}, ["ranji"])
     assert B._untracked(tmp_path / "missing.json") == (set(), [])
     assert "FC" in B._untracked()[0]  # the shipped config hides first-class
+
+
+def _minted_game(date, mid, name, pid, n=22):
+    """A scraped game where one player carries an id `link-players` minted (nothing in Base names him)."""
+    pl = [{"player": name if i == 0 else f"P{i}", "player_id": pid if i == 0 else "", "team": "Alpha" if i < 11 else "Beta", "opponent": "Beta" if i < 11 else "Alpha",
+           "runs": "21" if i == 0 else "0", "balls": "10"} for i in range(n)]
+    return _prov(mid, date, "Alpha", "Beta", pl)
+
+
+def test_a_player_only_scraped_matches_know_is_matched_by_his_full_name(tmp_path, monkeypatch):
+    """Dewan Marais had no face: Base's names are initials and the photo matcher only looked at Base players, so a minted id (name = the id) never met the source's list."""
+    _src_players(monkeypatch, "dewan-marais-9PP", "harry-brook-1IG")
+    z, data, out, _ = _out(tmp_path)
+    (data / "provisional" / "crex-m.json").write_text(json.dumps(_minted_game("2025-06-01", "crex-m", "Dewan Marais", "deadbeef")))
+    people = B.provisional_people(data, {})
+    assert people["deadbeef"] == {"name": "Dewan Marais", "n": 1, "last": "2025-06-01"} and "" not in people
+    assert B.provisional_people(data, {"deadbeef": "D Marais"}) == {}, "a player Base names is Base's to match"
+    B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    ph = json.loads((out / "photos.json").read_text())["p"]
+    assert ph["deadbeef"] == "c:9PP" and ph[synth.pid(synth.BROOK)] == "c:1IG"
+
+
+def test_a_source_player_the_list_dropped_keeps_his_face_and_a_remembered_namesake_never_breaks_a_link_that_works(tmp_path, monkeypatch):
+    """1500+ players had a photo link in an earlier build and none now: the source's list drifts. Pass 1 is the old behaviour, so a remembered name only adds."""
+    _src_players(monkeypatch, "ben-duckett-ZZ")                      # today's list: Duckett only; Brook's page dropped off it
+    z, data, out, _ = _out(tmp_path)
+    remembered = [("harry brook", "1IG"), ("ben duckett", "ZZ"), ("brian duckett", "BD")]  # a remembered namesake of Duckett, same surname and first initial
+    monkeypatch.setattr(B, "source_memory", lambda: (remembered, set()))
+    B.build(z, data, out, None, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    ph = json.loads((out / "photos.json").read_text())["p"]
+    assert ph[synth.pid(synth.BROOK)] == "c:1IG", "remembered, so the face we hold is kept"
+    assert ph[synth.pid(synth.DUCKETT)] == "c:ZZ", "matched on today's list alone; the remembered Brian Duckett cannot make him ambiguous"
+    assert any(r[0] == "1IG" for r in json.loads((out / "crex_index.json").read_text())["players"])
+
+
+def test_a_stock_avatar_is_not_a_photo_the_commons_photo_replaces_it_and_the_identity_link_stays(tmp_path, monkeypatch):
+    _src_players(monkeypatch, "harry-brook-1IG", "ben-duckett-ZZ")
+    z, data, out, _ = _out(tmp_path)
+    monkeypatch.setattr(B, "source_memory", lambda: ([], {"1IG"}))   # the picture stored for 1IG is one many players share
+    vb = _vb(tmp_path, [_line(synth.pid(synth.BROOK), "HC Brook", "Harry Brook")])
+    meta = B.build(z, data, out, vb, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    ph = json.loads((out / "photos.json").read_text())["p"]
+    assert synth.pid(synth.BROOK) not in ph and ph[synth.pid(synth.DUCKETT)] == "c:ZZ"
+    assert json.loads((out / "identity.json").read_text())["s"][synth.pid(synth.BROOK)] == "1IG", "live matching still knows who he is"
+    assert (meta["priced_players"], meta["priced_with_photo"]) == (1, 0)
+
+
+def test_faces_swaps_a_stock_avatar_for_the_commons_photo_or_nothing():
+    cx = {"p": {"a": "c:S1", "b": "c:S2", "c": "w:x.jpg", "d": "c:S4", "e": "c:S1"}, "w": {"a": "w:A.jpg"}}
+    assert B.faces(cx, {"a", "b", "c", "d"}, {"S1", "S2"}) == {"a": "w:A.jpg", "c": "w:x.jpg", "d": "c:S4"}
+    assert B.faces({"p": {"a": "c:S1"}}, {"a"}, {"S1"}) == {}, "a cache from before this existed has no `w`"
+    assert B.faces(cx, {"a", "b", "c", "d"}, set()) == {"a": "c:S1", "b": "c:S2", "c": "w:x.jpg", "d": "c:S4"}
+
+
+def test_a_minted_priced_player_whose_page_belongs_to_the_base_player_gets_the_same_face(tmp_path, monkeypatch):
+    """Priced as 'Ben Duckett' under a minted id while Base lists him as BM Duckett: one source page, so one picture; the link stays with Base's id."""
+    _src_players(monkeypatch, "ben-duckett-ZZ")
+    z, data, out, _ = _out(tmp_path)
+    (data / "provisional" / "crex-m.json").write_text(json.dumps(_minted_game("2025-06-01", "crex-m", "Ben Duckett", "deadbeef")))
+    vb = _vb(tmp_path, [_line("deadbeef", "Ben Duckett")])
+    meta = B.build(z, data, out, vb, workers=1, photos=True, crex_cache=tmp_path / "cache")
+    ph = json.loads((out / "photos.json").read_text())["p"]
+    ident = json.loads((out / "identity.json").read_text())["s"]
+    assert ph["deadbeef"] == ph[synth.pid(synth.DUCKETT)] == "c:ZZ"
+    assert list(ident.values()).count("ZZ") == 1, "the identity table keeps one id per source player"
+    assert (meta["priced_players"], meta["priced_with_photo"]) == (1, 1) and not (out / "identity_review.json").exists()

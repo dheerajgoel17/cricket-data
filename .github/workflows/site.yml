@@ -85,7 +85,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .sitecache
-          key: site-dl5-${{ steps.day.outputs.d }}
+          key: site-dl6-${{ steps.day.outputs.d }}
       - name: Download Base ball-by-ball and the people register (once a day)
         if: steps.dl.outputs.cache-hit != 'true'
         run: |
@@ -93,6 +93,9 @@ jobs:
           curl -fsSL --retry 4 --retry-delay 20 -o .sitecache/all_json.zip "$BASE_DATA_URL/downloads/all_json.zip"
           curl -fsSL --retry 3 -o .sitecache/people.csv "$BASE_DATA_URL/register/people.csv" || echo "::warning::people.csv unavailable, so no player photos"
       - name: Build site data
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}  # public read of our own copy of the source's player list and picture hashes (no key that can write)
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           PEOPLE=""; [ -f .sitecache/people.csv ] && PEOPLE="--people .sitecache/people.csv --photos --crex-cache .sitecache"
           python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out site/public/data --value-bets value_bets/out $PEOPLE --site-url "${{ vars.SITE_URL }}" | tee build.json
@@ -117,8 +120,14 @@ jobs:
           python -m cricket_site.guard --site site/public/data --data data $LIVE --summary "$GITHUB_STEP_SUMMARY"
       - name: List the priced players that could not be linked to the source
         run: |
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json
+          m = json.load(open("site/public/data/meta.json"))
+          if "priced_players" in m:
+              print(f"Faces: {m['priced_with_photo']} of {m['priced_players']} priced players have a photo ({m.get('photo_shared', 0)} share one with a second id of the same person); the rest show the silhouette.")
+          PY
           if [ -f site/public/data/identity_review.json ]; then
-            { echo "### Player identity: names to review"; python -m cricket_site.identity site/public/data/identity_review.json; } >> "$GITHUB_STEP_SUMMARY"
+            { echo "### Player identity: names to review"; python -m cricket_site.identity site/public/data/identity_review.json; } | tee -a "$GITHUB_STEP_SUMMARY"
             rm -f site/public/data/identity_review.json
           fi
       - name: Player profiles (role, batting hand, bowling style; resumable, polite, fails soft)
@@ -135,7 +144,8 @@ jobs:
             git commit -m "data: player profiles $(date -u +%F)"
             git pull --rebase -q && git push
           fi
-      - name: Keep our own copy of Source A images and id maps (Supabase Storage + Postgres)
+      - name: Keep our own copy of Source A images and id maps (Supabase Storage + Postgres; never from a pull request, which must not write to production)
+        if: github.event_name != 'pull_request'
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
@@ -143,6 +153,8 @@ jobs:
           SYNC_LIMIT: ${{ inputs.sync_limit || '1500' }}
         run: |
           python -m cricket_site.assets_sync --photos site/public/data/photos.json --index site/public/data/crex_index.json
+      - name: Wrap the small data files
+        run: |
           rm -f site/public/data/crex_index.json
           python -m cricket_site.wrap --dir site/public/data
       - name: Deploy to Vercel
