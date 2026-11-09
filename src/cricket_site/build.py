@@ -7,6 +7,7 @@ Everything here is stdlib-only. Output (all JSON, columnar, deterministic):
   index.json     players / teams / venues / events tables
   matches.json   one column per field, one entry per match (+ per-innings market aggregates)
   p/NN.json      player shards: batting rows, bowling spells, partnerships keyed by the lower player index
+  pp/NN.json     batting progression (runs after 10 / 20 / 30 balls faced), same shard number, read only by the live "from here" panel
   fixtures.json  upcoming fixtures
 """
 from __future__ import annotations
@@ -44,7 +45,7 @@ def _compact(m: dict) -> dict:
     out["pv"] = 0
     out["inn"] = [pack_inn(i) for i in m["innings"]]
     out["ov"] = [i.get("ov") or [] for i in m["innings"]]
-    out["bat"] = [(p, i["no"], i["team"], i["opp"], v["o"], v["r"], v["b"], v["f"], v["s"], v["k"], v["tb"], v["mt"])
+    out["bat"] = [(p, i["no"], i["team"], i["opp"], v["o"], v["r"], v["b"], v["f"], v["s"], v["k"], v["tb"], v["mt"], v.get("pr"))
                   for i in m["innings"] for p, v in i["bat"].items()]
     out["bowl"] = [(p, i["no"], i["opp"], i["team"], v["w"], v["rc"], v["bb"])
                    for i in m["innings"] for p, v in i["bowl"].items()]
@@ -383,6 +384,8 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
 
 MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq", "dls")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
+# progression shard (`pp/NN.json`, read only by the live "from here" panel): one row per batting innings of 10+ balls, with the runs after 10 / 20 / 30 balls faced (null if he was out or not there yet)
+PROG_KEYS = ("p", "m", "i", "b", "r", "x1", "x2", "x3")
 BOWL_KEYS = ("p", "m", "i", "t", "q", "w", "c", "n")
 FLD_KEYS = ("p", "m", "i", "t", "q", "ct", "st")
 XI_KEYS = ("p", "m")
@@ -479,7 +482,7 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
     pids = sorted({r[0] for m in ms for r in m["bat"]} | {r[0] for m in ms for r in m["bowl"]})
     pix = {p: i for i, p in enumerate(pids)}
 
-    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "fld": defaultdict(list), "pt": defaultdict(list), "xi": defaultdict(list)})
+    shards: dict[int, dict] = defaultdict(lambda: {"bat": defaultdict(list), "bowl": defaultdict(list), "fld": defaultdict(list), "pt": defaultdict(list), "xi": defaultdict(list), "pr": defaultdict(list)})
 
     def shard_of(pid: str) -> int:
         try:
@@ -505,6 +508,9 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             touch(pid, m, team)
             S = shards[shard_of(pid)]["bat"]
             _push(S, BAT_KEYS, (pix[pid], mi, r[1], team, opp, r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11]))
+            pr = r[12] if len(r) > 12 else None
+            if pr and pr[0] is not None:  # scraped totals carry no deliveries, so no progression
+                _push(shards[shard_of(pid)]["pr"], PROG_KEYS, (pix[pid], mi, r[1], r[6], r[5], *pr))
         for r in m["bowl"]:
             pid = r[0]
             try:
@@ -653,6 +659,9 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
     (out / "p").mkdir(exist_ok=True)
     for f in (out / "p").glob("*.json"):
         f.unlink()
+    (out / "pp").mkdir(exist_ok=True)
+    for f in (out / "pp").glob("*.json"):
+        f.unlink()
     dump = lambda o: json.dumps(o, separators=(",", ":"), ensure_ascii=False)  # noqa: E731
     cols = dict(A["cols"])
     cols["inn"] = A["inn"]
@@ -668,10 +677,12 @@ def write(out: Path, A: dict, names: dict[str, str], meta_extra: dict, cricinfo:
              "teams": [{"n": t, "g": g} for t, g in A["teams"]], "venues": A["venues"], "events": A["events"],
              "hosts": A["hosts"],
 
-             "kinds": KINDS, "formats": FORMAT_NAMES, "nshard": NSHARD}
+             "kinds": KINDS, "formats": FORMAT_NAMES, "nshard": NSHARD, "pp": 1}
     (out / "index.json").write_text(dump(index), encoding="utf-8")
     for s, d in sorted(A["shards"].items()):
-        (out / "p" / f"{s:02d}.json").write_text(dump({k: dict(v) for k, v in d.items()}), encoding="utf-8")
+        (out / "p" / f"{s:02d}.json").write_text(dump({k: dict(v) for k, v in d.items() if k != "pr"}), encoding="utf-8")
+        if d["pr"]:
+            (out / "pp" / f"{s:02d}.json").write_text(dump(dict(d["pr"])), encoding="utf-8")
     meta = {"schema": SCHEMA, "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
             "matches": len(A["ms"]), "players": len(A["pids"]), "teams": len(A["teams"]), "venues": len(A["venues"]),
             **meta_extra}

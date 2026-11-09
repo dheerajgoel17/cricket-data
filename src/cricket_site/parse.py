@@ -25,6 +25,7 @@ KIND_CODE = {k: i for i, k in enumerate(KINDS)}
 # completed over) is a parallel column on matches.json, not packed here: it is variable-length.
 INN_FIELDS = ["team", "runs", "wkts", "balls", "f4", "f6", "n30", "n50", "n100", "n10", "nsd", "nduck",
               "ho", "mc", "ts", "ex", "ro", "mw"]
+PROG_BALLS = (10, 20, 30)  # a batter's runs after this many balls faced (`pr`): the data behind "30 off 20, how often does he reach 50"
 INN_STATS = tuple(INN_FIELDS[1:])  # everything after team; compact rows insert opp between team and these
 OVERS_QUAL = 0.8  # T20/ODI summary markets: void unless 80% of the scheduled overs were bowled in BOTH innings
 
@@ -135,7 +136,7 @@ def _parse_innings(inn: dict, people: dict, bpo: int = 6) -> dict:
             bt, ns, bw = dl["batter"], dl["non_striker"], dl["bowler"]
             for p in (bt, ns):
                 if p not in B:
-                    B[p] = {"r": 0, "b": 0, "f": 0, "s": 0, "k": 0, "o": len(order) + 1}
+                    B[p] = {"r": 0, "b": 0, "f": 0, "s": 0, "k": 0, "o": len(order) + 1, "pr": [None] * len(PROG_BALLS)}
                     order.append(p)
             rr = dl["runs"]
             ex = dl.get("extras", {})
@@ -147,6 +148,8 @@ def _parse_innings(inn: dict, people: dict, bpo: int = 6) -> dict:
             b["r"] += rr["batter"]
             if "wides" not in ex:
                 b["b"] += 1
+                if b["b"] in PROG_BALLS:
+                    b["pr"][PROG_BALLS.index(b["b"])] = b["r"]
             if rr["batter"] == 4 and not rr.get("non_boundary"):
                 b["f"] += 1
             if rr["batter"] == 6:
