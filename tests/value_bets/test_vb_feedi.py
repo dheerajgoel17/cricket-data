@@ -297,3 +297,21 @@ def test_a_refused_hop_is_tagged_without_the_host(monkeypatch):
         feedi._http("https://book.test/en-in/sports/215", {"Accept": "text/html"})
     assert exc.value.reason == "relay-allow"
     assert "book.test" not in str(exc.value.reason)
+
+
+def test_the_relay_is_one_whole_pair_and_prefers_the_vercel_hop_to_the_worker(monkeypatch):
+    for k in ("FEEDI_RELAY", "FEEDI_RELAY_KEY", "FEEDG_RELAY", "FEEDG_RELAY_KEY", "FEEDH_RELAY", "FEEDH_RELAY_KEY"):
+        monkeypatch.delenv(k, raising=False)
+    assert feedi.relay() is None
+    monkeypatch.setenv("FEEDH_RELAY", "https://worker.example")
+    monkeypatch.setenv("FEEDH_RELAY_KEY", "h")
+    assert feedi.relay() == ("https://worker.example", "h")
+    monkeypatch.setenv("FEEDG_RELAY", "https://vercel.example")
+    assert feedi.relay() == ("https://worker.example", "h")  # an address with no key of its own is not a pair
+    monkeypatch.setenv("FEEDG_RELAY_KEY", "g")
+    assert feedi.relay() == ("https://vercel.example", "g")  # the Vercel hop before the Worker
+    monkeypatch.setenv("FEEDI_RELAY", "https://own.example")
+    monkeypatch.setenv("FEEDI_RELAY_KEY", "i")
+    assert feedi.relay() == ("https://own.example", "i")  # Feed I's own pair first
+    monkeypatch.setenv("FEEDI_RELAY", "http://insecure.example")
+    assert feedi.relay() == ("https://vercel.example", "g")  # only https

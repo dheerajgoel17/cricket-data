@@ -18,6 +18,8 @@ env:
   FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
   FEEDI_RELAY: ${{ secrets.FEEDI_RELAY }}
   FEEDI_RELAY_KEY: ${{ secrets.FEEDI_RELAY_KEY }}
+  FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+  FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
   FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
   FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
 

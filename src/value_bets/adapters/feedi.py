@@ -3,7 +3,7 @@
 The book and its host are deployment configuration, never code (docs/OPERATIONS.md): ``FEEDI_URL`` is the site root and
 ``FEEDI_NAME`` is the name its prices are published under. Unset, the source is skipped. It never runs on a laptop: ``fetch`` raises
 ``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only). On GitHub it goes through the Cloudflare Worker relay
-(``FEEDI_RELAY`` / ``FEEDI_RELAY_KEY``, or Feed H's pair); there is no direct call. The book's JSON is XOR-wrapped and its calls need the
+(``FEEDI_RELAY`` / ``FEEDI_RELAY_KEY``, else the Vercel Mumbai hop's ``FEEDG_RELAY`` pair, else Feed H's Worker pair); there is no direct call. The book's JSON is XOR-wrapped and its calls need the
 session cookie from the HTML shell, so the hop forwards that cookie plus the session headers (``relay/browser.js``). Polite: one shell,
 one listing, then each in-horizon game, ``FEEDI_SPACING_SECS`` apart, one attempt each; a 429 ends the run and ``FEEDI_BUDGET_SECS``
 stops new pages.
@@ -95,10 +95,13 @@ def published() -> dict[str, str]:
 
 
 def relay() -> tuple[str, str] | None:
-    """(relay address, key) from FEEDI_RELAY and FEEDI_RELAY_KEY, else Feed H's relay when both of those are set."""
-    addr = os.environ.get("FEEDI_RELAY", "").strip() or os.environ.get("FEEDH_RELAY", "").strip()
-    key = os.environ.get("FEEDI_RELAY_KEY", "").strip() or os.environ.get("FEEDH_RELAY_KEY", "").strip()
-    return (addr, key) if addr.startswith("https://") and key else None
+    """(relay address, key): Feed I's own pair (FEEDI_RELAY / FEEDI_RELAY_KEY), else the Vercel Mumbai hop's (FEEDG_RELAY), else the Cloudflare Worker's (FEEDH_RELAY). Each is taken as a pair, never an address from one and a key from another.
+    The Worker's egress gets a Cloudflare 403 on this book's first page (checked 2026-11-09 from a runner); the Vercel hop gets through, so it comes before the Worker."""
+    for prefix in ("FEEDI", "FEEDG", "FEEDH"):
+        addr, key = os.environ.get(f"{prefix}_RELAY", "").strip(), os.environ.get(f"{prefix}_RELAY_KEY", "").strip()
+        if addr.startswith("https://") and key:
+            return addr, key
+    return None
 
 
 def lab(url: str) -> bool:
