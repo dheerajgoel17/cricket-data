@@ -450,6 +450,9 @@ class Client:
             return body
         plain = unwrap(raw, headers or {}, self.key)
         text = plain.decode("utf-8", "replace")
+        if os.environ.get("FEEDI_DEBUG") and ("/bv_api/events/" in path or "coupon_groups" in path) and not getattr(self, "_shown", {}).get(path.split("/")[2] if False else "x"):
+            self._shown = {"x": 1}
+            print(f"DBG raw {path.split('?')[0].rsplit('/', 2)[0][-40:]} len_raw={len(raw)} len_text={len(text)} head={text[:400]!r}", file=sys.stderr)
         if text[:1] in "[{":
             return json.loads(text)
         return text
@@ -784,6 +787,7 @@ def inplay(fetched_at: str) -> list[dict]:
             print(f"DBG events-listing nodes={len(nodes)} sample_keys={sorted(nodes[0])[:25] if nodes else []}", file=sys.stderr)
             if nodes:
                 n0 = nodes[0]
+                print(f"DBG node0 full={json.dumps(n0)[:700]}", file=sys.stderr)
                 print(f"DBG node0 desc={n0.get('description')!r} info={n0.get('eventInformation')!r}"[:600], file=sys.stderr)
                 print(f"DBG node0 metadata={str(n0.get('metadata'))[:400]}", file=sys.stderr)
                 live = [n for n in nodes if isinstance(n.get('eventInformation'), dict) and n['eventInformation'].get('in_play')]
