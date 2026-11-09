@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-09T09:25:40Z",
- "generated_at_ist": "2026-11-09 14:55 IST",
- "runtime_secs": 104.2,
+ "generated_at_utc": "2026-11-09T09:30:36Z",
+ "generated_at_ist": "2026-11-09 15:00 IST",
+ "runtime_secs": 105.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-08",
-  "commit": "50975fe0b3"
+  "commit": "ce8680552d"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1419,
-   "secs": 1.4
+   "secs": 1.1
   },
   "smarkets": {
    "status": "ok",
    "rows": 458,
-   "secs": 2.6
+   "secs": 2.7
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 10.4,
+   "secs": 9.9,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 120,
-   "secs": 14.4,
+   "secs": 13.8,
    "events": 5
   },
   "feede": {
    "status": "ok",
    "rows": 454,
-   "secs": 42.5,
+   "secs": 43.9,
    "events": 16
   },
   "feedf": {
    "status": "ok",
    "rows": 256,
-   "secs": 45.3,
+   "secs": 50.3,
    "events": 7
   },
   "feedh": {
    "status": "ok",
    "rows": 1234,
-   "secs": 68.5,
+   "secs": 68.8,
    "events": 26
   }
  },
- "snapshot": "odds_20261109T092540Z.jsonl.gz",
+ "snapshot": "odds_20261109T093036Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -958,20 +958,20 @@
   }
  },
  "log": [
-  "[14:55 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[14:55 IST] history: 23975 matches, last 2026-11-08, players 431730",
-  "[14:57 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1419, 'secs': 1.4}",
-  "[14:57 IST] source smarkets: {'status': 'ok', 'rows': 458, 'secs': 2.6}",
-  "[14:57 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 10.4, 'events': 2}",
-  "[14:57 IST] source feedk: {'status': 'ok', 'rows': 120, 'secs': 14.4, 'events': 5}",
-  "[14:57 IST] source feede: {'status': 'ok', 'rows': 454, 'secs': 42.5, 'events': 16}",
-  "[14:57 IST] source feedf: {'status': 'ok', 'rows': 256, 'secs': 45.3, 'events': 7}",
-  "[14:57 IST] source feedh: {'status': 'ok', 'rows': 1234, 'secs': 68.5, 'events': 26}",
-  "[14:57 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[14:57 IST] 92 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[14:57 IST] book lines: 335 player lines from 7 source(s)",
-  "[14:57 IST] weather: forecasts for 10 events, 0 failed",
-  "[14:57 IST] prop model: 1139 prop selections modelled, 375 milestone ladder prices anchored to O/U",
-  "[14:57 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[15:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[15:00 IST] history: 23975 matches, last 2026-11-08, players 431730",
+  "[15:01 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1419, 'secs': 1.1}",
+  "[15:01 IST] source smarkets: {'status': 'ok', 'rows': 458, 'secs': 2.7}",
+  "[15:01 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 9.9, 'events': 2}",
+  "[15:01 IST] source feedk: {'status': 'ok', 'rows': 120, 'secs': 13.8, 'events': 5}",
+  "[15:01 IST] source feede: {'status': 'ok', 'rows': 454, 'secs': 43.9, 'events': 16}",
+  "[15:01 IST] source feedf: {'status': 'ok', 'rows': 256, 'secs': 50.3, 'events': 7}",
+  "[15:01 IST] source feedh: {'status': 'ok', 'rows': 1234, 'secs': 68.8, 'events': 26}",
+  "[15:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[15:02 IST] 92 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[15:02 IST] book lines: 335 player lines from 7 source(s)",
+  "[15:02 IST] weather: forecasts for 10 events, 0 failed",
+  "[15:02 IST] prop model: 1139 prop selections modelled, 375 milestone ladder prices anchored to O/U",
+  "[15:02 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
  ]
 }
