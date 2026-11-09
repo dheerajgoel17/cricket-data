@@ -69,10 +69,11 @@ describe("BatterSpot", () => {
 
 describe("live rows", () => {
   it("the tag, an over / under market with both prices and a pick with its outcomes", () => {
-    render(<><LiveTag /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8 }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
+    render(<><LiveTag /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8, book: "BookK" }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
     expect(screen.getAllByText("Live").length).toBe(3);
     expect(screen.getByText("Runs at Fall of 3rd Wicket")).toBeInTheDocument();
     expect(screen.getByText("O/U 81.5")).toBeInTheDocument();
+    expect(document.querySelector('[data-book="BookK"]')).not.toBeNull(); // the row names its book
     expect(screen.getByText("1.90")).toBeInTheDocument();
     expect(screen.getByText("1.80")).toBeInTheDocument();
     expect(screen.getByText("2.50")).toBeInTheDocument();

@@ -97,15 +97,19 @@ export function liveMerge(doc, inplay, resolve) {
           else addLines.push({ pid: who.pid, player: who.name || l.player, book_name: l.player, team: who.team || "", fmt: ref.fmt, stat: "runs", line: l.line, match: label, competition: ref.competition, start_utc: ref.start_utc, books: [quote] });
           continue;
         }
-        markets.push({ kind: "ou", market: `${l.player} innings runs`, line: l.line, over: l.over, under: l.under });
+        markets.push({ kind: "ou", market: `${l.player} innings runs`, line: l.line, over: l.over, under: l.under, book: l.book || FEED_BOOK });
       } else if (l.kind === "team_runs") {
         const team = [m.home, m.away].find((t) => teamKey(t) === teamKey(l.team)) || l.team;
         dropFancy.add(`${teamKey(team)}|${l.inn}`);
         addFancy.push({ match: label, home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true });
-      } else markets.push(l);
+      } else markets.push({ ...l, book: l.book || FEED_BOOK });
     }
+    // the match's "1st innings score" is the same bet as the side's 1st-innings total while only one side has a 1st-innings line (the one batting): it takes the live line too
+    const firstSides = new Set(addFancy.filter((f) => f.inn === 1).map((f) => teamKey(f.team)));
+    const firstKey = firstSides.size === 1;
+    if (firstKey) for (const f of addFancy.filter((x) => x.inn === 1)) addFancy.push({ ...f, key: "first_innings_runs", scope: "match", team: null, inn: undefined });
     lines = lines.filter((x) => !(matchPair(x) === pair && x.stat === "runs" && dropLines.has(x.pid))).concat(addLines);
-    fancy = fancy.filter((x) => !(matchPair(x) === pair && x.key === "team_total_runs" && dropFancy.has(`${teamKey(x.team)}|${x.inn || 1}`))).concat(addFancy);
+    fancy = fancy.filter((x) => !(matchPair(x) === pair && ((x.key === "team_total_runs" && dropFancy.has(`${teamKey(x.team)}|${x.inn || 1}`)) || (firstKey && x.key === "first_innings_runs")))).concat(addFancy);
     if (markets.length) live.push({ ...info, markets });
   }
   return { ...doc, lines, fancy, live };
