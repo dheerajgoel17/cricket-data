@@ -158,15 +158,27 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
     for pid in sorted(books):
         if pid in hand:
             continue
-        hits: set[str] = set()
-        for n in [books[pid]["hist"], *books[pid]["names"]]:
-            hits |= by_name.get(fold(n), set())
+        hits = by_name.get(fold(books[pid]["hist"]), set())  # the name our own data uses first: when it picks one source player the books' other spellings do not overrule it
+        if len(hits) != 1:                                   # (a book listing "Avishka Fernando" under AM Fernando's id must not hide "Asitha Fernando")
+            hits = set()
+            for n in [books[pid]["hist"], *books[pid]["names"]]:
+                hits |= by_name.get(fold(n), set())
         hits_of[pid] = hits
         if len(hits) == 1:
             claims[next(iter(hits))].append(pid)
+    # Two of our players claiming one source player get neither, unless one of them is a Base player whose name fits the page and the rest have no Base name (minted ids):
+    # one person, so the Base player holds the link and the minted ids share the face.
+    shares: dict[str, str] = {}
+    for sid, ps in list(claims.items()):
+        named = [p for p in ps if p in names]
+        if len(ps) > 1 and len(named) == 1 and _same_person(names[named[0]], full[sid], sid):
+            shares.update({p: sid for p in ps if p not in names})
+            claims[sid] = named
     stuck: dict[str, tuple[str, list | None]] = {}
     for pid, hits in hits_of.items():
         sid = next(iter(hits)) if len(hits) == 1 else ""
+        if pid in shares:
+            continue
         if not hits:
             stuck[pid] = ("no source player has this name", None)
         elif not sid:
@@ -182,19 +194,20 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
             stuck[pid] = ("several source players have this name", [[s, nm] for s, nm in sitemap if s in hits])
         elif link.get(pid) == sid:
             continue
+        elif sid in owner and pid not in link and pid not in names and owner[sid] not in hand and _same_person(names.get(owner[sid], ""), full[sid], sid):
+            also[pid] = sid  # a minted id for the person Base lists by initials: one face for both
         elif len(claims[sid]) > 1:
             stuck[pid] = (f"source player {sid} is claimed by {len(claims[sid])} of our players: " + ", ".join(claims[sid]), None)
         elif sid in owner:
-            q = owner[sid]
-            if pid not in link and pid not in names and q not in hand and _same_person(names.get(q, ""), full[sid], sid):
-                also[pid] = sid  # a minted id for the person Base lists by initials: one face for both
-                continue
             mine = f"; his own link {link[pid]} came from a name match" if pid in link else ""
-            stuck[pid] = (f"the source player with this name ({sid}) is already linked to {q}{mine}", None)
+            stuck[pid] = (f"the source player with this name ({sid}) is already linked to {owner[sid]}{mine}", None)
         else:
             if pid in link:
                 del owner[link[pid]]  # the photo map's match gives way to the exact name
             link[pid], owner[sid] = sid, pid
+    for pid, sid in sorted(shares.items()):
+        if pid not in link and sid in owner and owner[sid] not in hand:
+            also[pid] = sid
     for pid, sid in sorted(late.items()):
         if pid in link:
             continue
@@ -202,6 +215,9 @@ def build(photo_p: dict[str, str], sitemap: list[tuple[str, str]], names: dict[s
             link[pid], owner[sid] = sid, pid
         elif owner[sid] not in hand and _same_person(names.get(owner[sid], ""), full.get(sid, ""), sid):
             also[pid] = sid  # his full name picked the page a Base player holds by his initials: the same person
+    for pid, sid in sorted(shares.items()):
+        if pid not in link and pid not in also:
+            item(pid, f"source player {sid} is claimed by a Base player and by this minted id, and the Base player could not take it")
     for pid, (reason, cands) in stuck.items():
         if pid in also:
             continue

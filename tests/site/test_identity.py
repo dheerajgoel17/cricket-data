@@ -166,3 +166,27 @@ def test_a_minted_id_waits_for_the_base_players_and_the_books_before_it_takes_a_
     assert also == {"min": "I1"} and review == [], "the minted id is the same person by the compatibility rule, so he shares the face"
     # without a source list (an offline build) the photo map's links are taken as they always were
     assert I.build({"min": "c:I1"}, [], names, {}, {})[0]["s"] == {"min": "I1"}
+
+
+def test_both_ids_of_one_person_priced_the_base_one_holds_the_link_and_the_minted_one_shares_the_face():
+    """Athanaze: the books name 'Alick Athanaze' under two of our ids (Base's 'A Athanaze' and a minted one). Neither used to get the page ('claimed by 2')."""
+    sitemap = [("5Z0", "alick athanaze")]
+    names = {"base": "A Athanaze"}
+    books = {"base": priced("A Athanaze", "Alick Athanaze"), "min": priced("Alick Athanaze")}
+    for photo_p in ({}, {"base": "c:5Z0"}):   # whether or not the photo matcher had already given the page to the Base id
+        table, review, _, also = I.build(photo_p, sitemap, names, books, {})
+        assert table["s"] == {"base": "5Z0"} and also == {"min": "5Z0"} and review == []
+    # two Base-named players with the same exact book name are still two namesakes: neither gets the page
+    table, review, _, also = I.build({}, sitemap, {"a": "A Athanaze", "b": "AB Athanaze"}, {"a": priced("Alick Athanaze"), "b": priced("Alick Athanaze")}, {})
+    assert table["s"] == {} and also == {} and len(review) == 2
+
+
+def test_the_name_our_own_data_uses_first_decides_when_it_picks_one_source_player_whatever_another_book_prints():
+    """AM Fernando is priced as 'Asitha Fernando'; one book also prints 'Avishka Fernando' under his id, which made two source players 'several'."""
+    sitemap = [("S2", "avishka fernando"), ("S3", "asitha fernando")]
+    books = {"af": priced("Asitha Fernando", "A Fernando", "Avishka Fernando")}
+    table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, books, {})
+    assert table["s"] == {"af": "S3"} and review == []
+    # our name picking nobody (initials) still lets the book names decide, as before
+    table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, {"af": priced("AM Fernando", "Asitha Fernando")}, {})
+    assert table["s"] == {"af": "S3"}
