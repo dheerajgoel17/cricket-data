@@ -38,6 +38,7 @@ jobs:
             src/value_bets
             src/cricket_data
             scripts/inplay_extra.py
+            data/fixtures/upcoming.csv
             site/packages/engine
             site/scripts/inplay-snapshot.mjs
           sparse-checkout-cone-mode: false
@@ -48,7 +49,7 @@ jobs:
         run: pip install -e .
       - name: The other books' live lines
         continue-on-error: true
-        run: python scripts/inplay_extra.py > "$RUNNER_TEMP/inplay-extra.json"
+        run: python scripts/inplay_extra.py data/fixtures/upcoming.csv > "$RUNNER_TEMP/inplay-extra.json"
       - name: Snapshot
         env:
           INPLAY_EXTRA_FILE: ${{ runner.temp }}/inplay-extra.json

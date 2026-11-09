@@ -16,6 +16,7 @@ export function useLinesLive() {
   const lines = useQuery(linesQuery);
   const { store, rz } = useData();
   const live = useLiveDoc();
+  const fixtures = useQuery({ queryKey: ["fixtures"], queryFn: () => store.loadFixtures() as Promise<any[]> }); // the same cache entry as `useFixtures`
   const on = useMemo(() => (live.data?.matches || []).some((m: any) => m.status === "live"), [live.data]);
   const inplay = useQuery({ ...inplayQuery, enabled: on });
   const data = useMemo(() => {
@@ -29,7 +30,7 @@ export function useLinesLive() {
       }
       return null;
     };
-    return liveMerge(lines.data, inplay.data, resolve);
-  }, [on, inplay.data, lines.data, store, rz]);
+    return liveMerge(lines.data, inplay.data, resolve, fixtures.data || []);
+  }, [on, inplay.data, lines.data, store, rz, fixtures.data]);
   return { ...lines, data };
 }

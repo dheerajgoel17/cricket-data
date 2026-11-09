@@ -80,7 +80,23 @@ def test_feed_e_reads_team_innings_player_runs_other_over_unders_and_picks_and_l
 
 
 def test_all_matches_counts_each_source_and_a_failing_one_costs_only_itself(monkeypatch):
-    monkeypatch.setattr(ix, "k_matches", lambda now: (_ for _ in ()).throw(RuntimeError("down")))
-    monkeypatch.setattr(ix, "e_matches", lambda now: [{"home": "A", "away": "B", "league": "", "kickoff": None, "lines": [{"kind": "pick"}]}])
+    monkeypatch.setattr(ix, "k_matches", lambda now, wanted=None: (_ for _ in ()).throw(RuntimeError("down")))
+    monkeypatch.setattr(ix, "e_matches", lambda now, wanted=None: [{"home": "A", "away": "B", "league": "", "kickoff": None, "lines": [{"kind": "pick"}]}])
     matches, counts = ix.all_matches(NOW)
     assert counts == {"feedk": 0, "feede": 1} and len(matches) == 1
+
+
+def test_matches_live_on_our_fixture_list_are_read_first_whatever_level_the_book_leaves_off(tmp_path):
+    csv_path = tmp_path / "upcoming.csv"
+    csv_path.write_text("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n"
+                        "2026-11-09T05:00Z,1,U19 Asia Cup,ODI,male,Bangladesh U19,Malaysia U19,V,Live,/u,\n"
+                        "2026-11-09T04:30Z,2,Series,Test,male,Pakistan,Sri Lanka,V,Live,/u,\n"
+                        "2026-11-20T04:30Z,3,Series,T20,male,India,Australia,V,Upcoming,/u,\n")
+    wanted = ix.live_fixtures(str(csv_path))
+    assert wanted == [("Bangladesh U19", "Malaysia U19"), ("Pakistan", "Sri Lanka")]  # live ones only
+    assert ix.live_fixtures(str(tmp_path / "missing.csv")) == []
+    started = [("Karachi Region Blues", "Multan Region"), ("Bangladesh", "Malaysia"), ("Sri Lanka", "Pakistan"), ("New Zealand A", "India A")]
+    got = ix.wanted_first(started, wanted, lambda x: x)
+    assert got[:2] == [("Bangladesh", "Malaysia"), ("Sri Lanka", "Pakistan")]  # the U19 pair without its level, the Test either way round
+    assert got[2:] == [("Karachi Region Blues", "Multan Region"), ("New Zealand A", "India A")]  # the rest keep their order
+    assert ix.wanted_first(started, [], lambda x: x) == started

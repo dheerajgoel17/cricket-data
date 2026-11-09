@@ -70,6 +70,20 @@ const splitMatch = (s) => String(s || "").split(/\s+vs\.?\s+/i);
 const pairOf = (a, b) => [teamKey(a), teamKey(b)].filter(Boolean).sort().join("|");
 const matchPair = (e) => (e.home ? pairOf(e.home, e.away) : pairOf(...splitMatch(e.match)));
 
+/** A level the books often leave off a side's name ("Bangladesh" for "Bangladesh U19", "India" for "India A"). */
+const LEVEL = /\s+(?:u-?\d{2}|a|xi|ii|women|w)$/i;
+const core = (n) => teamKey(String(n || "").replace(LEVEL, ""));
+/** The same side, spelled alike or one with a level the other leaves off. */
+export const sameTeam = (a, b) => { const x = teamKey(a), y = teamKey(b); return !!x && !!y && (x === y || (core(a) === core(b) && (core(a) === x || core(b) === y))); };
+const HOURS_3 = 3 * 3600e3;
+const near = (a, b) => { const x = Date.parse(a), y = Date.parse(b); return !Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x - y) <= HOURS_3; };
+/** Does an entry (`home`/`away` or `match: "A vs B"`) with this start belong to the match `m` (home, away, kickoff)? Spelled alike first; else a level left off a side, and then the start must be within 3 hours. */
+function samePair(e, m, startOf = e.start_utc) {
+  const [eh, ea] = e.home ? [e.home, e.away] : splitMatch(e.match);
+  if (pairOf(eh, ea) === pairOf(m.home, m.away)) return true;
+  return ((sameTeam(eh, m.home) && sameTeam(ea, m.away)) || (sameTeam(eh, m.away) && sameTeam(ea, m.home))) && near(startOf, m.kickoff);
+}
+
 const overProb = (o, u) => (o > 1 && u > 1 ? 1 / o / (1 / o + 1 / u) : null);
 /** The line a market opened at: of the earlier entries (each with books), the one whose best-priced book is nearest evens, as `{ line, over, under }`; null when there is none. */
 function openedOf(entries) {
@@ -90,16 +104,22 @@ function openedOf(entries) {
  * - every other line (over / under or pick), and a batter who cannot be linked, goes to `live`: `[{ home, away, start_utc, fmt, markets }]`, shown as live rows.
  * `resolve(name, [home, away])` links a book's player name to `{ pid, name, team }` (or null). A match the books never priced before it started (no entry in `doc`) is left out. Returns `doc` itself when there is nothing live.
  */
-export function liveMerge(doc, inplay, resolve) {
+export function liveMerge(doc, inplay, resolve, fixtures = []) {
   const started = inplay?.matches || [];
   if (!doc || !started.length) return doc;
   let lines = [...(doc.lines || [])], fancy = [...(doc.fancy || [])];
   const live = [];
   for (const m of started) {
-    const pair = pairOf(m.home, m.away), ref = lines.find((x) => matchPair(x) === pair) || fancy.find((x) => matchPair(x) === pair);
+    // the match as the books priced it before the start; else the site's own fixture for it (a match no book priced still gets its live lines)
+    let ref = lines.find((x) => samePair(x, m)) || fancy.find((x) => samePair(x, m));
+    if (!ref) {
+      const fx = (fixtures || []).find((f) => samePair({ home: f.a, away: f.b }, m, f.start));
+      if (fx) ref = { match: `${fx.a} vs ${fx.b}`, home: fx.a, away: fx.b, start_utc: fx.start, fmt: fx.fmt, competition: fx.series || "", fromFixture: true };
+    }
     if (!ref) continue;
-    const info = { home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition };
-    const label = ref.match || `${m.home} vs ${m.away}`, markets = [], dropLines = new Set(), dropFancy = new Set(), addLines = [], addFancy = [];
+    const pair = matchPair(ref), [refHome, refAway] = ref.home ? [ref.home, ref.away] : splitMatch(ref.match);
+    const info = { home: refHome, away: refAway, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition };
+    const label = ref.match || `${refHome} vs ${refAway}`, markets = [], dropLines = new Set(), dropFancy = new Set(), addLines = [], addFancy = [];
     // a batter the books priced before the start is linked through those lines (the same book spells him the same way: "M Taha"); anyone else through `resolve`
     const known = lines.filter((x) => matchPair(x) === pair && x.pid);
     const link = (name, sides) => {
@@ -108,7 +128,7 @@ export function liveMerge(doc, inplay, resolve) {
     };
     for (const l of m.lines || []) {
       if (l.kind === "player_runs") {
-        const who = link(l.player, [m.home, m.away]);
+        const who = link(l.player, [refHome, refAway]);
         if (who?.pid) {
           dropLines.add(who.pid);
           const opened = openedOf(lines.filter((x) => matchPair(x) === pair && x.stat === "runs" && x.pid === who.pid && !x.books?.every((b) => b.live)));
@@ -119,10 +139,10 @@ export function liveMerge(doc, inplay, resolve) {
         }
         markets.push({ kind: "ou", market: `${l.player} innings runs`, line: l.line, over: l.over, under: l.under, book: l.book || FEED_BOOK });
       } else if (l.kind === "team_runs") {
-        const team = [m.home, m.away].find((t) => teamKey(t) === teamKey(l.team)) || l.team;
+        const team = [refHome, refAway].find((t) => sameTeam(t, l.team)) || l.team;
         dropFancy.add(`${teamKey(team)}|${l.inn}`);
         const opened = openedOf(fancy.filter((x) => matchPair(x) === pair && x.key === "team_total_runs" && teamKey(x.team) === teamKey(team) && (x.inn || 1) === l.inn));
-        addFancy.push({ match: label, home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true, ...(opened ? { opened: opened.line } : {}) });
+        addFancy.push({ match: label, home: refHome, away: refAway, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true, ...(opened ? { opened: opened.line } : {}) });
       } else markets.push({ ...l, book: l.book || FEED_BOOK });
     }
     // the match's "1st innings score" is the same bet as the side's 1st-innings total while only one side has a 1st-innings line (the one batting): it takes the live line too
@@ -143,23 +163,23 @@ export function liveMerge(doc, inplay, resolve) {
 
 /** The other live markets (over / under lines and picks) of a fixture, from `liveMerge`'s `doc.live`: the list for the two sides, either way round; [] when there are none. */
 export function liveRows(doc, fixture) {
-  const pair = pairOf(fixture?.a, fixture?.b);
-  return pair ? ((doc?.live || []).find((m) => pairOf(m.home, m.away) === pair)?.markets || []) : [];
+  if (!fixture?.a || !fixture?.b) return [];
+  const same = (m) => (sameTeam(m.home, fixture.a) && sameTeam(m.away, fixture.b)) || (sameTeam(m.home, fixture.b) && sameTeam(m.away, fixture.a));
+  return (doc?.live || []).find(same)?.markets || [];
 }
 
 const lineId = (l) => [l.kind, l.player || "", l.team || "", l.market || "", l.inn || 0, l.line ?? "", l.book || ""].join("|");
 
 /** The matches of several readers (the price feed and the books that list started matches) as one list, a match once: its lines are joined, the same line from the same book kept once. */
 export function mergeMatches(...lists) {
-  const by = new Map();
+  const all = [];
   for (const m of lists.flat()) {
-    const k = pairOf(m?.home, m?.away);
-    if (!k) continue;
-    const cur = by.get(k);
-    if (!cur) { by.set(k, { home: m.home, away: m.away, league: m.league || "", kickoff: m.kickoff || null, lines: [...(m.lines || [])] }); continue; }
+    if (!pairOf(m?.home, m?.away)) continue;
+    const cur = all.find((x) => samePair(x, m, x.kickoff));
+    if (!cur) { all.push({ home: m.home, away: m.away, league: m.league || "", kickoff: m.kickoff || null, lines: [...(m.lines || [])] }); continue; }
     const seen = new Set(cur.lines.map(lineId));
     for (const l of m.lines || []) { const id = lineId(l); if (!seen.has(id)) { seen.add(id); cur.lines.push(l); } }
     if (!cur.league && m.league) cur.league = m.league;
   }
-  return [...by.values()];
+  return all;
 }

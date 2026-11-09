@@ -241,3 +241,32 @@ test("the merged data says which live player lines it holds and the minute, so a
   assert.notEqual(a.live_sig, c.live_sig); // the next minute: scored again
   assert.equal(liveMerge(prematch(), { asOf: "2026-11-09T09:30:00Z", matches: [] }, resolveRahim).live_sig, undefined); // nothing live: the plain data
 });
+
+// ---- matches the books name differently, and live matches no book priced
+import { sameTeam } from "@cricket/engine/inplay-lines.js";
+
+test("a side with a level left off matches (Bangladesh / Bangladesh U19, India / India A), others do not", () => {
+  assert.ok(sameTeam("Bangladesh", "Bangladesh U19") && sameTeam("India A", "India") && sameTeam("Pakistan", "Pakistan"));
+  assert.ok(!sameTeam("Bangladesh", "India") && !sameTeam("Bangladesh U19", "Bangladesh A") && !sameTeam("", "India"));
+});
+
+test("a live match the books name without the level finds its priced match by the start, and the wrong start does not match", () => {
+  const doc = prematch();
+  doc.lines.push({ pid: "p-x", player: "Some Player", team: "Bangladesh U19", fmt: "ODI", stat: "runs", line: 20.5, match: "Bangladesh U19 vs Malaysia U19", competition: "U19", start_utc: "2026-11-09T05:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 1.9, under: 1.9 }] });
+  const lines = [{ kind: "ou", market: "Runs in over 3", line: 8.5, over: 1.9, under: 1.8 }];
+  const ok = liveMerge(doc, { matches: [{ home: "Bangladesh", away: "Malaysia", kickoff: "2026-11-09T05:30:00Z", lines }] }, () => null);
+  assert.deepEqual([ok.live[0].home, ok.live[0].away], ["Bangladesh U19", "Malaysia U19"]); // the site's names
+  const later = liveMerge(doc, { matches: [{ home: "Bangladesh", away: "Malaysia", kickoff: "2026-11-12T05:30:00Z", lines }] }, () => null);
+  assert.equal((later.live || []).length, 0); // another day's match is not this one
+});
+
+test("a live match no book priced takes its fixture from the site's list, a finished or other one does not", () => {
+  const fixtures = [{ a: "Sri Lanka U19", b: "Afghanistan U19", start: "2026-11-09T05:00Z", fmt: "ODI", series: "U19 Asia Cup" }];
+  const inplay = { matches: [{ home: "Sri Lanka", away: "Afghanistan", kickoff: "2026-11-09T05:00:00Z", lines: [{ kind: "player_runs", player: "A Batter", line: 20.5, over: 1.9, under: 1.9 }, { kind: "team_runs", team: "Sri Lanka", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "ou", market: "Runs in over 3", line: 8.5, over: 1.9, under: 1.8 }] }] };
+  const out = liveMerge(prematch(), inplay, () => ({ pid: "p-batter", name: "A Batter", team: "Sri Lanka U19" }), fixtures);
+  assert.deepEqual(out.lines.filter((l) => l.pid === "p-batter").map((l) => [l.fmt, l.match, l.books[0].live]), [["ODI", "Sri Lanka U19 vs Afghanistan U19", true]]);
+  assert.deepEqual(out.fancy.filter((f) => f.live && f.key === "team_total_runs").map((f) => [f.team, f.fmt, f.home]), [["Sri Lanka U19", "ODI", "Sri Lanka U19"]]); // the site's name for the side
+  assert.equal(out.live[0].markets.length, 1);
+  assert.deepEqual(liveRows(out, { a: "Afghanistan U19", b: "Sri Lanka U19" }).map((x) => x.market), ["Runs in over 3"]);
+  assert.deepEqual(liveMerge(prematch(), inplay, () => null, []).live, []); // no fixture, no priced match: nothing to attach to
+});
