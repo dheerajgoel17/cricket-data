@@ -688,6 +688,10 @@ def fetch(fetched_at: str):
             break
         detail = _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{stub['id']}", info)
         if not isinstance(detail, dict) or not detail.get("id"):
+            if dbg:
+                shape = {k: (type(v).__name__ if not isinstance(v, (dict, list)) else f"{type(v).__name__}[{len(v)}]") for k, v in detail.items()} if isinstance(detail, dict) else None
+                head = (detail[:1] if isinstance(detail, list) else str(detail)[:120] if isinstance(detail, str) else None)
+                print(f"DBG detail skipped: type={type(detail).__name__} shape={shape} head={str(head)[:300]}", file=sys.stderr)
             if dbg and isinstance(detail, dict):
                 for k, v in detail.items():
                     if isinstance(v, dict):
@@ -778,6 +782,12 @@ def inplay(fetched_at: str) -> list[dict]:
         nodes, assume = _event_nodes(_pull(pace, deadline, _events_path(), info)), False
         if dbg:
             print(f"DBG events-listing nodes={len(nodes)} sample_keys={sorted(nodes[0])[:25] if nodes else []}", file=sys.stderr)
+            if nodes:
+                n0 = nodes[0]
+                print(f"DBG node0 desc={n0.get('description')!r} info={n0.get('eventInformation')!r}"[:600], file=sys.stderr)
+                print(f"DBG node0 metadata={str(n0.get('metadata'))[:400]}", file=sys.stderr)
+                live = [n for n in nodes if isinstance(n.get('eventInformation'), dict) and n['eventInformation'].get('in_play')]
+                print(f"DBG nodes with eventInformation.in_play={len(live)}", file=sys.stderr)
     out = []
     cap = config.get("FEEDI_INPLAY_MAX")
     for node in nodes:
