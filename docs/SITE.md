@@ -184,6 +184,8 @@ There is no separate in-play section. While a match is on, its live lines are fo
   * The runs tape has no wickets, so wickets lost are not part of "the same spot".
 Where the lines come from: `/api/inplay` (~15 s, asked only while a match is on) reads the Supabase row the in-play snapshot job keeps (docs/OPERATIONS.md "Cadence"): the price feed about every 15 s, and the other books that list started matches (Feed K, Feed E) once a minute, each line with its book's name. A live match is matched to our fixture by its two sides and the start: a side the books name without its level ("Bangladesh" for "Bangladesh U19", "India" for "India A") matches when the start is within 3 hours; and a live fixture no book priced before the start still gets its live lines (the site's fixture list stands in for the earlier lines). The other-books reader takes the matches live on the fixture list first (`inplay_extra.live_fixtures`) and reads up to 14 per book. A batter is linked to our player by the name resolver (`rz.players`, score 8 or more) on the two sides of the match; one that cannot be linked is a live row of his own.
 
+**The site shows a filtered view; the log keeps all of it.** The tables above show what `liveMerge` folds in (and the live rows hide some markets). Every line the readers give, hidden ones included, is also appended to the Supabase table `inplay_log` by the same snapshot job, with the score at that moment, for later grading (PROJECT_GUIDE 5.10, docs/OPERATIONS.md "In-play line log"). The site never reads that table and settlement never uses it; nothing on a page depends on it.
+
 ## UI structure: reuse first
 Prefer the patterns already on the site over inventing a new shell, chrome or interaction for each feature.
 

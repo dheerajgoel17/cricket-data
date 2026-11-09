@@ -2,12 +2,13 @@
 // about 15 s apart, and each time replaces the one row of `inplay_lines` (service key; api/inplay.js reads it with the public key). Nothing is kept and nothing touches the pre-match files.
 // INPLAY_EXTRA_FILE, when set, holds the other books' started matches for the minute (written once by scripts/inplay_extra.py) and is merged into every round.
 // Needs PRICE_FEED_URL, SUPABASE_URL and SUPABASE_SERVICE_KEY in the environment (never printed). With nothing in play it writes one empty body and stops, so a quiet minute is a short run.
+// With INPLAY_LOG=1 every round is also appended to the log table `inplay_log` (inplay-log.mjs: only lines that first appear or move, with the score at that moment; data only, never read by the site or settlement).
 import { readFileSync } from "node:fs";
 import { mergeMatches, parseInplayFeed } from "../packages/engine/inplay-lines.js";
+import { createLogger, dbHeaders } from "./inplay-log.mjs";
 
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
-// Supabase refuses a secret key from anything that looks like a browser ("Forbidden use of secret API key in browser"), so its calls carry a plain server agent, not the feed read's Mozilla one.
-const DB_UA = "cricket-props-hub-inplay/0.1 (server)";
+// Supabase refuses a secret key from anything that looks like a browser ("Forbidden use of secret API key in browser"), so its calls carry a plain server agent (DB_UA), not the feed read's Mozilla one.
 export const ROUNDS = 4, GAP_MS = 15_000;
 
 const sleepMs = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -58,7 +59,7 @@ export async function saveBody({ base, key, body, fetchImpl = fetch }) {
   const r = await fetchImpl(`${base}/rest/v1/inplay_lines?on_conflict=id`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
     // a new-style secret key (sb_secret_...) goes only in `apikey`; a legacy service_role JWT also goes in Authorization (same rule as src/cricket_site/assets_sync.py)
-    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal", "User-Agent": DB_UA },
+    headers: { ...dbHeaders(key), Prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify([{ id: 1, as_of: body.asOf, body }]),
   });
   if (!r.ok) throw new Error(`save HTTP ${r.status} ${String(await r.text().catch(() => "")).slice(0, 120)} (key: ${describeKey(key)})`.trim());
@@ -66,24 +67,30 @@ export async function saveBody({ base, key, body, fetchImpl = fetch }) {
 
 /**
  * `rounds` reads `gapMs` apart. A round with nothing in play is written (so the row says "nothing on" and is fresh) and ends the run; a failed round is logged and the next one tries again.
- * Returns what it did: { reads, saved, failed, matches } (the last count of started matches).
+ * `record(matches, at)`, when given, appends the round to the log after the row is saved; it runs while the next gap is slept, and a failure in it is a warning, never a failed round.
+ * Returns what it did: { reads, saved, failed, matches } (the last count of started matches), plus { logged, unchanged } with a log.
  */
-export async function run({ read, save, sleep = sleepMs, rounds = ROUNDS, gapMs = GAP_MS, now = () => new Date(), log = console.log }) {
-  const out = { reads: 0, saved: 0, failed: 0, matches: 0 };
+export async function run({ read, save, record = null, sleep = sleepMs, rounds = ROUNDS, gapMs = GAP_MS, now = () => new Date(), log = console.log }) {
+  const out = { reads: 0, saved: 0, failed: 0, matches: 0, ...(record ? { logged: 0, unchanged: 0 } : {}) };
+  let logging = Promise.resolve();
+  const logRound = (matches, at) => record(matches, at).then((r) => { out.logged += r.rows; out.unchanged += r.unchanged; }, (e) => log(`::warning::in-play log failed: ${String(e.message || e).slice(0, 120)}`));
   for (let i = 0; i < rounds; i++) {
-    if (i > 0) await sleep(gapMs);
+    if (i > 0) await Promise.all([sleep(gapMs), logging]);
+    else await logging;
     out.reads++;
     try {
-      const matches = await read();
-      await save({ asOf: now().toISOString(), source: "inplay", matches });
+      const matches = await read(), at = now().toISOString();
+      await save({ asOf: at, source: "inplay", matches });
       out.saved++;
       out.matches = matches.length;
+      if (record && matches.length) logging = logRound(matches, at);
       if (!matches.length) break; // nothing on: no point reading again this minute
     } catch (e) {
       out.failed++;
       log(`::warning::in-play round ${i + 1} failed: ${String(e.message || e).slice(0, 120)}`);
     }
   }
+  await logging;
   return out;
 }
 
@@ -91,7 +98,9 @@ async function main() {
   const url = String(process.env.PRICE_FEED_URL || ""), base = String(process.env.SUPABASE_URL || "").replace(/\/+$/, ""), key = String(process.env.SUPABASE_SERVICE_KEY || "").trim();
   if (!url || !base || !key) { console.log("inplay-snapshot: PRICE_FEED_URL / SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping"); return; }
   const extra = loadExtra(process.env.INPLAY_EXTRA_FILE || "");
-  const out = await run({ read: () => readRound(url, extra), save: (body) => saveBody({ base, key, body }) });
+  // the log is opt-in: INPLAY_LOG=1 (a repository variable, set once the migration is applied); SITE_URL is where the live scores are read
+  const record = process.env.INPLAY_LOG === "1" ? createLogger({ base, key, siteUrl: String(process.env.SITE_URL || ""), wrapKey: String(process.env.DATA_WRAP_KEY || "").trim() }) : null;
+  const out = await run({ read: () => readRound(url, extra), save: (body) => saveBody({ base, key, body }), record });
   console.log(JSON.stringify(out));
 }
 
