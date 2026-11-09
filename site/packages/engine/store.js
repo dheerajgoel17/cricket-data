@@ -101,6 +101,29 @@ export class Store {
     return this.shards.get(n);
   }
 
+  async progShard(n) {
+    this.prog ||= new Map();
+    if (!this.prog.has(n)) {
+      const p = this.get(`pp/${String(n).padStart(2, "0")}.json`);
+      this.prog.set(n, p);
+      p.catch(() => { if (this.prog.get(n) === p) this.prog.delete(n); }); // a failed read is not kept: the next ask tries again
+    }
+    return this.prog.get(n);
+  }
+
+  /**
+   * One player's batting progression, innings of ten balls or more: `{ m, i, b, r, x }` with `x` his runs after 10 / 20 / 30 balls faced (null where he was out or still short of it).
+   * Read from the progression shard (`pp/NN.json`) only when asked, so the player files stay as they were; [] when the data has none (an older build, or he never faced ten balls).
+   */
+  async playerProgression(pidx) {
+    if (!this.index.pp) return [];
+    let d;
+    try { d = await this.progShard(this.shardOf(pidx)); } catch { return []; }
+    const out = [];
+    for (let k = 0; k < (d?.p?.length || 0); k++) if (d.p[k] === pidx) out.push({ m: d.m[k], i: d.i[k], b: d.b[k], r: d.r[k], x: [d.x1[k], d.x2[k], d.x3[k]] });
+    return out;
+  }
+
   _row(m, t, extra) {
     const M = this.M;
     return { m, date: M.d[m], fmt: M.f[m], g: M.g[m], intl: M.i[m], e: M.e[m], v: M.v[m], pv: M.pv[m], q: M.q[m],

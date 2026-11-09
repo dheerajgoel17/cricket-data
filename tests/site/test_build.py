@@ -68,6 +68,30 @@ def test_player_shards_hold_rows_and_partnerships(tmp_path):
     assert len(rows) == 15  # one opening stand in each of 10 T20s, 4 ODIs and the short T20
 
 
+def test_progression_shard_has_one_row_per_innings_of_ten_balls_and_agrees_with_the_batting_rows(tmp_path):
+    z, data, out, exp = _out(tmp_path)
+    B.build(z, data, out, None, workers=1)
+    M, IX = _load(out)
+    assert IX["pp"] == 1
+    brook = IX["players"]["id"].index(synth.pid(synth.BROOK))
+    sh = int(synth.pid(synth.BROOK), 16) % IX["nshard"]
+    bat = json.loads((out / "p" / f"{sh:02d}.json").read_text())["bat"]
+    assert "pr" not in json.loads((out / "p" / f"{sh:02d}.json").read_text())  # the player files do not grow
+    final = {(bat["p"][k], bat["m"][k], bat["i"][k]): (bat["r"][k], bat["b"][k]) for k in range(len(bat["p"]))}
+    pr = json.loads((out / "pp" / f"{sh:02d}.json").read_text())
+    mine = [k for k in range(len(pr["p"])) if pr["p"][k] == brook]
+    assert mine
+    for k in mine:
+        runs, balls = final[(pr["p"][k], pr["m"][k], pr["i"][k])]
+        assert (pr["r"][k], pr["b"][k]) == (runs, balls) and balls >= 10
+        marks = [pr["x1"][k], pr["x2"][k], pr["x3"][k]]
+        assert marks[0] is not None and marks[0] <= runs
+        assert all(a is None or (0 <= a <= runs) for a in marks)
+        seen = [a for a in marks if a is not None]
+        assert seen == sorted(seen)  # runs only go up
+        assert (marks[1] is not None) == (balls >= 20) and (marks[2] is not None) == (balls >= 30)
+
+
 def _prov(match_id, date, team_a, team_b, players, **kw):
     d = {"match_id": match_id, "date": date, "match_type": "T20", "team_type": "international", "gender": "male", "event": "X",
          "venue": "Beta Oval", "team_a": team_a, "team_b": team_b, "winner": team_a, "status": "provisional", "players": players}

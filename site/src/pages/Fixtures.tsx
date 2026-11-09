@@ -34,6 +34,7 @@ import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
 import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
+import { InplayHistory } from "@/components/app/inplay-history";
 import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
@@ -187,6 +188,7 @@ export function FixturePage() {
     <div className="flex flex-col gap-section">
       <MatchHeader f={fx} live={live} />
       <MatchAccordions match={match} teams={known} fmt={fmt} />
+      <InplayHistory match={match} fmt={fmt} gender={fx.gender} teams={known} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
           <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
