@@ -198,3 +198,16 @@ test("two books' lines for the same batter and line are one entry with both quot
   assert.deepEqual(r[0].books.map((b) => b.source), ["bet365", "BookK"]);
   assert.deepEqual(out.fancy.filter((f) => f.team === "Bangladesh").map((f) => [f.source, f.line]), [["bet365", 250.5], ["BookE", 255.5]]);
 });
+
+test("the match's 1st innings score takes the live line too while only one side has a 1st-innings line, and every live market names its book", () => {
+  const doc = prematch();
+  doc.fancy.push({ match: "Bangladesh vs West Indies", home: "Bangladesh", away: "West Indies", start_utc: "2026-11-05T03:00:00Z", fmt: "Test", competition: "2nd Test", key: "first_innings_runs", scope: "match", team: null, line: 325.5, over: 1.83, under: 1.83, source: "bet365", kind: "bookmaker" });
+  const one = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "ou", market: "Runs in First 20 Overs", line: 68.5, over: 1.9, under: 1.8, book: "BookK" }, { kind: "ou", market: "Other", line: 1.5, over: 1.9, under: 1.8 }] }] };
+  const out = liveMerge(doc, one, resolveRahim);
+  const first = out.fancy.filter((f) => f.key === "first_innings_runs");
+  assert.deepEqual(first.map((f) => [f.line, f.scope, f.team, f.live]), [[250.5, "match", null, true]]); // the pre-match 325.5 is gone
+  assert.deepEqual(out.live[0].markets.map((x) => x.book), ["BookK", "bet365"]);
+  // both sides have a 1st-innings line (the first is over): the match's market is left as it was
+  const two = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "team_runs", team: "West Indies", inn: 1, line: 300.5, over: 1.9, under: 1.8 }] }] };
+  assert.equal(liveMerge(doc, two, resolveRahim).fancy.filter((f) => f.key === "first_innings_runs")[0].line, 325.5);
+});
