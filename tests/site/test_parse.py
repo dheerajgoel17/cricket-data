@@ -205,12 +205,12 @@ def test_over_tape_is_cumulative_runs_after_each_completed_over():
     assert i0["ov"] == [6, 30] and i0["runs"] == 6 + 24 + 3 and i0["ho"] == 24
 
 
-def test_progression_is_runs_after_10_20_30_balls_faced_and_none_before_he_got_there():
-    """A1: 4, 4, 6 then twenty singles (23 balls; two wides do not count as balls faced): 21 after 10, 31 after 20, never faced 30. A4 faces the dot-ball padding."""
+def test_progression_is_runs_after_10_20_30_50_75_100_150_balls_faced_and_none_before_he_got_there():
+    """A1: 4, 4, 6 then twenty singles (23 balls; two wides do not count as balls faced): 21 after 10, 31 after 20, never faced 30. A4 faces the 94 dot-ball padding: 0 at 10 to 75, never 100."""
     st = {"A1": dict(runs=34, f4=2, f6=1, out=True, wides=2), "A2": dict(runs=3, out=True), "A3": dict(runs=0, out=False), "A4": dict(runs=0, out=False)}
     inn = scripted("X", ["A1", "A2", "A3", "A4"], st, ["B1", "B2"], pad_to=120)
     other = scripted("Y", ["C1", "C2"], {"C1": dict(runs=0), "C2": dict(runs=0)}, ["B1"], pad_to=120)
     bat = _rows(parse_match("pr", doc("2024-01-01", ("X", "Y"), [inn, other])))
-    assert bat[(pid("A1"), 1)]["pr"] == [21, 31, None]
-    assert bat[(pid("A2"), 1)]["pr"] == [None, None, None]  # three balls: out before ten
-    assert bat[(pid("A4"), 1)]["pr"] == [0, 0, 0]
+    assert bat[(pid("A1"), 1)]["pr"] == [21, 31, None, None, None, None, None]
+    assert bat[(pid("A2"), 1)]["pr"] == [None] * 7  # three balls: out before ten
+    assert bat[(pid("A4"), 1)]["pr"] == [0, 0, 0, 0, 0, None, None]

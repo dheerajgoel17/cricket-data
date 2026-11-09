@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { MIN_SAMPLE, conditionalReport as conditional, inplayScopes, liveInnings, sideIndex } from "@cricket/engine/inplay.js";
+import { MIN_SAMPLE, conditionalReport as conditional, inplayScopes, liveInnings, sideIndex, targetMarks } from "@cricket/engine/inplay.js";
 import { liveBoard, namesMatch, teamKey } from "@cricket/engine/live.js";
 import { bookLines, inplayFor } from "@cricket/engine/inplay-lines.js";
 import { summarize as summarizeRaw } from "@cricket/engine/stats.js";
@@ -92,8 +92,7 @@ export function InplayHistory({ match, fmt, gender, teams }: { match: any; fmt: 
   const scopes = useMemo(() => (inn && store.M ? inplayScopes(store, { fmt: fmtIx, gender: gender === "female" ? 1 : 0, team: teamIx >= 0 ? teamIx : null, now: NOW() }) : null), [store, inn, fmtIx, gender, teamIx]);
   const targets = useMemo(() => {
     if (!inn) return [] as [string, string][];
-    const marks = (inn.max >= 50 ? [10, 20, 30, 40] : inn.max >= 20 ? [6, 10, 15] : [5]).filter((n) => n > inn.overs + 1);
-    return [["total", "Innings"], ...marks.map((n) => [`o${n}`, `${n} ov`])] as [string, string][];
+    return [["total", "Innings"], ...(targetMarks(inn) as number[]).map((n) => [`o${n}`, `${n} ov`])] as [string, string][];
   }, [inn]);
   const t = targets.some(([k]) => k === target) ? target : "total";
   const report = useMemo(() => {

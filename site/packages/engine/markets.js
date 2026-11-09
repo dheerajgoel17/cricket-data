@@ -80,7 +80,7 @@ export const ALL_MARKETS = { ...MATCH_MARKETS, ...TEAM_MARKETS };
 
 /**
  * Matches that pass the filters AND are valid for summary markets (exchange void rules, see rules.js).
- * filters: { fmt (required), gender, team, opp, venue, since, until, intl, event[], lastN, teamFirst (only matches the team batted first) }
+ * filters: { fmt (required), gender, team, opp, venue, since, until, intl, event[], lastN, teamFirst (only matches the team batted first), anyQ (every match with innings: see below) }
  *
  * A scraped match (`pv`) is kept when it qualified (`q === 1`): Afghanistan men's games never land in Base,
  * so dropping every provisional row made Match Fancy stop at the last Base game of the other side.
@@ -91,7 +91,7 @@ export function selectMatches(store, f) {
   const out = [];
   const venues = f.venue == null ? null : Array.isArray(f.venue) ? f.venue : [f.venue];
   for (let m = 0; m < store.n; m++) {
-    if (M.f[m] !== f.fmt || M.q[m] !== 1) continue;
+    if (M.f[m] !== f.fmt || (f.anyQ ? M.q[m] === -1 : M.q[m] !== 1)) continue; // `anyQ`: an innings-level read (the in-play history) takes every match that has innings, not only those valid for summary markets
     if (f.gender != null && M.g[m] !== f.gender) continue;
     if (f.since && M.d[m] < f.since) continue;
     if (f.until && M.d[m] > f.until) continue;

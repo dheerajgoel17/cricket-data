@@ -55,10 +55,10 @@ describe("InplayHistory", () => {
     expect(screen.getAllByText("190.5")).toHaveLength(1); // the book's line is not repeated by the ladder
   });
 
-  it("is hidden when the match is not live, or the format has no over limit", () => {
+  it("is hidden when the match is not live, or the format is The Hundred (five-ball sets)", () => {
     const a = render(wrap(<InplayHistory match={live({ status: "final" })} fmt="T20" gender="male" teams={sides} />));
     expect(a.container).toBeEmptyDOMElement();
-    const b = render(wrap(<InplayHistory match={live()} fmt="Test" gender="male" teams={sides} />));
+    const b = render(wrap(<InplayHistory match={live()} fmt="Hundred" gender="male" teams={sides} />));
     expect(b.container).toBeEmptyDOMElement();
   });
 
@@ -81,5 +81,12 @@ describe("InplayHistory", () => {
     const batting = live({ players: [{ name: "Opener", team: "Alpha", runs: 8, balls: 6, out: false, strike: true }] });
     render(wrap(<InplayHistory match={batting} fmt="T20" gender="male" teams={sides} />));
     expect(screen.queryByText("Opener")).not.toBeInTheDocument();
+  });
+
+  it("works for a Test too: no over limit, the line can be on the next 30-over marks, and the heading says Test", async () => {
+    // a Test innings number 1 for Alpha at 120 after 40 overs; the synthetic history is T20 only, so nothing in the Test history: the panel says so rather than hiding
+    const test = live({ innings: [{ n: 1, team: "Alpha", runs: 120, wkts: 1, overs: 40 }] });
+    render(wrap(<InplayHistory match={test} fmt="Test" gender="male" teams={sides} />));
+    expect(await screen.findByText(/No past Test innings were between 108 and 132 after 40.0 overs/)).toBeInTheDocument();
   });
 });

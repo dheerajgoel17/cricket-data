@@ -25,7 +25,7 @@ KIND_CODE = {k: i for i, k in enumerate(KINDS)}
 # completed over) is a parallel column on matches.json, not packed here: it is variable-length.
 INN_FIELDS = ["team", "runs", "wkts", "balls", "f4", "f6", "n30", "n50", "n100", "n10", "nsd", "nduck",
               "ho", "mc", "ts", "ex", "ro", "mw"]
-PROG_BALLS = (10, 20, 30)  # a batter's runs after this many balls faced (`pr`): the data behind "30 off 20, how often does he reach 50"
+PROG_BALLS = (10, 20, 30, 50, 75, 100, 150)  # a batter's runs after this many balls faced (`pr`): the data behind "30 off 20, how often does he reach 50" (a Test innings runs on to 150 and beyond)
 INN_STATS = tuple(INN_FIELDS[1:])  # everything after team; compact rows insert opp between team and these
 OVERS_QUAL = 0.8  # T20/ODI summary markets: void unless 80% of the scheduled overs were bowled in BOTH innings
 
