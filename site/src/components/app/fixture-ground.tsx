@@ -267,8 +267,10 @@ function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx:
 }
 
 /** Dedicated ground page (player-page shape): hero + metrics + sticky filters + cards — no match scores or scorecard. */
-export function FixtureGroundPanel({ venue, fixtureId, from }: {
+export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
   venue?: string; fixtureId?: string; from?: FromFx;
+  /** Inside the match page's Ground chip: a short head with a link to the full page instead of the hero, no sticky filter row, the page title left alone. */
+  embedded?: boolean;
 }) {
   const nav = useNavigate();
   const reduce = useReducedMotion();
@@ -286,7 +288,7 @@ export function FixtureGroundPanel({ venue, fixtureId, from }: {
   const now = useNow(30_000);
   const local = wx?.timeZone ? groundClock(wx.timeZone, now) : (wx?.localTime || "");
   const fromFixture = !!fixtureId;
-  setTitle(`${ground}: matches at this ground`);
+  if (!embedded) setTitle(`${ground}: matches at this ground`);
 
   if (!venue) return <EmptyNote title="No venue">This fixture has no ground listed.</EmptyNote>;
   if (isLoading) return <ListSkeleton rows={3} />;
@@ -300,8 +302,46 @@ export function FixtureGroundPanel({ venue, fixtureId, from }: {
     else nav("/teams?tab=venues");
   };
 
+  const metrics = (
+    <>
+  <div className="grid grid-cols-3 gap-snug">
+    <Metric k="Matches" v={atGround.length} />
+    <Metric
+      k="Weather"
+      v={wxQ.isLoading ? "…" : wx ? (
+        <span className="inline-flex items-baseline gap-hair">
+          <CloudIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span>{wx.temp}°</span>
+        </span>
+      ) : "—"}
+    />
+    <Metric k="Local" v={wxQ.isLoading ? "…" : (local || "—")} />
+  </div>
+  {wx ? (
+    <p className="text-callout text-muted-foreground">{wx.label} · ground local time{wx.city && wx.city !== city ? ` · ${wx.city}` : ""}</p>
+  ) : wxQ.isError ? (
+    <p className="text-callout text-muted-foreground">Weather unavailable for this ground</p>
+  ) : null}
+    </>
+  );
+  const tour = from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={atGround} now={now} /> : null;
+
   return (
-    <div className="flex flex-col gap-section">
+    <div className={cn("flex flex-col", embedded ? "gap-stack" : "gap-section")}>
+      {embedded ? (
+        <div className="flex flex-col gap-snug">
+          <div className="flex items-center gap-snug">
+            <MapPinIcon className="size-5 shrink-0 text-primary" aria-hidden />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-body font-medium">{ground}</p>
+              {city ? <p className="truncate text-footnote text-muted-foreground">{city}</p> : null}
+            </div>
+            {fixtureId ? <Link to={`/fixture/${fixtureId}/ground`} className="inline-flex shrink-0 items-center gap-hair text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Full page<ChevronRightIcon className="size-4" aria-hidden /></Link> : null}
+          </div>
+          {metrics}
+          {tour}
+        </div>
+      ) : (
       <motion.section
         initial={reduce ? false : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -331,30 +371,14 @@ export function FixtureGroundPanel({ venue, fixtureId, from }: {
               {city ? <p className="truncate text-body text-muted-foreground">{city}</p> : null}
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-snug">
-            <Metric k="Matches" v={atGround.length} />
-            <Metric
-              k="Weather"
-              v={wxQ.isLoading ? "…" : wx ? (
-                <span className="inline-flex items-baseline gap-hair">
-                  <CloudIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                  <span>{wx.temp}°</span>
-                </span>
-              ) : "—"}
-            />
-            <Metric k="Local" v={wxQ.isLoading ? "…" : (local || "—")} />
-          </div>
-          {wx ? (
-            <p className="text-callout text-muted-foreground">{wx.label} · ground local time{wx.city && wx.city !== city ? ` · ${wx.city}` : ""}</p>
-          ) : wxQ.isError ? (
-            <p className="text-callout text-muted-foreground">Weather unavailable for this ground</p>
-          ) : null}
-          {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={atGround} now={now} /> : null}
+          {metrics}
+          {tour}
         </div>
       </motion.section>
+      )}
 
       {atGround.length ? (
-        <div className="sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
+        <div className={cn(!embedded && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
           <GroundFilterBar fx={atGround} fmt={activeFmt} gender={gender} onFmt={setFmt} onGender={setGender} />
         </div>
       ) : null}

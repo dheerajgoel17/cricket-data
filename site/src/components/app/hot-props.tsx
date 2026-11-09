@@ -41,9 +41,9 @@ import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
-import { BatterSpot, LiveTag } from "./live-spot";
+import { BatterSpot, LiveBadge, LiveOpened, LiveTrack } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
-import { DEFAULTS, activeFilters, clearFilter, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
+import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 import { propKey } from "@/lib/saved";
 
 const MAX_ROWS = 30;
@@ -79,16 +79,17 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
       const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
-      // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
+      // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one: that stays (it is the bet we settle) and the live line is added once it is passed
+      const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
       const keys = new Map<string, any>();
-      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l); // a Test's first-innings line is a row of its own beside the match line; two stamps of one limited-overs fixture share a row
+      for (const l of todays.lines) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}|${isLive(l) ? "live" : ""}`, l); // a Test's first-innings line is a row of its own beside the match line; two stamps of one limited-overs fixture share a row
       const year = String(new Date().getFullYear());
       const out: Row[] = [];
       const score = async (l: any) => {
         const idx = store.P.id.indexOf(l.pid);
         const inn = lineScope(l);
         const chip = matchChipId(l.match, l.start_utc, l.fmt);
-        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
+        const b = bookLinesFor({ lines: todays.lines.filter((x: any) => matchChipId(x.match, x.start_utc, x.fmt) === chip && isLive(x) === isLive(l)) }, l.pid, l.stat, l.fmt, now, archive ? Infinity : keepMsFor(l.fmt), inn);
         if (idx < 0 || !b) return;
         const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
         const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: inns === "all" ? null : inns }, split_by: [] }, { playerIdx: idx });
@@ -147,12 +148,13 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
         <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
-          {top.live && <LiveTag opened={top.opened} line={top.line} />}<BookBadge source={top.source} />{" "}
+          <BookBadge source={top.source} />{" "}
           {top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
             : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
           {top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
+        {top.live && <LiveOpened opened={top.opened} line={top.line} />}
         {rest.length > 0 && (
           <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
@@ -160,7 +162,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
           </button>
         )}
       </div>
-      {open && (
+            {open && (
         <table id={id} className="w-full max-w-sm text-left font-condensed">
           <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
           <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
@@ -185,6 +187,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
           <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
             <span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span>
             <TeamFlag name={r.team} />
+            {r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
             {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
@@ -192,13 +195,14 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
-          {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
+          {soFar != null && <LiveTrack value={soFar.v} line={r.line} was={r.quotes.find((q: Quote) => q.live)?.opened} verdict={soFar.verdict} />}
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {soFar != null && <StandingMark standing={soFar} line={r.line} />}
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
             {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
             <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
           </span>
+          {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
         </span>
         <span className="grid justify-items-end gap-hair">
           <span className="grid justify-items-end gap-hair text-right">
@@ -258,14 +262,14 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
             const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
             const ground = shortVenue(r.venue);
             return (
-              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} tabIndex={0} role="link"
+              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} tabIndex={0} role="link"
                 className={cn("cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover", out && "opacity-60")}
                 onClick={() => nav(to)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nav(to); } }}>
                 <td className="px-snug py-snug">
                   <span className="flex items-center gap-snug">
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0 gap-hair">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
@@ -347,7 +351,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
   const scored = useMemo(() => (data || []).map((r) => ({ ...r, ...modelSide(r[win], r.prior, r.over, r.under), live: matchOf(r)?.status === "live" }))
-    .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && r[win].played >= need),
+    .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && enoughHistory(r, win, need)),
   [data, stat, win, need, day, teams, start, fmt, live.data, pick]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => order(narrow(scored, sc), sc).slice(0, MAX_ROWS), [scored, sc]);
   // what the filter view may offer: the values the day's rows really have
@@ -414,7 +418,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
               </AnimatePresence>
             </ul>
             <div className="hidden lg:block">

@@ -22,6 +22,7 @@ import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, formatElapsed, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
+import { HeaderActions } from "@/lib/header-slot";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -33,7 +34,8 @@ import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
-import { LiveBoard, MatchAccordions } from "@/components/app/live-board";
+import { ScorecardBody, ScorecardCard, hasCard, scoreboardShows } from "@/components/app/live-board";
+import { RecentForm, recentForms } from "@/components/app/recent-form";
 import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
@@ -47,7 +49,7 @@ const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
-const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"], ["ground", "Ground"]];
+const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["ground", "Ground"], ["form", "Form"], ["grid", "Grid"], ["trends", "Custom line"]];
 
 /** Where the match is in time: label (Upcoming / Started / Completed) and the ticking value, from the shared 1 s clock. The clock never says Live. */
 function useMatchClock(when: Date, timed: boolean, fmt?: string) {
@@ -58,59 +60,98 @@ function useMatchClock(when: Date, timed: boolean, fmt?: string) {
   return { label: "Completed", value: "", tone: "", since: formatElapsed(-ms) };
 }
 
+/** A side's crest and name, linking to its team page when it has one. */
+function TeamName({ name, ix, small }: { name: string; ix: number; small?: boolean }) {
+  const body = <><TeamBadge name={name} size="md" className={small ? "size-8" : "size-control"} eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
+  return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
+}
+
+/** The two sides, each with its score (or "Yet to bat"). */
+function ScoreRows({ f, match, small }: { f: any; match: any; small?: boolean }) {
+  const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
+  return (
+    <div className="grid gap-snug">
+      {sides.map(([name, ix]) => (
+        <div key={name} className="flex min-w-0 items-center gap-snug">
+          <TeamName name={name} ix={ix} small={small} />
+          <LiveScore s={teamScore(match, name)} size="lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Match header, flat like Source B's (no card): status and format, the two sides with their start time and live timer, then series and venue. */
 function MatchHeader({ f, live }: { f: any; live: boolean }) {
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const clock = useMatchClock(when, timed, f.fmt);
   const { match } = useLiveMatch(f);
-  const scores = [teamScore(match, f.a), teamScore(match, f.b)];
   const { state, hasScore } = playState(f, match);
   const [final, delayed, on, started] = [state === "final", state === "delayed", state === "live", state === "started"]; // in play only on evidence, never on the clock
   const blurb = liveBlurb(match) || (final ? f.result || "" : started ? NO_SCORE : "");
   const session = sessionLabel(blurb) || match?.session || ""; // Rain delay / Stumps / Lunch — same badge as the home card; never a Live pulse over a session break
   const badge = session || (on ? "Live" : final ? "Final" : delayed ? "Delayed" : started ? "Started" : clock.label);
   const livePulse = on && !session;
-  const team = (name: string, ix: number) => {
-    const body = <><TeamBadge name={name} size="md" className="size-control" eager /><span className="min-w-0 truncate text-title font-bold leading-tight tracking-tight">{name}</span></>;
-    return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
-  };
+  const compact = hasScore && !final; // in play: one line for state + ground, a smaller crest, no series line (the board below carries the rest)
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
-  return (
-    <section className="flex flex-col gap-stack">
-      <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 flex items-center rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
+  const inCard = compact && scoreboardShows(match, true); // status, ground and scores all sit in the scorecard card instead
+  // the live-feed mark and Share live in the top bar, not in the card
+  const actions = (
+    <HeaderActions>
+      {live && <LiveFeed />}
+      <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
+      className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring",)}><ArrowUpOnSquareIcon className="size-5" /></button>
+    </HeaderActions>
+  );
+  const backBtn = (
+    <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 hidden items-center rounded-lg px-1 py-tight text-body text-primary lg:flex transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
+  );
+  const statusRow = (
       <div className="flex items-center gap-snug">
         <span className={cn("label-cap text-footnote", livePulse ? "text-miss" : session ? "text-destructive" : "text-muted-foreground")}>
           {livePulse && <span className="mr-2 inline-block size-2 animate-pulse rounded-full bg-miss align-middle" />}{badge}
         </span>
         <span className="text-footnote font-medium text-muted-foreground">· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
-        {live && <LiveFeed className="ml-auto" />}
-        <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
-          className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring", !live && "ml-auto")}><ArrowUpOnSquareIcon className="size-5" /></button>
       </div>
-      {hasScore ? (
-        <div className="grid gap-stack">
-          {sides.map(([name, ix], i) => (
-            <div key={name} className="flex min-w-0 items-center gap-snug">
-              {team(name, ix)}
-              <LiveScore s={scores[i]} size="lg" />
-            </div>
-          ))}
+  );
+  const stateLine = (
+        <div className="flex min-w-0 items-center gap-tight text-callout text-muted-foreground">
+          {blurb ? <span className="max-w-[60%] shrink-0 truncate">{blurb}</span> : null}
+          {blurb && f.venue ? <span aria-hidden>·</span> : null}
+          {f.venue ? <div className="min-w-0"><FixtureVenue venue={f.venue} fixtureId={f.id} /></div> : null}
         </div>
-      ) : (
+  );
+  if (inCard) {
+    const known = sides.filter(([, i]) => i >= 0);
+    return (
+      <section className="flex flex-col gap-tight">
+        {backBtn}
+        {actions}
+        <ScorecardCard match={match} teams={known} inPlay fixtureId={f.id} top={<div className="flex flex-col gap-tight">{statusRow}{stateLine}</div>} head={<ScoreRows f={f} match={match} small />} />
+      </section>
+    );
+  }
+  return (
+    <section className={cn("flex flex-col", compact ? "gap-tight" : hasScore ? "gap-snug" : "gap-stack")}>
+      {backBtn}
+      {actions}
+      {statusRow}
+      {hasScore ? <ScoreRows f={f} match={match} small={compact} /> : (
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug">
-          <div className="grid min-w-0 gap-stack">{team(f.a, f.a_ix)}{team(f.b, f.b_ix)}</div>
+          <div className="grid min-w-0 gap-stack"><TeamName name={f.a} ix={f.a_ix} /><TeamName name={f.b} ix={f.b_ix} /></div>
           <div className="grid justify-items-end gap-hair text-right">
             <span className="text-callout font-medium text-muted-foreground">{dayLabel(dayKey(f))}{timed ? `, ${localTime(when)}` : ""}</span>
             <b className={cn("text-metric font-bold leading-none tracking-tight tabular-nums", on && "text-miss")}>{delayed ? "Start delayed" : started ? clock.since : clock.value}</b>
           </div>
         </div>
       )}
+      {compact ? stateLine : (
       <div className="flex flex-col gap-hair">
         {(blurb || f.series) ? <p className="text-callout text-muted-foreground">{[blurb, f.series].filter(Boolean).join(" · ")}</p> : null}
         {f.venue ? <FixtureVenue venue={f.venue} fixtureId={f.id} /> : (!blurb && !f.series ? <p className="text-callout text-muted-foreground">Match details to be confirmed</p> : null)}
       </div>
-      {hasScore && !final && <LiveBoard match={match} teams={sides} />}
+      )}
     </section>
   );
 }
@@ -121,7 +162,8 @@ export function FixturePage() {
   const { "*": raw = "" } = useParams();
   const fancyDetail = /\/fancy\/?$/.test(raw);
   const groundDetail = /\/ground\/?$/.test(raw);
-  const id = fancyDetail ? raw.replace(/\/fancy\/?$/, "") : groundDetail ? raw.replace(/\/ground\/?$/, "") : raw;
+  const cardDetail = /\/scorecard\/?$/.test(raw);
+  const id = raw.replace(/\/(fancy|ground|scorecard)\/?$/, "");
   const [q, setQ] = useQ();
   const { fixtures: pricedFx, priced, ready } = usePricedFixtures();
   const { fx, doc, archived, isLoading } = useFixtureBooks(id);
@@ -132,7 +174,8 @@ export function FixturePage() {
   const stat = (STATS as any)[q.stat] ? q.stat : "sixes";
   const line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
   const games = [5, 10, 15, 20, 30].includes(Number(q.n)) ? Number(q.n) : 10;
-  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : k === "ground" ? fixtureHasGround(store, fx?.venue) : true));
+  const hasForm = !!fx && recentForms(store, [[fx.a, fx.a_ix], [fx.b, fx.b_ix]], fmt).some((f) => f.games.length);
+  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : k === "form" ? hasForm : k === "ground" ? fixtureHasGround(store, fx?.venue) : true));
   const wanted = q.tab === "markets" ? "fancy" : q.tab; // old links used ?tab=markets
   const tab = tabs.some(([k]) => k === wanted) ? wanted : tabs[0][0];
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";
@@ -141,18 +184,14 @@ export function FixturePage() {
   const gridTeam = known.some(([, i]) => String(i) === q.team) ? Number(q.team) : known[0]?.[1];
   const grids = useQuery({ queryKey: ["fx-grids", id, fmt, stat, games], enabled: !!fx && fx.fmt !== "FC", queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, games) }))) });
   const bodyRef = useRef<HTMLDivElement>(null);
+  const ps = fx ? playState(fx, match) : null, inPlay = !!ps && ps.hasScore && ps.state !== "final";
   const reduceMotion = useReducedMotion();
   // old links opened a market with ?tab=fancy&fm=… and scrolled the chart into view; send them to the market page instead
   useEffect(() => {
     if (!fancyDetail && tab === "fancy" && q.fm) nav(fancyMarketPath(id, { fm: q.fm, sc: q.sc, mw: q.mw, mv: q.mv, ml: q.ml }), { replace: true });
   }, [fancyDetail, tab, q.fm, q.sc, q.mw, q.mv, q.ml, id, nav]);
-  // Ground is its own page (like `/fixture/:id/fancy`), not an in-tab panel
-  useEffect(() => {
-    if (!groundDetail && !fancyDetail && tab === "ground") nav(`/fixture/${id}/ground`, { replace: true });
-  }, [groundDetail, fancyDetail, tab, id, nav]);
   // switching tabs: if the page is scrolled past the top of the tab body, bring the new body into view (smoothly) instead of stranding the reader mid-way
   const switchTab = (t: string) => {
-    if (t === "ground") { nav(`/fixture/${id}/ground`); return; }
     setQ({ tab: t });
     const align = () => { const el = bodyRef.current; if (el && el.getBoundingClientRect().top < 128) el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" }); };
     align();
@@ -180,13 +219,27 @@ export function FixturePage() {
       </div>
     );
   }
+  if (cardDetail) {
+    setTitle(`${fx.a} v ${fx.b} scorecard`);
+    return (
+      <div className="flex flex-col gap-stack">
+        <Link to={`/fixture/${fx.id}`} className="inline-flex w-fit min-w-0 items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+          <ChevronLeftIcon className="size-4 shrink-0" aria-hidden /><span className="truncate">{fx.a} v {fx.b}</span>
+        </Link>
+        <PageTitle sub={match?.session || liveBlurb(match) || undefined}>Scorecard</PageTitle>
+        {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyNote title="No scorecard yet">There is no card for this match from our source yet. It shows here once play has started.</EmptyNote>}
+      </div>
+    );
+  }
   if (groundDetail) {
     return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />;
   }
   return (
     <div className="flex flex-col gap-section">
-      <MatchHeader f={fx} live={live} />
-      <MatchAccordions match={match} teams={known} fmt={fmt} />
+      <div className="flex flex-col gap-stack">
+        <MatchHeader f={fx} live={live} />
+        {!inPlay && <ScorecardCard match={match} teams={known} inPlay={false} fixtureId={fx.id} />}
+      </div>
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
           <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
@@ -197,6 +250,8 @@ export function FixturePage() {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
           {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} fmt={fx.fmt} archive={archived ? doc : undefined} />}
+          {tab === "ground" && <FixtureGroundPanel embedded venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />}
+          {tab === "form" && <RecentForm teams={known} fmt={fmt} />}
           {tab === "grid" && (
             <>
               <GridFilterBar stat={stat} line={line} games={games} items={STAT_OPTIONS} setQ={setQ} />

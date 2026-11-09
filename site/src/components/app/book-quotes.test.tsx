@@ -33,4 +33,12 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(screen.getByText(/bet365/)).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\" at the end of it", () => {
+    const live = bookQuotes([{ line: 33.5, books: [{ ...B("bet365", 1.8, 1.9), live: true, opened: 25.5 }] }]);
+    const { container } = render(<BookQuotes quotes={live} />);
+    expect(screen.queryByText("Live")).toBeNull();
+    const note = screen.getByText("was 25.5");
+    expect(note.previousElementSibling).toContainElement(container.querySelector("[data-book]") as HTMLElement); // on the quote's own line, after the prices
+  });
 });

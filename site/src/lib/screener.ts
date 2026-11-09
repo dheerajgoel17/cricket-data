@@ -91,6 +91,11 @@ export function narrow<T extends FilterRow>(rows: T[], s: Screener): T[] {
   });
 }
 
+/** Does a row have the games it needs in the window shown? A thin history hides a pre-match prop (too little to count), never one a book is pricing in play: every supported live prop is shown, with whatever history there is. */
+export function enoughHistory(r: { quotes?: { live?: boolean }[] } & Record<string, any>, win: string, need: number): boolean { // eslint-disable-line @typescript-eslint/no-explicit-any
+  return (r[win]?.played ?? 0) >= need || (r.quotes || []).some((q) => q.live);
+}
+
 /** Order rows: a match in play first (as the home rail does), then by the chosen sort, ties by the others. */
 export function order<T extends FilterRow>(rows: T[], s: Screener): T[] {
   const key = (r: T) => ({ live: !!r.live, p: sideRate((r as any)[s.win]?.p ?? null, (r as any).side), edge: r.edge }); // an under row ranks by how often the line was not cleared
