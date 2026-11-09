@@ -180,7 +180,7 @@ def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[
             player, line = person(mm["last"], mm["first"]), p[0]
             for side, price in p[1].items():
                 rows.append(row(**common, market_type="batter_runs", market_raw=name, group_key=f"{gk}:{line}", selection=f"{player} {side} {line}", player=player,
-                                line=line, side=side, back=price))
+                                line=line, side=side, back=price, inn_hint=1))  # the name says "1st innings": the pipeline uses it when the match turns out to be multi-day
         elif (mm := PERFORMANCE.match(name)):
             p = _pair(m)
             if not p:
@@ -199,7 +199,7 @@ def parse_premium(markets: list[dict], ev: dict, fetched_at: str) -> tuple[list[
             player, line = person(mm["last"], mm["first"]), int(mm["n"]) - 0.5
             for side, key in (("over", "yes"), ("under", "no")):
                 rows.append(row(**common, market_type="batter_milestone", market_raw=name, group_key=f"{gk}:{player}:{line}",
-                                selection=f"{player} {int(line + 0.5)}+ {key}", player=player, line=line, side=side, back=px[key], ms_scope="match"))
+                                selection=f"{player} {int(line + 0.5)}+ {key}", player=player, line=line, side=side, back=px[key], ms_scope="match", inn_hint=1))
         elif name in MATCH_TOTAL or (mm := TEAM_TOTAL.match(name)):
             p = _pair(m)
             if not p:

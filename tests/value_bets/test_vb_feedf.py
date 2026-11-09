@@ -170,3 +170,10 @@ def test_a_player_performance_name_without_a_comma_is_read_as_it_is():
     mk = {"marketName": "Samantha Bates total player performance", "marketStatus": "Active", "marketId": 5, "uofOutComeOdds": [{"name": "over 40.5", "odd": 1.85, "active": True}, {"name": "under 40.5", "odd": 1.85, "active": True}]}
     rows, _, left = feedf.parse_premium([mk], ev, STAMP)
     assert [(r["player"], r["market_type"], r["line"], r["side"], r["back"]) for r in rows] == [("Samantha Bates", "player_points", 40.5, "over", 1.85), ("Samantha Bates", "player_points", 40.5, "under", 1.85)] and not left
+
+
+def test_a_premium_players_lines_carry_the_innings_the_market_name_wrote():
+    rows, _, _ = feedf.parse_premium(J("feedf_premium.json")["data"], england_sri_lanka(), STAMP)
+    named = [r for r in rows if r["market_type"] in ("batter_runs", "batter_milestone")]
+    assert named and all(r["inn_hint"] == 1 for r in named)  # "1st innings - <Last, First> total / to score N"
+    assert all(r.get("inn_hint") is None for r in rows if r["market_type"] == "player_points")

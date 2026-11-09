@@ -347,3 +347,46 @@ def test_github_actions_never_calls_the_book_directly(monkeypatch):
     with pytest.raises(feedh.Skip, match="never call the book directly"):
         feedh.fetch(STAMP)
     assert called == []
+
+
+# ---- the innings a market names: in its period field, or at either end of its name
+def test_strip_innings_reads_either_end_of_a_market_name():
+    s = feedh.strip_innings
+    assert s("Batsman Runs - Brook, Harry") == ("Batsman Runs - Brook, Harry", None)
+    assert s("1st Innings - Batsman Runs - Brook, Harry") == ("Batsman Runs - Brook, Harry", 1)
+    assert s("1st Innings: Batsman Runs - Brook, Harry") == ("Batsman Runs - Brook, Harry", 1)
+    assert s("Batsman Runs - Brook, Harry - 2nd Innings") == ("Batsman Runs - Brook, Harry", 2)
+    assert s("Batsman Runs - Brook, Harry (First Innings)") == ("Batsman Runs - Brook, Harry", 1)
+    assert s("Total runs for over 1 in 1st inning - India") == ("Total runs for over 1 in 1st inning - India", None)  # in the middle: part of the market's own name
+    assert s("Second innings - Batsman Fours - Cox, Jordan") == ("Batsman Fours - Cox, Jordan", 2)
+    assert feedh.period_inn({"period": {"fullDescription": "1st Innings"}}) == 1
+    assert feedh.period_inn({"period": {"fullDescription": "2nd Innings"}}) == 2
+    assert feedh.period_inn({"period": {"fullDescription": "Match"}}) is None
+    assert feedh.period_inn({}) is None
+
+
+def test_a_players_line_carries_the_innings_its_book_wrote_wherever_it_wrote_it():
+    def with_period(m, desc):
+        return {**m, "period": {"id": 196, "fullDescription": desc}}
+
+    markets = [
+        with_period(ou("Batsman Runs - Brook, Harry", 26.5, 1.85, 1.85, 1), "1st Innings"),            # in the period
+        ou("1st Innings - Batsman Fours - Cox, Jordan", 2.5, 1.9, 1.8, 2),                           # at the start of the name
+        ou("Bowler Wickets - Wood, Mark - 2nd Innings", 1.5, 1.9, 1.8, 3),                           # at the end
+        ou("Batsman Sixes - Pope, Ollie", 0.5, 1.9, 1.8, 4),                                         # nowhere
+    ]
+    rows, _, _, _ = feedh.parse_event(event(markets), feedh.SOURCE, STAMP)
+    by = {r["player"]: r for r in rows}
+    assert by["Harry Brook"]["inn_hint"] == 1
+    assert by["Jordan Cox"]["inn_hint"] == 1 and by["Jordan Cox"]["market_type"] == "batter_fours"  # the player name is not polluted by the innings text
+    assert by["Mark Wood"]["inn_hint"] == 2 and by["Mark Wood"]["market_type"] == "bowler_wickets"
+    assert by["Ollie Pope"]["inn_hint"] is None
+
+
+def test_the_pipeline_scopes_a_tests_lines_by_the_innings_the_book_wrote_else_the_first():
+    from value_bets.pipeline import scope_multiday_rows
+
+    base = dict(fmt="MULTI", source="feedh_x", market_type="batter_runs", line=26.5)
+    rows = [{**base, "inn_hint": 2}, {**base, "inn_hint": None}, {**base, "inn_hint": 1}, {**base, "fmt": "T20", "inn_hint": 2}]
+    scope_multiday_rows(rows)
+    assert [r.get("inn") for r in rows] == [2, 1, 1, None]  # a limited-overs match never takes the hint
