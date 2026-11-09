@@ -688,6 +688,10 @@ def fetch(fetched_at: str):
             break
         detail = _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{stub['id']}", info)
         if not isinstance(detail, dict) or not detail.get("id"):
+            if dbg and isinstance(detail, dict):
+                for k, v in detail.items():
+                    if isinstance(v, dict):
+                        print(f"DBG   detail.{k} keys={sorted(v)[:25]}", file=sys.stderr)
             continue
         st = parse_ts(detail.get("start_time") or detail.get("event_date"))
         if not st or st <= now or st > horizon or detail.get("in_play"):
@@ -757,6 +761,19 @@ def inplay(fetched_at: str) -> list[dict]:
     dbg = bool(os.environ.get("FEEDI_DEBUG"))
     if dbg:
         print(f"DBG board type={type(board).__name__} keys={sorted(board)[:12] if isinstance(board, dict) else len(board or [])} nodes={len(nodes)} stopped={info.get('stopped')}", file=sys.stderr)
+    if dbg and isinstance(board, dict):
+        sp = board.get("sports")
+        print(f"DBG board total={board.get('total_number_of_events')} sports_type={type(sp).__name__} sports_len={len(sp) if hasattr(sp, '__len__') else None}", file=sys.stderr)
+        first = (sp[0] if isinstance(sp, list) and sp else (next(iter(sp.values())) if isinstance(sp, dict) and sp else None))
+        print(f"DBG board first sport keys={sorted(first)[:20] if isinstance(first, dict) else type(first).__name__}", file=sys.stderr)
+        if isinstance(first, dict):
+            for k, v in first.items():
+                if isinstance(v, list) and v and isinstance(v[0], dict):
+                    print(f"DBG   {k}: len={len(v)} first_keys={sorted(v[0])[:20]}", file=sys.stderr)
+                elif isinstance(v, dict):
+                    print(f"DBG   {k}: dict keys={sorted(v)[:15]}", file=sys.stderr)
+        el = board.get("slider_elements")
+        print(f"DBG board slider_elements type={type(el).__name__} len={len(el) if hasattr(el, '__len__') else None} first={ (sorted(el[0]) if isinstance(el, list) and el and isinstance(el[0], dict) else None) }", file=sys.stderr)
     if not nodes and not info.get("stopped"):
         nodes, assume = _event_nodes(_pull(pace, deadline, _events_path(), info)), False
         if dbg:
@@ -769,6 +786,8 @@ def inplay(fetched_at: str) -> list[dict]:
         detail = node if node.get("home_name") else _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{node['id']}", info)
         if not isinstance(detail, dict) or not detail.get("id"):
             continue
+        if dbg and not (isinstance(detail, dict) and detail.get("id")):
+            print(f"DBG detail odd type={type(detail).__name__} keys={sorted(detail)[:25] if isinstance(detail, dict) else None} node_id={node.get('id')}", file=sys.stderr)
         if dbg:
             print(f"DBG event id={detail.get('id')} in_play={detail.get('in_play')} type={detail.get('event_type')} desc={detail.get('description')!r} comp={detail.get('competition_title')!r} start={detail.get('start_time')}", file=sys.stderr)
         if not detail.get("in_play") and not assume:
