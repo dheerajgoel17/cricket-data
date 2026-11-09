@@ -1,12 +1,12 @@
-# Cricket value bets - 2026-11-10 00:00 IST
+# Cricket value bets - 2026-11-10 01:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1290 prices
+- **moviodds_bet365**: ok, 1292 prices
 - **smarkets**: ok, 494 prices
 - **feedk**: ok, 136 prices, 7 events
-- **feedg**: ok, 32 prices, 4 events
+- **feedg**: ok, 40 prices, 5 events
 - **feedf**: ok, 172 prices, 6 events
 - **feede**: ok, 450 prices, 17 events
 - **feedh**: ok, 1512 prices, 35 events
@@ -17,4 +17,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Pak Xi (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female), Western Australia Warriors (male)
 
-Runtime 125.8s. Snapshot: `odds_20261109T183048Z.jsonl.gz`
+Runtime 132.3s. Snapshot: `odds_20261109T193037Z.jsonl.gz`

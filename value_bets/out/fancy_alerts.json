@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-09T18:33:51Z",
+ "generated_at_utc": "2026-11-09T19:33:58Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -87,7 +87,7 @@
    "team": null,
    "inn": 0,
    "side": "under",
-   "line": 63.5,
+   "line": 64.5,
    "best_odds": 1.833,
    "best_source": "bet365",
    "hits": 26,
