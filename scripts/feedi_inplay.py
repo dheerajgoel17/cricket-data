@@ -17,22 +17,8 @@ def main():
         print(json.dumps({"matches": []}))
         code = getattr(e, "code", None)
         where = f" at {feedi.LAST_STEP}" if feedi.LAST_STEP else ""
-        kind = ""
-        if code:
-            hdrs = getattr(e, "hdrs", None)
-            up = hdrs.get("x-relay-upstream-status") if hdrs is not None else None
-            try:
-                body = (e.read() or b"").decode("utf-8", "replace")[:24]
-            except Exception:
-                body = ""
-            if body.startswith("host not allowed"):
-                kind = " relay-allow"
-            elif body.strip() == "forbidden":
-                kind = " relay-key"
-            elif up:
-                kind = " upstream"
-            else:
-                kind = " relay"
+        reason = str(getattr(e, "reason", "") or "")
+        kind = f" {reason}" if reason in {"relay-allow", "relay-key", "cf-challenge", "upstream", "relay"} else ""
         print(f"feedi in-play failed: HTTP {code}{kind}{where}" if code else f"feedi in-play failed: {type(e).__name__}{where}", file=sys.stderr)
         return
     lines = sum(len(m.get("lines") or []) for m in matches)

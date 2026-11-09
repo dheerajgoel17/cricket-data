@@ -1,5 +1,6 @@
 """Feed I: player and fancy lines from one guest sportsbook, plus the session the relay has to forward."""
 import base64
+import io
 import json
 import urllib.error
 
@@ -281,3 +282,18 @@ def test_the_relay_forwards_the_session(monkeypatch):
     assert seen["headers"]["x-relay-cookie"] == "csrf=abc"
     assert seen["headers"]["x-relay-accept"] == "text/html"
     assert seen["headers"]["x-relay-key"] == "k"
+
+
+def test_a_refused_hop_is_tagged_without_the_host(monkeypatch):
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("FEEDI_RELAY", "https://relay.example")
+    monkeypatch.setenv("FEEDI_RELAY_KEY", "k")
+
+    def urlopen(req, timeout=None):
+        raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, io.BytesIO(b"host not allowed:book.test"))
+
+    monkeypatch.setattr(feedi.urllib.request, "urlopen", urlopen)
+    with pytest.raises(urllib.error.HTTPError) as exc:
+        feedi._http("https://book.test/en-in/sports/215", {"Accept": "text/html"})
+    assert exc.value.reason == "relay-allow"
+    assert "book.test" not in str(exc.value.reason)

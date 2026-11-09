@@ -490,7 +490,23 @@ def _http(url: str, headers: dict):
         with urllib.request.urlopen(req, timeout=config.get("HTTP_TIMEOUT")) as r:
             return r.read(), {k.lower(): v for k, v in r.headers.items()}
     except urllib.error.HTTPError as e:
-        raise urllib.error.HTTPError(e.url, e.code, (e.reason or "")[:80], e.hdrs, None) from e
+        # The body says which side refused. Keep a short tag only: the body can name the host.
+        try:
+            text = (e.read() or b"").decode("utf-8", "replace")[:120].lower()
+        except Exception:
+            text = ""
+        up = e.hdrs.get("x-relay-upstream-status") if e.hdrs is not None else ""
+        if "not allowed" in text:
+            tag = "relay-allow"
+        elif text.strip() == "forbidden":
+            tag = "relay-key"
+        elif any(s in text for s in ("1010", "cloudflare", "just a moment", "attention required")):
+            tag = "cf-challenge"
+        elif up:
+            tag = "upstream"
+        else:
+            tag = "relay"
+        raise urllib.error.HTTPError(e.url, e.code, tag, e.hdrs, None) from None
 
 
 def _groups(doc) -> list[dict]:
