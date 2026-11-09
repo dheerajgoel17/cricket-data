@@ -1,11 +1,11 @@
-# Cricket value bets - 2026-11-09 17:29 IST
+# Cricket value bets - 2026-11-09 18:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1468 prices
-- **smarkets**: ok, 450 prices
-- **feedg**: ok, 16 prices, 2 events
+- **moviodds_bet365**: ok, 1476 prices
+- **smarkets**: ok, 446 prices
+- **feedg**: ok, 8 prices, 2 events
 - **feedk**: ok, 128 prices, 6 events
 - **feedf**: ok, 232 prices, 6 events
 - **feede**: ok, 458 prices, 17 events
@@ -18,6 +18,6 @@ _No value bets passed the filters this run._
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-09 19:15 IST Emirates Eagles vs Arabian Aces / Top Batsman - Arabian Aces / Moeen Ali @ 12.50 (feedh_d): edge 47.5%, model None, market 0.118
 
-Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), Bangla Tigers (male), Hnb A (male), Pak Xi (male), Royal Champs (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female), Western Australia Warriors (male)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Pak Xi (male), Royal Champs (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female), Western Australia Warriors (male)
 
-Runtime 119.5s. Snapshot: `odds_20261109T115910Z.jsonl.gz`
+Runtime 111.8s. Snapshot: `odds_20261109T123031Z.jsonl.gz`
