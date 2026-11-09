@@ -69,11 +69,15 @@ export const upstreamHeaders = (url, get, post, contentType) => {
   const referer = String(get("x-relay-referer") || "").trim() || `${origin}/`;
   const cookie = String(get("x-relay-cookie") || "").trim();
   const overrideUa = String(get("x-relay-ua") || "").trim();
+  const accept = String(get("x-relay-accept") || "").trim();
+  const csrf = String(get("x-relay-csrf") || "").trim();
+  const ct = String(get("x-relay-ct") || "").trim();
+  const ctd = String(get("x-relay-ct-d") || "").trim();
   const p = pickProfile();
   const ua = overrideUa || p.ua;
   return {
     "User-Agent": ua,
-    Accept: "application/json, text/plain, */*",
+    Accept: accept || "application/json, text/plain, */*",
     "Accept-Language": p.lang,
     "Accept-Encoding": "gzip, deflate, br",
     Origin: origin,
@@ -86,6 +90,9 @@ export const upstreamHeaders = (url, get, post, contentType) => {
     "Sec-Fetch-Site": "same-site",
     ...(post && contentType ? { "Content-Type": contentType } : {}),
     ...(cookie ? { Cookie: cookie } : {}),
+    ...(csrf ? { "X-CSRF-Token": csrf } : {}),
+    ...(ct ? { "x-ct": ct } : {}),
+    ...(ctd ? { "x-ct-d": ctd } : {}),
   };
 };
 

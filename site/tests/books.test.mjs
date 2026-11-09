@@ -25,6 +25,7 @@ test("bookLogoStem resolves every feed name we publish to its mark", () => {
     ["FairWin247 Premium", "fairwin247"],
     ["FairWin247 Fancy", "fairwin247"],
     ["Dafabet", "dafabet"],
+    ["Puntit", "puntit"],
     ["Reddybook", "reddybook"],
     ["polymarket", "polymarket"],
     ["nobody", ""],

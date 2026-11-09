@@ -9,6 +9,8 @@
   FEEDE_BOOKS        Feed E's books, "id=Name@root,id=Name@root" (short id, published name, feed root)
   FEEDH_URL          Feed H's sportsbook root      FEEDH_NAME   the name its prices are published under
   FEEDH_RELAY        Cloudflare Worker relay (or reuse FEEDG_RELAY); Feed H never runs on a laptop
+  FEEDI_URL          Feed I's site root            FEEDI_NAME   the name its prices are published under
+  FEEDI_RELAY        the same Worker (or Feed H's pair); Feed I never runs on a laptop
   SRC_B_BASE, SRC_C_BASE, SRC_D_BASE, SRC_E_BASE   the optional scrapers / key-gated APIs that are not enabled by default
 
 Set them as repository variables for the workflows, as deployment variables for the site, and in a git-ignored env file locally (docs/OPERATIONS.md).

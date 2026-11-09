@@ -49,6 +49,10 @@ env:
   FEEDH_NAME: ${{ secrets.FEEDH_NAME }}
   FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
   FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
+  FEEDI_URL: ${{ secrets.FEEDI_URL }}
+  FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
+  FEEDI_RELAY: ${{ secrets.FEEDI_RELAY }}
+  FEEDI_RELAY_KEY: ${{ secrets.FEEDI_RELAY_KEY }}
 
 permissions:
   contents: write

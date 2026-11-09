@@ -35,6 +35,7 @@ FORBIDDEN_HOSTS = {
     "5c948026ec7613caf31056f44192f4477d9b752b8db0f876c7cd7a877f1c43d3",
     "c82ee20a97579d1d0b16476cbb500cbe3f3a7a71c51b566cf68feccc14082356",
     "0b583ca765c132f62cc1462057c9aaa28efa159821ac8b27b0a5fed7d98d30fd",
+    "37d01bdf7190b1fd18af86805885ac5efbc7664f8c2a1280a9ecad64ed00f8b9",
 }
 HOST = re.compile(r"(?<![A-Za-z0-9@_-])((?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,})")
 
