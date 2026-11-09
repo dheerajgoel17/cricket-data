@@ -58,3 +58,36 @@ export function playerLine(match, name) {
   const rows = (match?.lines || []).filter((l) => l.kind === "player_runs" && l.over != null && l.under != null && namesMatch(l.player, name));
   return rows.sort((x, y) => Math.abs(x.over - x.under) - Math.abs(y.over - y.under))[0] || null;
 }
+
+const pairKey = (m) => [teamKey(m?.home), teamKey(m?.away)].filter(Boolean).sort().join("|");
+const lineId = (l) => [l.kind, l.player || "", l.team || "", l.inn || 0, l.line, l.book || ""].join("|");
+
+/** The price feed's matches plus another book's, one row per fixture. The same line from two books stays as two rows (`book` is the published name). */
+export function mergeMatches(primary, extra) {
+  const by = new Map();
+  for (const m of [...(primary || []), ...(extra || [])]) {
+    const k = pairKey(m);
+    if (!k) continue;
+    const cur = by.get(k);
+    if (!cur) { by.set(k, { home: m.home, away: m.away, league: m.league || "", kickoff: m.kickoff || null, lines: [...(m.lines || [])] }); continue; }
+    const seen = new Set(cur.lines.map(lineId));
+    for (const l of m.lines || []) {
+      const id = lineId(l);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      cur.lines.push(l);
+    }
+  }
+  return [...by.values()];
+}
+
+/** One even-money line per book for the rows `pred` keeps. A line with no `book` is the price feed's. */
+export function bookLines(match, pred) {
+  const by = new Map();
+  for (const l of (match?.lines || []).filter((l) => pred(l) && l.over != null && l.under != null)) {
+    const k = l.book || "";
+    const cur = by.get(k);
+    if (!cur || Math.abs(l.over - l.under) < Math.abs(cur.over - cur.under)) by.set(k, l);
+  }
+  return [...by.values()];
+}

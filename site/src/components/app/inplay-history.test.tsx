@@ -24,6 +24,7 @@ vi.mock("@/lib/data", () => ({ useData: () => ({ store, rz: { players: () => [{ 
 // the in-play lines the route would give: Alpha's innings total 190.5 at 1.90 / 1.90 and the batter "Opener" at 49.5
 const DOC = { matches: [{ home: "Alpha", away: "Beta", lines: [
   { kind: "team_runs", team: "Alpha", inn: 1, line: 190.5, over: 1.9, under: 1.9 },
+  { kind: "team_runs", team: "Alpha", inn: 1, line: 185.5, over: 1.87, under: 1.91, book: "Puntit" },
   { kind: "player_runs", player: "Opener", line: 49.5, over: 1.8, under: 2 },
 ] }] };
 vi.mock("@/lib/queries", () => ({ inplayQuery: { queryKey: ["inplay-lines"], queryFn: async () => DOC } }));
@@ -50,6 +51,7 @@ describe("InplayHistory", () => {
   it("puts the book's live innings line first with its prices, scored on the same nine innings", async () => {
     render(wrap(<InplayHistory match={live({ teams: [{ name: "Alpha" }, { name: "Beta" }] })} fmt="T20" gender="male" teams={sides} />));
     expect(await screen.findByText(/Book line now · Over 1.90 · Under 1.90/)).toBeInTheDocument();
+    expect(screen.getByText(/Puntit · Over 1.87 · Under 1.91/)).toBeInTheDocument();
     expect(screen.getAllByText("190.5")).toHaveLength(1); // the book's line is not repeated by the ladder
   });
 

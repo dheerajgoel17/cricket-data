@@ -76,9 +76,11 @@ DEFAULTS = {
     "FEEDH_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
     "FEEDH_BUDGET_SECS": 240.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "FEEDI_SPACING_SECS": 0.5,     # Feed I (adapters/feedi.py, on whenever FEEDI_URL and FEEDI_NAME are set): seconds between its requests
-    "FEEDI_MAX_EVENTS": 24,        # ... matches read per run (one detail page and the player / fancy groups each)
-    "FEEDI_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
-    "FEEDI_BUDGET_SECS": 160.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDI_MAX_EVENTS": 48,        # ... matches read per run (one detail page and the player / fancy groups each)
+    "FEEDI_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days); the listing is asked once per day
+    "FEEDI_BUDGET_SECS": 220.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDI_INPLAY_MAX": 8,         # live matches read by the minute snapshot (player runs and a side's innings total only)
+    "FEEDI_INPLAY_BUDGET_SECS": 45.0,  # ... that read stops after this long so the snapshot still finishes inside its minute
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

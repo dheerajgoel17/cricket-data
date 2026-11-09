@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { inplayFor, parseInplayFeed, parseQuotes, playerLine, teamLine } from "@cricket/engine/inplay-lines.js";
+import { bookLines, inplayFor, mergeMatches, parseInplayFeed, parseQuotes, playerLine, teamLine } from "@cricket/engine/inplay-lines.js";
 
 // The shape the feed gave for a match that had started (probed from a workflow run): one quote per side per line.
 const q = (group_name, label, handicap, odds_dec, extra = {}) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec, ...extra });
@@ -59,6 +59,18 @@ test("a fixture finds its match either way round, and the line nearest even mone
   assert.equal(playerLine(m, "Mushfiqur Rahim").line, 33.5); // 33.5 is 1.833 / 1.833; 43.5 is 2.6 / 1.45
   assert.equal(playerLine(m, "Towhid Hridoy"), null); // priced on one side only
   assert.equal(playerLine(m, "Litton Das"), null);
+});
+
+test("another book's live lines merge onto the same fixture and stay labelled", () => {
+  const feed = parseInplayFeed({ matches: [{ home: "Bangladesh", away: "West Indies", in_play: true, quotes: QUOTES }] });
+  const extra = [{ home: "West Indies", away: "Bangladesh", lines: [
+    { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.91, under: 1.87, book: "Puntit" },
+    { kind: "team_runs", team: "Bangladesh", inn: 1, line: 260.5, over: 1.8, under: 1.9, book: "Puntit" },
+  ] }];
+  const [m] = mergeMatches(feed, extra);
+  assert.equal(bookLines(m, (l) => l.kind === "player_runs" && l.player === "M Rahim").length, 2);
+  assert.equal(bookLines(m, (l) => l.kind === "team_runs" && l.inn === 1).find((l) => l.book === "Puntit").line, 260.5);
+  assert.equal(mergeMatches([{ home: "India", away: "Australia", lines: [] }], extra).length, 2);
 });
 
 test("the route serves the Supabase row while it is fresh, an empty list when it is stale or there is none, and reads once per window", async () => {

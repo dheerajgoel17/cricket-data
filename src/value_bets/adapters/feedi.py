@@ -12,6 +12,10 @@ Rows are the player markets the other books already map: "<player> - Runs / Four
 yes/nos, and Top Batter / Top Bowler (match and per side). Match fours / sixes / run-outs and a side's runs / fours / sixes come back
 as ``fancy`` lines. A Test's innings-scoped line is published with ``inn`` and left out of the value-bet pricing. Head-to-head is never
 a row. Every open market of a fetched match is also a compact ``catalogue`` row.
+
+The hourly pull lists every day in the horizon (the book's events call takes a date) so a fixture later in the week is not missed, and
+it still files only matches that have not started. A started match is read by ``inplay`` for the minute snapshot instead: player innings
+runs and a side's innings total, merged into the in-play row and never written to ``book_lines`` or the archive.
 """
 from __future__ import annotations
 
@@ -498,6 +502,105 @@ def _groups(doc) -> list[dict]:
     return out
 
 
+def horizon_dates(now: dt.datetime, hours: float) -> list[str]:
+    """Each calendar day from `now` through the end of the horizon, as YYYY-MM-DD. The book's listing is one day at a time."""
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=dt.timezone.utc)
+    d, end = now.date(), (now + dt.timedelta(hours=hours)).date()
+    out = []
+    while d <= end:
+        out.append(d.isoformat())
+        d += dt.timedelta(days=1)
+    return out
+
+
+def _events_path(day: str | None = None) -> str:
+    path = f"/api/sportsbook/event_paths/{SPORT_PATH}/events?c={LOCALE}"
+    return f"{path}&date={day}" if day else path
+
+
+def _pull(pace, deadline: float, path: str, info: dict | None = None):
+    if time.monotonic() > deadline:
+        if info is not None:
+            info["stopped"] = "time budget"
+        return None
+    try:
+        return pace.get(path)
+    except urllib.error.HTTPError as e:
+        if info is not None and e.code == 429:
+            info["stopped"] = "HTTP 429"
+        return None
+
+
+def _event_nodes(doc) -> list[dict]:
+    """Event dicts from a listing or the live board. Nested sport blocks are walked one level."""
+    blocks = []
+    if isinstance(doc, list):
+        blocks = doc
+    elif isinstance(doc, dict):
+        for key in ("events", "matches"):
+            if isinstance(doc.get(key), list):
+                blocks.extend(doc[key])
+        for key in ("sports", "competitions", "event_paths"):
+            for block in doc.get(key) or []:
+                if isinstance(block, dict) and isinstance(block.get("events"), list):
+                    blocks.extend(block["events"])
+    out, seen = [], set()
+    for ev in blocks:
+        if not isinstance(ev, dict) or not ev.get("id") or ev["id"] in seen:
+            continue
+        seen.add(ev["id"])
+        out.append(ev)
+    return out
+
+
+def _period_inn(period: str) -> int | None:
+    """1..4 from a period label. Unlike `_inn`, a limited-overs innings still counts: the live panel asks for it."""
+    p = (period or "").lower()
+    for n, words in ((4, ("4th", "fourth")), (3, ("3rd", "third")), (2, ("2nd", "second")), (1, ("1st", "first"))):
+        if any(w in p for w in words):
+            return n
+    return None
+
+
+def live_lines(detail: dict, markets: list[dict], book: str) -> dict | None:
+    """One started match as the in-play row reads it: player innings runs and a side's innings total, both prices, with the book's name."""
+    if (detail.get("event_type") or "GAME").upper() not in ("GAME", ""):
+        return None
+    home, away = (detail.get("home_name") or "").strip(), (detail.get("away_name") or "").strip()
+    if not home or not away:
+        parts = re.split(r"\s+v(?:s\.?)?\s+", detail.get("description") or "", maxsplit=1, flags=re.I)
+        if len(parts) == 2:
+            home, away = parts[0].strip(), parts[1].strip()
+    if not home or not away:
+        return None
+    competition = detail.get("competition_title") or (detail.get("event_path_tree") or {}).get("description") or ""
+    blob = f"{competition} {home} {away} {detail.get('description') or ''}"
+    if SKIP_PATH.search(blob):
+        return None
+    lines = []
+    for m in markets or []:
+        if not isinstance(m, dict) or m.get("st") not in (None, 1, "1"):
+            continue
+        name = (m.get("des") or "").strip()
+        got = _ou(m)
+        if not name or not got:
+            continue
+        ln, px = got
+        side = {"line": ln, "over": round(px["over"], 3), "under": round(px["under"], 3), "book": book}
+        mm = PLAYER_STAT[0][0].match(name)
+        if mm and not _team(mm["p"], home, away):
+            lines.append({"kind": "player_runs", "player": mm["p"].strip(), **side})
+            continue
+        mm = TEAM_KEY[0][0].match(name)
+        if mm and _team(mm["team"], home, away):
+            lines.append({"kind": "team_runs", "team": mm["team"].strip(), "inn": _period_inn(m.get("p") or "") or 1, **side})
+    if not lines:
+        return None
+    return {"home": home, "away": away, "league": competition,
+            "kickoff": iso(parse_ts(detail.get("start_time") or detail.get("event_date"))), "lines": lines}
+
+
 def _markets(doc) -> list[dict]:
     if isinstance(doc, dict):
         doc = doc.get("coupons") or doc.get("markets") or []
@@ -526,51 +629,49 @@ def fetch(fetched_at: str):
     info: dict = {"events": 0, "rows": 0, "fancy": 0, "catalogue": 0, "left_out": Counter()}
     rows, fancy, catalogue = [], [], []
     client.open()
-    listing = pace.get(f"/api/sportsbook/event_paths/{SPORT_PATH}/events?c={LOCALE}")
-    if not isinstance(listing, list):
-        raise Skip("events listing was not a list")
-    stubs = []
-    for ev in listing:
-        if not isinstance(ev, dict) or not ev.get("id"):
+    seen, stubs = set(), []
+    info["days"] = 0
+    for day in [None, *horizon_dates(now, config.get("FEEDI_HORIZON_HOURS"))]:
+        if info.get("stopped") in ("time budget", "HTTP 429"):
+            break
+        listing = _pull(pace, deadline, _events_path(day), info)
+        if not isinstance(listing, list):
+            if day is None and not info.get("stopped"):
+                raise Skip("events listing was not a list")
             continue
-        desc = ev.get("description") or ""
-        if SKIP_PATH.search(desc):
-            continue
-        stubs.append((0 if INTL.search(desc) else 1, ev))
+        if day is not None:
+            info["days"] += 1
+        for ev in listing:
+            if not isinstance(ev, dict) or not ev.get("id") or ev["id"] in seen:
+                continue
+            desc = ev.get("description") or ""
+            if SKIP_PATH.search(desc):
+                continue
+            seen.add(ev["id"])
+            stubs.append((0 if INTL.search(desc) else 1, ev))
     stubs.sort(key=lambda t: t[0])
     cap = config.get("FEEDI_MAX_EVENTS")
     if cap > 0:
         stubs = stubs[:cap]
     info["listed"] = len(stubs)
 
-    def pull(path):
-        if time.monotonic() > deadline:
-            info["stopped"] = "time budget"
-            return None
-        try:
-            return pace.get(path)
-        except urllib.error.HTTPError as e:
-            if e.code == 429:
-                info["stopped"] = "HTTP 429"
-            return None
-
     for _, stub in stubs:
         if info.get("stopped") in ("time budget", "HTTP 429"):
             break
-        detail = pull(f"/bv_api/events/{LOCALE}/{stub['id']}")
+        detail = _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{stub['id']}", info)
         if not isinstance(detail, dict) or not detail.get("id"):
             continue
         st = parse_ts(detail.get("start_time") or detail.get("event_date"))
         if not st or st <= now or st > horizon or detail.get("in_play"):
             continue
-        groups = pull(f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{client.sport_id}?event_id={stub['id']}")
+        groups = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{client.sport_id}?event_id={stub['id']}", info)
         if info.get("stopped") in ("time budget", "HTTP 429"):
             break
         if groups is None:
             continue
         markets = []
         for g in _groups(groups):
-            got = pull(f"/bv_event_level/{LOCALE}/{client.brand}/coupons/{stub['id']}/{g['id']}?period_id=0")
+            got = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupons/{stub['id']}/{g['id']}?period_id=0", info)
             if info.get("stopped") in ("time budget", "HTTP 429"):
                 break
             markets.extend(_markets(got))
@@ -586,6 +687,60 @@ def fetch(fetched_at: str):
         info["catalogue"] += len(cat)
         info["left_out"].update(left)
     return rows, {"books": {s["NAME"]: {**info, "left_out": dict(info["left_out"])}}, "fancy": fancy, "catalogue": catalogue}
+
+
+def _session(budget_key: str):
+    """Open one session, or raise Skip. Returns (settings, client, pace, deadline)."""
+    s = settings()
+    if not s:
+        raise Skip("FEEDI_URL / FEEDI_NAME not set")
+    if not on_runner() and not lab(s["URL"]):
+        raise Skip("Feed I does not run on a local machine")
+    if not relay() and not lab(s["URL"]):
+        raise Skip("FEEDI_RELAY not set (never call the book directly)")
+    client = Client(host("FEEDI_URL"), _http)
+    pace = Pace(config.get("FEEDI_SPACING_SECS"), lambda path, accept="application/json": client.call(path, accept))
+    client.open()
+    return s, client, pace, time.monotonic() + config.get(budget_key)
+
+
+def _coupons(pace, deadline, client, event_id, info, names) -> list[dict]:
+    groups = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{client.sport_id}?event_id={event_id}", info)
+    markets = []
+    for g in _groups(groups):
+        if names and not names.search(g.get("name") or ""):
+            continue
+        got = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupons/{event_id}/{g['id']}?period_id=0", info)
+        if info.get("stopped") in ("time budget", "HTTP 429"):
+            break
+        markets.extend(_markets(got))
+    return markets
+
+
+def inplay(fetched_at: str) -> list[dict]:
+    """Started matches only, for the minute snapshot. Not filed in the hourly book. `fetched_at` keeps the call shaped like `fetch`."""
+    del fetched_at
+    s, client, pace, deadline = _session("FEEDI_INPLAY_BUDGET_SECS")
+    info: dict = {}
+    board = _pull(pace, deadline, f"/bv_in_play/v3/{LOCALE}/{client.brand}/mini_inplay?sport_id={client.sport_id}", info)
+    nodes, assume = _event_nodes(board), True
+    if not nodes and not info.get("stopped"):
+        nodes, assume = _event_nodes(_pull(pace, deadline, _events_path(), info)), False
+    out = []
+    cap = config.get("FEEDI_INPLAY_MAX")
+    for node in nodes:
+        if len(out) >= cap or info.get("stopped") in ("time budget", "HTTP 429"):
+            break
+        detail = node if node.get("home_name") else _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{node['id']}", info)
+        if not isinstance(detail, dict) or not detail.get("id"):
+            continue
+        if not detail.get("in_play") and not assume:
+            continue
+        markets = _coupons(pace, deadline, client, detail["id"], info, re.compile(r"players|innings", re.I))
+        match = live_lines(detail, markets, s["NAME"])
+        if match:
+            out.append(match)
+    return out
 
 
 if __name__ == "__main__":

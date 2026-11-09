@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GAP_MS, ROUNDS, readFeed, run, saveBody } from "../scripts/inplay-snapshot.mjs";
+import { GAP_MS, ROUNDS, loadExtra, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
 
 const q = (group_name, label, handicap, odds_dec) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec });
 const DOC = { matches: [
@@ -15,6 +15,21 @@ test("the feed read keeps only the matches that have started, with the lines we 
   assert.deepEqual([ms[0].home, ms[0].lines[0].player, ms[0].lines[0].line, ms[0].lines[0].over, ms[0].lines[0].under], ["Bangladesh", "M Rahim", 33.5, 1.8, 1.9]);
   assert.deepEqual(await readFeed("http://feed.invalid/", json([DOC])), ms); // the feed may wrap its body in a list
   await assert.rejects(readFeed("http://feed.invalid/", json({}, 503)), /feed HTTP 503/);
+});
+
+test("this book's live lines ride along, and a failed price-feed read still keeps them", async () => {
+  assert.deepEqual(loadExtra(""), []);
+  assert.deepEqual(loadExtra("missing", () => { throw new Error("no"); }), []);
+  const extra = [{ home: "India", away: "Australia", lines: [{ kind: "player_runs", player: "V Kohli", line: 30.5, over: 1.9, under: 1.9, book: "Puntit" }] }];
+  assert.deepEqual(loadExtra("x", () => JSON.stringify({ matches: extra })), extra);
+  const merged = await readRound("http://feed.invalid/", extra, json(DOC));
+  assert.equal(merged.length, 2);
+  assert.equal(merged.find((m) => m.home === "India").lines[0].book, "Puntit");
+  const logs = [];
+  const kept = await readRound("http://feed.invalid/", extra, json({}, 503), (m) => logs.push(m));
+  assert.equal(kept, extra);
+  assert.match(logs[0], /keeping this book's live lines/);
+  await assert.rejects(readRound("http://feed.invalid/", [], json({}, 503)), /feed HTTP 503/);
 });
 
 test("the row is replaced through the REST upsert with the service key, and a refusal throws", async () => {

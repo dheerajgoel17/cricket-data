@@ -143,17 +143,29 @@ def _serve(calls):
             return SHELL.encode(), {"set-cookie": "csrf=abc; Path=/"}
         if f"/api/sports/{feedi.SPORT_PATH}" in url:
             return json.dumps({"sections": [{"components": [{"sportId": 17500}]}]}).encode(), {}
-        if url.endswith("/events?c=en-in"):
+        if "/events?c=en-in" in url and "date=" not in url:
             return json.dumps([
                 {"id": 99, "description": "New Zealand v India"},
                 {"id": 3, "description": "Virtual Cricket SRL"},
+                {"id": 7, "description": "Live Match"},
             ]).encode(), {}
+        if "date=2026-11-12" in url:
+            return json.dumps([{"id": 100, "description": "Australia v England"}]).encode(), {}
+        if "date=" in url:
+            return b"[]", {}
         if url.endswith("/events/en-in/99"):
             return json.dumps(DETAIL).encode(), {}
+        if url.endswith("/events/en-in/7"):
+            return json.dumps({**DETAIL, "id": 7, "in_play": True, "start_time": "2026-11-09T05:00:00Z"}).encode(), {}
+        if url.endswith("/events/en-in/100"):
+            return json.dumps({**DETAIL, "id": 100, "home_name": "Australia", "away_name": "England",
+                               "start_time": "2026-11-12T02:00:00Z", "competition_title": "Test Match"}).encode(), {}
         if "coupon_groups" in url:
             return json.dumps([{"id": 7, "name": "Players"}, {"id": 8, "name": "Bet Boost"}]).encode(), {}
         if "/coupons/99/7" in url:
             return json.dumps([{"markets": MARKETS}]).encode(), {}
+        if "/coupons/100/7" in url:
+            return json.dumps([{"markets": [MARKETS[0]]}]).encode(), {}
         raise AssertionError(url)
     return fake
 
@@ -166,7 +178,11 @@ def test_fetch_reads_the_shell_then_one_event(monkeypatch):
     monkeypatch.setattr(feedi, "_http", _serve(calls))
     rows, raw = feedi.fetch(STAMP)
     assert len(rows) > 0 and raw["fancy"] and raw["catalogue"]
-    assert raw["books"]["Puntit"]["events"] == 1
+    assert raw["books"]["Puntit"]["events"] == 2  # today's card and a later day; the started match is left for the snapshot
+    assert raw["books"]["Puntit"]["days"] == 11
+    assert any("date=2026-11-09" in u for u in calls) and any("date=2026-11-19" in u for u in calls)
+    assert any(r["match"] == "Australia vs England" for r in rows)
+    assert not any("/coupons/7/" in u for u in calls)
     assert any(u.endswith("/sports/215") for u in calls)
     assert any(u.endswith("/events/en-in/99") for u in calls)
     assert any("/coupons/99/7" in u for u in calls)
@@ -185,13 +201,50 @@ def test_a_429_stops_the_book_for_the_run(monkeypatch):
             return SHELL.encode(), {"set-cookie": "csrf=abc; Path=/"}
         if f"/api/sports/{feedi.SPORT_PATH}" in url:
             return json.dumps({"sportId": 17500}).encode(), {}
-        if url.endswith("/events?c=en-in"):
+        if "/events?c=en-in" in url and "date=" not in url:
             return json.dumps([{"id": 99, "description": "New Zealand v India"}]).encode(), {}
+        if "date=" in url:
+            return b"[]", {}
         raise urllib.error.HTTPError(url, 429, "x", {}, None)
 
     monkeypatch.setattr(feedi, "_http", fake)
     rows, raw = feedi.fetch(STAMP)
     assert rows == [] and raw["books"]["Puntit"]["stopped"] == "HTTP 429"
+
+
+def test_inplay_reads_a_started_match_and_names_the_book(monkeypatch):
+    monkeypatch.setenv("FEEDI_URL", ROOT)
+    monkeypatch.setenv("FEEDI_NAME", "Puntit")
+    monkeypatch.setenv("CV_FEEDI_SPACING_SECS", "0")
+    calls = []
+
+    def fake(url, headers):
+        calls.append(url)
+        if url.endswith(f"/sports/{feedi.SPORT_PATH}"):
+            return SHELL.encode(), {"set-cookie": "csrf=abc; Path=/"}
+        if f"/api/sports/{feedi.SPORT_PATH}" in url:
+            return json.dumps({"sportId": 17500}).encode(), {}
+        if "mini_inplay" in url:
+            return json.dumps([{"id": 5}]).encode(), {}
+        if url.endswith("/events/en-in/5"):
+            return json.dumps({**DETAIL, "id": 5, "in_play": True, "start_time": "2026-11-09T05:00:00Z"}).encode(), {}
+        if "coupon_groups" in url:
+            return json.dumps([{"id": 1, "name": "Players"}, {"id": 2, "name": "Innings"}, {"id": 3, "name": "Bet Boost"}]).encode(), {}
+        if "/coupons/5/1" in url:
+            return json.dumps([{"markets": [ou("Shreyas Iyer - Runs - (28.5)", 28.5, 1.85, 1.91, 1)]}]).encode(), {}
+        if "/coupons/5/2" in url:
+            return json.dumps([{"markets": [ou("India - Runs - (278.5)", 278.5, 1.85, 1.85, 8, "2nd Innings")]}]).encode(), {}
+        raise AssertionError(url)
+
+    monkeypatch.setattr(feedi, "_http", fake)
+    matches = feedi.inplay(STAMP)
+    assert [(m["home"], m["away"]) for m in matches] == [("New Zealand", "India")]
+    got = {(x["kind"], x.get("player") or x.get("team"), x.get("inn"), x["book"], x["line"]) for x in matches[0]["lines"]}
+    assert ("player_runs", "Shreyas Iyer", None, "Puntit", 28.5) in got
+    assert ("team_runs", "India", 2, "Puntit", 278.5) in got
+    assert not any("/coupons/5/3" in u for u in calls)
+    assert feedi.horizon_dates(feedi.parse_ts(STAMP), 240)[0] == "2026-11-09"
+    assert feedi.horizon_dates(feedi.parse_ts(STAMP), 240)[-1] == "2026-11-19"
 
 
 def test_the_relay_forwards_the_session(monkeypatch):
