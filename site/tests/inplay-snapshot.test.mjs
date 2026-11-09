@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GAP_MS, ROUNDS, readFeed, run, saveBody } from "../scripts/inplay-snapshot.mjs";
+import { GAP_MS, ROUNDS, describeKey, readFeed, run, saveBody } from "../scripts/inplay-snapshot.mjs";
 
 const q = (group_name, label, handicap, odds_dec) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec });
 const DOC = { matches: [
@@ -28,7 +28,7 @@ test("the row is replaced through the REST upsert with the service key, and a re
   assert.equal(calls[0].init.headers.Authorization, "Bearer svc");
   assert.equal(calls[0].init.headers.Prefer, "resolution=merge-duplicates,return=minimal");
   assert.deepEqual(JSON.parse(calls[0].init.body), [{ id: 1, as_of: "2026-11-09T07:00:00.000Z", body }]);
-  await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401/);
+  await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401 .* \(key: an unrecognised key, length 3\)/);
   // a new-style secret key is sent as `apikey` only: as a bearer token the API refuses it
   await saveBody({ base: "https://db.invalid", key: "sb_secret_abc", body, fetchImpl });
   assert.equal(calls[1].init.headers.apikey, "sb_secret_abc");
@@ -64,4 +64,12 @@ test("a round that fails is logged as a warning and the next one tries again", a
   // a save that fails counts the same way and does not stop the run
   const bad = await run({ read: async () => [{ home: "A", away: "B", lines: [] }], save: async () => { throw new Error("save HTTP 500"); }, sleep: async () => {}, log: () => {} });
   assert.deepEqual([bad.reads, bad.saved, bad.failed], [4, 0, 4]);
+});
+
+test("a refused save says what the key is and what Supabase answered, never the key", async () => {
+  const refuse = async () => new Response('{"message":"Invalid API key"}', { status: 401 });
+  await assert.rejects(saveBody({ base: "https://db.invalid", key: "sb_publishable_xyz", body: {}, fetchImpl: refuse }), (e) => /Invalid API key/.test(e.message) && /publishable key/.test(e.message) && !e.message.includes("xyz"));
+  assert.equal(describeKey("sb_secret_abcdef"), "a secret key, length 16");
+  const jwt = `h.${Buffer.from('{"role":"service_role"}').toString("base64url")}.s`;
+  assert.equal(describeKey(jwt), "a JWT with role service_role");
 });
