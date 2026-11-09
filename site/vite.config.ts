@@ -46,7 +46,7 @@ function devApi(localLive: boolean): Plugin {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const name = /^\/api\/([a-z]+)$/.exec((req.url || "").split("?")[0] || "")?.[1];
-        const load = name === "live" && localLive ? () => import("./api/live.js") : name === "gate" && localLive ? () => import("./api/gate.js") : null;
+        const load = name === "live" && localLive ? () => import("./api/live.js") : name === "inplay" && localLive ? () => import("./api/inplay.js") : name === "gate" && localLive ? () => import("./api/gate.js") : null;
         if (!load) return next();
         const { default: handler } = await load();
         let raw = "";
@@ -64,8 +64,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, import.meta.dirname, "");
   const site = String(env.SITE_URL || process.env.SITE_URL || "").replace(/\/$/, "");
   const useProd = !!site && mode !== "test";
-  if (useProd) console.info(`[vite] ${site} for /data, /api/gate, /api/live`);
-  const proxy = useProd ? { "/data": prodProxy(site), "/api/gate": prodProxy(site), "/api/live": prodProxy(site) } : undefined;
+  if (useProd) console.info(`[vite] ${site} for /data, /api/gate, /api/live, /api/inplay`);
+  const proxy = useProd ? { "/data": prodProxy(site), "/api/gate": prodProxy(site), "/api/live": prodProxy(site), "/api/inplay": prodProxy(site) } : undefined;
   return {
     plugins: [react(), tailwindcss(), dataVersion(), devApi(!useProd)],
     resolve: { alias: [{ find: "@", replacement: path.resolve(import.meta.dirname, "src") }, { find: /^cn$/, replacement: path.resolve(import.meta.dirname, "src/lib/utils.ts") }] },

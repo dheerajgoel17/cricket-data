@@ -3,27 +3,34 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MIN_SAMPLE, conditionalReport as conditional, inplayScopes, liveInnings, sideIndex } from "@cricket/engine/inplay.js";
 import { liveBoard } from "@cricket/engine/live.js";
+import { inplayFor, playerLine, teamLine } from "@cricket/engine/inplay-lines.js";
+import { summarize as summarizeRaw } from "@cricket/engine/stats.js";
 import { PLAYER_MIN_SAMPLE, PLAYER_RANGE, playerConditional as playerCond } from "@cricket/engine/player-inplay.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { PillGroup } from "@/components/app/pill-group";
 import { useData } from "@/lib/data";
+import { inplayQuery } from "@/lib/queries";
+import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Side = [string, number];
 type Row = { line: number; over: number; under: number; push: number; n: number };
 const NOW = () => Date.now();
 // the engine is plain JS: give its report the loose shape this view reads
+const summarize = summarizeRaw as unknown as (values: number[], line: number) => Row;
 const playerConditional = playerCond as (store: any, rows: any[], o: { fmt: number; state: { balls: number; runs: number } }) => any;
 const conditionalReport = conditional as (store: any, ms: number[], o: { team?: number | null; innNo: number; state: { balls: number; runs: number }; target: { kind: string; n?: number } }) => any;
 
 const overs = (o: number) => (Number.isInteger(o) ? o.toFixed(1) : String(o));
 
 /** One ladder line: the line, how many similar innings went over it and how many under, as counts (never a model). */
-function LadderRow({ r }: { r: Row }) {
+type Listed = { line: number; over: number | null; under: number | null };
+
+function LadderRow({ r, book }: { r: Row; book?: Listed }) {
   const live = r.over + r.under;
   const lean = r.over === r.under ? "" : r.over > r.under ? "over" : "under";
   return (
-    <li className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-snug py-tight">
+    <li className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-snug gap-y-hair py-tight">
       <span className="font-condensed text-metric font-bold leading-none tabular-nums">{r.line}</span>
       <span className="flex h-2 overflow-hidden rounded-full bg-secondary" aria-hidden>
         {live > 0 && <span className="bg-primary/70" style={{ width: `${(r.over / live) * 100}%` }} />}
@@ -32,12 +39,19 @@ function LadderRow({ r }: { r: Row }) {
         <span className={cn(lean === "over" ? "font-medium text-primary" : "text-muted-foreground")}>Over {r.over}/{r.n}</span>
         <span className={cn(lean === "under" ? "font-medium text-primary" : "text-muted-foreground")}>Under {r.under}/{r.n}</span>
       </span>
+      {book && <span className="col-span-3 text-footnote text-muted-foreground">Book line now · Over {odds(book.over)} · Under {odds(book.under)}</span>}
     </li>
   );
 }
 
+/** The ladder to show: the book's live line first (scored on the same similar innings) with its prices, then the lines around the middle without a repeat of it. */
+function withBook(report: any, book: Listed | null, take?: [number, number]): { r: Row; book?: Listed }[] {
+  const base = (take ? (report.ladder as Row[]).slice(...take) : (report.ladder as Row[])).filter((r) => !book || r.line !== book.line).map((r) => ({ r }));
+  return book && report.n > 0 ? [{ r: summarize(report.values, book.line), book }, ...base] : base;
+}
+
 /** One batter at the crease (10 to 30 balls in): his own past innings that were in the same spot, counted. Nothing shown when he is not in the data or has none like this. */
-function BatterHistory({ b, teamIx, fmtIx }: { b: any; teamIx: number; fmtIx: number }) {
+function BatterHistory({ b, teamIx, fmtIx, listed }: { b: any; teamIx: number; fmtIx: number; listed: any }) {
   const { store, rz } = useData();
   const idx = useMemo(() => {
     const hits = rz.players(b.name, teamIx >= 0 ? { team: teamIx } : {}, 2) as { idx: number; score: number }[];
@@ -54,7 +68,7 @@ function BatterHistory({ b, teamIx, fmtIx }: { b: any; teamIx: number; fmtIx: nu
         <span className="label-cap text-footnote text-muted-foreground">{b.runs} ({b.balls})</span>
       </div>
       <p className="text-callout text-muted-foreground">{r.n} of his {r.n === 1 ? "innings was" : "innings were"} between {lo} and {hi} after {b.balls} balls. His final scores:</p>
-      <ul className="flex flex-col divide-y divide-border/60">{(r.ladder as Row[]).slice(1, 4).map((x) => <LadderRow key={x.line} r={x} />)}</ul>
+      <ul className="flex flex-col divide-y divide-border/60">{withBook(r, playerLine(listed, b.name) as Listed | null, [1, 4]).map((x) => <LadderRow key={x.r.line} {...x} />)}</ul>
       {r.low && <p className="text-footnote text-amber">Small sample: under {PLAYER_MIN_SAMPLE} innings.</p>}
     </div>
   );
@@ -68,6 +82,9 @@ export function InplayHistory({ match, fmt, gender, teams }: { match: any; fmt: 
   const { store } = useData();
   const fmtIx = FORMATS.indexOf(fmt);
   const inn = useMemo(() => liveInnings(match, fmtIx), [match, fmtIx]);
+  const feed = useQuery({ ...inplayQuery, enabled: !!inn });
+  const names = (match?.teams ?? []).map((t: any) => t.name);
+  const listed = inn && feed.data ? inplayFor(feed.data, { a: names[0], b: names[1] }) : null;
   const [scope, setScope] = useState<"team" | "wide">("wide");
   const [target, setTarget] = useState("total");
   const teamIx = inn ? sideIndex(teams, inn.team) : -1;
@@ -85,7 +102,6 @@ export function InplayHistory({ match, fmt, gender, teams }: { match: any; fmt: 
   }, [store, inn, scopes, scope, teamIx, t]);
   const batters = useMemo(() => (inn ? ((liveBoard(match)?.batters ?? []) as any[]).filter((b) => b.balls >= PLAYER_RANGE[0] && b.balls <= PLAYER_RANGE[1]) : []), [match, inn]);
   if (!inn || !report) return null;
-  const rows = report.ladder as Row[];
   const [lo, hi] = report.band as [number, number];
   const what = t === "total" ? "finished with" : `had after ${t.slice(1)} overs`;
   return (
@@ -103,11 +119,11 @@ export function InplayHistory({ match, fmt, gender, teams }: { match: any; fmt: 
       </div>
       {report.n > 0 && (
         <ul className="flex flex-col divide-y divide-border/60">
-          {rows.map((r) => <LadderRow key={r.line} r={r} />)}
+          {withBook(report, t === "total" && listed ? (teamLine(listed, inn.team, inn.innNo) as Listed | null) : null).map((x) => <LadderRow key={x.r.line} {...x} />)}
         </ul>
       )}
       {report.n > 0 && report.low && <p className="text-footnote text-amber">Small sample: under {MIN_SAMPLE} innings, so read the counts loosely.</p>}
-      {batters.map((b) => <BatterHistory key={b.name} b={b} teamIx={teamIx} fmtIx={fmtIx} />)}
+      {batters.map((b) => <BatterHistory key={b.name} b={b} teamIx={teamIx} fmtIx={fmtIx} listed={listed} />)}
     </section>
   );
 }

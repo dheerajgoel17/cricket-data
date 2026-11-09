@@ -21,6 +21,12 @@ const store = (() => {
 const progression = [[30, 55], [28, 62], [33, 41]].map(([at20, fin], m) => ({ m, i: 1, b: 40, r: fin, x: [Math.round(at20 / 2), at20, Math.round((at20 + fin) / 2)] }));
 (store as any).playerProgression = async () => progression;
 vi.mock("@/lib/data", () => ({ useData: () => ({ store, rz: { players: () => [{ idx: 0, score: 10 }] } }) }));
+// the in-play lines the route would give: Alpha's innings total 190.5 at 1.90 / 1.90 and the batter "Opener" at 49.5
+const DOC = { matches: [{ home: "Alpha", away: "Beta", lines: [
+  { kind: "team_runs", team: "Alpha", inn: 1, line: 190.5, over: 1.9, under: 1.9 },
+  { kind: "player_runs", player: "Opener", line: 49.5, over: 1.8, under: 2 },
+] }] };
+vi.mock("@/lib/queries", () => ({ inplayQuery: { queryKey: ["inplay-lines"], queryFn: async () => DOC } }));
 const wrap = (ui: React.ReactElement) => <QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>;
 
 const live = (o = {}) => ({ status: "live", innings: [{ n: 1, team: "Alpha", runs: 60, wkts: 1, overs: 6 }], ...o });
@@ -41,6 +47,12 @@ describe("InplayHistory", () => {
     vi.useRealTimers();
   });
 
+  it("puts the book's live innings line first with its prices, scored on the same nine innings", async () => {
+    render(wrap(<InplayHistory match={live({ teams: [{ name: "Alpha" }, { name: "Beta" }] })} fmt="T20" gender="male" teams={sides} />));
+    expect(await screen.findByText(/Book line now · Over 1.90 · Under 1.90/)).toBeInTheDocument();
+    expect(screen.getAllByText("190.5")).toHaveLength(1); // the book's line is not repeated by the ladder
+  });
+
   it("is hidden when the match is not live, or the format has no over limit", () => {
     const a = render(wrap(<InplayHistory match={live({ status: "final" })} fmt="T20" gender="male" teams={sides} />));
     expect(a.container).toBeEmptyDOMElement();
@@ -54,9 +66,11 @@ describe("InplayHistory", () => {
   });
 
   it("adds a batter's own innings once he is 10 to 30 balls in: three innings in the band, counted against his final scores", async () => {
-    const batting = live({ players: [{ name: "Opener", team: "Alpha", runs: 30, balls: 20, out: false, strike: true }] });
+    const batting = live({ teams: [{ name: "Alpha" }, { name: "Beta" }], players: [{ name: "Opener", team: "Alpha", runs: 30, balls: 20, out: false, strike: true }] });
     render(wrap(<InplayHistory match={batting} fmt="T20" gender="male" teams={sides} />));
     expect(await screen.findByText("Opener")).toBeInTheDocument();
+    expect(await screen.findByText(/Book line now · Over 1.80 · Under 2.00/)).toBeInTheDocument(); // his listed 49.5: 55, 62 over, 41 under
+    expect(screen.getByText("49.5")).toBeInTheDocument();
     expect(screen.getByText(/3 of his innings were between 25 and 35 after 20 balls/)).toBeInTheDocument();
     expect(screen.getAllByText(/Small sample/).length).toBeGreaterThan(0); // 3 < 6
   });

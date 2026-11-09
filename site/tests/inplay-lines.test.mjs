@@ -1,0 +1,87 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { createServer } from "node:http";
+import { inplayFor, parseInplayFeed, parseQuotes, playerLine, teamLine } from "@cricket/engine/inplay-lines.js";
+
+// The shape the feed gave for a match that had started (probed from a workflow run): one quote per side per line.
+const q = (group_name, label, handicap, odds_dec, extra = {}) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec, ...extra });
+const QUOTES = [
+  q("M Rahim Innings Runs", "Over", "33.5", 1.8333333), q("M Rahim Innings Runs", "Under", "33.5", 1.8333333),
+  q("M Rahim Innings Runs", "Over", "43.5", 2.6), q("M Rahim Innings Runs", "Under", "43.5", 1.45),
+  q("Bangladesh 1st Inns Runs", "Over", "250.5", 1.9), q("Bangladesh 1st Inns Runs", "Under", "250.5", 1.8),
+  q("Bangladesh 1st Inns Runs", "Over", "250.5", 1.95), // a second listing of the same line: the better price wins
+  q("M Rahim Milestones", "50+", null, 2.1), // not read
+  q("Runs in First 20 Overs", "Under", "68.5", 1.83), // not read
+  q("Method of Dismissal 6-Way", "Caught", null, 2),
+  q("Towhid Hridoy Innings Runs", "Under", "37.5", 1.8333), // one side only: kept, the other is null
+];
+
+test("a market line is one row with the best price each side, and only the markets we read", () => {
+  const rows = parseQuotes(QUOTES);
+  assert.deepEqual(rows.map((r) => [r.kind, r.player || r.team, r.line, r.over, r.under]), [
+    ["team_runs", "Bangladesh", 250.5, 1.95, 1.8],
+    ["player_runs", "M Rahim", 33.5, 1.833, 1.833],
+    ["player_runs", "Towhid Hridoy", 37.5, null, 1.833],
+    ["player_runs", "M Rahim", 43.5, 2.6, 1.45],
+  ]);
+  assert.equal(rows.length, 4);
+  assert.equal(rows.find((r) => r.kind === "team_runs").inn, 1);
+  assert.equal(rows.filter((r) => r.player === "M Rahim").length, 2);
+});
+
+test("a price is decimal above 1 and rounds to three places; a quote with no side or line is ignored", () => {
+  assert.equal(parseQuotes([q("A Innings Runs", "Over", "10.5", 1.8333333333)])[0].over, 1.833);
+  assert.equal(parseQuotes([q("A Innings Runs", "Over", "10.5", 1)]).length, 0);
+  assert.equal(parseQuotes([q("A Innings Runs", "Maybe", "10.5", 2)]).length, 0);
+  assert.equal(parseQuotes([q("A Innings Runs", "Over", null, 2)]).length, 0);
+  assert.equal(parseQuotes([{ group_name: "A Innings Runs", side: "Over", handicap: "x", odds_dec: 2 }]).length, 0);
+});
+
+test("only matches that have started are kept, and one with no line we read is dropped", () => {
+  const doc = { matches: [
+    { home: "Bangladesh", away: "West Indies", league: "2nd Test", in_play: true, kickoff_utc: "2026-11-05T03:30:00Z", quotes: QUOTES },
+    { home: "India", away: "Australia", in_play: false, quotes: QUOTES },
+    { home: "Pakistan", away: "Sri Lanka", in_play: true, quotes: [q("Method of Dismissal 6-Way", "Caught", null, 2)] },
+  ] };
+  const ms = parseInplayFeed(doc);
+  assert.equal(ms.length, 1);
+  assert.deepEqual([ms[0].home, ms[0].away, ms[0].kickoff], ["Bangladesh", "West Indies", "2026-11-05T03:30:00Z"]);
+  assert.deepEqual(parseInplayFeed(null), []);
+});
+
+test("a fixture finds its match either way round, and the line nearest even money is the one shown", () => {
+  const doc = { matches: parseInplayFeed({ matches: [{ home: "Bangladesh", away: "West Indies", in_play: true, quotes: QUOTES }] }) };
+  assert.ok(inplayFor(doc, { a: "West Indies", b: "Bangladesh" }));
+  assert.equal(inplayFor(doc, { a: "India", b: "Bangladesh" }), null);
+  const m = doc.matches[0];
+  assert.equal(teamLine(m, "Bangladesh", 1).line, 250.5);
+  assert.equal(teamLine(m, "Bangladesh", 2), null); // a different innings
+  assert.equal(playerLine(m, "Mushfiqur Rahim").line, 33.5); // 33.5 is 1.833 / 1.833; 43.5 is 2.6 / 1.45
+  assert.equal(playerLine(m, "Towhid Hridoy"), null); // priced on one side only
+  assert.equal(playerLine(m, "Litton Das"), null);
+});
+
+test("the route fetches the feed once per window, lists started matches, and is empty without a feed", async () => {
+  let hits = 0;
+  const server = createServer((req, res) => { hits++; res.setHeader("content-type", "application/json"); res.end(JSON.stringify({ matches: [{ home: "Bangladesh", away: "West Indies", in_play: true, quotes: QUOTES }] })); });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  const { default: handler, snapshot } = await import("../api/inplay.js");
+  const call = async () => { let out; await handler({ method: "GET" }, { setHeader() {}, status(c) { return { json(b) { out = { c, b }; } }; } }); return out; };
+  try {
+    delete process.env.PRICE_FEED_URL;
+    assert.deepEqual((await call()).b.matches, []); // no feed configured: empty, not an error
+    process.env.PRICE_FEED_URL = `http://127.0.0.1:${server.address().port}/`;
+    const t0 = Date.now() + 60e6; // past the empty body's window
+    const a = await snapshot(t0);
+    assert.equal(a.matches.length, 1);
+    assert.equal(a.matches[0].lines.length, 4);
+    await snapshot(t0 + 5_000);
+    assert.equal(hits, 1); // inside 15 s: no second request
+    await snapshot(t0 + 20_000);
+    assert.equal(hits, 2);
+    const r = await call();
+    assert.equal(r.c, 200);
+    assert.equal(r.b.source, "inplay");
+    assert.equal(405, (await (async () => { let c; await handler({ method: "POST" }, { setHeader() {}, status(x) { c = x; return { json() {} }; } }); return { c }; })()).c);
+  } finally { server.close(); delete process.env.PRICE_FEED_URL; }
+});
