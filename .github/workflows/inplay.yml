@@ -53,6 +53,8 @@ jobs:
         run: pip install -e .
       - name: This book's live lines
         continue-on-error: true
+        env:
+          FEEDI_DEBUG: "1"
         run: python scripts/feedi_inplay.py > "$RUNNER_TEMP/feedi-inplay.json"
       - name: Snapshot
         env:

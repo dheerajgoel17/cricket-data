@@ -24,6 +24,7 @@ import datetime as dt
 import json
 import os
 import re
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -733,6 +734,8 @@ def _session(budget_key: str):
 
 def _coupons(pace, deadline, client, event_id, info, names) -> list[dict]:
     groups = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{client.sport_id}?event_id={event_id}", info)
+    if os.environ.get("FEEDI_DEBUG"):
+        print(f"DBG   groups raw={len(groups) if isinstance(groups, (list, dict)) else groups!r} kept={[g.get('name') for g in _groups(groups)][:12]} all={[g.get('name') for g in (groups.get('groups') if isinstance(groups, dict) else groups) or [] if isinstance(g, dict)][:25]}", file=sys.stderr)
     markets = []
     for g in _groups(groups):
         if names and not names.search(g.get("name") or ""):
@@ -751,8 +754,13 @@ def inplay(fetched_at: str) -> list[dict]:
     info: dict = {}
     board = _pull(pace, deadline, f"/bv_in_play/v3/{LOCALE}/{client.brand}/mini_inplay?sport_id={client.sport_id}", info)
     nodes, assume = _event_nodes(board), True
+    dbg = bool(os.environ.get("FEEDI_DEBUG"))
+    if dbg:
+        print(f"DBG board type={type(board).__name__} keys={sorted(board)[:12] if isinstance(board, dict) else len(board or [])} nodes={len(nodes)} stopped={info.get('stopped')}", file=sys.stderr)
     if not nodes and not info.get("stopped"):
         nodes, assume = _event_nodes(_pull(pace, deadline, _events_path(), info)), False
+        if dbg:
+            print(f"DBG events-listing nodes={len(nodes)} sample_keys={sorted(nodes[0])[:25] if nodes else []}", file=sys.stderr)
     out = []
     cap = config.get("FEEDI_INPLAY_MAX")
     for node in nodes:
@@ -761,9 +769,13 @@ def inplay(fetched_at: str) -> list[dict]:
         detail = node if node.get("home_name") else _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{node['id']}", info)
         if not isinstance(detail, dict) or not detail.get("id"):
             continue
+        if dbg:
+            print(f"DBG event id={detail.get('id')} in_play={detail.get('in_play')} type={detail.get('event_type')} desc={detail.get('description')!r} comp={detail.get('competition_title')!r} start={detail.get('start_time')}", file=sys.stderr)
         if not detail.get("in_play") and not assume:
             continue
         markets = _coupons(pace, deadline, client, detail["id"], info, re.compile(r"players|innings", re.I))
+        if dbg:
+            print(f"DBG   markets={len(markets)} des_sample={[ (m.get('des'), m.get('st'), m.get('p')) for m in markets[:8]]}", file=sys.stderr)
         match = live_lines(detail, markets, s["NAME"])
         if match:
             out.append(match)
