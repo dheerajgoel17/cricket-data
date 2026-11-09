@@ -25,6 +25,9 @@
     "api/geo.js": {
       "maxDuration": 5
     },
+    "api/inplay.js": {
+      "maxDuration": 15
+    },
     "api/live.js": {
       "maxDuration": 20,
       "includeFiles": "public/data/identity.json"

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { LIVE_TTL_MS } from "@cricket/engine/live.js";
-import { loadLines, loadLive, loadRail, loadState } from "@/lib/feeds";
+import { loadInplay, loadLines, loadLive, loadRail, loadState } from "@/lib/feeds";
 import { readLive } from "@/lib/live-cache";
 
 // The three feeds the home page reads, defined once so the hooks and the start-up prefetch share a cache entry.
@@ -10,6 +10,9 @@ export const railQuery = queryOptions({ queryKey: ["rail"], queryFn: loadRail, s
 /** Polls /api/live every ~15 s. The function caches the same interval; this just refreshes the page. Starts from the last body kept on the device (`live-cache.ts`), which counts as stale, so the fresh one is asked for at once. */
 export const liveQuery = queryOptions({ queryKey: ["live-scores"], queryFn: loadLive, refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, placeholderData: (p: any) => p,
   initialData: () => readLive()?.body, initialDataUpdatedAt: () => readLive()?.t });
+
+/** Polls /api/inplay every ~15 s (the function caches the same interval). Used only while a priced match is on, see `useInplayLines`. */
+export const inplayQuery = queryOptions({ queryKey: ["inplay-lines"], queryFn: () => loadInplay(), refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, retry: false });
 
 /** The match-state table: one phase per match, refreshed by a job every few minutes. A body older than `STATE_MAX_AGE_MS` is not trusted (see `freshState`). */
 export const stateQuery = queryOptions({ queryKey: ["match-state"], queryFn: loadState, refetchInterval: 30_000, staleTime: 30_000, retry: false });

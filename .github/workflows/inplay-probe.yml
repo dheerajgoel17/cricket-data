@@ -1,0 +1,28 @@
+name: In-play probe
+
+# Read-only: prints which markets the price feed lists for matches that have started (names and a few sample quotes, never a host).
+# Runs on a PR that touches the probe (proves what the feed gives from GitHub's runners) or by hand. Commits nothing.
+on:
+  pull_request:
+    paths: ["scripts/probe_inplay.py", ".github/workflows/inplay-probe.yml"]
+  workflow_dispatch:
+
+env:
+  PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Probe
+        run: python scripts/probe_inplay.py | tee -a "$GITHUB_STEP_SUMMARY"
