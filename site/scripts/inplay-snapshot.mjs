@@ -20,7 +20,8 @@ export async function readFeed(url, fetchImpl = fetch) {
 export async function saveBody({ base, key, body, fetchImpl = fetch }) {
   const r = await fetchImpl(`${base}/rest/v1/inplay_lines?on_conflict=id`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
-    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal", "User-Agent": UA },
+    // a new-style secret key (sb_secret_...) goes only in `apikey`; a legacy service_role JWT also goes in Authorization (same rule as src/cricket_site/assets_sync.py)
+    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal", "User-Agent": UA },
     body: JSON.stringify([{ id: 1, as_of: body.asOf, body }]),
   });
   if (!r.ok) throw new Error(`save HTTP ${r.status}`);
