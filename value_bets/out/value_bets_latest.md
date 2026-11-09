@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-09 14:00 IST
+# Cricket value bets - 2026-11-09 14:55 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -20,4 +20,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Amzet Lanka (male), BBK Partnership (male), Bangla Tigers (male), Hayleys Group A (male), Hnb A (male), Royal Champs (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female)
 
-Runtime 112.2s. Snapshot: `odds_20261109T083035Z.jsonl.gz`
+Runtime 104.2s. Snapshot: `odds_20261109T092540Z.jsonl.gz`
