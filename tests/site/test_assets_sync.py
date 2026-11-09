@@ -138,3 +138,27 @@ def test_sync_also_copies_each_teams_two_shirts_and_the_placeholder_shirt(tmp_pa
     assert out["s"]["t"] == ["O"]  # a shirt is not mistaken for a logo
     assert stats["downloaded"] == 5
     assert {"jerseys/limited/O.png", "jerseys/test/O.png", "jerseys/limited/AD.png", "teams/O.png"} <= set(db.objects)
+
+
+def _paged(rows_by_table):
+    def http(method, url, key, data=None, headers=None, timeout=60):
+        assert method == "GET" and key == "anon-key"
+        table = url.split("/rest/v1/")[1].split("?")[0]
+        off = int(url.split("offset=")[1])
+        return 200, "application/json", json.dumps(rows_by_table[table][off:off + 1000]).encode()
+    return http
+
+
+def test_remembered_players_pages_through_the_table_and_keeps_names_and_ids_only():
+    rows = [{"crex_id": f"I{i}", "name": f"player {i}", "cricsheet_id": "x"} for i in range(2300)] + [{"crex_id": "", "name": "no id"}, {"crex_id": "Z", "name": ""}]
+    got = s.remembered_players(BASE, "anon-key", _paged({"crex_players": rows}))
+    assert len(got) == 2300 and got[0] == ("player 0", "I0") and got[-1] == ("player 2299", "I2299")
+
+
+def test_a_picture_stored_for_many_players_is_the_sources_stock_avatar():
+    stock = "a" * 64
+    rows = [{"ref": f"S{i}", "sha256": stock} for i in range(s.PLACEHOLDER_COPIES)] + [{"ref": f"R{i}", "sha256": f"{i:064d}"} for i in range(30)]
+    rows += [{"ref": "few1", "sha256": "b" * 64}, {"ref": "few2", "sha256": "b" * 64}, {"ref": "nohash", "sha256": None}]
+    ids = s.placeholder_ids(BASE, "anon-key", _paged({"assets": rows}))
+    assert ids == {f"S{i}" for i in range(s.PLACEHOLDER_COPIES)}, "two copies are a namesake photo, not the stock avatar; a real photo is stored once"
+    assert s.placeholder_ids(BASE, "anon-key", _paged({"assets": []})) == set()

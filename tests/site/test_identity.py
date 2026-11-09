@@ -14,7 +14,7 @@ def priced(hist, *book):
 
 def test_a_source_id_comes_from_an_override_first_then_the_photo_map_then_the_books_exact_name():
     books = {"p1": priced("HC Brook"), "p2": priced("BKG Mendis", "Kusal Mendis"), "p3": priced("Kamindu Mendis"), "p4": priced("V Suryavanshi")}
-    table, review, added = I.build({"p1": "c:S1", "p5": "w:a.jpg"}, SITEMAP, NAMES, books, {"p4": "S4"})
+    table, review, added, _ = I.build({"p1": "c:S1", "p5": "w:a.jpg"}, SITEMAP, NAMES, books, {"p4": "S4"})
     assert table["s"] == {"p1": "S1", "p2": "S5", "p3": "S6", "p4": "S4"}
     assert added == {"p2": "S5", "p3": "S6", "p4": "S4"}, "the photo map already had p1"
     assert table["b"] == {"p2": ["Kusal Mendis"]}, "a book name equal to ours adds nothing"
@@ -24,13 +24,13 @@ def test_a_source_id_comes_from_an_override_first_then_the_photo_map_then_the_bo
 def test_the_exact_name_of_a_priced_player_replaces_a_photo_link_to_a_namesake_but_not_one_that_somebody_else_holds():
     names = {**NAMES, "pa": "AR Patel", "pb": "AY Patel"}
     # the photo map's initials-and-surname match gave Axar Patel the source's "Ajaz Patel"; the books say Axar Patel, and one source player has that name
-    table, review, added = I.build({"pa": "c:NGF"}, SITEMAP, names, {"pa": priced("Axar Patel", "AR Patel")}, {})
+    table, review, added, _ = I.build({"pa": "c:NGF"}, SITEMAP, names, {"pa": priced("Axar Patel", "AR Patel")}, {})
     assert table["s"] == {"pa": "A9"} and added == {"pa": "A9"} and review == []
     # a photo link that agrees with the books stays; one with no evidence from the books stays
     assert I.build({"pa": "c:A9"}, SITEMAP, names, {"pa": priced("Axar Patel")}, {})[0]["s"] == {"pa": "A9"}
     assert I.build({"pa": "c:NGF"}, SITEMAP, names, {"pa": priced("AR Patel")}, {})[0]["s"] == {"pa": "NGF"}
     # the exact name never takes a source player the photo map gave to another player: the photo link it already had is kept, and the disagreement is reviewed
-    table, review, _ = I.build({"pa": "c:NGF", "pb": "c:A9"}, SITEMAP, names, {"pa": priced("Axar Patel")}, {})
+    table, review, _, _ = I.build({"pa": "c:NGF", "pb": "c:A9"}, SITEMAP, names, {"pa": priced("Axar Patel")}, {})
     assert table["s"] == {"pa": "NGF", "pb": "A9"}
     assert [(r["pid"], r["why"]) for r in review] == [("pa", "the source player with this name (A9) is already linked to pb; his own link NGF came from a name match")]
     # a hand-checked link is never replaced by the books
@@ -38,19 +38,19 @@ def test_the_exact_name_of_a_priced_player_replaces_a_photo_link_to_a_namesake_b
 
 
 def test_an_override_beats_the_photo_map_and_takes_the_source_player_from_whoever_the_name_matcher_gave_him_to():
-    table, _, added = I.build({"p5": "c:S2"}, SITEMAP, NAMES, {}, {"p6": "S2"})
+    table, _, added, _ = I.build({"p5": "c:S2"}, SITEMAP, NAMES, {}, {"p6": "S2"})
     assert table["s"] == {"p6": "S2"} and added == {"p6": "S2"}
 
 
 def test_an_override_naming_an_id_the_sources_list_lacks_is_not_taken_and_without_a_list_it_is_taken_on_trust():
-    table, review, _ = I.build({}, SITEMAP, NAMES, {}, {"p4": "S99"})
+    table, review, _, _ = I.build({}, SITEMAP, NAMES, {}, {"p4": "S99"})
     assert table["s"] == {} and review[0]["pid"] == "p4" and "S99" in review[0]["why"]
     assert I.build({}, [], NAMES, {}, {"p4": "S99"})[0]["s"] == {"p4": "S99"}
 
 
 def test_what_cannot_be_linked_is_reviewed_with_the_reason_and_who_it_might_be():
     books = {"p4": priced("V Suryavanshi"), "p6": priced("WIA Fernando"), "p7": priced("SM Curran", "Sam Curran"), "p9": priced("Chipo Mugeri-Tiripano", "C Mugeri-Tiripano")}
-    table, review, added = I.build({}, SITEMAP, NAMES, books, {})
+    table, review, added, _ = I.build({}, SITEMAP, NAMES, books, {})
     assert table["s"] == {} and added == {}
     by = {r["pid"]: r for r in review}
     assert by["p4"]["why"] == "no source player has this name" and by["p4"]["suggest"] == [["S4", "vaibhav sooryavanshi"]], "Suryavanshi ~ Sooryavanshi, same first initial"
@@ -65,24 +65,24 @@ def test_several_source_players_with_the_book_name_drop_a_namesake_photo_link_an
     sitemap = [("MJC", "rydham sharma"), ("2X", "rohit sharma"), ("60H", "rohit sharma"), ("PAR", "rohit sharma")]
     names = {"rg": "RG Sharma"}
     books = {"rg": priced("RG Sharma", "Rohit Sharma")}
-    table, review, added = I.build({"rg": "c:MJC"}, sitemap, names, books, {})
+    table, review, added, _ = I.build({"rg": "c:MJC"}, sitemap, names, books, {})
     assert table["s"] == {} and added == {}  # namesake dropped; not replaced by a guess among the three
     assert len(review) == 1 and review[0]["pid"] == "rg" and review[0]["why"] == "several source players have this name"
     assert review[0]["suggest"] == [["2X", "rohit sharma"], ["60H", "rohit sharma"], ["PAR", "rohit sharma"]]
     # a photo link that is already one of the book-name hits stays (no review, no churn)
-    table, review, _ = I.build({"rg": "c:2X"}, sitemap, names, books, {})
+    table, review, _, _ = I.build({"rg": "c:2X"}, sitemap, names, books, {})
     assert table["s"] == {"rg": "2X"} and review == []
 
 
 def test_two_of_our_players_claiming_one_source_player_get_neither():
     books = {"p5": priced("AM Fernando", "Asitha Fernando"), "p8": priced("Asitha Fernando")}
-    table, review, _ = I.build({}, SITEMAP, NAMES, books, {})
+    table, review, _, _ = I.build({}, SITEMAP, NAMES, books, {})
     assert table["s"] == {}
     assert {r["pid"] for r in review} == {"p5", "p8"} and all("claimed by 2" in r["why"] for r in review)
 
 
 def test_a_source_player_already_linked_to_another_is_not_given_away_by_a_name():
-    table, review, _ = I.build({"p2": "c:S5"}, SITEMAP, NAMES, {"p3": priced("PHKD Mendis", "Kusal Mendis")}, {})
+    table, review, _, _ = I.build({"p2": "c:S5"}, SITEMAP, NAMES, {"p3": priced("PHKD Mendis", "Kusal Mendis")}, {})
     assert table["s"] == {"p2": "S5"} and review[0]["pid"] == "p3" and "already linked to p2" in review[0]["why"]
 
 
@@ -126,3 +126,67 @@ def test_the_committed_overrides_file_gives_each_player_and_each_source_id_once(
     by = {r[0]: r[1] for r in rows}
     assert by["740742ef"] == "2X" and by["d12143bf"] == "IB" and by["89bbc67a"] == "PA" and by["18fac429"] == "1C0"
     assert len(I.load_overrides(f.parents[1])) == len(rows)
+
+
+def test_a_minted_id_for_a_person_base_lists_by_initials_shares_the_face_but_not_the_link():
+    """Dewan Marais: the scraped scorecards mint an id for the full name, Base has 'D Marais' (the photo matcher gave him the source page). The priced minted id is the
+    same person, so he gets the picture; the identity link stays with the one id that holds it."""
+    names = {"base": "D Marais", "ap": "AL Phehlukwayo"}
+    sitemap = [("M1", "dewan marais"), ("P1", "andile phehlukwayo")]
+    books = {"min": priced("Dewan Marais"), "min2": priced("Andile Phehlukwayo")}
+    table, review, added, also = I.build({"base": "c:M1", "ap": "c:P1"}, sitemap, names, books, {})
+    assert table["s"] == {"base": "M1", "ap": "P1"} and also == {"min": "M1", "min2": "P1"} and review == []
+    # a Base-named priced player is not given somebody else's page this way, whatever his book name says (BKG Mendis is Kusal; PHKD is Kamindu)
+    _, review, _, also = I.build({"p2": "c:S5"}, SITEMAP, NAMES, {"p3": priced("PHKD Mendis", "Kusal Mendis")}, {})
+    assert also == {} and review[0]["pid"] == "p3"
+    # the holder must be name-compatible with the source player: 'AB Marais' is not 'Dewan'
+    _, review, _, also = I.build({"base": "c:M1"}, sitemap, {"base": "AB Marais"}, {"min": priced("Dewan Marais")}, {})
+    assert also == {} and review[0]["pid"] == "min"
+    # a link somebody checked by hand is never shared on a name
+    _, review, _, also = I.build({}, sitemap, {"base": "D Marais"}, {"min": priced("Dewan Marais")}, {"base": "M1"})
+    assert also == {} and review[0]["pid"] == "min"
+
+
+def test_a_source_id_repeated_in_the_overrides_is_one_person_under_two_ids_the_first_holds_the_link(tmp_path):
+    """Base can list one player under two names (a long and a short initials form). Both ids get the face; only the first line holds the link."""
+    table, review, _, also = I.build({"p5": "c:S2"}, SITEMAP, NAMES, {}, {"p6": "S2", "p5": "S2"})
+    assert table["s"] == {"p6": "S2"} and also == {"p5": "S2"} and review == []
+    # the hand line beats the photo map's own (different) link for the second id too
+    table, _, _, also = I.build({"p5": "c:S3"}, SITEMAP, NAMES, {}, {"p6": "S2", "p5": "S2"})
+    assert table["s"] == {"p6": "S2"} and also == {"p5": "S2"}
+
+
+def test_a_minted_id_waits_for_the_base_players_and_the_books_before_it_takes_a_source_player():
+    """A Nepal U19 'Niraj Kumar Yadav' with a minted id and NK Yadav (Base) both fit one source page. The matcher's link for the minted id must not block NK, whom the books name exactly."""
+    sitemap = [("I1", "niraj kumar yadav"), ("F1", "free agent")]
+    names = {"nk": "NK Yadav"}
+    books = {"nk": priced("NK Yadav", "Niraj Kumar Yadav")}
+    table, review, _, also = I.build({"min": "c:I1", "free": "c:F1"}, sitemap, names, books, {})
+    assert table["s"] == {"nk": "I1", "free": "F1"}, "NK holds the page by his exact name; a minted id nobody else wants takes a free page"
+    assert also == {"min": "I1"} and review == [], "the minted id is the same person by the compatibility rule, so he shares the face"
+    # without a source list (an offline build) the photo map's links are taken as they always were
+    assert I.build({"min": "c:I1"}, [], names, {}, {})[0]["s"] == {"min": "I1"}
+
+
+def test_both_ids_of_one_person_priced_the_base_one_holds_the_link_and_the_minted_one_shares_the_face():
+    """Athanaze: the books name 'Alick Athanaze' under two of our ids (Base's 'A Athanaze' and a minted one). Neither used to get the page ('claimed by 2')."""
+    sitemap = [("5Z0", "alick athanaze")]
+    names = {"base": "A Athanaze"}
+    books = {"base": priced("A Athanaze", "Alick Athanaze"), "min": priced("Alick Athanaze")}
+    for photo_p in ({}, {"base": "c:5Z0"}):   # whether or not the photo matcher had already given the page to the Base id
+        table, review, _, also = I.build(photo_p, sitemap, names, books, {})
+        assert table["s"] == {"base": "5Z0"} and also == {"min": "5Z0"} and review == []
+    # two Base-named players with the same exact book name are still two namesakes: neither gets the page
+    table, review, _, also = I.build({}, sitemap, {"a": "A Athanaze", "b": "AB Athanaze"}, {"a": priced("Alick Athanaze"), "b": priced("Alick Athanaze")}, {})
+    assert table["s"] == {} and also == {} and len(review) == 2
+
+
+def test_the_name_our_own_data_uses_first_decides_when_it_picks_one_source_player_whatever_another_book_prints():
+    """AM Fernando is priced as 'Asitha Fernando'; one book also prints 'Avishka Fernando' under his id, which made two source players 'several'."""
+    sitemap = [("S2", "avishka fernando"), ("S3", "asitha fernando")]
+    books = {"af": priced("Asitha Fernando", "A Fernando", "Avishka Fernando")}
+    table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, books, {})
+    assert table["s"] == {"af": "S3"} and review == []
+    # our name picking nobody (initials) still lets the book names decide, as before
+    table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, {"af": priced("AM Fernando", "Asitha Fernando")}, {})
+    assert table["s"] == {"af": "S3"}
