@@ -29,6 +29,10 @@ test("the row is replaced through the REST upsert with the service key, and a re
   assert.equal(calls[0].init.headers.Prefer, "resolution=merge-duplicates,return=minimal");
   assert.deepEqual(JSON.parse(calls[0].init.body), [{ id: 1, as_of: "2026-11-09T07:00:00.000Z", body }]);
   await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401/);
+  // a new-style secret key is sent as `apikey` only: as a bearer token the API refuses it
+  await saveBody({ base: "https://db.invalid", key: "sb_secret_abc", body, fetchImpl });
+  assert.equal(calls[1].init.headers.apikey, "sb_secret_abc");
+  assert.equal(calls[1].init.headers.Authorization, undefined);
 });
 
 test("a match is on: four reads fifteen seconds apart, each one written", async () => {
