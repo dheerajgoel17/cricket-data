@@ -794,6 +794,9 @@ def inplay(fetched_at: str) -> list[dict]:
         if len(out) >= cap or info.get("stopped") in ("time budget", "HTTP 429"):
             break
         detail = node if node.get("home_name") else _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{node['id']}", info)
+        if dbg and (not isinstance(detail, dict) or not detail.get("id")):
+            shape = {k: (type(v).__name__ if not isinstance(v, (dict, list)) else f"{type(v).__name__}[{len(v)}]") for k, v in detail.items()} if isinstance(detail, dict) else None
+            print(f"DBG detail skipped node={node.get('id')} type={type(detail).__name__} shape={shape} stopped={info.get('stopped')}", file=sys.stderr)
         if not isinstance(detail, dict) or not detail.get("id"):
             continue
         if dbg and not (isinstance(detail, dict) and detail.get("id")):
