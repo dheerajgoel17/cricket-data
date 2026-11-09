@@ -79,6 +79,9 @@ class Skip(Exception):
     pass
 
 
+LAST_STEP = ""
+
+
 def settings() -> dict[str, str]:
     """The deployment's FEEDI_URL and FEEDI_NAME; empty if the source is not configured."""
     url, name = os.environ.get("FEEDI_URL", "").strip().rstrip("/"), os.environ.get("FEEDI_NAME", "").strip()
@@ -434,6 +437,8 @@ class Client:
         self.cookies.setdefault("price_format_id", "2")
 
     def call(self, path: str, accept: str = "application/json"):
+        global LAST_STEP
+        LAST_STEP = path.split("?", 1)[0].rsplit("/", 1)[-1][:40]
         body, headers = self._get(self.base + path, self._headers(accept))
         self._take_cookie(headers or {})
         raw = body if isinstance(body, bytes) else (body.encode() if isinstance(body, str) else b"")

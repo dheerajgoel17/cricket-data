@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GAP_MS, ROUNDS, loadExtra, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
+import { GAP_MS, ROUNDS, describeKey, loadExtra, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
 
 const q = (group_name, label, handicap, odds_dec) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec });
 const DOC = { matches: [
@@ -42,8 +42,13 @@ test("the row is replaced through the REST upsert with the service key, and a re
   assert.equal(calls[0].init.headers.apikey, "svc");
   assert.equal(calls[0].init.headers.Authorization, "Bearer svc");
   assert.equal(calls[0].init.headers.Prefer, "resolution=merge-duplicates,return=minimal");
+  assert.ok(!/mozilla/i.test(calls[0].init.headers["User-Agent"]));
   assert.deepEqual(JSON.parse(calls[0].init.body), [{ id: 1, as_of: "2026-11-09T07:00:00.000Z", body }]);
-  await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401/);
+  await assert.rejects(saveBody({ base: "https://db.invalid", key: "svc", body, fetchImpl: async () => new Response(null, { status: 401 }) }), /save HTTP 401 .* \(key: an unrecognised key, length 3\)/);
+  await saveBody({ base: "https://db.invalid", key: "sb_secret_abc", body, fetchImpl });
+  assert.equal(calls[1].init.headers.apikey, "sb_secret_abc");
+  assert.equal(calls[1].init.headers.Authorization, undefined);
+  assert.equal(describeKey("sb_secret_abcdef"), "a secret key, length 16");
 });
 
 test("a match is on: four reads fifteen seconds apart, each one written", async () => {

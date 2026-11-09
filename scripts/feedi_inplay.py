@@ -15,7 +15,9 @@ def main():
         return
     except Exception as e:
         print(json.dumps({"matches": []}))
-        print(f"feedi in-play failed: {type(e).__name__}", file=sys.stderr)
+        code = getattr(e, "code", None)
+        where = f" at {feedi.LAST_STEP}" if feedi.LAST_STEP else ""
+        print(f"feedi in-play failed: HTTP {code}{where}" if code else f"feedi in-play failed: {type(e).__name__}{where}", file=sys.stderr)
         return
     lines = sum(len(m.get("lines") or []) for m in matches)
     print(json.dumps({"matches": matches}))
