@@ -168,10 +168,11 @@ test("with nothing live the data is returned as it is", () => {
   assert.equal(liveMerge(doc, { matches: [] }, resolveRahim), doc);
   assert.equal(liveMerge(doc, null, resolveRahim), doc);
   assert.equal(liveMerge(null, inplayDoc(), resolveRahim), null);
-  // nothing resolves: the doc still gains the live rows and the side's innings line, never a half-linked player
+  // the resolver knows nobody: a batter the books priced before the start is still linked through those earlier lines (the same spelling), so nothing is half-linked
   const out = liveMerge(prematch(), inplayDoc(), () => null);
-  assert.equal(out.lines.filter((l) => l.stat === "runs" && l.pid === "p-rahim").length, 1); // the pre-match one stays
-  assert.ok(out.live[0].markets.some((x) => x.market === "M Rahim innings runs" && x.line === 33.5));
+  assert.deepEqual(out.lines.filter((l) => l.stat === "runs" && l.pid === "p-rahim").map((l) => l.books[0].live), [true, true]); // his 33.5 and 43.5, not the old 25.5
+  // a batter with no earlier line and no link goes to the live rows
+  assert.ok(out.live[0].markets.some((x) => x.market === "Litton Das innings runs" && x.line === 20.5));
 });
 
 import { liveRows } from "@cricket/engine/inplay-lines.js";
@@ -210,4 +211,24 @@ test("the match's 1st innings score takes the live line too while only one side 
   // both sides have a 1st-innings line (the first is over): the match's market is left as it was
   const two = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "team_runs", team: "West Indies", inn: 1, line: 300.5, over: 1.9, under: 1.8 }] }] };
   assert.equal(liveMerge(doc, two, resolveRahim).fancy.filter((f) => f.key === "first_innings_runs")[0].line, 325.5);
+});
+
+test("a live line records where the market opened, and a batter is linked through the same book's own earlier spelling", () => {
+  const doc = prematch();
+  doc.lines[0].book_name = "M Rahim";
+  doc.lines.push({ pid: "p-rahim", player: "Mushfiqur Rahim", book_name: "M Rahim", team: "Bangladesh", fmt: "Test", stat: "runs", line: 45.5, match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 2.6, under: 1.45 }] });
+  doc.fancy.push({ match: "Bangladesh vs West Indies", home: "Bangladesh", away: "West Indies", start_utc: "2026-11-05T03:00:00Z", fmt: "Test", competition: "2nd Test", key: "first_innings_runs", scope: "match", team: null, line: 325.5, over: 1.83, under: 1.83, source: "bet365", kind: "bookmaker" });
+  const inplay = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [
+    { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.8, under: 1.9 },
+    { kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 },
+  ] }] };
+  const out = liveMerge(doc, inplay, () => null); // the resolver knows nobody: the earlier lines do the linking
+  const r = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs");
+  assert.equal(r.length, 1);
+  assert.equal(r[0].books[0].opened, 25.5); // of 25.5 (1.8 / 1.9) and 45.5 (2.6 / 1.45) the first is nearer evens
+  assert.equal(r[0].player, "Mushfiqur Rahim");
+  const team = out.fancy.find((f) => f.key === "team_total_runs" && f.team === "Bangladesh");
+  assert.equal(team.opened, 200.5);
+  assert.equal(out.fancy.find((f) => f.key === "first_innings_runs").opened, 325.5);
+  assert.equal(out.live?.length ?? 0, 0); // nothing fell through to the generic rows
 });

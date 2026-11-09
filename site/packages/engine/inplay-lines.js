@@ -5,7 +5,7 @@
 //   any other Over / Under line    ou: the market's own name ("Runs in First 20 Overs", "Runs at Fall of 3rd Wicket", "Wickets Lost for 100 Runs", the next over's runs ...)
 //   everything else                pick: the market's name and its outcomes with their prices (top batter, method of dismissal, milestones, match winner, ...)
 // A price is decimal, back only, exactly as listed. The first two kinds feed the existing player and fancy tables (`liveMerge`); `ou` and `pick` are shown as live rows of their own.
-import { teamKey } from "./live.js";
+import { namesMatch, teamKey } from "./live.js";
 
 const PLAYER = /^(.+?)\s+Innings Runs$/i;
 const TEAM = /^(.+?)\s+(1st|2nd|3rd|4th)\s+Inns(?:ings)?\s+Runs$/i;
@@ -70,6 +70,19 @@ const splitMatch = (s) => String(s || "").split(/\s+vs\.?\s+/i);
 const pairOf = (a, b) => [teamKey(a), teamKey(b)].filter(Boolean).sort().join("|");
 const matchPair = (e) => (e.home ? pairOf(e.home, e.away) : pairOf(...splitMatch(e.match)));
 
+const overProb = (o, u) => (o > 1 && u > 1 ? 1 / o / (1 / o + 1 / u) : null);
+/** The line a market opened at: of the earlier entries (each with books), the one whose best-priced book is nearest evens, as `{ line, over, under }`; null when there is none. */
+function openedOf(entries) {
+  let best = null;
+  for (const e of entries) {
+    for (const b of e.books || [e]) {
+      const p = overProb(b.over, b.under), far = p == null ? 1 : Math.abs(p - 0.5);
+      if (!best || far < best.far) best = { far, line: e.line, over: b.over ?? null, under: b.under ?? null };
+    }
+  }
+  return best ? { line: best.line, over: best.over, under: best.under } : null;
+}
+
 /**
  * The lines data (`{ lines, fancy }`, what the tables read) with the live lines of started matches folded in, so the existing tables show them with their own history figures and no table of their own:
  * - a batter's innings-runs line becomes a `lines` entry (stat "runs", the book's name, `live: true` on its quote) and replaces every earlier line for that player's runs in that match;
@@ -87,12 +100,19 @@ export function liveMerge(doc, inplay, resolve) {
     if (!ref) continue;
     const info = { home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition };
     const label = ref.match || `${m.home} vs ${m.away}`, markets = [], dropLines = new Set(), dropFancy = new Set(), addLines = [], addFancy = [];
+    // a batter the books priced before the start is linked through those lines (the same book spells him the same way: "M Taha"); anyone else through `resolve`
+    const known = lines.filter((x) => matchPair(x) === pair && x.pid);
+    const link = (name, sides) => {
+      const hit = known.find((x) => namesMatch(x.book_name || x.player, name) || namesMatch(x.player, name));
+      return hit ? { pid: hit.pid, name: hit.player, team: hit.team } : (resolve ? resolve(name, sides) : null);
+    };
     for (const l of m.lines || []) {
       if (l.kind === "player_runs") {
-        const who = resolve ? resolve(l.player, [m.home, m.away]) : null;
+        const who = link(l.player, [m.home, m.away]);
         if (who?.pid) {
           dropLines.add(who.pid);
-          const quote = { source: l.book || FEED_BOOK, kind: "bookmaker", over: l.over, under: l.under, live: true }, at = addLines.find((x) => x.pid === who.pid && x.line === l.line);
+          const opened = openedOf(lines.filter((x) => matchPair(x) === pair && x.stat === "runs" && x.pid === who.pid && !x.books?.every((b) => b.live)));
+          const quote = { source: l.book || FEED_BOOK, kind: "bookmaker", over: l.over, under: l.under, live: true, ...(opened ? { opened: opened.line } : {}) }, at = addLines.find((x) => x.pid === who.pid && x.line === l.line);
           if (at) at.books.push(quote); // the same line from another book: one entry with both
           else addLines.push({ pid: who.pid, player: who.name || l.player, book_name: l.player, team: who.team || "", fmt: ref.fmt, stat: "runs", line: l.line, match: label, competition: ref.competition, start_utc: ref.start_utc, books: [quote] });
           continue;
@@ -101,13 +121,17 @@ export function liveMerge(doc, inplay, resolve) {
       } else if (l.kind === "team_runs") {
         const team = [m.home, m.away].find((t) => teamKey(t) === teamKey(l.team)) || l.team;
         dropFancy.add(`${teamKey(team)}|${l.inn}`);
-        addFancy.push({ match: label, home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true });
+        const opened = openedOf(fancy.filter((x) => matchPair(x) === pair && x.key === "team_total_runs" && teamKey(x.team) === teamKey(team) && (x.inn || 1) === l.inn));
+        addFancy.push({ match: label, home: m.home, away: m.away, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true, ...(opened ? { opened: opened.line } : {}) });
       } else markets.push({ ...l, book: l.book || FEED_BOOK });
     }
     // the match's "1st innings score" is the same bet as the side's 1st-innings total while only one side has a 1st-innings line (the one batting): it takes the live line too
     const firstSides = new Set(addFancy.filter((f) => f.inn === 1).map((f) => teamKey(f.team)));
     const firstKey = firstSides.size === 1;
-    if (firstKey) for (const f of addFancy.filter((x) => x.inn === 1)) addFancy.push({ ...f, key: "first_innings_runs", scope: "match", team: null, inn: undefined });
+    if (firstKey) {
+      const was = openedOf(fancy.filter((x) => matchPair(x) === pair && x.key === "first_innings_runs"));
+      for (const f of addFancy.filter((x) => x.inn === 1)) addFancy.push({ ...f, key: "first_innings_runs", scope: "match", team: null, inn: undefined, ...(was ? { opened: was.line } : {}) });
+    }
     lines = lines.filter((x) => !(matchPair(x) === pair && x.stat === "runs" && dropLines.has(x.pid))).concat(addLines);
     fancy = fancy.filter((x) => !(matchPair(x) === pair && ((x.key === "team_total_runs" && dropFancy.has(`${teamKey(x.team)}|${x.inn || 1}`)) || (firstKey && x.key === "first_innings_runs")))).concat(addFancy);
     if (markets.length) live.push({ ...info, markets });

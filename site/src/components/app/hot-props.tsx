@@ -55,7 +55,7 @@ const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
-type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
+type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean };
 interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 
 /**
@@ -147,7 +147,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
         <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
-          {top.live && <LiveTag />}<BookBadge source={top.source} />{" "}
+          {top.live && <LiveTag opened={top.opened} line={top.line} />}<BookBadge source={top.source} />{" "}
           {top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
             : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
@@ -189,7 +189,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
             <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
-            <span className="label-cap text-footnote text-primary">{[label, scopeTag(r.fmt, r.inn)].filter(Boolean).join(" · ")}</span>
+            <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
           {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
@@ -268,7 +268,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                       <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
-                        <span className="label-cap text-footnote text-primary">{[(STATS as any)[r.stat]?.label, scopeTag(r.fmt, r.inn)].filter(Boolean).join(" · ")}</span>
+                        <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
                         {soFar != null && <StandingMark standing={soFar} line={r.line} />}
                       </span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
