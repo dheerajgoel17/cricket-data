@@ -10,6 +10,7 @@ Match winner style markets (match odds, draw no bet, double chance) are not prop
 """
 from __future__ import annotations
 
+import csv
 import datetime as dt
 import re
 import sys
@@ -21,7 +22,7 @@ from .adapters import feede, feedk
 from .adapters.base import Pace
 from .util import http_json, iso, parse_ts
 
-MAX_EVENTS = 8      # started matches read per book
+MAX_EVENTS = 14     # started matches read per book, the ones live on our fixture list first
 MAX_LINES = 120     # lines kept per match
 BUDGET_SECS = 40.0  # one source's read stops after this long so the minute's run still ends in time
 SKIP_MARKET = re.compile(r"^(match odds|match winner|draw no bet|double chance|team to lead|2-way match|to win the match|match betting)", re.I)
@@ -32,6 +33,33 @@ E_TEAM_TOTAL = re.compile(r"^(?P<team>.+?) Over/Under (?P<line>\d+(?:\.\d+)?) Ru
 E_PLAYER = re.compile(r"^(?P<p>.+?) - Over/Under (?P<line>\d+(?:\.\d+)?) Runs(?: (?P<inn>1st|2nd) innings)?$")
 E_LINE = re.compile(r"\s*\bOver/Under (?P<line>\d+(?:\.\d+)?)\b")
 INNINGS = {"1st": 1, "2nd": 2, "3rd": 3, "4th": 4}
+
+
+LEVEL = re.compile(r"\s+(?:u-?\d{2}|a|xi|ii|women|w)$", re.I)
+
+
+def _core(name: str) -> str:
+    """A side's name for comparing: lower case, letters and digits only, a level the books leave off ("U19", "A", "XI", "Women") dropped."""
+    return re.sub(r"[^a-z0-9]+", "", LEVEL.sub("", (name or "").strip()).lower())
+
+
+def live_fixtures(path: str, now: dt.datetime | None = None) -> list[tuple[str, str]]:
+    """The (side, side) pairs of the matches our fixture list has as live or just started, so the readers take those matches first when a book lists more started matches than they read."""
+    out = []
+    try:
+        with open(path, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if (r.get("status") or "").strip().lower() in ("live", "started", "innings break", "stumps") and r.get("team_a") and r.get("team_b"):
+                    out.append((r["team_a"], r["team_b"]))
+    except OSError:
+        return []
+    return out
+
+
+def wanted_first(items: list, wanted: list[tuple[str, str]], sides) -> list:
+    """`items` with the ones whose two sides (from `sides(item)`) are a wanted pair first; the order inside each group is kept."""
+    keys = {frozenset((_core(a), _core(b))) for a, b in wanted}
+    return sorted(items, key=lambda it: 0 if frozenset(_core(x) for x in sides(it)) in keys else 1)
 
 
 def _round(x: float | None) -> float | None:
@@ -91,7 +119,7 @@ def k_lines(ev: dict, offers: list[dict], book: str) -> list[dict]:
     return out[:MAX_LINES]
 
 
-def k_matches(now: dt.datetime) -> list[dict]:
+def k_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> list[dict]:
     from cricket_data.hosts import host
 
     base = host("FEEDK_URL")
@@ -106,6 +134,7 @@ def k_matches(now: dt.datetime) -> list[dict]:
             print(f"inplay K {type(e).__name__}", file=sys.stderr)
             continue
         started = [e["event"] for e in listing.get("events") or [] if (e.get("event") or {}).get("state") == "STARTED"]
+        started = wanted_first(started, wanted or [], lambda ev: (ev.get("homeName"), ev.get("awayName")))
         for ev in started[:MAX_EVENTS]:
             if time.monotonic() > deadline:
                 break
@@ -152,7 +181,7 @@ def e_lines(ev: dict, book: str) -> list[dict]:
     return out[:MAX_LINES]
 
 
-def e_matches(now: dt.datetime) -> list[dict]:
+def e_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> list[dict]:
     configured = feede.books()
     pace = Pace(config.get("FEEDE_SPACING_SECS"), lambda u: http_json(u, retries=0)[0])
     deadline = time.monotonic() + BUDGET_SECS
@@ -165,6 +194,7 @@ def e_matches(now: dt.datetime) -> list[dict]:
             print(f"inplay E {type(e).__name__}", file=sys.stderr)
             continue
         evs = [c["event"] for c in (listing.get("SSResponse") or {}).get("children") or [] if "event" in c and c["event"].get("eventStatusCode") == "A" and " v " in (c["event"].get("name") or "")]
+        evs = wanted_first(evs, wanted or [], lambda ev: feede.split_name(ev.get("name") or ""))
         for stub in evs[:MAX_EVENTS]:
             if time.monotonic() > deadline:
                 break
@@ -183,12 +213,12 @@ def e_matches(now: dt.datetime) -> list[dict]:
     return out
 
 
-def all_matches(now: dt.datetime) -> tuple[list[dict], dict[str, int]]:
+def all_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> tuple[list[dict], dict[str, int]]:
     """Every started match these books list, and how many each source gave (a source that is not configured or fails gives 0)."""
     matches, counts = [], {}
     for key, fn in (("feedk", k_matches), ("feede", e_matches)):
         try:
-            got = fn(now)
+            got = fn(now, wanted)
         except Exception as e:  # not configured, or down: this source gives nothing, the others carry on
             print(f"inplay {key} skipped: {type(e).__name__}", file=sys.stderr)
             got = []
