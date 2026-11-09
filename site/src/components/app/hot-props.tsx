@@ -70,7 +70,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
   const rows = useQuery({
     queryKey: key,
     enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,

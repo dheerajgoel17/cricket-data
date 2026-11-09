@@ -232,3 +232,12 @@ test("a live line records where the market opened, and a batter is linked throug
   assert.equal(out.fancy.find((f) => f.key === "first_innings_runs").opened, 325.5);
   assert.equal(out.live?.length ?? 0, 0); // nothing fell through to the generic rows
 });
+
+test("the merged data says which live player lines it holds and the minute, so a cache keyed on the file's timestamp is not reused", () => {
+  const at = (iso) => ({ asOf: iso, matches: inplayDoc().matches });
+  const a = liveMerge(prematch(), at("2026-11-09T09:30:10.000Z"), resolveRahim), b = liveMerge(prematch(), at("2026-11-09T09:30:50.000Z"), resolveRahim), c = liveMerge(prematch(), at("2026-11-09T09:31:05.000Z"), resolveRahim);
+  assert.equal(a.live_sig, "p-rahim|runs|33.5,p-rahim|runs|43.5@" + Math.floor(Date.parse("2026-11-09T09:30:00Z") / 60000));
+  assert.equal(a.live_sig, b.live_sig); // the same minute: one scoring
+  assert.notEqual(a.live_sig, c.live_sig); // the next minute: scored again
+  assert.equal(liveMerge(prematch(), { asOf: "2026-11-09T09:30:00Z", matches: [] }, resolveRahim).live_sig, undefined); // nothing live: the plain data
+});
