@@ -1,10 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
+import { bookQuotes } from "@cricket/engine/lines.js";
 import { authState, savedKeys } from "@/test/auth-harness";
 import { PropRow, PropTable } from "./hot-props";
 
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
+vi.mock("./live-spot", async (orig) => ({ ...(await orig<typeof import("./live-spot")>()), BatterSpot: () => null })); // its history line needs the data provider; not what is tested here
 vi.mock("./badges", () => ({
   PlayerBadge: () => <span>pic</span>,
   PlayerPhoto: () => <span>face</span>,
@@ -79,5 +81,25 @@ describe("PropTable", () => {
     render(<MemoryRouter><PropTable rows={[one]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
     expect(screen.getByText("bet365")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
+  });
+});
+
+describe("a live props row", () => {
+  it("has the Live mark beside the player's name, and was-39.5 on the quote line", () => {
+    const quotes = bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
+    render(<MemoryRouter><PropTable rows={[{ ...row, line: 49.5, quotes }]} win="l10" onWin={() => undefined} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    const name = screen.getAllByText("AM Tribe")[0];
+    expect(within(name.parentElement!.parentElement as HTMLElement).getByText("Live")).toBeInTheDocument(); // on the name line
+    expect(screen.getAllByText("Live")).toHaveLength(1);
+    expect(screen.getByText("was 39.5")).toBeInTheDocument();
+  });
+
+  it("the card row has the same: the mark beside the name, was-39.5 on the quote line", () => {
+    const quotes = bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
+    render(<MemoryRouter><ul><PropRow r={{ ...row, line: 49.5, quotes }} win="l10" wl="L10" i={0} soFar={{ v: 30, state: "live", verdict: null }} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByRole("img", { name: "30 of 49.5, was 39.5" })).toBeInTheDocument(); // the bar under the quote
+    expect(screen.getAllByText("Live")).toHaveLength(1);
+    expect(within(screen.getByText("AM Tribe").closest("span.flex") as HTMLElement).getByText("Live")).toBeInTheDocument();
+    expect(screen.getByText("was 39.5")).toBeInTheDocument();
   });
 });

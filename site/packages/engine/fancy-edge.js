@@ -35,8 +35,8 @@ export const firstInnsMs = (store, ms, scope) => ms.filter((m) => store.M.fi[m] 
  * One market's row: the book's line(s) and best prices, each side's edge (`sideEdge` of its hit rate over `ms` pulled toward the market's no-vig chance) and the better side, the same line at
  * the ground, and the last ten results against the line. `hits` / `played` / `chance` are that better side's record and shrunk chance. Null when the books list nothing or no match is scored.
  */
-export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, ground, inn = 0 }) {
-  const booked = fancyFor(doc, fxInfo, k, teamName, inn);
+export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, ground, inn = 0, live = null }) {
+  const booked = fancyFor(doc, fxInfo, k, teamName, inn, live);
   const all = fancyByLine(booked);
   // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
   const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
@@ -64,18 +64,20 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
 }
 
 /** `marketRow` for each of `keys` (market keys; "top_batter" is a list, not a line), the best edge first. `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. */
-export function overviewRows({ store, doc, fxInfo, ms, scope, teamName, keys, ground, inn = 0 }) {
+export function overviewRows({ store, doc, fxInfo, ms, scope, teamName, keys, ground, inn = 0, live = null }) {
   if (!ms.length || !doc) return [];
-  const rows = keys.filter((k) => k !== "top_batter").flatMap((k) => marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, ground, inn }) ?? []);
+  const rows = keys.filter((k) => k !== "top_batter").flatMap((k) => marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, ground, inn, live }) ?? []);
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
 }
 
 /** Whole-match markets plus each side's team totals, including a Test's own 1st/2nd innings lines, best edge first. `teams` is [[name, team index]] of the two sides. */
 export function fancyOverview({ store, doc, fxInfo, ms, teams, ground }) {
-  const rows = [
-    ...overviewRows({ store, doc, fxInfo, ms, scope: -1, teamName: null, keys: MATCH_KEYS.map(([k]) => k), ground }),
-    ...teams.filter(([, i]) => i >= 0).flatMap(([name, i]) => FANCY_INNS.flatMap((inn) => overviewRows({ store, doc, fxInfo, ms, scope: i, teamName: name, keys: TEAM_KEYS.map(([k]) => k), ground, inn }))),
-  ];
+  // a live line is a row of its own beside the pre-match one (which stays: it is the bet we settle); with no live line in the doc every market is one row, as before
+  const lanes = (doc?.fancy || []).some((l) => l.live) ? [false, true] : [null];
+  const rows = lanes.flatMap((live) => [
+    ...overviewRows({ store, doc, fxInfo, ms, scope: -1, teamName: null, keys: MATCH_KEYS.map(([k]) => k), ground, live }),
+    ...teams.filter(([, i]) => i >= 0).flatMap(([name, i]) => FANCY_INNS.flatMap((inn) => overviewRows({ store, doc, fxInfo, ms, scope: i, teamName: name, keys: TEAM_KEYS.map(([k]) => k), ground, inn, live }))),
+  ]);
   return rows.sort((x, y) => (y.edge ?? -9) - (x.edge ?? -9));
 }
 
@@ -93,7 +95,7 @@ export const innTag = (inn, test = false, key = "") => (inn === 1 ? "1st inns" :
 const abbr = (n) => { const w = String(n || "").replace(/\(W\)/i, "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join("") : (w[0] || "?")).slice(0, 3).toUpperCase(); };
 
 /** A market row as the Match Fancy tab shows it: the engine's numbers (`marketRow`) plus the id the link carries and the label (the side's short name in front when `nameInLabel`). */
-const withLabel = (r, label, nameInLabel, test = false) => ({ ...r, id: fancyFm(`${r.scope}:${r.key}`, r.inn), label: [nameInLabel && r.team ? abbr(r.team) : "", innTag(r.inn, test, r.key), r.batFirst ? BAT_FIRST_TAG : "", label(r.key)].filter(Boolean).join(" · ") });
+const withLabel = (r, label, nameInLabel, test = false) => ({ ...r, id: fancyFm(`${r.scope}:${r.key}`, r.inn) + (r.live ? ":live" : ""), label: [nameInLabel && r.team ? abbr(r.team) : "", innTag(r.inn, test, r.key), r.batFirst ? BAT_FIRST_TAG : "", label(r.key)].filter(Boolean).join(" · ") });
 
 /** `overviewRows` of `keys` ([key, label] pairs), each with its id and label. `label` names a key the pairs do not. */
 export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, ground, inn = 0, nameInLabel = false }) {

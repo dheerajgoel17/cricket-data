@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULTS, activeFilters, clearFilter, narrow, options, order, parseScreener, screenerParams, screenerQuery } from "./screener";
+import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, screenerQuery } from "./screener";
 
 const hit = (p: number | null, played = 10) => ({ p, played, hits: Math.round((p ?? 0) * played) });
 const row = (o: any) => ({ fmt: "T20", team: "India", comp: "IPL", stat: "runs", edge: 0.05, over: 1.9, l10: hit(0.7), l5: hit(0.6, 5), season: hit(0.5), h2h: hit(null, 0), ven: hit(0.4, 2), live: false, ...o });
@@ -58,5 +58,15 @@ describe("narrowing and ordering rows", () => {
   it("offers only values the rows have, most common first", () => {
     expect(options(rows, "fmt")).toEqual(["T20", "ODI"]);
     expect(options(rows, "comp")).toEqual(["IPL", "ODI series"]);
+  });
+});
+
+describe("enoughHistory", () => {
+  it("hides a pre-match prop with too few games in the window, but never one a book is pricing in play", () => {
+    const thin = { l10: hit(1, 1), quotes: [{ live: false }] };
+    expect(enoughHistory(thin, "l10", 6)).toBe(false);
+    expect(enoughHistory({ ...thin, quotes: [{ live: false }, { live: true }] }, "l10", 6)).toBe(true); // a debutant with a live line is shown, with the one game he has
+    expect(enoughHistory({ l10: hit(0.5, 8), quotes: [] }, "l10", 6)).toBe(true);
+    expect(enoughHistory({ quotes: [] }, "l10", 6)).toBe(false); // no window at all
   });
 });

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { odds } from "@/lib/format";
 import { BookBadge } from "./book-badge";
-import { LiveTag } from "./live-spot";
+import { LiveBadge } from "./live-spot";
 
 /** One live market of the Match Fancy list: an over / under line with both prices, or a pick with its outcomes. Same row chrome as the other rows of the list; prices only (no history for it). */
 export function LiveMarketRow({ m }: { m: any }) {
@@ -9,7 +9,7 @@ export function LiveMarketRow({ m }: { m: any }) {
     <div className="grid gap-hair px-gutter py-snug">
       <span className="flex min-w-0 items-baseline gap-snug">
         <span className="truncate text-body font-medium leading-snug">{m.market}</span>
-        <LiveTag />
+        <LiveBadge />
         {m.book && <BookBadge source={m.book} />}
       </span>
       {m.kind === "ou" ? (
