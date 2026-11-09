@@ -264,8 +264,6 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         <>
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
-              <h2 className="text-title font-bold">Bookmaker lines</h2>
-              {liveMatch?.status === "live" && <p className="text-footnote text-muted-foreground">So far this match, delayed up to about 20 seconds. Not used for settlement.</p>}
               <ul className="-mx-gutter">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {overview.map((r, i) => (
