@@ -73,6 +73,9 @@ export const upstreamHeaders = (url, get, post, contentType) => {
   const csrf = String(get("x-relay-csrf") || "").trim();
   const ct = String(get("x-relay-ct") || "").trim();
   const ctd = String(get("x-relay-ct-d") || "").trim();
+  const dest = String(get("x-relay-dest") || "").trim();
+  const mode = String(get("x-relay-mode") || "").trim();
+  const site = String(get("x-relay-site") || "").trim();
   const p = pickProfile();
   const ua = overrideUa || p.ua;
   return {
@@ -85,9 +88,9 @@ export const upstreamHeaders = (url, get, post, contentType) => {
     "Sec-CH-UA": chForUa(ua, p.ch),
     "Sec-CH-UA-Mobile": mobileForUa(ua, p.mobile),
     "Sec-CH-UA-Platform": platformForUa(ua, p.platform),
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site",
+    "Sec-Fetch-Dest": dest || "empty",
+    "Sec-Fetch-Mode": mode || "cors",
+    "Sec-Fetch-Site": site || "same-site",
     ...(post && contentType ? { "Content-Type": contentType } : {}),
     ...(cookie ? { Cookie: cookie } : {}),
     ...(csrf ? { "X-CSRF-Token": csrf } : {}),

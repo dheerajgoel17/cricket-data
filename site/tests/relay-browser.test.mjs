@@ -23,12 +23,16 @@ test("upstreamHeaders forwards a book's session cookie and headers", () => {
     "x-relay-ct": "12",
     "x-relay-ct-d": "34",
     "x-relay-accept": "text/html",
+    "x-relay-dest": "document", "x-relay-mode": "navigate", "x-relay-site": "none",
   }[name] || ""), false, "");
   assert.equal(h.Cookie, "csrf=abc");
   assert.equal(h["X-CSRF-Token"], "abc");
   assert.equal(h["x-ct"], "12");
   assert.equal(h["x-ct-d"], "34");
   assert.equal(h.Accept, "text/html");
+  assert.equal(h["Sec-Fetch-Dest"], "document");
+  assert.equal(h["Sec-Fetch-Mode"], "navigate");
+  assert.equal(h["Sec-Fetch-Site"], "none");
 });
 
 test("upstreamHeaders rotate UA when the caller does not override", () => {

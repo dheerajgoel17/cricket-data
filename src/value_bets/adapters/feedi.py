@@ -484,6 +484,9 @@ def _http(url: str, headers: dict):
             "x-relay-ct": headers.get("x-ct", ""),
             "x-relay-ct-d": headers.get("x-ct-d", ""),
             "x-relay-accept": headers.get("Accept", ""),
+            "x-relay-dest": "document" if str(headers.get("Accept", "")).startswith("text/html") else "",
+            "x-relay-mode": "navigate" if str(headers.get("Accept", "")).startswith("text/html") else "",
+            "x-relay-site": "none" if str(headers.get("Accept", "")).startswith("text/html") else "",
         }
     req = urllib.request.Request(target, headers={k: v for k, v in req_headers.items() if v}, method="GET")
     try:
