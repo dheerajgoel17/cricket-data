@@ -11,7 +11,9 @@ const ago = (min) => iso(T - min * MIN);
 const TOKEN = "tok-abc-123456";
 const env = { GITHUB_DISPATCH_TOKEN: TOKEN, GITHUB_REPO: "own/repo" };
 const job = (file) => JOBS.find((j) => j.file === file);
-const FILES = JOBS.map((j) => j.file);
+// the four data workflows the older tests are about; the in-play snapshot (every minute) has its own tests at the end
+const DATA_JOBS = JOBS.filter((j) => j.file !== "inplay.yml");
+const FILES = DATA_JOBS.map((j) => j.file);
 
 beforeEach(() => { mock.method(console, "error", () => {}); mock.method(console, "log", () => {}); });
 afterEach(() => mock.restoreAll());
@@ -92,7 +94,7 @@ test("each job's cron is the one its workflow keeps as the fallback, and every o
 // ---- the skip rules ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 test("nothing has run: every due job is dispatched once, with the documented request (GET the runs first, then POST {ref}) and no token anywhere but the Authorization header", async () => {
-  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   const res = await s.tick(env, T);
   assert.equal(res.ok, true);
   assert.deepEqual(res.counts, { dispatched: 4, skipped: 0, failed: 0 });
@@ -114,7 +116,7 @@ test("nothing has run: every due job is dispatched once, with the documented req
 
 test("the ref comes from the DISPATCH_REF variable (default main)", async () => {
   const gh = fakeGithub();
-  await createScheduler({ fetchImpl: gh.fetchImpl }).tick({ ...env, DISPATCH_REF: "release" }, T);
+  await createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS }).tick({ ...env, DISPATCH_REF: "release" }, T);
   assert.ok(gh.posts().every((c) => c.body === '{"ref":"release"}'));
   assert.ok(gh.calls.filter((c) => c.method === "GET").every((c) => c.query.branch === "release"));
 });
@@ -135,7 +137,7 @@ const SKIP_CASES = [
 ];
 for (const [name, runs, action, reason] of SKIP_CASES) {
   test(`skip rules: ${name}`, async () => {
-    const gh = fakeGithub({ runs: { "value-bets.yml": runs } }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+    const gh = fakeGithub({ runs: { "value-bets.yml": runs } }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
     const res = await s.tick(env, T);
     const o = outcome(res, "value-bets.yml");
     assert.equal(o.action, action);
@@ -154,7 +156,7 @@ test("decide is pure: the same runs and clock give the same answer", () => {
 });
 
 test("a slot that is handled costs no further calls; the next slot of that job is looked at again, the others stay quiet", async () => {
-  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   await s.tick(env, T);
   assert.equal(gh.calls.length, 8);
   const again = await s.tick(env, T + MIN);
@@ -167,7 +169,7 @@ test("a slot that is handled costs no further calls; the next slot of that job i
 
 test("a run that is still going when the next slot starts is waited for, then the late slot is dispatched as soon as it has finished", async () => {
   const runs = { "balls-update.yml": [run(5, { status: "in_progress", conclusion: null })] }; // started at 10:45, before balls' 10:47 slot
-  const gh = fakeGithub({ runs }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub({ runs }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   assert.equal(outcome(await s.tick(env, T), "balls-update.yml").reason, "running");
   assert.equal(outcome(await s.tick(env, T + MIN), "balls-update.yml").reason, "running", "asked again every minute while it runs");
   runs["balls-update.yml"] = [run(6, { status: "completed" })];
@@ -178,7 +180,7 @@ test("a run that is still going when the next slot starts is waited for, then th
 // ---- failures ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 test("a failing job (dispatch refused, network error, run list refused) is logged and counted and never stops the others", async () => {
-  const gh = fakeGithub({ runs: { "value-bets.yml": 403 }, post: { "scraper-update.yml": "network", "site.yml": 500 } }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub({ runs: { "value-bets.yml": 403 }, post: { "scraper-update.yml": "network", "site.yml": 500 } }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   const res = await s.tick(env, T);
   assert.equal(res.ok, false);
   assert.deepEqual(res.counts, { dispatched: 1, skipped: 0, failed: 3 });
@@ -193,7 +195,7 @@ test("a failing job (dispatch refused, network error, run list refused) is logge
 });
 
 test("a failed dispatch is retried after five minutes, not every minute", async () => {
-  const gh = fakeGithub({ post: { "value-bets.yml": 500 } }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub({ post: { "value-bets.yml": 500 } }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   assert.equal(outcome(await s.tick(env, T), "value-bets.yml").action, "failed");
   const n = gh.calls.length;
   await s.tick(env, T + MIN);
@@ -206,7 +208,7 @@ test("a failed dispatch is retried after five minutes, not every minute", async 
 });
 
 test("when the refusal clears, the retry dispatches the slot", async () => {
-  const post = { "value-bets.yml": 502 }, gh = fakeGithub({ post }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const post = { "value-bets.yml": 502 }, gh = fakeGithub({ post }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   await s.tick(env, T);
   post["value-bets.yml"] = 204;
   assert.equal(outcome(await s.tick(env, T + 5 * MIN), "value-bets.yml").action, "dispatched");
@@ -217,7 +219,7 @@ test("when the refusal clears, the retry dispatches the slot", async () => {
 
 test("a missing secret says so clearly and does nothing: no call to GitHub, an error in the result and the log", async () => {
   for (const [e, what] of [[{}, "GITHUB_DISPATCH_TOKEN is not set"], [{ GITHUB_REPO: "own/repo" }, "GITHUB_DISPATCH_TOKEN is not set"], [{ GITHUB_DISPATCH_TOKEN: TOKEN }, "GITHUB_REPO is not set"], [{ GITHUB_DISPATCH_TOKEN: "  ", GITHUB_REPO: "own/repo" }, "GITHUB_DISPATCH_TOKEN is not set"], [{ GITHUB_DISPATCH_TOKEN: TOKEN, GITHUB_REPO: "not a repo" }, "GITHUB_REPO is not set"]]) {
-    const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl });
+    const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
     const res = await s.tick(e, T);
     assert.equal(res.ok, false);
     assert.match(res.error, new RegExp(what));
@@ -235,17 +237,17 @@ test("the cron handler never throws or rejects: missing secret, failing fetch, e
   const ctx = { waitUntil: (p) => waited.push(p) };
   const sync = () => { throw new Error("boom before any promise"); };
   for (const [e, fetchImpl] of [[{}, fakeGithub().fetchImpl], [env, fakeGithub({ runs: Object.fromEntries(FILES.map((f) => [f, 500])) }).fetchImpl], [env, sync]]) {
-    await createScheduler({ fetchImpl }).scheduled({ scheduledTime: T }, e, ctx);
+    await createScheduler({ fetchImpl, jobs: DATA_JOBS }).scheduled({ scheduledTime: T }, e, ctx);
   }
   assert.equal(waited.length, 3);
   await Promise.all(waited); // none of them rejects
-  const none = await createScheduler({ fetchImpl: fakeGithub().fetchImpl }).scheduled({ scheduledTime: T }, env, undefined);
+  const none = await createScheduler({ fetchImpl: fakeGithub().fetchImpl, jobs: DATA_JOBS }).scheduled({ scheduledTime: T }, env, undefined);
   assert.equal(none.ok, true, "also without a ctx");
 });
 
 test("the cron handler uses the scheduled minute as its clock, so a late start still picks the right slot", async () => {
   const gh = fakeGithub(), waited = [];
-  await createScheduler({ fetchImpl: gh.fetchImpl }).scheduled({ scheduledTime: T }, env, { waitUntil: (p) => waited.push(p) });
+  await createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS }).scheduled({ scheduledTime: T }, env, { waitUntil: (p) => waited.push(p) });
   assert.equal(waited.length, 1);
   assert.equal(gh.posts().length, 4);
 });
@@ -269,7 +271,7 @@ test("/status says per job what the last tick did and what GitHub lists, and car
     "site.yml": [run(1, { event: "push" }), run(3, { event: "workflow_dispatch", conclusion: "failure" }), run(63, { event: "schedule" })],
     "value-bets.yml": [run(5)],
   };
-  const gh = fakeGithub({ runs }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub({ runs }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   await s.tick(env, T);
   const body = await s.status(env, T);
   assert.equal(body.ok, true);
@@ -290,7 +292,7 @@ test("/status says per job what the last tick did and what GitHub lists, and car
 });
 
 test("/status is a GET on /status only, answers JSON, and is cached for 30 seconds", async () => {
-  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   assert.equal((await s.fetch(new Request("https://w.test/"), env)).status, 404);
   assert.equal((await s.fetch(new Request("https://w.test/status", { method: "POST" }), env)).status, 404);
   assert.equal(gh.calls.length, 0, "other routes call nothing");
@@ -307,7 +309,7 @@ test("/status is a GET on /status only, answers JSON, and is cached for 30 secon
 });
 
 test("/status with no token reports it, lists the slots and calls nothing", async () => {
-  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub(), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   const body = await (await s.fetch(new Request("https://w.test/status"), {})).json();
   assert.equal(body.ok, false);
   assert.equal(body.token, "missing");
@@ -318,7 +320,7 @@ test("/status with no token reports it, lists the slots and calls nothing", asyn
 });
 
 test("/status shows a failing lookup as an error on that job, not a failed page", async () => {
-  const gh = fakeGithub({ runs: { "site.yml": 403 } }), s = createScheduler({ fetchImpl: gh.fetchImpl });
+  const gh = fakeGithub({ runs: { "site.yml": 403 } }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: DATA_JOBS });
   const body = await s.status(env, T);
   assert.match(body.jobs.find((j) => j.workflow === "site.yml").latest_run.error, /HTTP 403/);
   assert.equal(body.jobs.find((j) => j.workflow === "balls-update.yml").latest_run, null);
@@ -345,4 +347,31 @@ test("lagReport counts the first run inside each slot: its lag, who started it, 
   const empty = lagReport([], job("site.yml"), Date.parse("2026-11-02T00:00:00Z"), Date.parse("2026-11-02T06:00:00Z"));
   assert.deepEqual([empty.slots, empty.covered, empty.missed, empty.p50_min, empty.max_min, empty.longest_gap_h], [5, 0, 5, null, null, 0], "00:50 to 04:50; the 05:50 slot is not over at 06:00");
   assert.match(table([rep, empty]), /^workflow\s+slots\s+run\s+missed.*\nvalue-bets\.yml\s+3\s+2\s+1\s+1\s+1\s+11\s+11\s+0\.7\s+schedule 1, workflow_dispatch 1\nsite\.yml/);
+});
+
+// ---- the in-play snapshot: a one-minute run, every minute is a slot ------------------------------------------------------------------------------------------------------------------------
+
+test("the in-play snapshot has a slot every minute", () => {
+  const j = job("inplay.yml");
+  assert.equal(slotStart(j, T + 37_000), T); // 37 s into the minute: this minute's slot
+  assert.equal(slotStart(j, T), T);
+  assert.equal(nextSlot(j, T), T + MIN);
+  assert.equal(slotsOfDay(j).length, 24 * 60);
+});
+
+test("in-play: dispatched when nothing ran this minute, left alone while its last run is still going, started again the minute after it finishes", async () => {
+  const runs = { "inplay.yml": [] };
+  const gh = fakeGithub({ runs }), s = createScheduler({ fetchImpl: gh.fetchImpl, jobs: [job("inplay.yml")] });
+  assert.equal(outcome(await s.tick(env, T), "inplay.yml").action, "dispatched");
+  runs["inplay.yml"] = [run(0, { event: "workflow_dispatch", status: "in_progress", conclusion: null, created_at: iso(T + 1000) })];
+  assert.equal(outcome(await s.tick(env, T + MIN), "inplay.yml").reason, "running"); // the minute-long run is still going: not doubled
+  runs["inplay.yml"] = [{ event: "workflow_dispatch", status: "completed", conclusion: "success", created_at: iso(T + 1000) }];
+  assert.equal(outcome(await s.tick(env, T + 2 * MIN), "inplay.yml").action, "dispatched");
+  assert.equal(gh.posts().length, 2);
+});
+
+test("the default Worker lists all five jobs, the in-play snapshot among them", async () => {
+  const gh = fakeGithub(), res = await createScheduler({ fetchImpl: gh.fetchImpl }).tick(env, T);
+  assert.deepEqual(res.counts, { dispatched: 5, skipped: 0, failed: 0 });
+  assert.ok(gh.posts().some((c) => c.file === "inplay.yml"));
 });

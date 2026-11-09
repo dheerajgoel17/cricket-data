@@ -6,6 +6,7 @@ export const JOBS = [
   { file: "value-bets.yml", cron: "30 * * * *" },
   { file: "site.yml", cron: "50 * * * *" },
   { file: "balls-update.yml", cron: "47 */2 * * *" },
+  { file: "inplay.yml", cron: "* * * * *" }, // the in-play snapshot: a one-minute run, so every minute is a slot (a run still going counts as "running" and the next minute starts it)
 ];
 
 export const MIN = 60e3, HOUR = 60 * MIN, DAY = 24 * HOUR;
