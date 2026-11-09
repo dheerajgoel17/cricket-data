@@ -31,7 +31,7 @@ import { FancyFilters } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
-import { LiveTag, TeamSpot } from "./live-spot";
+import { LiveBadge, LiveOpened, LiveTrack, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
@@ -81,11 +81,13 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         ? <TeamBadge name={r.team} size="md" className="size-control" />
         : <span className="grid size-control place-items-center rounded-full bg-secondary text-muted-foreground" aria-hidden><ChartBarIcon className="size-5" /></span>}
       <span className="grid min-w-0 gap-hair">
-        <span className="truncate text-body font-medium leading-snug">{r.label}</span>
+        <span className="flex min-w-0 items-baseline gap-tight">
+          <span className="truncate text-body font-medium leading-snug">{r.label}</span>
+          {r.live && <LiveBadge />}
+        </span>
         {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
         <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
           <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
-          {r.live && <LiveTag opened={r.opened} line={r.line} />}
           {r.at && (() => {
             const ground = shortVenue(r.venue);
             const hits = r.at.side === "over" ? r.at.over : r.at.under;
@@ -108,8 +110,14 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
               <span className="inline-flex items-center gap-tight whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
             </>
           )}
-          {mark != null && <StandingMark standing={mark} line={r.line} />}
+          {r.live && <LiveOpened opened={r.opened} line={r.line} />}
         </span>
+        {mark != null && (
+          <>
+            <LiveTrack value={mark.v} line={r.line} was={r.opened} verdict={mark.verdict} />
+            <span className="text-callout text-muted-foreground"><StandingMark standing={mark} line={r.line} /></span>
+          </>
+        )}
       </span>
       <span className="grid justify-items-end gap-hair">
         <span className="grid justify-items-end gap-hair text-right">

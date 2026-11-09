@@ -260,9 +260,10 @@ export function fixtureBooks(doc, fixture) {
  * (the lines a team's match total is charted against) or 1 / 2 for one innings of a Test: a team's first-innings total is not its match total and never appears among them.
  * Returns [{ line, over, under, source, bat_first }] sorted by line. `bat_first` is a fancy side run line that voids if that side bowls first (premium fours / sixes are not tagged).
  */
-export function fancyFor(doc, fixture, key, team = null, inn = 0) {
+export function fancyFor(doc, fixture, key, team = null, inn = 0, live = null) {
   return (doc?.fancy || []).filter((l) => {
     if (l.key !== key || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
+    if (live !== null && !!l.live !== live) return false; // true: only the live lines, false: only the pre-match ones, null: both
     return sameFixture(l, fixture, doc);
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true, ...(l.opened != null ? { opened: l.opened } : {}) } : {}) })).sort((x, y) => x.line - y.line);
 }
