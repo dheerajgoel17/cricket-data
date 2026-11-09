@@ -5,6 +5,7 @@ import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
+import { HeaderSlotProvider } from "@/lib/header-slot";
 
 const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
 
@@ -55,18 +56,20 @@ export function Shell() {
   // A new page starts at the top. The router keeps the old scroll position, so opening a player from the middle of a long list used to land half-way down the player page.
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
+    <HeaderSlotProvider>
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] lg:pb-0">
       <div className="sticky top-0 z-50"><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
           {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
-          <main key={pathname} id="main" className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack duration-200">
+          <main key={pathname} id="main" className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
             <Outlet />
           </main>
         </SidebarInset>
       </div>
       <IosTabBar />
     </SidebarProvider>
+    </HeaderSlotProvider>
   );
 }

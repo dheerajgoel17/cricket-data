@@ -7,6 +7,8 @@ import { useSaved } from "@/lib/saved";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 import { isTopLevel } from "./nav";
+import { useHeaderSlot } from "@/lib/header-slot";
+import { cn } from "@/lib/utils";
 
 /** The Fancy.cash mark: a rounded dark tile with a green F whose top arm ends in a ball. Inline SVG, so it is crisp at any size and needs no file. */
 export function BrandMark({ className }: { className?: string }) {
@@ -76,18 +78,20 @@ export function Header() {
   const nav = useNavigate();
   const down = !isTopLevel(pathname); // one level down (a player, a team, a match): a back button on phones, where there is no sidebar
   const back = () => (history.state?.idx > 0 ? nav(-1) : nav("/"));
+  const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions (a match) gets a bar with just the back button and those
   return (
-    <header className="sticky top-0 z-50 h-header bg-background text-foreground ring-1 ring-hairline">
+    <header className={cn("sticky top-0 z-50 h-header text-foreground", slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
         <SidebarTrigger className="-ml-2 hidden text-foreground hover:bg-muted hover:text-foreground lg:inline-flex" aria-label="Toggle sidebar" />
         {down && <button type="button" aria-label="Back" onClick={back} className="-ml-2 grid size-(--touch) shrink-0 place-items-center rounded-full text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted lg:hidden"><ChevronLeftIcon className="size-6" /></button>}
-        <Brand />
-        <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />
-        <div className="ml-auto flex shrink-0 items-center gap-snug">
+        {own ? null : <Brand />}
+        {own ? null : <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />}
+        <div ref={slot?.setEl} className={own ? "ml-auto flex shrink-0 items-center gap-snug" : "hidden"} />
+        {own ? null : <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
           <AccountControl />
           <span className="hidden lg:contents"><SavedLink /></span>
-        </div>
+        </div>}
       </div>
       <SearchDialog open={search.open} onOpenChange={search.setOpen} />
     </header>
