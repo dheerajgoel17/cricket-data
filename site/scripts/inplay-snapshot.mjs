@@ -4,6 +4,8 @@
 import { parseInplayFeed } from "../packages/engine/inplay-lines.js";
 
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
+// Supabase refuses a secret key from anything that looks like a browser ("Forbidden use of secret API key in browser"), so its calls carry a plain server agent, not the feed read's Mozilla one.
+const DB_UA = "cricket-props-hub-inplay/0.1 (server)";
 export const ROUNDS = 4, GAP_MS = 15_000;
 
 const sleepMs = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -16,15 +18,26 @@ export async function readFeed(url, fetchImpl = fetch) {
   return parseInplayFeed(Array.isArray(doc) ? doc[0] : doc);
 }
 
+/** What kind of key this is, never the key itself: a wrong secret is the usual reason a save is refused (same idea as assets_sync.describe_key). */
+export function describeKey(key) {
+  if (key.startsWith("sb_publishable_")) return "a publishable key (read-only: use the secret key)";
+  if (key.startsWith("sb_secret_")) return `a secret key, length ${key.length}`;
+  const parts = key.split(".");
+  if (parts.length === 3) {
+    try { const c = JSON.parse(Buffer.from(parts[1], "base64url").toString()); return `a JWT with role ${c.role}`; } catch { /* not a JWT after all */ }
+  }
+  return `an unrecognised key, length ${key.length}`;
+}
+
 /** Replaces the single row (id 1) with this body. */
 export async function saveBody({ base, key, body, fetchImpl = fetch }) {
   const r = await fetchImpl(`${base}/rest/v1/inplay_lines?on_conflict=id`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
     // a new-style secret key (sb_secret_...) goes only in `apikey`; a legacy service_role JWT also goes in Authorization (same rule as src/cricket_site/assets_sync.py)
-    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal", "User-Agent": UA },
+    headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal", "User-Agent": DB_UA },
     body: JSON.stringify([{ id: 1, as_of: body.asOf, body }]),
   });
-  if (!r.ok) throw new Error(`save HTTP ${r.status}`);
+  if (!r.ok) throw new Error(`save HTTP ${r.status} ${String(await r.text().catch(() => "")).slice(0, 120)} (key: ${describeKey(key)})`.trim());
 }
 
 /**
