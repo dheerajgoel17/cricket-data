@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-09T01:34:00Z",
+ "generated_at_utc": "2026-11-09T02:33:40Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -19,14 +19,14 @@
    "inn": 0,
    "side": "over",
    "line": 7.5,
-   "best_odds": 2.1,
+   "best_odds": 2,
    "best_source": "bet365",
    "hits": 29,
    "played": 40,
    "window": 20,
-   "chance": 0.6685,
-   "edge": 0.4039,
-   "edge_pct": 40.4,
+   "chance": 0.6727,
+   "edge": 0.3454,
+   "edge_pct": 34.5,
    "bat_first": false
   },
   {
@@ -326,29 +326,6 @@
    "chance": 0.6768,
    "edge": 0.1689,
    "edge_pct": 16.9,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-11-perth-scorchers-women-v-sydney-thunder-women|team_total_fours|Perth Scorchers Women|0|under",
-   "fixture_id": "2026-11-11-perth-scorchers-women-v-sydney-thunder-women",
-   "match": "Perth Scorchers Women vs Sydney Thunder Women",
-   "format": "T20",
-   "series": "WBBL 2026",
-   "start_utc": "2026-11-11T08:10:00Z",
-   "start_ist": "2026-11-11 13:40 IST",
-   "key": "team_total_fours",
-   "team": "Perth Scorchers Women",
-   "inn": 0,
-   "side": "under",
-   "line": 15.5,
-   "best_odds": 1.95,
-   "best_source": "Dafabet",
-   "hits": 13,
-   "played": 20,
-   "window": 20,
-   "chance": 0.5915,
-   "edge": 0.1534,
-   "edge_pct": 15.3,
    "bat_first": false
   }
  ]
