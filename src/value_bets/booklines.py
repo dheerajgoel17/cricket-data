@@ -107,6 +107,73 @@ def rescope_prev(prev: dict) -> dict:
     return {**prev, "lines": out + moved} if moved else prev
 
 
+KINDS = ("events", "lines", "fancy")
+
+
+def _rows_of(src: dict) -> list:
+    return [x for kind in KINDS for x in src.get(kind) or []]
+
+
+def _test_starts(*docs: dict) -> tuple[set, dict]:
+    """(the names of the Tests in these documents, per Test pairing every (start, raw) seen): the next Test of a series (same pair) is a window of its own."""
+    rows = [x for d in docs for x in _rows_of(d)]
+    names = {x.get("match") for x in rows if x.get("fmt") == "Test"}
+    starts: dict[str, list] = {}
+    for m in names:
+        for x in rows:
+            st = parse_ts(x.get("start_utc")) if x.get("match") == m else None
+            if st:
+                starts.setdefault(m, []).append((st, x.get("start_utc")))
+    return names, starts
+
+
+def _first_start(row: dict, starts: dict) -> tuple | None:
+    """(start, raw) of the first morning of the Test this row belongs to: the earliest start seen within ``TEST_WINDOW`` before the row's own. None for a match that is not a Test."""
+    st = parse_ts(row.get("start_utc"))
+    if st and row.get("match") in starts:
+        return min((c for c in starts[row["match"]] if dt.timedelta(0) <= st - c[0] < testend.TEST_WINDOW), default=None)
+    return None
+
+
+def _line_key(x: dict):
+    return (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0), x.get("line"))
+
+
+def _fancy_key(x: dict):
+    return (x.get("match"), x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind"))
+
+
+def hold_started(book: dict, prev: dict | None, now: dt.datetime) -> tuple[dict, dict]:
+    """The pull without the lines and fancy lines of a match that has started and that the previous published file did not have: ``(book, {"lines": n, "fancy": n})`` with the counts held back.
+
+    The file is pre-match prices only, and statistics and settlement read it that way. A book stops listing a match at the first ball, but a **Test** is listed again between days
+    under the next morning's start, with every price conditional on the score so far: a batter on 57 at stumps is priced 95.5 for his innings, and the pull files that as a 1st-innings
+    line beside his real pre-match 31.5. Nothing in the row says it is in play (the book calls the event not started), so the rule is about when the line first shows: once the match has
+    begun, whatever was not in the file before is not a pre-match line and is not added. What the file already had is untouched (closing prices still refresh, a book that stops quoting
+    is carried by ``carry_started``). A Test has begun when the first morning of its window (restamped days included, ``TEST_WINDOW``) has passed; any other match when the row's own
+    start has. Applies to every league and format. Events are not prices and are left alone. With no previous file there is nothing to tell new from old, so nothing is held back.
+    """
+    none = {"lines": 0, "fancy": 0}
+    if not prev or not (prev.get("lines") or prev.get("fancy")):
+        return book, none
+    prev = rescope_prev(prev)
+    _, starts = _test_starts(prev, book)
+    known = {"lines": {_line_key(x) for x in prev.get("lines") or []}, "fancy": {_fancy_key(x) for x in prev.get("fancy") or []}}
+    keyed = {"lines": _line_key, "fancy": _fancy_key}
+
+    def begun(row: dict) -> bool:
+        first = _first_start(row, starts)
+        st = first[0] if first else parse_ts(row.get("start_utc"))
+        return bool(st) and st <= now
+
+    out, held = dict(book), dict(none)
+    for kind, key in keyed.items():
+        keep = [x for x in book.get(kind) or [] if key(x) in known[kind] or not begun(x)]
+        held[kind] = len(book.get(kind) or []) - len(keep)
+        out[kind] = keep
+    return out, held
+
+
 def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list | None = None) -> dict:
     """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
     the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
@@ -125,26 +192,14 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
     if not prev:
         return book
     prev = rescope_prev(prev)
-    kinds = ("events", "lines", "fancy")
-
-    def rows_of(src: dict) -> list:
-        return [x for kind in kinds for x in src.get(kind) or []]
-
-    test_names = {x.get("match") for x in rows_of(prev) + rows_of(book) if x.get("fmt") == "Test"}
-    starts: dict[str, list] = {}  # per Test pairing, every (start, raw) seen: the next Test of a series (same pair) is a window of its own
-    for m in test_names:
-        for x in rows_of(prev) + rows_of(book):
-            st = parse_ts(x.get("start_utc")) if x.get("match") == m else None
-            if st:
-                starts.setdefault(m, []).append((st, x.get("start_utc")))
+    kinds = KINDS
+    test_names, starts = _test_starts(prev, book)
 
     def restamp(row: dict) -> dict:
         row = dict(row)
-        st = parse_ts(row.get("start_utc"))
-        if st and row.get("match") in starts:
-            first = min((c for c in starts[row["match"]] if dt.timedelta(0) <= st - c[0] < testend.TEST_WINDOW), default=None)
-            if first:
-                row["start_utc"] = first[1]
+        first = _first_start(row, starts)
+        if first:
+            row["start_utc"] = first[1]
         return row
 
     def is_test(row: dict) -> bool:
@@ -164,17 +219,11 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
         return (x.get("start_utc") or "", x.get("match") or "", x.get("player") or "", x.get("stat") or x.get("key") or "", x.get("team") or "", x.get("inn", 0),
                 line if isinstance(line, (int, float)) else 0.0)
 
-    def line_key(x: dict):
-        return (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0), x.get("line"))
-
-    def fancy_key(x: dict):
-        return (x.get("match"), x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind"))
-
     def row_key(kind: str, x: dict):
         if kind == "lines":
-            return line_key(x)
+            return _line_key(x)
         if kind == "fancy":
-            return fancy_key(x)
+            return _fancy_key(x)
         return x.get("match") if is_test(x) else (x.get("match"), x.get("start_utc"))
 
     def merge_books(cur: dict, old: dict) -> dict:

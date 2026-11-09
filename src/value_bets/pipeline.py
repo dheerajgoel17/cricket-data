@@ -443,6 +443,13 @@ def run():
     if pm:
         log(f"player performance markets not read yet: {pm}")
     book = booklines.book_lines(rows, stamp, fancy.match_fancy(raws.get("moviodds_bet365")) + fancy.adapter_fancy(raws))  # every matched two-sided player line, kept for the site (value_bets/out/book_lines.json)
+    try:
+        prev_book = json.loads((config.OUT / "book_lines.json").read_text())
+    except (OSError, ValueError):
+        prev_book = None
+    book, held = booklines.hold_started(book, prev_book, now)  # the file is pre-match prices: a started match takes no line the file did not already have (a Test is re-listed between days with prices that know the score)
+    if held["lines"] or held["fancy"]:
+        log(f"held back {held['lines']} player and {held['fancy']} fancy lines first priced after their match started (not pre-match prices)")
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
     n_inn = sum(1 for r in rows if r.get("inn"))
     if n_inn:
@@ -843,10 +850,6 @@ def run():
         "model_backtest": _prop_backtest_summary(), "log": LOG,
     }
     (config.OUT / "value_bets_latest.json").write_text(json.dumps(result, indent=1, default=str))
-    try:
-        prev_book = json.loads((config.OUT / "book_lines.json").read_text())
-    except (OSError, ValueError):
-        prev_book = None
     try:  # every match's props are kept for good; this must never stop the run
         fx_of = {(r.get("match"), r.get("start_utc")): clusters[r["event_key"]]["fixture"] for r in rows if (clusters.get(r.get("event_key")) or {}).get("fixture")}
         cat = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("catalogue") or []]

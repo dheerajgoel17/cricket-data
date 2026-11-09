@@ -444,3 +444,27 @@ def test_heal_book_restores_lines_a_partial_post_start_pull_wiped(tmp_path):
     by = {x["line"]: [b["source"] for b in x["books"]] for x in out["lines"]}
     assert by[21.5] == ["FairWin247 Fancy"]
     assert by[30.5] == ["Dafabet", "FairWin247 Premium"]
+
+
+def test_a_tests_in_play_line_never_reaches_the_archive_or_the_published_file(tmp_path):
+    """Day 1 at stumps the book re-lists the Test under 10 Nov and prices a batter on 57 not out at 95.5. Held before the archive, it is in neither: not filed, not healed back."""
+    from value_bets.booklines import carry_started, hold_started
+
+    first, day2 = "2026-11-09T04:00:00Z", "2026-11-10T04:30:00Z"
+    sched = [{"start_utc": "2026-11-09T04:30Z", "format": "Test", "gender": "male", "team_a": "Pakistan", "team_b": "Sri Lanka", "venue": "Rawalpindi", "series": "SL tour", "status": "Live"}]
+
+    def tl(ln, start, src):
+        return {"pid": "sk", "player": "Saud Shakeel", "team": "Pakistan", "fmt": "Test", "stat": "runs", "line": ln, "inn": 1, "match": "Pakistan vs Sri Lanka", "competition": "",
+                "start_utc": start, "books": [{"source": src, "kind": "bookmaker", "over": 1.85, "under": 1.85}]}
+
+    prev = {"generated_at_utc": "a", "events": [], "fancy": [], "lines": [tl(31.5, first, "Ladbrokes")]}
+    update(tmp_path, prev, dt.datetime(2026, 11, 9, 3, 0, tzinfo=dt.timezone.utc), None, sched)
+    now = dt.datetime(2026, 11, 9, 11, 59, tzinfo=dt.timezone.utc)
+    pulled = {"generated_at_utc": "b", "events": [], "fancy": [], "lines": [tl(31.5, day2, "Ladbrokes"), tl(95.5, day2, "LeoVegas")]}
+    held, n = hold_started(pulled, prev, now)
+    assert n["lines"] == 1
+    update(tmp_path, held, now, None, sched)
+    published = heal_book(carry_started(held, prev, now), tmp_path, now)
+    d = read(tmp_path, "2026-11-09-pakistan-v-sri-lanka")
+    assert [x["line"] for x in d["lines"]] == [31.5]
+    assert [x["line"] for x in published["lines"]] == [31.5]
