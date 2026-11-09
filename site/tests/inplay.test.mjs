@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { BAND, MIN_SAMPLE, checkpoints, conditionalReport, inplayScopes, levelOf, liveInnings, runsAtBalls, runsBand, similarInnings, targetValue } from "@cricket/engine/inplay.js";
+import { BAND, MIN_SAMPLE, checkpoints, conditionalReport, inningsComplete, inplayScopes, levelOf, liveInnings, runsAtBalls, runsBand, similarInnings, targetMarks, targetValue } from "@cricket/engine/inplay.js";
 import { Store } from "@cricket/engine/store.js";
 
 // Alpha (team 0) bats first in every match, at the same ground, in T20s: a steady c runs an over, so the tape is c, 2c, ... 20c and the total 20c.
@@ -110,7 +110,10 @@ test("liveInnings reads the innings being batted, only in a live limited-overs m
   assert.equal(liveInnings(live({ innings: [{ n: 1, team: "Alpha", runs: 150, wkts: 4, overs: 20 }] }), 0), null); // overs used
   assert.equal(liveInnings(live({ innings: [{ n: 1, team: "Alpha", runs: 90, wkts: 10, overs: 12 }] }), 0), null); // all out
   assert.equal(liveInnings(live({ status: "final" }), 0), null);
-  assert.equal(liveInnings(live(), 2), null); // a Test
+  assert.equal(liveInnings(live(), 3), null); // The Hundred: five-ball sets, left out
+  assert.deepEqual(liveInnings(live({ innings: [{ n: 3, team: "Alpha", runs: 210, wkts: 4, overs: 70.2 }] }), 2), { team: "Alpha", innNo: 3, balls: 422, runs: 210, wkts: 4, overs: 70.2, max: null }); // a Test: no over limit, 3rd innings of the match
+  assert.equal(liveInnings(live({ innings: [{ n: 4, team: "Beta", runs: 90, wkts: 2, overs: 400 }] }), 2).innNo, 4);
+  assert.equal(liveInnings(live({ innings: [{ n: 1, team: "Alpha", runs: 300, wkts: 10, overs: 90 }] }), 2), null); // all out
   assert.equal(liveInnings(live({ innings: [{ n: 1, team: "Alpha", runs: 160, wkts: 5, overs: 20 }, { n: 2, team: "Beta", runs: 30, wkts: 0, overs: 3 }] }), 0).innNo, 2);
   assert.equal(liveInnings(live({ innings: [] }), 0), null);
 });
@@ -150,12 +153,12 @@ test("30 off 20 balls: of his innings that were 25-35 after 20 balls, how many r
   assert.equal(r.summary.median, 51); // 38 41 49 50 52 55 62 71
 });
 
-test("a batter is never compared across formats, nor before ten balls or past thirty", () => {
+test("a batter is never compared across formats, nor before ten balls or past a hundred and fifty", () => {
   const rows = [{ m: 0, i: 1, b: 40, r: 60, x: [14, 30, 45] }, { m: 1, i: 1, b: 40, r: 20, x: [14, 30, 35] }];
   const store = { M: { f: [0, 1] } };
   assert.equal(playerConditional(store, rows, { fmt: 0, state: { balls: 20, runs: 30 } }).n, 1); // the ODI row is left out
   assert.equal(playerConditional(store, rows, { fmt: 0, state: { balls: 9, runs: 10 } }), null);
-  assert.equal(playerConditional(store, rows, { fmt: 0, state: { balls: 31, runs: 40 } }), null);
+  assert.equal(playerConditional(store, rows, { fmt: 0, state: { balls: 151, runs: 90 } }), null);
 });
 
 test("the store reads one player's progression rows from the progression shard, [] when there is none", async () => {
@@ -163,7 +166,7 @@ test("the store reads one player's progression rows from the progression shard, 
   const index = (extra) => ({ players: { nm: ["A", "B"], id: ["00", "01"] }, teams: [], venues: [], events: [], hosts: [], nshard: 1, ...extra });
   const asks = [];
   const store = new Store({}, index({ pp: 1 }), { id: [], f: [] }, async (path) => { asks.push(path); return pp; });
-  assert.deepEqual(await store.playerProgression(0), [{ m: 3, i: 1, b: 23, r: 34, x: [21, 31, null] }, { m: 4, i: 1, b: 31, r: 45, x: [9, 18, 33] }]);
+  assert.deepEqual(await store.playerProgression(0), [{ m: 3, i: 1, b: 23, r: 34, x: [21, 31, null, null, null, null, null] }, { m: 4, i: 1, b: 31, r: 45, x: [9, 18, 33, null, null, null, null] }]); // an older shard has only x1-x3
   assert.deepEqual((await store.playerProgression(1)).map((r) => r.r), [60]);
   assert.deepEqual(asks, ["pp/00.json"]); // one fetch for the shard
   const none = new Store({}, index(), { id: [], f: [] }, async () => { throw new Error("must not be asked"); });
@@ -172,4 +175,64 @@ test("the store reads one player's progression rows from the progression shard, 
   const flaky = new Store({}, index({ pp: 1 }), { id: [], f: [] }, async () => { if (++calls === 1) throw new Error("offline"); return pp; });
   assert.deepEqual(await flaky.playerProgression(0), []); // a failed read is not an error for the panel...
   assert.equal((await flaky.playerProgression(0)).length, 2); // ...and is not kept: the next ask tries again
+});
+
+// ---- Tests: no over limit, the innings number runs to 4, and an innings the clock stopped is not "how an innings goes on"
+// Alpha (team 0) bats in every match. Each match is two innings of Alpha's (a match 1st and 3rd), tape c an over for 90 overs (a complete innings, 90c) or cut at 60 overs by the end of the match.
+function testStore(rows) {
+  const M = { id: rows.map((_, m) => `t${m}`), f: rows.map(() => 2), q: rows.map((r) => r.q ?? 0), g: rows.map(() => 0), d: rows.map((_, m) => `2026-01-${String(m + 1).padStart(2, "0")}`),
+    i: rows.map(() => 1), e: rows.map(() => 0), v: rows.map(() => 0), a: rows.map(() => 0), b: rows.map(() => 1), fi: rows.map(() => 0), pv: rows.map(() => 0), w: rows.map((r) => r.w ?? -1),
+    inn: rows.map((r) => r.inn), ov: rows.map((r) => r.ov), h: rows.map(() => -1) };
+  const index = { players: { nm: [], id: [] }, teams: [{ n: "Alpha", g: 0 }, { n: "Beta", g: 0 }], venues: ["Ground, City"], events: [], hosts: [], nshard: 0 };
+  const s = new Store({}, index, M, async () => { throw new Error("no shards"); });
+  s.n = rows.length;
+  return s;
+}
+const long = (c, overs) => Array.from({ length: overs }, (_, i) => c * (i + 1));
+// match 0: a draw. Alpha's 1st innings 90 overs at 3 an over (270, all out), Beta 1st, Alpha's 2nd innings cut off at 60 overs by the end (180/4), nothing after. Beta 1st is not Alpha's.
+const draw = { q: 0, inn: [[0, 270, 10, 540], [1, 250, 10, 520], [0, 180, 4, 360]], ov: [long(3, 90), long(3, 87), long(3, 60)] };
+// match 1: Alpha bowled out for 200 in the 3rd innings (a complete one) and win the match
+const win = { q: 1, w: 0, inn: [[0, 300, 10, 600], [1, 250, 10, 500], [0, 200, 10, 400], [1, 150, 10, 300]], ov: [long(3.3, 100).map(Math.round), long(3, 83), long(3, 66), long(3, 50)] };
+
+test("a Test innings is complete when it is not the match's last, or was bowled out, or won the match; only the clock-stopped last innings of a draw is not", () => {
+  const store = testStore([draw, win]);
+  assert.equal(inningsComplete(store, 0, 0), true); // the 1st innings
+  assert.equal(inningsComplete(store, 0, 2), false); // the draw's last: 180/4 when stumps came
+  assert.equal(inningsComplete(store, 1, 2), true); // bowled out
+  assert.equal(inningsComplete(store, 1, 3), true); // Beta bowled out chasing
+  const t20 = synthetic();
+  assert.equal(inningsComplete(t20, 0, 0), true); // limited overs: always
+});
+
+test("a Test total is counted only over complete innings, the runs after 40 overs over any that got there; the innings number picks which turn of the match", () => {
+  const store = testStore([draw, win]);
+  // 3rd innings of the match by Alpha: 120 after 40 overs (3 an over), the band 108-132. Both matches have one.
+  const state = { balls: 240, runs: 120 };
+  const rows = similarInnings(store, [0, 1], { team: 0, innNo: 3, ...state });
+  assert.equal(rows.length, 2);
+  assert.equal(conditionalReport(store, [0, 1], { team: 0, innNo: 3, state }).n, 1); // the draw's cut-off 180 is not a total
+  assert.deepEqual(conditionalReport(store, [0, 1], { team: 0, innNo: 3, state }).values, [200]);
+  // the runs after 60 overs count in both: 180 and 180 (the cut-off one reached 60 overs)
+  assert.deepEqual(conditionalReport(store, [0, 1], { team: 0, innNo: 3, state, target: { kind: "overs", n: 60 } }).values, [180, 180]);
+  // the 1st innings: both Alpha innings of that number
+  assert.equal(similarInnings(store, [0, 1], { team: 0, innNo: 1, balls: 240, runs: 120 }).length, 2); // 3 an over (match 0) and 3.3 (match 1: 132 at 40 overs, inside 108-132)
+});
+
+test("the scopes take a Test match whatever its summary-market validity, but a T20 only when valid", () => {
+  const store = testStore([draw, win]); // q 0 and 1
+  const s = inplayScopes(store, { fmt: 2, gender: 0, team: 0, now: Date.parse("2026-06-01T00:00:00Z") });
+  assert.equal(s.team.length, 2);
+  assert.equal(s.wide.length, 2);
+  const t20 = synthetic();
+  t20.M.q[0] = 0; // not valid for summary markets: a T20 leaves it out
+  assert.equal(inplayScopes(t20, { fmt: 0, gender: 0, team: 0, now: Date.parse("2026-06-01T00:00:00Z") }).team.length, 11);
+});
+
+test("the overs a line can be on: a limited-overs format's marks beyond now, a Test's next three multiples of 30", () => {
+  assert.deepEqual(targetMarks({ max: 20, overs: 6 }), [10, 15]);
+  assert.deepEqual(targetMarks({ max: 50, overs: 12.3 }), [20, 30, 40]);
+  assert.deepEqual(targetMarks({ max: 10, overs: 2 }), [5]);
+  assert.deepEqual(targetMarks({ max: null, overs: 44.2 }), [60, 90, 120]);
+  assert.deepEqual(targetMarks({ max: null, overs: 150 }), [180]);
+  assert.deepEqual(targetMarks(null), []);
 });

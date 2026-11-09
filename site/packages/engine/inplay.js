@@ -6,13 +6,14 @@ import { oversToBalls, teamKey } from "./live.js";
 import { suggestLines, summarize } from "./stats.js";
 
 const IT = 0, IR = 1, IW = 2, IB = 3; // innings array layout (see markets.js)
-/** Formats with six-ball overs and a tape worth reading: T20, ODI, T10, O60 (index in `FORMATS`). A Test has no over limit, The Hundred counts five-ball sets. */
-export const INPLAY_FORMATS = [0, 1, 4, 5];
+/** Formats with six-ball overs and a tape worth reading: T20, ODI, Test, T10, O60 (index in `FORMATS`). The Hundred counts five-ball sets and is left out. */
+export const INPLAY_FORMATS = [0, 1, 2, 4, 5];
+const TEST = 2;
 /** Fewest similar innings a figure is shown without a "small sample" note. */
 export const MIN_SAMPLE = 8;
 /** How far a past innings' runs at the same point may sit from the live ones to count as "the same spot": 10% of the live runs, at least 4. */
 export const BAND = { pct: 0.1, min: 4 };
-const MAX_OVERS = { 0: 20, 1: 50, 4: 10, 5: 60 };
+const MAX_OVERS = { 0: 20, 1: 50, 4: 10, 5: 60 }; // a Test has none
 /** Each side's last matches in the format that make up the team scope, and how far back the wide scope (every side in the format) reaches. */
 export const TEAM_WINDOW = 40, WIDE_YEARS = 3;
 
@@ -56,14 +57,24 @@ export function similarInnings(store, ms, { team = null, innNo = 1, balls, runs,
     const pts = checkpoints(M.ov?.[m]?.[innNo - 1], inn);
     const at = runsAtBalls(pts, balls);
     if (at == null || at < band[0] || at > band[1]) continue;
-    out.push({ m, k: innNo - 1, pts, total: inn[IR], wkts: inn[IW], balls: inn[IB], at });
+    out.push({ m, k: innNo - 1, pts, total: inn[IR], wkts: inn[IW], balls: inn[IB], at, complete: inningsComplete(store, m, innNo - 1) });
   }
   return out;
 }
 
+/**
+ * Did this innings finish by itself? In a Test the last innings of a drawn match is stopped by the clock, so its final runs say nothing about how an innings goes on: it counts only when
+ * the side was bowled out or won the match; any earlier innings ended by itself (bowled out or declared). Limited-overs matches here are the ones valid for summary markets, whose innings all finished.
+ */
+export function inningsComplete(store, m, k) {
+  if (store.M.f[m] !== TEST) return true;
+  const inns = store.M.inn[m], inn = inns[k];
+  return k < inns.length - 1 || (inn[IW] || 0) >= 10 || store.M.w?.[m] === inn[IT];
+}
+
 /** The value a target takes in one similar innings: `{kind: "total"}` the innings' final runs, `{kind: "overs", n}` its runs after n overs (the total if it was bowled out sooner). Null if unknown. */
 export function targetValue(row, target) {
-  if (!target || target.kind === "total") return row.total ?? null;
+  if (!target || target.kind === "total") return row.complete === false ? null : (row.total ?? null);
   const nb = target.n * 6, v = runsAtBalls(row.pts, nb);
   if (v != null) return Math.round(v);
   return (row.wkts || 0) >= 10 ? row.total : null;
@@ -77,7 +88,7 @@ export function conditionalReport(store, ms, { team = null, innNo = 1, state, ta
   const band = runsBand(state.runs);
   const rows = similarInnings(store, ms, { team, innNo, balls: state.balls, runs: state.runs, band });
   const values = rows.map((r) => targetValue(r, target)).filter((v) => v != null);
-  const step = target.kind === "overs" ? 2 : 5;
+  const step = target.kind === "overs" ? (state.balls >= 360 ? 10 : 2) : (state.runs >= 150 ? 10 : 5);
   const lines = suggestLines(values, step, 5);
   return { n: values.length, band, target, state, innNo, values, summary: summarize(values, line), ladder: lines.map((l) => summarize(values, l)), low: values.length < MIN_SAMPLE };
 }
@@ -97,24 +108,33 @@ export function levelOf(store, team, fmt, gender, last = 10) {
 export function inplayScopes(store, { fmt, gender, team, now }) {
   const since = new Date(now - WIDE_YEARS * 365.25 * 864e5).toISOString().slice(0, 10);
   const intl = team != null ? levelOf(store, team, fmt, gender) : null;
+  const anyQ = fmt === TEST; // most drawn Tests are not valid for summary markets, but their innings count here (see `inningsComplete`)
   return {
-    team: team != null ? selectMatches(store, { fmt, gender, team, lastN: TEAM_WINDOW }) : [],
-    wide: selectMatches(store, { fmt, gender, since, ...(intl != null ? { intl } : {}) }),
+    team: team != null ? selectMatches(store, { fmt, gender, team, lastN: TEAM_WINDOW, anyQ }) : [],
+    wide: selectMatches(store, { fmt, gender, since, anyQ, ...(intl != null ? { intl } : {}) }),
   };
 }
 
 /**
  * The innings of a live match that is being batted right now, `{ team, innNo, balls, runs, wkts, overs, max }`, or null: the match is not live, the innings is over (all out, overs used, the other
- * side has begun) or the format has no over limit. Read from the 15 s snapshot (`match.innings`).
+ * side has begun). A Test has no over limit (`max` is null) and its innings number runs to 4. Read from the 15 s snapshot (`match.innings`).
  */
 export function liveInnings(match, fmtIndex) {
   if (!match || match.status !== "live" || !INPLAY_FORMATS.includes(fmtIndex)) return null;
   const inns = (match.innings || []).filter((i) => i.runs != null);
   if (!inns.length) return null;
   const cur = inns.reduce((a, i) => (i.n > a.n ? i : a), inns[0]);
-  const balls = oversToBalls(cur.overs), max = MAX_OVERS[fmtIndex];
-  if (balls == null || balls <= 0 || (cur.wkts || 0) >= 10 || cur.overs >= max) return null;
-  return { team: cur.team, innNo: Math.min(cur.n, 2), balls, runs: cur.runs, wkts: cur.wkts || 0, overs: cur.overs, max };
+  const balls = oversToBalls(cur.overs), max = MAX_OVERS[fmtIndex] ?? null;
+  if (balls == null || balls <= 0 || (cur.wkts || 0) >= 10 || (max != null && cur.overs >= max)) return null;
+  return { team: cur.team, innNo: fmtIndex === TEST ? Math.min(cur.n, 4) : Math.min(cur.n, 2), balls, runs: cur.runs, wkts: cur.wkts || 0, overs: cur.overs, max };
+}
+
+/** The overs a line can be on, for the innings being batted: the marks the books use beyond where it is now (a Test: the next three multiples of 30 overs). */
+export function targetMarks(inn) {
+  if (!inn) return [];
+  const marks = inn.max == null ? Array.from({ length: 6 }, (_, i) => 30 * (i + 1)) : inn.max >= 50 ? [10, 20, 30, 40] : inn.max >= 20 ? [6, 10, 15] : [5];
+  const left = marks.filter((n) => n > inn.overs + 1);
+  return inn.max == null ? left.slice(0, 3) : left;
 }
 
 /** `teamKey` match of the live batting side against the fixture's two sides: its index in `store.teams`, or -1. `sides` is `[[name, index]]`. */
