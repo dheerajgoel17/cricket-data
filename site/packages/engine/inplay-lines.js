@@ -136,7 +136,9 @@ export function liveMerge(doc, inplay, resolve) {
     fancy = fancy.filter((x) => !(matchPair(x) === pair && ((x.key === "team_total_runs" && dropFancy.has(`${teamKey(x.team)}|${x.inn || 1}`)) || (firstKey && x.key === "first_innings_runs")))).concat(addFancy);
     if (markets.length) live.push({ ...info, markets });
   }
-  return { ...doc, lines, fancy, live };
+  // what a cache keyed on the lines file's own timestamp must also see: which live player lines there are, and the minute they were read (a row is scored again at most once a minute while a match is on)
+  const sig = lines.filter((l) => l.books?.some((b) => b.live)).map((l) => `${l.pid}|${l.stat}|${l.line}`).sort().join(",") + `@${Math.floor((Date.parse(inplay?.asOf) || 0) / 60000)}`;
+  return { ...doc, lines, fancy, live, live_sig: sig };
 }
 
 /** The other live markets (over / under lines and picks) of a fixture, from `liveMerge`'s `doc.live`: the list for the two sides, either way round; [] when there are none. */
