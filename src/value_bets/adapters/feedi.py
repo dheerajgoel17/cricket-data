@@ -52,7 +52,7 @@ CFG_RE = re.compile(r"cfgA\\*\"?\s*:\s*\\*\"([A-Za-z0-9+/=]{4,})")
 CSRF_RE = re.compile(r"(?:^|[;,\s])csrf=([^;,\s]+)")
 LINE_RE = re.compile(r"\((?P<n>\d+(?:\.\d+)?)\)\s*$")
 PLAYER_STAT = (
-    (re.compile(r"^(?P<p>.+?) - Runs - \((?P<n>\d+(?:\.\d+)?)\)\s*$", re.I), "batter_runs"),
+    (re.compile(r"^(?P<p>.+?) - Runs - \((?P<n>\d+(?:\.\d+)?)\)(?: - (?:1st|2nd|3rd|4th) Innings)?\s*$", re.I), "batter_runs"),  # the live page prints the innings after the line
     (re.compile(r"^(?P<p>.+?) - Fours - \((?P<n>\d+(?:\.\d+)?)\)\s*$", re.I), "batter_fours"),
     (re.compile(r"^(?P<p>.+?) - Sixes - \((?P<n>\d+(?:\.\d+)?)\)\s*$", re.I), "batter_sixes"),
     (re.compile(r"^(?P<p>.+?) - Wickets - \((?P<n>\d+(?:\.\d+)?)\)\s*$", re.I), "bowler_wickets"),
@@ -731,8 +731,8 @@ def _session(budget_key: str):
     return s, client, pace, time.monotonic() + config.get(budget_key)
 
 
-def _coupons(pace, deadline, client, event_id, info, names) -> list[dict]:
-    groups = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{client.sport_id}?event_id={event_id}", info)
+def _coupons(pace, deadline, client, event_id, info, names, sport_id=None) -> list[dict]:
+    groups = _pull(pace, deadline, f"/bv_event_level/{LOCALE}/{client.brand}/coupon_groups/{sport_id or client.sport_id}?event_id={event_id}", info)
     markets = []
     for g in _groups(groups):
         if names and not names.search(g.get("name") or ""):
@@ -744,26 +744,36 @@ def _coupons(pace, deadline, client, event_id, info, names) -> list[dict]:
     return markets
 
 
+def _overview_events(doc) -> list[dict]:
+    """The cricket events on the site's In-Play page (`in_play/overview`: sports, then competitions, then events), shaped like the event-detail endpoint, which answers `{}` to this session
+    (the page's own call gets the full event, ours an empty object). The page lists the live matches with both sides, the competition and the start, so nothing more is needed to name them."""
+    out = []
+    for sport in (doc.get("sports") if isinstance(doc, dict) else None) or []:
+        if not isinstance(sport, dict) or sport.get("epId") != SPORT_PATH:
+            continue
+        for comp in sport.get("comp") or []:
+            for ev in (comp.get("events") if isinstance(comp, dict) else None) or []:
+                if not isinstance(ev, dict) or not ev.get("id") or (ev.get("scoreboard") or {}).get("inPlay") is False:
+                    continue
+                t = ev.get("time")
+                start = iso(dt.datetime.fromtimestamp(t / 1000, dt.timezone.utc)) if isinstance(t, (int, float)) else ""
+                out.append({"id": ev["id"], "home_name": ev.get("oppADesc") or "", "away_name": ev.get("oppBDesc") or "", "description": ev.get("desc") or "",
+                            "competition_title": comp.get("desc") or "", "start_time": start, "event_type": "GAME", "in_play": True, "sport_id": ev.get("sport_id") or sport.get("id")})
+    return out
+
+
 def inplay(fetched_at: str) -> list[dict]:
     """Started matches only, for the minute snapshot. Not filed in the hourly book. `fetched_at` keeps the call shaped like `fetch`."""
     del fetched_at
     s, client, pace, deadline = _session("FEEDI_INPLAY_BUDGET_SECS")
     info: dict = {}
-    board = _pull(pace, deadline, f"/bv_in_play/v3/{LOCALE}/{client.brand}/mini_inplay?sport_id={client.sport_id}", info)
-    nodes, assume = _event_nodes(board), True
-    if not nodes and not info.get("stopped"):
-        nodes, assume = _event_nodes(_pull(pace, deadline, _events_path(), info)), False
+    events = _overview_events(_pull(pace, deadline, f"/bv_in_play/v3/{LOCALE}/{client.brand}/in_play/overview", info))
     out = []
     cap = config.get("FEEDI_INPLAY_MAX")
-    for node in nodes:
+    for detail in events:
         if len(out) >= cap or info.get("stopped") in ("time budget", "HTTP 429"):
             break
-        detail = node if node.get("home_name") else _pull(pace, deadline, f"/bv_api/events/{LOCALE}/{node['id']}", info)
-        if not isinstance(detail, dict) or not detail.get("id"):
-            continue
-        if not detail.get("in_play") and not assume:
-            continue
-        markets = _coupons(pace, deadline, client, detail["id"], info, re.compile(r"players|innings", re.I))
+        markets = _coupons(pace, deadline, client, detail["id"], info, re.compile(r"players|innings", re.I), detail.get("sport_id"))
         match = live_lines(detail, markets, s["NAME"])
         if match:
             out.append(match)

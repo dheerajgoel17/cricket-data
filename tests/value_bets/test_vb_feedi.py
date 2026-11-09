@@ -213,6 +213,24 @@ def test_a_429_stops_the_book_for_the_run(monkeypatch):
     assert rows == [] and raw["books"]["Puntit"]["stopped"] == "HTTP 429"
 
 
+OVERVIEW = {"sports": [
+    {"id": 17500, "epId": 215, "desc": "Cricket", "comp": [
+        {"id": 1, "desc": "ODI Series", "events": [
+            {"id": 5, "event_type": "GAME_EVENT", "sport_id": 17500, "desc": "New Zealand v India", "oppADesc": "New Zealand", "oppBDesc": "India", "time": 1793849400000, "scoreboard": {"inPlay": True}},
+            {"id": 6, "desc": "Over v Done", "oppADesc": "Over", "oppBDesc": "Done", "time": 1793849400000, "scoreboard": {"inPlay": False}},  # not on yet: left out
+            {"id": 0, "desc": "no id"},
+        ]}]},
+    {"id": 1, "epId": 99, "desc": "Football", "comp": [{"id": 2, "desc": "League", "events": [{"id": 7, "desc": "A v B", "oppADesc": "A", "oppBDesc": "B"}]}]},
+]}
+
+
+def test_overview_events_are_the_cricket_ones_shaped_like_an_event(monkeypatch):
+    got = feedi._overview_events(OVERVIEW)
+    assert got == [{"id": 5, "home_name": "New Zealand", "away_name": "India", "description": "New Zealand v India", "competition_title": "ODI Series",
+                    "start_time": "2026-11-05T03:30:00Z", "event_type": "GAME", "in_play": True, "sport_id": 17500}]
+    assert feedi._overview_events(None) == [] and feedi._overview_events({"sports": [None, {"epId": 215, "comp": None}]}) == []
+
+
 def test_inplay_reads_a_started_match_and_names_the_book(monkeypatch):
     monkeypatch.setenv("FEEDI_URL", ROOT)
     monkeypatch.setenv("FEEDI_NAME", "Puntit")
@@ -225,14 +243,14 @@ def test_inplay_reads_a_started_match_and_names_the_book(monkeypatch):
             return SHELL.encode(), {"set-cookie": "csrf=abc; Path=/"}
         if f"/api/sports/{feedi.SPORT_PATH}" in url:
             return json.dumps({"sportId": 17500}).encode(), {}
-        if "mini_inplay" in url:
-            return json.dumps([{"id": 5}]).encode(), {}
+        if "in_play/overview" in url:
+            return json.dumps(OVERVIEW).encode(), {}
         if url.endswith("/events/en-in/5"):
-            return json.dumps({**DETAIL, "id": 5, "in_play": True, "start_time": "2026-11-09T05:00:00Z"}).encode(), {}
-        if "coupon_groups" in url:
+            return b"{}", {}  # the detail endpoint answers an empty object to this session: the In-Play page has what the match needs
+        if "coupon_groups/17500?event_id=5" in url:
             return json.dumps([{"id": 1, "name": "Players"}, {"id": 2, "name": "Innings"}, {"id": 3, "name": "Bet Boost"}]).encode(), {}
-        if "/coupons/5/1" in url:
-            return json.dumps([{"markets": [ou("Shreyas Iyer - Runs - (28.5)", 28.5, 1.85, 1.91, 1)]}]).encode(), {}
+        if "/coupons/5/1" in url:  # the live page prints the innings after the line: both spellings read the same
+            return json.dumps([{"markets": [ou("Shreyas Iyer - Runs - (28.5)", 28.5, 1.85, 1.91, 1), ou("Kane Williamson - Runs - (40.5) - 1st Innings", 40.5, 1.8, 1.9, 4)]}]).encode(), {}
         if "/coupons/5/2" in url:
             return json.dumps([{"markets": [ou("India - Runs - (278.5)", 278.5, 1.85, 1.85, 8, "2nd Innings")]}]).encode(), {}
         raise AssertionError(url)
@@ -242,6 +260,7 @@ def test_inplay_reads_a_started_match_and_names_the_book(monkeypatch):
     assert [(m["home"], m["away"]) for m in matches] == [("New Zealand", "India")]
     got = {(x["kind"], x.get("player") or x.get("team"), x.get("inn"), x["book"], x["line"]) for x in matches[0]["lines"]}
     assert ("player_runs", "Shreyas Iyer", None, "Puntit", 28.5) in got
+    assert ("player_runs", "Kane Williamson", None, "Puntit", 40.5) in got
     assert ("team_runs", "India", 2, "Puntit", 278.5) in got
     assert not any("/coupons/5/3" in u for u in calls)
     assert feedi.horizon_dates(feedi.parse_ts(STAMP), 240)[0] == "2026-11-09"
