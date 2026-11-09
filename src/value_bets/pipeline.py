@@ -54,6 +54,30 @@ INNINGS_MS_MKT = "batter_innings_milestone"
 SINGLE_INNINGS_FMTS = ("T20", "ODI")  # one innings per side: innings milestone == match milestone
 
 
+# The only source that quotes a multi-day player's WHOLE-MATCH total ("Batsman Match Runs": both innings, a median line near 60 for a Test batter). Every other source's unscoped Test player line
+# is his 1st-innings line (a median near 26, the level of the 1st-innings lines Feed K and Feed E tag themselves; Feed F's market names say "1st innings"), but those two books' format check reads the
+# competition text, which is empty for these events, so their rows arrive untagged and used to be filed as complete-match lines (checked 2026-11-09 against the archive: Dafabet, FairWin247, ReddyBook).
+MATCH_TOTAL_SOURCES = booklines.MATCH_TOTAL_SOURCES
+INNINGS_SCOPED_MKTS = ("batter_runs", "batter_fours", "batter_sixes", "bowler_wickets")
+
+
+def scope_multiday_rows(rows):
+    """A multi-day match's player line with no innings from a source that does not quote the match total is its 1st-innings line: tag it (`inn` 1, a milestone's `ms_scope` "innings") so it is
+    published as an innings line and never priced against the match-total history. Runs after the format is known. Returns how many rows it tagged."""
+    n = 0
+    for r in rows:
+        if r.get("fmt") != "MULTI" or r.get("source") in MATCH_TOTAL_SOURCES or r.get("inn"):
+            continue
+        mt = r.get("market_type")
+        if mt in INNINGS_SCOPED_MKTS:
+            r["inn"] = 1
+            n += 1
+        elif mt == "batter_milestone" and r.get("ms_scope") != "innings":
+            r["ms_scope"] = "innings"
+            n += 1
+    return n
+
+
 def split_innings_milestones(rows):
     """Re-type Yes/No 'in the match' milestones of multi-day (or unknown-format) games so they get their own
     selection key instead of colliding with the aggregate-runs ladder rung of the same number. Returns count."""
@@ -408,6 +432,9 @@ def run():
     if n_scope_fix:
         log(f"{n_scope_fix} unmatched players kept in their team top-batter/bowler market (team taken from market)")
 
+    n_scoped = scope_multiday_rows(rows)
+    if n_scoped:
+        log(f"{n_scoped} multi-day player prices from books that do not quote the match total tagged as 1st-innings lines")
     n_inns_ms = split_innings_milestones(rows)
     if n_inns_ms:
         log(f"{n_inns_ms} multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)")

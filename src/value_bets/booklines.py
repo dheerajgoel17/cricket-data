@@ -21,7 +21,8 @@ from .util import parse_ts
 
 STAT ={"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets", "player_points": "points"}
 PROP_MARKETS = set(STAT) | {"top_batter_team", "top_batter_match", "top_bowler_team", "top_bowler_match", "batter_milestone", "bowler_milestone"}
-PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}  # published under the book's own name; the key names the feed it came through
+PUBLIC_SOURCE = {"moviodds_bet365": "bet365"}
+MATCH_TOTAL_SOURCES = ("moviodds_bet365",)  # see pipeline.MATCH_TOTAL_SOURCES: the one source that quotes a Test player's whole-match total  # published under the book's own name; the key names the feed it came through
 
 
 def public_names() -> dict[str, str]:
@@ -88,6 +89,24 @@ LIVE_KEEP = dt.timedelta(hours=40)  # buffer past the site's 24 h keep so a late
 TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
 
 
+def rescope_prev(prev: dict) -> dict:
+    """The previous pull with a Test's earlier complete-match lines from books that do not quote the match total moved to their 1st-innings entry: earlier runs filed them untagged
+    (`pipeline.scope_multiday_rows`), and carrying that over would keep the wrong scope for the rest of the match. bet365's own match totals stay. Nothing else changes."""
+    total = {public_names().get(k, k) for k in MATCH_TOTAL_SOURCES}
+    out, moved = [], []
+    for x in prev.get("lines") or []:
+        if x.get("fmt") != "Test" or x.get("inn") or x.get("stat") not in ("runs", "fours", "sixes", "wickets"):
+            out.append(x)
+            continue
+        keep = [b for b in x.get("books") or [] if b.get("source") in total]
+        other = [b for b in x.get("books") or [] if b.get("source") not in total]
+        if keep:
+            out.append({**x, "books": keep})
+        if other:
+            moved.append({**x, "inn": 1, "books": other})
+    return {**prev, "lines": out + moved} if moved else prev
+
+
 def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list | None = None) -> dict:
     """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
     the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
@@ -105,6 +124,7 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
     """
     if not prev:
         return book
+    prev = rescope_prev(prev)
     kinds = ("events", "lines", "fancy")
 
     def rows_of(src: dict) -> list:

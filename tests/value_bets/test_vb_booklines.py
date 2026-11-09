@@ -262,3 +262,55 @@ def test_the_end_of_one_test_does_not_touch_another_match_of_the_series_or_a_lim
     other = [("India vs NZ", start, start)]   # even an entry for its name changes nothing: only a Test reads it
     assert len(carry_started(doc(), odi, dt.datetime(2026, 11, 8, 22, 0, tzinfo=dt.timezone.utc), other)["lines"]) == 1   # 39 h in
     assert carry_started(doc(), odi, dt.datetime(2026, 11, 9, 0, 0, tzinfo=dt.timezone.utc), other)["lines"] == []   # past its 40 h, as before
+
+
+# ---- a Test's player line from a book that does not quote the match total is its 1st-innings line
+def test_scope_multiday_rows_tags_the_unscoped_lines_of_every_source_but_the_match_total_one():
+    from value_bets.pipeline import scope_multiday_rows
+
+    rows = [
+        row(fmt="MULTI", source="feedh_x", line=26.5),                                  # a Test line, no innings: 1st innings
+        row(fmt="MULTI", source="feedf_y", market_type="batter_fours", line=2.5),       # any scoped stat
+        row(fmt="MULTI", source="feedh_x", market_type="bowler_wickets", line=1.5),
+        row(fmt="MULTI", source="feedh_x", market_type="batter_milestone", ms_scope="match", line=49.5),
+        row(fmt="MULTI", source="moviodds_bet365", line=59.5),                          # the book that quotes the whole match: left alone
+        row(fmt="MULTI", source="feedk_z", inn=2, line=20.5),                           # already scoped: left alone
+        row(fmt="T20", source="feedh_x", line=17.5),                                    # one innings per side: nothing to scope
+        row(fmt="ODI", source="feedh_x", line=30.5),
+        row(fmt="MULTI", source="feedh_x", market_type="player_points", line=40.5),     # a stat not read as innings-scoped
+    ]
+    assert scope_multiday_rows(rows) == 4
+    assert [r.get("inn") for r in rows] == [1, 1, 1, None, None, 2, None, None, None]
+    assert rows[3]["ms_scope"] == "innings"
+    assert scope_multiday_rows(rows) == 0  # idempotent
+
+
+def test_tagged_rows_are_published_as_innings_lines_and_the_match_total_stays_a_complete_match_line():
+    from value_bets.pipeline import scope_multiday_rows
+
+    rows = []
+    for src, line in (("feedh_x", 26.5), ("moviodds_bet365", 59.5)):
+        rows += [row(fmt="MULTI", source=src, line=line), row(fmt="MULTI", source=src, line=line, side="under", back=1.95)]
+    scope_multiday_rows(rows)
+    lines = book_lines(rows, "t")["lines"]
+    assert [(x["line"], x.get("inn", 0)) for x in lines] == [(59.5, 0), (26.5, 1)]
+
+
+def test_earlier_complete_match_lines_of_books_that_do_not_quote_the_total_are_carried_as_1st_innings_lines():
+    from value_bets.booklines import rescope_prev
+
+    base = {"pid": "p1", "player": "P", "team": "Bangladesh", "fmt": "Test", "stat": "runs", "match": "Bangladesh vs West Indies", "competition": "", "start_utc": "2026-10-27T03:00:00Z"}
+    b = lambda s, o=1.9, u=1.9: {"source": s, "kind": "bookmaker", "over": o, "under": u}  # noqa: E731
+    prev = {"generated_at_utc": "a", "events": [], "fancy": [], "lines": [
+        {**base, "line": 26.5, "books": [b("Dafabet"), b("ReddyBook Fancy")]},               # both filed untagged: 1st innings
+        {**base, "line": 59.5, "books": [b("bet365")]},                                       # the match total: stays
+        {**base, "line": 27.5, "books": [b("bet365"), b("Dafabet")]},                          # a mixed entry is split
+        {**base, "line": 24.5, "inn": 1, "books": [b("Ladbrokes")]},                           # already scoped: untouched
+        {**base, "fmt": "ODI", "line": 30.5, "books": [b("Dafabet")]},                         # not a Test: untouched
+    ]}
+    out = rescope_prev(prev)
+    got = sorted((x["line"], x.get("inn", 0), tuple(y["source"] for y in x["books"])) for x in out["lines"])
+    assert got == [(24.5, 1, ("Ladbrokes",)), (26.5, 1, ("Dafabet", "ReddyBook Fancy")), (27.5, 0, ("bet365",)), (27.5, 1, ("Dafabet",)), (30.5, 0, ("Dafabet",)), (59.5, 0, ("bet365",))]
+    assert rescope_prev({"lines": [], "events": [], "fancy": []}) == {"lines": [], "events": [], "fancy": []}
+    carried = carry_started({"generated_at_utc": "b", "events": [], "fancy": [], "lines": []}, prev, dt.datetime(2026, 10, 27, 9, 33, tzinfo=dt.timezone.utc))
+    assert not any(x["fmt"] == "Test" and x.get("inn", 0) == 0 and any(y["source"] == "Dafabet" for y in x["books"]) for x in carried["lines"])

@@ -19,7 +19,7 @@ def show_h(full):
         if re.search(r"batsman runs|bowler wickets|batsman fours", d, re.I) and shown < 4:
             shown += 1
             extra = {k: (v if not isinstance(v, (dict, list)) else f"<{type(v).__name__}>") for k, v in m.items() if k not in ("outcomes",)}
-            print(f"H   market {d!r} fields={json.dumps(extra)[:600]}", file=sys.stderr)
+            print(f"H   market {d!r} period={json.dumps(m.get('period'))[:300]} descriptions={json.dumps(m.get('descriptions'))[:300]} typeInfo={json.dumps(m.get('marketTypeInfo'))[:400]}", file=sys.stderr)
         if re.search(r"inning|1st|2nd|first|second", d, re.I) and SEEN["hi"] < 12:
             SEEN["hi"] += 1
             print(f"H   innings-ish name {d!r}", file=sys.stderr)
@@ -29,7 +29,7 @@ orig_h = feedh.parse_event
 
 
 def parse_h(full, src, fetched_at):
-    if SEEN["h"] < 6:
+    if SEEN["h"] < 10:
         SEEN["h"] += 1
         show_h(full)
     return orig_h(full, src, fetched_at)
