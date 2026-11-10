@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-10 10:14 IST
+# Cricket value bets - 2026-11-10 11:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -7,11 +7,11 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **smarkets**: ok, 433 prices
 - **feedk**: ok, 72 prices, 6 events
 - **feedg**: ok, 32 prices, 4 events
-- **feede**: ok, 378 prices, 16 events
-- **feedf**: ok, 288 prices, 13 events
-- **feedh**: ok, 1364 prices, 30 events
+- **feede**: ok, 354 prices, 14 events
+- **feedf**: ok, 272 prices, 11 events
+- **feedh**: ok, 1364 prices, 29 events
 
-Matches starting in next 168h: **33**, markets priced: **393**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **28**, markets priced: **384**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **33**, markets priced: **393**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Pak Xi (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female), Western Australia Warriors (male)
 
-Runtime 113.9s. Snapshot: `odds_20261110T044420Z.jsonl.gz`
+Runtime 119.7s. Snapshot: `odds_20261110T053031Z.jsonl.gz`
