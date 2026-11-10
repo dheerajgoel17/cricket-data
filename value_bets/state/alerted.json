@@ -3,5 +3,10 @@
   "edge": 0.0627,
   "start_utc": "2026-11-13T03:30:00Z",
   "alerted_at": "2026-11-10T04:32:30.334743+00:00"
+ },
+ "male|Australia|England|2026-11-13|batter_milestone||C Connolly 50+ no|49.5|under": {
+  "edge": 0.0614,
+  "start_utc": "2026-11-13T03:30:00Z",
+  "alerted_at": "2026-11-10T09:32:29.828714+00:00"
  }
 }

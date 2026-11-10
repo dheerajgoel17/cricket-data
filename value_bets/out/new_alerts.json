@@ -1,4 +1,66 @@
 {
- "generated_at_ist": "2026-11-10 14:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-10 15:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Australia|England|2026-11-13",
+   "match": "Australia vs England",
+   "start_utc": "2026-11-13T03:30:00Z",
+   "start_ist": "2026-11-13 09:00 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Batsman to Score a Fifty in the Match",
+   "team_scope": "",
+   "selection": "C Connolly 50+ no",
+   "player_matched_as": "C Connolly",
+   "player_id": "fe366f34",
+   "player_team": "Australia",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "under",
+   "best_odds": 1.364,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 1.364,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0667,
+   "implied_prob": 0.7334,
+   "fair_odds": 1.285,
+   "fair_prob": 0.7784,
+   "model_prob": 0.8348,
+   "market_prob": 0.7322,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0614,
+   "edge_pct": 6.14,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 83% vs market 73% for 50+ runs; form 33.9 runs/inn recency-weighted ODI (n_eff 14.2; last 5: 23, 10, 38, 21, 78), bats in 86% of games played; venue unknown/unmatched (venue terms neutral)",
+   "notes": "2 market source(s) for fair price; model 0.835 vs market 0.732; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); price via unofficial Book A mirror - confirm on Book A before betting",
+   "model_detail": {
+    "n_eff": 14.2,
+    "expected": 29.18,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.861,
+    "venue_matched": null,
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": null,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": null,
+    "cloud_pct": null,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "abadd28dc4d2ffde",
+   "alert_key": "male|Australia|England|2026-11-13|batter_milestone||C Connolly 50+ no|49.5|under",
+   "alerted_at_ist": "2026-11-10 15:02 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
