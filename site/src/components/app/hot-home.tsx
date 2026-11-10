@@ -106,8 +106,8 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
           />
           {block ? (
             <ul className="-mx-gutter">
-              {block.items.map((item, i) => item.kind === "player"
-                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" i={i} soFar={soFarOf(item.r)} out={outOf(item.r)} hideMatch />
+              {block.items.map((item) => item.kind === "player"
+                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={outOf(item.r)} hideMatch />
                 : (
                   <li key={item.key} className="border-t border-hairline">
                     <OverviewRow

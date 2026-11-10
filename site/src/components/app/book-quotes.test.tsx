@@ -34,6 +34,17 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(screen.queryByRole("button")).toBeNull();
   });
 
+  it("updates a live price with a steady arrow and no flashing background", () => {
+    const live = (price: number) => bookQuotes([{ line: 33.5, books: [{ ...B("bet365", price, 1.9), live: true }] }]);
+    const { rerender } = render(<BookQuotes quotes={live(1.8)} />);
+    const ticker = screen.getByText("1.80");
+    expect(ticker.querySelector("svg")).toHaveClass("invisible");
+    rerender(<BookQuotes quotes={live(2.1)} />);
+    expect(screen.getByText("2.10")).toBe(ticker);
+    expect(ticker.querySelector("svg")).not.toHaveClass("invisible");
+    expect(ticker.className).not.toMatch(/tick-(up|down)/);
+  });
+
   it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\" at the end of it", () => {
     const live = bookQuotes([{ line: 33.5, books: [{ ...B("bet365", 1.8, 1.9), live: true, opened: 25.5 }] }]);
     const { container } = render(<BookQuotes quotes={live} />);

@@ -24,7 +24,7 @@ type TapeRow = {
 };
 
 /** One card for the two sharp-tape lists, a tab each: the long shots that cleared, the heavy favourites that missed. */
-export function MarketTape({ rows }: { rows: TapeRow[] }) {
+export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }) {
   const { hits, misses } = marketTape(rows);
   const id = useId();
   const [tab, setTab] = useState<"hit" | "miss">("hit");
@@ -59,7 +59,7 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
                 <span className="truncate text-footnote text-muted-foreground">O {r.line} {(STATS as Record<string, { label: string }>)[r.stat]?.label}</span>
               </span>
               <span className="grid justify-items-end gap-hair text-right">
-                <Tick value={r.over} className={cn("text-callout font-medium tabular-nums", hit ? "text-primary" : "text-miss")}>{odds(r.over)}</Tick>
+                <Tick quiet={quiet} value={r.over} className={cn("text-callout font-medium tabular-nums", hit ? "text-primary" : "text-miss")}>{odds(r.over)}</Tick>
                 <span className={cn("text-footnote font-medium", hit ? "text-primary" : "text-miss")}>{hit ? "Cleared" : "Missed"}{r.v != null ? ` · ${r.v}` : ""}</span>
               </span>
             </Link>
