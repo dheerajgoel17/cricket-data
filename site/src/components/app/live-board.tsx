@@ -7,7 +7,6 @@ import { useHeaderFlush } from "@/lib/header-slot";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
-import { playerPhotos } from "@/lib/assets";
 import { useData } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -27,25 +26,6 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
     const hits = rz.players(name, teamIdx != null && teamIdx >= 0 ? { team: teamIdx } : {}, 2) as { idx: number; score: number }[];
     return hits.length && hits[0].score >= 8 ? hits[0].idx : null; // the resolver's own bar for "this is the player"; a debutant or unknown name stays plain text
   }, [rz, name, teamIdx]);
-}
-
-const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
-
-/** Photo only, no frame; a silhouette if every URL fails. */
-function Face({ name, photo, team, sides }: { name: string; photo?: string; team?: string; sides?: Side[] }) {
-  const idx = usePlayerIdx(name, team, sides);
-  const { store, photos } = useData();
-  const urls = useMemo(() => {
-    const fromIdx = idx != null ? (playerPhotos(photos, store.P.id[idx]) as string[]) : [];
-    return [photo, ...fromIdx].filter(Boolean) as string[];
-  }, [photo, idx, photos, store]);
-  const [i, setI] = useState(0);
-  const url = urls[i];
-  return (
-    <span title={name} className="relative inline-grid size-9 shrink-0 place-items-center overflow-hidden rounded-full">
-      {url ? <img src={url} alt="" className="size-full object-cover object-top" onError={() => setI((n) => n + 1)} /> : <Silhouette />}
-    </span>
-  );
 }
 
 function Who({ name, team, sides, strike, short, className }: { name: string; team?: string; sides?: Side[]; strike?: boolean; short?: boolean; className?: string }) {
@@ -90,7 +70,7 @@ function Overs({ overs }: { overs: { n?: number | null; balls: string[] }[] }) {
     <div className="flex min-w-0 items-center gap-snug" aria-label={`Ball by ball: ${groups.map((o) => `${o.n != null ? `over ${o.n} ` : ""}${o.balls.join(" ")}`).join(", ")}. Scroll left for earlier overs.`}>
       <span className="label-cap shrink-0 text-footnote text-muted-foreground">Ball by ball</span>
       <div className="relative min-w-0 flex-1">
-        {fadeLeft ? <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-card to-transparent" /> : null}
+        {fadeLeft ? <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background to-transparent" /> : null}
         <div
           ref={ref}
           onScroll={syncFade}
@@ -268,15 +248,16 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
   );
 }
 
-/** One batter of the pair, side by side with the other: photo, name (* on strike) over runs and balls. */
-function Batter({ p, sides }: { p: any; sides?: Side[] }) {
+function LivePlayer({ player, sides, bowling = false }: { player: any; sides?: Side[]; bowling?: boolean }) {
+  const figures = bowling ? `${player.wickets ?? 0}–${player.conceded ?? 0}` : player.runs ?? 0;
+  const detail = bowling ? `${ov(player) ?? "–"} ov` : `${player.balls ?? 0} balls`;
   return (
-    <div className="flex min-w-0 items-center gap-snug">
-      <Face name={p.name} photo={p.photo} team={p.team} sides={sides} />
-      <div className="grid min-w-0 gap-hair">
-        <Who name={p.name} team={p.team} sides={sides} strike={!!p.strike} short className="min-w-0 text-callout" />
-        <span className="font-condensed tabular-nums leading-none"><b className="text-body font-bold">{p.runs ?? 0}</b><span className="text-footnote text-muted-foreground"> ({p.balls ?? 0})</span></span>
-      </div>
+    <div className="grid min-w-0 gap-hair">
+      <Who name={player.name} team={player.team} sides={sides} strike={!bowling && !!player.strike} short className="text-footnote" />
+      <span className="flex flex-wrap items-baseline gap-x-hair tabular-nums">
+        <b className="font-condensed text-body leading-none">{figures}</b>
+        <span className="text-caption text-muted-foreground">({detail})</span>
+      </span>
     </div>
   );
 }
@@ -290,11 +271,11 @@ export function Rule({ dotted }: { dotted?: boolean }) {
   return <div aria-hidden className={cn("border-t border-hairline", flush ? "-mx-gutter" : "-mx-inset", dotted && "border-dotted")} />;
 }
 
-/** Laid out across the card, not down it: the pair side by side with photos, the bowler with wickets–runs and overs (the full scorecard has the rest), the ball-by-ball tape, and one line of partnership, last wicket and rates. So-far only. */
-export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
+/** Current batters, bowler and deliveries. Extra match figures appear with the expanded scorecard. */
+export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side[]; expanded: boolean }) {
   const board = liveBoard(match);
   if (!board) return null;
-  const bw = board.bowler, bowlOv = ov(bw);
+  const bw = board.bowler;
   const meta: ReactNode[] = [];
   if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-medium text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
   if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-medium text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
@@ -302,25 +283,14 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
   return (
     <section aria-label="Live scoreboard" className="flex flex-col gap-tight">
-      {!!board.batters.length && (
-        <div className="grid grid-cols-2 gap-stack">
-          <Batter p={board.batters[0]} sides={teams} />
-          {board.batters[1] ? <Batter p={board.batters[1]} sides={teams} /> : <div />}
+      {(!!board.batters.length || bw) && (
+        <div className="grid grid-cols-3 gap-tight">
+          {board.batters.slice(0, 2).map((b: any) => <LivePlayer key={b.id || b.name} player={b} sides={teams} />)}
+          {bw && <div className="col-start-3 border-l border-hairline pl-tight"><LivePlayer player={bw} sides={teams} bowling /></div>}
         </div>
       )}
-      {bw && (
-        <div className="flex min-w-0 items-center gap-snug">
-          <Face name={bw.name} photo={bw.photo} team={bw.team} sides={teams} />
-          <div className="grid min-w-0 flex-1 gap-hair">
-            <Who name={bw.name} team={bw.team} sides={teams} short className="min-w-0 text-callout" />
-            <span className="label-cap text-caption text-muted-foreground">Bowling</span>
-          </div>
-          <span className="shrink-0 font-condensed tabular-nums leading-none"><b className="text-body font-bold">{bw.wickets ?? 0}–{bw.conceded ?? 0}</b><span className="text-footnote text-muted-foreground"> ({bowlOv ?? "–"} ov)</span></span>
-        </div>
-      )}
-      {(!!board.overs.length || !!meta.length) && <Rule dotted />}
       {!!board.overs.length && <Overs overs={board.overs} />}
-      {!!meta.length && <div className="flex flex-wrap items-baseline gap-x-stack gap-y-hair font-condensed text-footnote font-medium tabular-nums">{meta}</div>}
+      {expanded && !!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
     </section>
   );
 }
@@ -351,7 +321,7 @@ function CardSummary({ match, teams }: { match: any; teams?: Side[] }) {
 /** The match's scorecard as one card: the live strip while it is on (a short top-performers summary otherwise), and a tap on the row below it opens the full card in place. So-far only. */
 export const scoreboardShows = (match: any, inPlay: boolean) => hasCard(match) || (inPlay && !!liveBoard(match));
 
-/** `top` (status and ground line) and `head` (the two sides with their scores) sit at the top of the card while a match is in play: the card is then the page's header, full width and flush under the top bar, split by edge-to-edge rules, dotted and solid in turn. Otherwise it is a rounded card in the page. */
+/** `top` (status and ground line) and `head` (the two sides with their scores) sit at the top of the card while a match is in play: the card is then the page's header, full width and flush under the top bar, with compact player figures beneath the team scores. Otherwise it is a rounded card in the page. */
 export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { match: any; teams?: Side[]; inPlay: boolean; fixtureId?: string; top?: ReactNode; head?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const full = hasCard(match), strip = inPlay && !!liveBoard(match);
@@ -360,10 +330,10 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
   if (!scoreboardShows(match, inPlay)) return null;
   return (
     <FlushCtx.Provider value={flush}>
-    <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-inset" : "rounded-2xl bg-card p-inset")}>
-      {inPlay && top ? <>{top}<Rule dotted /></> : null}
+    <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-snug" : "rounded-2xl bg-card p-inset")}>
+      {inPlay && top ? <>{top}</> : null}
       {inPlay && head ? <>{head}<Rule /></> : null}
-      {strip ? <LiveBoard match={match} teams={teams} /> : <CardSummary match={match} teams={teams} />}
+      {strip ? <LiveBoard match={match} teams={teams} expanded={open || !full} /> : <CardSummary match={match} teams={teams} />}
       {full && (
         <>
           <Rule />

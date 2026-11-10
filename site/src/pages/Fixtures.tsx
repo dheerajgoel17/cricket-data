@@ -70,7 +70,7 @@ function TeamName({ name, ix, small }: { name: string; ix: number; small?: boole
 function ScoreRows({ f, match, small }: { f: any; match: any; small?: boolean }) {
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   return (
-    <div className="grid gap-snug">
+    <div className={cn("grid", small ? "gap-tight" : "gap-snug")}>
       {sides.map(([name, ix]) => (
         <div key={name} className="flex min-w-0 items-center gap-snug">
           <TeamName name={name} ix={ix} small={small} />
