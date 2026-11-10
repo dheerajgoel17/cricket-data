@@ -7,6 +7,7 @@ import { useHeaderFlush } from "@/lib/header-slot";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
+import { playerPhotos } from "@/lib/assets";
 import { useData } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,25 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
     const hits = rz.players(name, teamIdx != null && teamIdx >= 0 ? { team: teamIdx } : {}, 2) as { idx: number; score: number }[];
     return hits.length && hits[0].score >= 8 ? hits[0].idx : null; // the resolver's own bar for "this is the player"; a debutant or unknown name stays plain text
   }, [rz, name, teamIdx]);
+}
+
+const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
+
+/** Photo only, no frame; a silhouette if every URL fails. */
+function Face({ name, photo, team, sides }: { name: string; photo?: string; team?: string; sides?: Side[] }) {
+  const idx = usePlayerIdx(name, team, sides);
+  const { store, photos } = useData();
+  const urls = useMemo(() => {
+    const fromIdx = idx != null ? (playerPhotos(photos, store.P.id[idx]) as string[]) : [];
+    return [photo, ...fromIdx].filter(Boolean) as string[];
+  }, [photo, idx, photos, store]);
+  const [i, setI] = useState(0);
+  const url = urls[i];
+  return (
+    <span title={name} className="relative inline-grid size-6 shrink-0 sm:size-8 place-items-center overflow-hidden rounded-full">
+      {url ? <img src={url} alt="" className="size-full object-cover object-top" onError={() => setI((n) => n + 1)} /> : <Silhouette />}
+    </span>
+  );
 }
 
 function Who({ name, team, sides, strike, short, className }: { name: string; team?: string; sides?: Side[]; strike?: boolean; short?: boolean; className?: string }) {
@@ -133,6 +153,7 @@ export function innLabel(card: any[], k: number) {
 export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   const [pick, setPick] = useState<string>();
   const flush = useContext(FlushCtx);
+  const namePadding = flush ? "pl-gutter pr-tight" : "px-tight";
   const card = cardInns(match);
   if (!card.length) return null;
   const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
@@ -153,10 +174,10 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           </div>
           {!!inn.batters?.length && (
             <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush ? "[&_tr>*:first-child]:pl-gutter [&_tr>*:last-child]:pr-gutter" : "[&_tr>*:first-child]:px-tight")}>
+              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush && "[&_tr>*:last-child]:pr-gutter")}>
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className="py-snug text-left">Batter</th>
+                    <th className={cn("py-snug text-left", namePadding)}>Batter</th>
                     <th className="px-tight py-snug text-right">R</th>
                     <th className="px-tight py-snug text-right">B</th>
                     <th className="px-tight py-snug text-right">4s</th>
@@ -167,7 +188,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                 <tbody>
                   {inn.batters.map((p: any) => (
                     <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className="py-snug pr-snug">
+                      <td className={cn("py-snug", namePadding)}>
                         <div className="flex min-w-0 items-center gap-snug">
                           <div className="min-w-0">
                             <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
@@ -185,14 +206,14 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                   ))}
                   {inn.extras && (
                     <tr className="border-t border-hairline text-muted-foreground">
-                      <td className="py-snug">Extras</td>
+                      <td className={cn("py-snug", namePadding)}>Extras</td>
                       <Num className="font-medium text-foreground">{inn.extras.total}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
                     </tr>
                   )}
                   {inn.runs != null && (
                     <tr className="border-t border-hairline">
-                      <td className="py-snug font-medium">Total</td>
+                      <td className={cn("py-snug font-medium", namePadding)}>Total</td>
                       <Num className="font-medium text-foreground">{inn.runs}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
                     </tr>
@@ -212,10 +233,10 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           )}
           {!!inn.bowlers?.length && (
             <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush ? "[&_tr>*:first-child]:pl-gutter [&_tr>*:last-child]:pr-gutter" : "[&_tr>*:first-child]:px-tight")}>
+              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush && "[&_tr>*:last-child]:pr-gutter")}>
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className="py-snug text-left">Bowler</th>
+                    <th className={cn("py-snug text-left", namePadding)}>Bowler</th>
                     <th className="px-tight py-snug text-right">O</th>
                     <th className="px-tight py-snug text-right">M</th>
                     <th className="px-tight py-snug text-right">R</th>
@@ -226,7 +247,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                 <tbody>
                   {inn.bowlers.map((p: any) => (
                     <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className="py-snug pr-snug">
+                      <td className={cn("py-snug", namePadding)}>
                         <div className="flex min-w-0 items-center gap-snug">
                           <Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" />
                         </div>
@@ -253,12 +274,15 @@ function LivePlayer({ player, sides, bowling = false }: { player: any; sides?: S
   const figures = bowling ? `${player.wickets ?? 0}–${player.conceded ?? 0}` : player.runs ?? 0;
   const detail = bowling ? `${ov(player) ?? "–"} ov` : `${player.balls ?? 0} balls`;
   return (
-    <div className="grid min-w-0 gap-hair">
-      <Who name={player.name} team={player.team} sides={sides} strike={!bowling && !!player.strike} short className="text-footnote" />
-      <span className="flex flex-wrap items-baseline gap-x-hair tabular-nums">
-        <b className="font-condensed text-body leading-none">{figures}</b>
-        <span className="text-caption text-muted-foreground">({detail})</span>
-      </span>
+    <div className="flex min-w-0 items-center gap-hair sm:gap-tight">
+      <Face key={player.photo || player.name} name={player.name} photo={player.photo} team={player.team} sides={sides} />
+      <div className="grid min-w-0 gap-hair">
+        <Who name={player.name} team={player.team} sides={sides} strike={!bowling && !!player.strike} short className="text-footnote" />
+        <span className="flex flex-wrap items-baseline gap-x-hair tabular-nums">
+          <b className="font-condensed text-body leading-none">{figures}</b>
+          <span className="text-caption text-muted-foreground">({detail})</span>
+        </span>
+      </div>
     </div>
   );
 }
@@ -286,9 +310,9 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
   return (
     <section aria-label="Live scoreboard" className="flex flex-col gap-tight">
       {(!!board.batters.length || bw) && (
-        <div className={cn("grid grid-cols-3 border-y border-hairline divide-x divide-hairline [&>*]:px-tight [&>*]:py-tight", flush ? "-mx-gutter" : "border-x")}>
+        <div className={cn("grid grid-cols-3 border-y border-hairline divide-x divide-hairline", flush ? "-mx-gutter" : "border-x")}>
           {[board.batters[0], board.batters[1], bw].map((player, i) => (
-            <div key={i}>
+            <div key={i} className={cn("min-w-0 py-tight", flush && i === 0 ? "pl-gutter" : "pl-tight", flush && i === 2 ? "pr-gutter" : "pr-tight")}>
               <div className="mb-hair label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
               {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
             </div>
