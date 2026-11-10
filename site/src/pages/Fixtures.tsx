@@ -67,14 +67,14 @@ function TeamName({ name, ix, small }: { name: string; ix: number; small?: boole
 }
 
 /** The two sides, each with its score (or "Yet to bat"). */
-function ScoreRows({ f, match, small }: { f: any; match: any; small?: boolean }) {
+function ScoreRows({ f, match, small, flush }: { f: any; match: any; small?: boolean; flush?: boolean }) {
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   return (
-    <div className="grid gap-snug">
+    <div className={cn("grid", flush ? "-mx-gutter divide-y divide-hairline border-y border-hairline" : "gap-snug")}>
       {sides.map(([name, ix]) => (
-        <div key={name} className="flex min-w-0 items-center gap-snug">
-          <TeamName name={name} ix={ix} small={small} />
-          <LiveScore s={teamScore(match, name)} size="lg" />
+        <div key={name} className={cn("min-w-0 items-center", flush ? "grid grid-cols-[minmax(0,1fr)_minmax(0,44%)]" : "flex gap-snug")}>
+          <div className={cn("min-w-0 flex-1", flush && "px-gutter py-tight")}><TeamName name={name} ix={ix} small={small} /></div>
+          {flush ? <div className="flex min-w-0 self-stretch items-center justify-end border-l border-hairline px-gutter"><LiveScore s={teamScore(match, name)} size="lg" /></div> : <LiveScore s={teamScore(match, name)} size="lg" /> }
         </div>
       ))}
     </div>
@@ -128,7 +128,7 @@ function MatchHeader({ f, live }: { f: any; live: boolean }) {
       <section className="flex flex-col gap-tight">
         {backBtn}
         {actions}
-        <ScorecardCard match={match} teams={known} inPlay fixtureId={f.id} top={<div className="flex flex-col gap-tight">{statusRow}{stateLine}</div>} head={<ScoreRows f={f} match={match} small />} />
+        <ScorecardCard match={match} teams={known} inPlay fixtureId={f.id} top={<div className="flex flex-col gap-tight">{statusRow}{stateLine}</div>} head={<ScoreRows f={f} match={match} small flush />} />
       </section>
     );
   }
@@ -243,7 +243,7 @@ export function FixturePage() {
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
           <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
-            <PillGroup segmented layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
+            <PillGroup layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
           </div>
           <div ref={bodyRef} className="scroll-mt-32">
           <AnimatedHeight>

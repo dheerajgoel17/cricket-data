@@ -9,7 +9,7 @@ import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { MarketTape } from "./market-tape";
-import { StandingMark, Tick } from "./tick";
+import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
@@ -41,7 +41,7 @@ import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
-import { BatterSpot, LiveBadge, LiveOpened, LiveTrack } from "./live-spot";
+import { BatterSpot, LiveBadge, LiveOpened, LineProgress } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 import { propKey } from "@/lib/saved";
@@ -56,7 +56,7 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean };
-interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
+interface Row { gender: number | null; comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
@@ -100,13 +100,15 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         const l5 = windowRate(entries, 5, main.line), l10 = windowRate(entries, 10, main.line);
         const season = windowRate(entries.filter((e) => String(e.date).startsWith(year)), 0, main.line);
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
-        const venue = String((fixtures.data || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f))?.venue || "");
+        const fixture = (fixtures.data || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f));
+        const venue = String(fixture?.venue || "");
+        const gender = fixture?.gender === "female" ? 1 : fixture?.gender === "male" ? 0 : null;
         const ven = windowRate(venue ? entries.filter((e) => venueStem(e.venueName) === venueStem(venue)) : [], 0, main.line); // his games at the match's ground (the data spells a ground several ways)
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ gender, comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
@@ -172,6 +174,17 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
   );
 }
 
+function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
+  if (out) return null;
+  const quote = r.quotes.find((q) => q.live);
+  return (
+    <>
+      <LineProgress standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
+      {quote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
+    </>
+  );
+}
+
 /** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
 export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
@@ -195,16 +208,14 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
-          {soFar != null && <LiveTrack value={soFar.v} line={r.line} was={r.quotes.find((q: Quote) => q.live)?.opened} verdict={soFar.verdict} />}
+          <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
-            {soFar != null && <StandingMark standing={soFar} line={r.line} />}
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
             {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
             <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
           </span>
-          {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
         </span>
-        <span className="grid justify-items-end gap-hair">
+        <span className="grid self-start justify-items-end gap-hair pt-control">
           <span className="grid justify-items-end gap-hair text-right">
             <span className="flex items-baseline gap-tight whitespace-nowrap">
               <span className="label-cap text-caption text-muted-foreground">Model</span>
@@ -273,9 +284,9 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
-                        {soFar != null && <StandingMark standing={soFar} line={r.line} />}
                       </span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+                      <PropProgress r={r} soFar={soFar} out={out} />
                     </span>
                   </span>
                 </td>
@@ -389,7 +400,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
       <div className={cn("flex flex-col gap-snug", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
       {/* one chip row for the prop type, plus a Filters button (count of active filters on it) that opens the filter view: full screen on a phone, a right drawer from lg */}
       <div className="flex items-center gap-snug">
-        <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+        <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
         <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
           className={cn("relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none", urlState && "hidden lg:inline-flex")}>
           <AdjustmentsHorizontalIcon className="size-4" />{wl}
@@ -418,7 +429,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} hideMatch={!!teams} />)}
               </AnimatePresence>
             </ul>
             <div className="hidden lg:block">
