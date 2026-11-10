@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-10T09:33:27Z",
+ "generated_at_utc": "2026-11-10T10:33:47Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -179,15 +179,15 @@
    "team": "Sydney Thunder Women",
    "inn": 0,
    "side": "under",
-   "line": 41.5,
-   "best_odds": 2.7,
+   "line": 40.5,
+   "best_odds": 2.68,
    "best_source": "Dafabet",
    "hits": 8,
    "played": 16,
    "window": 20,
-   "chance": 0.4384,
-   "edge": 0.1837,
-   "edge_pct": 18.4,
+   "chance": 0.439,
+   "edge": 0.1766,
+   "edge_pct": 17.7,
    "bat_first": false
   },
   {
