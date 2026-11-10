@@ -674,3 +674,19 @@ def test_a_minted_priced_player_whose_page_belongs_to_the_base_player_gets_the_s
     assert ph["deadbeef"] == ph[synth.pid(synth.DUCKETT)] == "c:ZZ"
     assert list(ident.values()).count("ZZ") == 1, "the identity table keeps one id per source player"
     assert (meta["priced_players"], meta["priced_with_photo"]) == (1, 1) and not (out / "identity_review.json").exists()
+
+
+def test_a_book_that_names_a_youth_match_by_its_competition_alone_is_not_a_second_fixture(tmp_path):
+    """10 Nov 2026: a book listed "India vs United Arab Emirates" in "U19 Asia Cup"; the schedule has India U19 / United Arab Emirates U19, so the archive file became a senior T20 stop-gap with no score."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    for name, match in (("2026-11-10-india-v-united-arab-emirates", "India vs United Arab Emirates"), ("2026-11-10-india-u19-v-uae-u19", "India U19 vs UAE U19")):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "competition": "U19 Asia Cup", "start_utc": "2026-11-10T05:00:00Z", "fixture": None, "events": [{}]}))
+    now = datetime(2026, 11, 10, 6, 0, tzinfo=timezone.utc)
+    listed = [{"start": "2026-11-10T05:00Z", "fmt": "ODI", "a": "India U19", "b": "United Arab Emirates U19"}]
+    assert B._unscheduled_priced(vb, listed, now=now) == []
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19", "India U19"]  # with no schedule row the stop-gap at least carries the youth tag

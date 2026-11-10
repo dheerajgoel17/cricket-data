@@ -32,7 +32,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-from cricket_site.sides import SAME_SIDE
+from cricket_site.sides import SAME_SIDE, youth_sides
 from cricket_site.wrap import unwrap as unwrap_data
 
 from . import config
@@ -78,10 +78,13 @@ def group(book: dict) -> list[dict]:
             st = parse_ts(x.get("start_utc"))
             if not (a and b and st):
                 continue
+            ya, yb = youth_sides(a, b, x.get("competition"))
+            named = x.get("match") if (ya, yb) == (a, b) else f"{ya} vs {yb}"  # "India" v "UAE" in the U19 Asia Cup is the U19 match, filed with it
+            a, b = ya, yb
             k = frozenset((team_key(a), team_key(b)))
             g = next((g for g in out if g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME), None)
             if g is None:
-                g = {"k": k, "start": st, "match": x.get("match") or f"{a} vs {b}", "start_utc": x["start_utc"], "competition": x.get("competition"),
+                g = {"k": k, "start": st, "match": named or f"{a} vs {b}", "start_utc": x["start_utc"], "competition": x.get("competition"),
                      **{kind: [] for kind in KINDS}}
                 out.append(g)
             elif not g["competition"] and x.get("competition"):
@@ -212,10 +215,13 @@ def _wanted_matches(book: dict) -> list[dict]:
             st = parse_ts(x.get("start_utc"))
             if not (a and b and st):
                 continue
+            ya, yb = youth_sides(a, b, x.get("competition"))
+            named = x.get("match") if (ya, yb) == (a, b) else f"{ya} vs {yb}"  # "India" v "UAE" in the U19 Asia Cup is the U19 match, filed with it
+            a, b = ya, yb
             k = frozenset((team_key(a), team_key(b)))
             if any(g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME for g in out):
                 continue
-            out.append({"k": k, "start": st, "match": x.get("match") or f"{a} vs {b}",
+            out.append({"k": k, "start": st, "match": named or f"{a} vs {b}",
                         "start_utc": x["start_utc"], "competition": x.get("competition")})
     return out
 
