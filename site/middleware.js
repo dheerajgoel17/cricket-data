@@ -1,9 +1,9 @@
-import { fromOurPage } from "./packages/engine/guard.js";
-// Edge: block known scrapers on /data and /api, require the gate cookie for /data JSON (except meta.json),
+import { ASSISTANT_UA, BOT_UA, fromOurPage } from "./packages/engine/guard.js";
+// Edge: block known scrapers on /data and /api (AI assistants too: they only get the share pages), require the gate cookie for /data JSON (except meta.json),
 // and send link-preview crawlers the share HTML (so WhatsApp/Twitter see the card without running the app).
-const BOT = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|amazonbot|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalsearch|ia_archiver|megaindex/i;
 // Link-preview fetchers (not search indexers): they get the share HTML so they never have to run the app.
-export const CRAWLER = /twitterbot|facebookexternalhit|facebot|whatsapp|telegrambot|slackbot|linkedinbot|discordbot|pinterest|skypeuripreview|embedly|quora link preview|redditbot|vkshare|tumblr|bitlybot|flipboard|iframely|opengraph|microsoftpreview|cardyb|bridgy|mastodon|summaly|viber|line\//i;
+const PREVIEW = /twitterbot|facebookexternalhit|facebot|whatsapp|telegrambot|slackbot|linkedinbot|discordbot|pinterest|skypeuripreview|embedly|quora link preview|redditbot|vkshare|tumblr|bitlybot|flipboard|iframely|opengraph|microsoftpreview|cardyb|bridgy|mastodon|summaly|viber|line\//i;
+export const CRAWLER = new RegExp(`${PREVIEW.source}|${ASSISTANT_UA.source}`, "i");
 
 export const config = { matcher: ["/data/:path*", "/api/:path*", "/player/:path*", "/fixture/:path*", "/venue/:path*"] };
 
@@ -39,8 +39,9 @@ export default async function middleware(req) {
     dest.searchParams.set("path", crawlerSharePath(url));
     return fetch(dest, { headers: req.headers });
   }
+  if (ASSISTANT_UA.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // an assistant reads the share pages above, never the data or the gate
   if (path === "/api/gate") return;
-  if (!ua || BOT.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
+  if (!ua || BOT_UA.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
   // api/og fetches matches.json + one player shard with this header (shards stay out of the function bundle).

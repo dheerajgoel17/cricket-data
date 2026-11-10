@@ -411,8 +411,10 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
     assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")
     assert "User-agent: Twitterbot\nAllow: /" in robots
-    for bot in ("GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "PerplexityBot"):
+    for bot in ("GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "Bytespider", "SemrushBot"):  # training crawlers and SEO scrapers
         assert f"User-agent: {bot}\nDisallow: /\n" in robots
+    for bot in ("ChatGPT-User", "OAI-SearchBot", "Claude-User", "Claude-SearchBot", "PerplexityBot", "Perplexity-User"):  # assistants and AI search follow the `*` rules: pages yes, /api/ and /data/ no
+        assert f"User-agent: {bot}" not in robots
     assert "User-agent: Googlebot" not in robots and "User-agent: Bingbot" not in robots  # search engines stay allowed
 
 
