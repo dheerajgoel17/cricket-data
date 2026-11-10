@@ -55,7 +55,7 @@ export async function insertRows({ base, key, rows, fetchImpl = fetch }) {
  * The per-round writer: `record(matches, at)` with the round's started matches (as the snapshot read them). Reads each pair's latest values back once per run, reads the live scores once per round,
  * and inserts what changed. Returns `{ rows, unchanged, skipped }` (skipped: matches left alone this round because the read-back failed).
  */
-export function createLogger({ base, key, siteUrl = "", wrapKey = "", fetchImpl = fetch, now = () => Date.now(), log = console.log }) {
+export function createLogger({ base, key, siteUrl = "", wrapKey = "", fetchImpl = fetch, now = () => Date.now(), log = console.log, load = loadLatest, append = insertRows }) {
   const state = createState();
   const warn = (what, e) => log(`::warning::in-play log: ${what}: ${String(e?.message || e).slice(0, 140)}`);
   return async function record(matches, at) {
@@ -63,7 +63,7 @@ export function createLogger({ base, key, siteUrl = "", wrapKey = "", fetchImpl 
     if (!matches.length) return out;
     const need = pairsToLoad(state, matches);
     if (need.length) {
-      try { ingest(state, need, await loadLatest({ base, key, pairs: need, since: new Date(now() - LOOKBACK_MS).toISOString(), fetchImpl })); } catch (e) { warn("read-back failed, nothing logged for these matches this round", e); }
+      try { ingest(state, need, await load({ base, key, pairs: need, since: new Date(now() - LOOKBACK_MS).toISOString(), fetchImpl })); } catch (e) { warn("read-back failed, nothing logged for these matches this round", e); }
     }
     let liveDoc = null;
     if (siteUrl) { try { liveDoc = await readScores({ siteUrl, wrapKey, fetchImpl }); } catch (e) { warn("live scores unavailable, rows carry no score", e); } }
@@ -71,7 +71,7 @@ export function createLogger({ base, key, siteUrl = "", wrapKey = "", fetchImpl 
     out.unchanged = plan.unchanged;
     out.skipped = plan.skipped;
     if (plan.rows.length) {
-      try { out.rows = await insertRows({ base, key, rows: plan.rows, fetchImpl }); plan.commit(out.rows); } catch (e) { out.rows = e.written || 0; plan.commit(out.rows); warn("insert failed, will retry the rest next round", e); }
+      try { out.rows = await append({ base, key, rows: plan.rows, fetchImpl }); plan.commit(out.rows); } catch (e) { out.rows = e.written || 0; plan.commit(out.rows); warn("insert failed, will retry the rest next round", e); }
     }
     plan.listed();
     return out;

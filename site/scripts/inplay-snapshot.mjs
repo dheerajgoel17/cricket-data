@@ -2,9 +2,10 @@
 // about 15 s apart, and each time replaces the one row of `inplay_lines` (service key; api/inplay.js reads it with the public key). Nothing is kept and nothing touches the pre-match files.
 // INPLAY_EXTRA_FILE, when set, holds the other books' started matches for the minute (written once by scripts/inplay_extra.py) and is merged into every round.
 // Needs PRICE_FEED_URL, SUPABASE_URL and SUPABASE_SERVICE_KEY in the environment (never printed). With nothing in play it writes one empty body and stops, so a quiet minute is a short run.
-// With INPLAY_LOG=1 every round is also appended to the log table `inplay_log` (inplay-log.mjs: only lines that first appear or move, with the score at that moment; data only, never read by the site or settlement).
+// INPLAY_LOG=storage archives changes as compressed files; INPLAY_LOG=1 selects the SQL log.
 import { readFileSync } from "node:fs";
 import { mergeMatches, parseInplayFeed } from "../packages/engine/inplay-lines.js";
+import { historyStorage } from "./inplay-storage.mjs";
 import { createLogger, dbHeaders } from "./inplay-log.mjs";
 
 const UA = "Mozilla/5.0 (compatible; cricket-props-hub/0.2; +https://github.com/dheerajgoel17/cricket-data)";
@@ -98,8 +99,9 @@ async function main() {
   const url = String(process.env.PRICE_FEED_URL || ""), base = String(process.env.SUPABASE_URL || "").replace(/\/+$/, ""), key = String(process.env.SUPABASE_SERVICE_KEY || "").trim();
   if (!url || !base || !key) { console.log("inplay-snapshot: PRICE_FEED_URL / SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping"); return; }
   const extra = loadExtra(process.env.INPLAY_EXTRA_FILE || "");
-  // the log is opt-in: INPLAY_LOG=1 (a repository variable, set once the migration is applied); SITE_URL is where the live scores are read
-  const record = process.env.INPLAY_LOG === "1" ? createLogger({ base, key, siteUrl: String(process.env.SITE_URL || ""), wrapKey: String(process.env.DATA_WRAP_KEY || "").trim() }) : null;
+  // Enable the file archive with INPLAY_LOG=storage after applying the bucket migration.
+  const storage = process.env.INPLAY_LOG === "storage" ? historyStorage({ base, key }) : null;
+  const record = storage || process.env.INPLAY_LOG === "1" ? createLogger({ base, key, load: storage?.load, append: storage?.append, siteUrl: String(process.env.SITE_URL || ""), wrapKey: String(process.env.DATA_WRAP_KEY || "").trim() }) : null;
   const out = await run({ read: () => readRound(url, extra), save: (body) => saveBody({ base, key, body }), record });
   console.log(JSON.stringify(out));
 }

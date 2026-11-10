@@ -20,7 +20,7 @@ const store = (() => {
   return s;
 })();
 let match: any = null;
-vi.mock("@/lib/data", () => ({ useData: () => ({ store }) }));
+vi.mock("@/lib/data", () => ({ useData: () => ({ store }), loadJson: async () => ({ "T20|0|3|6|3": { over: 7, under: 4, push: 1 } }) }));
 vi.mock("@/hooks/useLive", () => ({ useLiveMatch: () => ({ match }) }));
 
 const live = (o = {}) => ({ status: "live", teams: [{ name: "Alpha" }, { name: "Beta" }], innings: [{ n: 1, team: "Alpha", runs: 60, wkts: 1, overs: 6 }], ...o });
@@ -34,7 +34,7 @@ describe("TeamSpot", () => {
     match = live();
     render(<TeamSpot r={row()} fx={fx} teams={sides} />);
     expect(screen.getByText("6 over · 3 under")).toBeInTheDocument();
-    expect(screen.getByText(/Same spot:/)).toHaveAttribute("title", "60/1 after 6.0 ov, 54–66 runs in 9 past T20 innings · median finish 200"); // the nine finished 180 x3, 200 x4, 220 x2: the detail is in the title, not on the row
+    expect(screen.getByText(/Similar team innings:/)).toHaveAttribute("title", "60/1 after 6.0 ov, 54–66 runs in 9 past T20 innings · median finish 200"); // the nine finished 180 x3, 200 x4, 220 x2: the detail is in the title, not on the row
     expect(screen.queryByText(/small sample/)).not.toBeInTheDocument();
   });
 
@@ -52,11 +52,18 @@ describe("TeamSpot", () => {
 });
 
 describe("BatterSpot", () => {
+  it("labels comparable live lines and shows results that finished exactly on the line", async () => {
+    match = live({ players: [{ name: "Opener", team: "Alpha", runs: 30, balls: 20, out: false }] });
+    render(wrap(<BatterSpot r={{ pid: "pid1", name: "Opener", team: "Alpha", opp: "Beta", fmt: "T20", gender: 0, stat: "runs", line: 49.5 }} />));
+    expect(await screen.findByText("7 over · 4 under · 1 on the line")).toBeInTheDocument();
+    expect(screen.getByText(/Similar in-play lines:/)).toBeInTheDocument();
+  });
+
   it("counts the batter's own past innings in the same spot: 30 off 20, 3 innings in the band, 2 over 49.5 and 1 under", async () => {
     match = live({ players: [{ name: "Opener", team: "Alpha", runs: 30, balls: 20, out: false, strike: true }] });
     render(wrap(<BatterSpot r={{ pid: "pid1", name: "Opener", team: "Alpha", opp: "Beta", fmt: "T20", start: "2026-11-09T10:00:00Z", line: 49.5 }} />));
     expect(await screen.findByText("2 over · 1 under")).toBeInTheDocument();
-    expect(screen.getByText(/Same spot:/)).toHaveAttribute("title", "30 off 20, 3 of his innings · median finish 55"); // 41, 55, 62
+    expect(screen.getByText(/Batter’s own history:/)).toHaveAttribute("title", "30 off 20, 3 of his innings · median finish 55"); // 41, 55, 62
     expect(screen.getByText(/small sample/)).toBeInTheDocument(); // 3 < 6
   });
 

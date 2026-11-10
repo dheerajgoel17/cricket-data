@@ -76,9 +76,13 @@ export function OddsPage() {
 
 // ------------------------------------------------------------------ glossary
 const GLOSS: [string, string, string, string][] = [
-  ["Hit rate", "Basic", "Prices", "Share of games where the stat cleared the line (over: strictly more than the line). Pushes on whole-number lines are void."],
+  ["Hit rate", "Basic", "Prices", "Share of eligible games that finished on the chosen side of the line. Over means above the line, and under means below it. A result exactly on the line is left out of the rate."],
   ["Fair decimal price", "Basic", "Prices", "1 ÷ hit rate. The price at which the historical rate breaks even, with no bookmaker margin."],
   ["Line", "Basic", "Prices", "The threshold in a prop, e.g. sixes over 0.5 or runs over 24.5."],
+  ["Similar in-play lines", "Basic", "Form", "How recent live batter-run lines finished in comparable T20 or ODI innings. The comparison uses runs scored, balls faced and runs needed to go over. Each batter innings counts once in the comparison."],
+  ["Batter’s own history", "Basic", "Form", "How this batter's own past innings finished against today's line after scoring a similar number of runs from the same number of balls."],
+  ["Similar team innings", "Basic", "Form", "How past teams finished against today's line after scoring a similar number of runs at the same point in the innings."],
+  ["On the line (push)", "Basic", "Rules", "The final score lands exactly on the line. For example, 50 runs on a line of 50 is a push. The stake is returned."],
   ["DNP", "Basic", "Form", "Did not play: the team had a fixture but the player was not in the playing XI. Shown on charts, left out of hit rates."],
   ["VOID (did not bat / bowl)", "Intermediate", "Rules", "Named in the playing XI but never reached the crease (or never bowled): bets on that player's batting (or bowling) stats are void and the stake is returned. Left out of hit rates."],
   ["30s", "Basic", "Markets", "Innings of 30-49 runs. Counted per match as a fancy market."],
@@ -93,10 +97,10 @@ const GLOSS: [string, string, string, string][] = [
   ["Retired hurt", "Basic", "Rules", "Not a wicket. Penalty runs count. Super overs are ignored."],
   ["Batting position", "Intermediate", "Form", "Order in which a batter first appears at the crease (openers are 1 and 2)."],
   ["Home / away / neutral", "Intermediate", "Form", "Inferred from the series name, the venue's host nation and who plays there most; the base data has no home flag."],
-  ["Correlated props", "Advanced", "Prices", "How often a player's other props clear when a given prop clears, versus his normal rate."],
+  ["Correlated props", "Advanced", "Prices", "How often two of a player's stats clear their lines together, compared with how often each clears on its own."],
   ["Overround", "Advanced", "Prices", "The sum of implied probabilities above 100%: the bookmaker's margin."],
   ["Kelly stake", "Advanced", "Prices", "Stake sized from your edge: (p × price - 1) ÷ (price - 1). Quarter Kelly is the usual cautious fraction."],
-  ["Provisional matches", "Intermediate", "Data", "Scraped scorecards covering the gap until the base data is updated: player totals only, so no partnerships or batting order."],
+  ["Provisional matches", "Intermediate", "Data", "Recent matches shown from early scorecards while we wait for the full match data. Some stats may be unavailable."],
 ];
 export function GlossaryPage() {
   setTitle("Cricket stats explained");

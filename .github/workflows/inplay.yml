@@ -4,7 +4,7 @@ name: In-play snapshot
 # The same run reads the other books that list started matches once (scripts/inplay_extra.py) and merges them into every round.
 # The scheduler Worker starts it every minute (GitHub's own cron is hours late and runs no more often than every 5 minutes, so the schedule below is only the fallback).
 # Nothing is committed and the pre-match files are untouched. With nothing in play a run is one read and one write.
-# With the repository variable INPLAY_LOG=1 every round is also appended to the log table `inplay_log` (only lines that first appear or move, with the score at that moment; docs/OPERATIONS.md "In-play line log"). Unset, nothing is logged.
+# INPLAY_LOG=storage saves changed offers and their scores as compressed files. INPLAY_LOG=1 selects the SQL log.
 on:
   schedule:
     - cron: "* * * * *"
@@ -46,6 +46,7 @@ jobs:
             site/packages/engine
             site/scripts/inplay-snapshot.mjs
             site/scripts/inplay-log.mjs
+            site/scripts/inplay-storage.mjs
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:

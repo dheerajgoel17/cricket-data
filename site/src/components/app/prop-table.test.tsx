@@ -6,7 +6,7 @@ import { authState, savedKeys } from "@/test/auth-harness";
 import { PropRow, PropTable } from "./hot-props";
 
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
-vi.mock("./live-spot", async (orig) => ({ ...(await orig<typeof import("./live-spot")>()), BatterSpot: () => null })); // its history line needs the data provider; not what is tested here
+vi.mock("./live-spot", async (orig) => ({ ...(await orig<typeof import("./live-spot")>()), BatterSpot: () => <span>Similar in-play lines</span> })); // its history line needs the data provider; not what is tested here
 vi.mock("./badges", () => ({
   PlayerBadge: () => <span>pic</span>,
   PlayerPhoto: () => <span>face</span>,
@@ -40,6 +40,29 @@ describe("PropTable", () => {
     expect(screen.getByText("Wankhede")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "H2H" }));
     expect(onWin).toHaveBeenCalledWith("h2h");
+  });
+
+  it("shows the same score, history and fallback states in the card and table", () => {
+    const live = { ...row, line: 40, quotes: [{ source: "book", name: "Book", line: 40, over: 1.85, under: 1.95, live: true }] };
+    const renderRows = (standing: Parameters<typeof PropRow>[0]["soFar"], out = false) => (
+      <MemoryRouter>
+        <ul><PropRow r={live} win="l10" wl="L10" i={0} soFar={standing} out={out} /></ul>
+        <PropTable rows={[live]} win="l10" onWin={() => {}} bars={false} soFarOf={() => standing} outOf={() => out} />
+      </MemoryRouter>
+    );
+    const { rerender } = render(renderRows({ v: 32, state: "live", verdict: null }));
+    expect(screen.getAllByText(/32 so far/)).toHaveLength(2);
+    expect(screen.getAllByRole("img", { name: "32 of 40" })).toHaveLength(2);
+    expect(screen.getAllByText("Similar in-play lines")).toHaveLength(2);
+    rerender(renderRows(null));
+    expect(screen.getAllByText("Score unavailable")).toHaveLength(2);
+    rerender(renderRows({ v: 40, state: "final", verdict: "push" }));
+    expect(screen.getAllByText(/40 final · On the line/)).toHaveLength(2);
+    expect(screen.queryByText("Similar in-play lines")).toBeNull();
+    expect(screen.queryByRole("img", { name: "40 of 40" })).toBeNull();
+    rerender(renderRows(null, true));
+    expect(screen.getAllByText("Not in XI")).toHaveLength(2);
+    expect(screen.queryByText("Score unavailable")).toBeNull();
   });
 
   it("uses a short stadium name on the prop card, full venue on the title", () => {
