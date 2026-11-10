@@ -80,7 +80,7 @@ export function Header() {
   const back = () => (history.state?.idx > 0 ? nav(-1) : nav("/"));
   const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions (a match) gets a bar with just the back button and those
   return (
-    <header className={cn("sticky top-0 z-50 h-header text-foreground", slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
+    <header className={cn("sticky top-0 z-50 h-header bg-background text-foreground", !slot?.flush && "ring-1 ring-hairline")}>
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
         <SidebarTrigger className="-ml-2 hidden text-foreground hover:bg-muted hover:text-foreground lg:inline-flex" aria-label="Toggle sidebar" />
         {down && <button type="button" aria-label="Back" onClick={back} className="-ml-2 grid size-(--touch) shrink-0 place-items-center rounded-full text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted lg:hidden"><ChevronLeftIcon className="size-6" /></button>}

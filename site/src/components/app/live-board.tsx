@@ -360,7 +360,7 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
   if (!scoreboardShows(match, inPlay)) return null;
   return (
     <FlushCtx.Provider value={flush}>
-    <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight bg-card", flush ? "-mx-gutter px-gutter py-inset" : "rounded-2xl p-inset")}>
+    <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-inset" : "rounded-2xl bg-card p-inset")}>
       {inPlay && top ? <>{top}<Rule dotted /></> : null}
       {inPlay && head ? <>{head}<Rule /></> : null}
       {strip ? <LiveBoard match={match} teams={teams} /> : <CardSummary match={match} teams={teams} />}
