@@ -8,6 +8,7 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { batterHistoryKey } from "@cricket/engine/inplay-history.js";
 import { loadJson, useData } from "@/lib/data";
+import { StandingMark, type Standing } from "./tick";
 import { cn } from "@/lib/utils";
 
 // the engine is plain JS: give its reports the loose shape these views read
@@ -43,6 +44,18 @@ export function LiveTrack({ value, line, was, verdict, className }: { value?: nu
   );
 }
 
+export function LineProgress({ standing, live, line, opened }: { standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
+  if (!standing || (standing.v == null && standing.state !== "void")) {
+    return live ? <span className="text-footnote text-muted-foreground">Score unavailable</span> : null;
+  }
+  return (
+    <span className="grid gap-hair text-footnote text-muted-foreground">
+      {standing.state === "live" && <LiveTrack value={standing.v} line={line} was={opened} verdict={standing.verdict} />}
+      <StandingMark standing={standing} line={line} />
+    </span>
+  );
+}
+
 /**
  * Under a live innings-total row: how past innings that were in the same spot (the same runs after the same balls, 10% either way) went against this row's line: "6 of 9 over". Counts of the
  * format's history (every side, three years, same level), never a model; nothing shows when the row is not the innings being batted now or nothing in the history was in that spot.
@@ -62,7 +75,7 @@ export function TeamSpot({ r, fx, teams, className }: { r: any; fx: any; teams: 
   const [lo, hi] = rep.band as [number, number];
   return (
     <p className={cn("text-footnote text-muted-foreground", className)} title={`${inn!.runs}/${inn!.wkts} after ${overs(inn!.overs)} ov, ${lo}–${hi} runs in ${rep.n} past ${fx.fmt} innings · median finish ${rep.summary.median}`}>
-      Similar team innings: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < MIN_SAMPLE ? " · small sample" : ""}
+      Similar team innings: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < MIN_SAMPLE ? " · small sample" : ""}
     </p>
   );
 }
@@ -84,10 +97,10 @@ export function BatterSpot({ r, className }: { r: any; className?: string }) {
   return (
     <span className={cn("text-footnote text-muted-foreground", className)}>
       {!!rep?.n && <span className="block" title={`${bat.runs} off ${bat.balls}, ${rep.n} of his innings · median finish ${rep.summary.median}`}>
-        Batter in similar starts: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+        Batter’s own history: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
       {counts && <span className="block" title="Recent T20 or ODI innings in the same format with similar runs, balls faced and runs needed to go over. Each batter innings counts once here.">
-        Similar in-play lines: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} on the line`}</span>{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+        Similar in-play lines: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} on the line`}</span> · {counts.over + counts.under + counts.push} innings{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
     </span>
   );

@@ -80,7 +80,7 @@ const GLOSS: [string, string, string, string][] = [
   ["Fair decimal price", "Basic", "Prices", "1 ÷ hit rate. The price at which the historical rate breaks even, with no bookmaker margin."],
   ["Line", "Basic", "Prices", "The threshold in a prop, e.g. sixes over 0.5 or runs over 24.5."],
   ["Similar in-play lines", "Basic", "Form", "How recent live batter-run lines finished in comparable T20 or ODI innings. The comparison uses runs scored, balls faced and runs needed to go over. Each batter innings counts once in the comparison."],
-  ["Batter in similar starts", "Basic", "Form", "How this batter's own past innings finished against today's line after scoring a similar number of runs from the same number of balls."],
+  ["Batter’s own history", "Basic", "Form", "How this batter's own past innings finished against today's line after scoring a similar number of runs from the same number of balls."],
   ["Similar team innings", "Basic", "Form", "How past teams finished against today's line after scoring a similar number of runs at the same point in the innings."],
   ["On the line (push)", "Basic", "Rules", "The final score lands exactly on the line. For example, 50 runs on a line of 50 is a push. The stake is returned."],
   ["DNP", "Basic", "Form", "Did not play: the team had a fixture but the player was not in the playing XI. Shown on charts, left out of hit rates."],

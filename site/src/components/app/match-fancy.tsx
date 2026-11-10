@@ -31,7 +31,7 @@ import { FancyFilters } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
-import { LiveBadge, LiveOpened, LiveTrack, TeamSpot } from "./live-spot";
+import { LiveBadge, LiveOpened, LineProgress, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
@@ -112,12 +112,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
           )}
           {r.live && <LiveOpened opened={r.opened} line={r.line} />}
         </span>
-        {mark != null && (
-          <>
-            <LiveTrack value={mark.v} line={r.line} was={r.opened} verdict={mark.verdict} />
-            <span className="text-callout text-muted-foreground"><StandingMark standing={mark} line={r.line} /></span>
-          </>
-        )}
+        <LineProgress standing={mark} live={!!r.live} line={r.line} opened={r.opened} />
       </span>
       <span className="grid justify-items-end gap-hair">
         <span className="grid justify-items-end gap-hair text-right">

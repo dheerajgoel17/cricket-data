@@ -63,7 +63,7 @@ describe("BatterSpot", () => {
     match = live({ players: [{ name: "Opener", team: "Alpha", runs: 30, balls: 20, out: false, strike: true }] });
     render(wrap(<BatterSpot r={{ pid: "pid1", name: "Opener", team: "Alpha", opp: "Beta", fmt: "T20", start: "2026-11-09T10:00:00Z", line: 49.5 }} />));
     expect(await screen.findByText("2 over · 1 under")).toBeInTheDocument();
-    expect(screen.getByText(/Batter in similar starts:/)).toHaveAttribute("title", "30 off 20, 3 of his innings · median finish 55"); // 41, 55, 62
+    expect(screen.getByText(/Batter’s own history:/)).toHaveAttribute("title", "30 off 20, 3 of his innings · median finish 55"); // 41, 55, 62
     expect(screen.getByText(/small sample/)).toBeInTheDocument(); // 3 < 6
   });
 

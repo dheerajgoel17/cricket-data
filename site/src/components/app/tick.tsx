@@ -4,7 +4,7 @@ import { stillNeed } from "@cricket/engine/tape.js";
 import { useTick } from "@/hooks/useTick";
 import { cn } from "@/lib/utils";
 
-const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const;
+const VERDICT = { cleared: "Cleared", missed: "Missed", push: "On the line" } as const;
 
 /** Flash green on a rise, red on a drop; a small arrow while the flash holds. The live poll is ~15 s, so this is how a so-far or a price change is seen. */
 export function Tick({ value, children, className }: { value: number | null | undefined; children: ReactNode; className?: string }) {
@@ -24,7 +24,7 @@ export type Standing = { v: number | null; state: string; verdict: "cleared" | "
 export function StandingMark({ standing, line, className }: { standing: Standing | null | undefined; line?: number; className?: string }) {
   if (!standing) return null;
   if (standing.state === "void") return <span className={cn("rounded border border-dashed border-amber/60 px-hair text-caption text-amber", className)}>VOID</span>;
-  const need = stillNeed(standing.v, line, standing.verdict);
+  const need = standing.state === "live" ? stillNeed(standing.v, line, standing.verdict) : null;
   const tone = standing.verdict === "cleared" ? "text-primary" : standing.verdict === "missed" ? "text-miss" : "text-muted-foreground";
   return (
     <Tick value={standing.v} className={cn("tabular-nums", tone, className)}>

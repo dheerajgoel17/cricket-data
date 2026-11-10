@@ -9,7 +9,7 @@ import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { MarketTape } from "./market-tape";
-import { StandingMark, Tick } from "./tick";
+import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
@@ -41,7 +41,7 @@ import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
-import { BatterSpot, LiveBadge, LiveOpened, LiveTrack } from "./live-spot";
+import { BatterSpot, LiveBadge, LiveOpened, LineProgress } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 import { propKey } from "@/lib/saved";
@@ -174,6 +174,17 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
   );
 }
 
+function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
+  if (out) return null;
+  const quote = r.quotes.find((q) => q.live);
+  return (
+    <>
+      <LineProgress standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
+      {quote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
+    </>
+  );
+}
+
 /** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
 export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
@@ -197,14 +208,12 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
           {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
-          {soFar != null && <LiveTrack value={soFar.v} line={r.line} was={r.quotes.find((q: Quote) => q.live)?.opened} verdict={soFar.verdict} />}
+          <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
-            {soFar != null && <StandingMark standing={soFar} line={r.line} />}
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
             {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
             <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
           </span>
-          {r.quotes.some((q: Quote) => q.live) && <BatterSpot r={r} />}
         </span>
         <span className="grid justify-items-end gap-hair">
           <span className="grid justify-items-end gap-hair text-right">
@@ -275,9 +284,9 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
-                        {soFar != null && <StandingMark standing={soFar} line={r.line} />}
                       </span>
                       {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+                      <PropProgress r={r} soFar={soFar} out={out} />
                     </span>
                   </span>
                 </td>
