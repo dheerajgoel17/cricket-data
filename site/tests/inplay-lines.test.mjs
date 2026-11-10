@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { SKIP_MARKET, mergeMatches, parseInplayFeed, parseQuotes } from "@cricket/engine/inplay-lines.js";
+import { FIRST_GRACE_MS, SKIP_MARKET, mergeMatches, parseInplayFeed, parseQuotes, stampFirst } from "@cricket/engine/inplay-lines.js";
 
 // The shape the feed gave for a match that had started (probed from a workflow run): one quote per side per line.
 const q = (group_name, label, handicap, odds_dec, extra = {}) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec, ...extra });
@@ -366,4 +366,46 @@ test("the same rule for a side's innings total and a batter's milestone: the pre
   assert.deepEqual(bd(liveMerge(doc, inplay, resolveRahim, [], () => 1, () => 30)), [[200.5, false], [250.5, true]]); // no side scorer given: as before
   assert.deepEqual(ml(at(0, 30)), [[49.5, false], [99.5, true]]); // 30 short of the 49.5 he was priced at: that stays; the 100 he was never priced at shows at once
   assert.deepEqual(ml(at(0, 50)), [[49.5, false], [49.5, true], [99.5, true]]); // past 49.5: the live one is added beside it
+});
+
+test("a batter or side with no pre-match line gets its first live line as where it opened, so the bar can pass it however far the line moves", () => {
+  const doc = prematch();
+  doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim");
+  const feed = (line, over = 1.85, under = 1.85) => [{ home: "Bangladesh", away: "West Indies", lines: [
+    { kind: "player_runs", player: "M Rahim", line, over, under },
+    { kind: "team_runs", team: "Bangladesh", inn: 2, line: line * 4, over, under },
+  ] }];
+  const t0 = Date.parse("2026-11-10T07:00:00Z");
+  let s = stampFirst(feed(24.5), {}, t0);
+  assert.equal(s.matches[0].lines[0].first, 24.5);
+  assert.equal(s.matches[0].lines[1].first, 98);
+  s = stampFirst(feed(33.5), s.firsts, t0 + 60_000); // the line moved up with his score: the first stays
+  assert.equal(s.matches[0].lines[0].first, 24.5);
+  const out = liveMerge(doc, { matches: s.matches }, resolveRahim, [], () => 0, () => 30);
+  const live = out.lines.find((l) => l.pid === "p-rahim" && l.books[0].live);
+  assert.equal(live.line, 33.5);
+  assert.equal(live.books[0].opened, 24.5); // no pre-match line: opened is the first live line
+  assert.equal(out.fancy.find((f) => f.key === "team_total_runs" && f.live && f.inn === 2).opened, 98);
+  // a pre-match line, when there is one, still wins
+  const withPre = prematch();
+  const hit = liveMerge(withPre, { matches: s.matches }, resolveRahim, [], () => 0, () => 99).lines.find((l) => l.pid === "p-rahim" && l.books[0].live);
+  assert.notEqual(hit.books[0].opened, undefined);
+  assert.notEqual(hit.books[0].opened, 24.5);
+});
+
+test("the first line is the one nearest evens when several are listed at once, a row that is not a batter's or side's innings is left alone, and a line not listed for a while is forgotten", () => {
+  const m = [{ home: "A", away: "B", lines: [
+    { kind: "player_runs", player: "J Smith", line: 45.5, over: 2.6, under: 1.45 },
+    { kind: "player_runs", player: "J Smith", line: 25.5, over: 1.8, under: 1.9 },
+    { kind: "ou", market: "Runs in First 6 Overs", line: 40.5, over: 1.9, under: 1.9 },
+  ] }];
+  const t0 = 1_000_000;
+  const s = stampFirst(m, {}, t0);
+  assert.deepEqual(s.matches[0].lines.map((l) => l.first), [25.5, 25.5, undefined]);
+  assert.equal(m[0].lines[0].first, undefined); // the input is not changed
+  const gone = stampFirst([], s.firsts, t0 + FIRST_GRACE_MS - 1); // not listed for a round: remembered
+  assert.equal(Object.keys(gone.firsts).length, 1);
+  assert.equal(Object.keys(stampFirst([], s.firsts, t0 + FIRST_GRACE_MS + 1).firsts).length, 0); // long gone (a new innings): forgotten
+  const back = stampFirst([{ home: "A", away: "B", lines: [{ kind: "player_runs", player: "J Smith", line: 80.5, over: 1.9, under: 1.9 }] }], s.firsts, t0 + FIRST_GRACE_MS + 1);
+  assert.equal(back.matches[0].lines[0].first, 80.5);
 });
