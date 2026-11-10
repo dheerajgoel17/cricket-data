@@ -28,7 +28,7 @@ from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
-from .sides import SAME_SIDE, same_pair, youth_sides
+from .sides import SAME_SIDE, find_scheduled, same_pair, youth_sides
 
 NSHARD = 64
 SCHEMA = 1
@@ -843,6 +843,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     now = now or datetime.now(timezone.utc)
     now_min = now.timestamp() // 60
     held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
+    sched = [(r, r["a"], r["b"], _minutes(r["start"]) * 60, r.get("gender") == "female") for r in rows if r["fmt"] not in ("Test", "FC")]  # for a name no side key joins (``find_scheduled``)
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
@@ -858,6 +859,9 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             continue
         fx = d.get("fixture") or {}
         fmt = fx.get("fmt") or next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
+        women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
+        if fmt not in ("Test", "FC") and find_scheduled(a, b, mins * 60, (fx.get("gender") == "female") if fx.get("gender") else women, sched) is not None:
+            continue  # the schedule lists this match under the names it uses (the book said "Bangla Tigers v Royal Champs" for United Tigers v Royal Desert Champions): one fixture, not two
         keep_min = 6 * 24 * 60 if fmt in ("Test", "FC") else 24 * 60
         if mins > now_min:
             if fx:
@@ -866,7 +870,6 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             continue  # counted from the start the row publishes (the fixture's), the clock the data guard uses; the books' start can be hours later
         elif fmt == "Test" and (end := testend.end_of(d)) and testend.gone(end, now):
             continue  # it has a result and ended more than a day ago; its fixture page opens from the archive
-        women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
         elif (fx.get("result") or "").strip():

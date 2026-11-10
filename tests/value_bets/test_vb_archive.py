@@ -555,3 +555,54 @@ def test_same_pair_maps_a_variant_spelling_onto_the_match_we_have():
     # no competition hint on the line: the untagged name still files with the tagged match
     ev = lambda m: {"match": m, "competition": "", "start_utc": START, "markets": ["batter_runs"], "sources": ["x"], "n": 1}  # noqa: E731
     assert len(group({"generated_at_utc": "t", "lines": [], "fancy": [], "events": [ev("India vs United Arab Emirates"), ev("India U19 vs United Arab Emirates U19")]})) == 1
+
+
+# ---------------------------------------------------------------- a book's other name for a scheduled match
+NAME_SCHED = [
+    {"team_a": "Karachi Kings", "team_b": "Lahore Qalandars", "start_utc": "2026-11-09T16:00Z", "format": "T20", "gender": "male"},
+    {"team_a": "Dhaka Capitals", "team_b": "Sylhet Strikers", "start_utc": "2026-11-09T18:00Z", "format": "T20", "gender": "male"},
+    {"team_a": "Larkana Region", "team_b": "Rawalpindi Region", "start_utc": "2026-11-07T03:30Z", "format": "FC", "gender": "male"},
+    {"team_a": "India U19", "team_b": "Nepal U19", "start_utc": "2026-11-10T05:00Z", "format": "ODI", "gender": "male"},
+    {"team_a": "India Women", "team_b": "Australia Women", "start_utc": "2026-11-10T05:00Z", "format": "ODI", "gender": "female"},
+]
+
+
+def test_a_book_name_for_a_scheduled_match_is_renamed_to_the_schedules():
+    from value_bets.booklines import map_to_schedule
+
+    ev = {"match": "Karachi Kings XI vs Lahore Q", "competition": "", "start_utc": "2026-11-09T16:00:00Z"}
+    ln = {"match": "Capitals Dhaka vs Sylhet Sixers", "team": "Sylhet Sixers", "start_utc": "2026-11-09T18:00:00Z", "fmt": "T20"}
+    fx = {"match": "Karachi Kings XI vs Lahore Q", "home": "Karachi Kings XI", "away": "Lahore Q", "start_utc": "2026-11-09T16:00:00Z"}
+    book = {"lines": [ln], "events": [ev], "fancy": [fx]}
+    renamed = map_to_schedule([book], NAME_SCHED)
+    assert ev["match"] == "Karachi Kings vs Lahore Qalandars" and (fx["home"], fx["away"]) == ("Karachi Kings", "Lahore Qalandars")
+    assert ln["match"] == "Dhaka Capitals vs Sylhet Strikers" and ln["team"] == "Sylhet Strikers"
+    assert {r["schedule"] for r in renamed} == {"Karachi Kings vs Lahore Qalandars", "Dhaka Capitals vs Sylhet Strikers"}
+    assert len(group(book)) == 2 and {g["match"] for g in group(book)} == {"Karachi Kings vs Lahore Qalandars", "Dhaka Capitals vs Sylhet Strikers"}
+
+
+def test_a_name_the_exact_join_already_links_is_not_churned():
+    from value_bets.booklines import map_to_schedule
+
+    women = {"match": "India (W) vs Australia (W)", "start_utc": "2026-11-10T05:00:00Z"}
+    untagged = {"match": "India vs Nepal", "start_utc": "2026-11-10T05:00:00Z"}  # the age tag is the one the exact join drops
+    assert map_to_schedule([{"lines": [women, untagged]}], NAME_SCHED) == [] and women["match"] == "India (W) vs Australia (W)" and untagged["match"] == "India vs Nepal"
+
+
+def test_an_unsure_book_name_is_left_alone():
+    from value_bets.booklines import map_to_schedule
+
+    other_start = {"match": "Karachi Kings XI vs Lahore Q", "start_utc": "2026-11-09T19:30:00Z"}  # a different start: another match
+    one_side = {"match": "Karachi Kings XI vs Peshawar Z", "start_utc": "2026-11-09T16:00:00Z"}  # only one side is alike
+    multi_day = {"match": "Larkana vs Rawalpindi", "start_utc": "2026-11-07T03:30:00Z"}  # first-class games are priced day by day and keep their names
+    books = [other_start, one_side, multi_day]
+    assert map_to_schedule([{"lines": books}], NAME_SCHED) == [] and [x["match"] for x in books] == ["Karachi Kings XI vs Lahore Q", "Karachi Kings XI vs Peshawar Z", "Larkana vs Rawalpindi"]
+
+
+def test_a_start_shared_by_several_matches_with_a_common_word_is_not_guessed():
+    from value_bets.booklines import map_to_schedule
+
+    fc = [{"team_a": f"{a} Region", "team_b": f"{b} Region", "start_utc": "2026-11-07T03:30Z", "format": "ODI", "gender": "male"} for a, b in (("Larkana", "Rawalpindi"), ("Karachi", "Multan"), ("Lahore", "Quetta"), ("Hyderabad", "AJK"))]
+    x = {"match": "Sindh Region vs Punjab Region", "start_utc": "2026-11-07T03:30:00Z"}
+    map_to_schedule([{"lines": [x]}], fc)
+    assert x["match"] == "Sindh Region vs Punjab Region"  # "region" says nothing here: left alone, a visible stop-gap at worst

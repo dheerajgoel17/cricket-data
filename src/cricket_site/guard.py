@@ -11,7 +11,7 @@ engine's own function would agree with a bug in it (the one place the engine is 
     c  hard  each edition's bat-first win % equals a recount over every match in it with a winner (the engine is run on the built data)
     d  hard  a complete match (both innings ran their course) is not void; warn: the share of void summary-market matches per format per week
     e  warn  a scraped innings' stated total agrees with the batters' runs plus extras and with ball by ball
-    f  hard  one pair of sides is not two fixtures within 12 h
+    f  hard  one pair of sides is not two fixtures within 12 h, and a stop-gap row from the books is not a scheduled match under other names (same start, both sides alike)
     g  warn  priced players that could not be linked to the live source
 """
 from __future__ import annotations
@@ -33,6 +33,7 @@ from pathlib import Path
 
 from .build import _side
 from .parse import FORMAT_NAMES, INN_LEN
+from .sides import find_scheduled
 from .wrap import unwrap
 
 HARD, WARN = "hard", "warn"
@@ -314,6 +315,11 @@ def check_duplicate_fixtures(fixtures: list[dict]) -> Check:
         for (t1, f1), (t2, f2) in zip(rows, rows[1:], strict=False):
             if t2 - t1 < DUP_S:
                 c.problems.append(f"{_name(f1)} and {_name(f2)} are {(t2 - t1) / H:.1f} h apart")
+    sched = [(f, f.get("a"), f.get("b"), _ts(f.get("start")), f.get("gender") == "female") for f in fixtures if f.get("source") != "books" and f.get("fmt") not in ("Test", "FC") and _ts(f.get("start")) is not None]
+    for f in fixtures:
+        t = _ts(f.get("start"))
+        if f.get("source") == "books" and f.get("fmt") not in ("Test", "FC") and t is not None and (g := find_scheduled(f.get("a"), f.get("b"), t, f.get("gender") == "female", sched)):
+            c.problems.append(f"{_name(f)} (from the books) is the scheduled {_name(g)}: same start, sides alike")
     return c
 
 
