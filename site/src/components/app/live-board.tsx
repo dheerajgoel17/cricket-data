@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Fragment, createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ArrowTopRightOnSquareIcon, ChevronDownIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
@@ -153,7 +153,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           </div>
           {!!inn.batters?.length && (
             <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
+              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush ? "[&_tr>*:first-child]:pl-gutter [&_tr>*:last-child]:pr-gutter" : "[&_tr>*:first-child]:px-tight")}>
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Batter</th>
@@ -212,7 +212,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           )}
           {!!inn.bowlers?.length && (
             <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
+              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush ? "[&_tr>*:first-child]:pl-gutter [&_tr>*:last-child]:pr-gutter" : "[&_tr>*:first-child]:px-tight")}>
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Bowler</th>
@@ -345,16 +345,17 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
       {full && (
         <>
           <Rule />
-          <div>
+          <div className={cn(flush && "-mx-gutter")}>
             <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
-              className="flex w-full items-center gap-tight text-callout font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:opacity-70">
+              className={cn("flex min-h-control w-full items-center gap-tight text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:opacity-70", flush && "px-gutter")}>
+              <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
               {open ? "Hide scorecard" : "Full scorecard"}
-              <ChevronDownIcon className={cn("ml-auto size-4 transition-transform", open && "rotate-180")} aria-hidden />
+              <ChevronDownIcon className={cn("ml-auto size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} aria-hidden />
             </button>
             <AnimatedHeight>
               {open && (
-                <div className="flex flex-col gap-tight pt-snug">
-                  {fixtureId ? <Link to={`/fixture/${fixtureId}/scorecard`} className="ml-auto block w-fit text-footnote font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">Open as a page</Link> : null}
+                <div className={cn("flex flex-col gap-tight border-t border-hairline pt-tight", flush && "px-gutter")}>
+                  {fixtureId ? <Link to={`/fixture/${fixtureId}/scorecard`} className="ml-auto inline-flex min-h-control w-fit items-center gap-tight text-footnote font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">Open as a page <ArrowTopRightOnSquareIcon className="size-4" aria-hidden /></Link> : null}
                   <ScorecardBody match={match} teams={teams} />
                 </div>
               )}
