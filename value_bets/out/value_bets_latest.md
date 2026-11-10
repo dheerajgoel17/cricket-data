@@ -1,15 +1,15 @@
-# Cricket value bets - 2026-11-11 00:00 IST
+# Cricket value bets - 2026-11-11 01:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1840 prices
-- **smarkets**: ok, 607 prices
+- **smarkets**: ok, 564 prices
 - **feedk**: ok, 196 prices, 9 events
 - **feedg**: ok, 40 prices, 5 events
 - **feede**: ok, 586 prices, 19 events
 - **feedf**: ok, 354 prices, 9 events
-- **feedh**: ok, 1664 prices, 42 events
+- **feedh**: ok, 1684 prices, 42 events
 
 Matches starting in next 168h: **35**, markets priced: **468**, value bets: **1** (new alerts: 0). Min edge 5%.
 
@@ -26,4 +26,4 @@ Matches starting in next 168h: **35**, markets priced: **468**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), CDB A (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Nhlangano Legends (male), Royal Champs (male), South Australia Redbacks (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female), Western Australia Warriors (male)
 
-Runtime 176.1s. Snapshot: `odds_20261110T183036Z.jsonl.gz`
+Runtime 179.9s. Snapshot: `odds_20261110T193038Z.jsonl.gz`
