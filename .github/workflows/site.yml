@@ -153,6 +153,13 @@ jobs:
           SYNC_LIMIT: ${{ inputs.sync_limit || '1500' }}
         run: |
           python -m cricket_site.assets_sync --photos site/public/data/photos.json --index site/public/data/crex_index.json
+      - name: Grade archived in-play batter lines
+        if: github.event_name != 'pull_request' && vars.INPLAY_LOG == 'storage'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node site/scripts/grade-inplay.mjs site/public/data
       - name: Wrap the small data files
         run: |
           rm -f site/public/data/crex_index.json

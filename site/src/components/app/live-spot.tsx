@@ -6,7 +6,8 @@ import { PLAYER_MIN_SAMPLE, PLAYER_RANGE, playerConditional as playerCond } from
 import { liveBoard, namesMatch, teamKey } from "@cricket/engine/live.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
-import { useData } from "@/lib/data";
+import { batterHistoryKey } from "@cricket/engine/inplay-history.js";
+import { loadJson, useData } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 // the engine is plain JS: give its reports the loose shape these views read
@@ -75,10 +76,19 @@ export function BatterSpot({ r, className }: { r: any; className?: string }) {
   const idx = useMemo(() => (store.P?.id ?? []).indexOf(r.pid), [store, r.pid]);
   const rows = useQuery({ queryKey: ["progression", idx], enabled: bat != null && idx >= 0, staleTime: Infinity, queryFn: () => store.playerProgression(idx) });
   const rep = useMemo(() => (bat && rows.data && store.M ? playerConditional(store, rows.data, { fmt: fmtIx, state: { balls: bat.balls, runs: bat.runs }, line: r.line }) : null), [bat, rows.data, store, fmtIx, r.line]);
-  if (!bat || !rep || !rep.n) return null;
+  const band = bat && r.stat === "runs" ? batterHistoryKey({ fmt: r.fmt, gender: r.gender, balls: bat.balls, runs: bat.runs, line: r.line }) : null;
+  const archived = useQuery({ queryKey: ["inplay-history"], enabled: band != null, staleTime: Infinity, queryFn: () => loadJson("/data/inplay-history.json") });
+  const summaries = archived.data as Record<string, { over: number; under: number; push: number }> | null | undefined;
+  const counts = band ? summaries?.[band] : null;
+  if (!bat || (!rep?.n && !counts)) return null;
   return (
-    <span className={cn("text-footnote text-muted-foreground", className)} title={`${bat.runs} off ${bat.balls}, ${rep.n} of his innings · median finish ${rep.summary.median}`}>
-      Same spot: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+    <span className={cn("text-footnote text-muted-foreground", className)}>
+      {!!rep?.n && <span className="block" title={`${bat.runs} off ${bat.balls}, ${rep.n} of his innings · median finish ${rep.summary.median}`}>
+        Same spot: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+      </span>}
+      {counts && <span className="block" title="Similar live offers from a three-date UTC window. One offer per batter innings in each score band.">
+        Past live offers: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} push`}</span>{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+      </span>}
     </span>
   );
 }

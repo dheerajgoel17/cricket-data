@@ -56,7 +56,7 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean };
-interface Row { comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
+interface Row { gender: number | null; comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
@@ -100,13 +100,15 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         const l5 = windowRate(entries, 5, main.line), l10 = windowRate(entries, 10, main.line);
         const season = windowRate(entries.filter((e) => String(e.date).startsWith(year)), 0, main.line);
         const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
-        const venue = String((fixtures.data || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f))?.venue || "");
+        const fixture = (fixtures.data || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f));
+        const venue = String(fixture?.venue || "");
+        const gender = fixture?.gender === "female" ? 1 : fixture?.gender === "male" ? 0 : null;
         const ven = windowRate(venue ? entries.filter((e) => venueStem(e.venueName) === venueStem(venue)) : [], 0, main.line); // his games at the match's ground (the data spells a ground several ways)
         const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ gender, comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
