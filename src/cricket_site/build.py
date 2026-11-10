@@ -786,8 +786,10 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
 
 
-# AI training / scraping crawlers asked to stay out (honest ones obey); search and link-preview bots are not here
-AI_CRAWLERS = ("GPTBot", "ChatGPT-User", "ClaudeBot", "Claude-Web", "anthropic-ai", "CCBot", "Google-Extended", "PerplexityBot", "Bytespider", "Amazonbot", "Applebot-Extended", "Meta-ExternalAgent", "cohere-ai", "Diffbot", "ImagesiftBot", "omgili")
+# AI training crawlers and SEO scrapers asked to stay out (honest ones obey). Not here, so they follow the `*` rules (pages yes, /api/ and /data/ no): search engines,
+# link-preview bots, and the AI assistants / AI search that fetch a page for a person's question (ChatGPT-User, OAI-SearchBot, Claude-User, Claude-SearchBot, PerplexityBot, Perplexity-User).
+AI_CRAWLERS = ("GPTBot", "ClaudeBot", "Claude-Web", "anthropic-ai", "CCBot", "Google-Extended", "Bytespider", "Amazonbot", "Applebot-Extended", "Meta-ExternalAgent", "FacebookBot", "cohere-ai", "Diffbot", "ImagesiftBot", "omgili", "Timpibot",
+               "SemrushBot", "AhrefsBot", "MJ12bot", "DotBot", "DataForSeoBot", "PetalBot")
 
 
 def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixtures: list[dict] | None = None) -> int:

@@ -179,7 +179,14 @@ Left alone: the daily 03:17 scraper backfill and the weekly value-bets refit (th
 **Limits.** Free Cloudflare plan: 1,440 cron invocations a day plus `/status` calls (the plan allows 100,000 requests a day), at most 8 GitHub calls per tick (the limit is 50). GitHub API: about one list call per job per slot, plus one a minute while a run is in progress, far under the token's 5,000 an hour. `/status` is open to anyone with the Worker's address (it holds no secret; set `workers_dev` to `false` in `wrangler.jsonc` to hide it). The Vercel Hobby deploy limit (about 100 a day) is not at risk: `site.yml` is dispatched at most 24 times a day.
 
 ## Scraper protection
-`/data/*` is wrapped (key from `/api/gate`, never in the bundle) and behind the gate cookie. The gate and `/data` answer only requests from our own page (`Sec-Fetch-Site`, `site/packages/engine/guard.js`), refuse self-identified scrapers by User-Agent, and `robots.txt` asks AI crawlers to stay out (`AI_CRAWLERS` in `build.py`). None of this stops a script that runs the whole app in a real browser: the browser must be able to read the data to draw it.
+`/data/*` is wrapped (key from `/api/gate`, never in the bundle) and behind the gate cookie. The gate and `/data` answer only requests from our own page (`Sec-Fetch-Site`, `site/packages/engine/guard.js`), refuse self-identified scrapers by User-Agent, and `robots.txt` asks AI training crawlers and SEO scrapers to stay out (`AI_CRAWLERS` in `build.py`).
+
+**Bot policy.** Three kinds of automated visitor, one list each in `site/packages/engine/guard.js`:
+* *AI assistants and AI search* (`ASSISTANT_UA`: ChatGPT-User, OAI-SearchBot, Claude-User, Claude-SearchBot, PerplexityBot, Perplexity-User, DuckAssistBot...) fetch a page for a person's question. They are welcome on `/player`, `/fixture` and `/venue`, where the Edge middleware gives them the same share HTML the link-preview bots get (title, summary, card). They are refused on `/data`, `/api` and the gate. They are not named in `robots.txt`, so they follow the `*` rules.
+* *Training crawlers, SEO tools and scripts* (`BOT_UA`: GPTBot, ClaudeBot, CCBot, Bytespider, Semrush, python-requests, axios, headless browsers...) are refused on `/data` and `/api` and named in `robots.txt`.
+* *Link previews* (WhatsApp, Telegram, X, Slack...) get the share HTML, as before.
+
+A User-Agent is only a name: a script can claim to be an assistant or a browser, and one that runs the whole app in a real browser can read the data, because the browser must read it to draw it. What slows that down is the rate limit and bot scoring in front of the site (next section).
 
 ### Store live odds as files
 
