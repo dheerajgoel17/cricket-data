@@ -186,7 +186,12 @@ Left alone: the daily 03:17 scraper backfill and the weekly value-bets refit (th
 * *Training crawlers, SEO tools and scripts* (`BOT_UA`: GPTBot, ClaudeBot, CCBot, Bytespider, Semrush, python-requests, axios, headless browsers...) are refused on `/data` and `/api` and named in `robots.txt`.
 * *Link previews* (WhatsApp, Telegram, X, Slack...) get the share HTML, as before.
 
-A User-Agent is only a name: a script can claim to be an assistant or a browser, and one that runs the whole app in a real browser can read the data, because the browser must read it to draw it. What slows that down is the rate limit and bot scoring in front of the site (next section).
+A User-Agent is only a name: a script can claim to be an assistant or a browser, and one that runs the whole app in a real browser can read the data, because the browser must read it to draw it. What slows that down is a rate limit and bot scoring in front of the site (below). Our own clients (the archive job, the in-play scripts, the mobile app, the guard step) send their own User-Agent names, none of them on the lists: keep it that way, and never send a default `python-requests`, `axios` or headless-browser name to `/api` or `/data`.
+
+**Rules in front of the site (Cloudflare; the dashboard, not the repo).** Security -> Security rules:
+1. *Rate limit* on `/data/` and `/api/` (not `/api/gate`'s cookie logic, which stays as is): per IP, start at about 100 requests per 10 s, action Log for a day, read Security -> Events for real visitors that would have been hit, then switch to Block (10 min). Challenges cannot be used here: a page's `fetch` cannot solve one.
+2. *Bot Fight Mode* / *Block AI bots*: turn them on for the pages. Use the per-crawler list (AI Crawl Control) to keep the assistants in `ASSISTANT_UA` allowed and the training crawlers blocked. Check the app still loads on a phone afterwards: a challenge on `/data` or `/api` breaks it.
+3. *Managed Challenge* (the captcha) only for page navigations (path not starting `/data/` or `/api/`) from a country or network that is not ours, or a high threat score; never for the preview bots (WhatsApp, X, Telegram).
 
 ### Store live odds as files
 

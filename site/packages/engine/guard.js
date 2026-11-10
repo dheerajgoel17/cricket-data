@@ -10,7 +10,7 @@ export function fromOurPage(get) {
 }
 
 /** Scripts, SEO tools and AI training crawlers that name themselves: refused on /api and /data. Honest names only; a spoofed User-Agent is the rate limit's job (docs/OPERATIONS.md). */
-export const BOT_UA = /curl|wget|python-requests|python-urllib|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|node-fetch|axios|undici|postmanruntime|selenium|puppeteer|playwright|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|claude-web|anthropic-ai|amazonbot|meta-externalagent|facebookbot|diffbot|imagesiftbot|omgili|timpibot|cohere-ai|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalbot|petalsearch|ia_archiver|megaindex/i;
+export const BOT_UA = /curl|wget|python-requests|scrapy|httpx|aiohttp|go-http-client|libwww|okhttp|java\/|node-fetch|axios|undici|postmanruntime|selenium|puppeteer|playwright|phantomjs|headlesschrome|bytespider|gptbot|ccbot|claudebot|claude-web|anthropic-ai|amazonbot|meta-externalagent|facebookbot|diffbot|imagesiftbot|omgili|timpibot|cohere-ai|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalbot|petalsearch|ia_archiver|megaindex/i;
 
 /**
  * AI assistants and AI search that fetch a page for a person's question (not training crawlers): welcome on the pages people share, never on /api or /data.
