@@ -243,7 +243,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       <div className={cn("flex flex-col gap-snug", mode === "detail" && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
         <div className="flex items-center gap-snug">
           {scopes.length > 1 ? (
-            <PillGroup layoutId="fancy-scope" label="Scope" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v, ...(mode === "list" ? { fm: "" } : {}) })}
+            <PillGroup layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v, ...(mode === "list" ? { fm: "" } : {}) })}
               className="min-w-0 flex-1"
               items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
           ) : <span className="min-w-0 flex-1" />}

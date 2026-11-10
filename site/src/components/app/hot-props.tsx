@@ -400,7 +400,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
       <div className={cn("flex flex-col gap-snug", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
       {/* one chip row for the prop type, plus a Filters button (count of active filters on it) that opens the filter view: full screen on a phone, a right drawer from lg */}
       <div className="flex items-center gap-snug">
-        <PillGroup layoutId="hot-stat" label="Prop type" value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+        <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
         <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
           className={cn("relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none", urlState && "hidden lg:inline-flex")}>
           <AdjustmentsHorizontalIcon className="size-4" />{wl}
