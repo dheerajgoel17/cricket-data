@@ -690,3 +690,22 @@ def test_a_book_that_names_a_youth_match_by_its_competition_alone_is_not_a_secon
     listed = [{"start": "2026-11-10T05:00Z", "fmt": "ODI", "a": "India U19", "b": "United Arab Emirates U19"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
     assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19", "India U19"]  # with no schedule row the stop-gap at least carries the youth tag
+
+
+def test_a_feed_that_names_a_priced_match_with_other_team_names_is_not_a_second_fixture(tmp_path):
+    """9 Nov 2026: "Bangla Tigers v Royal Champs" is the schedule's United Tigers v Royal Desert Champions (same start; the same feed's other pairings line up the same way), and "West Indies A v England Lions" is West Indies A v England A."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    for name, match, start in (("2026-11-09-bangla-tigers-v-royal-champs", "Bangla Tigers vs Royal Champs", "2026-11-09T16:00:00Z"),
+                               ("2026-11-09-west-indies-a-v-england-lions", "West Indies A vs England Lions", "2026-11-09T18:00:00Z"),
+                               ("2026-11-10-delhi-bulls-v-emirates-eagles", "Delhi Bulls vs Emirates Eagles", "2026-11-10T16:00:00Z")):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "competition": "", "start_utc": start, "fixture": None, "events": [{}]}))
+    now = datetime(2026, 11, 10, 20, 0, tzinfo=timezone.utc)
+    listed = [{"start": "2026-11-09T16:00Z", "fmt": "T10", "a": "United Tigers", "b": "Royal Desert Champions"},
+              {"start": "2026-11-09T18:00Z", "fmt": "ODI", "a": "West Indies A", "b": "England A"},
+              {"start": "2026-11-10T16:00Z", "fmt": "T10", "a": "UAE Bulls", "b": "Emirates Eagles"}]
+    assert B._unscheduled_priced(vb, listed, now=now) == []

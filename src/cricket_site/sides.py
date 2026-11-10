@@ -8,7 +8,8 @@ import re
 
 SAME_SIDE = {"aucklandaces": "auckland", "canterburykings": "canterbury", "wellingtonfirebirds": "wellington", "otagovolts": "otago", "northerndistricts": "northernbrave", "boland": "rocks",
              "southwesterndistricts": "gardenroutebadgers", "easterns": "easternstorm", "centraldistricts": "centralstags", "central": "centralstags", "eagles": "mashonalandeagles",
-             "tuskers": "matabelelandtuskers", "uae": "unitedarabemirates", "uaeu19": "unitedarabemiratesu19"}
+             "tuskers": "matabelelandtuskers", "uae": "unitedarabemirates", "uaeu19": "unitedarabemiratesu19", "englandlions": "englanda",
+             "banglatigers": "unitedtigers", "delhibulls": "uaebulls", "royalchamps": "royaldesertchampions"}
 
 _YOUTH_COMP = re.compile(r"\b(?:u|under)[\s-]?(1[2-9]|2[0-3])s?\b", re.I)
 _YOUTH_NAME = re.compile(r"\b(?:u[\s-]?\d{2}|under[\s-]?\d{2})\b", re.I)
