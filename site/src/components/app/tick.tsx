@@ -6,14 +6,18 @@ import { cn } from "@/lib/utils";
 
 const VERDICT = { cleared: "Cleared", missed: "Missed", push: "On the line" } as const;
 
-/** Flash green on a rise, red on a drop; a small arrow while the flash holds. The live poll is ~15 s, so this is how a so-far or a price change is seen. */
+/** Quiet ticks roll the new value into place and leave the direction visible briefly. */
 export function Tick({ value, children, className, quiet = false }: { quiet?: boolean; value: number | null | undefined; children: ReactNode; className?: string }) {
-  const dir = useTick(value);
+  const dir = useTick(value, quiet ? 2600 : undefined);
   return (
     <span className={cn("inline-flex items-baseline gap-hair rounded-md px-hair", !quiet && dir === 1 && "tick-up", !quiet && dir === -1 && "tick-down", className)}>
       {dir === -1 ? <ArrowDownIcon className="size-3 shrink-0 text-miss" aria-hidden /> : null}
       {(dir === 1 || (quiet && dir === 0)) && <ArrowUpIcon className={cn("size-3 shrink-0 text-primary", dir === 0 && "invisible")} aria-hidden />}
-      {children}
+      {quiet ? (
+        <span className="inline-block min-w-0 overflow-hidden align-baseline">
+          <span key={value ?? "empty"} className={cn("block tabular-nums", dir === 1 && "ticker-roll-up text-primary", dir === -1 && "ticker-roll-down text-miss")}>{children}</span>
+        </span>
+      ) : children}
     </span>
   );
 }
