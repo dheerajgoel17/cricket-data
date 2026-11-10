@@ -70,6 +70,7 @@ describe("PropTable", () => {
   it("uses a short stadium name on the prop card, full venue on the title", () => {
     const r = { ...row, venue: "Western Australia Cricket Association Ground, Perth", ven: window(0.2, 5), l10: window(0.7, 10) };
     render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByRole("img", { name: /Last 2: 53, 12/ })).toBeInTheDocument();
     expect(screen.queryByText("7 in L10")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Stats" }));
     expect(screen.getByText("7 in L10")).toBeInTheDocument();

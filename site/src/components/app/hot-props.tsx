@@ -219,18 +219,20 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
           </CollapsibleTrigger>
         </div>
         <div className="grid min-w-0 gap-hair">
-          {!hideMatch && soFar == null && <span className="truncate text-footnote text-muted-foreground">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
-          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-tight">
+            <div className="grid min-w-0 gap-hair">
+              {!hideMatch && soFar == null && <span className="truncate text-footnote text-muted-foreground">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
+              {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+            </div>
+            <Spark r={r} />
+          </div>
           {out ? <Badge variant="outline" className="w-fit text-muted-foreground">Not in XI</Badge> : <LineProgress standing={soFar} live={!!liveQuote} line={r.line} opened={liveQuote?.opened} />}
         </div>
         <CollapsibleContent className="grid gap-tight border-t border-hairline pt-tight data-[state=closed]:hidden">
-          <div className="flex flex-wrap items-center justify-between gap-tight">
-            <div className="grid gap-hair text-footnote text-muted-foreground">
-              <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
-              {ground && <span title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
-              {r.edge != null && <span>Model edge <b className={r.edge > 0 ? "text-primary" : "text-miss"}>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</b> · {edgeTag(r.edge, r.side)}</span>}
-            </div>
-            <Spark r={r} />
+          <div className="grid gap-hair text-footnote text-muted-foreground">
+            <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
+            {ground && <span title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
+            {r.edge != null && <span>Model edge <b className={r.edge > 0 ? "text-primary" : "text-miss"}>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</b> · {edgeTag(r.edge, r.side)}</span>}
           </div>
           {!out && liveQuote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
         </CollapsibleContent>
