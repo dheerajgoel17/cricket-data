@@ -32,7 +32,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-from cricket_site.sides import SAME_SIDE, youth_sides
+from cricket_site.sides import SAME_SIDE, same_pair, youth_sides
 from cricket_site.wrap import unwrap as unwrap_data
 
 from . import config
@@ -82,7 +82,7 @@ def group(book: dict) -> list[dict]:
             named = x.get("match") if (ya, yb) == (a, b) else f"{ya} vs {yb}"  # "India" v "UAE" in the U19 Asia Cup is the U19 match, filed with it
             a, b = ya, yb
             k = frozenset((team_key(a), team_key(b)))
-            g = next((g for g in out if g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME), None)
+            g = next((g for g in out if same_pair(g["k"], k) and abs((g["start"] - st).total_seconds()) < SAME), None)
             if g is None:
                 g = {"k": k, "start": st, "match": named or f"{a} vs {b}", "start_utc": x["start_utc"], "competition": x.get("competition"),
                      **{kind: [] for kind in KINDS}}
@@ -101,7 +101,7 @@ def _fixture(g: dict, fx_of: dict, schedule: list[dict]) -> dict | None:
                 return f
     for f in schedule:
         st = parse_ts(f.get("start_utc"))
-        if {team_key(f.get("team_a")), team_key(f.get("team_b"))} == g["k"] and st and abs((st - g["start"]).total_seconds()) < (6 * 86400 if f.get("format") == "Test" else 12 * 3600):  # a Test is priced day by day
+        if same_pair(frozenset((team_key(f.get("team_a")), team_key(f.get("team_b")))), g["k"]) and st and abs((st - g["start"]).total_seconds()) < (6 * 86400 if f.get("format") == "Test" else 12 * 3600):  # a Test is priced day by day
             return f
     return None
 
@@ -219,7 +219,7 @@ def _wanted_matches(book: dict) -> list[dict]:
             named = x.get("match") if (ya, yb) == (a, b) else f"{ya} vs {yb}"  # "India" v "UAE" in the U19 Asia Cup is the U19 match, filed with it
             a, b = ya, yb
             k = frozenset((team_key(a), team_key(b)))
-            if any(g["k"] == k and abs((g["start"] - st).total_seconds()) < SAME for g in out):
+            if any(same_pair(g["k"], k) and abs((g["start"] - st).total_seconds()) < SAME for g in out):
                 continue
             out.append({"k": k, "start": st, "match": named or f"{a} vs {b}",
                         "start_utc": x["start_utc"], "competition": x.get("competition")})

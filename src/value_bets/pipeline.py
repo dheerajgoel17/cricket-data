@@ -447,6 +447,9 @@ def run():
         prev_book = json.loads((config.OUT / "book_lines.json").read_text())
     except (OSError, ValueError):
         prev_book = None
+    renamed = booklines.map_to_schedule([book, *([prev_book] if prev_book else [])], fixtures)  # a book's other name for a scheduled match is that match (one fixture, never a stop-gap beside it)
+    for m in renamed:
+        log(f"name map: {m['book']} -> {m['schedule']} ({m['start_utc']})")
     book, held = booklines.hold_started(book, prev_book, now)  # the file is pre-match prices: a started match takes no line the file did not already have (a Test is re-listed between days with prices that know the score)
     if held["lines"] or held["fancy"]:
         log(f"held back {held['lines']} player and {held['fancy']} fancy lines first priced after their match started (not pre-match prices)")
@@ -853,6 +856,7 @@ def run():
     try:  # every match's props are kept for good; this must never stop the run
         fx_of = {(r.get("match"), r.get("start_utc")): clusters[r["event_key"]]["fixture"] for r in rows if (clusters.get(r.get("event_key")) or {}).get("fixture")}
         cat = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("catalogue") or []]
+        booklines.map_to_schedule([cat], fixtures)
         wrote, bad = archive.update(config.ARCHIVE, {**book, "catalogue": cat} if cat else book, now, fx_of, fixtures)
         log(f"archive: {len(wrote)} match file(s) written" + (f", {len(bad)} unreadable and left as they are" if bad else ""))
     except Exception as e:

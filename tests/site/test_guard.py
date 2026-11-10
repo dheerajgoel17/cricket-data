@@ -284,3 +284,14 @@ def test_the_windows_equal_the_ones_the_site_and_the_pipeline_use():
     from value_bets.booklines import LIVE_KEEP, TEST_KEEP
 
     assert (LIVE_KEEP.total_seconds(), TEST_KEEP.total_seconds()) == (G.CARRY_S, G.TEST_CARRY_S)
+
+
+def test_f_a_stop_gap_from_the_books_that_is_a_scheduled_match_under_other_names_stops_the_build():
+    rows = [fx("United Tigers", "Royal Desert Champions", "2026-11-09T16:00Z", "Completed", "src", fmt="T10"), fx("Bangla Tigers", "Royal Champs", "2026-11-09T16:00Z", "Started", "books", fmt="T10"),
+            fx("India U19", "United Arab Emirates U19", "2026-11-10T05:00Z", "Live", "src"), fx("India", "United Arab Emirates", "2026-11-10T05:00Z", "Started", "books"),
+            fx("Pak XI", "Bangla Tigers", "2026-11-10T07:00Z", "Started", "books", fmt="T10"),                                   # nothing scheduled at that start: a real stop-gap
+            fx("Sri Lanka", "Pakistan", "2026-11-09T04:30Z", "Live", "src", fmt="Test"), fx("Pakistan", "Sri Lanka", "2026-11-09T04:30Z", "Started", "books", fmt="Test")]
+    c = G.check_duplicate_fixtures(rows)
+    assert c.level == G.HARD and len(c.problems) == 4  # Tigers twice (the alias, then the alike-sides rule), India v UAE, and the Test pair the 12 h rule already knew
+    assert any("Bangla Tigers v Royal Champs" in p and "United Tigers" in p for p in c.problems) and any(p.startswith("India v United Arab Emirates") for p in c.problems)
+    assert not any("Pak XI" in p for p in c.problems)
