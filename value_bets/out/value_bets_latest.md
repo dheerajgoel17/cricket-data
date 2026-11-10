@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-10 20:00 IST
+# Cricket value bets - 2026-11-10 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1730 prices
-- **smarkets**: ok, 423 prices
+- **moviodds_bet365**: ok, 1909 prices
+- **smarkets**: ok, 384 prices
 - **feedg**: ok, 24 prices, 3 events
 - **feedk**: ok, 148 prices, 8 events
-- **feede**: ok, 394 prices, 14 events
-- **feedf**: ok, 168 prices, 11 events
-- **feedh**: ok, 1336 prices, 28 events
+- **feede**: ok, 366 prices, 14 events
+- **feedh**: error - IncompleteRead: IncompleteRead(248236 bytes read)
+- **feedf**: ok, 128 prices, 9 events
 
-Matches starting in next 168h: **27**, markets priced: **379**, value bets: **2** (new alerts: 2). Min edge 5%.
+Matches starting in next 168h: **19**, markets priced: **310**, value bets: **2** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,6 +26,6 @@ Matches starting in next 168h: **27**, markets priced: **379**, value bets: **2*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 42.8%, model 0.1279, market 0.1549
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 42.5%, model 0.1279, market 0.1544
 
-Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Fairfirst Insurance (male), HNB (male), Hnb A (male), Nhlangano Legends (male), South Australia Redbacks (male), South Western Districts (male), USA (W) (female), Western Australia Warriors (male)
+Unmatched team names (add to mappings/teams.csv): Cdb A (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), USA (W) (female)
 
-Runtime 137.0s. Snapshot: `odds_20261110T143041Z.jsonl.gz`
+Runtime 93.9s. Snapshot: `odds_20261110T153033Z.jsonl.gz`
