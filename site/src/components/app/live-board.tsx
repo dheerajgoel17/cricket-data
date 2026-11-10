@@ -289,7 +289,12 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
           {bw && <div className="col-start-3 border-l border-hairline pl-tight"><LivePlayer player={bw} sides={teams} bowling /></div>}
         </div>
       )}
-      {!!board.overs.length && <Overs overs={board.overs} />}
+      {!!board.overs.length && (
+        <>
+          {(!!board.batters.length || bw) && <Rule dotted />}
+          <Overs overs={board.overs} />
+        </>
+      )}
       {expanded && !!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
     </section>
   );
@@ -331,7 +336,7 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
   return (
     <FlushCtx.Provider value={flush}>
     <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-snug" : "rounded-2xl bg-card p-inset")}>
-      {inPlay && top ? <>{top}</> : null}
+      {inPlay && top ? <>{top}{head && <Rule dotted />}</> : null}
       {inPlay && head ? <>{head}<Rule /></> : null}
       {strip ? <LiveBoard match={match} teams={teams} expanded={open || !full} /> : <CardSummary match={match} teams={teams} />}
       {full && (
