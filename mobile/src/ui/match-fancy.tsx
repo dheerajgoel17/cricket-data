@@ -27,6 +27,9 @@ import { ChartBars } from "@/ui/charts";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
+import { LiveMarketRow } from "@/ui/live-market-row";
+import { TeamSpot } from "@/ui/live-spot";
+import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -95,6 +98,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // the other live markets (over / under lines and picks), from the in-play merge: prices only
+  const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
 
   const book = useMemo(() => (fancyByLine(bookedNow) as { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] }[]), [bookedNow]);
   const base = useMemo(() => (!store || !key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -196,15 +202,18 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {mode === "list" && overview.length > 0 ? (
+          {mode === "list" && (overview.length > 0 || liveList.length > 0) ? (
             <View style={{ gap: space.snug }}>
               <Text style={styles.h2}>Bookmaker lines</Text>
               {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
               <View style={styles.bleed}>
                 {overview.map((r: any, i: number) => (
                   <View key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-                    <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} />
+                    <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
                   </View>
+                ))}
+                {liveList.map((m, i) => (
+                  <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}><LiveMarketRow m={m} /></View>
                 ))}
               </View>
             </View>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Press } from "@/ui/press";
@@ -9,6 +9,7 @@ import { BookBadge } from "@/ui/book-badge";
 import { Collapsible, TurnChevron } from "@/ui/collapsible";
 import { MiniBars } from "@/ui/mini-bars";
 import { TeamBadge } from "@/ui/team-badge";
+import { LiveBadge, LiveOpened, LineProgress } from "@/ui/live-bits";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
 
@@ -40,7 +41,7 @@ export function BookList({ books, shown }: { books: { source: string; over: numb
  * One market's row, in the props-list style: its name, how the ground has gone, the book's line and price(s), the model's edge on the better side (and which side), and the other
  * books behind "+N books". `standing` is the 15 s live so-far, the same words as a player prop.
  */
-export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string }) {
+export function OverviewRow({ r, onOpen, active, standing, sub, extra }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string; extra?: ReactNode }) {
   const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
   const split = r.overLine != null && r.underLine != null && r.overLine !== r.underLine;
   const mark = standing ?? r.standing;
@@ -54,7 +55,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOp
           ? <TeamBadge name={r.team} size={44} />
           : <View style={styles.icon} accessibilityElementsHidden><Ionicons name="stats-chart-outline" size={20} color={color["muted-foreground"]} /></View>}
         <View style={styles.left}>
-          <Text style={styles.label} numberOfLines={2}>{r.label}</Text>
+          <View style={styles.titleRow}><Text style={[styles.label, styles.titleText]} numberOfLines={2}>{r.label}</Text>{r.live ? <LiveBadge /> : null}</View>
           {sub ? <Text style={styles.at} numberOfLines={1}>{sub}</Text> : null}
           <View style={styles.hero}>
             <Text style={styles.heroLine}>{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</Text>
@@ -77,8 +78,10 @@ export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOp
                 <View style={styles.price}>{underSrc && underSrc !== overSrc ? <BookBadge source={underSrc} /> : null}<Text style={styles.sideTag}>U</Text><Tick value={r.under} style={styles.odds}>{odds(r.under)}</Tick></View>
               </>
             )}
-            {mark != null ? <StandingMark standing={mark} line={r.line} /> : null}
+            {r.live ? <LiveOpened opened={r.opened} line={r.line} /> : null}
+            {mark != null && !r.live ? <StandingMark standing={mark} line={r.line} /> : null}
           </View>
+          {r.live ? <LineProgress standing={mark} live line={r.line} opened={r.opened} /> : null}
         </View>
         <View style={styles.side}>
           <View style={styles.edgeBlock}>
@@ -91,6 +94,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub }: { r: any; onOp
           <MiniBars last={r.last} line={r.line} width={76} />
         </View>
       </Press>
+      {extra}
       <BookList books={r.books} shown={[r.overBook, r.underBook]} />
     </View>
   );
@@ -103,6 +107,8 @@ const styles = StyleSheet.create({
   icon: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: color.pill },
   left: { flex: 1, minWidth: 0, gap: 3 },
   label: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  titleRow: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
+  titleText: { flexShrink: 1 },
   hero: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: space.snug, rowGap: 2 },
   heroLine: { ...numLg, fontSize: 22, letterSpacing: -0.4, lineHeight: 24, color: color.foreground },
   at: { ...type.footnote, color: color["muted-foreground"] },

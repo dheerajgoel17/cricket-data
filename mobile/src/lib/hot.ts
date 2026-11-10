@@ -15,7 +15,7 @@ const SHARDS_AT_ONCE = 8;
 /** The first scored row is shown at once; after that, rows already scored are shown at most this often while the rest are still coming. */
 const PUBLISH_MS = 600;
 
-export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean };
+export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean; live?: boolean; opened?: number };
 export interface Row {
   comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string;
   line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string;

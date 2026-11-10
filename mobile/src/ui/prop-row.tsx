@@ -16,6 +16,8 @@ import { MiniBars } from "@/ui/mini-bars";
 import { enter } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
+import { LiveBadge, LiveOpened, LineProgress } from "@/ui/live-bits";
+import { BatterSpot } from "@/ui/live-spot";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
 
@@ -41,6 +43,7 @@ function PriceLine({ quotes, line, price, open, onToggle }: { quotes: Quote[]; l
             {top.under != null ? <Text style={styles.priceUnder}>U {odds(top.under)}</Text> : null}
           </>
         : <Text style={styles.price}>{`U ${top.line} ${odds(top.under)}`}</Text>}
+      {top.live ? <LiveOpened opened={top.opened} line={top.line} /> : null}
       {more > 0 ? (
         <Press scale={1} onPress={onToggle} hitSlop={10} accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={open ? "Hide other books" : `Show ${more} more books`} style={styles.moreBtn}>
           <Text style={styles.more}>{open ? "Hide" : `+${more}`}</Text>
@@ -72,6 +75,7 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
   const label = (STATS as any)[r.stat]?.label;
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const [open, setOpen] = useState(false);
+  const live = r.quotes.find((q: Quote) => q.live); // a line the books are pricing in play: the Live mark, "was", and the bar against it
   const ground = groundNote(r.ven) as { hits: number; played: number; tone: "good" | "bad" | "plain" } | null;
   // Rise-in only for the first rows; Android keeps fewer to hold 60 fps (AGENTS.md).
   const rise = i < (Platform.OS === "android" ? 4 : 8);
@@ -84,6 +88,7 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
             <View style={styles.titleRow}>
               <Text style={styles.name} numberOfLines={1}>{r.name}</Text>
               <TeamBadge name={r.team} size={18} bare />
+              {live ? <LiveBadge /> : null}
               {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
             </View>
             <View style={styles.descRow}>
@@ -92,7 +97,7 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
             </View>
             <PriceLine quotes={r.quotes} line={r.line} price={r.over} open={open} onToggle={() => setOpen((o) => !o)} />
             <View style={styles.foot}>
-              {soFar ? <StandingMark standing={soFar} line={r.line} /> : null}
+              {!live && soFar ? <StandingMark standing={soFar} line={r.line} /> : null}
               {ground ? (
                 <Text style={styles.context} numberOfLines={1}>
                   <Text style={[styles.contextStrong, ground.tone === "good" && { color: color.primary }, ground.tone === "bad" && { color: color.miss }]}>{ground.hits}/{ground.played}</Text> at {shortVenue(r.venue)}
@@ -100,6 +105,8 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
               ) : null}
               <Text style={styles.l10}>{r.l10?.hits ?? 0} in L10</Text>
             </View>
+            {live && !out ? <LineProgress standing={soFar} live line={r.line} opened={live.opened} /> : null}
+            {live && !out && (!soFar || soFar.state === "live") ? <BatterSpot r={r} /> : null}
           </View>
           <View style={styles.side}>
             <View style={styles.edgeBlock}>

@@ -34,6 +34,13 @@ export const liveQuery = queryOptions({
   initialDataUpdatedAt: () => readLive()?.t,
 });
 
+/** In-play lines (a batter's innings runs, a side's innings total, the other live markets) from /api/inplay: null when the route is down or has nothing. Polled every ~15 s, but only while a match is on (see `useLinesLive`). */
+export const inplayQuery = queryOptions({
+  queryKey: ["inplay-lines"],
+  queryFn: async (): Promise<any | null> => { try { return await getJson("/api/inplay"); } catch { return null; } },
+  refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, retry: false,
+});
+
 /** react-query on a phone: polling follows whether the app is in front, not a browser tab's focus. */
 export function watchAppState(): () => void {
   const sub = AppState.addEventListener("change", (s) => focusManager.setFocused(s === "active"));
