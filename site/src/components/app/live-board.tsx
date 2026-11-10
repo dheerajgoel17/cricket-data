@@ -132,6 +132,7 @@ export function innLabel(card: any[], k: number) {
 /** Batting + bowling tables, one innings at a time: a selector over the innings (two in a T20 or ODI, up to four in a Test) that follows the latest one until a tab is picked. So-far only. */
 export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   const [pick, setPick] = useState<string>();
+  const flush = useContext(FlushCtx);
   const card = cardInns(match);
   if (!card.length) return null;
   const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
@@ -151,7 +152,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
             <span className="shrink-0 text-footnote font-medium tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
           </div>
           {!!inn.batters?.length && (
-            <div className="overflow-x-auto">
+            <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
               <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
@@ -210,7 +211,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
             <p className="py-snug text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-normal" /></Fragment>)}</p>
           )}
           {!!inn.bowlers?.length && (
-            <div className="overflow-x-auto">
+            <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
               <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
@@ -273,6 +274,7 @@ export function Rule({ dotted }: { dotted?: boolean }) {
 
 /** Current batters, bowler and deliveries. Extra match figures appear with the expanded scorecard. */
 export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side[]; expanded: boolean }) {
+  const flush = useContext(FlushCtx);
   const board = liveBoard(match);
   if (!board) return null;
   const bw = board.bowler;
@@ -284,7 +286,7 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
   return (
     <section aria-label="Live scoreboard" className="flex flex-col gap-tight">
       {(!!board.batters.length || bw) && (
-        <div className="grid grid-cols-3 border border-hairline [&>*]:border-r [&>*]:border-hairline [&>*]:px-tight [&>*]:py-tight [&>*:nth-child(3)]:border-r-0">
+        <div className={cn("grid grid-cols-3 border-y border-hairline divide-x divide-hairline [&>*]:px-tight [&>*]:py-tight", flush ? "-mx-gutter" : "border-x")}>
           {[board.batters[0], board.batters[1], bw].map((player, i) => (
             <div key={i}>
               <div className="mb-hair label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
@@ -294,7 +296,7 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
         </div>
       )}
       {!!board.overs.length && (
-        <div className="min-w-0 border border-hairline px-tight py-tight"><Overs overs={board.overs} /></div>
+        <div className={cn("min-w-0 border-y border-hairline py-tight", flush ? "-mx-gutter px-gutter" : "border-x px-tight")}><Overs overs={board.overs} /></div>
       )}
       {expanded && !!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
     </section>
@@ -337,8 +339,8 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
   return (
     <FlushCtx.Provider value={flush}>
     <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-snug" : "rounded-2xl bg-card p-inset")}>
-      {inPlay && top ? <>{top}{head && <Rule dotted />}</> : null}
-      {inPlay && head ? <>{head}<Rule /></> : null}
+      {inPlay && top ? top : null}
+      {inPlay && head ? head : null}
       {strip ? <LiveBoard match={match} teams={teams} expanded={open || !full} /> : <CardSummary match={match} teams={teams} />}
       {full && (
         <>
