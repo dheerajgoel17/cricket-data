@@ -215,7 +215,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
           </span>
         </span>
-        <span className="grid justify-items-end gap-hair">
+        <span className="grid self-start justify-items-end gap-hair pt-control">
           <span className="grid justify-items-end gap-hair text-right">
             <span className="flex items-baseline gap-tight whitespace-nowrap">
               <span className="label-cap text-caption text-muted-foreground">Model</span>
@@ -429,7 +429,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
           <>
             <ul className="-mx-gutter lg:hidden">
               <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} hideMatch={!!teams} />)}
               </AnimatePresence>
             </ul>
             <div className="hidden lg:block">
