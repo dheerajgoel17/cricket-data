@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-10 23:00 IST
+# Cricket value bets - 2026-11-11 00:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1840 prices
-- **smarkets**: ok, 555 prices
-- **feedk**: ok, 196 prices, 7 events
-- **feedg**: ok, 32 prices, 4 events
-- **feede**: ok, 516 prices, 16 events
-- **feedf**: ok, 284 prices, 9 events
-- **feedh**: ok, 1483 prices, 35 events
+- **smarkets**: ok, 607 prices
+- **feedk**: ok, 196 prices, 9 events
+- **feedg**: ok, 40 prices, 5 events
+- **feede**: ok, 586 prices, 19 events
+- **feedf**: ok, 354 prices, 9 events
+- **feedh**: ok, 1664 prices, 42 events
 
-Matches starting in next 168h: **30**, markets priced: **430**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **35**, markets priced: **468**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **30**, markets priced: **430**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1279, market 0.136
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1279, market 0.1419
 
-Unmatched team names (add to mappings/teams.csv): CDB A (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), South Australia Redbacks (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female), Western Australia Warriors (male)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), CDB A (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Nhlangano Legends (male), Royal Champs (male), South Australia Redbacks (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female), Western Australia Warriors (male)
 
-Runtime 166.8s. Snapshot: `odds_20261110T173032Z.jsonl.gz`
+Runtime 176.1s. Snapshot: `odds_20261110T183036Z.jsonl.gz`
