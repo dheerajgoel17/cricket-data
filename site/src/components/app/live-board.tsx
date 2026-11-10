@@ -312,8 +312,8 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
       {(!!board.batters.length || bw) && (
         <div className={cn("grid grid-cols-3 border-y border-hairline divide-x divide-hairline", flush ? "-mx-gutter" : "border-x")}>
           {[board.batters[0], board.batters[1], bw].map((player, i) => (
-            <div key={i} className={cn("min-w-0 py-tight", flush && i === 0 ? "pl-gutter" : "pl-tight", flush && i === 2 ? "pr-gutter" : "pr-tight")}>
-              <div className="mb-hair label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
+            <div key={i} className={cn("grid min-w-0 content-start gap-hair py-tight", flush && i === 0 ? "pl-gutter" : "pl-tight", flush && i === 2 ? "pr-gutter" : "pr-tight")}>
+              <div className="label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
               {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
             </div>
           ))}
