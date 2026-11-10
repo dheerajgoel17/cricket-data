@@ -152,7 +152,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           </div>
           {!!inn.batters?.length && (
             <div className="overflow-x-auto">
-              <table className="w-full text-footnote">
+              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Batter</th>
@@ -211,7 +211,7 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           )}
           {!!inn.bowlers?.length && (
             <div className="overflow-x-auto">
-              <table className="w-full text-footnote">
+              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50 [&_tr>*:first-child]:px-tight">
                 <thead>
                   <tr className="label-cap text-footnote text-muted-foreground">
                     <th className="py-snug text-left">Bowler</th>
@@ -284,16 +284,17 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
   return (
     <section aria-label="Live scoreboard" className="flex flex-col gap-tight">
       {(!!board.batters.length || bw) && (
-        <div className="grid grid-cols-3 gap-tight">
-          {board.batters.slice(0, 2).map((b: any) => <LivePlayer key={b.id || b.name} player={b} sides={teams} />)}
-          {bw && <div className="col-start-3 border-l border-hairline pl-tight"><LivePlayer player={bw} sides={teams} bowling /></div>}
+        <div className="grid grid-cols-3 border border-hairline [&>*]:border-r [&>*]:border-hairline [&>*]:px-tight [&>*]:py-tight [&>*:nth-child(3)]:border-r-0">
+          {[board.batters[0], board.batters[1], bw].map((player, i) => (
+            <div key={i}>
+              <div className="mb-hair label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
+              {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
+            </div>
+          ))}
         </div>
       )}
       {!!board.overs.length && (
-        <>
-          {(!!board.batters.length || bw) && <Rule dotted />}
-          <Overs overs={board.overs} />
-        </>
+        <div className="min-w-0 border border-hairline px-tight py-tight"><Overs overs={board.overs} /></div>
       )}
       {expanded && !!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
     </section>
@@ -304,12 +305,12 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
 function CardSummary({ match, teams }: { match: any; teams?: Side[] }) {
   const card = cardInns(match);
   return (
-    <div className="flex flex-col gap-snug">
+    <div className="divide-y divide-hairline border border-hairline">
       {card.map((inn: any, k: number) => {
         const bat = [...(inn.batters || [])].sort((a: any, b: any) => (b.runs ?? 0) - (a.runs ?? 0)).slice(0, 2);
         const bowl = [...(inn.bowlers || [])].sort((a: any, b: any) => (b.wickets ?? 0) - (a.wickets ?? 0) || (a.conceded ?? 0) - (b.conceded ?? 0))[0];
         return (
-          <div key={innId(inn)} className="flex flex-col gap-hair">
+          <div key={innId(inn)} className="flex flex-col gap-hair px-tight py-tight">
             <div className="flex items-baseline justify-between gap-snug">
               <span className="truncate text-callout font-medium">{innLabel(card, k)}</span>
               <span className="shrink-0 font-condensed text-body font-bold tabular-nums">{innScore(inn) || "—"}</span>

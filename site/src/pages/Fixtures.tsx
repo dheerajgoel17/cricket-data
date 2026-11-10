@@ -70,11 +70,11 @@ function TeamName({ name, ix, small }: { name: string; ix: number; small?: boole
 function ScoreRows({ f, match, small }: { f: any; match: any; small?: boolean }) {
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   return (
-    <div className={cn("grid", small ? "gap-tight" : "gap-snug")}>
+    <div className={cn("grid", small ? "divide-y divide-hairline border border-hairline" : "gap-snug")}>
       {sides.map(([name, ix]) => (
-        <div key={name} className="flex min-w-0 items-center gap-snug">
-          <TeamName name={name} ix={ix} small={small} />
-          <LiveScore s={teamScore(match, name)} size="lg" />
+        <div key={name} className={cn("min-w-0 items-center", small ? "grid grid-cols-[minmax(0,1fr)_minmax(0,44%)]" : "flex gap-snug")}>
+          <div className={cn("min-w-0 flex-1", small && "px-tight py-tight")}><TeamName name={name} ix={ix} small={small} /></div>
+          {small ? <div className="flex min-w-0 self-stretch items-center justify-end border-l border-hairline px-tight"><LiveScore s={teamScore(match, name)} size="lg" /></div> : <LiveScore s={teamScore(match, name)} size="lg" /> }
         </div>
       ))}
     </div>
