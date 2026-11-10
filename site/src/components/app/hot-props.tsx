@@ -1,3 +1,4 @@
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useId, useMemo, useState, type ReactNode } from "react";
 import { track } from "@/lib/analytics";
@@ -185,48 +186,55 @@ function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boo
   );
 }
 
-/** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
+/** Compact mobile row. The line stays visible while the supporting stats open below it. */
 export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
   const side = r.side === "under" ? "U" : "O";
   const ground = win !== "ven" ? groundNote(r.ven) : null;
+  const liveQuote = r.quotes.find((q) => q.live);
+  const scope = scopeTag(r.fmt, r.inn);
   return (
-    <motion.li className="relative border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    <motion.li className="border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
-        className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", out && "opacity-60")}>
-        <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
-        <span className="grid min-w-0 gap-hair">
-          <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
-            <span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span>
-            <TeamFlag name={r.team} />
-            {r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
-            {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
-          </span>
-          <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
-            <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
-          </span>
-          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
-          <PropProgress r={r} soFar={soFar} out={out} />
-          <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
-            {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
-            {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
-            <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
-          </span>
-        </span>
-        <span className="grid self-start justify-items-end gap-hair pt-control">
-          <span className="grid justify-items-end gap-hair text-right">
-            <span className="flex items-baseline gap-tight whitespace-nowrap">
-              <span className="label-cap text-caption text-muted-foreground">Model</span>
-              <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+      <Collapsible className={cn("grid gap-tight px-gutter py-tight", out && "opacity-60")}>
+        <div className="flex min-w-0 items-center">
+          <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
+            className="flex min-w-0 flex-1 items-center gap-tight rounded-md py-hair outline-none focus-visible:ring-2 focus-visible:ring-ring active:opacity-70">
+            <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control shrink-0" />
+            <span className="grid min-w-0 gap-hair">
+              <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
+                <span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span>
+                <TeamFlag name={r.team} />
+                {liveQuote && <LiveBadge />}
+              </span>
+              <span className="flex flex-wrap items-baseline gap-x-tight text-footnote text-muted-foreground">
+                <b className="font-condensed text-body tabular-nums text-foreground">{side} {r.line}</b>
+                <span>{label}{scope && ` · ${scope}`}</span>
+              </span>
             </span>
-            {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
-          </span>
-          <Spark r={r} />
-        </span>
-      </Link>
-      <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
+          </Link>
+          <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} />
+          <CollapsibleTrigger className="group inline-flex h-control shrink-0 items-center gap-hair rounded-md px-tight text-footnote font-medium text-muted-foreground outline-none hover:bg-card focus-visible:ring-2 focus-visible:ring-ring">
+            Stats <ChevronDownIcon className="size-3.5 transition-transform group-data-[state=open]:rotate-180" aria-hidden />
+          </CollapsibleTrigger>
+        </div>
+        <div className="grid min-w-0 gap-hair">
+          {!hideMatch && soFar == null && <span className="truncate text-footnote text-muted-foreground">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
+          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          {out ? <Badge variant="outline" className="w-fit text-muted-foreground">Not in XI</Badge> : <LineProgress standing={soFar} live={!!liveQuote} line={r.line} opened={liveQuote?.opened} />}
+        </div>
+        <CollapsibleContent className="grid gap-tight border-t border-hairline pt-tight data-[state=closed]:hidden">
+          <div className="flex flex-wrap items-center justify-between gap-tight">
+            <div className="grid gap-hair text-footnote text-muted-foreground">
+              <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
+              {ground && <span title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
+              {r.edge != null && <span>Model edge <b className={r.edge > 0 ? "text-primary" : "text-miss"}>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</b> · {edgeTag(r.edge, r.side)}</span>}
+            </div>
+            <Spark r={r} />
+          </div>
+          {!out && liveQuote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
+        </CollapsibleContent>
+      </Collapsible>
     </motion.li>
   );
 }

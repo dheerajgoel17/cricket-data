@@ -53,6 +53,8 @@ describe("PropTable", () => {
     const { rerender } = render(renderRows({ v: 32, state: "live", verdict: null }));
     expect(screen.getAllByText(/32 so far/)).toHaveLength(2);
     expect(screen.getAllByRole("img", { name: "32 of 40" })).toHaveLength(2);
+    expect(screen.getAllByText("Similar in-play lines")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Stats" }));
     expect(screen.getAllByText("Similar in-play lines")).toHaveLength(2);
     rerender(renderRows(null));
     expect(screen.getAllByText("Score unavailable")).toHaveLength(2);
@@ -68,6 +70,8 @@ describe("PropTable", () => {
   it("uses a short stadium name on the prop card, full venue on the title", () => {
     const r = { ...row, venue: "Western Australia Cricket Association Ground, Perth", ven: window(0.2, 5), l10: window(0.7, 10) };
     render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.queryByText("7 in L10")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Stats" }));
     expect(screen.getByText("7 in L10")).toBeInTheDocument();
     const chip = screen.getByTitle("Western Australia Cricket Association Ground, Perth");
     expect(chip).toHaveTextContent("1/5 at WACA");
@@ -96,7 +100,7 @@ describe("PropTable", () => {
     const r = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
     render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
     expect(screen.getByText("bet365")).toBeInTheDocument();
-    expect(screen.getByText("bet365").closest("a")).toBeTruthy();
+    expect(screen.getByText("bet365").closest("a")).toBeNull();
   });
 
   it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
