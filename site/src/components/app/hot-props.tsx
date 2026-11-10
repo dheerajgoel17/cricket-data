@@ -70,9 +70,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
+  const scopeKey = ["hot-props", scope] as const;
+  const key = [...scopeKey, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", archive ? doc.data?.lines?.length : null];
   const rows = useQuery({
     queryKey: key,
+    placeholderData: (previous, query) => query?.queryKey[1] === scope ? previous : undefined,
     enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
@@ -114,9 +117,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
       // Later files come several at a time. A few plans run at once, giving the main thread back in between. Rows are published as they land.
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
+      // Keep a complete snapshot visible while its replacement is scored. Only the
+      // first load of a scope streams partial rows as player files arrive.
+      const refreshing = qc.getQueriesData<Row[]>({ queryKey: scopeKey }).some(([, data]) => data !== undefined);
       let published = 0;
       const publish = () => {
-        if (!out.length || (published && Date.now() - published < PUBLISH_MS)) return;
+        if (refreshing || !out.length || (published && Date.now() - published < PUBLISH_MS)) return;
         published = Date.now();
         qc.setQueryData(key, [...out]);
       };
@@ -132,7 +138,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   });
   const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
-  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
+  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching && !rows.isPlaceholderData, otherDay };
 }
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
