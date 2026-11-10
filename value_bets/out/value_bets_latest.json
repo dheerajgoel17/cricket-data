@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-10T04:30:35Z",
- "generated_at_ist": "2026-11-10 10:00 IST",
- "runtime_secs": 115.8,
+ "generated_at_utc": "2026-11-10T04:44:20Z",
+ "generated_at_ist": "2026-11-10 10:14 IST",
+ "runtime_secs": 113.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-09",
-  "commit": "f3813c80e4"
+  "commit": "e98118ae0a"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1523,
-   "secs": 0.6
+   "rows": 1541,
+   "secs": 0.7
   },
   "smarkets": {
    "status": "ok",
    "rows": 433,
-   "secs": 1.3
+   "secs": 1.4
   },
   "feedk": {
    "status": "ok",
    "rows": 72,
-   "secs": 15.7,
+   "secs": 15.9,
    "events": 6
   },
   "feedg": {
    "status": "ok",
    "rows": 32,
-   "secs": 21.8,
+   "secs": 21.2,
    "events": 4
   },
   "feede": {
    "status": "ok",
    "rows": 378,
-   "secs": 40.1,
+   "secs": 40.7,
    "events": 16
   },
   "feedf": {
    "status": "ok",
    "rows": 288,
-   "secs": 71.8,
+   "secs": 71.9,
    "events": 13
   },
   "feedh": {
    "status": "ok",
    "rows": 1364,
-   "secs": 73.0,
-   "events": 29
+   "secs": 72.2,
+   "events": 30
   }
  },
- "snapshot": "odds_20261110T043035Z.jsonl.gz",
+ "snapshot": "odds_20261110T044420Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,13 +120,13 @@
  },
  "stats": {
   "events_in_window": 33,
-  "rows_in_window": 4038,
-  "selections_with_model": 2235,
-  "selections_with_market_fair": 2612,
-  "markets_in_window": 392,
+  "rows_in_window": 4056,
+  "selections_with_model": 2253,
+  "selections_with_market_fair": 2630,
+  "markets_in_window": 393,
   "value_bets": 1,
   "dropped_by_filter": {
-   "model_market_gap": 777,
+   "model_market_gap": 779,
    "odds_range": 21,
    "loose_name_match": 5,
    "model_disagrees": 7,
@@ -211,12 +211,12 @@
     "corr": 0.36
    },
    "top_bowler_match": {
-    "n_prices": 122,
-    "mean_model_p": 0.051,
+    "n_prices": 140,
+    "mean_model_p": 0.052,
     "mean_market_p": 0.057,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.6,
-    "corr": 0.24
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 0.578,
+    "corr": 0.281
    }
   }
  },
@@ -1069,22 +1069,23 @@
   }
  },
  "log": [
-  "[10:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:00 IST] history: 23983 matches, last 2026-11-09, players 431907",
-  "[10:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1523, 'secs': 0.6}",
-  "[10:02 IST] source smarkets: {'status': 'ok', 'rows': 433, 'secs': 1.3}",
-  "[10:02 IST] source feedk: {'status': 'ok', 'rows': 72, 'secs': 15.7, 'events': 6}",
-  "[10:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 21.8, 'events': 4}",
-  "[10:02 IST] source feede: {'status': 'ok', 'rows': 378, 'secs': 40.1, 'events': 16}",
-  "[10:02 IST] source feedf: {'status': 'ok', 'rows': 288, 'secs': 71.8, 'events': 13}",
-  "[10:02 IST] source feedh: {'status': 'ok', 'rows': 1364, 'secs': 73.0, 'events': 29}",
-  "[10:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:02 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[10:02 IST] 24 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[10:02 IST] book lines: 357 player lines from 7 source(s)",
-  "[10:02 IST] 48 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[10:02 IST] weather: forecasts for 9 events, 0 failed",
-  "[10:02 IST] prop model: 1244 prop selections modelled, 420 milestone ladder prices anchored to O/U",
-  "[10:02 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[10:14 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[10:14 IST] history: 23983 matches, last 2026-11-09, players 431907",
+  "[10:15 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1541, 'secs': 0.7}",
+  "[10:15 IST] source smarkets: {'status': 'ok', 'rows': 433, 'secs': 1.4}",
+  "[10:15 IST] source feedk: {'status': 'ok', 'rows': 72, 'secs': 15.9, 'events': 6}",
+  "[10:15 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 21.2, 'events': 4}",
+  "[10:15 IST] source feede: {'status': 'ok', 'rows': 378, 'secs': 40.7, 'events': 16}",
+  "[10:15 IST] source feedf: {'status': 'ok', 'rows': 288, 'secs': 71.9, 'events': 13}",
+  "[10:15 IST] source feedh: {'status': 'ok', 'rows': 1364, 'secs': 72.2, 'events': 30}",
+  "[10:16 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[10:16 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[10:16 IST] 24 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[10:16 IST] held back 0 player and 32 fancy lines first priced after their match started (not pre-match prices)",
+  "[10:16 IST] book lines: 357 player lines from 7 source(s)",
+  "[10:16 IST] 48 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[10:16 IST] weather: forecasts for 9 events, 0 failed",
+  "[10:16 IST] prop model: 1244 prop selections modelled, 420 milestone ladder prices anchored to O/U",
+  "[10:16 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
