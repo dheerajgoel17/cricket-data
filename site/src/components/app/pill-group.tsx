@@ -35,7 +35,7 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
             className={cn(
               "relative shrink-0 font-medium transition-colors",
               outlined
-                ? "h-control rounded-[var(--chip-radius)] border! border-foreground/40! bg-background! px-3.5 text-callout text-foreground! shadow-none data-[state=on]:border-foreground! data-[state=on]:bg-foreground! data-[state=on]:text-background!"
+                ? "h-control rounded-[var(--chip-radius)] border! border-foreground/40! bg-background! px-3.5 text-callout text-foreground! shadow-none data-[state=on]:border-primary! data-[state=on]:bg-[color-mix(in_oklab,var(--foreground)_82%,var(--primary))]! data-[state=on]:text-background!"
                 : segmented
                   ? "h-full flex-none rounded-[var(--chip-radius)] border-0 bg-transparent px-3 text-callout data-[spacing=0]:rounded-[var(--chip-radius)] data-[spacing=0]:first:rounded-[var(--chip-radius)] data-[spacing=0]:last:rounded-[var(--chip-radius)] hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground"
                   : "h-control rounded-[var(--chip-radius)] border-0 bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-background data-[state=off]:text-foreground/80",
