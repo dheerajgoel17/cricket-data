@@ -62,7 +62,7 @@ export function TeamSpot({ r, fx, teams, className }: { r: any; fx: any; teams: 
   const [lo, hi] = rep.band as [number, number];
   return (
     <p className={cn("text-footnote text-muted-foreground", className)} title={`${inn!.runs}/${inn!.wkts} after ${overs(inn!.overs)} ov, ${lo}–${hi} runs in ${rep.n} past ${fx.fmt} innings · median finish ${rep.summary.median}`}>
-      Same spot: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < MIN_SAMPLE ? " · small sample" : ""}
+      Similar team innings: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < MIN_SAMPLE ? " · small sample" : ""}
     </p>
   );
 }
@@ -84,10 +84,10 @@ export function BatterSpot({ r, className }: { r: any; className?: string }) {
   return (
     <span className={cn("text-footnote text-muted-foreground", className)}>
       {!!rep?.n && <span className="block" title={`${bat.runs} off ${bat.balls}, ${rep.n} of his innings · median finish ${rep.summary.median}`}>
-        Same spot: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+        Batter in similar starts: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span>{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
-      {counts && <span className="block" title="Similar live offers from a three-date UTC window. One offer per batter innings in each score band.">
-        Past live offers: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} push`}</span>{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+      {counts && <span className="block" title="Recent T20 or ODI innings in the same format with similar runs, balls faced and runs needed to go over. Each batter innings counts once here.">
+        Similar in-play lines: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} on the line`}</span>{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
     </span>
   );
