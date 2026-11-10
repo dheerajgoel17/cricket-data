@@ -31,7 +31,16 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
       {items.map(([v, l]) => {
         const clearable = value === v && outlined && v !== resetValue;
         return (
-          <ToggleGroupItem key={v} value={v} title={clearable ? "Clear filter" : undefined} className={cn("relative shrink-0 border-0 bg-transparent font-medium transition-colors", segmented ? "h-full flex-none rounded-[var(--chip-radius)] bg-transparent px-3 text-callout data-[spacing=0]:rounded-[var(--chip-radius)] data-[spacing=0]:first:rounded-[var(--chip-radius)] data-[spacing=0]:last:rounded-[var(--chip-radius)] hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground" : "h-control rounded-[var(--chip-radius)] bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-background data-[state=off]:text-foreground/80", outlined && "border border-hairline bg-transparent hover:bg-surface-hover data-[state=on]:border-foreground data-[state=on]:bg-foreground data-[state=off]:bg-transparent", itemClassName)}>
+          <ToggleGroupItem key={v} value={v} title={clearable ? "Clear filter" : undefined}
+            className={cn(
+              "relative shrink-0 font-medium transition-colors",
+              outlined
+                ? "h-control rounded-[var(--chip-radius)] border! border-foreground/40! bg-background! px-3.5 text-callout text-foreground! shadow-none data-[state=on]:border-foreground! data-[state=on]:bg-foreground! data-[state=on]:text-background!"
+                : segmented
+                  ? "h-full flex-none rounded-[var(--chip-radius)] border-0 bg-transparent px-3 text-callout data-[spacing=0]:rounded-[var(--chip-radius)] data-[spacing=0]:first:rounded-[var(--chip-radius)] data-[spacing=0]:last:rounded-[var(--chip-radius)] hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground"
+                  : "h-control rounded-[var(--chip-radius)] border-0 bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-background data-[state=off]:text-foreground/80",
+              itemClassName,
+            )}>
             {!outlined && value === v && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 rounded-[var(--chip-radius)]", segmented ? "bg-secondary shadow-sm" : "bg-foreground")} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
             <span className="relative flex items-center gap-hair">{l}{clearable && <XMarkIcon className="size-4 shrink-0" aria-hidden />}</span>
           </ToggleGroupItem>
