@@ -143,8 +143,8 @@
 .tick-down { animation: tick-down 1.1s ease-out; }
 @keyframes ticker-roll-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes ticker-roll-down { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-.ticker-roll-up { animation: ticker-roll-up 260ms ease-out; }
-.ticker-roll-down { animation: ticker-roll-down 260ms ease-out; }
+.ticker-roll-up { animation: ticker-roll-up 420ms ease-out; }
+.ticker-roll-down { animation: ticker-roll-down 420ms ease-out; }
 
 /* Skeleton fill: a token-coloured shimmer the size of the real block, not a generic pulse. */
 @keyframes skeleton-shimmer {

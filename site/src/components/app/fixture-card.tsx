@@ -14,6 +14,7 @@ import { abbr, dayKey, dayLabel, fixtureStart, localTime, matchDateLabel, pretty
 import { useNow } from "@/lib/clock";
 import { TeamAvatar, TeamBadge, usePreloadTeams } from "./badges";
 import { PillGroup } from "./pill-group";
+import { Tick } from "./tick";
 
 import { seriesChips } from "@cricket/engine/props-view.js";
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
@@ -26,14 +27,17 @@ const hasTime = (f: any) => f.start.length > 10;
 const city = (v: string) => (v || "").split(",")[0].replace(/\(.*\)/, "").trim();
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
-export function LiveScore({ s, size = "md", className }: { s: { display?: string; runs?: number | null; wkts?: number | null; overs?: number | null } | null | undefined; size?: "md" | "lg"; className?: string }) {
+export function LiveScore({ s, size = "md", className, live = false }: { live?: boolean; s: { display?: string; runs?: number | null; wkts?: number | null; overs?: number | null } | null | undefined; size?: "md" | "lg"; className?: string }) {
   if (!s?.display) {
     return <span className={cn("shrink-0 text-muted-foreground", size === "lg" ? "text-callout" : "text-footnote", className)}>Yet to bat</span>;
   }
   const total = scoreLabel(s);
+  const totalClass = cn("font-condensed font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body");
+  // Include wickets so a dismissal can animate the score even when no runs were scored.
+  const change = s.runs == null ? null : s.runs + (s.wkts ?? 0) / 100;
   return (
     <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
-      <span className={cn("font-condensed font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body")}>{total}</span>
+      {live ? <Tick quiet value={change} className={cn(totalClass, "px-0")}>{total}</Tick> : <span className={totalClass}>{total}</span>}
       {s.overs != null && <span className="font-condensed text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
     </span>
   );
@@ -88,7 +92,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
                   <TeamBadge name={t} size="md" eager />
                   <span className={cn("truncate text-body font-medium", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
                 </div>
-                {hasScore || live ? <LiveScore s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
+                {hasScore || live ? <LiveScore live={live} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
                     {timed && <span className="text-callout font-medium tabular-nums">{localTime(when)}</span>}

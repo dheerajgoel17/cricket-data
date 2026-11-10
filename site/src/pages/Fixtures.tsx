@@ -74,7 +74,7 @@ function ScoreRows({ f, match, small, flush }: { f: any; match: any; small?: boo
       {sides.map(([name, ix]) => (
         <div key={name} className={cn("min-w-0 items-center", flush ? "grid grid-cols-[minmax(0,1fr)_minmax(0,44%)]" : "flex gap-snug")}>
           <div className={cn("min-w-0 flex-1", flush && "px-gutter py-tight")}><TeamName name={name} ix={ix} small={small} /></div>
-          {flush ? <div className="flex min-w-0 self-stretch items-center justify-end border-l border-hairline px-gutter"><LiveScore s={teamScore(match, name)} size="lg" /></div> : <LiveScore s={teamScore(match, name)} size="lg" /> }
+          {flush ? <div className="flex min-w-0 self-stretch items-center justify-end border-l border-hairline px-gutter"><LiveScore live={match?.status === "live"} s={teamScore(match, name)} size="lg" /></div> : <LiveScore live={match?.status === "live"} s={teamScore(match, name)} size="lg" /> }
         </div>
       ))}
     </div>

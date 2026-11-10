@@ -8,7 +8,7 @@ const VERDICT = { cleared: "Cleared", missed: "Missed", push: "On the line" } as
 
 /** Quiet ticks roll the new value into place and leave the direction visible briefly. */
 export function Tick({ value, children, className, quiet = false }: { quiet?: boolean; value: number | null | undefined; children: ReactNode; className?: string }) {
-  const dir = useTick(value, quiet ? 2600 : undefined);
+  const dir = useTick(value, quiet ? 5000 : undefined);
   return (
     <span className={cn("inline-flex items-baseline gap-hair rounded-md px-hair", !quiet && dir === 1 && "tick-up", !quiet && dir === -1 && "tick-down", className)}>
       {dir === -1 ? <ArrowDownIcon className="size-3 shrink-0 text-miss" aria-hidden /> : null}
