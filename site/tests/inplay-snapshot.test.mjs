@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GAP_MS, ROUNDS, describeKey, loadExtra, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
+import { GAP_MS, ROUNDS, describeKey, loadExtra, loadFirsts, readFeed, readRound, run, saveBody } from "../scripts/inplay-snapshot.mjs";
 
 const q = (group_name, label, handicap, odds_dec) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec });
 const DOC = { matches: [
@@ -43,7 +43,7 @@ test("a match is on: four reads fifteen seconds apart, each one written", async 
   assert.deepEqual(out, { reads: ROUNDS, saved: ROUNDS, failed: 0, matches: 1 });
   assert.deepEqual(sleeps, [GAP_MS, GAP_MS, GAP_MS]);
   assert.deepEqual(saved.map((b) => b.asOf), ["07:00:00", "07:00:15", "07:00:30", "07:00:45"].map((x) => `2026-11-09T${x}.000Z`));
-  assert.ok(saved.every((b) => b.source === "inplay" && b.matches === matches));
+  assert.ok(saved.every((b) => b.source === "inplay" && b.matches.length === 1 && b.matches[0].home === "A"));
   assert.equal(ROUNDS * GAP_MS, 60_000);
 });
 
@@ -94,4 +94,27 @@ test("a round is the price feed's matches with the other books' joined in; a fai
   assert.equal(kept.length, 1);
   assert.match(logs[0], /^::warning::price feed read failed, keeping the other books' matches: feed HTTP 503/);
   await assert.rejects(readRound("http://feed.invalid/", [], json({}, 503)), /feed HTTP 503/);
+});
+
+test("a line that opened in play keeps its first value across rounds and runs, and the row carries what to remember", async () => {
+  const feed = [[40.5], [44.5], [51.5]].map(([line]) => [{ home: "A", away: "B", lines: [{ kind: "player_runs", player: "J Smith", line, over: 1.85, under: 1.85 }] }]);
+  const saved = [];
+  let n = 0, t = Date.parse("2026-11-09T07:00:00Z");
+  await run({ read: async () => feed[n++], save: async (b) => saved.push(b), sleep: async (ms) => { t += ms; }, now: () => new Date(t), rounds: 3 });
+  assert.deepEqual(saved.map((b) => b.matches[0].lines[0].line), [40.5, 44.5, 51.5]);
+  assert.deepEqual(saved.map((b) => b.matches[0].lines[0].first), [40.5, 40.5, 40.5]); // the line moved, the first one did not
+  assert.equal(Object.keys(saved[2].firsts).length, 1);
+  // the next run (a minute later) starts from what the last one left in the row
+  const again = [];
+  await run({ read: async () => [{ home: "A", away: "B", lines: [{ kind: "player_runs", player: "J Smith", line: 60.5, over: 1.85, under: 1.85 }] }], save: async (b) => again.push(b), sleep: async () => {}, now: () => new Date(t + 60_000), rounds: 1, firsts: saved[2].firsts });
+  assert.equal(again[0].matches[0].lines[0].first, 40.5);
+});
+
+test("the last run's first lines are read back from the row, and nothing readable is just empty", async () => {
+  const f = { x: { line: 30.5, seen: 1 } };
+  const ok = async (u) => (assert.match(u, /inplay_lines\?select=body&id=eq\.1/), new Response(JSON.stringify([{ body: { firsts: f } }])));
+  assert.deepEqual(await loadFirsts({ base: "https://db.invalid", key: "svc", fetchImpl: ok }), f);
+  assert.deepEqual(await loadFirsts({ base: "https://db.invalid", key: "svc", fetchImpl: async () => new Response("[]") }), {});
+  assert.deepEqual(await loadFirsts({ base: "https://db.invalid", key: "svc", fetchImpl: async () => new Response(null, { status: 500 }) }), {});
+  assert.deepEqual(await loadFirsts({ base: "https://db.invalid", key: "svc", fetchImpl: async () => { throw new Error("down"); } }), {});
 });

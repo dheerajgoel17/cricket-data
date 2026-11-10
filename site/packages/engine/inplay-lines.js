@@ -143,7 +143,7 @@ function openedOf(entries) {
 
 /**
  * The lines data (`{ lines, fancy }`, what the tables read) with the live lines of started matches added, so the existing tables show them with their own history figures and no table of their own. Live lines are ADDED beside the pre-match ones, never in place of them (the pre-match line is the bet we track and settle):
- * - a batter's innings-runs line becomes a `lines` entry (stat "runs", the book's name, `live: true` on its quote, `opened` the pre-match line nearest evens);
+ * - a batter's innings-runs line becomes a `lines` entry (stat "runs", the book's name, `live: true` on its quote, `opened` the pre-match line nearest evens, else, for a batter nobody priced before the start, `first`: where the live line first stood, stamped by `stampFirst`);
  * - a side's innings-total line becomes a `fancy` entry (`team_total_runs`, its `inn`, `live: true`);
  * - every other line (over / under or pick), and a batter who cannot be linked, goes to `live`: `[{ home, away, start_utc, fmt, markets }]`, shown as live rows.
  * `resolve(name, [home, away])` links a book's player name to `{ pid, name, team }` (or null). A Test's "Innings Runs" is the batter's current innings, not the match: `innOf(team, [home, away])` says which of his side's innings that is (1 or 2, or null when the live match is not known), so the live line is his 1st / 2nd innings line (`inn`) and `opened` comes from that scope's pre-match lines only. While a batter has pre-match lines in that scope, the live line is added only once his runs so far (`soFarOf(name, [home, away])`, null when unknown) are past the main one (the line nearest evens, `openedOf`: a stray high line cannot hold it back). A batter with no pre-match line in that scope (a debutant nobody priced, a 2nd innings) shows the live line at once. The same holds for a batter's milestone at a rung he was priced at before the start (added once his runs are past the rung) and, with `teamRunsOf(team, inn, [home, away], fmt)`, for a side's innings total (added once the side's runs in that innings are past its main pre-match line). With no callback the live line is always added. A match the books never priced before it started (no entry in `doc`) takes its fixture from `fixtures`. Returns `doc` itself when there is nothing live.
@@ -188,7 +188,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
             const runs = soFarOf(who.name || l.player, [refHome, refAway]);
             if (!(runs != null && runs > openedOf(pre).line)) continue; // the main pre-match line is still open: his row stays pre-match
           }
-          const opened = openedOf(pre);
+          const opened = openedOf(pre) || (l.first != null ? { line: l.first } : null); // no pre-match line: where the live line first stood
           const quote = { source: l.book || FEED_BOOK, kind: "bookmaker", over: l.over, under: l.under, live: true, ...(opened ? { opened: opened.line } : {}) }, at = addLines.find((x) => x.pid === who.pid && x.line === l.line && lineScope(x) === inn);
           if (at) at.books.push(quote); // the same line from another book: one entry with both
           else addLines.push({ pid: who.pid, player: who.name || l.player, book_name: l.player, team: who.team || "", fmt: ref.fmt, stat: "runs", ...(inn ? { inn } : {}), line: l.line, match: label, competition: ref.competition, start_utc: ref.start_utc, books: [quote] });
@@ -202,7 +202,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
           const runs = teamRunsOf(team, l.inn, [refHome, refAway], ref.fmt);
           if (!(runs != null && runs > openedOf(pre).line)) continue; // the side's main pre-match line is still open: it stays
         }
-        const opened = openedOf(pre);
+        const opened = openedOf(pre) || (l.first != null ? { line: l.first } : null);
         addFancy.push({ match: label, home: refHome, away: refAway, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true, ...(opened ? { opened: opened.line } : {}) });
       } else if (l.kind === "pick") {
         // a batter's milestone is a line of his own in the props (replacing the earlier one at that line); every other pick has nothing to be judged by and is not shown
@@ -241,6 +241,34 @@ export function liveRows(doc, fixture) {
   if (!fixture?.a || !fixture?.b) return [];
   const same = (m) => (sameTeam(m.home, fixture.a) && sameTeam(m.away, fixture.b)) || (sameTeam(m.home, fixture.b) && sameTeam(m.away, fixture.a));
   return (doc?.live || []).find(same)?.markets || [];
+}
+
+/** How long a batter's or side's first live line is remembered after the feed last listed it (a feed that drops it for a round or two does not start it over; a new innings lists it again much later). */
+export const FIRST_GRACE_MS = 20 * 60e3;
+
+/**
+ * Where each live batter's / side's innings-runs line stood the first time we saw it: stamped as `first` on every such row of the match (one number per batter or side and innings). The live bar and "was" read it as
+ * the line it opened at when there is no pre-match line (a batter nobody priced before the start), so the bar can turn green once he passes it however far the line has moved since. Kept by the snapshot job:
+ * `prev` is the last round's `firsts` (`{ key: { line, seen } }`), a key listed again keeps its first line, a new one takes the line nearest evens of the round, one not listed for FIRST_GRACE_MS is forgotten.
+ * Pure: returns `{ matches, firsts }` and leaves the input alone.
+ */
+export function stampFirst(matches, prev = {}, nowMs = Date.now()) {
+  const firsts = {};
+  for (const [k, v] of Object.entries(prev || {})) if (Number.isFinite(v?.line) && nowMs - (v.seen || 0) <= FIRST_GRACE_MS) firsts[k] = v;
+  const keyOf = (m, l) => `${pairOf(m.home, m.away)}|${l.kind}|${teamKey(l.team || l.player)}|${l.inn || 0}`;
+  const fresh = new Map();
+  for (const m of matches || []) {
+    for (const l of m.lines || []) {
+      if (l.kind !== "player_runs" && l.kind !== "team_runs") continue;
+      const k = keyOf(m, l);
+      if (firsts[k]) { firsts[k] = { ...firsts[k], seen: nowMs }; continue; }
+      const p = overProb(l.over, l.under), far = p == null ? 1 : Math.abs(p - 0.5), cur = fresh.get(k);
+      if (!cur || far < cur.far) fresh.set(k, { far, line: l.line });
+    }
+  }
+  for (const [k, v] of fresh) firsts[k] = { line: v.line, seen: nowMs };
+  const out = (matches || []).map((m) => ({ ...m, lines: (m.lines || []).map((l) => (l.kind === "player_runs" || l.kind === "team_runs") && firsts[keyOf(m, l)] ? { ...l, first: firsts[keyOf(m, l)].line } : l) }));
+  return { matches: out, firsts };
 }
 
 const lineId = (l) => [l.kind, l.player || "", l.team || "", l.market || "", l.inn || 0, l.line ?? "", l.book || ""].join("|");
