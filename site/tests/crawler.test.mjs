@@ -87,3 +87,17 @@ test("middleware: an assistant is refused on /data, /api and the gate; a trainin
   assert.equal((await call("/api/live", scrapers[6])).status, 403);
   assert.equal(await call("/data/meta.json", people[0], { "sec-fetch-site": "same-origin" }), undefined);
 });
+
+test("middleware: an assistant opening a player page is sent to the share HTML, and the /api/share request it becomes is not refused", async () => {
+  const real = globalThis.fetch;
+  let asked = null;
+  globalThis.fetch = async (url, init) => { asked = { url: String(url), ua: new Headers(init.headers).get("user-agent") }; return new Response("card", { status: 200 }); };
+  try {
+    const r = await call("/player/22?stat=runs&line=24.5", assistants[0]);
+    assert.equal(r.status, 200);
+    assert.equal(asked.url, "https://x.test/api/share?path=player%2F22%2Fruns%2F24.5");
+    assert.equal(asked.ua, assistants[0]);
+  } finally { globalThis.fetch = real; }
+  assert.equal(await call("/api/share?path=player%2F22", assistants[0]), undefined);
+  assert.equal((await call("/api/live", assistants[0])).status, 403);
+});

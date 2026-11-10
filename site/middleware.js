@@ -39,7 +39,7 @@ export default async function middleware(req) {
     dest.searchParams.set("path", crawlerSharePath(url));
     return fetch(dest, { headers: req.headers });
   }
-  if (ASSISTANT_UA.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // an assistant reads the share pages above, never the data or the gate
+  if (ASSISTANT_UA.test(ua) && path !== "/api/share") return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } }); // an assistant reads the share pages above (the forward below is itself a request to /api/share, with the assistant's User-Agent), never the data or the gate
   if (path === "/api/gate") return;
   if (!ua || BOT_UA.test(ua)) return new Response("no", { status: 403, headers: { "Cache-Control": "private, no-store" } });
   if (!path.startsWith("/data/") || path === "/data/meta.json") return;

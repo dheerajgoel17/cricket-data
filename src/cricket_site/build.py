@@ -28,7 +28,7 @@ from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
-from .sides import SAME_SIDE
+from .sides import SAME_SIDE, youth_sides
 
 NSHARD = 64
 SCHEMA = 1
@@ -848,6 +848,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
             a, b = re.split(r"\s+vs\s+", d["match"], maxsplit=1, flags=re.I)
+            a, b = youth_sides(a, b, d.get("competition"))  # a file written before the tag was added to the grouping still pairs with its U19 schedule row
             start = d["start_utc"]
             mins = _minutes(start)
         except (ValueError, KeyError, TypeError, OSError):

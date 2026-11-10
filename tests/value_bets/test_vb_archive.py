@@ -530,3 +530,15 @@ def test_readers_of_the_archive_never_take_a_held_line_for_a_price_or_a_result(t
     shutil.copytree(path.parent, vb.parent / "archive" / path.parent.name)
     assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["Pakistan"]
     assert set(I.collect_books(vb)) == {"sk"}  # the held player is not read as one the books priced
+
+
+def test_a_youth_match_the_book_names_without_the_age_tag_joins_the_tagged_one():
+    def ev(m, c):
+        return {"match": m, "competition": c, "start_utc": START, "markets": ["batter_runs"], "sources": ["x"], "n": 1}
+
+    b = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": [ev("India U19 vs United Arab Emirates U19", "Under-19s Asia Cup"), ev("India vs United Arab Emirates", "U19 Asia Cup"),
+                                                                         ev("India U19 vs UAE U19", " /  / ")]}
+    g = group(b)
+    assert len(g) == 1 and len(g[0]["events"]) == 3  # UAE is United Arab Emirates, and "India" in an U19 competition is India U19
+    assert len(group({"generated_at_utc": "t", "lines": [], "fancy": [], "events": [ev("India vs United Arab Emirates", "T20 Series")]})) == 1  # a senior match keeps its names
+    assert group({"generated_at_utc": "t", "lines": [], "fancy": [], "events": [ev("India vs United Arab Emirates", "U19 Asia Cup")]})[0]["match"] == "India U19 vs United Arab Emirates U19"
