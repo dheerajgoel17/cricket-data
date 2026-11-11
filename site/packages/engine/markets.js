@@ -113,7 +113,7 @@ export function selectMatches(store, f) {
 
 /**
  * The store's venue indexes for a fixture's venue name ("Sharjah Cricket Stadium, Sharjah"): the data holds one ground under several spellings (with or without the city,
- * "Cricket Association Stadium"), so venues match on the name before the comma with "association" dropped. [] when the fixture has no venue or the data has no such ground.
+ * "Cricket Association Stadium") or under a former name. [] when the fixture has no venue or the data has no such ground.
  */
 export function venueIndices(store, name) {
   const want = venueStem(name);
@@ -121,8 +121,28 @@ export function venueIndices(store, name) {
   return store.venues.flatMap((v, i) => (venueStem(v) === want ? [i] : []));
 }
 
-/** A ground's name for comparing: the part before the comma, "association" dropped, case and punctuation ignored. */
-export const venueStem = (v) => norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
+const VENUE_ALIASES = new Map([
+  ["optus stadium", "perth stadium"],
+  ["the gabba", "brisbane cricket ground"],
+  ["gabba", "brisbane cricket ground"],
+  ["marvel stadium", "docklands stadium"],
+  ["gmhba stadium", "kardinia park"],
+  ["emirates old trafford", "old trafford"],
+  ["rose bowl", "the rose bowl"],
+  ["ageas bowl", "the rose bowl"],
+  ["the ageas bowl", "the rose bowl"],
+  ["utilita bowl", "the rose bowl"],
+  ["feroz shah kotla", "arun jaitley stadium"],
+  ["feroz shah kotla ground", "arun jaitley stadium"],
+  ["motera stadium", "narendra modi stadium"],
+  ["chinnaswamy stadium", "m chinnaswamy stadium"],
+]);
+
+/** Compare venue names without the city suffix and account for known renames. */
+export function venueStem(v) {
+  const name = norm(String(v ?? "").split(",")[0].replace(/\bassociation\b/i, ""));
+  return VENUE_ALIASES.get(name) ?? name;
+}
 
 export function marketReport(store, ms, key, line = null) {
   const n = oversN(key);

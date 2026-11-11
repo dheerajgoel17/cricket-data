@@ -232,7 +232,7 @@ export function FixturePage() {
     );
   }
   if (groundDetail) {
-    return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />;
+    return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender, fmt: fx.fmt }} />;
   }
   return (
     <div className="flex flex-col gap-section">
@@ -250,7 +250,7 @@ export function FixturePage() {
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-w-0 flex-col gap-stack">
           {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} fmt={fx.fmt} archive={archived ? doc : undefined} />}
-          {tab === "ground" && <FixtureGroundPanel embedded venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender }} />}
+          {tab === "ground" && <FixtureGroundPanel embedded venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender, fmt: fx.fmt }} />}
           {tab === "form" && <RecentForm teams={known} fmt={fmt} />}
           {tab === "grid" && (
             <>
