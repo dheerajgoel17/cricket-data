@@ -1,10 +1,10 @@
-# Cricket value bets - 2026-11-12 04:27 IST
+# Cricket value bets - 2026-11-12 05:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1734 prices
-- **smarkets**: ok, 482 prices
+- **smarkets**: ok, 451 prices
 - **feedk**: ok, 212 prices, 5 events
 - **feedg**: ok, 40 prices, 5 events
 - **feede**: ok, 538 prices, 17 events
@@ -21,4 +21,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
 
-Runtime 207.7s. Snapshot: `odds_20261111T225757Z.jsonl.gz`
+Runtime 208.5s. Snapshot: `odds_20261111T233037Z.jsonl.gz`
