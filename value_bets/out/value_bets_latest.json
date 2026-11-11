@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-11T18:30:35Z",
- "generated_at_ist": "2026-11-12 00:00 IST",
- "runtime_secs": 217.9,
+ "generated_at_utc": "2026-11-11T19:30:34Z",
+ "generated_at_ist": "2026-11-12 01:00 IST",
+ "runtime_secs": 161.3,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-11",
-  "commit": "d0ff1c8aad"
+  "commit": "e726a5a4d7"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1721,
-   "secs": 1.0
+   "rows": 1725,
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 470,
-   "secs": 1.8
+   "rows": 451,
+   "secs": 2.3
   },
   "feedk": {
    "status": "ok",
    "rows": 212,
-   "secs": 12.8,
+   "secs": 13.5,
    "events": 5
   },
   "feedg": {
    "status": "ok",
-   "rows": 40,
-   "secs": 26.2,
-   "events": 5
+   "rows": 48,
+   "secs": 31.8,
+   "events": 6
   },
   "feede": {
    "status": "ok",
    "rows": 582,
-   "secs": 42.9,
+   "secs": 44.7,
    "events": 17
   },
   "feedf": {
    "status": "ok",
    "rows": 334,
-   "secs": 60.0,
+   "secs": 58.5,
    "events": 12
   },
   "feedh": {
    "status": "ok",
    "rows": 1161,
-   "secs": 93.0,
+   "secs": 78.5,
    "events": 36
   }
  },
- "snapshot": "odds_20261111T183035Z.jsonl.gz",
+ "snapshot": "odds_20261111T193034Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,14 +120,14 @@
  },
  "stats": {
   "events_in_window": 32,
-  "rows_in_window": 4381,
+  "rows_in_window": 4385,
   "selections_with_model": 2629,
   "selections_with_market_fair": 2660,
   "markets_in_window": 420,
   "value_bets": 1,
   "dropped_by_filter": {
    "odds_range": 37,
-   "model_market_gap": 1194,
+   "model_market_gap": 1190,
    "loose_name_match": 8,
    "market_disabled": 1,
    "model_disagrees": 16,
@@ -144,9 +144,9 @@
     "n_prices": 703,
     "mean_model_p": 0.054,
     "mean_market_p": 0.073,
-    "mean_logit_diff_model_minus_market": 0.106,
-    "mean_abs_logit_diff": 0.869,
-    "corr": 0.723
+    "mean_logit_diff_model_minus_market": 0.107,
+    "mean_abs_logit_diff": 0.871,
+    "corr": 0.722
    },
    "top_bowler_team": {
     "n_prices": 249,
@@ -160,7 +160,7 @@
     "n_prices": 690,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.722,
     "corr": 0.157
    },
@@ -457,6 +457,7 @@
    "format_source": "name",
    "teams_matched": null,
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -582,6 +583,7 @@
     "Rwanda Women"
    ],
    "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -649,6 +651,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedg_f",
     "feedh_d",
     "feedk_leoal",
     "moviodds_bet365"
@@ -1035,24 +1038,24 @@
   }
  },
  "log": [
-  "[00:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:00 IST] history: 23997 matches, last 2026-11-11, players 432215",
-  "[00:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1721, 'secs': 1.0}",
-  "[00:02 IST] source smarkets: {'status': 'ok', 'rows': 470, 'secs': 1.8}",
-  "[00:02 IST] source feedk: {'status': 'ok', 'rows': 212, 'secs': 12.8, 'events': 5}",
-  "[00:02 IST] source feedg: {'status': 'ok', 'rows': 40, 'secs': 26.2, 'events': 5}",
-  "[00:02 IST] source feede: {'status': 'ok', 'rows': 582, 'secs': 42.9, 'events': 17}",
-  "[00:02 IST] source feedf: {'status': 'ok', 'rows': 334, 'secs': 60.0, 'events': 12}",
-  "[00:02 IST] source feedh: {'status': 'ok', 'rows': 1161, 'secs': 93.0, 'events': 36}",
-  "[00:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:02 IST] 39 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[00:02 IST] 24 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[00:02 IST] 38 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[00:02 IST] held back 35 player and 34 fancy lines first priced after their match started (not pre-match prices)",
-  "[00:02 IST] book lines: 419 player lines from 7 source(s)",
-  "[00:02 IST] 60 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[00:04 IST] weather: forecasts for 13 events, 0 failed",
-  "[00:04 IST] prop model: 1507 prop selections modelled, 503 milestone ladder prices anchored to O/U",
-  "[00:04 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[01:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[01:00 IST] history: 23997 matches, last 2026-11-11, players 432215",
+  "[01:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1725, 'secs': 0.8}",
+  "[01:02 IST] source smarkets: {'status': 'ok', 'rows': 451, 'secs': 2.3}",
+  "[01:02 IST] source feedk: {'status': 'ok', 'rows': 212, 'secs': 13.5, 'events': 5}",
+  "[01:02 IST] source feedg: {'status': 'ok', 'rows': 48, 'secs': 31.8, 'events': 6}",
+  "[01:02 IST] source feede: {'status': 'ok', 'rows': 582, 'secs': 44.7, 'events': 17}",
+  "[01:02 IST] source feedf: {'status': 'ok', 'rows': 334, 'secs': 58.5, 'events': 12}",
+  "[01:02 IST] source feedh: {'status': 'ok', 'rows': 1161, 'secs': 78.5, 'events': 36}",
+  "[01:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[01:02 IST] 39 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[01:02 IST] 32 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[01:02 IST] 38 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[01:02 IST] held back 38 player and 45 fancy lines first priced after their match started (not pre-match prices)",
+  "[01:02 IST] book lines: 419 player lines from 7 source(s)",
+  "[01:02 IST] 68 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[01:03 IST] weather: forecasts for 13 events, 0 failed",
+  "[01:03 IST] prop model: 1507 prop selections modelled, 503 milestone ladder prices anchored to O/U",
+  "[01:03 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
