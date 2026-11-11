@@ -46,7 +46,7 @@ describe("PropTable", () => {
     const live = { ...row, line: 40, quotes: [{ source: "book", name: "Book", line: 40, over: 1.85, under: 1.95, live: true }] };
     const renderRows = (standing: Parameters<typeof PropRow>[0]["soFar"], out = false) => (
       <MemoryRouter>
-        <ul><PropRow r={live} win="l10" wl="L10" i={0} soFar={standing} out={out} /></ul>
+        <ul><PropRow r={live} win="l10" wl="L10" soFar={standing} out={out} /></ul>
         <PropTable rows={[live]} win="l10" onWin={() => {}} bars={false} soFarOf={() => standing} outOf={() => out} />
       </MemoryRouter>
     );
@@ -67,7 +67,7 @@ describe("PropTable", () => {
 
   it("uses a short stadium name on the prop card, full venue on the title", () => {
     const r = { ...row, venue: "Western Australia Cricket Association Ground, Perth", ven: window(0.2, 5), l10: window(0.7, 10) };
-    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
     expect(screen.getByText("7 in L10")).toBeInTheDocument();
     const chip = screen.getByTitle("Western Australia Cricket Association Ground, Perth");
     expect(chip).toHaveTextContent("1/5 at WACA");
@@ -77,7 +77,7 @@ describe("PropTable", () => {
   });
 
   it("stars a prop without opening it, and stores it on the account", async () => {
-    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: "Add to watchlist" }));
     expect(screen.getByRole("button", { name: "Remove from watchlist" })).toHaveAttribute("aria-pressed", "true");
     await waitFor(() => expect(savedKeys()).toContain("prop:1:runs:39.5:1"));
@@ -85,7 +85,7 @@ describe("PropTable", () => {
 
   it("opens sign-in instead of starring when logged out", () => {
     authState.user = null;
-    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: "Add to watchlist" }));
     expect(authState.openSignIn).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Add to watchlist" })).toHaveAttribute("aria-pressed", "false");
@@ -94,7 +94,7 @@ describe("PropTable", () => {
 
   it("puts the bookmaker mark under the line, even when only one book prices the line", () => {
     const r = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
-    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" i={0} soFar={null} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
     expect(screen.getByText("bet365")).toBeInTheDocument();
     expect(screen.getByText("bet365").closest("a")).toBeTruthy();
   });
@@ -119,7 +119,7 @@ describe("a live props row", () => {
 
   it("the card row has the same: the mark beside the name, was-39.5 on the quote line", () => {
     const quotes = bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
-    render(<MemoryRouter><ul><PropRow r={{ ...row, line: 49.5, quotes }} win="l10" wl="L10" i={0} soFar={{ v: 30, state: "live", verdict: null }} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><ul><PropRow r={{ ...row, line: 49.5, quotes }} win="l10" wl="L10" soFar={{ v: 30, state: "live", verdict: null }} out={false} /></ul></MemoryRouter>);
     expect(screen.getByRole("img", { name: "30 of 49.5, was 39.5" })).toBeInTheDocument(); // the bar under the quote
     expect(screen.getAllByText("Live")).toHaveLength(1);
     expect(within(screen.getByText("AM Tribe").closest("span.flex") as HTMLElement).getByText("Live")).toBeInTheDocument();

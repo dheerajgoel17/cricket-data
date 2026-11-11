@@ -7,7 +7,7 @@ import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon } from "@h
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
-import { fancyMarketPath } from "@/lib/fancy-path";
+import { fancyRowPath } from "@/lib/fancy-path";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { fancyStanding } from "@cricket/engine/live.js";
@@ -35,7 +35,7 @@ import { LiveBadge, LiveOpened, LineProgress, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
-import { EmptyNote } from "./page";
+import { EmptyNote, PageTitle } from "./page";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
@@ -226,20 +226,18 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     const opp = scope >= 0 ? (a === scope ? b : a) : -1;
     return { date: d, text: scope >= 0 ? `v ${abbr(store.teamName(opp, true))}` : `${abbr(store.teamName(a, true))} v ${abbr(store.teamName(b, true))}` };
   }), [scoredMs, store, scope]);
-  const open = (k: string) => {
-    track("fancy_market", { market: k });
-    if (mode === "list") {
-      nav(fancyMarketPath(fx.id, { fm: k, sc: scope, mw: win, mv: here ? "1" : "" }));
-      return;
-    }
-    set({ fm: k });
+  const open = (r: Parameters<typeof fancyRowPath>[1]) => {
+    track("fancy_market", { market: fancyFm(r.key, r.inn || 0) });
+    nav(fancyRowPath(fx.id, r, { mw: win, mv: here ? "1" : "" }));
   };
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
   const activeFilters: { key: string; label: string; value: string }[] = [];
   if (win !== 20) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
   if (here) activeFilters.push({ key: "mv", label: "Sample", value: `At ${venueName}` });
+  const detailTitle = [team?.[0], innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", key ? marketLabel(key) : "Match Fancy"].filter(Boolean).join(" · ");
   return (
     <div className="flex min-w-0 flex-col gap-stack">
+      {mode === "detail" && <PageTitle sub={`${fx.a} v ${fx.b} · ${fmt}`}>{detailTitle}</PageTitle>}
       <div className={cn("flex flex-col gap-snug", mode === "detail" && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
         <div className="flex items-center gap-snug">
           {scopes.length > 1 ? (
@@ -273,7 +271,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                     <motion.li key={r.id || rowFm(r)} layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                       transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
                       className="border-t border-hairline first:border-t-0">
-                      <OverviewRow r={r} onOpen={() => open(rowFm(r))} />
+                      <OverviewRow r={r} onOpen={() => open(r)} />
                       <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
                       <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug" />
                     </motion.li>))}
@@ -291,7 +289,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                     <>
                       <section className="flex flex-col gap-stack">
-                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
+                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">Recent results</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
                         {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                         <div className="flex items-end gap-group">
                           <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>

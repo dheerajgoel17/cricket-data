@@ -845,6 +845,7 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     sched = [(r, r["a"], r["b"], _minutes(r["start"]) * 60, r.get("gender") == "female") for r in rows if r["fmt"] not in ("Test", "FC")]  # for a name no side key joins (``find_scheduled``)
     out = []
+    archived_starts: list[tuple[frozenset[str], int, int, str]] = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
@@ -876,7 +877,17 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             status = "Completed"
         else:
             status = "Started"  # the books priced it and its start has passed; nothing says it is in play (that is the schedule's or the live feed's word, and neither lists it)
-        out.append({"start": (fx.get("start") or start)[:16] + "Z", "fmt": fmt, "gender": fx.get("gender") or ("female" if women else "male"),
+        public_start = (fx.get("start") or start)[:16] + "Z"
+        public_pair = frozenset((_side(fx.get("a") or a), _side(fx.get("b") or b)))
+        gender = fx.get("gender") or ("female" if women else "male")
+        public_min = _minutes(public_start)
+        window = keep_min if fmt in ("Test", "FC") else 14 * 60
+        # Old archive files can price the same unscheduled match on either side of UTC midnight.
+        if any(gender == g and same_pair(public_pair, k) and abs(public_min - m) < max(w, window)
+               for k, m, w, g in archived_starts):
+            continue
+        archived_starts.append((public_pair, public_min, window, gender))
+        out.append({"start": public_start, "fmt": fmt, "gender": gender,
                     "a": fx.get("a") or a.strip(), "b": fx.get("b") or b.strip(), "venue": fx.get("venue") or "",
                     "series": fx.get("series") or "", "status": status, "result": fx.get("result") or "", "source": "books"})
     return out

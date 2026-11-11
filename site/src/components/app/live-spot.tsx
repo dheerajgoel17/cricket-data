@@ -44,14 +44,14 @@ export function LiveTrack({ value, line, was, verdict, className }: { value?: nu
   );
 }
 
-export function LineProgress({ standing, live, line, opened }: { standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
+export function LineProgress({ standing, live, line, opened, quiet }: { quiet?: boolean; standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
   if (!standing || (standing.v == null && standing.state !== "void")) {
     return live ? <span className="text-footnote text-muted-foreground">Score unavailable</span> : null;
   }
   return (
     <span className="grid gap-hair text-footnote text-muted-foreground">
       {standing.state === "live" && <LiveTrack value={standing.v} line={line} was={opened} verdict={standing.verdict} />}
-      <StandingMark standing={standing} line={line} />
+      <StandingMark quiet={quiet} standing={standing} line={line} />
     </span>
   );
 }

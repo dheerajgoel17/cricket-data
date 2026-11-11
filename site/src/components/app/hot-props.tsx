@@ -4,7 +4,6 @@ import { track } from "@/lib/analytics";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
@@ -70,9 +69,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
+  const scopeKey = ["hot-props", scope] as const;
+  const key = [...scopeKey, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", archive ? doc.data?.lines?.length : null];
   const rows = useQuery({
     queryKey: key,
+    placeholderData: (previous, query) => query?.queryKey[1] === scope ? previous : undefined,
     enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
@@ -114,9 +116,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
       // Later files come several at a time. A few plans run at once, giving the main thread back in between. Rows are published as they land.
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
+      // Keep a complete snapshot visible while its replacement is scored. Only the
+      // first load of a scope streams partial rows as player files arrive.
+      const refreshing = qc.getQueriesData<Row[]>({ queryKey: scopeKey }).some(([, data]) => data !== undefined);
       let published = 0;
       const publish = () => {
-        if (!out.length || (published && Date.now() - published < PUBLISH_MS)) return;
+        if (refreshing || !out.length || (published && Date.now() - published < PUBLISH_MS)) return;
         published = Date.now();
         qc.setQueryData(key, [...out]);
       };
@@ -132,7 +137,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   });
   const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
-  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
+  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching && !rows.isPlaceholderData, otherDay };
 }
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
@@ -153,7 +158,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
           <BookBadge source={top.source} />{" "}
           {top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
-            : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
+            : <><span className="font-bold">O {top.line}</span> <Tick quiet value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
           {top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
         {top.live && <LiveOpened opened={top.opened} line={top.line} />}
@@ -167,7 +172,7 @@ export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?:
             {open && (
         <table id={id} className="w-full max-w-sm text-left font-condensed">
           <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
+          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick quiet value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
     </div>
@@ -179,20 +184,19 @@ function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boo
   const quote = r.quotes.find((q) => q.live);
   return (
     <>
-      <LineProgress standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
+      <LineProgress quiet standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
       {quote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
     </>
   );
 }
 
 /** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
-export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
+export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
   const side = r.side === "under" ? "U" : "O";
   const ground = win !== "ven" ? groundNote(r.ven) : null;
   return (
-    <motion.li className="relative border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+    <li className="relative border-t border-hairline first:border-t-0">
       <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
         className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", out && "opacity-60")}>
         <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
@@ -207,7 +211,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
             <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
-          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick quiet value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
           <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
@@ -227,7 +231,7 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
         </span>
       </Link>
       <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
-    </motion.li>
+    </li>
   );
 }
 
@@ -291,7 +295,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</td>
+                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums"><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
@@ -382,7 +386,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
       {heading ? <h1 className="hidden text-display font-bold tracking-tight lg:block">{heading}</h1> : null}
-      {!waiting ? <div className="hidden lg:block"><MarketTape rows={tapeRows} /></div> : null}
+      {!waiting ? <div className="hidden lg:block"><MarketTape quiet rows={tapeRows} /></div> : null}
       {urlState && !isLoading && (
         <PillGroup layoutId="hot-day" label="Day" value={day} onChange={(v) => update({ day: v, match: "all" })} items={hotDayLabels()} className="min-w-0" />
       )}
@@ -428,9 +432,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
         ) : (
           <>
             <ul className="-mx-gutter lg:hidden">
-              <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} hideMatch={!!teams} />)}
-              </AnimatePresence>
+              {rows.map((r) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} soFar={soFarOf(r)} out={outOf(r)} hideMatch={!!teams} />)}
             </ul>
             <div className="hidden lg:block">
               <PropTable rows={rows} win={win} onWin={(w) => update({ win: w })} bars={bars} soFarOf={soFarOf} outOf={outOf} />
@@ -439,7 +441,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
         )}
       </AnimatedHeight>
       {/* on a phone the rows come first and the tape follows them (it used to push the first prop below the fold) */}
-      {!waiting ? <div className="lg:hidden"><MarketTape rows={tapeRows} /></div> : null}
+      {!waiting ? <div className="lg:hidden"><MarketTape quiet rows={tapeRows} /></div> : null}
       {urlState && (
         <button type="button" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
           className="fixed right-gutter bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+var(--space-stack))] z-50 grid size-(--fab) place-items-center rounded-full bg-primary text-primary-foreground shadow-(--shadow-fab) outline-none transition-transform focus-visible:ring-2 focus-visible:ring-ring active:scale-95 lg:hidden">
