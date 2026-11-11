@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { motion, useReducedMotion } from "motion/react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { MORE_NAV } from "@/components/layout/nav";
 import { track } from "@/lib/analytics";
@@ -8,18 +7,17 @@ import { HOME_PHASES, type HomePhase } from "@/lib/home-phase";
 import { cn } from "@/lib/utils";
 
 /**
- * Floating glass bar on home: In play / Pre-match / Resulted, plus More (the pages the sidebar already lists).
+ * Floating match filter on home: In play / Pre-match / Resulted, plus More (the pages the sidebar already lists).
  * Sits above the iOS tab bar on phones; at the bottom of the viewport on desktop where that bar is hidden.
  */
 export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; counts: Record<HomePhase, number>; onChange: (p: HomePhase) => void }) {
-  const reduce = useReducedMotion();
   const pick = (p: HomePhase) => { if (p === value) return; track("home_phase", { phase: p }); onChange(p); };
   return (
     <nav
       aria-label="Match state"
       className="pointer-events-none fixed inset-x-gutter bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+var(--space-snug))] z-50 flex justify-center lg:bottom-stack"
     >
-      <div className="pointer-events-auto flex max-w-full items-center gap-hair rounded-[var(--chip-radius)] bg-card/70 p-hair ring-1 ring-hairline backdrop-blur-2xl backdrop-saturate-150">
+      <div className="pointer-events-auto flex max-w-full items-center gap-hair rounded-[var(--chip-radius)] bg-card p-hair ring-1 ring-hairline">
         <div role="tablist" aria-label="In play, pre-match or resulted" className="flex min-w-0">
           {HOME_PHASES.map(([id, label]) => {
             const on = value === id, n = counts[id];
@@ -30,9 +28,8 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
                 role="tab"
                 aria-selected={on}
                 onClick={() => pick(id)}
-                className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-medium", on ? "text-background" : "text-muted-foreground")}
+                className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-medium", on ? "bg-foreground text-background" : "text-muted-foreground")}
               >
-                {on && <motion.span layoutId="home-phase" aria-hidden className="absolute inset-0 rounded-[var(--chip-radius)] bg-foreground" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
                 <span className="relative flex items-center gap-hair">
                   {label}
                   <span className="text-caption font-medium tabular-nums opacity-70">{n}</span>

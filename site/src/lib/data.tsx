@@ -8,7 +8,7 @@ import { type Photos } from "@/lib/assets";
 import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string>; /** false until matches.json has joined the store; the home rail does not wait for it */ matchesReady: boolean }
+export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string>; /** false until matches.json has joined the store; the home rail does not wait for it */ matchesReady: boolean; requestHistory: () => void }
 const Ctx = createContext<Data | null>(null);
 
 export async function loadJson(url: string) {
@@ -24,10 +24,10 @@ async function loadIdentity(base: string) {
   return identityIndex(await loadJson(`${base}identity.json`));
 }
 
-async function boot(): Promise<Data> {
+async function boot(): Promise<Omit<Data, "requestHistory">> {
   const k = await gateKey();
   setWrapKey(k);
-  const store = await createStore({ base: "/data/", urlFor: dataUrl, wrapKey: k, deferMatches: true });
+  const store = await createStore({ base: "/data/", urlFor: dataUrl, wrapKey: k, deferMatches: "on-demand" });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
   const [photos, identity, names] = await Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
@@ -50,16 +50,22 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setData(null);
     (async () => {
       try {
-        let out: Data;
+        let out: Awaited<ReturnType<typeof boot>>;
         try { out = await boot(); }
         catch (e) {
           if (!retryable(e)) throw e;
           await new Promise((r) => setTimeout(r, 80)); // the gate cookie is sometimes not on the next request yet
           out = await boot();
         }
-        if (live) setData(out);
-        out.store.ready.then(() => { if (live) setData((d) => (d && d.store === out.store ? { ...d, matchesReady: true } : d)); })
-          .catch((e: unknown) => { if (live) setError((e as Error).message); });
+        let requested = false;
+        const requestHistory = () => {
+          if (requested) return;
+          requested = true;
+          out.store.ready.then(() => {
+            if (live) setData((d) => d && d.store === out.store ? { ...d, matchesReady: true } : d);
+          }).catch((e: unknown) => { if (live) setError((e as Error).message); });
+        };
+        if (live) setData({ ...out, requestHistory });
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };
@@ -86,3 +92,10 @@ export function useData(): Data {
 
 /** The data when a provider is above, else null: for small display components that must not throw in isolation (tests, previews). */
 export function useDataMaybe(): Data | null { return useContext(Ctx); }
+
+/** Request history only when a view that reads it is opened. */
+export function HistoryGate({ children, fallback = <AppSkeleton /> }: { children: ReactNode; fallback?: ReactNode }) {
+  const { matchesReady, requestHistory } = useData();
+  useEffect(() => { requestHistory(); }, [requestHistory]);
+  return matchesReady ? children : fallback;
+}

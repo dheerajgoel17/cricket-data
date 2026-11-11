@@ -119,17 +119,17 @@ export function FancySkeleton() {
   );
 }
 
-/** The home rail while its inputs load (fixtures, bookmaker lines, rail settings): series chips, two fixture cards. */
+/** The home rail while its inputs load (fixtures, bookmaker lines, rail settings): series chips and match rows. */
 export function RailSkeleton() {
   return (
     <div aria-hidden className="flex flex-col gap-stack">
       <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
-      <div className="-mx-gutter flex gap-snug overflow-hidden px-gutter">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}</div>
+      <div className="grid gap-px overflow-hidden rounded-xl md:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map((n) => <Skeleton key={n} className="h-28 rounded-none" />)}</div>
     </div>
   );
 }
 
-/** The whole app while the data files and the page code load: header bar, series chips, two fixture cards, a props list. Both waits render this, so a refresh shows one skeleton, not two "Loading" messages. */
+/** The whole app while the data files and the page code load: header bar, series chips, match rows and a props list. Both waits render this, so a refresh shows one skeleton, not two "Loading" messages. */
 export function AppSkeleton() {
   return (
     <div role="status" aria-label="Loading" className="min-h-screen">

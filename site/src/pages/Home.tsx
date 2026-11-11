@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { liveForFixture } from "@cricket/engine/live.js";
@@ -13,15 +13,18 @@ import { useHomeRail } from "@/hooks/useHomeRail";
 import { useLiveDoc } from "@/hooks/useLive";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
-import { HotHome } from "@/components/app/hot-home";
+import { HistoryGate } from "@/lib/data";
 import { Muted } from "@/components/app/page";
-import { RailSkeleton } from "@/components/app/skeletons";
+import { RailSkeleton, RowsSkeleton } from "@/components/app/skeletons";
+
+const HotHome = lazy(() => import("@/components/app/hot-home").then((m) => ({ default: m.HotHome })));
 
 export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
   // matches in play first, then those starting within 24 hours, then later games up to 10 days; inside each the viewer's own team, then the biggest matches (src/lib/priority.ts, settings in config/home_rail.json)
   const { ready, fixtures } = useHomeRail();
   const live = useLiveDoc();
+  const [showProps, setShowProps] = useState(false);
   const [q, setQ] = useQ();
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
   const priced = useMemo(() => fixtures.filter((f) => !f.noProps), [fixtures]);
@@ -30,8 +33,19 @@ export function HomePage() {
   const shown = fixtures.filter((f) => (f.noProps ? phase === "pre" : phaseOf(stateOf(f)) === phase));
   return (
     <div className="flex flex-col gap-section pb-[calc(var(--control)+var(--space-section))]">
+      {ready && counts[phase] > 0 && (
+        <section className="flex flex-col items-start gap-snug">
+          <button type="button" aria-expanded={showProps} aria-controls="home-props"
+            className="min-h-control rounded-md border border-hairline px-inset text-callout font-medium hover:bg-surface-hover"
+            onClick={() => setShowProps((shown) => !shown)}>
+            {showProps ? "Hide featured props" : "Show featured props"}
+          </button>
+          <div id="home-props" className="w-full" hidden={!showProps}>
+            {showProps && <Suspense fallback={<RowsSkeleton />}><HistoryGate fallback={<RowsSkeleton />}><HotHome phase={phase} /></HistoryGate></Suspense>}
+          </div>
+        </section>
+      )}
       {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
-      <HotHome phase={phase} />
       <HomePhaseBar value={phase} counts={counts} onChange={(p) => setQ({ view: p })} />
     </div>
   );

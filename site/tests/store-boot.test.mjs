@@ -36,3 +36,21 @@ test("a failed index does not leave matches.json as an unhandled rejection", asy
   await assert.rejects(() => createStore({ fetchJson }), /no data origin/);
   await new Promise((r) => setImmediate(r));
 });
+
+test("on-demand history starts only when requested and shares one download", async () => {
+  const requests = [];
+  const store = await createStore({
+    deferMatches: "on-demand",
+    fetchJson: async (path) => {
+      requests.push(path);
+      return path === "index.json" ? index : path === "matches.json" ? { id: ["m1"] } : {};
+    },
+  });
+  assert.deepEqual(requests, ["meta.json", "index.json"]);
+  assert.equal(store.n, 0);
+  const first = store.ready;
+  assert.equal(store.ready, first);
+  await first;
+  assert.equal(store.n, 1);
+  assert.deepEqual(requests, ["meta.json", "index.json", "matches.json"]);
+});

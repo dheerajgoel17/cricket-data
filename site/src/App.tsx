@@ -5,7 +5,7 @@ import { syncAds } from "@/lib/ads";
 import { AppSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
-import { useData } from "@/lib/data";
+import { HistoryGate } from "@/lib/data";
 import { initGa, track, trackPage } from "@/lib/ga";
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
@@ -42,13 +42,6 @@ function Analytics() {
   return null;
 }
 
-/** Every page except home reads matches.json. Home paints the rail from the fixture file while that download finishes. */
-function HistoryGate() {
-  const { matchesReady } = useData();
-  if (matchesReady === false) return <AppSkeleton />;
-  return <Outlet />;
-}
-
 export function App() {
   return (
     <>
@@ -58,37 +51,39 @@ export function App() {
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<HomePage />} />
-            <Route element={<HistoryGate />}>
-            <Route path="fixtures" element={<Navigate to="/" replace />} />
-            <Route path="fixture/*" element={<FixturePage />} />
-            <Route path="trends" element={<TrendsPage />} />
-            <Route path="leagues" element={<LeaguesPage />} /><Route path="stats" element={<Navigate to="/leagues" replace />} />
-            <Route path="competitions" element={<CompetitionsPage />} />
-            <Route path="league/:id" element={<LeaguePage />} />
-            <Route path="tools" element={<ToolsPage />} /><Route path="features" element={<Navigate to="/tools" replace />} />
+            <Route path="tools" element={<ToolsPage />} />
             <Route path="odds" element={<OddsPage />} />
             <Route path="glossary" element={<GlossaryPage />} />
-            <Route path="saved" element={<SavedPage />} />
             <Route path="auth/callback" element={<AuthCallbackPage />} />
-            <Route path="players" element={<PlayersPage />} />
-            <Route path="player/:id" element={<Player />} />
-            <Route path="teams" element={<TeamsPage />} />
-            <Route path="team/:id" element={<TeamPage />} />
-            <Route path="venue/:id/preview" element={<Navigate to=".." relative="path" replace />} />
-            <Route path="venue/:id" element={<VenuePage />} />
-            <Route path="pair" element={<PairPage />} />
-            <Route path="props" element={<PropsPage />} /><Route path="fancy" element={<FancyPage />} />
-            <Route path="ask" element={<Navigate to="/" replace />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="privacy-policy" element={<PrivacyPage />} />
-            <Route path="privacy" element={<Navigate to="/privacy-policy" replace />} />
             <Route path="terms-of-use" element={<TermsPage />} />
-            <Route path="terms" element={<Navigate to="/terms-of-use" replace />} />
             <Route path="docs" element={<DisclaimerPage />} />
+            <Route path="fixtures" element={<Navigate to="/" replace />} />
+            <Route path="stats" element={<Navigate to="/leagues" replace />} />
+            <Route path="features" element={<Navigate to="/tools" replace />} />
+            <Route path="venue/:id/preview" element={<Navigate to=".." relative="path" replace />} />
+            <Route path="ask" element={<Navigate to="/" replace />} />
+            <Route path="privacy" element={<Navigate to="/privacy-policy" replace />} />
+            <Route path="terms" element={<Navigate to="/terms-of-use" replace />} />
             <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
             <Route path="responsible" element={<Navigate to="/docs" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route element={<HistoryGate><Outlet /></HistoryGate>}>
+              <Route path="fixture/*" element={<FixturePage />} />
+              <Route path="trends" element={<TrendsPage />} />
+              <Route path="leagues" element={<LeaguesPage />} />
+              <Route path="competitions" element={<CompetitionsPage />} />
+              <Route path="league/:id" element={<LeaguePage />} />
+              <Route path="saved" element={<SavedPage />} />
+              <Route path="players" element={<PlayersPage />} />
+              <Route path="player/:id" element={<Player />} />
+              <Route path="teams" element={<TeamsPage />} />
+              <Route path="team/:id" element={<TeamPage />} />
+              <Route path="venue/:id" element={<VenuePage />} />
+              <Route path="pair" element={<PairPage />} />
+              <Route path="props" element={<PropsPage />} /><Route path="fancy" element={<FancyPage />} />
             </Route>
           </Route>
         </Routes>
