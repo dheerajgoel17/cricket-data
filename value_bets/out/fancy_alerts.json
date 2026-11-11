@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-11T07:33:47Z",
+ "generated_at_utc": "2026-11-11T08:10:23Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -234,29 +234,6 @@
    "chance": 0.5377,
    "edge": 0.2366,
    "edge_pct": 23.7,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-11-perth-scorchers-women-v-sydney-thunder-women|highest_over||0|under",
-   "fixture_id": "2026-11-11-perth-scorchers-women-v-sydney-thunder-women",
-   "match": "Perth Scorchers Women vs Sydney Thunder Women",
-   "format": "T20",
-   "series": "Womens Big Bash League 2026",
-   "start_utc": "2026-11-11T08:10:00Z",
-   "start_ist": "2026-11-11 13:40 IST",
-   "key": "highest_over",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 18.5,
-   "best_odds": 1.833,
-   "best_source": "bet365",
-   "hits": 19,
-   "played": 26,
-   "window": 20,
-   "chance": 0.6667,
-   "edge": 0.222,
-   "edge_pct": 22.2,
    "bat_first": false
   },
   {

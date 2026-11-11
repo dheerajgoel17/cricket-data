@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 13:00 IST
+# Cricket value bets - 2026-11-11 13:36 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 2106 prices
-- **smarkets**: ok, 543 prices
+- **smarkets**: ok, 539 prices
 - **feedk**: ok, 218 prices, 10 events
-- **feedg**: ok, 32 prices, 5 events
-- **feede**: ok, 522 prices, 16 events
+- **feedg**: ok, 36 prices, 5 events
+- **feede**: ok, 546 prices, 16 events
 - **feedf**: ok, 396 prices, 12 events
-- **feedh**: ok, 1287 prices, 26 events
+- **feedh**: ok, 1287 prices, 25 events
 
-Matches starting in next 168h: **26**, markets priced: **430**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **25**, markets priced: **389**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **26**, markets priced: **430**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1278, market 0.136
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1278, market 0.1419
 
-Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Nhlangano Legends (male), Royal Champs (male), Speedworld Security Solutions (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), Hnb A (male), Nhlangano Legends (male), Royal Champs (male), Speedworld Security Solutions (male), USA (W) (female)
 
-Runtime 158.0s. Snapshot: `odds_20261111T073028Z.jsonl.gz`
+Runtime 163.6s. Snapshot: `odds_20261111T080637Z.jsonl.gz`
