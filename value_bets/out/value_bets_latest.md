@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 08:00 IST
+# Cricket value bets - 2026-11-11 09:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **smarkets**: ok, 564 prices
-- **moviodds_bet365**: ok, 2109 prices
+- **moviodds_bet365**: ok, 2110 prices
+- **smarkets**: ok, 497 prices
 - **feedk**: ok, 196 prices, 9 events
 - **feedg**: ok, 40 prices, 5 events
 - **feede**: ok, 586 prices, 16 events
 - **feedf**: ok, 450 prices, 13 events
-- **feedh**: ok, 1481 prices, 34 events
+- **feedh**: ok, 1363 prices, 34 events
 
-Matches starting in next 168h: **33**, markets priced: **453**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **32**, markets priced: **443**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,4 +26,4 @@ Matches starting in next 168h: **33**, markets priced: **453**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), CDB A (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Nhlangano Legends (male), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female)
 
-Runtime 173.1s. Snapshot: `odds_20261111T023038Z.jsonl.gz`
+Runtime 161.3s. Snapshot: `odds_20261111T033033Z.jsonl.gz`
