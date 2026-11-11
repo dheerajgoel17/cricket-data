@@ -703,7 +703,7 @@ def test_a_book_that_names_a_youth_match_by_its_competition_alone_is_not_a_secon
     now = datetime(2026, 11, 10, 6, 0, tzinfo=timezone.utc)
     listed = [{"start": "2026-11-10T05:00Z", "fmt": "ODI", "a": "India U19", "b": "United Arab Emirates U19"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
-    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19", "India U19"]  # with no schedule row the stop-gap at least carries the youth tag
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19"]  # the single fallback keeps the youth tag
 
 
 def test_a_feed_that_names_a_priced_match_with_other_team_names_is_not_a_second_fixture(tmp_path):
