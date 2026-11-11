@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 09:00 IST
+# Cricket value bets - 2026-11-11 10:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 2110 prices
-- **smarkets**: ok, 497 prices
-- **feedk**: ok, 196 prices, 9 events
+- **smarkets**: ok, 568 prices
+- **feedk**: ok, 186 prices, 9 events
 - **feedg**: ok, 40 prices, 5 events
-- **feede**: ok, 586 prices, 16 events
-- **feedf**: ok, 450 prices, 13 events
-- **feedh**: ok, 1363 prices, 34 events
+- **feede**: ok, 550 prices, 16 events
+- **feedf**: ok, 414 prices, 13 events
+- **feedh**: ok, 1403 prices, 32 events
 
-Matches starting in next 168h: **32**, markets priced: **443**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **28**, markets priced: **446**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **32**, markets priced: **443**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1278, market 0.136
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1278, market 0.1419
 
-Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), CDB A (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Nhlangano Legends (male), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Cdb A (male), Central (male), Elite Cricket Academy (male), Fairfirst Insurance (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Nhlangano Legends (male), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female)
 
-Runtime 161.3s. Snapshot: `odds_20261111T033033Z.jsonl.gz`
+Runtime 155.8s. Snapshot: `odds_20261111T043028Z.jsonl.gz`
