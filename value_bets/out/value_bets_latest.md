@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 22:04 IST
+# Cricket value bets - 2026-11-11 23:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1632 prices
-- **smarkets**: ok, 445 prices
+- **moviodds_bet365**: ok, 1691 prices
+- **smarkets**: ok, 470 prices
 - **feedk**: ok, 212 prices, 5 events
 - **feedg**: ok, 40 prices, 5 events
-- **feede**: ok, 486 prices, 13 events
+- **feede**: ok, 534 prices, 15 events
 - **feedf**: ok, 286 prices, 9 events
-- **feedh**: ok, 1123 prices, 31 events
+- **feedh**: ok, 1137 prices, 34 events
 
-Matches starting in next 168h: **28**, markets priced: **378**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **32**, markets priced: **407**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **28**, markets priced: **378**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1278, market 0.136
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1278, market 0.1419
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Central (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
 
-Runtime 151.9s. Snapshot: `odds_20261111T163432Z.jsonl.gz`
+Runtime 205.4s. Snapshot: `odds_20261111T173030Z.jsonl.gz`

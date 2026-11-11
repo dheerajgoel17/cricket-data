@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-11T16:37:53Z",
+ "generated_at_utc": "2026-11-11T17:34:37Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -234,29 +234,6 @@
    "chance": 0.5377,
    "edge": 0.2366,
    "edge_pct": 23.7,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-12-melbourne-stars-women-v-brisbane-heat-women|team_total_runs|Brisbane Heat Women|0|under",
-   "fixture_id": "2026-11-12-melbourne-stars-women-v-brisbane-heat-women",
-   "match": "Melbourne Stars Women vs Brisbane Heat Women",
-   "format": "T20",
-   "series": "Womens Big Bash League 2026",
-   "start_utc": "2026-11-12T04:40:00Z",
-   "start_ist": "2026-11-12 10:10 IST",
-   "key": "team_total_runs",
-   "team": "Brisbane Heat Women",
-   "inn": 0,
-   "side": "under",
-   "line": 158.5,
-   "best_odds": 1.85,
-   "best_source": "Dafabet",
-   "hits": 14,
-   "played": 20,
-   "window": 20,
-   "chance": 0.6333,
-   "edge": 0.1717,
-   "edge_pct": 17.2,
    "bat_first": false
   },
   {
