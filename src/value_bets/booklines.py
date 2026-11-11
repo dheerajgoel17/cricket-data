@@ -12,9 +12,11 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from collections import defaultdict
 
 from cricket_site import testend
+from cricket_site.sides import alike, find_scheduled, same_pair, side_key
 
 from .adapters import feede, feedf, feedg, feedh, feedk
 from .util import parse_ts
@@ -251,3 +253,65 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
                 by[k] = merge_books(by[k], y)
         out[kind] = sorted(by.values(), key=order)
     return public(out)
+
+
+_WOMEN = re.compile(r"\(w\)|\bwomen", re.I)
+
+
+def map_to_schedule(docs: list, fixtures: list[dict]) -> list[dict]:
+    """Rename a book's match to the schedule's own when it is that match under other names, and say what was renamed.
+
+    ``docs``: book documents (``{"lines", "events", "fancy", "catalogue"}``) or bare lists of rows, changed in place. A row whose two sides do not name a scheduled match exactly
+    (``cricket_site.sides.find_scheduled``: same start, gender agrees, both sides alike, one candidate only) but are one scheduled match, takes that match's names in its ``match``,
+    ``home`` / ``away`` and ``team``. Everything downstream (the archive's fixture link, the site's props, the stop-gap builder) then sees one match, not a second fixture
+    with a priced name. Anything uncertain is left alone. A multi-day match is priced day by day and keeps its names. Returns one entry per rename for the run's log."""
+    sched = []
+    for f in fixtures:
+        st = parse_ts(f.get("start_utc"))
+        if st and f.get("format") not in ("Test", "FC") and f.get("team_a") and f.get("team_b"):
+            sched.append((f, f["team_a"], f["team_b"], st.timestamp(), (f.get("gender") or "male") == "female"))
+    if not sched:
+        return []
+    done: dict[tuple, tuple | None] = {}
+    out: list[dict] = []
+
+    def sides_of(x: dict) -> tuple[str, str]:
+        if x.get("home") and x.get("away"):
+            return x["home"], x["away"]
+        p = re.split(r"\s+vs\s+", str(x.get("match") or ""), maxsplit=1, flags=re.I)
+        return (p[0].strip(), p[1].strip()) if len(p) == 2 else ("", "")
+
+    def fix(x: dict) -> None:
+        a, b = sides_of(x)
+        st = parse_ts(x.get("start_utc"))
+        if not (a and b and st) or x.get("fmt") == "Test":
+            return
+        key = (a, b, x.get("start_utc"))
+        if key not in done:
+            f = find_scheduled(a, b, st.timestamp(), bool(_WOMEN.search(f"{a} {b}")), sched)
+            if f is None:
+                done[key] = None
+            else:
+                fa, fb = f["team_a"], f["team_b"]
+                if same_pair(frozenset((side_key(a), side_key(b))), frozenset((side_key(fa), side_key(fb)))):
+                    done[key] = None  # the exact join already links it ("(W)" / "Women", an alias): names are not churned
+                else:
+                    na, nb = (fa, fb) if alike(a, fa) and alike(b, fb) else (fb, fa)
+                    done[key] = (na, nb)
+                    out.append({"book": f"{a} vs {b}", "schedule": f"{na} vs {nb}", "start_utc": x.get("start_utc")})
+        to = done[key]
+        if not to:
+            return
+        x["match"] = f"{to[0]} vs {to[1]}"
+        if x.get("home") and x.get("away"):
+            x["home"], x["away"] = to
+        if x.get("team") in (a, b):
+            x["team"] = to[0] if x["team"] == a else to[1]
+
+    for doc in docs:
+        for rows in (doc.values() if isinstance(doc, dict) else [doc]):
+            if isinstance(rows, list):
+                for x in rows:
+                    if isinstance(x, dict):
+                        fix(x)
+    return out

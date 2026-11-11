@@ -1,25 +1,29 @@
-# Cricket value bets - 2026-11-10 10:00 IST
+# Cricket value bets - 2026-11-11 23:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1523 prices
-- **smarkets**: ok, 433 prices
-- **feedk**: ok, 72 prices, 6 events
-- **feedg**: ok, 32 prices, 4 events
-- **feede**: ok, 378 prices, 16 events
-- **feedf**: ok, 288 prices, 13 events
-- **feedh**: ok, 1364 prices, 29 events
+- **moviodds_bet365**: ok, 1691 prices
+- **smarkets**: ok, 470 prices
+- **feedk**: ok, 212 prices, 5 events
+- **feedg**: ok, 40 prices, 5 events
+- **feede**: ok, 534 prices, 15 events
+- **feedf**: ok, 286 prices, 9 events
+- **feedh**: ok, 1137 prices, 34 events
 
-Matches starting in next 168h: **33**, markets priced: **392**, value bets: **1** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **32**, markets priced: **407**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-13 09:00 IST | Australia vs England | Ben Duckett To Score 50 | Ben Duckett 50+ yes | 3.25 @ feede_lb | 3.06 | 0.3169 | 6.3% | 0.70% | medium |
+| 11-13 07:30 IST | New Zealand vs India | Virat Kohli To Score 50 | Virat Kohli 50+ no | 1.61 @ feede_lb | 1.52 | 0.6761 | 5.8% | 2.00% | medium |
 
 ### Why / notes per bet
-- **Australia vs England / Ben Duckett To Score 50 / Ben Duckett 50+ yes** - why: Model 32% vs market 34% for 50+ runs; form 47.8 runs/inn recency-weighted ODI (n_eff 23.2; last 5: 167, 105, 29, 45, 0), bats in 98% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 6 inns avg 78.3. Notes: 2 market source(s) for fair price; model 0.317 vs market 0.335; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / Virat Kohli To Score 50 / Virat Kohli 50+ no** - why: Model 68% vs market 64% for 50+ runs; form 52.7 runs/inn recency-weighted ODI (n_eff 25.9; last 5: 7, 74, 0, 29, 139), bats in 95% of games played; at Bay Oval, Mount Maunganui: 3 inns avg 37.3; vs New Zealand: 27 inns avg 53.5; weather: high humidity 75%. Notes: 3 market source(s) for fair price; model 0.676 vs market 0.641; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
-Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Pak Xi (male), South Australia Redbacks (male), South Western Districts (male), UAE U19 (male), USA (W) (female), Western Australia Warriors (male)
+### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
+- 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1278, market 0.136
+- 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1278, market 0.1419
 
-Runtime 115.8s. Snapshot: `odds_20261110T043035Z.jsonl.gz`
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Central (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
+
+Runtime 205.4s. Snapshot: `odds_20261111T173030Z.jsonl.gz`

@@ -411,8 +411,10 @@ def test_the_sitemap_lists_the_fixtures_with_a_date_and_robots_keeps_crawlers_of
     assert "Disallow: /api/" in robots and "Disallow: /data/" in robots
     assert robots.index("User-agent: Twitterbot") < robots.index("Disallow: /api/")
     assert "User-agent: Twitterbot\nAllow: /" in robots
-    for bot in ("GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "PerplexityBot"):
+    for bot in ("GPTBot", "ClaudeBot", "CCBot", "Google-Extended", "Bytespider", "SemrushBot"):  # training crawlers and SEO scrapers
         assert f"User-agent: {bot}\nDisallow: /\n" in robots
+    for bot in ("ChatGPT-User", "OAI-SearchBot", "Claude-User", "Claude-SearchBot", "PerplexityBot", "Perplexity-User"):  # assistants and AI search follow the `*` rules: pages yes, /api/ and /data/ no
+        assert f"User-agent: {bot}" not in robots
     assert "User-agent: Googlebot" not in robots and "User-agent: Bingbot" not in robots  # search engines stay allowed
 
 
@@ -672,3 +674,38 @@ def test_a_minted_priced_player_whose_page_belongs_to_the_base_player_gets_the_s
     assert ph["deadbeef"] == ph[synth.pid(synth.DUCKETT)] == "c:ZZ"
     assert list(ident.values()).count("ZZ") == 1, "the identity table keeps one id per source player"
     assert (meta["priced_players"], meta["priced_with_photo"]) == (1, 1) and not (out / "identity_review.json").exists()
+
+
+def test_a_book_that_names_a_youth_match_by_its_competition_alone_is_not_a_second_fixture(tmp_path):
+    """10 Nov 2026: a book listed "India vs United Arab Emirates" in "U19 Asia Cup"; the schedule has India U19 / United Arab Emirates U19, so the archive file became a senior T20 stop-gap with no score."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    for name, match in (("2026-11-10-india-v-united-arab-emirates", "India vs United Arab Emirates"), ("2026-11-10-india-u19-v-uae-u19", "India U19 vs UAE U19")):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "competition": "U19 Asia Cup", "start_utc": "2026-11-10T05:00:00Z", "fixture": None, "events": [{}]}))
+    now = datetime(2026, 11, 10, 6, 0, tzinfo=timezone.utc)
+    listed = [{"start": "2026-11-10T05:00Z", "fmt": "ODI", "a": "India U19", "b": "United Arab Emirates U19"}]
+    assert B._unscheduled_priced(vb, listed, now=now) == []
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19", "India U19"]  # with no schedule row the stop-gap at least carries the youth tag
+
+
+def test_a_feed_that_names_a_priced_match_with_other_team_names_is_not_a_second_fixture(tmp_path):
+    """9 Nov 2026: "Bangla Tigers v Royal Champs" is the schedule's United Tigers v Royal Desert Champions (same start; the same feed's other pairings line up the same way), and "West Indies A v England Lions" is West Indies A v England A."""
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "value_bets" / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    vb = tmp_path / "value_bets" / "out"
+    vb.mkdir(parents=True)
+    for name, match, start in (("2026-11-09-bangla-tigers-v-royal-champs", "Bangla Tigers vs Royal Champs", "2026-11-09T16:00:00Z"),
+                               ("2026-11-09-west-indies-a-v-england-lions", "West Indies A vs England Lions", "2026-11-09T18:00:00Z"),
+                               ("2026-11-10-delhi-bulls-v-emirates-eagles", "Delhi Bulls vs Emirates Eagles", "2026-11-10T16:00:00Z")):
+        (arc / f"{name}.json").write_text(json.dumps({"match": match, "competition": "", "start_utc": start, "fixture": None, "events": [{}]}))
+    now = datetime(2026, 11, 10, 20, 0, tzinfo=timezone.utc)
+    listed = [{"start": "2026-11-09T16:00Z", "fmt": "T10", "a": "United Tigers", "b": "Royal Desert Champions"},
+              {"start": "2026-11-09T18:00Z", "fmt": "ODI", "a": "West Indies A", "b": "England A"},
+              {"start": "2026-11-10T16:00Z", "fmt": "T10", "a": "UAE Bulls", "b": "Emirates Eagles"}]
+    assert B._unscheduled_priced(vb, listed, now=now) == []

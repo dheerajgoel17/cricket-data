@@ -28,7 +28,7 @@ from .crex_assets import display_name as ca_display_name
 from .crex_assets import league_key
 from .crex_doc import balls_doc
 from .parse import FORMAT_NAMES, INN_STATS, KINDS, pack_inn, parse_match, qualifies, squad_quality
-from .sides import SAME_SIDE
+from .sides import SAME_SIDE, find_scheduled, same_pair, youth_sides
 
 NSHARD = 64
 SCHEMA = 1
@@ -786,8 +786,10 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")
 
 
-# AI training / scraping crawlers asked to stay out (honest ones obey); search and link-preview bots are not here
-AI_CRAWLERS = ("GPTBot", "ChatGPT-User", "ClaudeBot", "Claude-Web", "anthropic-ai", "CCBot", "Google-Extended", "PerplexityBot", "Bytespider", "Amazonbot", "Applebot-Extended", "Meta-ExternalAgent", "cohere-ai", "Diffbot", "ImagesiftBot", "omgili")
+# AI training crawlers and SEO scrapers asked to stay out (honest ones obey). Not here, so they follow the `*` rules (pages yes, /api/ and /data/ no): search engines,
+# link-preview bots, and the AI assistants / AI search that fetch a page for a person's question (ChatGPT-User, OAI-SearchBot, Claude-User, Claude-SearchBot, PerplexityBot, Perplexity-User).
+AI_CRAWLERS = ("GPTBot", "ClaudeBot", "Claude-Web", "anthropic-ai", "CCBot", "Google-Extended", "Bytespider", "Amazonbot", "Applebot-Extended", "Meta-ExternalAgent", "FacebookBot", "cohere-ai", "Diffbot", "ImagesiftBot", "omgili", "Timpibot",
+               "SemrushBot", "AhrefsBot", "MJ12bot", "DotBot", "DataForSeoBot", "PetalBot")
 
 
 def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixtures: list[dict] | None = None) -> int:
@@ -841,20 +843,25 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     now = now or datetime.now(timezone.utc)
     now_min = now.timestamp() // 60
     held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
+    sched = [(r, r["a"], r["b"], _minutes(r["start"]) * 60, r.get("gender") == "female") for r in rows if r["fmt"] not in ("Test", "FC")]  # for a name no side key joins (``find_scheduled``)
     out = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
             a, b = re.split(r"\s+vs\s+", d["match"], maxsplit=1, flags=re.I)
+            a, b = youth_sides(a, b, d.get("competition"))  # a file written before the tag was added to the grouping still pairs with its U19 schedule row
             start = d["start_utc"]
             mins = _minutes(start)
         except (ValueError, KeyError, TypeError, OSError):
             continue
         pair = frozenset((_side(a), _side(b)))
-        if any(pair == k and abs(mins - m) < w for k, m, w in held):
+        if any(same_pair(pair, k) and abs(mins - m) < w for k, m, w in held):
             continue
         fx = d.get("fixture") or {}
         fmt = fx.get("fmt") or next((x["fmt"] for x in d.get("lines", []) if x.get("fmt")), "")
+        women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
+        if fmt not in ("Test", "FC") and find_scheduled(a, b, mins * 60, (fx.get("gender") == "female") if fx.get("gender") else women, sched) is not None:
+            continue  # the schedule lists this match under the names it uses (the book said "Bangla Tigers v Royal Champs" for United Tigers v Royal Desert Champions): one fixture, not two
         keep_min = 6 * 24 * 60 if fmt in ("Test", "FC") else 24 * 60
         if mins > now_min:
             if fx:
@@ -863,7 +870,6 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
             continue  # counted from the start the row publishes (the fixture's), the clock the data guard uses; the books' start can be hours later
         elif fmt == "Test" and (end := testend.end_of(d)) and testend.gone(end, now):
             continue  # it has a result and ended more than a day ago; its fixture page opens from the archive
-        women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if mins > now_min:
             status = "Upcoming"
         elif (fx.get("result") or "").strip():
