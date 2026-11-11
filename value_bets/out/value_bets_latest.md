@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 15:00 IST
+# Cricket value bets - 2026-11-11 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1782 prices
-- **smarkets**: ok, 535 prices
+- **moviodds_bet365**: ok, 1790 prices
+- **smarkets**: ok, 519 prices
 - **feedg**: ok, 32 prices, 4 events
-- **feedk**: ok, 192 prices, 9 events
-- **feede**: ok, 522 prices, 15 events
-- **feedf**: ok, 396 prices, 12 events
-- **feedh**: ok, 1287 prices, 25 events
+- **feedk**: ok, 228 prices, 9 events
+- **feede**: ok, 518 prices, 16 events
+- **feedf**: ok, 368 prices, 12 events
+- **feedh**: ok, 1235 prices, 25 events
 
-Matches starting in next 168h: **25**, markets priced: **389**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **29**, markets priced: **393**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,4 +26,4 @@ Matches starting in next 168h: **25**, markets priced: **389**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Central (male), Elite Cricket Academy (male), Pak Xi (male), Royal Champs (male), Speedworld Security Solutions (male), USA (W) (female)
 
-Runtime 169.3s. Snapshot: `odds_20261111T093038Z.jsonl.gz`
+Runtime 164.0s. Snapshot: `odds_20261111T103034Z.jsonl.gz`
