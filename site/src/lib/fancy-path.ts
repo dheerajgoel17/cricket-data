@@ -6,7 +6,7 @@ export function fancyMarketPath(id: string, o: { fm: string; sc?: number | strin
   if (o.fm) q.set("fm", o.fm);
   if (o.sc != null && o.sc !== "" && String(o.sc) !== "-1") q.set("sc", String(o.sc));
   if (o.mw != null && o.mw !== "" && Number(o.mw) !== 20) q.set("mw", String(o.mw));
-  if (o.mv === "1") q.set("mv", "1");
+  if (o.mv === "1" || o.mv === "h2h") q.set("mv", o.mv);
   if (o.ml != null && o.ml !== "") q.set("ml", String(o.ml));
   const s = q.toString();
   return `/fixture/${encodeURIComponent(id)}/fancy${s ? `?${s}` : ""}`;

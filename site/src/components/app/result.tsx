@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-2 py-0.5 font-medium", rateClass(p))}>{pc(p)}</span>);
 
 export const LadderTable = ({ ladder, label = "Line" }: { ladder: any[]; label?: string }) => (
-  <DataTable columns={[label, "Over %", "Fair over", "Under %", "Fair under", "n"]}
+  <DataTable columns={[label, "Over %", "Implied over odds", "Under %", "Implied under odds", "n"]}
     rows={ladder.filter((l) => l.n).map((l) => [`${l.line}`, <HitCell p={l.pOver} />, <OddsText>{odds(l.fairOver)}</OddsText>, <HitCell p={l.pUnder} />, <OddsText>{odds(l.fairUnder)}</OddsText>, l.n])} />
 );
 
@@ -53,11 +53,11 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
       {r.kind === "match_market" && r.tables.filter((t: any) => t.n).map((t: any) => (
         <Panel key={t.label} title={t.label}>
           <Muted>{`n=${t.n} · median ${num(t.summary.median)} · mean ${num(t.summary.mean)} · range ${num(t.summary.min)}–${num(t.summary.max)}`}</Muted>
-          {t.summary.line != null && <p className="my-2">Over {t.summary.line}: {pc(t.summary.pOver)} (fair <OddsText>{odds(t.summary.fairOver)}</OddsText>) · Under: {pc(t.summary.pUnder)} (fair <OddsText>{odds(t.summary.fairUnder)}</OddsText>)</p>}
+          {t.summary.line != null && <p className="my-2">Over {t.summary.line}: {pc(t.summary.pOver)} (implied odds <OddsText>{odds(t.summary.fairOver)}</OddsText>) · Under: {pc(t.summary.pUnder)} (implied odds <OddsText>{odds(t.summary.fairUnder)}</OddsText>)</p>}
           <LadderTable ladder={t.ladder} />
         </Panel>
       ))}
-      {r.kind === "top_batter" && <Panel flat><DataTable columns={["Batter", "Sole top", "Tied top", "Share (sole)", "Fair price"]} rows={r.rows.map((x: any) => [x.name, x.sole, x.tied, pc(x.pSole), <OddsText>{odds(x.fairSole)}</OddsText>])} /></Panel>}
+      {r.kind === "top_batter" && <Panel flat><DataTable columns={["Batter", "Sole top", "Tied top", "Share (sole)", "Historical implied odds"]} rows={r.rows.map((x: any) => [x.name, x.sole, x.tied, pc(x.pSole), <OddsText>{odds(x.fairSole)}</OddsText>])} /></Panel>}
       {r.notes?.length ? <Panel title="Notes"><ul className="list-disc pl-5 text-sm">{r.notes.map((n: string) => <li key={n}>{n}</li>)}</ul></Panel> : null}
       <Muted>{r.freshness}</Muted>
     </div>

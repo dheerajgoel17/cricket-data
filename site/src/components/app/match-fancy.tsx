@@ -27,7 +27,7 @@ import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { ActiveChip } from "./chip";
-import { FancyFilters } from "./fancy-filters";
+import { FancyFilters, type FancySample } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
@@ -117,7 +117,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
       <span className="grid justify-items-end gap-hair">
         <span className="grid justify-items-end gap-hair text-right">
           <span className="flex items-baseline gap-tight whitespace-nowrap">
-            <span className="label-cap text-caption text-muted-foreground">Model</span>
+            <span className="label-cap text-caption text-muted-foreground">History edge</span>
             <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
           </span>
           {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
@@ -163,13 +163,19 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const venueIdx = useMemo(() => (venueIndices as (s: any, n: string) => number[])(store, fx.venue), [store, fx.venue]);
   const gender = fx.gender === "female" ? 1 : 0;
   const venueName = String(fx.venue || "").split(",")[0].trim();
+  const a = teams[0]?.[1] ?? -1, b = teams[1]?.[1] ?? -1;
+  const hasPair = a >= 0 && b >= 0 && a !== b;
+  const headToHead = q.mv === "h2h" && hasPair;
   const here = q.mv === "1" && venueIdx.length > 0;
+  const sample: FancySample = here ? "1" : headToHead ? "h2h" : "";
+  const sampleLabel = here ? `At ${venueName}` : headToHead ? `${fx.a} vs ${fx.b} only` : `Recent matches involving ${team?.[0] ?? `${fx.a} or ${fx.b}`}`;
   const hereMatches = (n: number) => (scope < 0 ? selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, lastN: n }) : selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, team: scope, lastN: n })) as number[];
   const ms = useMemo(() => {
     if (here) return hereMatches(win);
-    const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => selectMatches(store, { fmt: fmtIdx, gender, team: i, lastN: win }) as number[]);
+    if (headToHead) return selectMatches(store, { fmt: fmtIdx, gender, team: a, opp: b, lastN: win }) as number[];
+    const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).filter(([, i]) => i >= 0).map(([, i]) => selectMatches(store, { fmt: fmtIdx, gender, team: i, lastN: win }) as number[]);
     return [...new Set(sets.flat())].sort((a, b) => a - b);
-  }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [store, teams, scope, fmtIdx, win, here, venueIdx, gender, headToHead, a, b]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookedNow = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null, inn)), [doc.data, fxInfo, key, team, inn]);
   const batFirstNow = batFirstBooked(bookedNow, inn, scope);
   const scoredMs = useMemo(() => (batFirstNow ? firstInnsMs(store, ms, scope) : ms), [ms, batFirstNow, store, scope]);
@@ -228,12 +234,12 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   }), [scoredMs, store, scope]);
   const open = (r: Parameters<typeof fancyRowPath>[1]) => {
     track("fancy_market", { market: fancyFm(r.key, r.inn || 0) });
-    nav(fancyRowPath(fx.id, r, { mw: win, mv: here ? "1" : "" }));
+    nav(fancyRowPath(fx.id, r, { mw: win, mv: sample }));
   };
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
   const activeFilters: { key: string; label: string; value: string }[] = [];
   if (win !== 20) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
-  if (here) activeFilters.push({ key: "mv", label: "Sample", value: `At ${venueName}` });
+  if (sample) activeFilters.push({ key: "mv", label: "Sample", value: headToHead ? "Head-to-head" : `At ${venueName}` });
   const detailTitle = [team?.[0], innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", key ? marketLabel(key) : "Match Fancy"].filter(Boolean).join(" · ");
   return (
     <div className="flex min-w-0 flex-col gap-stack">
@@ -258,10 +264,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           </div>
         )}
       </div>
-      <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
-        onApply={({ win: w, here: h }) => set({ mw: w === 20 ? "" : String(w), mv: h ? "1" : "" })} />
+      <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} sample={sample} hasPair={hasPair} venueName={venueName} hasVenue={venueIdx.length > 0}
+        onApply={({ win: w, sample: s }) => set({ mw: w === 20 ? "" : String(w), mv: s })} />
 
-      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
+      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">{sampleLabel} · 0 {fmt} matches</EmptyNote> : (
         <>
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
@@ -289,7 +295,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
                     <>
                       <section className="flex flex-col gap-stack">
-                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">Recent results</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
+                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">{sampleLabel}</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">{rep.n} {fmt} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
                         {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
                         <div className="flex items-end gap-group">
                           <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
@@ -309,7 +315,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
                                 <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                                 <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
-                                <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
+                                <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · historical implied odds {odds(fair)}</div>
                                 {bookHere && (() => { const b = bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side]) : null; return b && (
                                   <div className="flex items-baseline justify-between gap-tight border-t border-hairline pt-tight text-footnote">
                                     <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
@@ -321,7 +327,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                         {ground && (
                           <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
                             {ground.differs && <b className="font-medium">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
-                            {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
+                            {here ? "" : ` (selected sample: ${rep.summary.under} of ${rep.n} under)`}.
                           </p>)}
                         {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
                         {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
@@ -365,7 +371,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
               <Link to={`/player/${r.player}`}>
                 <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
                 <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-medium"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
-                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
+                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">historical implied odds {odds(r.fairSole)}</span></ItemActions>
               </Link>
             </Item>
           </motion.li>))}

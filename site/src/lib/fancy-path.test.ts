@@ -12,4 +12,8 @@ describe("fancyRowPath", () => {
     expect(fancyRowPath("match", { key: "match_sixes", scope: -1, line: 12.5 }))
       .toBe("/fixture/match/fancy?fm=match_sixes&ml=12.5");
   });
+  it("preserves the head-to-head sample when opening a market", () => {
+    expect(fancyRowPath("match", { key: "match_sixes", scope: -1, line: 16.5 }, { mv: "h2h", mw: 10 }))
+      .toBe("/fixture/match/fancy?fm=match_sixes&mw=10&mv=h2h&ml=16.5");
+  });
 });

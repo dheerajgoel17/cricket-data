@@ -207,7 +207,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                     </span>
                     <span className="grid justify-items-end text-right">
                       <AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} />
-                      <span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span>
+                      <span className="text-footnote text-muted-foreground">historical implied odds {odds(r.fairSole)}</span>
                     </span>
                   </Link>
                 </motion.li>
@@ -240,7 +240,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                   <div className="h-1.5 overflow-hidden rounded-full bg-hairline">
                     <motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} />
                   </div>
-                  <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · fair {odds(fair)}</div>
+                  <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · historical implied odds {odds(fair)}</div>
                 </div>
               );
             })}
