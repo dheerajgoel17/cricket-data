@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 20:00 IST
+# Cricket value bets - 2026-11-11 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1714 prices
-- **smarkets**: ok, 483 prices
+- **moviodds_bet365**: ok, 1702 prices
+- **smarkets**: ok, 444 prices
 - **feedk**: ok, 220 prices, 7 events
 - **feedg**: ok, 40 prices, 5 events
-- **feede**: ok, 532 prices, 15 events
-- **feedf**: ok, 332 prices, 11 events
-- **feedh**: ok, 1253 prices, 25 events
+- **feede**: ok, 498 prices, 15 events
+- **feedf**: ok, 286 prices, 9 events
+- **feedh**: ok, 1123 prices, 27 events
 
-Matches starting in next 168h: **26**, markets priced: **403**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **26**, markets priced: **391**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,4 +26,4 @@ Matches starting in next 168h: **26**, markets priced: **403**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Royal Champs (male)
 
-Runtime 167.0s. Snapshot: `odds_20261111T143040Z.jsonl.gz`
+Runtime 159.2s. Snapshot: `odds_20261111T153031Z.jsonl.gz`
