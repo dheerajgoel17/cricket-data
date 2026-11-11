@@ -18,7 +18,9 @@ describe("Saved page", () => {
     authState.user = null;
     open();
     expect(screen.getByText(/Sign in to sync Saved/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(authState.openSignIn).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(authState.openSignIn).toHaveBeenCalledOnce();
   });
 
   it("lists watchlist props, filter combinations and recents, and removes a prop on the server", async () => {

@@ -55,6 +55,12 @@ describe("narrowing and ordering rows", () => {
     expect(order([...rows, row({ id: 4, live: true, l10: hit(0.1) })], DEFAULTS)[0]).toMatchObject({ id: 4 });
     expect(order([row({ id: 5, over: 1.5 }), row({ id: 6, over: 3 })], { ...DEFAULTS, sort: "price" }).map((r: any) => r.id)).toEqual([6, 5]);
   });
+  it("keeps unavailable rows below available lines and out of value-only results", () => {
+    const available = row({ id: 1 });
+    const unavailable = row({ id: 2, live: true, edge: 0.37, out: true });
+    expect(order([unavailable, available], DEFAULTS)).toEqual([available, unavailable]);
+    expect(narrow([unavailable, available], { ...DEFAULTS, value: true })).toEqual([available]);
+  });
   it("offers only values the rows have, most common first", () => {
     expect(options(rows, "fmt")).toEqual(["T20", "ODI"]);
     expect(options(rows, "comp")).toEqual(["IPL", "ODI series"]);

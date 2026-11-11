@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BookmarkIcon, ClockIcon, LinkIcon, StarIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -37,10 +37,6 @@ export function SavedPage() {
   const { combos, remove } = useCombos();
   const { recents } = useRecents();
 
-  useEffect(() => {
-    if (!loading && !user) openSignIn();
-  }, [loading, user, openSignIn]);
-
   const props = list.map((k) => ({ k, p: parsePropKey(k) })).filter((x): x is { k: string; p: NonNullable<ReturnType<typeof parsePropKey>> } => !!x.p && x.p.idx >= 0 && x.p.idx < store.P.id.length);
   const people = list.filter((k) => k.startsWith("player:") || k.startsWith("team:")).map((k) => {
     const [kind, i] = k.split(":");
@@ -60,7 +56,7 @@ export function SavedPage() {
           title="Sign in to sync Saved"
           body="Create a free account or continue with Google. Your watchlist, players, teams and filters are stored on the server."
         />
-        <Button type="button" className="h-control w-full max-w-xs rounded-full self-center" onClick={openSignIn}>Sign in</Button>
+        <Button type="button" disabled={loading} className="h-control w-full max-w-xs rounded-full self-center" onClick={openSignIn}>Sign in</Button>
       </div>
     );
   }

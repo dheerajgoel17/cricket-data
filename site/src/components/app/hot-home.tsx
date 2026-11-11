@@ -48,7 +48,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const outOf = (r: any) => lineNotIn(matchOf(r), asLine(r), identity);
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
 
-  const props = useMemo(() => data.map((r) => ({ ...r, ...modelSide(r.l10, r.prior, r.over, r.under) })).filter((r) => r.l10.played >= 6 && (!phase || lineHomePhase(r, live.data) === phase)), [data, live.data, phase]);
+  const props = useMemo(() => data.map((r) => ({ ...r, ...modelSide(r.l10, r.prior, r.over, r.under) })).filter((r) => r.l10.played >= 6 && !outOf(r) && (!phase || lineHomePhase(r, live.data) === phase)), [data, live.data, identity, phase]);
 
   const fancyById = useMemo(() => {
     const m = new Map<string, { r: any; f: any }[]>();
@@ -107,7 +107,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
           {block ? (
             <ul className="-mx-gutter">
               {block.items.map((item) => item.kind === "player"
-                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={outOf(item.r)} hideMatch />
+                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
                 : (
                   <li key={item.key} className="border-t border-hairline">
                     <OverviewRow

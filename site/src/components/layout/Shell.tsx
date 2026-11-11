@@ -1,5 +1,6 @@
-import { useEffect } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { AppSkeleton } from "@/components/app/skeletons";
+import { Suspense, useLayoutEffect, useRef } from "react";
+import { NavLink, Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
@@ -51,21 +52,58 @@ function AppSidebar() {
 
 /** Page chrome: header, left rail (>= lg), bottom tab bar (phones and tablets), animated route outlet. */
 export function Shell() {
-  const { pathname } = useLocation();
+  const { pathname, key } = useLocation();
+  const action = useNavigationType();
+  const positions = useRef(new Map<string, number>());
+  const currentKey = useRef(key);
+  const content = useRef<HTMLDivElement>(null);
   useMetaSync(pathname);
-  // A new page starts at the top. The router keeps the old scroll position, so opening a player from the middle of a long list used to land half-way down the player page.
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useLayoutEffect(() => {
+    const previous = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    return () => { history.scrollRestoration = previous; };
+  }, []);
+  useLayoutEffect(() => {
+    const top = action === "POP" ? positions.current.get(key) ?? 0 : 0;
+    const observer = new ResizeObserver(restore);
+    function restore() {
+      window.scrollTo({ top, behavior: "instant" });
+      if (window.scrollY >= top) observer.disconnect();
+    }
+    if (top && content.current) observer.observe(content.current);
+    restore();
+    const save = () => positions.current.set(currentKey.current, window.scrollY);
+    const stop = () => observer.disconnect();
+    window.addEventListener("scroll", save, { passive: true });
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
+    return () => {
+      stop();
+      window.removeEventListener("scroll", save);
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
+    };
+  }, [pathname]); // Query-only changes keep the current scroll.
+  useLayoutEffect(() => {
+    if (currentKey.current !== key && !positions.current.has(key)) {
+      positions.current.set(key, window.scrollY);
+    }
+    currentKey.current = key;
+  }, [key]);
   return (
     <HeaderSlotProvider>
     <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] lg:pb-0">
+      <a href="#main" className="sr-only z-[70] focus:not-sr-only focus:fixed focus:left-gutter focus:top-snug focus:rounded-lg focus:bg-card focus:p-snug">Skip to content</a>
       <div className="sticky top-0 z-50"><Header /></div>
       <div className="flex flex-1">
         <AppSidebar />
-        <SidebarInset className="min-w-0 overflow-x-clip bg-transparent">
+        <SidebarInset id="main" tabIndex={-1} className="min-w-0 overflow-x-clip bg-transparent">
           {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
-          <main key={pathname} id="main" className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
-            <Outlet />
-          </main>
+          <div key={pathname} ref={content} className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
+            <Suspense fallback={<AppSkeleton />}><Outlet /></Suspense>
+          </div>
         </SidebarInset>
       </div>
       <IosTabBar />

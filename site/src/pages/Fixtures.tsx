@@ -207,7 +207,7 @@ export function FixturePage() {
       <Button asChild variant="secondary" className="w-fit rounded-full"><Link to="/">Back to fixtures</Link></Button>
     </div>
   );
-  if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
+  if (fx.fmt === "FC") return <div><h1 className="sr-only">{fx.a} v {fx.b}</h1><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   if (fancyDetail) {
     setTitle(`Match Fancy · ${fx.a} v ${fx.b}`);
     return (
@@ -236,6 +236,7 @@ export function FixturePage() {
   }
   return (
     <div className="flex flex-col gap-section">
+      <h1 className="sr-only">{fx.a} v {fx.b}</h1>
       <div className="flex flex-col gap-stack">
         <MatchHeader f={fx} live={live} />
         {!inPlay && <ScorecardCard match={match} teams={known} inPlay={false} fixtureId={fx.id} />}

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { syncAds } from "@/lib/ads";
 import { AppSkeleton } from "@/components/app/skeletons";
@@ -88,7 +88,13 @@ export function App() {
             <Route path="docs" element={<DisclaimerPage />} />
             <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
             <Route path="responsible" element={<Navigate to="/docs" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={
+              <section className="flex flex-col items-start gap-snug">
+                <h1 className="text-title font-bold">Page not found</h1>
+                <p className="text-muted-foreground">This address may have changed.</p>
+                <Link to="/" className="text-primary underline underline-offset-4">Back to fixtures</Link>
+              </section>
+            } />
             </Route>
           </Route>
         </Routes>

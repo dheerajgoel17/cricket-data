@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+
 import { Kbd } from "@/components/ui/kbd";
 import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
@@ -17,26 +17,36 @@ import { PlayerName } from "@/components/app/player-name";
  * Search state shared by the header field (desktop) and the icon button (phones): a shadcn command dialog opened with Cmd/Ctrl+K. Players are typo tolerant (engine resolver), plus teams and grounds. */
 export function useSearchDialog() {
   const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLElement | null>(null);
+  const show = () => {
+    trigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setOpen(true);
+  };
+  const restoreFocus = (event: Event) => {
+    event.preventDefault();
+    trigger.current?.focus();
+  };
   useEffect(() => {
-    const k = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setOpen((o) => !o); } };
+    const k = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); if (!open) show(); } };
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
-  }, []);
-  return { open, setOpen };
+  }, [open]);
+  return { open, setOpen, show, restoreFocus };
 }
 
-/** The header field: a read-only shadcn InputGroup that opens the dialog. */
+/** Search opens on activation and remains a normal tab stop. */
 export function SearchField({ onOpen, className = "" }: { onOpen: () => void; className?: string }) {
   return (
-    <InputGroup className={`h-10 cursor-pointer rounded-[var(--chip-radius)] border-0 bg-muted text-foreground [&_svg]:text-muted-foreground [&_input]:placeholder:text-primary-foreground/70 [&_kbd]:bg-primary-foreground/15 [&_kbd]:text-primary-foreground lg:bg-muted lg:text-foreground lg:[&_svg]:text-muted-foreground lg:[&_input]:placeholder:text-muted-foreground lg:[&_kbd]:bg-background lg:[&_kbd]:text-muted-foreground ${className}`} onClick={onOpen}>
-      <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
-      <InputGroupInput readOnly placeholder="Search players, teams, grounds" aria-label="Search" className="cursor-pointer text-body" onFocus={onOpen} />
-      <InputGroupAddon align="inline-end"><Kbd>⌘K</Kbd></InputGroupAddon>
-    </InputGroup>
+    <button type="button" aria-haspopup="dialog" aria-label="Search" onClick={onOpen}
+      className={`h-10 items-center gap-snug rounded-[var(--chip-radius)] bg-muted px-inset text-left text-body text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring ${className}`}>
+      <MagnifyingGlassIcon className="size-4 shrink-0" aria-hidden />
+      <span className="flex-1">Search players, teams, matches, grounds</span>
+      <Kbd aria-hidden>⌘K</Kbd>
+    </button>
   );
 }
 
-export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+export function SearchDialog({ open, onOpenChange, onCloseAutoFocus }: { open: boolean; onOpenChange: (o: boolean) => void; onCloseAutoFocus: (event: Event) => void }) {
   const { store, rz } = useData();
   const nav = useNavigate();
   const [text, setText] = useState("");
@@ -56,7 +66,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
   const go = (to: string) => { onOpenChange(false); setText(""); nav(to); };
   const n = items.teams.length + items.players.length + items.venues.length + items.fixtures.length;
   return (
-    <CommandDialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setText(""); }} title="Search" description="Search players, teams, matches and grounds">
+    <CommandDialog onCloseAutoFocus={onCloseAutoFocus} open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setText(""); }} title="Search" description="Search players, teams, matches and grounds">
       <CommandInput value={text} onValueChange={setText} placeholder="Search players, teams, matches, grounds" />
       <CommandList>
         {query === text && text.trim().length >= 2 && n === 0 && <CommandEmpty>No player, team, match or ground matches “{text.trim()}”</CommandEmpty>}
