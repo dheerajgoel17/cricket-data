@@ -120,7 +120,7 @@ function GroundFilterBar({ fx, fmt, gender, onFmt, onGender }: {
   );
 }
 
-type FromFx = { a: string; b: string; series?: string; start?: string; status?: string; gender?: string };
+type FromFx = { a: string; b: string; series?: string; start?: string; status?: string; gender?: string; fmt?: string };
 
 /** Compact tour row back to the match: crests, series, dates here, status mark (MatchStatus language). */
 function TourChip({ from, fixtureId, atGround, now }: { from: FromFx; fixtureId: string; atGround: any[]; now: number }) {
@@ -157,7 +157,7 @@ function TourChip({ from, fixtureId, atGround, now }: { from: FromFx; fixtureId:
 }
 
 /** Match Fancy–shaped markets: median/mean/range, bars, O/U at the main line, compact ladder — not the Ask ResultView chrome. Format comes from the sticky bar (one format only). */
-function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx: number; fmt: string; gender: GenderFilter }) {
+function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
   const reduce = useReducedMotion();
   const [market, setMarket] = useState("match_runs");
   const [line, setLine] = useState<number | null>(null);
@@ -165,9 +165,9 @@ function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx:
   useEffect(() => { setLine(null); }, [fmtName, market]);
   const ms = useMemo(() => selectMatches(store, {
     fmt: FORMATS.indexOf(fmtName),
-    venue: venueIdx,
+    venue: venueIndexes,
     gender: gender === "female" ? 1 : gender === "male" ? 0 : null,
-  }), [store, venueIdx, fmtName, gender]);
+  }), [store, venueIndexes, fmtName, gender]);
   const isTop = market === "top_batter";
   const rep = useMemo(() => (isTop || !ms.length ? null : marketReport(store, ms, market)), [store, ms, market, isTop]);
   const tops = useMemo(() => (isTop && ms.length ? topBatters(store, ms, { scope: "match" }) : null), [store, ms, isTop]);
@@ -275,10 +275,11 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
   const nav = useNavigate();
   const reduce = useReducedMotion();
   const { store } = useData();
-  const { primary, label, known, atGround, isLoading } = useVenueGround(venue);
+  const { primary, venueIndices, label, known, atGround, isLoading } = useVenueGround(venue);
   const majorityFmt = useMemo(() => majorityFormat(atGround), [atGround]);
   const [fmt, setFmt] = useState("");
-  const activeFmt = FORMATS.includes(fmt) ? fmt : majorityFmt;
+  const preferredFmt = from?.fmt ?? "";
+  const activeFmt = FORMATS.includes(fmt) ? fmt : FORMATS.includes(preferredFmt) ? preferredFmt : majorityFmt;
   const [gender, setGender] = useState<GenderFilter>("");
   const shown = useMemo(() => filterGames(atGround, activeFmt, gender), [atGround, activeFmt, gender]);
   const name = label || venue || "Ground";
@@ -401,7 +402,7 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
         )}
       </section>
 
-      {primary >= 0 ? <GroundMarkets store={store} venueIdx={primary} fmt={activeFmt} gender={gender} /> : null}
+      {primary >= 0 ? <GroundMarkets store={store} venueIndexes={venueIndices} fmt={activeFmt} gender={gender} /> : null}
     </div>
   );
 }
