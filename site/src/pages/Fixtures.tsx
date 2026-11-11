@@ -209,9 +209,9 @@ export function FixturePage() {
   );
   if (fx.fmt === "FC") return <div><MatchHeader f={fx} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   if (fancyDetail) {
+    setTitle(`Match Fancy · ${fx.a} v ${fx.b}`);
     return (
-      <div className="flex flex-col gap-section">
-        <MatchHeader f={fx} live={live} />
+      <div className="flex flex-col gap-snug">
         <Link to={`/fixture/${fx.id}?tab=fancy`} className="inline-flex w-fit items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
           <ChevronLeftIcon className="size-4" aria-hidden />Match Fancy
         </Link>

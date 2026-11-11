@@ -18,7 +18,7 @@ import { PropRow, useHotRows } from "./hot-props";
 import { MarketTape } from "./market-tape";
 import { PillGroup } from "./pill-group";
 import { mixHomeRows } from "@/lib/hot-lines";
-import { fancyMarketPath } from "@/lib/fancy-path";
+import { fancyRowPath } from "@/lib/fancy-path";
 import { lineHomePhase, phaseOf, type HomePhase } from "@/lib/home-phase";
 import { RowsSkeleton, TapeSkeleton } from "./skeletons";
 
@@ -112,7 +112,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
                   <li key={item.key} className="border-t border-hairline">
                     <OverviewRow
                       r={item.r}
-                      onOpen={() => nav(fancyMarketPath(item.f.id, { fm: item.r.inn ? `${item.r.key}:${item.r.inn}` : item.r.key, sc: item.r.scope >= 0 ? item.r.scope : null }))}
+                      onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
                     />
                   </li>
                 ))}

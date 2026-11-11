@@ -38,12 +38,12 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     const live = (price: number) => bookQuotes([{ line: 33.5, books: [{ ...B("bet365", price, 1.9), live: true }] }]);
     const { rerender } = render(<BookQuotes quotes={live(1.8)} />);
     const ticker = screen.getByText("1.80").parentElement!.parentElement!;
-    expect(ticker.querySelector("svg")).toHaveClass("invisible");
+    expect(ticker.querySelector("[aria-hidden]")).toBeEmptyDOMElement();
     rerender(<BookQuotes quotes={live(2.1)} />);
     const price = screen.getByText("2.10");
     expect(ticker).toContainElement(price);
     expect(price).toHaveClass("ticker-roll-up");
-    expect(ticker.querySelector("svg")).not.toHaveClass("invisible");
+    expect(ticker.querySelector("[aria-hidden]")).toHaveTextContent("▲");
     expect(ticker.className).not.toMatch(/tick-(up|down)/);
   });
 
