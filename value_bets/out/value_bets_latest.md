@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-11 21:58 IST
+# Cricket value bets - 2026-11-11 22:04 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -26,4 +26,4 @@ Matches starting in next 168h: **28**, markets priced: **378**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
 
-Runtime 168.6s. Snapshot: `odds_20261111T162843Z.jsonl.gz`
+Runtime 151.9s. Snapshot: `odds_20261111T163432Z.jsonl.gz`

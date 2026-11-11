@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-11T16:28:43Z",
- "generated_at_ist": "2026-11-11 21:58 IST",
- "runtime_secs": 168.6,
+ "generated_at_utc": "2026-11-11T16:34:32Z",
+ "generated_at_ist": "2026-11-11 22:04 IST",
+ "runtime_secs": 151.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-11",
-  "commit": "58776f9a54"
+  "commit": "5d238588ad"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1632,
-   "secs": 1.8
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
    "rows": 445,
-   "secs": 2.1
+   "secs": 2.2
   },
   "feedk": {
    "status": "ok",
    "rows": 212,
-   "secs": 14.1,
+   "secs": 13.0,
    "events": 5
   },
   "feedg": {
    "status": "ok",
    "rows": 40,
-   "secs": 27.2,
+   "secs": 27.7,
    "events": 5
   },
   "feede": {
    "status": "ok",
    "rows": 486,
-   "secs": 38.6,
+   "secs": 34.1,
    "events": 13
   },
   "feedf": {
    "status": "ok",
    "rows": 286,
-   "secs": 55.9,
+   "secs": 51.8,
    "events": 9
   },
   "feedh": {
    "status": "ok",
    "rows": 1123,
-   "secs": 80.3,
+   "secs": 76.9,
    "events": 31
   }
  },
- "snapshot": "odds_20261111T162843Z.jsonl.gz",
+ "snapshot": "odds_20261111T163432Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -967,24 +967,24 @@
   }
  },
  "log": [
-  "[21:58 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[21:58 IST] history: 23993 matches, last 2026-11-11, players 432127",
-  "[22:00 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1632, 'secs': 1.8}",
-  "[22:00 IST] source smarkets: {'status': 'ok', 'rows': 445, 'secs': 2.1}",
-  "[22:00 IST] source feedk: {'status': 'ok', 'rows': 212, 'secs': 14.1, 'events': 5}",
-  "[22:00 IST] source feedg: {'status': 'ok', 'rows': 40, 'secs': 27.2, 'events': 5}",
-  "[22:00 IST] source feede: {'status': 'ok', 'rows': 486, 'secs': 38.6, 'events': 13}",
-  "[22:00 IST] source feedf: {'status': 'ok', 'rows': 286, 'secs': 55.9, 'events': 9}",
-  "[22:00 IST] source feedh: {'status': 'ok', 'rows': 1123, 'secs': 80.3, 'events': 31}",
-  "[22:00 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:00 IST] 35 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:00 IST] 24 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[22:00 IST] 38 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[22:00 IST] held back 35 player and 34 fancy lines first priced after their match started (not pre-match prices)",
-  "[22:00 IST] book lines: 389 player lines from 7 source(s)",
-  "[22:00 IST] 60 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[22:01 IST] weather: forecasts for 10 events, 0 failed",
-  "[22:01 IST] prop model: 1372 prop selections modelled, 468 milestone ladder prices anchored to O/U",
-  "[22:01 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[22:04 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:04 IST] history: 23993 matches, last 2026-11-11, players 432127",
+  "[22:06 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1632, 'secs': 0.2}",
+  "[22:06 IST] source smarkets: {'status': 'ok', 'rows': 445, 'secs': 2.2}",
+  "[22:06 IST] source feedk: {'status': 'ok', 'rows': 212, 'secs': 13.0, 'events': 5}",
+  "[22:06 IST] source feedg: {'status': 'ok', 'rows': 40, 'secs': 27.7, 'events': 5}",
+  "[22:06 IST] source feede: {'status': 'ok', 'rows': 486, 'secs': 34.1, 'events': 13}",
+  "[22:06 IST] source feedf: {'status': 'ok', 'rows': 286, 'secs': 51.8, 'events': 9}",
+  "[22:06 IST] source feedh: {'status': 'ok', 'rows': 1123, 'secs': 76.9, 'events': 31}",
+  "[22:06 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:06 IST] 35 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[22:06 IST] 24 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[22:06 IST] 38 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[22:06 IST] held back 35 player and 34 fancy lines first priced after their match started (not pre-match prices)",
+  "[22:06 IST] book lines: 389 player lines from 7 source(s)",
+  "[22:06 IST] 60 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[22:07 IST] weather: forecasts for 10 events, 0 failed",
+  "[22:07 IST] prop model: 1372 prop selections modelled, 468 milestone ladder prices anchored to O/U",
+  "[22:07 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
