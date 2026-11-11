@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-11T13:34:05Z",
+ "generated_at_utc": "2026-11-11T14:34:18Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -257,6 +257,29 @@
    "chance": 0.6333,
    "edge": 0.1717,
    "edge_pct": 17.2,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-14-perth-scorchers-women-v-adelaide-strikers-women|highest_over||0|under",
+   "fixture_id": "2026-11-14-perth-scorchers-women-v-adelaide-strikers-women",
+   "match": "Perth Scorchers Women vs Adelaide Strikers Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-14T08:10:00Z",
+   "start_ist": "2026-11-14 13:40 IST",
+   "key": "highest_over",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 18.5,
+   "best_odds": 1.833,
+   "best_source": "bet365",
+   "hits": 18,
+   "played": 26,
+   "window": 20,
+   "chance": 0.6389,
+   "edge": 0.1711,
+   "edge_pct": 17.1,
    "bat_first": false
   },
   {

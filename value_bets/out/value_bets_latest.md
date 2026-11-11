@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-11 19:00 IST
+# Cricket value bets - 2026-11-11 20:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1786 prices
-- **smarkets**: ok, 477 prices
-- **feedg**: ok, 32 prices, 4 events
-- **feedk**: ok, 220 prices, 8 events
-- **feede**: ok, 538 prices, 16 events
-- **feedf**: ok, 332 prices, 9 events
-- **feedh**: ok, 1253 prices, 24 events
+- **moviodds_bet365**: ok, 1714 prices
+- **smarkets**: ok, 483 prices
+- **feedk**: ok, 220 prices, 7 events
+- **feedg**: ok, 40 prices, 5 events
+- **feede**: ok, 532 prices, 15 events
+- **feedf**: ok, 332 prices, 11 events
+- **feedh**: ok, 1253 prices, 25 events
 
-Matches starting in next 168h: **28**, markets priced: **406**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **26**, markets priced: **403**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,6 +24,6 @@ Matches starting in next 168h: **28**, markets priced: **406**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 32.3%, model 0.1278, market 0.136
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.6%, model 0.1278, market 0.1419
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Royal Champs (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): Central (male), Royal Champs (male)
 
-Runtime 154.3s. Snapshot: `odds_20261111T133039Z.jsonl.gz`
+Runtime 167.0s. Snapshot: `odds_20261111T143040Z.jsonl.gz`
