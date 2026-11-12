@@ -25,8 +25,10 @@ export async function buildDoc({ dataDir, linesPath, now = Date.now() }) {
   if (!fixtures.length) throw new Error("no fixtures in the built data");
   const rz = new Resolver(store);
   const year = String(new Date(now).getUTCFullYear());
-  const want = wantedLines(doc.lines || [], now);
-  const byChip = groupByChip(want);
+  const all = wantedLines(doc.lines || [], now);
+  const byChip = groupByChip(all);
+  // one row per key: several book lines of one player and stat (other lines, other books) are one row, scored on the books' main line
+  const want = [...new Map(all.map((l) => [lineKey(l), l])).values()];
   const byShard = new Map();
   for (const l of want) { const i = store.P.id.indexOf(l.pid); if (i >= 0) { const s = store.shardOf(i); (byShard.get(s) ?? byShard.set(s, []).get(s)).push(l); } }
   const rows = {};

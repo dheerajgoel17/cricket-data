@@ -61,7 +61,7 @@ test("wantedLines keeps priced pre-match lines inside the window and nothing els
 });
 
 test("the script writes the history of each priced line under its key, and fails on an empty build", async () => {
-  const { data, lines } = await dataDir([line(), line({ stat: "fours", line: 1.5 }), line({ pid: "unknown0", stat: "runs" })]);
+  const { data, lines } = await dataDir([line(), line({ line: 25.5 }), line({ stat: "fours", line: 1.5 }), line({ pid: "unknown0", stat: "runs" })]);
   const doc = await buildDoc({ dataDir: data, linesPath: lines, now: NOW });
   assert.equal(doc.v, 1);
   assert.equal(doc.generated_at_utc, "2026-11-03T05:00:00Z");
@@ -71,6 +71,8 @@ test("the script writes the history of each priced line under its key, and fails
   assert.ok(!doc.rows[lineKey(line({ pid: "unknown0" }))], "a player not in the data has no row");
   assert.equal(doc.scored, Object.keys(doc.rows).length);
   assert.equal(doc.scored + doc.skipped, doc.lines);
+  assert.equal(doc.lines, 3, "two lines of one player and stat are one key, one row");
+  assert.equal(JSON.parse(JSON.stringify(doc.rows)) && Object.values(JSON.parse(JSON.stringify(doc.rows))).every((r) => ["idx", "name", "line", "prior", "opp", "venue", "l5", "l10", "season", "h2h", "ven", "last", "max"].every((f) => f in r)), true, "every row keeps the fields the guard asks for once written as JSON");
   assert.deepEqual(Object.keys(doc.rows[lineKey(line())]).sort(), ["h2h", "idx", "l10", "l5", "last", "line", "max", "name", "opp", "prior", "season", "settled", "ven", "venue"].sort());
   await writeFile(join(data, "fixtures.json"), "[]");
   await assert.rejects(buildDoc({ dataDir: data, linesPath: lines, now: NOW }), /no fixtures/);

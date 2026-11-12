@@ -331,7 +331,7 @@ def check_unlinked(review: list[dict] | None, linked: int | None = None) -> Chec
     return c
 
 
-HOT_FIELDS = ("idx", "name", "line", "prior", "opp", "venue", "l5", "l10", "season", "h2h", "ven", "last", "max", "settled")
+HOT_FIELDS = ("idx", "name", "line", "prior", "opp", "venue", "l5", "l10", "season", "h2h", "ven", "last", "max")  # `settled` is left out: it is absent until the match is in the data
 
 
 def check_hot_rows(hot: dict | None, meta: dict, now: float) -> Check:
