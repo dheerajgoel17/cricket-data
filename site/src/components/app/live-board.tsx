@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, createContext, useContext, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowTopRightOnSquareIcon, ChevronDownIcon, TableCellsIcon } from "@heroicons/react/24/outline";
-import { AnimatedHeight } from "@/components/app/animated-height";
+import { ChevronRightIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
 import { TeamBadge } from "@/components/app/badges";
@@ -310,14 +309,8 @@ function LivePlayer({ player, sides, bowling = false }: { player: any; sides?: S
 /** Is the card running the full width of the page (so its rules cancel the page gutter, not the card's own padding)? */
 const FlushCtx = createContext(false);
 
-/** A divider across the whole card, edge to edge (it cancels the card's side padding): solid or dotted. */
-export function Rule({ dotted }: { dotted?: boolean }) {
-  const flush = useContext(FlushCtx);
-  return <div aria-hidden className={cn("border-t border-hairline", flush ? "-mx-gutter" : "-mx-inset", dotted && "border-dotted")} />;
-}
-
-/** Current batters, bowler and deliveries. Extra match figures appear with the expanded scorecard. */
-export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side[]; expanded: boolean }) {
+/** Current batters, bowler, deliveries and chase figures. */
+function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   const flush = useContext(FlushCtx);
   const board = liveBoard(match);
   if (!board) return null;
@@ -342,73 +335,34 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
       {!!board.overs.length && (
         <div className={cn("min-w-0 border-y border-hairline py-tight", flush ? "-mx-gutter px-gutter" : "border-x px-tight")}><Overs overs={board.overs} /></div>
       )}
-      {expanded && !!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
+      {!!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
     </section>
   );
 }
 
-/** Not in play: per innings, the score, the two best batters and the best bowler, one line each. */
-function CardSummary({ match, teams }: { match: any; teams?: Side[] }) {
-  const card = cardInns(match);
-  return (
-    <div className="grid gap-tight sm:grid-cols-2">
-      {card.map((inn: any, k: number) => {
-        const bat = [...(inn.batters || [])].sort((a: any, b: any) => (b.runs ?? 0) - (a.runs ?? 0)).slice(0, 2);
-        const bowl = [...(inn.bowlers || [])].sort((a: any, b: any) => (b.wickets ?? 0) - (a.wickets ?? 0) || (a.conceded ?? 0) - (b.conceded ?? 0))[0];
-        return (
-          <div key={innId(inn)} className="flex min-w-0 flex-col gap-tight rounded-xl bg-muted/40 px-snug py-snug ring-1 ring-inset ring-hairline">
-            <div className="flex items-baseline justify-between gap-snug">
-              <span className="flex min-w-0 items-center gap-tight text-callout font-medium">{inn.team && <TeamBadge name={inn.team} size="xs" />}<span className="truncate">{innLabel(card, k)}</span></span>
-              <span className="shrink-0 font-condensed text-metric font-bold tabular-nums">{innScore(inn) || "—"}</span>
-            </div>
-            {!!bat.length && <p className="truncate text-footnote text-muted-foreground">{bat.map((b: any, j: number) => <Fragment key={b.id || b.name}>{j > 0 && " · "}<Who name={b.name} team={b.team || inn.team} sides={teams} short className="font-medium text-foreground" /> {b.runs ?? 0} ({b.balls ?? 0})</Fragment>)}</p>}
-            {bowl && <p className="truncate text-footnote text-muted-foreground"><Who name={bowl.name} team={bowl.team} sides={teams} short className="font-medium text-foreground" /> {bowl.wickets ?? 0}–{bowl.conceded ?? 0} ({fmtOv(bowl.overs)})</p>}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/** The match's scorecard as one card: the live strip while it is on (a short top-performers summary otherwise), and a tap on the row below it opens the full card in place. So-far only. */
 export const scoreboardShows = (match: any, inPlay: boolean) => hasCard(match) || (inPlay && !!liveBoard(match));
 
-/** `top` (status and ground line) and `head` (the two sides with their scores) sit at the top of the card while a match is in play: the card is then the page's header, full width and flush under the top bar, with compact player figures beneath the team scores. Otherwise it is a rounded card in the page. */
-export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { match: any; teams?: Side[]; inPlay: boolean; fixtureId?: string; top?: ReactNode; head?: ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const bodyId = useId();
+/** Keep the live strip with the match header and link to the full innings tables. */
+export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { match: any; teams?: Side[]; inPlay: boolean; fixtureId: string; top?: ReactNode; head?: ReactNode }) {
   const full = hasCard(match), strip = inPlay && !!liveBoard(match);
-  const flush = inPlay && !!top && scoreboardShows(match, inPlay);
+  const flush = inPlay && !!top && (full || strip);
   useHeaderFlush(flush);
-  if (!scoreboardShows(match, inPlay)) return null;
+  if (!full && !strip) return null;
   return (
     <FlushCtx.Provider value={flush}>
-    <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush ? "-mx-gutter bg-background px-gutter py-snug" : "rounded-2xl bg-card p-inset")}>
-      {inPlay && top ? top : null}
-      {inPlay && head ? head : null}
-      {strip ? <LiveBoard match={match} teams={teams} expanded={open || !full} /> : <CardSummary match={match} teams={teams} />}
-      {full && (
-        <>
-          <Rule />
-          <div className={cn(flush && "-mx-gutter")}>
-            <button type="button" aria-expanded={open} aria-controls={open ? bodyId : undefined} onClick={() => setOpen((o) => !o)}
-              className={cn("flex min-h-control w-full items-center gap-tight text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:opacity-70", flush && "px-gutter")}>
-              <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-              {open ? "Hide scorecard" : "Full scorecard"}
-              <ChevronDownIcon className={cn("ml-auto size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} aria-hidden />
-            </button>
-            <AnimatedHeight>
-              {open && (
-                <div id={bodyId} className={cn("flex flex-col gap-snug border-t border-hairline pt-snug", flush && "px-gutter")}>
-                  {fixtureId ? <Link to={`/fixture/${fixtureId}/scorecard`} className="ml-auto inline-flex min-h-control w-fit items-center gap-tight text-footnote font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">Open as a page <ArrowTopRightOnSquareIcon className="size-4" aria-hidden /></Link> : null}
-                  <ScorecardBody match={match} teams={teams} />
-                </div>
-              )}
-            </AnimatedHeight>
-          </div>
-        </>
-      )}
-    </section>
+      <section aria-label="Scorecard" data-flush={flush ? "" : undefined} className={cn("flex flex-col gap-tight", flush && "-mx-gutter bg-background px-gutter py-snug")}>
+        {inPlay && top}
+        {inPlay && head}
+        {strip && <LiveBoard match={match} teams={teams} />}
+        {full && (
+          <Link to={`/fixture/${fixtureId}/scorecard`}
+            className="flex min-h-control items-center gap-snug rounded-xl bg-card px-snug py-tight text-callout font-medium outline-none ring-1 ring-inset ring-hairline hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring">
+            <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+            Full scorecard
+            <ChevronRightIcon className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden />
+          </Link>
+        )}
+      </section>
     </FlushCtx.Provider>
   );
 }
