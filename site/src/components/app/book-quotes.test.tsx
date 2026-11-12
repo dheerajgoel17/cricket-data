@@ -17,7 +17,7 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(chips(container)).toEqual(["Ladbrokes O 14.5 1.83 · U 1.83 (lowest line, best price)"]);
     expect(screen.queryByRole("table")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "+1 book" }));
-    expect(screen.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Hide prices" })).toHaveAttribute("aria-expanded", "true");
     expect([...screen.getByRole("table").querySelectorAll("tbody td")].map((c) => c.textContent)).toEqual(["bet365", "17.5", "1.83", "1.83"]);
   });
 
@@ -32,6 +32,19 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     render(<BookQuotes quotes={bookQuotes([{ line: 17.5, books: [B("bet365", 1.833, 1.833)] }])} />);
     expect(screen.getByText(/bet365/)).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("rolls the new price in place without flashing the background", () => {
+    const live = (price: number) => bookQuotes([{ line: 33.5, books: [{ ...B("bet365", price, 1.9), live: true }] }]);
+    const { rerender } = render(<BookQuotes quotes={live(1.8)} />);
+    const ticker = screen.getByText("1.80").parentElement!.parentElement!;
+    expect(ticker.querySelector("[aria-hidden]")).toBeEmptyDOMElement();
+    rerender(<BookQuotes quotes={live(2.1)} />);
+    const price = screen.getByText("2.10");
+    expect(ticker).toContainElement(price);
+    expect(price).toHaveClass("ticker-roll-up");
+    expect(ticker.querySelector("[aria-hidden]")).toHaveTextContent("▲");
+    expect(ticker.className).not.toMatch(/tick-(up|down)/);
   });
 
   it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\" at the end of it", () => {

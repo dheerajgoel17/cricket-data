@@ -4,7 +4,7 @@ import { Platform, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated from "react-native-reanimated";
-import { SCOPE_LABEL } from "@cricket/engine/lines.js";
+import { scopeTag } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { odds, shortVenue } from "@site/lib/format";
 import { groundNote } from "@cricket/engine/props-view.js";
@@ -93,7 +93,7 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
             </View>
             <View style={styles.descRow}>
               <Text style={styles.line}>{r.side === "under" ? "U" : "O"} {r.line}</Text>
-              <Text style={styles.statCap}>{label}{r.inn ? ` · ${(SCOPE_LABEL as any)[r.inn]}` : ""}</Text>
+              <Text style={styles.statCap}>{[label, (scopeTag as any)(r.fmt, r.inn)].filter(Boolean).join(" · ")}</Text>
             </View>
             <PriceLine quotes={r.quotes} line={r.line} price={r.over} open={open} onToggle={() => setOpen((o) => !o)} />
             <View style={styles.foot}>

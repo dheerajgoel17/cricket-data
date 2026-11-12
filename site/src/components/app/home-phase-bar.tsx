@@ -7,28 +7,24 @@ import { track } from "@/lib/analytics";
 import { HOME_PHASES, type HomePhase } from "@/lib/home-phase";
 import { cn } from "@/lib/utils";
 
-/**
- * Floating glass bar on home: In play / Pre-match / Resulted, plus More (the pages the sidebar already lists).
- * Sits above the iOS tab bar on phones; at the bottom of the viewport on desktop where that bar is hidden.
- */
+/** Match-state controls for the fixture rail and props feed. */
 export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; counts: Record<HomePhase, number>; onChange: (p: HomePhase) => void }) {
   const reduce = useReducedMotion();
   const pick = (p: HomePhase) => { if (p === value) return; track("home_phase", { phase: p }); onChange(p); };
   return (
     <nav
       aria-label="Match state"
-      className="pointer-events-none fixed inset-x-gutter bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+var(--space-snug))] z-50 flex justify-center lg:bottom-stack"
+      className="flex"
     >
-      <div className="pointer-events-auto flex max-w-full items-center gap-hair rounded-[var(--chip-radius)] bg-card/70 p-hair ring-1 ring-hairline backdrop-blur-2xl backdrop-saturate-150">
-        <div role="tablist" aria-label="In play, pre-match or resulted" className="flex min-w-0">
+      <div className="flex max-w-full flex-wrap items-center gap-hair rounded-[var(--chip-radius)] bg-card p-hair ring-1 ring-hairline">
+        <div role="group" aria-label="Fixture phase" className="flex flex-wrap">
           {HOME_PHASES.map(([id, label]) => {
             const on = value === id, n = counts[id];
             return (
               <button
                 key={id}
                 type="button"
-                role="tab"
-                aria-selected={on}
+                aria-pressed={on}
                 onClick={() => pick(id)}
                 className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-medium", on ? "text-background" : "text-muted-foreground")}
               >

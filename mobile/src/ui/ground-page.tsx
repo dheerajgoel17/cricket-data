@@ -96,7 +96,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
         </View>
 
         {activeSection === "markets"
-          ? <GroundMarkets store={store} venueIdx={g.primary} fmt={activeFmt} gender={gender} />
+          ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
           : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
       </ScrollView>
     </View>
@@ -168,12 +168,12 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
 }
 
 /** Match-Fancy-shaped markets from the games at this ground: median / mean / range, bars, over / under at a line, and the ladder. One format (the chips above). */
-function GroundMarkets({ store, venueIdx, fmt, gender }: { store: any; venueIdx: number; fmt: string; gender: GenderFilter }) {
+function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
   const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [market, setMarket] = useState("match_runs"), [line, setLine] = useState<number | null>(null);
   const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
-  useEffect(() => { setLine(null); }, [venueIdx, fmtName, gender, market]);
-  const ms = useMemo(() => selectMatches(store, { fmt: FORMATS.indexOf(fmtName), venue: venueIdx, gender: gender === "female" ? 1 : gender === "male" ? 0 : null }) as number[], [store, venueIdx, fmtName, gender]);
+  useEffect(() => { setLine(null); }, [venueIndexes, fmtName, gender, market]);
+  const ms = useMemo(() => selectMatches(store, { fmt: FORMATS.indexOf(fmtName), venue: venueIndexes, gender: gender === "female" ? 1 : gender === "male" ? 0 : null }) as number[], [store, venueIndexes, fmtName, gender]);
   const isTop = market === "top_batter";
   const rep = useMemo(() => (isTop || !ms.length ? null : marketReport(store, ms, market)), [store, ms, market, isTop]);
   const tops = useMemo(() => (isTop && ms.length ? (topBatters as any)(store, ms, { scope: "match" }) : null), [store, ms, isTop]);

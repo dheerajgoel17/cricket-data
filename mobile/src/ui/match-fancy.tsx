@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
-import { FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
+import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { fancyShareText } from "@cricket/engine/share-text.js";
@@ -69,7 +69,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   const scope = scopes.some(([v]) => v === sc) ? Number(sc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
   const keys = (scope < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][];
-  const keyList = keys.flatMap(([k, lab]) => (scope < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn), lab].filter(Boolean).join(" · ")] as [string, string]));
+  const keyList = keys.flatMap(([k, lab]) => (scope < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc, fxInfo, k, team?.[0] ?? null, inn), inn, scope) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
   const fm = keyList.some(([k]) => k === fmId) ? fmId : keyList[0]?.[0] || "";
   const { key, inn } = parseFm(fm) as { key: string; inn: number };
   const marketLabel = (k: string) => keys.find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : (((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string));
@@ -147,7 +147,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     const lean = pO != null && pU != null && pO !== pU ? (pO > pU ? "over" : "under") : null;
     const vms = venueIdx.length ? (batFirstNow ? (firstInnsMs(store, hereMatches(10), scope) as number[]) : hereMatches(10)) : [];
     const url = shareFixtureUrl(SITE_URL, fx.id);
-    const text = (fancyShareText as any)({ a: fx.a, b: fx.b, label: [innTag(inn), team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
+    const text = (fancyShareText as any)({ a: fx.a, b: fx.b, label: [innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
     void Share.share({ message: text || url, title: `${fx.a} v ${fx.b}` });
   };
 
@@ -225,7 +225,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
               <View style={{ gap: space.stack }}>
                 <View style={styles.titleRow}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.h3}>{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</Text>
+                    <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
                     <Text style={styles.note}>last {rep.n} matches</Text>
                   </View>
                   <Press scale={1} onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>

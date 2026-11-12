@@ -41,7 +41,7 @@ export function PairPage() {
         <Field label="Batter 1"><PlayerPicker placeholder="Batter 1 (e.g. Duckett)" initial={a} onPick={setA} /></Field>
         <Field label="Batter 2"><PlayerPicker placeholder="Batter 2 (e.g. Banton)" initial={b} onPick={setB} /></Field>
         <Field label="Format"><NativeSelect name="fmt" options={[["", "auto"], ...FORMATS.map((f: string) => [f, f] as [string, string])]} defaultValue={fmt} onChange={(e) => setFmt(e.target.value)} /></Field>
-        <Field label="Opening pair only"><label className="flex h-10 items-center"><Checkbox checked={open} onCheckedChange={(v) => setOpen(v === true)} /></label></Field>
+        <Field label="Opening pair only"><span className="flex h-10 items-center"><Checkbox checked={open} onCheckedChange={(v) => setOpen(v === true)} /></span></Field>
         <Field label="Opposition"><Input list="dl-teams" value={opp} onChange={(e) => setOpp(e.target.value)} className="w-40" /></Field>
         <Field label="Venue"><Input list="dl-venues" value={ven} onChange={(e) => setVen(e.target.value)} className="w-44" /></Field>
         <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={vt} onChange={(e) => setVt(e.target.value)} /></Field>

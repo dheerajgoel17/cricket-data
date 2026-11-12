@@ -30,9 +30,10 @@ const FRAME_MS = 8, REST_MS = 4;
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
 export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Date.now(), onRows }: { store: any; rz: any; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void }): Promise<Row[]> {
   const todays = hotLines(lines || [], scope, now);
-  // one row per player, stat and match: a series has several matches between the same sides, each priced on its own
+  // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one (that stays: it is the bet we settle).
+  const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
   const keys = new Map<string, any>();
-  for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}`, l);
+  for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}|${isLive(l) ? "live" : ""}`, l);
   const year = String(new Date().getFullYear());
   const out: Row[] = [];
   const byChip = new Map<string, any[]>();
@@ -43,7 +44,7 @@ export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Da
     const idx = store.P.id.indexOf(l.pid);
     const inn = lineScope(l);
     const chip = matchChipId(l.match, l.start_utc, l.fmt);
-    const b = bookLinesFor({ lines: byChip.get(chip) ?? [] }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
+    const b = bookLinesFor({ lines: (byChip.get(chip) ?? []).filter((x: any) => isLive(x) === isLive(l)) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
     if (idx < 0 || !b) return;
     const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
     const tp = Date.now();

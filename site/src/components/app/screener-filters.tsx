@@ -61,7 +61,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
       <SheetContent side={wide ? "right" : "bottom"} showCloseButton={false}
         className={wide ? "w-[26rem] max-w-full gap-0 border-l border-hairline sm:max-w-[26rem]" : "h-dvh max-h-dvh gap-0 rounded-none border-0 pt-[env(safe-area-inset-top)]"}>
         <header className="flex h-header shrink-0 items-center justify-between gap-snug border-b border-hairline px-gutter">
-          <SheetTitle className="text-title font-bold tracking-tight">Filters{active ? <span className="ml-snug rounded-full bg-primary px-snug py-hair text-footnote font-bold text-primary-foreground">{active}</span> : null}</SheetTitle>
+          <SheetTitle className="text-title font-bold tracking-tight">Filters{active ? <span aria-hidden className="ml-snug rounded-full bg-primary px-snug py-hair text-footnote font-bold text-primary-foreground">{active}</span> : null}</SheetTitle>
           <SheetDescription className="sr-only">Narrow the props by day, match, team, format, competition, hit rate and sort order.</SheetDescription>
           <button type="button" aria-label="Close filters" onClick={() => onOpenChange(false)} className="grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring"><XMarkIcon className="size-5" /></button>
         </header>

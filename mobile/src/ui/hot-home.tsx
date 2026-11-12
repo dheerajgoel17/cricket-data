@@ -24,7 +24,7 @@ import { OverviewRow } from "@/ui/fancy-row";
 import { ChevronRight } from "@/ui/icons";
 import { MatchChips } from "@/ui/match-chip";
 import { MarketTape, type TapeRow } from "@/ui/market-tape";
-import { Working } from "@/ui/motion";
+import { Skeleton, Working } from "@/ui/motion";
 import { PropRow } from "@/ui/prop-row";
 import { color, space, type } from "@/ui/tokens";
 
@@ -52,7 +52,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
   const { cards, ready: fancyReady } = useFancyCards(!isLoading && !scoring);
 
-  const props = useMemo(() => rows.filter((r) => r.l10.played >= 6), [rows]);
+  const props = useMemo(() => rows.filter((r) => r.l10.played >= 6 || r.quotes?.some((q: any) => q.live)), [rows]);
 
   const fancyById = useMemo(() => {
     const m = new Map<string, { r: any; f: any }[]>();
@@ -71,7 +71,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
       const fancy = fancyById.get(f.id) || [];
       const liveNow = stateOf(f) === "live";
       const items = mixHomeRows<MixItem>([
-        ...players.map((r) => ({ kind: "player" as const, key: `p:${r.idx}:${r.stat}:${r.start}:${r.inn}`, live: liveNow, edge: r.edge ?? null, p: sideRate(r.l10.p, r.side) ?? 0, r })),
+        ...players.map((r) => ({ kind: "player" as const, key: `p:${r.idx}:${r.stat}:${r.start}:${r.inn}${r.quotes?.some((q: any) => q.live) ? ":L" : ""}`, live: liveNow, edge: r.edge ?? null, p: sideRate(r.l10.p, r.side) ?? 0, r })),
         ...fancy.map(({ r, f: fx }) => ({ kind: "fancy" as const, key: `f:${fx.id}:${r.id || r.key}:${r.inn || 0}`, live: liveNow, edge: r.edge ?? null, p: r.played ? r.hits / r.played : 0, r, f: fx })),
       ], PER);
       if (items.length) out.push({ f, items });
@@ -142,7 +142,21 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   );
 }
 
+/** The Props section before the schedule is in: its real title with the loading rows under it, so the rail's cards and the rows load together, not one after the other. */
+export function HotHomeSkeleton() {
+  return (
+    <View style={styles.wrap}>
+      <View style={[styles.head, styles.pad]}>
+        <Text style={styles.headTitle}>Props</Text>
+        <View style={styles.links}><Skeleton style={styles.skLink} /><Skeleton style={styles.skLink} /></View>
+      </View>
+      <Working label="Loading today's lines…" rows={4} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  skLink: { width: 54, height: 12, borderRadius: 6 },
   wrap: { gap: space.group, paddingTop: space.group },
   pad: { paddingHorizontal: space.gutter },
   body: { gap: space.stack },

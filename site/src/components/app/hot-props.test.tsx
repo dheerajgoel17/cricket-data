@@ -40,7 +40,7 @@ function fakeStore(players: number, nshard: number) {
 function run(day = 0, teams?: [string, string], inns: "all" | "first" | "second" = "all") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const wrapper = ({ children }: { children: ReactNode }) => createElement(QueryClientProvider, { client }, children);
-  return renderHook((p: { day: number }) => useHotRows(undefined, teams, p.day, inns), { wrapper, initialProps: { day } });
+  return { ...renderHook((p: { day: number }) => useHotRows(undefined, teams, p.day, inns), { wrapper, initialProps: { day } }), client };
 }
 const flush = () => act(async () => { await vi.advanceTimersByTimeAsync(0); });
 const settle = () => act(async () => { await vi.advanceTimersByTimeAsync(2000); });
@@ -131,6 +131,27 @@ describe("useHotRows", () => {
     await settle();
     expect(result.current.data).toHaveLength(36);
     expect(result.current.scoring).toBe(false);
+  });
+
+  it("keeps the complete props list visible until a new live snapshot is scored", async () => {
+    env.store = fakeStore(2, 2);
+    env.doc = { ...env.doc, lines: [line("id0", at(28, 19))] };
+    const { result, client } = run(0);
+    await flush();
+    env.store.land(0);
+    await settle();
+    expect(result.current.data?.map((r) => r.over)).toEqual([1.9]);
+
+    const updated = { ...env.doc.lines[0], books: [{ over: 2.1, under: 1.8 }] };
+    act(() => client.setQueryData(["lines"], { ...env.doc, live_sig: "next", lines: [updated, line("id1", at(28, 19))] }));
+    await settle();
+    expect(env.store.requested).toEqual([0, 1]);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data?.map((r) => r.over)).toEqual([1.9]);
+
+    env.store.land(1);
+    await settle();
+    expect(result.current.data?.map((r) => r.over).sort()).toEqual([1.9, 2.1]);
   });
 
   it("a fixture page scores just its own match", async () => {

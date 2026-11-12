@@ -49,7 +49,7 @@ import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 import { LineStepper } from "@/components/app/line-stepper";
 import { OutcomeDonut } from "@/components/app/viz";
-import { Tick } from "@/components/app/tick";
+import { Tick, TrendArrow } from "@/components/app/tick";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
@@ -74,7 +74,7 @@ function Metric({ k, v, tone, className, text }: { k: string; v: ReactNode; tone
 
 /** A value with a small trend arrow: green up when it beats the line, red down when it does not (no arrow when there is nothing to compare). */
 function Arrow({ up, children }: { up: boolean | null; children: ReactNode }) {
-  return <span className="inline-flex items-center gap-hair">{up == null ? null : <span aria-hidden className={cn("text-footnote", up ? "text-primary" : "text-miss")}>{up ? "▲" : "▼"}</span>}{children}</span>;
+  return <span className="inline-flex items-center gap-hair">{up == null ? null : <TrendArrow up={up} />}{children}</span>;
 }
 
 /** Hit-rate ring: green from 60%, amber from 40%, red below. */

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, type FormEvent, type ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 export type Q = Record<string, string>;
@@ -20,7 +19,7 @@ export function useQ(): [Q, (patch: Record<string, unknown>, opts?: { replace?: 
 export const useGo = () => { const nav = useNavigate(); return (path: string, q: Record<string, unknown> = {}) => { const qs = new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== "").map(([k, v]) => [k, String(v)])).toString(); nav(`/${path}${qs ? `?${qs}` : ""}`); }; };
 
 export const Field = ({ label, children, className }: { label: string; children: ReactNode; className?: string }) => (
-  <div className={cn("grid gap-1.5", className)}><Label className="text-xs text-muted-foreground">{label}</Label>{children}</div>
+  <label className={cn("grid gap-1.5", className)}><span className="text-xs font-medium text-muted-foreground">{label}</span>{children}</label>
 );
 
 /** Filters apply as you change them (no Update button): selects, checkboxes and dates on change, typed fields shortly after you stop. */

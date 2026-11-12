@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mark } from "@/lib/perf";
 import { StyleSheet, View } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { scoreLabel } from "@cricket/engine/live.js";
@@ -12,7 +11,7 @@ import type { RailItem } from "@/lib/rail";
 import { ChevronRight } from "@/ui/icons";
 import { LiveDot } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, radius, space, type } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
 function LiveScore({ s, dim }: { s: any | null; dim?: boolean }) {
@@ -33,7 +32,6 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
   const place = city(f.venue);
   return (
     <Press disabled={!link || !f.id} onPress={() => openFixture(f)} accessibilityRole="link" accessibilityLabel={`${f.a} v ${f.b}`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      {m.live ? <LinearGradient pointerEvents="none" colors={["rgba(255,69,58,0.2)", "rgba(255,69,58,0)"]} start={{ x: 0, y: 0 }} end={{ x: 0.85, y: 0.65 }} style={[StyleSheet.absoluteFill, { borderRadius: radius.card }]} /> : null}
       <View style={styles.meta}>
         {m.session ? (
           <Text style={[styles.cap, styles.red]}>{m.session}</Text>
@@ -74,7 +72,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
 }
 
 const styles = StyleSheet.create({
-  card: { flex: 1, ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.snug, justifyContent: "space-between" },
+  card: { flex: 1, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug, justifyContent: "space-between" },
   pressed: { backgroundColor: color["surface-hover"] },
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color.foreground, ...cap },

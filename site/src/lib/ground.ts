@@ -137,7 +137,7 @@ export function groundGames(store: any, fixtures: any[] | undefined, venue?: str
   const past = (venue ? historyAtVenue(store, venue) : []).filter((f) => !seen.has(f._key));
   const liveish = scheduled.slice().sort((a: any, b: any) => (a.start < b.start ? 1 : a.start > b.start ? -1 : 0));
   const atGround = [...liveish, ...past];
-  return { primary, label, known: primary >= 0 || atGround.length > 0, atGround };
+  return { primary, venueIndices: ixs, label, known: primary >= 0 || atGround.length > 0, atGround };
 }
 
 /** The format with most games at the ground (the page opens on it). */

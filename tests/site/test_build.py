@@ -438,6 +438,20 @@ def test_a_priced_test_day_is_not_a_second_fixture_beside_the_schedules_test(tmp
     assert [r["start"] for r in B._unscheduled_priced(vb, t20, now=now)] == ["2026-10-29T03:30Z", "2026-11-10T03:30Z"]  # a T20 a day apart is another match
 
 
+def test_duplicate_unscheduled_archive_starts_across_midnight_publish_one_fixture(tmp_path):
+    from datetime import datetime, timezone
+
+    arc = tmp_path / "archive" / "2026-11"
+    arc.mkdir(parents=True)
+    for start in ("2026-11-10T21:50:00Z", "2026-11-11T01:50:00Z", "2026-11-12T01:50:00Z"):
+        (arc / f"{start[:10]}.json").write_text(json.dumps({
+            "match": "SCG Gov XI vs ADF Tour", "start_utc": start, "fixture": None, "lines": [],
+        }))
+    rows = B._unscheduled_priced(tmp_path / "out", [], now=datetime(2026, 11, 11, 2, tzinfo=timezone.utc))
+    assert [r["start"] for r in rows] == ["2026-11-10T21:50Z", "2026-11-12T01:50Z"]
+    assert len(list(arc.glob("*.json"))) == 3
+
+
 def test_a_priced_test_the_schedule_dropped_comes_back_from_its_archive(tmp_path):
     from datetime import datetime, timezone
 
@@ -689,7 +703,7 @@ def test_a_book_that_names_a_youth_match_by_its_competition_alone_is_not_a_secon
     now = datetime(2026, 11, 10, 6, 0, tzinfo=timezone.utc)
     listed = [{"start": "2026-11-10T05:00Z", "fmt": "ODI", "a": "India U19", "b": "United Arab Emirates U19"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
-    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19", "India U19"]  # with no schedule row the stop-gap at least carries the youth tag
+    assert [r["a"] for r in B._unscheduled_priced(vb, [], now=now)] == ["India U19"]  # the single fallback keeps the youth tag
 
 
 def test_a_feed_that_names_a_priced_match_with_other_team_names_is_not_a_second_fixture(tmp_path):

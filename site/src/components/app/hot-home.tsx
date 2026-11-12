@@ -18,7 +18,7 @@ import { PropRow, useHotRows } from "./hot-props";
 import { MarketTape } from "./market-tape";
 import { PillGroup } from "./pill-group";
 import { mixHomeRows } from "@/lib/hot-lines";
-import { fancyMarketPath } from "@/lib/fancy-path";
+import { fancyRowPath } from "@/lib/fancy-path";
 import { lineHomePhase, phaseOf, type HomePhase } from "@/lib/home-phase";
 import { RowsSkeleton, TapeSkeleton } from "./skeletons";
 
@@ -48,7 +48,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const outOf = (r: any) => lineNotIn(matchOf(r), asLine(r), identity);
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
 
-  const props = useMemo(() => data.map((r) => ({ ...r, ...modelSide(r.l10, r.prior, r.over, r.under) })).filter((r) => r.l10.played >= 6 && (!phase || lineHomePhase(r, live.data) === phase)), [data, live.data, phase]);
+  const props = useMemo(() => data.map((r) => ({ ...r, ...modelSide(r.l10, r.prior, r.over, r.under) })).filter((r) => r.l10.played >= 6 && !outOf(r) && (!phase || lineHomePhase(r, live.data) === phase)), [data, live.data, identity, phase]);
 
   const fancyById = useMemo(() => {
     const m = new Map<string, { r: any; f: any }[]>();
@@ -106,13 +106,13 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
           />
           {block ? (
             <ul className="-mx-gutter">
-              {block.items.map((item, i) => item.kind === "player"
-                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" i={i} soFar={soFarOf(item.r)} out={outOf(item.r)} hideMatch />
+              {block.items.map((item) => item.kind === "player"
+                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
                 : (
                   <li key={item.key} className="border-t border-hairline">
                     <OverviewRow
                       r={item.r}
-                      onOpen={() => nav(fancyMarketPath(item.f.id, { fm: item.r.inn ? `${item.r.key}:${item.r.inn}` : item.r.key, sc: item.r.scope >= 0 ? item.r.scope : null }))}
+                      onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
                     />
                   </li>
                 ))}

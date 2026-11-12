@@ -51,16 +51,43 @@ export function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
   );
 }
 
-/** The loading rows of a list: a round picture and two lines each. */
+const W1 = ["46%", "38%", "54%", "42%", "50%"];
+const W2 = ["72%", "64%", "78%", "68%", "60%"];
+
+/** The loading rows of a list, drawn like a prop row (picture, name, the line, a small footnote, the edge on the right, a hairline between), each a little fainter than the one above. */
 export function RowsSkeleton({ rows = 3 }: { rows?: number }) {
   return (
-    <View style={styles.rows}>
+    <View>
       {Array.from({ length: rows }, (_, k) => (
-        <View key={k} style={styles.skRow}>
+        <View key={k} style={[styles.skRow, k > 0 && styles.skSep, { opacity: Math.max(0.45, 1 - k * 0.14) }]}>
           <Skeleton style={styles.skAvatar} />
-          <View style={styles.skText}><Skeleton style={styles.skLine} /><Skeleton style={[styles.skLine, { width: "55%" }]} /></View>
+          <View style={styles.skText}>
+            <Skeleton style={[styles.skLine, { width: W1[k % 5] }]} />
+            <Skeleton style={[styles.skBig, { width: W2[k % 5] }]} />
+            <Skeleton style={[styles.skLine, { width: "34%", height: 9 }]} />
+          </View>
+          <View style={styles.skSide}><Skeleton style={styles.skEdge} /><Skeleton style={styles.skTag} /></View>
         </View>
       ))}
+    </View>
+  );
+}
+
+/** The loading card of the Home rail: the fixture card's surface, a small header line, two sides with a crest and a score each, and the footer. */
+export function CardSkeleton({ width }: { width: number }) {
+  return (
+    <View style={[styles.skCard, { width }]}>
+      <View style={styles.skMeta}><Skeleton style={[styles.skLine, { width: 70 }]} /><Skeleton style={[styles.skLine, { width: 110 }]} /></View>
+      <View style={styles.skSides}>
+        {[0, 1].map((k) => (
+          <View key={k} style={styles.skSide2}>
+            <Skeleton style={styles.skCrest} />
+            <Skeleton style={[styles.skTeam, { width: k ? "34%" : "42%" }]} />
+            <Skeleton style={styles.skScore} />
+          </View>
+        ))}
+      </View>
+      <View style={styles.skMeta}><Skeleton style={[styles.skLine, { width: "52%" }]} /><Skeleton style={[styles.skLine, { width: 44 }]} /></View>
     </View>
   );
 }
@@ -80,12 +107,23 @@ export function Working({ label, fill, rows = 3 }: { label: string; fill?: boole
 const styles = StyleSheet.create({
   clip: { overflow: "hidden" },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: color.destructive },
-  skeleton: { backgroundColor: color.card, borderRadius: radius.card },
-  rows: { gap: space.stack, paddingHorizontal: space.gutter },
-  skRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  skAvatar: { width: 36, height: 36, borderRadius: 18 },
-  skText: { flex: 1, gap: space.tight },
-  skLine: { height: 12, borderRadius: 6, width: "80%" },
+  skeleton: { backgroundColor: "rgba(255,255,255,0.09)", borderRadius: radius.card },
+  skRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
+  skSep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  skAvatar: { width: 44, height: 44, borderRadius: 22 },
+  skText: { flex: 1, gap: 7 },
+  skLine: { height: 10, borderRadius: 5 },
+  skBig: { height: 18, borderRadius: 6 },
+  skSide: { alignItems: "flex-end", gap: 8 },
+  skEdge: { width: 46, height: 18, borderRadius: 6 },
+  skTag: { width: 28, height: 9, borderRadius: 4.5 },
+  skCard: { flexShrink: 0, height: 190, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, justifyContent: "space-between" },
+  skMeta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  skSides: { gap: space.snug },
+  skSide2: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  skCrest: { width: 36, height: 36, borderRadius: 18 },
+  skTeam: { height: 14, borderRadius: 7 },
+  skScore: { width: 56, height: 14, borderRadius: 7, marginLeft: "auto" },
   working: { alignSelf: "stretch", paddingVertical: space.stack },
   workingFill: { flex: 1, minHeight: 280 },
 });

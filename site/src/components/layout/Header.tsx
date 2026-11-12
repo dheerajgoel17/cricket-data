@@ -85,15 +85,15 @@ export function Header() {
         <SidebarTrigger className="-ml-2 hidden text-foreground hover:bg-muted hover:text-foreground lg:inline-flex" aria-label="Toggle sidebar" />
         {down && <button type="button" aria-label="Back" onClick={back} className="-ml-2 grid size-(--touch) shrink-0 place-items-center rounded-full text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted lg:hidden"><ChevronLeftIcon className="size-6" /></button>}
         {own ? null : <Brand />}
-        {own ? null : <SearchField onOpen={() => search.setOpen(true)} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />}
+        {own ? null : <SearchField onOpen={search.show} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />}
         <div ref={slot?.setEl} className={own ? "ml-auto flex shrink-0 items-center gap-snug" : "hidden"} />
         {own ? null : <div className="ml-auto flex shrink-0 items-center gap-snug">
-          <button type="button" aria-label="Search" onClick={() => search.setOpen(true)} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
+          <button type="button" aria-label="Search" onClick={search.show} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
           <AccountControl />
           <span className="hidden lg:contents"><SavedLink /></span>
         </div>}
       </div>
-      <SearchDialog open={search.open} onOpenChange={search.setOpen} />
+      <SearchDialog open={search.open} onOpenChange={search.setOpen} onCloseAutoFocus={search.restoreFocus} />
     </header>
   );
 }

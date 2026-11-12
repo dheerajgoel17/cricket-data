@@ -1,3 +1,5 @@
+import { fancyFm } from "@cricket/engine/fancy-edge.js";
+
 /** Path to one fancy market's page (like `/player/:id` for a prop). Query carries the market, scope, sample window and ground switch. */
 export function fancyMarketPath(id: string, o: { fm: string; sc?: number | string | null; mw?: number | string | null; mv?: string | null; ml?: number | string | null }) {
   const q = new URLSearchParams();
@@ -8,4 +10,15 @@ export function fancyMarketPath(id: string, o: { fm: string; sc?: number | strin
   if (o.ml != null && o.ml !== "") q.set("ml", String(o.ml));
   const s = q.toString();
   return `/fixture/${encodeURIComponent(id)}/fancy${s ? `?${s}` : ""}`;
+}
+
+
+/** Open the market and the exact line displayed on its row. */
+export function fancyRowPath(id: string, row: {
+  key: string; inn?: number; scope: number; line: number;
+  side?: "over" | "under" | null; overLine?: number | null; underLine?: number | null;
+}, filters?: { mw?: number; mv?: string }) {
+  const split = row.overLine != null && row.underLine != null && row.overLine !== row.underLine;
+  const ml = split ? (row.side === "under" ? row.underLine : row.overLine) : row.line;
+  return fancyMarketPath(id, { ...filters, fm: fancyFm(row.key, row.inn || 0), sc: row.scope, ml });
 }

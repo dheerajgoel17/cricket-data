@@ -4,7 +4,6 @@ import { track } from "@/lib/analytics";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
@@ -70,9 +69,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const fixtures = useFixtures(); // each match's ground, for the venue window
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const key = ["hot-props", inns, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", today, archive ? `${teams?.join("|")}|${doc.data?.lines?.length}` : "", teams ? teams.join("|") : day];
+  const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
+  const scopeKey = ["hot-props", scope] as const;
+  const key = [...scopeKey, fixtures.isLoading, doc.data?.generated_at_utc, doc.data?.live_sig ?? "", archive ? doc.data?.lines?.length : null];
   const rows = useQuery({
     queryKey: key,
+    placeholderData: (previous, query) => query?.queryKey[1] === scope ? previous : undefined,
     enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<Row[]> => {
@@ -114,9 +116,12 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
       // Later files come several at a time. A few plans run at once, giving the main thread back in between. Rows are published as they land.
       const yieldToMain = () => new Promise<void>((r) => { const s = (globalThis as any).scheduler; if (s?.yield) s.yield().then(r); else setTimeout(r, 0); });
+      // Keep a complete snapshot visible while its replacement is scored. Only the
+      // first load of a scope streams partial rows as player files arrive.
+      const refreshing = qc.getQueriesData<Row[]>({ queryKey: scopeKey }).some(([, data]) => data !== undefined);
       let published = 0;
       const publish = () => {
-        if (!out.length || (published && Date.now() - published < PUBLISH_MS)) return;
+        if (refreshing || !out.length || (published && Date.now() - published < PUBLISH_MS)) return;
         published = Date.now();
         qc.setQueryData(key, [...out]);
       };
@@ -132,7 +137,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   });
   const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
-  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching, otherDay };
+  return { ...rows, isLoading: rows.isLoading || (!rows.data && !rows.isError), scoring: rows.isFetching && !rows.isPlaceholderData, otherDay };
 }
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
@@ -141,33 +146,48 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 
 /** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
-export function BookQuotes({ quotes, className }: { quotes: Quote[]; className?: string }) {
+export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; className?: string; rowLine?: number }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const [top, ...rest] = quotes;
   if (!top) return null;
+  const compact = rowLine != null;
+  const comparison = compact ? quotes : rest;
+  const underLine = top.underAt?.line ?? top.line;
+  const underPrice = top.underAt?.price ?? top.under;
   return (
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
-        <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
+        <span className={cn("inline-flex flex-wrap items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
           <BookBadge source={top.source} />{" "}
-          {top.over == null
+          {compact ? (
+            <>
+              <span className="inline-flex items-center gap-tight">
+                <span className="text-muted-foreground">Over{top.over != null && top.line !== rowLine ? ` ${top.line}` : ""}</span>
+                <Tick quiet value={top.over} className="text-body font-bold text-foreground">{odds(top.over)}</Tick>
+              </span>
+              <span className="inline-flex items-center gap-tight">
+                <span className="text-muted-foreground">Under{underPrice != null && underLine !== rowLine ? ` ${underLine}` : ""}</span>
+                <Tick quiet value={underPrice} className="text-body font-bold text-foreground">{odds(underPrice)}</Tick>
+              </span>
+            </>
+          ) : top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
-            : <><span className="font-bold">O {top.line}</span> <Tick value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
-          {top.best && <span className="sr-only"> (lowest line, best price)</span>}
+            : <><span className="font-bold">O {top.line}</span> <Tick quiet value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
+          {!compact && top.best && <span className="sr-only"> (lowest line, best price)</span>}
         </span>
-        {top.live && <LiveOpened opened={top.opened} line={top.line} />}
-        {rest.length > 0 && (
-          <button type="button" aria-expanded={open} aria-controls={id} className="inline-flex items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
+        {top.live && <LiveOpened opened={top.opened} line={top.line} label={compact ? "Opened at" : undefined} />}
+        {comparison.length > 0 && (
+          <button type="button" aria-expanded={open} aria-controls={id} className="relative z-10 inline-flex min-h-8 items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
-            {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
+            {open ? "Hide prices" : compact ? (quotes.length === 1 ? "Book prices" : `Compare ${quotes.length} books`) : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
         )}
       </div>
             {open && (
-        <table id={id} className="w-full max-w-sm text-left font-condensed">
+        <table id={id} className="relative z-10 w-full max-w-sm text-left font-condensed">
           <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{rest.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
+          <tbody>{comparison.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick quiet value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
         </table>
       )}
     </div>
@@ -179,35 +199,34 @@ function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boo
   const quote = r.quotes.find((q) => q.live);
   return (
     <>
-      <LineProgress standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
+      <LineProgress quiet standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
       {quote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
     </>
   );
 }
 
 /** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
-export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; i: number; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
+export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
-  const side = r.side === "under" ? "U" : "O";
   const ground = win !== "ven" ? groundNote(r.ven) : null;
   return (
-    <motion.li className="relative border-t border-hairline first:border-t-0" layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.025, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
-      <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`}
-        className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", out && "opacity-60")}>
+    <li className="relative border-t border-hairline first:border-t-0">
+      <div className="grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left">
         <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
         <span className="grid min-w-0 gap-hair">
           <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
-            <span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span>
+            <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`} className="truncate outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring"><PlayerName idx={r.idx} fallback={r.name} /></Link>
             <TeamFlag name={r.team} />
-            {r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
+            {!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
             {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{side} {r.line}</span>
+            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `O/U ${r.line}`}</span>
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
-          {r.quotes.length > 0 ? <BookQuotes quotes={r.quotes} /> : r.over > 1 ? <Tick value={r.over} className="font-condensed text-callout font-bold tabular-nums text-primary">{odds(r.over)}</Tick> : null}
+          {!out && (r.quotes.length ? <BookQuotes quotes={r.quotes} rowLine={r.line} /> : (
+            <span className="font-condensed text-callout tabular-nums text-muted-foreground">Over <b className="text-foreground">{odds(r.over)}</b> · Under <b className="text-foreground">{odds(r.under)}</b></span>
+          ))}
           <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
@@ -216,18 +235,18 @@ export function PropRow({ r, win, wl, i, soFar, out, hideMatch }: { r: Row; win:
           </span>
         </span>
         <span className="grid self-start justify-items-end gap-hair pt-control">
-          <span className="grid justify-items-end gap-hair text-right">
+          {!out && <span className="grid justify-items-end gap-hair text-right">
             <span className="flex items-baseline gap-tight whitespace-nowrap">
               <span className="label-cap text-caption text-muted-foreground">Model</span>
-              <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+              <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
             {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
-          </span>
+          </span>}
           <Spark r={r} />
         </span>
-      </Link>
-      <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
-    </motion.li>
+      </div>
+      <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute z-10 right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
+    </li>
   );
 }
 
@@ -273,29 +292,29 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
             const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
             const ground = shortVenue(r.venue);
             return (
-              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} tabIndex={0} role="link"
-                className={cn("cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover", out && "opacity-60")}
-                onClick={() => nav(to)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); nav(to); } }}>
+              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`}
+                className="cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover"
+                onClick={() => nav(to)}>
                 <td className="px-snug py-snug">
                   <span className="flex items-center gap-snug">
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0 gap-hair">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><span className="truncate"><PlayerName idx={r.idx} fallback={r.name} /></span><TeamFlag name={r.team} />{r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-                        <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{r.side === "under" ? "U" : "O"} {r.line}</span>
+                        <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{out ? r.line : `${r.side === "under" ? "Under" : "Over"} ${r.line}`}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
                       </span>
-                      {r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+                      {!out && r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
                       <PropProgress r={r} soFar={soFar} out={out} />
                     </span>
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums"><Tick value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</td>
+                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums">{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-condensed text-title font-bold tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-medium text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
+                <td className={cn("px-snug py-snug text-right font-condensed text-title font-bold tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-medium text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
                 <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
@@ -307,7 +326,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
 }
 
 /** "Hot player props" for the selected day's matches (today by default, any of the next 10 days from Filters), in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
-export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; heading?: string; phase?: HomePhase; syncUrl?: boolean } = {}) {
+export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams?: [string, string]; start?: string; fmt?: string; archive?: any; phase?: HomePhase; syncUrl?: boolean } = {}) {
   // The screener's filters: in the URL on the Props page (a link or a refresh restores the view, and going to a player and back keeps it), plain state elsewhere (home, a fixture's own page).
   const [params, setParams] = useSearchParams();
   const [local, setLocal] = useState<Screener>(DEFAULTS);
@@ -336,7 +355,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   const matchOf = (r: Row) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt }); };
   const asLine = (r: Row) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: Row): SoFar | null => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });
-  const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
+
   const matchKey = sc.match;
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string; fmt?: string; series?: string }>();
@@ -361,9 +380,13 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   }, [data]);
   const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
-  const scored = useMemo(() => (data || []).map((r) => ({ ...r, ...modelSide(r[win], r.prior, r.over, r.under), live: matchOf(r)?.status === "live" }))
+  const scored = useMemo(() => (data || []).map((r) => {
+    const match = matchOf(r);
+    const out = lineNotIn(match, asLine(r), identity);
+    return { ...r, ...modelSide(r[win], r.prior, r.over, r.under), out, live: match?.status === "live" };
+  })
     .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && enoughHistory(r, win, need)),
-  [data, stat, win, need, day, teams, start, fmt, live.data, pick]); // eslint-disable-line react-hooks/exhaustive-deps
+  [data, stat, win, need, day, teams, start, fmt, live.data, identity, pick]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => order(narrow(scored, sc), sc).slice(0, MAX_ROWS), [scored, sc]);
   // what the filter view may offer: the values the day's rows really have
   const dayRows = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : r.day === Number(day))), [data, teams, day, start]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -381,8 +404,7 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
-      {heading ? <h1 className="hidden text-display font-bold tracking-tight lg:block">{heading}</h1> : null}
-      {!waiting ? <div className="hidden lg:block"><MarketTape rows={tapeRows} /></div> : null}
+      {!waiting ? <div className="hidden lg:block"><MarketTape quiet rows={tapeRows} /></div> : null}
       {urlState && !isLoading && (
         <PillGroup layoutId="hot-day" label="Day" value={day} onChange={(v) => update({ day: v, match: "all" })} items={hotDayLabels()} className="min-w-0" />
       )}
@@ -402,8 +424,8 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
       <div className="flex items-center gap-snug">
         <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
         <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-          className={cn("relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none", urlState && "hidden lg:inline-flex")}>
-          <AdjustmentsHorizontalIcon className="size-4" />{wl}
+          className="relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+          <AdjustmentsHorizontalIcon className="size-4" />Filters
           {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
         </Button>
       </div>
@@ -428,25 +450,16 @@ export function HotProps({ teams, start, fmt, archive, heading, phase, syncUrl }
         ) : (
           <>
             <ul className="-mx-gutter lg:hidden">
-              <AnimatePresence mode="popLayout" initial={false}>
-                {rows.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} i={i} soFar={soFarOf(r)} out={outOf(r)} hideMatch={!!teams} />)}
-              </AnimatePresence>
+              {rows.map((r) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} soFar={soFarOf(r)} out={r.out} hideMatch={!!teams} />)}
             </ul>
             <div className="hidden lg:block">
-              <PropTable rows={rows} win={win} onWin={(w) => update({ win: w })} bars={bars} soFarOf={soFarOf} outOf={outOf} />
+              <PropTable rows={rows} win={win} onWin={(w) => update({ win: w })} bars={bars} soFarOf={soFarOf} outOf={(r) => lineNotIn(matchOf(r), asLine(r), identity)} />
             </div>
           </>
         )}
       </AnimatedHeight>
       {/* on a phone the rows come first and the tape follows them (it used to push the first prop below the fold) */}
-      {!waiting ? <div className="lg:hidden"><MarketTape rows={tapeRows} /></div> : null}
-      {urlState && (
-        <button type="button" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-          className="fixed right-gutter bottom-[calc(var(--tabbar-h)+env(safe-area-inset-bottom)+var(--space-stack))] z-50 grid size-(--fab) place-items-center rounded-full bg-primary text-primary-foreground shadow-(--shadow-fab) outline-none transition-transform focus-visible:ring-2 focus-visible:ring-ring active:scale-95 lg:hidden">
-          <AdjustmentsHorizontalIcon className="size-6" />
-          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-5 place-items-center rounded-full bg-foreground px-hair text-caption font-bold text-background">{active.length}</span>}
-        </button>
-      )}
+      {!waiting ? <div className="lg:hidden"><MarketTape quiet rows={tapeRows} /></div> : null}
     </section>
   );
 }
