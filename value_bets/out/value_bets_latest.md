@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-12 09:00 IST
+# Cricket value bets - 2026-11-12 09:32 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1763 prices
-- **smarkets**: ok, 482 prices
+- **moviodds_bet365**: ok, 1952 prices
+- **smarkets**: ok, 442 prices
 - **feedk**: ok, 244 prices, 6 events
-- **feedg**: ok, 40 prices, 5 events
-- **feede**: ok, 538 prices, 17 events
-- **feedh**: ok, 1182 prices, 32 events
-- **feedf**: ok, 422 prices, 17 events
+- **feedg**: ok, 32 prices, 5 events
+- **feede**: ok, 506 prices, 17 events
+- **feedh**: ok, 1070 prices, 32 events
+- **feedf**: ok, 352 prices, 16 events
 
-Matches starting in next 168h: **30**, markets priced: **415**, value bets: **1** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **29**, markets priced: **422**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,6 +26,6 @@ Matches starting in next 168h: **30**, markets priced: **415**, value bets: **1*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.8%, model 0.1278, market 0.1423
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 36.3%, model 0.1278, market 0.1432
 
-Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), USA (W) (female)
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Knight Fighters 11 (male), Lokseva Academy (male), Omr Checker (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), USA (W) (female)
 
-Runtime 229.1s. Snapshot: `odds_20261112T033036Z.jsonl.gz`
+Runtime 221.5s. Snapshot: `odds_20261112T040231Z.jsonl.gz`
