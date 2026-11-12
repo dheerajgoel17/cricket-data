@@ -22,5 +22,7 @@ export function syncAds(pathname: string) {
   }
 }
 
-/** The ad unit shown at the foot of an ad page: the slot id of a display unit made in AdSense (a public id, the repository variable `ADSENSE_SLOT`, inlined at build as `VITE_ADSENSE_SLOT`). Unset: no unit is drawn (Auto ads, if switched on in AdSense, still place ads themselves). */
-export const AD_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim().replace(/[^0-9]/g, "");
+/** The slot id of the display unit at the foot of an ad page ("stats footer" in AdSense). A public id, like the publisher above, so it lives in the code; the build variable `VITE_ADSENSE_SLOT` replaces it (another unit, or empty to draw none). */
+const DEFAULT_SLOT = "3081954637";
+const fromEnv = import.meta.env.VITE_ADSENSE_SLOT as string | undefined;
+export const AD_SLOT = String(fromEnv ?? DEFAULT_SLOT).trim().replace(/[^0-9]/g, "");

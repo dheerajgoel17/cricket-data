@@ -19,3 +19,8 @@ test("no unit on a page with prices, props or fancy lines, or without a slot id"
   expect(at("/leagues", "").container.querySelector("ins")).toBeNull();
   expect((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle).toBeUndefined();
 });
+
+test("the built-in slot is the stats footer unit, digits only", async () => {
+  const { AD_SLOT } = await import("@/lib/ads");
+  expect(AD_SLOT).toMatch(/^\d{10}$/);
+});
