@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-12 09:32 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-12 10:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Brisbane Heat Women|Melbourne Stars Women|2026-11-12",
+   "match": "Melbourne Stars vs Brisbane Heat",
+   "start_utc": "2026-11-12T04:40:00Z",
+   "start_ist": "2026-11-12 10:10 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_milestone",
+   "market": "Meg Lanning To Score 25",
+   "team_scope": "",
+   "selection": "Meg Lanning 25+ no",
+   "player_matched_as": "Meg Lanning",
+   "player_id": "27e003ce",
+   "player_team": "Melbourne Stars Women",
+   "stat": "runs",
+   "inn": 0,
+   "line": 24.5,
+   "side": "under",
+   "best_odds": 2.1,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 2.1,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.075,
+   "implied_prob": 0.4762,
+   "fair_odds": 1.988,
+   "fair_prob": 0.503,
+   "model_prob": 0.5765,
+   "market_prob": 0.443,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0564,
+   "edge_pct": 5.64,
+   "kelly_quarter_stake_pct": 1.28,
+   "n_sources": 1,
+   "confidence": "low",
+   "why": "Model 58% vs market 44% for 25+ runs; form 31.2 runs/inn recency-weighted T20 (n_eff 69.1; last 5: 56, 2, 41, 32, 71), bats in 98% of games played; at Junction Oval, Melbourne: 21 inns avg 28.5; weather: cloud cover 74%",
+   "notes": "1 market source(s) for fair price; model 0.576 vs market 0.443; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 69.1,
+    "expected": 31.16,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.98,
+    "venue_matched": "junction oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 60,
+    "cloud_pct": 74,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "617ecab4550026a1",
+   "alert_key": "female|Brisbane Heat Women|Melbourne Stars Women|2026-11-12|batter_milestone||Meg Lanning 25+ no|24.5|under",
+   "alerted_at_ist": "2026-11-12 10:03 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
