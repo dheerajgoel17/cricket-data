@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDownIcon, TableCellsIcon } from "@heroicons/react/24/outline";
+import { TableCellsIcon } from "@heroicons/react/24/outline";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
 import { playerPhotos } from "@/lib/assets";
@@ -315,19 +316,20 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
 }
 
 export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[] }) {
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
+  const [section, setSection] = useState("");
   return (
-    <div className="min-w-0 border-t border-hairline">
-      <button type="button" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}
-        className="flex min-h-control w-full items-center gap-snug bg-background/60 px-inset text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
-        <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-        {open ? "Hide scorecard" : "Full scorecard"}
-        <ChevronDownIcon className={cn("ml-auto size-4 shrink-0 text-muted-foreground transition-transform motion-reduce:transition-none", open && "rotate-180")} aria-hidden />
-      </button>
-      <div id={panelId} hidden={!open} className="border-t border-dashed border-hairline px-inset py-snug">
-        {open && <ScorecardBody match={match} teams={teams} />}
-      </div>
-    </div>
+    <Accordion type="single" collapsible value={section} onValueChange={setSection} className="min-w-0 border-t border-hairline">
+      <AccordionItem value="scorecard">
+        <AccordionTrigger className="min-h-control gap-snug rounded-none bg-background/60 px-inset py-tight text-callout hover:bg-surface-hover hover:no-underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&>svg]:motion-reduce:transition-none">
+          <span className="flex min-w-0 items-center gap-snug">
+            <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+            {section ? "Hide scorecard" : "Full scorecard"}
+          </span>
+        </AccordionTrigger>
+        <AccordionContent className="border-t border-dashed border-hairline px-inset py-snug">
+          <ScorecardBody match={match} teams={teams} />
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }
