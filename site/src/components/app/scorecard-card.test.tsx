@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
-import { FullScorecardLink, LiveBoard, ScorecardBody } from "./live-board";
+import { LiveBoard, ScorecardAccordion, ScorecardBody } from "./live-board";
 
 vi.mock("@/lib/data", () => ({ useData: () => ({ rz: { players: () => [] } }) }));
 
@@ -18,11 +18,17 @@ const inn = { n: 1, team: "Pakistan", runs: 281, wkts: 5, overs: 67.2, extras: {
 const match = { card: [inn], teams: [], players: [] };
 
 describe("Fixture scorecard", () => {
-  it("links directly to the innings page without rendering a second set of totals", () => {
-    render(<MemoryRouter><FullScorecardLink fixtureId="x" /></MemoryRouter>);
-    expect(screen.getByRole("link", { name: "Full scorecard" })).toHaveAttribute("href", "/fixture/x/scorecard");
+  it("opens and closes the innings tables inline without repeating totals while collapsed", () => {
+    render(<MemoryRouter><ScorecardAccordion match={match} /></MemoryRouter>);
+    const toggle = screen.getByRole("button", { name: "Full scorecard" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("table")).toBeNull();
     expect(screen.queryByText(/281/)).toBeNull();
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Hide scorecard" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getAllByRole("table")).toHaveLength(2);
+    fireEvent.click(toggle);
+    expect(screen.queryByRole("table")).toBeNull();
   });
 
   it("keeps batting and bowling on the full innings page", () => {

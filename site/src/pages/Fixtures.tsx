@@ -34,7 +34,7 @@ import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
-import { FullScorecardLink, LiveBoard, ScorecardBody, hasCard } from "@/components/app/live-board";
+import { LiveBoard, ScorecardAccordion, ScorecardBody, hasCard } from "@/components/app/live-board";
 import { RecentForm, recentForms } from "@/components/app/recent-form";
 import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
@@ -69,6 +69,7 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
   const badge = session || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
   const livePulse = on && !session;
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
+  const knownSides = sides.filter(([, i]) => i >= 0);
   const innings = liveCard(match);
   const scores = sides.map(([name]) => {
     const score = teamScore(match, name);
@@ -116,8 +117,8 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
           {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
         </div>
-        {on && <LiveBoard match={match} teams={sides.filter(([, i]) => i >= 0)} />}
-        {hasCard(match) && <FullScorecardLink fixtureId={f.id} />}
+        {on && <LiveBoard match={match} teams={knownSides} />}
+        {hasCard(match) && <ScorecardAccordion key={f.id} match={match} teams={knownSides} />}
       </div>
     </section>
   );

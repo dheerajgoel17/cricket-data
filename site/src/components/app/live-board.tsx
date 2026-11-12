@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRightIcon, TableCellsIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
@@ -314,13 +314,20 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   );
 }
 
-export function FullScorecardLink({ fixtureId }: { fixtureId: string }) {
+export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[] }) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
   return (
-    <Link to={`/fixture/${fixtureId}/scorecard`}
-      className="flex min-h-control items-center gap-snug rounded-lg bg-background/60 px-snug text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring">
-      <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-      Full scorecard
-      <ChevronRightIcon className="ml-auto size-4 shrink-0 text-muted-foreground" aria-hidden />
-    </Link>
+    <div className="flex min-w-0 flex-col gap-snug">
+      <button type="button" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}
+        className="flex min-h-control w-full items-center gap-snug rounded-lg bg-background/60 px-snug text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring">
+        <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+        {open ? "Hide scorecard" : "Full scorecard"}
+        <ChevronDownIcon className={cn("ml-auto size-4 shrink-0 text-muted-foreground transition-transform motion-reduce:transition-none", open && "rotate-180")} aria-hidden />
+      </button>
+      <div id={panelId} hidden={!open}>
+        {open && <ScorecardBody match={match} teams={teams} />}
+      </div>
+    </div>
   );
 }
