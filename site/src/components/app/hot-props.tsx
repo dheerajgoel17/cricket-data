@@ -146,18 +146,32 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 
 /** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
-export function BookQuotes({ quotes, className, compact }: { quotes: Quote[]; className?: string; compact?: boolean }) {
+export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; className?: string; rowLine?: number }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   const [top, ...rest] = quotes;
   if (!top) return null;
+  const compact = rowLine != null;
   const comparison = compact ? quotes : rest;
+  const underLine = top.underAt?.line ?? top.line;
+  const underPrice = top.underAt?.price ?? top.under;
   return (
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
-        <span className={cn("inline-flex items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
+        <span className={cn("inline-flex flex-wrap items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
           <BookBadge source={top.source} />{" "}
-          {compact ? null : top.over == null
+          {compact ? (
+            <>
+              <span className="inline-flex items-center gap-tight">
+                <span className="text-muted-foreground">Over{top.over != null && top.line !== rowLine ? ` ${top.line}` : ""}</span>
+                <Tick quiet value={top.over} className="text-body font-bold text-foreground">{odds(top.over)}</Tick>
+              </span>
+              <span className="inline-flex items-center gap-tight">
+                <span className="text-muted-foreground">Under{underPrice != null && underLine !== rowLine ? ` ${underLine}` : ""}</span>
+                <Tick quiet value={underPrice} className="text-body font-bold text-foreground">{odds(underPrice)}</Tick>
+              </span>
+            </>
+          ) : top.over == null
             ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
             : <><span className="font-bold">O {top.line}</span> <Tick quiet value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
           {!compact && top.best && <span className="sr-only"> (lowest line, best price)</span>}
@@ -194,8 +208,6 @@ function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boo
 /** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
 export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
-  const side = r.side === "under" ? "Under" : "Over";
-  const price = side === "Under" ? r.under : r.over;
   const ground = win !== "ven" ? groundNote(r.ven) : null;
   return (
     <li className="relative border-t border-hairline first:border-t-0">
@@ -209,11 +221,12 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
             {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `${side} ${r.line}`}</span>
-            {!out && price > 1 && <Tick quiet value={price} className="font-condensed text-callout font-bold tabular-nums text-foreground"><span className="sr-only">Best price </span>· {odds(price)}</Tick>}
+            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `O/U ${r.line}`}</span>
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
-          {!out && <BookQuotes quotes={r.quotes} compact />}
+          {!out && (r.quotes.length ? <BookQuotes quotes={r.quotes} rowLine={r.line} /> : (
+            <span className="font-condensed text-callout tabular-nums text-muted-foreground">Over <b className="text-foreground">{odds(r.over)}</b> · Under <b className="text-foreground">{odds(r.under)}</b></span>
+          ))}
           <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}

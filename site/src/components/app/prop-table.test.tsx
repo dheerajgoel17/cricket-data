@@ -104,6 +104,15 @@ describe("PropTable", () => {
     expect(screen.getByRole("table")).toBeInTheDocument();
   });
 
+  it("labels both book prices inline and shows a different threshold beside its price", () => {
+    const quotes = [{ source: "bet365", name: "bet365", line: 39.5, over: 1.83, under: null, underAt: { line: 41.5, price: 1.95 }, best: false }];
+    render(<MemoryRouter><ul><PropRow r={{ ...row, quotes, edge: null }} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByText("O/U 39.5")).toBeInTheDocument();
+    expect(screen.getByText("Over").parentElement).toHaveTextContent(/Over\s*1.83/);
+    expect(screen.getByText("Under 41.5").parentElement).toHaveTextContent(/Under 41.5\s*1.95/);
+    expect(screen.queryByRole("table")).toBeNull();
+  });
+
   it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
     const one = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
     render(<MemoryRouter><PropTable rows={[one]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
