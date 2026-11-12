@@ -356,8 +356,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-snug">
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
-                    <>
-                      <section className="flex flex-col gap-snug">
+                    <div className="flex flex-col gap-snug lg:grid lg:grid-cols-12 lg:items-start lg:gap-section">
+                      <section className="flex flex-col gap-snug lg:col-span-8">
                         <div className="flex items-baseline justify-between gap-snug">
                           <div className="grid min-w-0 gap-hair">
                             <h2 className="text-body font-medium">Recent results</h2>
@@ -402,9 +402,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                           ))}
                         </div>
                         <ValueBars values={rep.values} line={line} labels={barLabels} />
-                        <div className="flex flex-wrap items-center justify-center gap-snug">
+                        <div className="flex flex-wrap items-center justify-center gap-snug lg:justify-start">
                           <LineStepper value={line} label="O/U" min={0} onStep={(d) => set({ ml: d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2 })} />
-                          {/* Jump home to the bookie main; other booked lines live in the ladder below (no duplicate chip row). */}
+                          {/* Jump home to the bookie main; other booked lines live in the ladder (no duplicate chip row). */}
                           {bookMain && bookMain.line !== line && (
                             <Button variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: bookMain.line })}>
                               {faceBadge(bookMain)} main {bookMain.line}
@@ -455,7 +455,12 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                         {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
                       </section>
 
-                      <section className="-mx-gutter border-y border-hairline" aria-label="Line ladder">
+                      {/* Phone: full-bleed under the chart. Desktop: sticky beside the chart (same pattern as the player page's book lines). */}
+                      <section className="-mx-gutter border-y border-hairline lg:col-span-4 lg:col-start-9 lg:mx-0 lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
+                        <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
+                          <h2 className="text-body font-medium">Lines</h2>
+                          <span className="text-footnote text-muted-foreground">Tap a row</span>
+                        </div>
                         <Table>
                           <TableHeader>
                             <TableRow className="hover:bg-transparent">
@@ -501,7 +506,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                           </TableBody>
                         </Table>
                       </section>
-                    </>)}
+                    </div>)}
                 </motion.div>
               </AnimatePresence>
               </AnimatedHeight>
