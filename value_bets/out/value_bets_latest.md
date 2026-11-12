@@ -1,9 +1,9 @@
-# Cricket value bets - 2026-11-12 18:36 IST
+# Cricket value bets - 2026-11-12 19:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1364 prices
+- **moviodds_bet365**: ok, 1367 prices
 - **smarkets**: ok, 291 prices
 - **feedg**: ok, 24 prices, 3 events
 - **feedk**: ok, 196 prices, 9 events
@@ -21,4 +21,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male)
 
-Runtime 109.6s. Snapshot: `odds_20261112T130637Z.jsonl.gz`
+Runtime 112.5s. Snapshot: `odds_20261112T133036Z.jsonl.gz`
