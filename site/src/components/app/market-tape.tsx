@@ -28,13 +28,13 @@ function rowHref(r: TapeRow) {
   return `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
 }
 
-/** Dashed tear across a ticket, with page-coloured notches so the card looks perforated. */
-function TicketTear({ className }: { className?: string }) {
+/** Perforated tear across a ticket — page-coloured notches bite the sides (parent must not clip). */
+function TicketTear() {
   return (
-    <div aria-hidden className={cn("relative -mx-inset h-0", className)}>
-      <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-primary-foreground/35" />
-      <span className="absolute top-1/2 left-0 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
-      <span className="absolute top-1/2 right-0 size-3 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+    <div aria-hidden className="relative z-10 h-0">
+      <div className="absolute inset-x-5 top-1/2 border-t border-dashed border-primary-foreground/45" />
+      <span className="absolute top-1/2 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+      <span className="absolute top-1/2 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
     </div>
   );
 }
@@ -53,7 +53,7 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
     return (
       <section
         aria-label="High odds hits and low odds misses"
-        className="relative flex min-w-0 flex-col overflow-hidden rounded-2xl bg-primary text-primary-foreground"
+        className="relative flex min-w-0 flex-col rounded-2xl bg-primary text-primary-foreground"
       >
         <header className="flex flex-col gap-tight px-inset pt-inset pb-snug">
           {hits.length && misses.length ? (
@@ -76,7 +76,7 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
 
         <TicketTear />
 
-        <ul className="flex flex-col px-inset pb-snug">
+        <ul className="flex flex-col px-inset pb-snug pt-snug">
           {list.slice(0, 4).map((r, i) => (
             <li key={`${r.idx}${r.stat}${r.line}${r.fmt}`} className={cn(i > 0 && "border-t border-dashed border-primary-foreground/25")}>
               <Link
@@ -93,7 +93,7 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
                     </span>
                   </span>
                 </span>
-                <span className="grid justify-items-end gap-hair border-l border-dashed border-primary-foreground/30 pl-stack text-right">
+                <span className="grid justify-items-end gap-hair border-l border-dashed border-primary-foreground/35 pl-stack text-right">
                   <Tick quiet={quiet} value={r.over} className="num-cond text-title text-primary-foreground">{fmtPrice(r.over)}</Tick>
                   <span className="label-cap text-footnote text-primary-foreground">
                     Cleared{r.v != null ? ` · ${r.v}` : ""}

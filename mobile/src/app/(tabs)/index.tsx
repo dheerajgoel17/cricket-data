@@ -70,7 +70,9 @@ export default function Fixtures() {
 }
 
 function TimedFixtureCard({ item }: { item: RailItem }) {
-  const now = useNow();
+  // Stumps · Day N countdown goes to mm:ss under one hour — tick every second then.
+  const stumps = /stumps|close of (?:play|day)|end of (?:the )?day/i.test(String(item.live?.summary || item.live?.session || ""));
+  const now = useNow(stumps ? 1000 : 30_000);
   return <FixtureCard item={item} now={now} />;
 }
 

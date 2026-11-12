@@ -23,7 +23,7 @@ export const MATCH_MARKETS = {
   match_ducks: { label: "Ducks", get: (s, m) => (known(s.M.inn[m], IDK) ? sum(s.M.inn[m], IDK) : null) },
   match_extras: { label: "Match extras", get: (s, m) => (known(s.M.inn[m], IEX) ? sum(s.M.inn[m], IEX) : null) },
   match_runouts: { label: "Match run outs", get: (s, m) => (known(s.M.inn[m], IRO) ? sum(s.M.inn[m], IRO) : null) },
-  highest_over: { label: "Highest single over (runs)", get: (s, m) => (s.M.pv[m] && !s.M.ho[m] ? null : s.M.ho[m]) },
+  highest_over: { label: "Highest runs in an over", get: (s, m) => (s.M.pv[m] && !s.M.ho[m] ? null : s.M.ho[m]) },
   max_conceded: { label: "Most runs conceded by a bowler", get: (s, m) => (s.M.pv[m] && !s.M.mc[m] ? null : s.M.mc[m]) },
   max_wickets: { label: "Most wickets by a bowler", get: (s, m) => (s.M.pv[m] && !s.M.mw[m] ? null : s.M.mw[m]) },
   top_score: { label: "Top batter's score", get: (s, m) => s.M.ts[m] },
@@ -42,7 +42,7 @@ export const TEAM_MARKETS = {
   team_single_digits: { label: "Team single-digit scores (batting first)", get: first(ISD) },
   team_ducks: { label: "Team ducks (batting first)", get: first(IDK) },
   team_top_score: { label: "Team top batter's score (batting first)", get: first(ITS) },
-  team_highest_over: { label: "Team highest over (batting first)", get: first(IHO) },
+  team_highest_over: { label: "Team highest runs in an over (batting first)", get: first(IHO) },
 };
 
 // A team's own innings in the match, whichever side batted first: the basis of the books' "Team total" markets (the TEAM_MARKETS above are
@@ -56,7 +56,7 @@ export const TEAM_TOTAL_MARKETS = {
   team_total_extras: { label: "Team extras", keys: [IEX] },
   team_total_runouts: { label: "Team run outs", keys: [IRO] },
   team_total_ducks: { label: "Team ducks", keys: [IDK] },
-  team_total_highest_over: { label: "Team highest over", keys: [IHO] },
+  team_total_highest_over: { label: "Team highest runs in an over", keys: [IHO] },
 };
 
 /** Session / first-N-overs keys the books quote (`overs_6`, `overs_10`, …). `first_over` is the match's opening over. */
@@ -65,13 +65,15 @@ export const oversN = (key) => (key === "first_over" ? 1 : +(OVERS_KEY.exec(key)
 export const oversLabel = (n) => (n === 1 ? "1st over" : `${n} overs`);
 
 /**
- * Cumulative runs after `n` completed overs. If the innings ended earlier (all out / declared), the innings total
- * stands. An incomplete innings that never reached `n` overs is unknown (null), not zero.
+ * Cumulative runs after `n` completed overs. If the innings ended earlier (all out / declared) *and* we have a
+ * partial tape, the innings total stands. An empty / missing tape is unknown (null) — never the full innings
+ * total (that was reading 300+ "1st over" scores when `ov` was absent). Incomplete innings short of `n` are null.
  */
 export function oversScore(ov, inn, n) {
   if (!(n > 0)) return null;
   const tape = Array.isArray(ov) ? ov : [];
   if (tape.length >= n) return tape[n - 1];
+  if (!tape.length) return null;
   if (inn && ((inn[IW] || 0) >= 10 || inn.declared)) return inn[IR] ?? null;
   return null;
 }

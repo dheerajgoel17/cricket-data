@@ -89,7 +89,7 @@ const GLOSS: [string, string, string, string][] = [
   ["50s", "Basic", "Markets", "Innings of 50-99 runs (100+ are centuries)."],
   ["Double-digit scores", "Basic", "Markets", "Batters reaching 10 or more."],
   ["Single-digit scores", "Basic", "Markets", "Scores of 1-9. Ducks (out for 0) are not single-digit."],
-  ["Highest over", "Intermediate", "Markets", "Most runs conceded in a single over of the match."],
+  ["Highest runs in an over", "Intermediate", "Markets", "Most runs scored in a single over of the match."],
   ["Most runs conceded", "Intermediate", "Markets", "The largest number of runs conceded by one bowler in the match."],
   ["Top batter", "Intermediate", "Markets", "Highest scorer in the match, or for the team batting first. Ties are shown separately."],
   ["Void rules", "Intermediate", "Rules", "T20 and ODI summary markets are void unless 80% of the overs are bowled in both innings; Tests unless there is a result or 300 (5-day) / 200 (4-day) overs."],

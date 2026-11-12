@@ -101,21 +101,22 @@ export function ScorecardSkeleton() {
   );
 }
 
-/** High-odds / low-odds tape while the live lines settle. Same 80vw peek rail as the fixture cards on a phone. */
+/** High-odds ticket while the live lines settle. */
 export function TapeSkeleton() {
   return (
-    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
-      {[0, 1].map((k) => (
-        <div key={k} className="flex w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:w-auto">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-48" />
-          {[0, 1].map((n) => (
-            <div key={n} className="flex min-h-row items-center gap-snug">
-              <Skeleton className="size-control rounded-full" />
-              <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3 w-20" /></div>
-              <Skeleton className="h-5 w-12 rounded-md" />
-            </div>
-          ))}
+    <div aria-hidden className="relative flex min-w-0 flex-col rounded-2xl bg-primary/80 p-inset">
+      <Skeleton className="h-5 w-36 bg-primary-foreground/25" />
+      <Skeleton className="mt-tight h-3 w-52 bg-primary-foreground/20" />
+      <div className="relative my-snug h-0">
+        <div className="absolute inset-x-5 top-1/2 border-t border-dashed border-primary-foreground/35" />
+        <span className="absolute top-1/2 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+        <span className="absolute top-1/2 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+      </div>
+      {[0, 1].map((n) => (
+        <div key={n} className="flex min-h-row items-center gap-snug py-tight">
+          <Skeleton className="size-control rounded-full bg-primary-foreground/25" />
+          <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-28 bg-primary-foreground/25" /><Skeleton className="h-3 w-20 bg-primary-foreground/20" /></div>
+          <Skeleton className="h-6 w-12 rounded-md bg-primary-foreground/25" />
         </div>
       ))}
     </div>

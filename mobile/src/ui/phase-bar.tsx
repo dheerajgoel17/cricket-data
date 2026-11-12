@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   tab: { alignItems: "center", paddingTop: space.snug },
   label: { ...type.callout, color: color["muted-foreground"], paddingBottom: space.snug },
-  labelOn: { color: color.foreground },
+  labelOn: { color: color.primary },
   rule: { alignSelf: "stretch", height: 2, borderRadius: 1, backgroundColor: "transparent" },
-  ruleOn: { backgroundColor: color.foreground },
+  ruleOn: { backgroundColor: color.primary },
 });

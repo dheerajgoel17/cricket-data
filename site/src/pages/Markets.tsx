@@ -26,7 +26,7 @@ import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
-const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
+const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
 
 // ------------------------------------------------------------------ competitions
 export function CompetitionsPage() {

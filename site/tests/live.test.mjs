@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeOversTape, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
-  matchWindow, namesMatch, oversToBalls, parseFixtureCsv, parseMatchPage, parseOvers, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionLabel, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
+  matchWindow, namesMatch, nextTestDayLine, nextTestDayStart, oversToBalls, parseFixtureCsv, parseMatchPage, parseOvers, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionBadge, sessionLabel, sessionMeta, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "@cricket/engine/live.js";
 import { identityIndex } from "@cricket/engine/identity.js";
 
@@ -127,6 +127,24 @@ test("sessionLabel: the source's badge, not a Live pulse", () => {
   assert.equal(sessionLabel("Team Break"), "Team break");
   assert.equal(sessionLabel("Match Paused"), "Paused");
   assert.equal(sessionLabel("IND need 12 runs"), "");
+});
+
+test("sessionBadge keeps the Test day; next dig is day-1 kick-off + N days", () => {
+  assert.deepEqual(sessionMeta("Stumps - Day 3"), { label: "Stumps", day: 3 });
+  assert.deepEqual(sessionMeta("Close of play"), { label: "Stumps", day: null });
+  assert.deepEqual(sessionMeta("Lunch"), { label: "Lunch", day: null });
+  assert.equal(sessionBadge("Stumps - Day 3"), "Stumps · Day 3");
+  assert.equal(sessionBadge("Close of play"), "Stumps");
+  assert.equal(sessionBadge("Lunch"), "Lunch");
+  assert.equal(sessionBadge("IND need 12"), "");
+  // Day 1 kicked off 2026-11-09 05:00Z; after Day 3 stumps, Day 4 is +3d = 2026-11-12 05:00Z
+  const start = "2026-11-09T05:00:00Z";
+  assert.equal(nextTestDayStart(start, 3)?.toISOString(), "2026-11-12T05:00:00.000Z");
+  assert.equal(nextTestDayStart(start, null), null);
+  assert.equal(nextTestDayLine(start, "Stumps - Day 3", Date.parse("2026-11-11T18:00:00Z")), "Day 4 begins in 11h");
+  assert.equal(nextTestDayLine(start, "Stumps - Day 3", Date.parse("2026-11-12T04:40:00Z")), "Day 4 begins in 20:00");
+  assert.equal(nextTestDayLine(start, "Close of play", Date.parse("2026-11-11T18:00:00Z")), "", "no day number: no countdown");
+  assert.equal(nextTestDayLine(start, "Stumps - Day 3", Date.parse("2026-11-12T06:00:00Z")), "", "past the next dig clock");
 });
 
 test("scoreLabel keeps both Test innings; a one-innings total is runs/wkts", () => {

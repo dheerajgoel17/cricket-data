@@ -15,7 +15,7 @@ import { cap, color, control, font, numLg, radius, space, type, tonal } from "@/
 
 export type TapeRow = { idx: number; pid: string; name: string; stat: string; line: number; over: number; fmt: string; inn?: number; verdict: "cleared" | "missed" | "push" | null; v?: number };
 
-/** Perforated tear across a ticket stub. */
+/** Perforated tear across a ticket — page-coloured notches bite the sides (ticket must not clip). */
 function TicketTear() {
   return (
     <View style={styles.tearWrap} accessible={false}>
@@ -118,18 +118,17 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
   );
 }
 
-const NOTCH = 12;
+const NOTCH = 16;
 
 const styles = StyleSheet.create({
   ticket: {
     backgroundColor: color.primary,
     borderRadius: radius.card,
-    overflow: "hidden",
   },
   ticketHead: { paddingHorizontal: space.inset, paddingTop: space.inset, paddingBottom: space.snug, gap: space.tight },
-  ticketBody: { paddingHorizontal: space.inset, paddingBottom: space.snug },
-  tearWrap: { height: 0, marginVertical: space.hair, justifyContent: "center" },
-  tearLine: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderColor: "rgba(15, 15, 15, 0.35)", marginHorizontal: space.inset },
+  ticketBody: { paddingHorizontal: space.inset, paddingTop: space.snug, paddingBottom: space.snug },
+  tearWrap: { height: 0, zIndex: 1, justifyContent: "center" },
+  tearLine: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderColor: "rgba(15, 15, 15, 0.45)", marginHorizontal: space.stack },
   notch: { position: "absolute", top: -NOTCH / 2, width: NOTCH, height: NOTCH, borderRadius: NOTCH / 2, backgroundColor: color.background },
   notchLeft: { left: -NOTCH / 2 },
   notchRight: { right: -NOTCH / 2 },

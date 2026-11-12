@@ -40,6 +40,55 @@ export function sessionLabel(s) {
   return "";
 }
 
+/** Session kind plus an optional Test day number from "Stumps - Day 3". */
+export function sessionMeta(s) {
+  const label = sessionLabel(s);
+  if (!label) return null;
+  const m = /\bday\s*(\d+)\b/i.exec(String(s || ""));
+  const day = m ? Number(m[1]) : null;
+  return { label, day: Number.isFinite(day) && day > 0 ? day : null };
+}
+
+/** Card/header badge: "Stumps · Day 3" when the source names the day; else the short sessionLabel. */
+export function sessionBadge(s) {
+  const meta = sessionMeta(s);
+  if (!meta) return "";
+  return meta.label === "Stumps" && meta.day ? `Stumps · Day ${meta.day}` : meta.label;
+}
+
+/**
+ * After Stumps · Day N, the next dig is due at the day-1 kick-off clock + N days
+ * (Day 1 start → after Day 3 stumps, Day 4 = start + 3 days). Null when day is unknown.
+ */
+export function nextTestDayStart(startIso, day) {
+  const t = Date.parse(startIso);
+  if (!Number.isFinite(t) || !Number.isFinite(day) || day < 1) return null;
+  return new Date(t + day * 864e5);
+}
+
+const p2 = (n) => String(n).padStart(2, "0");
+
+/**
+ * Status line while a Test is at stumps with a known day: "Day 4 begins in 11h", or a mm:ss timer under one hour.
+ * Empty when not Stumps, day unknown, or the next dig's clock has passed.
+ */
+export function nextTestDayLine(startIso, summary, now = Date.now()) {
+  const meta = sessionMeta(summary);
+  if (!meta || meta.label !== "Stumps" || meta.day == null) return "";
+  const next = nextTestDayStart(startIso, meta.day);
+  if (!next) return "";
+  const ms = next.getTime() - now;
+  if (ms <= 0) return "";
+  const nextDay = meta.day + 1;
+  const s = Math.floor(ms / 1000);
+  if (s >= 86400) {
+    const d = Math.floor(s / 86400), h = Math.floor(s / 3600) % 24;
+    return `Day ${nextDay} begins in ${d}d ${p2(h)}h`;
+  }
+  if (s >= 3600) return `Day ${nextDay} begins in ${Math.floor(s / 3600)}h`;
+  return `Day ${nextDay} begins in ${p2(Math.floor(s / 60) % 60)}:${p2(s % 60)}`;
+}
+
 /** Lunch, tea, stumps, rain delay, paused — a session break, not the end of the match. */
 export function isSessionLine(s) {
   return !!sessionLabel(s);

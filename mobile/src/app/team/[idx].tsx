@@ -22,7 +22,7 @@ import { TeamBadge } from "@/ui/team-badge";
 import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
-const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
+const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
 
 /** A team: its players' last fixtures in a format against a line (the site's team page, Player grid tab). */
 export default function Team() {

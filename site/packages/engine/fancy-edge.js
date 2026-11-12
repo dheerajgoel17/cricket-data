@@ -8,10 +8,10 @@ import { FORMATS } from "./util.js";
 /** [market key, short label] of the whole-match and team-total markets the Match Fancy tab shows, in its order (a key a book prices that is not here is not scored). */
 export const MATCH_KEYS = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["first_over", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
   ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"], ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"],
-  ["match_extras", "Extras"], ["match_runouts", "Run outs"], ["match_ducks", "Ducks"], ["highest_over", "Top over"], ["max_wickets", "Most wickets"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
+  ["match_extras", "Extras"], ["match_runouts", "Run outs"], ["match_ducks", "Ducks"], ["highest_over", "Highest runs in an over"], ["max_wickets", "Most wickets"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
 export const TEAM_KEYS = [["team_total_runs", "Runs"], ["overs_1", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
   ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"],
-  ["team_total_extras", "Extras"], ["team_total_runouts", "Run outs"], ["team_total_ducks", "Ducks"], ["team_total_highest_over", "Top over"], ["top_batter", "Top batter"]];
+  ["team_total_extras", "Extras"], ["team_total_runouts", "Run outs"], ["team_total_ducks", "Ducks"], ["team_total_highest_over", "Highest runs in an over"], ["top_batter", "Top batter"]];
 export const FANCY_INNS = [0, 1, 2]; // 0 = the whole match (or the side's match total); 1 / 2 = that side's own 1st / 2nd innings (a Test)
 /** Each side's last matches a market is scored on, and the last matches at the ground. */
 export const WINDOW = 20, GROUND_WINDOW = 10;
@@ -32,13 +32,14 @@ export const batFirstBooked = (entries, inn, scope) => inn === 0 && scope >= 0 &
 export const firstInnsMs = (store, ms, scope) => ms.filter((m) => store.M.fi[m] === scope);
 
 /**
- * One market's row: the book's line(s) and best prices, each side's edge (`sideEdge` of its hit rate over `ms` pulled toward the market's no-vig chance) and the better side, the same line at
- * the ground, and the last ten results against the line. `hits` / `played` / `chance` are that better side's record and shrunk chance. Null when the books list nothing or no match is scored.
+ * One market's row: the book's available over and under lines (`fancyHeadline` — over@4.5 with under@3.5 when that is how the books list them, so the UI never needs a dash for a side that exists elsewhere),
+ * each side's edge, the better side, the same line at the ground, and the last ten results. When several books quote the same line at the same price, `overBook` / `underBook` name one face book; the rest stay in `books` for the +N accordion.
+ * Null when the books list nothing or no match is scored.
  */
 export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, ground, inn = 0, live = null }) {
   const booked = fancyFor(doc, fxInfo, k, teamName, inn, live);
   const all = fancyByLine(booked);
-  // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first line with an over price and the first with an under price, each on its own line
+  // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first over line and the first under line, each on its own
   const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
   if (!b) return null;
   const batFirst = batFirstBooked(booked, inn, scope);
@@ -51,6 +52,7 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
   const eo = lo && so ? sideEdge(so.over, so.over + so.under, po, lo.over) : null;
   const eu = lu && su ? sideEdge(su.under, su.over + su.under, pu, lu.under) : null;
   const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
+  // one face book per side: first book that matches the best price (same line + same odds → any one; the rest sit in books for +N)
   const src = (l, sd) => (l && l[sd] != null ? l.books.find((x) => x[sd] === l[sd])?.source : undefined);
   const shownBooks = [...new Map([...(lo?.books ?? []), ...(lu?.books ?? [])].map((x) => [x.source, x])).values()];
   const rep = run(b.line);
@@ -60,7 +62,7 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
   const mine = side === "over" ? so : su, hits = mine ? (side === "over" ? mine.over : mine.under) : 0, played = mine ? mine.over + mine.under : 0;
   return { key: k, inn, scope, team: teamName, batFirst, line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks,
     overBook: src(lo, "over"), underBook: src(lu, "under"), live: shownBooks.some((x) => x.live), opened: shownBooks.find((x) => x.opened != null)?.opened ?? null, side, edge: side === "over" ? eo : eu, hits, played, chance: shrunkProb(hits, played, side === "over" ? po : pu),
-    at, last: rep.values.slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) };
+    at, last: (rep.values || []).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) };
 }
 
 /** `marketRow` for each of `keys` (market keys; "top_batter" is a list, not a line), the best edge first. `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. */
@@ -88,6 +90,51 @@ export const parseFm = (fm) => {
   const inn = Number(raw);
   return { key, inn: inn === 1 || inn === 2 ? inn : 0 };
 };
+
+/** Match ↔ team keys that are the same prop (Fours, Sixes, 1st over…). Shared overs keys map to themselves. Used so switching Match / NZ / IND keeps the market selected. */
+export const MARKET_PEER = {
+  match_runs: "team_total_runs", team_total_runs: "match_runs",
+  first_over: "overs_1", overs_1: "first_over",
+  match_sixes: "team_total_sixes", team_total_sixes: "match_sixes",
+  match_fours: "team_total_fours", team_total_fours: "match_fours",
+  match_boundaries: "team_total_boundaries", team_total_boundaries: "match_boundaries",
+  match_wickets: "team_total_wickets", team_total_wickets: "match_wickets",
+  match_extras: "team_total_extras", team_total_extras: "match_extras",
+  match_runouts: "team_total_runouts", team_total_runouts: "match_runouts",
+  match_ducks: "team_total_ducks", team_total_ducks: "match_ducks",
+  highest_over: "team_total_highest_over", team_total_highest_over: "highest_over",
+  top_batter: "top_batter",
+  overs_5: "overs_5", overs_6: "overs_6", overs_10: "overs_10", overs_15: "overs_15",
+};
+
+/**
+ * Best fm in `available` ([[fm, label], …]) for the market the user was on: exact match, else the peer market (Match Fours ↔ team Fours),
+ * keeping a Test innings tag when the peer still has it. Null when nothing maps.
+ */
+export function peerFancyFm(want, available) {
+  const list = available || [];
+  if (!want || !list.length) return null;
+  if (list.some(([f]) => f === want)) return want;
+  const { key, inn } = parseFm(want), peer = MARKET_PEER[key];
+  if (!peer) return null;
+  const ids = list.map(([f]) => f), has = (f) => f && ids.includes(f);
+  return [fancyFm(peer, inn), fancyFm(peer, 0), ...ids.filter((f) => parseFm(f).key === peer)].find(has) || null;
+}
+
+/**
+ * Matches a fancy chart / overview is scored on: one side's last `lastN`, or (Match scope) the newest `lastN` among either side's last `lastN`
+ * — so L10 is ten bars (industry), not the raw union of both schedules.
+ */
+export function fancySample(store, { fmt, gender, teams, scope, lastN, venue }) {
+  if (venue?.length) {
+    return scope < 0
+      ? selectMatches(store, { fmt, gender, venue, lastN })
+      : selectMatches(store, { fmt, gender, venue, team: scope, lastN });
+  }
+  const sides = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => i).filter((i) => i >= 0);
+  const all = [...new Set(sides.flatMap((i) => selectMatches(store, { fmt, gender, team: i, lastN })))].sort((a, b) => a - b);
+  return scope < 0 ? all.slice(-lastN) : all;
+}
 /** The tag on a team line that is only valid if that side bats first (the book voids it once the side is bowling first). */
 export const BAT_FIRST_TAG = "If bats first";
 /** A line's innings tag. A Test line that covers the whole match says so ("Complete match"), so it is never read as a first-innings line; the first-innings score market is its own innings and needs no tag. */

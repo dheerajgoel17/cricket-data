@@ -17,7 +17,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { liveBlurb, liveCard, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
+import { liveBlurb, liveCard, nextTestDayLine, sessionBadge, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, useNow } from "@/lib/clock";
@@ -65,10 +65,13 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
   const now = useNow(1000);
   const { state } = playState(f, match, now);
   const final = state === "final", on = state === "live";
-  const blurb = liveBlurb(match) || (final ? f.result || "" : state === "started" ? NO_SCORE : "");
-  const session = !final && (sessionLabel(blurb) || match?.session);
-  const badge = session || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
+  const rawBlurb = liveBlurb(match);
+  const sessionSummary = rawBlurb || match?.session || "";
+  const session = !final && (sessionLabel(sessionSummary) || "");
+  const badge = (!final && sessionBadge(sessionSummary)) || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
   const livePulse = on && !session;
+  const nextDay = !final ? nextTestDayLine(f.start, sessionSummary, now) : "";
+  const blurb = nextDay || rawBlurb || (final ? f.result || "" : state === "started" ? NO_SCORE : "");
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   const knownSides = sides.filter(([, i]) => i >= 0);
   const innings = liveCard(match);
@@ -84,9 +87,11 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
   const start = `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`;
   const actions = (
     <HeaderActions>
-      {live && <LiveFeed />}
-      <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
-      className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring",)}><ArrowUpOnSquareIcon className="size-5" /></button>
+      <div className="ml-auto flex shrink-0 items-center gap-snug">
+        {live && <LiveFeed />}
+        <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
+          className="grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button>
+      </div>
     </HeaderActions>
   );
   const backBtn = (
@@ -178,22 +183,16 @@ export function FixturePage() {
   if (fx.fmt === "FC" && !cardDetail) return <div><h1 className="sr-only">{fx.a} v {fx.b}</h1><MatchHeader f={fx} match={match} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   if (fancyDetail) {
     setTitle(`Match Fancy · ${fx.a} v ${fx.b}`);
-    return (
-      <div className="flex flex-col gap-snug">
-        <Link to={`/fixture/${fx.id}?tab=fancy`} className="inline-flex w-fit items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronLeftIcon className="size-4" aria-hidden />Match Fancy
-        </Link>
-        <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />
-      </div>
-    );
+    // phone header back only (player / ground pattern) — no second in-content “Match Fancy” crumb
+    return <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />;
   }
   if (cardDetail) {
     setTitle(`${fx.a} v ${fx.b} scorecard`);
     return (
       <div className="flex flex-col gap-stack">
-        <Link to={`/fixture/${fx.id}`} className="inline-flex w-fit min-w-0 items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronLeftIcon className="size-4 shrink-0" aria-hidden /><span className="truncate">{fx.a} v {fx.b}</span>
-        </Link>
+        <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav(`/fixture/${fx.id}`))} className="hidden size-control place-items-center rounded-full bg-secondary text-primary lg:grid">
+          <ChevronLeftIcon className="size-5" />
+        </button>
         <PageTitle sub={match?.session || liveBlurb(match) || undefined}>Scorecard</PageTitle>
         {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyNote title="No scorecard yet">There is no card for this match from our source yet. It shows here once play has started.</EmptyNote>}
       </div>

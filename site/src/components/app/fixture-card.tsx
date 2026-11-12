@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { liveBlurb, scoreLabel, sessionLabel, teamScore } from "@cricket/engine/live.js";
+import { liveBlurb, nextTestDayLine, scoreLabel, sessionBadge, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, matchDateLabel, pretty } from "@/lib/format";
@@ -47,17 +47,20 @@ export function startsIn(ms: number) {
 /** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge.
  *  `f.cardScores` (optional): precomputed side scores from history when the live feed has none — same shape as `teamScore`. */
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
-  const now = useNow(30000);
-  const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const { match } = useLiveMatch(f);
+  const blurb = liveBlurb(match);
+  const sessionSummary = blurb || match?.session || "";
+  const stumps = sessionLabel(sessionSummary) === "Stumps";
+  const now = useNow(stumps ? 1000 : 30000); // mm:ss under one hour needs a 1 s tick
+  const when = fixtureStart(f), ms = when.getTime() - now, timed = hasTime(f);
   const liveScores = [teamScore(match, f.a), teamScore(match, f.b)];
   const scores = (f.cardScores?.[0]?.display || f.cardScores?.[1]?.display) ? f.cardScores : liveScores;
   const play = playState(f, match, now);
   const hasScore = play.hasScore || !!(scores?.[0]?.display || scores?.[1]?.display);
   const [final, delayed, live, started] = [play.state === "final", play.state === "delayed", play.state === "live", play.state === "started"]; // in play only on evidence; a started match with no word on play has no LIVE badge and no score columns
-  const blurb = liveBlurb(match);
-  const session = sessionLabel(blurb) || match?.session || "";
-  const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const session = sessionBadge(sessionSummary);
+  const nextDay = nextTestDayLine(f.start, sessionSummary, now);
+  const status = nextDay || blurb || (final ? f.result || "Match completed" : live && !session ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const lost = (t: string) => !!winner && t !== winner; // the side that lost a finished match steps back
   const cta = f.noProps ? (final ? "Match" : "No props live yet") : "Props";
@@ -68,7 +71,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 bg-card py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-raised">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
-            {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
+            {session ? <span className="label-cap text-footnote text-amber">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
             {final ? (
@@ -84,7 +87,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
                   <TeamBadge name={t} size="md" eager />
                   <span className={cn("truncate text-body font-medium", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
                 </div>
-                {hasScore || live ? <LiveScore live={live} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
+                {hasScore || live ? <LiveScore live={live && !session} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
                     {timed && <span className="text-callout font-medium tabular-nums">{localTime(when)}</span>}
@@ -108,7 +111,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
 export function MatchChip({ f }: { f: any }) {
   const when = fixtureStart(f), timed = hasTime(f);
   const { match } = useLiveMatch(f);
-  const session = sessionLabel(liveBlurb(match)) || match?.session || "";
+  const session = sessionBadge(liveBlurb(match) || match?.session);
   const live = !!(session || match?.status === "live");
   const sub = session || (match?.status === "live" ? "Live" : timed ? localTime(when) : dayLabel(dayKey(f)));
   return (
@@ -120,7 +123,7 @@ export function MatchChip({ f }: { f: any }) {
       <span className="grid min-w-0 text-left leading-tight">
         <span className="truncate text-caption font-medium">{abbr(f.a)} v {abbr(f.b)}</span>
         {live
-          ? <Badge variant="destructive" className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-medium">{sub}</Badge>
+          ? <Badge variant={session ? "secondary" : "destructive"} className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-medium">{sub}</Badge>
           : <span className="truncate text-caption opacity-70">{sub}</span>}
       </span>
     </span>

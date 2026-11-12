@@ -35,7 +35,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
     <Press disabled={!link || !f.id} onPress={() => openFixture(f)} accessibilityRole="link" accessibilityLabel={`${f.a} v ${f.b}`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.meta}>
         {m.session ? (
-          <Text style={[styles.cap, styles.red]}>{m.session}</Text>
+          <Text style={[styles.cap, styles.session]}>{m.session}</Text>
         ) : m.live ? (
           <View style={styles.liveRow}><LiveDot /><Text style={[styles.cap, styles.red]}>Live</Text></View>
         ) : (
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color.foreground, ...cap },
   red: { color: color.destructive },
+  session: { color: color.amber },
   liveRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
   metaText: { ...type.footnote, color: color["muted-foreground"] },
   place: { marginLeft: "auto", flexShrink: 1 },

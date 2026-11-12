@@ -30,9 +30,12 @@ describe("cardModel", () => {
     expect(m).toMatchObject({ delayed: true, live: false, status: "Start delayed" });
   });
 
-  test("a Test at stumps shows the session", () => {
-    const m = cardModel({ fixture: fixture({ fmt: "Test", start: at(-30) }), live: { status: "live", summary: "Day 3: Stumps - Australia lead by 40 runs", teams: both } }, NOW);
-    expect(m).toMatchObject({ live: true, session: "Stumps" });
+  test("a Test at stumps shows the session day and the next dig countdown", () => {
+    // Day 1 kick-off 18h ago → after Day 1 stumps, Day 2 = start + 1d = 6h from NOW
+    const m = cardModel({ fixture: fixture({ fmt: "Test", start: at(-18) }), live: { status: "live", summary: "Stumps - Day 1", teams: both } }, NOW);
+    expect(m).toMatchObject({ live: true, session: "Stumps · Day 1", status: "Day 2 begins in 6h" });
+    const plain = cardModel({ fixture: fixture({ fmt: "Test", start: at(-18) }), live: { status: "live", summary: "Close of play", teams: both } }, NOW);
+    expect(plain).toMatchObject({ live: true, session: "Stumps", status: "Close of play" });
   });
 
   test("a date with no clock time is to be confirmed", () => {
