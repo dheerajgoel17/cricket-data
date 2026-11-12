@@ -41,6 +41,21 @@ export const inplayQuery = queryOptions({
   refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, retry: false,
 });
 
+/**
+ * The published history of every priced line (`/data/hot-rows.json`, built with the data: docs/PROJECT_GUIDE.md 5.11), so a cold start draws the props without the player files and the scoring pass.
+ * Null when there is none or it is for another build of the data than `meta.json` names (its row numbers are positions in that build's player list); the lines are then scored on the phone.
+ */
+export const hotRowsQuery = queryOptions({
+  queryKey: ["hot-rows-file"],
+  queryFn: async (): Promise<any | null> => {
+    try {
+      const [meta, doc] = await Promise.all([getJson("/data/meta.json"), getJson("/data/hot-rows.json")]);
+      return doc?.v === 1 && doc.build && doc.build === meta?.built_at && doc.rows && typeof doc.rows === "object" ? doc : null;
+    } catch { return null; }
+  },
+  staleTime: 10 * 60_000, retry: false,
+});
+
 /** The Home rail's published settings (`config/home_rail.json`, read at view time like the site's `loadRail`, so a change needs no release); null when it cannot be read, and the built-in ones apply. */
 const RAIL_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/config/home_rail.json";
 export const railConfigQuery = queryOptions({

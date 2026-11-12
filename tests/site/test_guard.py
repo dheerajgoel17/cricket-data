@@ -295,3 +295,23 @@ def test_f_a_stop_gap_from_the_books_that_is_a_scheduled_match_under_other_names
     assert c.level == G.HARD and len(c.problems) == 4  # Tigers twice (the alias, then the alike-sides rule), India v UAE, and the Test pair the 12 h rule already knew
     assert any("Bangla Tigers v Royal Champs" in p and "United Tigers" in p for p in c.problems) and any(p.startswith("India v United Arab Emirates") for p in c.problems)
     assert not any("Pak XI" in p for p in c.problems)
+
+
+def hot(**over):
+    rec = {f: 1 for f in G.HOT_FIELDS}
+    doc = {"v": 1, "generated_at_utc": "2026-11-02T09:30:00Z", "build": "2026-11-02T08:00Z", "lines": 30, "scored": 2, "skipped": 28, "rows": {"a": rec, "b": rec}}
+    doc.update(over)
+    return doc
+
+
+def test_hot_rows_check_passes_a_good_file_skips_a_missing_one_and_names_each_fault():
+    meta = {"built_at": "2026-11-02T08:00Z"}
+    assert G.check_hot_rows(None, meta, NOW).skipped and not G.check_hot_rows(None, meta, NOW).problems
+    assert G.check_hot_rows(hot(lines=3, scored=2), meta, NOW).problems == []
+    assert any("version 1" in p for p in G.check_hot_rows({"v": 2, "rows": {}}, meta, NOW).problems)
+    assert any("site data is" in p for p in G.check_hot_rows(hot(build="2026-11-01T08:00Z"), meta, NOW).problems)  # another build: the row numbers point at other players
+    assert any("6 h ago" in p for p in G.check_hot_rows(hot(generated_at_utc="2026-11-02T03:00:00Z"), meta, NOW).problems)
+    assert any("only 2 of 30" in p for p in G.check_hot_rows(hot(), meta, NOW).problems)  # a pass that lost most of its lines
+    assert any("lack a field" in p for p in G.check_hot_rows(hot(rows={"a": {"idx": 1}, "b": {"idx": 2}}, lines=3), meta, NOW).problems)
+    assert any("says 5 rows" in p for p in G.check_hot_rows(hot(scored=5, lines=3), meta, NOW).problems)
+    assert G.check_hot_rows(hot(), meta, NOW).level == G.WARN

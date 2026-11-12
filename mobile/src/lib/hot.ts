@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Hot props: every priced line of a day scored against the player's history (hit rate over the last 5 / 10 games, this year, against today's opponent, at the ground), as the
 // site's `useHotRows` does (site/src/components/app/hot-props.tsx, a React hook and so not importable). The scoring itself is the shared engine; this is the same loop around it.
-import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "@cricket/engine/lines.js";
-import { venueStem } from "@cricket/engine/markets.js";
-import { runPlan } from "@cricket/engine/plan.js";
-import { barState, windowRate } from "@cricket/engine/windows.js";
+import { booksOf, groupByChip, lineKey, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { prioritizeHotGroups, shouldPublishHot } from "@/lib/hot-priority";
 import { span } from "@/lib/perf";
-import { byShard, hotDay, hotLines, matchChipId, norm, pool, type HotScope } from "@site/lib/hot-lines";
+import { byShard, hotDay, hotLines, pool, type HotScope } from "@site/lib/hot-lines";
 
 export const MAX_ROWS = 30;
 /** Player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early. */
@@ -28,52 +25,35 @@ const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
 const FRAME_MS = 8, REST_MS = 4;
 
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
-export async function scoreHotRows({ store, rz, lines, fixtures, scope, now = Date.now(), onRows }: { store: any; rz: any; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void }): Promise<Row[]> {
+export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scope, now = Date.now(), onRows, seed }: { store?: any; rz?: any; loadStore?: () => Promise<{ store: any; rz: any }>; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void; seed?: Record<string, any> | null }): Promise<Row[]> {
   const todays = hotLines(lines || [], scope, now);
   // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one (that stays: it is the bet we settle).
-  const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
   const keys = new Map<string, any>();
-  for (const l of todays) keys.set(`${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}|${isLive(l) ? "live" : ""}`, l);
+  for (const l of todays) keys.set(lineKey(l), l);
   const year = String(new Date().getFullYear());
   const out: Row[] = [];
-  const byChip = new Map<string, any[]>();
-  for (const x of todays) { const c = matchChipId(x.match, x.start_utc, x.fmt); (byChip.get(c) ?? byChip.set(c, []).get(c)!).push(x); }
+  const byChip = groupByChip(todays);
   let plan = 0, shardMs = 0;
   const tAll = Date.now();
+  // lines the published file already scored (the history part; the prices are the books' own, now) need no player files and no plan: they are rows at once
+  const todo: any[] = [];
+  for (const l of keys.values()) {
+    const row = seed ? seedRow({ store, l, b: booksOf(l, byChip, now), rec: seed[lineKey(l)] }) : null;
+    if (row) out.push({ ...row, day: hotDay(row.start, l.fmt, now) }); else todo.push(l);
+  }
+  if (out.length) onRows?.([...out]);
+  if (!todo.length) { span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} seeded=${out.length}`); return out; }
+  if (!store) ({ store, rz } = await loadStore!());
   const score = async (l: any) => {
-    const idx = store.P.id.indexOf(l.pid);
-    const inn = lineScope(l);
-    const chip = matchChipId(l.match, l.start_utc, l.fmt);
-    const b = bookLinesFor({ lines: (byChip.get(chip) ?? []).filter((x: any) => isLive(x) === isLive(l)) }, l.pid, l.stat, l.fmt, now, keepMsFor(l.fmt), inn);
-    if (idx < 0 || !b) return;
-    const main = b.main, over = Math.max(...main.books.map((x: any) => x.over || 0)), under = Math.max(...main.books.map((x: any) => x.under || 0));
     const tp = Date.now();
-    const r: any = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: null }, split_by: [] }, { playerIdx: idx });
+    const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year });
     plan += Date.now() - tp;
-    const entries: any[] = r?.ok ? r.chart?.entries || [] : [];
-    if (!entries.length) return;
-    const [a, c] = String(b.match).split(/\s+vs\s+/i);
-    const opp = norm(l.team) === norm(a) ? c : a;
-    const l5 = windowRate(entries, 5, main.line), l10 = windowRate(entries, 10, main.line);
-    const season = windowRate(entries.filter((e) => String(e.date).startsWith(year)), 0, main.line);
-    const h2h = windowRate(entries.filter((e) => norm(e.opp) === norm(opp)), 0, main.line);
-    const venue = String((fixtures || []).find((f: any) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f))?.venue || "");
-    const ven = windowRate(venue ? entries.filter((e) => venueStem(e.venueName) === venueStem(venue)) : [], 0, main.line); // his games at the match's ground (the data spells a ground several ways)
-    const last = entries.slice(-10).map((e) => ({ v: e.value as number | null, s: barState(e, main.line) as string }));
-    // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
-    const lastE = entries[entries.length - 1];
-    const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-    out.push({
-      comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn,
-      name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line,
-      fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue, prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null,
-      max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1),
-    });
+    if (r) out.push({ ...r, day: hotDay(r.start, l.fmt, now) });
   };
   // A file's lines are scored as soon as it is in, a few plans at once, giving the main thread back in between so the screen stays alive while the batch runs.
   let published = 0, sliceStart = Date.now();
   // matches already on come first, so the rows the screen leads with are the first scored
-  await pool(prioritizeHotGroups(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now), SHARDS_AT_ONCE, async (g) => {
+  await pool(prioritizeHotGroups(byShard(todo, (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now), SHARDS_AT_ONCE, async (g) => {
     const ts = Date.now();
     await store.shard(g.shard).catch(() => {});
     shardMs += Date.now() - ts; // a file that does not load costs its own rows (the plan answers "not ok" for them), not the screen

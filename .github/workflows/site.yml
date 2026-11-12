@@ -112,6 +112,10 @@ jobs:
               print("::warning::Neither Base nor the scraper has data newer than 3 days")
           PY
           du -sh site/public/data
+      - name: Score the priced lines for the apps (hot-rows.json is optional and fails soft, without it the apps score on the phone)
+        continue-on-error: true
+        run: |
+          node site/scripts/hot-rows.mjs --data site/public/data --lines value_bets/out/book_lines.json || rm -f site/public/data/hot-rows.json
       - name: Data guard (the built data and the book lines hold their invariants; a hard failure stops the deploy and the last good one stays)
         env:
           SITE_URL: ${{ vars.SITE_URL }}

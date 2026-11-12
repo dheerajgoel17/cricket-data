@@ -10,30 +10,31 @@ import { storeQuery } from "@/lib/data";
 import { hotSnapKey, readHotSnap, writeHotSnap } from "@/lib/hot-cache";
 import { scoreHotRows, type Row } from "@/lib/hot";
 import { sideRate, withModelSide } from "@/lib/model-side";
-import { fixturesQuery, liveQuery } from "@/lib/queries";
+import { fixturesQuery, hotRowsQuery, liveQuery } from "@/lib/queries";
 import { useLinesLive } from "@/lib/use-lines-live";
 
 /** The scored rows (see `scoreHotRows`) for a day (`{ day }`) or one match (`{ teams }`), put in the cache as they come. `scoring` is true while more are still arriving. */
 export function useHotRows(scope?: HotScope, doc?: any) {
-  const stats = useQuery(storeQuery), linesQ = useLinesLive(), fixtures = useQuery(fixturesQuery);
+  const stats = useQuery(storeQuery), linesQ = useLinesLive(), fixtures = useQuery(fixturesQuery), seedQ = useQuery(hotRowsQuery);
+  const seed = seedQ.data?.rows ?? null; // the published history of the lines (null: score on the phone)
   const lines = { data: doc ?? linesQ.data }; // `doc`: the book doc with an archived match added, for that match's own page
   const qc = useQueryClient();
   const what = !scope ? "none" : "day" in scope ? scope.day : scope.teams.join("|");
   const stamp = new Date().toDateString();
-  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, lines.data?.live_sig ?? "", doc ? lines.data?.lines?.length : ""];
+  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, lines.data?.live_sig ?? "", doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
   // a day's rows kept from the last launch (not for one match's own page, which adds an archived match to the lines)
   const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
   const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
   const generated = `${lines.data?.generated_at_utc ?? ""}|${lines.data?.live_sig ?? ""}`; // the live lines count: a kept row of the same book file but other live lines is not the answer
   const rows = useQuery({
     queryKey: key,
-    enabled: !!scope && !!lines.data && fixtures.isSuccess && (!!stats.data || !!snap),
+    enabled: !!scope && !!lines.data && fixtures.isSuccess && seedQ.isFetched && (!!stats.data || !!snap || !!seed),
     staleTime: 10 * 60_000,
     placeholderData: (prev: Row[] | undefined) => prev ?? snap?.rows, // the last launch's rows until the first pass of this one is in
     queryFn: async () => {
       if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows; // the same books file: those rows are the answer
-      const data = stats.data ?? (await qc.ensureQueryData(storeQuery));
-      const out = await scoreHotRows({ ...data, lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, onRows: (r) => qc.setQueryData(key, r) });
+      // the published history covers most lines: those are rows at once, and the player files are only asked for (`loadStore`) by a line it does not cover
+      const out = await scoreHotRows({ store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery), lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, seed, onRows: (r) => qc.setQueryData(key, r) });
       if (snapKey) writeHotSnap(snapKey, generated, out);
       return out;
     },

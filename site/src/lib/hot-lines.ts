@@ -3,7 +3,8 @@
 
 import { keepMsFor } from "@cricket/engine/lines.js";
 
-export const norm = (n: string) => String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
+import { matchChipId, norm } from "@cricket/engine/hot-rows.js";
+export { matchChipId, norm };
 export const sameMatch = (match: string, [a, b]: [string, string]) => { const [x, y] = String(match).split(/\s+vs\s+/i); const s = new Set([norm(x), norm(y)]); return s.has(norm(a)) && s.has(norm(b)); };
 
 /** How many local days of priced lines Hot props lists (today = 0). */
@@ -47,14 +48,6 @@ export function otherHotCount(lines: any[], day: number, now = Date.now()): numb
     const d = hotDay(l.start_utc, l.fmt, now);
     return d >= 0 && d !== day;
   }).length;
-}
-
-/** One chip per match: a Test's day-by-day book starts share a chip; a limited-overs line groups by UTC date so two books a few minutes apart are one fixture, not two kick-offs. */
-export function matchChipId(match: string, start: string, fmt?: string): string {
-  const [a, b] = String(match).split(/\s+vs\s+/i);
-  const pair = [norm(a), norm(b)].sort().join("|");
-  const day = String(start || "").slice(0, 10);
-  return fmt === "Test" || fmt === "FC" ? `${pair}|${fmt}` : `${pair}|${day}`;
 }
 
 export type HotScope =
