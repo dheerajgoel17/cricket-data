@@ -17,7 +17,7 @@ from pathlib import Path
 
 # First-paint files stay plaintext: the browser would otherwise SHA-256 every 32 bytes of index.json
 # (~1 MB → tens of thousands of awaits) and phones show "Data not found". Cookie gate still blocks scrapers.
-SKIP = {"meta.json", "matches.json", "index.json", "crex_index.json"}
+SKIP = {"meta.json", "matches.json", "index.json", "crex_index.json", "hot-rows.json"}  # hot-rows.json: the apps read it on a cold start, so it stays plaintext too
 MAX_BYTES = 200_000
 
 

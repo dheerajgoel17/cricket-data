@@ -13,6 +13,7 @@ engine's own function would agree with a bug in it (the one place the engine is 
     e  warn  a scraped innings' stated total agrees with the batters' runs plus extras and with ball by ball
     f  hard  one pair of sides is not two fixtures within 12 h, and a stop-gap row from the books is not a scheduled match under other names (same start, both sides alike)
     g  warn  priced players that could not be linked to the live source
+    h  warn  the published hot rows file (when there is one) is for this build of the data, is well formed and kept most of the priced lines it was asked to score
 """
 from __future__ import annotations
 
@@ -330,6 +331,37 @@ def check_unlinked(review: list[dict] | None, linked: int | None = None) -> Chec
     return c
 
 
+HOT_FIELDS = ("idx", "name", "line", "prior", "opp", "venue", "l5", "l10", "season", "h2h", "ven", "last", "max")  # `settled` is left out: it is absent until the match is in the data
+
+
+def check_hot_rows(hot: dict | None, meta: dict, now: float) -> Check:
+    """``hot-rows.json`` (docs/PROJECT_GUIDE.md 5.11) is optional: the apps score on the phone without it. A file that is there must be for this build of the data (its row numbers are
+    positions in that build's player list), well formed, recent, and not a collapse of the pass (most of the lines it was asked to score have a row)."""
+    c = Check("h", "The hot rows file matches this build and kept most of its lines", WARN)
+    if hot is None:
+        c.skipped = "no hot rows file (the apps score on the phone)"
+        return c
+    rows = hot.get("rows")
+    if hot.get("v") != 1 or not isinstance(rows, dict):
+        c.problems.append("not a version 1 file with a rows object")
+        return c
+    c.checked = len(rows)
+    if hot.get("build") != meta.get("built_at"):
+        c.problems.append(f"built for data {hot.get('build')}, the site data is {meta.get('built_at')}")
+    t = _ts(str(hot.get("generated_at_utc") or ""))
+    if t is None or now - t > 6 * H:
+        c.problems.append(f"generated {hot.get('generated_at_utc')}, more than 6 h ago")
+    if hot.get("scored") != len(rows):
+        c.problems.append(f"says {hot.get('scored')} rows scored, holds {len(rows)}")
+    n = int(hot.get("lines") or 0)
+    if n >= 20 and len(rows) < 0.5 * n:
+        c.problems.append(f"only {len(rows)} of {n} priced lines have a row")
+    bad = [k for k, r in rows.items() if not isinstance(r, dict) or any(f not in r for f in HOT_FIELDS)]
+    if bad:
+        c.problems.append(f"{len(bad)} rows lack a field, e.g. `{bad[0]}`")
+    return c
+
+
 # ------------------------------------------------------------------ run and report
 def _read(path: Path, default=None):
     try:
@@ -367,6 +399,7 @@ def run(site: Path, data: Path, live: dict | None = None, now: float | None = No
     docs = [d for f in sorted((data / "provisional").glob("*.json")) if (d := _read(f))]
     checks.append(check_scraped_totals(docs, ball_totals(data, {d.get("match_id", "") for d in docs}) if (data / "balls").is_dir() else None))
     checks += [check_duplicate_fixtures(fixtures), check_unlinked(_read(site / "identity_review.json", []), meta.get("identity_linked"))]
+    checks.append(check_hot_rows(_read(site / "hot-rows.json"), meta, now))
     return checks
 
 

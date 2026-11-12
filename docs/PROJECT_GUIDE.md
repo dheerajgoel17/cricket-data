@@ -164,6 +164,7 @@ Role, batting hand and bowling style exist in neither Base nor its people regist
 | e | warn | a scraped match's stated innings total (`innings` in `data/provisional/*.json`) equals the batters' runs plus the ball-by-ball extras and the ball-by-ball total (`data/balls`); a stated total below the batters' runs. Tests and first-class are out of scope (four innings) |
 | f | hard | one pair of sides (`SAME_SIDE` folded, same gender) is not two fixtures within 12 h |
 | g | warn | priced players that could not be linked to the live source (the list `identity_review.json`; 5.7) |
+| h | warn | `hot-rows.json` (5.11), when there is one, is for this build of the data (`build` = `meta.json` `built_at`), well formed, under 6 h old and kept at least half of its priced lines |
 
 A hard failure prints the matches at fault in the summary (`::error` lines too). Fix the data or the rule that produced it, not the check; a check that is wrong is fixed in `guard.py` with a test. Add a new invariant as one `check_*` function, one row in `run`, and a test that feeds it deliberately wrong data (`tests/site/test_guard.py`).
 
@@ -226,6 +227,15 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
 * The Vite dev server has the SPA fallback built in, and serves `/api/ask` and `/api/live` with the same handlers Vercel runs (`vite.config.ts`).
+
+### 5.11 Published hot rows (`site/packages/engine/hot-rows.js`, `site/scripts/hot-rows.mjs`, `hot-rows.json`)
+**What.** The history half of every Hot props row (`HISTORY_FIELDS`: his player index and name, the line, the model's prior, the opponent and ground, the L5 / L10 / season / head-to-head / ground rates, the last ten bars, the settled value) for every priced pre-match line, built with the data and published beside it. A phone that reads it skips the player files (about 20 MB) and the scoring pass (6 to 7 s of JS on a phone) on a cold start; a line the file does not cover is scored on the phone as before.
+**How.** `site.yml` runs `node site/scripts/hot-rows.mjs` after the data build and before the guard. The script runs the engine's `scoreLine` (the code the phone runs; `mobile/src/lib/hot.ts` calls the same function) over the priced pre-match lines of `value_bets/out/book_lines.json` (started within the keep window, or starting in the next 11 days) and writes `{ v, generated_at_utc, lines_generated_at_utc, build, lines, scored, skipped, rows }`; `rows` is keyed by `lineKey` (player, stat, format, match chip, innings scope, pre-match or live). The step fails soft (`continue-on-error`, the file is removed on failure): without it the apps score as before. It stays plaintext in `wrap.py` (the apps read it on a cold start). Guard check `h` (5.8) warns on a stale or malformed file.
+**Rules.**
+* **Only history is published.** The prices, books and quotes are the phone's own `book_lines.json` (fresher than the build), so a row is `rowOf({ line, books, history })`. `seedRow` uses a record only when its `line` is the one the books lead with now and, with the store loaded, when `idx` is still that player; otherwise the line is scored on the phone. Never store prices in the file.
+* **Build-bound.** `idx` is a position in the build's player list, so the app reads the file only when `build` equals `meta.json`'s `built_at` (`hotRowsQuery`).
+* **Same for everyone.** Nothing here depends on the viewer: `day` (the viewer's local day) is added by the reader, and live (in-play) lines are never in the file (the phone merges them from `/api/inplay`).
+* **One definition.** A change to what a row holds is a change to `hot-rows.js` (the site's own hook `useHotRows` has its own loop and does not read the file yet).
 
 ## 10. Roadmap ideas (not built)
 Umpire/match-referee stats (Base officials) · competition standings (per-tournament points rules) · minutes-style and traits panels on player pages · server-side rendering for SEO ·
