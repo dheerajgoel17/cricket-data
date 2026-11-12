@@ -20,7 +20,12 @@ test("no unit on a page with prices, props or fancy lines, or without a slot id"
   expect((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle).toBeUndefined();
 });
 
-test("the built-in slot is the stats footer unit, digits only", async () => {
-  const { AD_SLOT } = await import("@/lib/ads");
+test("the slot: the built-in unit when the build variable is unset or empty (GitHub passes an unset variable as empty), another id when set, none on request", async () => {
+  const { slotFrom, AD_SLOT } = await import("@/lib/ads");
+  expect(slotFrom(undefined)).toMatch(/^\d{10}$/);
+  expect(slotFrom("")).toBe(slotFrom(undefined));
+  expect(slotFrom(" 5551234567 ")).toBe("5551234567");
+  expect(slotFrom("none")).toBe("");
+  expect(slotFrom("garbage")).toBe(slotFrom(undefined));
   expect(AD_SLOT).toMatch(/^\d{10}$/);
 });

@@ -22,7 +22,7 @@ export function syncAds(pathname: string) {
   }
 }
 
-/** The slot id of the display unit at the foot of an ad page ("stats footer" in AdSense). A public id, like the publisher above, so it lives in the code; the build variable `VITE_ADSENSE_SLOT` replaces it (another unit, or empty to draw none). */
+/** The slot id of the display unit at the foot of an ad page ("stats footer" in AdSense). A public id, like the publisher above, so it lives in the code. The build variable `VITE_ADSENSE_SLOT` (the repository variable `ADSENSE_SLOT`; an unset one arrives empty) replaces it: another unit's id, or `none` to draw no unit. */
 const DEFAULT_SLOT = "3081954637";
-const fromEnv = import.meta.env.VITE_ADSENSE_SLOT as string | undefined;
-export const AD_SLOT = String(fromEnv ?? DEFAULT_SLOT).trim().replace(/[^0-9]/g, "");
+export const slotFrom = (v: unknown) => { const t = String(v ?? "").trim(); return t.toLowerCase() === "none" ? "" : t.replace(/[^0-9]/g, "") || DEFAULT_SLOT; };
+export const AD_SLOT = slotFrom(import.meta.env.VITE_ADSENSE_SLOT);
