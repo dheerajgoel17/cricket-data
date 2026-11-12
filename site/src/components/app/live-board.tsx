@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, createContext, useContext, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, createContext, useContext, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowTopRightOnSquareIcon, ChevronDownIcon, TableCellsIcon } from "@heroicons/react/24/outline";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
+import { TeamBadge } from "@/components/app/badges";
 import { PillGroup } from "@/components/app/pill-group";
 import { abbr } from "@/lib/format";
 import { playerPhotos } from "@/lib/assets";
@@ -152,120 +153,139 @@ export function innLabel(card: any[], k: number) {
 /** Batting + bowling tables, one innings at a time: a selector over the innings (two in a T20 or ODI, up to four in a Test) that follows the latest one until a tab is picked. So-far only. */
 export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   const [pick, setPick] = useState<string>();
-  const flush = useContext(FlushCtx);
-  const namePadding = flush ? "pl-gutter pr-tight" : "px-tight";
+  const namePadding = "pl-snug pr-tight sm:pl-inset";
+  const tableClass = "w-full text-footnote [&_th]:whitespace-nowrap [&_th]:bg-muted/60 [&_th]:font-medium [&_tr>*:last-child]:pr-snug sm:[&_tr>*:last-child]:pr-inset";
   const card = cardInns(match);
   if (!card.length) return null;
   const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
   const balls = inn.overs != null ? oversToBalls(inn.overs) : null, rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
   const onStrike = (name: string) => (match?.players || []).some((p: any) => p.strike && namesMatch(p.name, name));
-  const yet = (inn: any) => (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
+  const yet = (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
+  const inningsName = inn.team || `Innings ${inn.n}`;
   return (
     <div className="flex flex-col gap-stack">
       {card.length > 1 && (
-        <PillGroup layoutId="innings-chip" label="Innings" value={innId(inn)} onChange={setPick}
+        <PillGroup layoutId="innings-chip" label="Innings" segmented value={innId(inn)} onChange={setPick}
           items={card.map((i: any, j: number) => [innId(i), <span key={innId(i)}>{innLabel(card, j)} <span className="ml-1 text-footnote opacity-70">{innScore(i) || "—"}</span></span>] as [string, ReactNode])} />
       )}
-      {[inn].map((inn: any) => (
-        <div key={innId(inn)} className="flex flex-col">
-          <div className="flex items-center gap-snug py-snug">
-            <span className="min-w-0 flex-1 truncate text-callout font-medium">{inn.team || `Innings ${inn.n}`}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</span>
-            <span className="shrink-0 text-footnote font-medium tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
+      <div key={innId(inn)} className="flex min-w-0 flex-col gap-stack">
+        <div className="flex flex-wrap items-center justify-between gap-snug rounded-2xl bg-secondary/50 px-inset py-stack ring-1 ring-inset ring-hairline">
+          <div className="flex min-w-0 items-center gap-snug">
+            {inn.team && <TeamBadge name={inn.team} size="md" />}
+            <h2 className="text-body font-semibold">{inningsName}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</h2>
           </div>
-          {!!inn.batters?.length && (
-            <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush && "[&_tr>*:last-child]:pr-gutter")}>
-                <thead>
-                  <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className={cn("py-snug text-left", namePadding)}>Batter</th>
-                    <th className="px-tight py-snug text-right">R</th>
-                    <th className="px-tight py-snug text-right">B</th>
-                    <th className="px-tight py-snug text-right">4s</th>
-                    <th className="px-tight py-snug text-right">6s</th>
-                    <th className="px-tight py-snug text-right">SR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inn.batters.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className={cn("py-snug", namePadding)}>
-                        <div className="flex min-w-0 items-center gap-snug">
-                          <div className="min-w-0">
-                            <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
-                            {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
-                            <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <Num className="font-medium text-foreground">{p.runs ?? 0}</Num>
-                      <Num>{p.balls ?? 0}</Num>
-                      <Num>{p.fours ?? 0}</Num>
-                      <Num>{p.sixes ?? 0}</Num>
-                      <Num>{p.sr != null ? Number(p.sr).toFixed(2) : "—"}</Num>
-                    </tr>
-                  ))}
-                  {inn.extras && (
-                    <tr className="border-t border-hairline text-muted-foreground">
-                      <td className={cn("py-snug", namePadding)}>Extras</td>
-                      <Num className="font-medium text-foreground">{inn.extras.total}</Num>
-                      <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
-                    </tr>
-                  )}
-                  {inn.runs != null && (
-                    <tr className="border-t border-hairline">
-                      <td className={cn("py-snug font-medium", namePadding)}>Total</td>
-                      <Num className="font-medium text-foreground">{inn.runs}</Num>
-                      <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-          {!!inn.fow?.length && (
-            <p className="py-snug text-footnote text-muted-foreground">
-              <span className="font-medium text-foreground">FOW</span>{" "}
-              {inn.fow.map((w: any, k: number) => <Fragment key={`${w.wkts}-${w.name}`}>{k > 0 && " · "}{w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-normal" />{w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})</Fragment>)}
-            </p>
-          )}
-          {!!yet(inn).length && (
-            <p className="py-snug text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-normal" /></Fragment>)}</p>
-          )}
-          {!!inn.bowlers?.length && (
-            <div className={cn("overflow-x-auto", flush && "-mx-gutter")}>
-              <table className={cn("w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50", flush && "[&_tr>*:last-child]:pr-gutter")}>
-                <thead>
-                  <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className={cn("py-snug text-left", namePadding)}>Bowler</th>
-                    <th className="px-tight py-snug text-right">O</th>
-                    <th className="px-tight py-snug text-right">M</th>
-                    <th className="px-tight py-snug text-right">R</th>
-                    <th className="px-tight py-snug text-right">W</th>
-                    <th className="px-tight py-snug text-right">Econ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inn.bowlers.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className={cn("py-snug", namePadding)}>
-                        <div className="flex min-w-0 items-center gap-snug">
-                          <Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" />
-                        </div>
-                      </td>
-                      <Num>{fmtOv(p.overs)}</Num>
-                      <Num>{p.maidens ?? 0}</Num>
-                      <Num>{p.conceded ?? 0}</Num>
-                      <Num className="font-medium text-foreground">{p.wickets ?? 0}</Num>
-                      <Num>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Num>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="flex flex-wrap items-baseline gap-x-stack gap-y-hair tabular-nums">
+            <strong className="font-condensed text-display leading-none">{inn.runs == null ? "—" : `${inn.runs}${inn.wkts == null ? "" : `/${inn.wkts}`}`}</strong>
+            {inn.overs != null && <span className="text-callout text-muted-foreground">{fmtOv(inn.overs)} overs</span>}
+            {rr && <span className="text-footnote text-muted-foreground">Run rate <b className="text-foreground">{rr}</b></span>}
+          </div>
         </div>
-      ))}
-      <p className="py-snug text-footnote text-muted-foreground">So far this match. Not used for settlement.</p>
+        {!!inn.batters?.length && (
+          <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-inset ring-hairline">
+            <table className={tableClass}>
+              <caption className="px-snug py-snug text-left text-callout font-semibold sm:px-inset">Batting</caption>
+              <thead>
+                <tr className="label-cap text-footnote text-muted-foreground">
+                  <th className={cn("py-snug text-left", namePadding)}>Batter</th>
+                  <th className="px-tight py-snug text-right">R</th>
+                  <th className="px-tight py-snug text-right">B</th>
+                  <th className="px-tight py-snug text-right">4s</th>
+                  <th className="px-tight py-snug text-right">6s</th>
+                  <th className="px-tight py-snug text-right">SR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inn.batters.map((p: any) => (
+                  <tr key={p.id || p.name} className="border-t border-hairline even:bg-muted/20">
+                    <td className={cn("py-snug", namePadding)}>
+                      <div className="flex min-w-0 items-center gap-snug">
+                        <div className="min-w-0">
+                          <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
+                          {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
+                          <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <Num className="font-bold text-foreground">{p.runs ?? 0}</Num>
+                    <Num>{p.balls ?? 0}</Num>
+                    <Num>{p.fours ?? 0}</Num>
+                    <Num>{p.sixes ?? 0}</Num>
+                    <Num>{p.sr != null ? Number(p.sr).toFixed(2) : "—"}</Num>
+                  </tr>
+                ))}
+                {inn.extras && (
+                  <tr className="border-t border-hairline text-muted-foreground">
+                    <td className={cn("py-snug", namePadding)}>Extras</td>
+                    <Num className="font-medium text-foreground">{inn.extras.total}</Num>
+                    <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
+                  </tr>
+                )}
+                {inn.runs != null && (
+                  <tr className="border-t border-hairline bg-muted/60">
+                    <td className={cn("py-snug font-semibold", namePadding)}>Total</td>
+                    <Num className="font-medium text-foreground">{inn.runs}</Num>
+                    <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {(!!inn.fow?.length || !!yet.length) && (
+          <div className="flex flex-col gap-snug rounded-xl bg-card px-snug py-stack ring-1 ring-inset ring-hairline sm:px-inset">
+            {!!inn.fow?.length && (
+              <div className="flex flex-col gap-tight">
+                <h3 className="text-callout font-semibold">Fall of wickets</h3>
+                <ol className="flex flex-wrap gap-tight">
+                  {inn.fow.map((w: any) => (
+                    <li key={`${w.wkts}-${w.name}`} className="flex flex-wrap items-baseline gap-tight rounded-lg bg-muted px-snug py-tight text-footnote text-muted-foreground">
+                      <b className="tabular-nums text-foreground">{w.runs}/{w.wkts}</b>
+                      <Who name={w.name} team={inn.team} sides={teams} className="font-normal" />
+                      {w.balls != null && <span>{fmtOv(ballsToOvers(w.balls))} ov</span>}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+            {!!yet.length && (
+              <p className="text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet.map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-normal" /></Fragment>)}</p>
+            )}
+          </div>
+        )}
+        {!!inn.bowlers?.length && (
+          <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-inset ring-hairline">
+            <table className={tableClass}>
+              <caption className="px-snug py-snug text-left text-callout font-semibold sm:px-inset">Bowling</caption>
+              <thead>
+                <tr className="label-cap text-footnote text-muted-foreground">
+                  <th className={cn("py-snug text-left", namePadding)}>Bowler</th>
+                  <th className="px-tight py-snug text-right">O</th>
+                  <th className="px-tight py-snug text-right">M</th>
+                  <th className="px-tight py-snug text-right">R</th>
+                  <th className="px-tight py-snug text-right">W</th>
+                  <th className="px-tight py-snug text-right">Econ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inn.bowlers.map((p: any) => (
+                  <tr key={p.id || p.name} className="border-t border-hairline even:bg-muted/20">
+                    <td className={cn("py-snug", namePadding)}>
+                      <div className="flex min-w-0 items-center gap-snug">
+                        <Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" />
+                      </div>
+                    </td>
+                    <Num>{fmtOv(p.overs)}</Num>
+                    <Num>{p.maidens ?? 0}</Num>
+                    <Num>{p.conceded ?? 0}</Num>
+                    <Num className="font-bold text-foreground">{p.wickets ?? 0}</Num>
+                    <Num>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Num>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -331,15 +351,15 @@ export function LiveBoard({ match, teams, expanded }: { match: any; teams?: Side
 function CardSummary({ match, teams }: { match: any; teams?: Side[] }) {
   const card = cardInns(match);
   return (
-    <div className="divide-y divide-hairline border border-hairline">
+    <div className="grid gap-tight sm:grid-cols-2">
       {card.map((inn: any, k: number) => {
         const bat = [...(inn.batters || [])].sort((a: any, b: any) => (b.runs ?? 0) - (a.runs ?? 0)).slice(0, 2);
         const bowl = [...(inn.bowlers || [])].sort((a: any, b: any) => (b.wickets ?? 0) - (a.wickets ?? 0) || (a.conceded ?? 0) - (b.conceded ?? 0))[0];
         return (
-          <div key={innId(inn)} className="flex flex-col gap-hair px-tight py-tight">
+          <div key={innId(inn)} className="flex min-w-0 flex-col gap-tight rounded-xl bg-muted/40 px-snug py-snug ring-1 ring-inset ring-hairline">
             <div className="flex items-baseline justify-between gap-snug">
-              <span className="truncate text-callout font-medium">{innLabel(card, k)}</span>
-              <span className="shrink-0 font-condensed text-body font-bold tabular-nums">{innScore(inn) || "—"}</span>
+              <span className="flex min-w-0 items-center gap-tight text-callout font-medium">{inn.team && <TeamBadge name={inn.team} size="xs" />}<span className="truncate">{innLabel(card, k)}</span></span>
+              <span className="shrink-0 font-condensed text-metric font-bold tabular-nums">{innScore(inn) || "—"}</span>
             </div>
             {!!bat.length && <p className="truncate text-footnote text-muted-foreground">{bat.map((b: any, j: number) => <Fragment key={b.id || b.name}>{j > 0 && " · "}<Who name={b.name} team={b.team || inn.team} sides={teams} short className="font-medium text-foreground" /> {b.runs ?? 0} ({b.balls ?? 0})</Fragment>)}</p>}
             {bowl && <p className="truncate text-footnote text-muted-foreground"><Who name={bowl.name} team={bowl.team} sides={teams} short className="font-medium text-foreground" /> {bowl.wickets ?? 0}–{bowl.conceded ?? 0} ({fmtOv(bowl.overs)})</p>}
@@ -356,6 +376,7 @@ export const scoreboardShows = (match: any, inPlay: boolean) => hasCard(match) |
 /** `top` (status and ground line) and `head` (the two sides with their scores) sit at the top of the card while a match is in play: the card is then the page's header, full width and flush under the top bar, with compact player figures beneath the team scores. Otherwise it is a rounded card in the page. */
 export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { match: any; teams?: Side[]; inPlay: boolean; fixtureId?: string; top?: ReactNode; head?: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const bodyId = useId();
   const full = hasCard(match), strip = inPlay && !!liveBoard(match);
   const flush = inPlay && !!top && scoreboardShows(match, inPlay);
   useHeaderFlush(flush);
@@ -370,7 +391,7 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
         <>
           <Rule />
           <div className={cn(flush && "-mx-gutter")}>
-            <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
+            <button type="button" aria-expanded={open} aria-controls={open ? bodyId : undefined} onClick={() => setOpen((o) => !o)}
               className={cn("flex min-h-control w-full items-center gap-tight text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:opacity-70", flush && "px-gutter")}>
               <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
               {open ? "Hide scorecard" : "Full scorecard"}
@@ -378,7 +399,7 @@ export function ScorecardCard({ match, teams, inPlay, fixtureId, top, head }: { 
             </button>
             <AnimatedHeight>
               {open && (
-                <div className={cn("flex flex-col gap-tight border-t border-hairline pt-tight", flush && "px-gutter")}>
+                <div id={bodyId} className={cn("flex flex-col gap-snug border-t border-hairline pt-snug", flush && "px-gutter")}>
                   {fixtureId ? <Link to={`/fixture/${fixtureId}/scorecard`} className="ml-auto inline-flex min-h-control w-fit items-center gap-tight text-footnote font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">Open as a page <ArrowTopRightOnSquareIcon className="size-4" aria-hidden /></Link> : null}
                   <ScorecardBody match={match} teams={teams} />
                 </div>

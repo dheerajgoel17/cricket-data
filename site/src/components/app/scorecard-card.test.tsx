@@ -28,8 +28,10 @@ describe("ScorecardCard", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     fireEvent.click(toggle);
     expect(screen.getByRole("button", { name: "Hide scorecard" })).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByText("Batter")).toBeInTheDocument();
-    expect(screen.getByText("Bowler")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pakistan" })).toBeInTheDocument();
+    expect(screen.getByText("Run rate")).toHaveTextContent("4.17");
+    expect(screen.getByRole("table", { name: "Batting" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Bowling" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open as a page" })).toHaveAttribute("href", "/fixture/x/scorecard");
   });
 
