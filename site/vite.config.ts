@@ -45,8 +45,12 @@ function devApi(localLive: boolean): Plugin {
     configResolved(config) { for (const [k, v] of Object.entries(loadEnv(config.mode, config.root, ""))) process.env[k] ??= v; }, // site/.env.local feeds the handlers' process.env
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        const name = /^\/api\/([a-z]+)$/.exec((req.url || "").split("?")[0] || "")?.[1];
-        const load = name === "live" && localLive ? () => import("./api/live.js") : name === "inplay" && localLive ? () => import("./api/inplay.js") : name === "gate" && localLive ? () => import("./api/gate.js") : null;
+        const name = /^\/api\/([a-z][a-z0-9-]*)$/.exec((req.url || "").split("?")[0] || "")?.[1];
+        const load = name === "live" && localLive ? () => import("./api/live.js")
+          : name === "inplay" && localLive ? () => import("./api/inplay.js")
+          : name === "gate" && localLive ? () => import("./api/gate.js")
+          : name === "ads-admin" ? () => import("./api/ads-admin.js")
+          : null;
         if (!load) return next();
         const { default: handler } = await load();
         let raw = "";

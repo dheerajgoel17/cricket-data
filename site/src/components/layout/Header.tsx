@@ -78,15 +78,15 @@ export function Header() {
   const nav = useNavigate();
   const down = !isTopLevel(pathname); // one level down (a player, a team, a match): a back button on phones, where there is no sidebar
   const back = () => (history.state?.idx > 0 ? nav(-1) : nav("/"));
-  const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions (a match) gets a bar with just the back button and those
+  const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions gets the slot; from lg the brand stays (phone still swaps title into the bar)
   return (
     <header className={cn("sticky top-0 z-50 h-header text-foreground", slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
         <SidebarTrigger className="-ml-2 hidden text-foreground hover:bg-muted hover:text-foreground lg:inline-flex" aria-label="Toggle sidebar" />
         {down && <button type="button" aria-label="Back" onClick={back} className="-ml-2 grid size-(--touch) shrink-0 place-items-center rounded-full text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted lg:hidden"><ChevronLeftIcon className="size-6" /></button>}
-        {own ? null : <Brand />}
+        {own ? <span className="hidden lg:contents"><Brand /></span> : <Brand />}
         {own ? null : <SearchField onOpen={search.show} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />}
-        {/* When a page owns the bar, this portal replaces the brand: title / actions sit here (flex-1 so a title can grow). */}
+        {/* When a page owns the bar, actions land here. On phones they replace the brand; from lg the brand stays and this slot holds trailing actions. */}
         <div ref={slot?.setEl} className={own ? "flex min-w-0 flex-1 items-center gap-snug" : "hidden"} />
         {own ? null : <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={search.show} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>

@@ -7,7 +7,6 @@ import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
 import { HeaderSlotProvider } from "@/lib/header-slot";
-import { AdSlot } from "@/components/app/ad-slot";
 
 const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
 
@@ -104,7 +103,6 @@ export function Shell() {
           {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
           <div key={pathname} ref={content} className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
             <Suspense fallback={<AppSkeleton />}><Outlet /></Suspense>
-            <AdSlot />
           </div>
         </SidebarInset>
       </div>

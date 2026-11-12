@@ -3,11 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon, ChevronLeftIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
 import { fancyRowPath } from "@/lib/fancy-path";
+import { fancySplitNote } from "@/lib/fancy-split";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -38,7 +39,8 @@ import { LiveBadge, LiveOpened, LineProgress, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
-import { EmptyNote } from "./page";
+import { AdSlot } from "./ad-slot";
+import { Crumbs, EmptyNote } from "./page";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
@@ -81,6 +83,55 @@ export const collectOverview = collectOverviewRows as (o: { store: any; doc: any
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
 
+/** Best book for one side at a line: price + that book's mark on one row — never pairs the other side under the same badge. */
+function SideBook({ priced, side }: { priced?: BookLine | null; side: "over" | "under" }) {
+  const face = priced?.[side] != null ? priced.books.find((x) => x[side] === priced[side]) : null;
+  const p = face?.[side] ?? null;
+  if (p == null) return <span className="text-footnote text-muted-foreground">—</span>;
+  return (
+    <span className="flex min-w-0 max-w-full items-center gap-tight overflow-hidden">
+      <Tick value={p} className="shrink-0 font-condensed text-body font-bold leading-none tabular-nums text-primary">{odds(p)}</Tick>
+      <BookBadge source={face!.source} className="min-w-0 max-w-full truncate" />
+    </span>
+  );
+}
+
+/** One ladder line: Over and Under each own their book; extras sit behind the shared +N books accordion. */
+function LadderRow({ line, summary, priced, selected, onPick }: {
+  line: number; summary: { pOver: number; pUnder: number; fairOver: number; fairUnder: number }; priced: BookLine | null; selected: boolean; onPick: () => void;
+}) {
+  const overSrc = priced?.over != null ? priced.books.find((x) => x.over === priced.over)?.source : undefined;
+  const underSrc = priced?.under != null ? priced.books.find((x) => x.under === priced.under)?.source : undefined;
+  return (
+    <TableRow data-state={selected ? "selected" : undefined}
+      className="cursor-pointer border-hairline active:bg-primary/10 data-[state=selected]:bg-primary/15"
+      onClick={onPick}>
+      <TableCell className="w-[3rem] px-snug py-tight align-middle font-medium tabular-nums">{line}</TableCell>
+      <TableCell className="min-w-0 overflow-hidden whitespace-normal px-snug py-tight align-middle">
+        <span className="grid min-w-0 justify-items-start gap-hair" onClick={(e) => e.stopPropagation()}>
+          <SideBook priced={priced} side="over" />
+          {priced && <BookTable books={priced.books} shown={[overSrc, underSrc]} />}
+        </span>
+      </TableCell>
+      <TableCell className="min-w-0 overflow-hidden whitespace-normal px-snug py-tight align-middle">
+        <SideBook priced={priced} side="under" />
+      </TableCell>
+      <TableCell className="w-[3.75rem] whitespace-normal px-snug py-tight align-middle tabular-nums">
+        <span className="grid justify-items-start gap-hair text-left">
+          <b className="text-primary leading-none">{pc(summary.pOver)}</b>
+          <span className="text-footnote leading-none text-muted-foreground">{odds(summary.fairOver)}</span>
+        </span>
+      </TableCell>
+      <TableCell className="w-[3.75rem] whitespace-normal px-snug py-tight align-middle tabular-nums">
+        <span className="grid justify-items-start gap-hair text-left">
+          <b className="leading-none">{pc(summary.pUnder)}</b>
+          <span className="text-footnote leading-none text-muted-foreground">{odds(summary.fairUnder)}</span>
+        </span>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 /** One market's row — same chrome as a player PropRow: title, available over/under lines (named when they differ), one face book per side (+N accordion for the rest), model edge + last-N bars. */
 export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null }) {
   const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
@@ -121,7 +172,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
           ) : (
             <>
               <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
             </>
           )}
           {r.live && <LiveOpened opened={r.opened} line={r.line} />}
@@ -237,9 +288,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
   // available over/under across lines (so under@3.5 shows beside over@4.5 instead of a dash); one face book per side, rest in +N
   const head = useMemo(() => fancyHeadline(book), [book]);
-  const faceBook = (lane: typeof head.over, side: "over" | "under") => (lane && lane[side] != null ? lane.books.find((x) => x[side] === lane[side]) : null);
+  const faceBook = (lane: typeof head.over, side: "over" | "under") => (lane && lane[side] != null ? lane.books.find((x: BookLine["books"][number]) => x[side] === lane[side]) : null);
   const overFace = faceBook(head.over, "over"), underFace = faceBook(head.under, "under");
-  const headBooks = useMemo(() => [...new Map([...(head.over?.books ?? []), ...(head.under?.books ?? [])].map((x) => [x.source, x])).values()], [head]);
+  const splitNote = fancySplitNote(head.over?.line, head.under?.line, overFace?.source, underFace?.source);
   // the shared text: the pick (the side the sample favours, at its best listed price), how the ground has gone and the recent matches; the link is the match's card
   const shareLine = () => {
     if (!rep) return;
@@ -274,32 +325,39 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
   const activeFilters: { key: string; label: string; value: string }[] = [];
   if (win !== 10) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
-  if (here) activeFilters.push({ key: "mv", label: "Sample", value: `At ${venueName}` });
+  if (here) activeFilters.push({ key: "mv", label: "Ground", value: `At ${venueName}` });
   const detailTitle = [team?.[0], innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", key ? marketLabel(key) : "Match Fancy"].filter(Boolean).join(" · ");
   const groundNote = ground
     ? `${ground.differs ? "Ground differs. " : ""}At ${venueName}, last ${ground.n} ${fmt} ${scope >= 0 ? `of ${team?.[0]}` : "matches"}: ${ground.under} under ${line}, ${ground.over} over${ground.max != null ? ` · highest ${ground.max}` : ""}${here ? "" : ` (teams' form: ${rep?.summary.under} of ${rep?.n} under)`}.`
     : "";
-  const backToFancy = () => (history.length > 1 ? nav(-1) : nav(`/fixture/${fx.id}?tab=fancy`));
   const faceBadge = (lane: (typeof book)[number] | null | undefined) => {
     const src = lane?.books[0]?.source;
     return src ? <BookBadge key={src} source={src} /> : null;
   };
+  const fancyListPath = `/fixture/${fx.id}?tab=fancy`;
+  const matchPath = `/fixture/${fx.id}`;
   return (
     <div className="flex min-w-0 flex-col gap-snug" {...(mode === "detail" ? { "data-flush": true } : {})}>
       {mode === "detail" && (
         <HeaderActions>
-          <button type="button" aria-label="Back" onClick={backToFancy} className="hidden size-control shrink-0 place-items-center rounded-full bg-secondary text-primary lg:grid">
-            <ChevronLeftIcon className="size-5" />
-          </button>
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate text-body font-semibold tracking-tight">{detailTitle}</h1>
+          {/* Desktop keeps the brand mark (chips name the market); phone still gets title + match. */}
+          <h1 className="sr-only">{detailTitle}</h1>
+          <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
+            <p className="truncate text-body font-semibold tracking-tight">{detailTitle}</p>
             <p className="truncate text-footnote text-muted-foreground">{fx.a} v {fx.b} · {fmt}</p>
           </div>
+          <span className="hidden flex-1 lg:block" aria-hidden />
           <button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control shrink-0 place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <ArrowUpOnSquareIcon className="size-5" />
           </button>
         </HeaderActions>
       )}
+      {mode === "detail" && (
+        <div className="hidden px-gutter lg:block">
+          <Crumbs items={[[`${abbr(fx.a)} v ${abbr(fx.b)}`, matchPath], ["Match Fancy", fancyListPath], [key ? marketLabel(key) : "Market"]]} />
+        </div>
+      )}
+      {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
       <div className={cn("flex flex-col", mode === "detail" ? "sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150" : "gap-snug")}>
         {/* HomePhaseBar shape: edge-to-edge hairline, scope tabs + L10 on one row, market pills under. */}
         <div className={cn("flex min-w-0 items-stretch gap-snug border-b border-hairline", mode === "detail" && "px-gutter")}>
@@ -356,8 +414,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-snug">
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
-                    <div className="flex flex-col gap-snug lg:grid lg:grid-cols-12 lg:items-start lg:gap-section">
-                      <section className="flex flex-col gap-snug lg:col-span-8">
+                    <div className="flex flex-col gap-snug lg:grid lg:grid-cols-2 lg:items-start lg:gap-section">
+                      <section className="flex min-w-0 flex-col gap-snug">
                         <div className="flex items-baseline justify-between gap-snug">
                           <div className="grid min-w-0 gap-hair">
                             <h2 className="text-body font-medium">Recent results</h2>
@@ -411,8 +469,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                             </Button>
                           )}
                         </div>
-                        {/* Hit-rate meters left (selected O/U); available book over/under right — tap a side on another line to jump the meter there. */}
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-stretch gap-snug border-t border-hairline pt-snug">
+                        {/* Hit rates for the meter line; book Over/Under are independent lanes (often different books or lines on Fancy). */}
+                        <div className="grid gap-snug border-t border-hairline pt-snug">
                           <div className="grid min-w-0 grid-cols-2 gap-snug">
                             {(["over", "under"] as const).map((side) => {
                               const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
@@ -425,87 +483,70 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 </div>);
                             })}
                           </div>
-                          <div className="flex min-w-[7.5rem] flex-col justify-center gap-snug border-l border-hairline pl-snug">
-                            {([
-                              ["over", head.over, overFace] as const,
-                              ["under", head.under, underFace] as const,
-                            ]).map(([side, lane, face]) => {
-                              const jump = lane && lane.line !== line;
-                              const body = face ? (
-                                <span className="flex items-baseline justify-end gap-tight whitespace-nowrap text-footnote">
-                                  <BookBadge source={face.source} />
-                                  <b className="font-condensed text-title font-bold tabular-nums text-primary">{odds(face[side])}</b>
-                                </span>
-                              ) : <span className="text-footnote text-muted-foreground">—</span>;
-                              return (
-                                <div key={side} className="grid gap-hair text-right">
-                                  <span className="label-cap text-caption text-muted-foreground">{side}{lane && lane.line !== line ? ` ${lane.line}` : ""}</span>
-                                  {jump ? (
-                                    <button type="button" onClick={() => set({ ml: lane.line })} aria-label={`Use ${side} line ${lane.line}`}
-                                      className="justify-self-end rounded-sm outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring">
+                          {(head.over || head.under) && (
+                            <div className="grid gap-tight border-t border-hairline pt-snug" aria-label="Book prices">
+                              <div className="grid grid-cols-2 gap-snug">
+                                {([
+                                  ["over", head.over, overFace] as const,
+                                  ["under", head.under, underFace] as const,
+                                ]).map(([side, lane, face]) => {
+                                  const jump = !!(lane && lane.line !== line);
+                                  const body = face ? (
+                                    <span className="grid justify-items-start gap-hair text-left">
+                                      <span className="label-cap text-caption text-muted-foreground">{side} {lane!.line}</span>
+                                      <span className="flex min-w-0 items-center gap-tight">
+                                        <Tick value={face[side]} className="shrink-0 font-condensed text-title font-bold leading-none tabular-nums text-primary">{odds(face[side])}</Tick>
+                                        <BookBadge source={face.source} className="min-w-0 truncate" />
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span className="grid justify-items-start gap-hair text-left">
+                                      <span className="label-cap text-caption text-muted-foreground">{side}</span>
+                                      <span className="text-footnote text-muted-foreground">—</span>
+                                    </span>
+                                  );
+                                  return jump ? (
+                                    <button key={side} type="button" onClick={() => set({ ml: lane!.line })} aria-label={`Use ${side} line ${lane!.line}`}
+                                      className="rounded-sm text-left outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring">
                                       {body}
                                     </button>
-                                  ) : body}
-                                </div>
-                              );
-                            })}
-                            {headBooks.length > 0 && <BookTable books={headBooks} shown={[overFace?.source, underFace?.source]} className="items-end" />}
-                          </div>
+                                  ) : <div key={side} className="text-left">{body}</div>;
+                                })}
+                              </div>
+                              {splitNote && <p className="text-footnote text-muted-foreground">{splitNote}</p>}
+                              {bookHere && (
+                                <BookTable books={bookHere.books} shown={[
+                                  bookHere.over != null ? bookHere.books.find((x) => x.over === bookHere.over)?.source : undefined,
+                                  bookHere.under != null ? bookHere.books.find((x) => x.under === bookHere.under)?.source : undefined,
+                                ]} />
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
+                        {rep.n < 10 && <p className="text-footnote text-amber">Few matches ({rep.n}): treat these with caution.</p>}
                       </section>
 
-                      {/* Phone: full-bleed under the chart. Desktop: sticky beside the chart (same pattern as the player page's book lines). */}
-                      <section className="-mx-gutter border-y border-hairline lg:col-span-4 lg:col-start-9 lg:mx-0 lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
+                      {/* Phone: full-bleed under the chart. Desktop: equal sticky column; panel scrolls so the page does not. */}
+                      <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
                         <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
                           <h2 className="text-body font-medium">Lines</h2>
                           <span className="text-footnote text-muted-foreground">Tap a row</span>
                         </div>
-                        <Table>
+                        <Table className="table-fixed">
                           <TableHeader>
                             <TableRow className="hover:bg-transparent">
-                              <TableHead className="h-auto px-gutter py-tight font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
-                              <TableHead className="h-auto px-gutter py-tight font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Book</TableHead>
-                              <TableHead className="h-auto px-gutter py-tight text-right font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
-                              <TableHead className="h-auto px-gutter py-tight text-right font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
+                              <TableHead className="h-auto w-[3rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
+                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
+                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
+                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit O</TableHead>
+                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit U</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {ladder.map((l: any) => {
-                              const priced = book.find((b) => b.line === l.line);
-                              const overB = priced?.over != null ? priced.books.find((x) => x.over === priced.over) : null;
-                              const underB = priced?.under != null ? priced.books.find((x) => x.under === priced.under) : null;
-                              const face = overB || underB;
-                              return (
-                              <TableRow key={l.line} data-state={l.line === line ? "selected" : undefined}
-                                className="cursor-pointer border-hairline active:bg-primary/10 data-[state=selected]:bg-primary/15"
-                                onClick={() => set({ ml: l.line })}>
-                                <TableCell className="px-gutter py-snug font-medium tabular-nums">{l.line}</TableCell>
-                                <TableCell className="px-gutter py-snug" onClick={(e) => e.stopPropagation()}>
-                                  {priced && face ? (
-                                    <span className="grid gap-hair">
-                                      <button type="button" className="grid justify-items-start gap-hair text-left outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => set({ ml: l.line })}>
-                                        <BookBadge source={face.source} />
-                                        <span className="inline-flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
-                                          <span className="inline-flex items-center gap-tight whitespace-nowrap">O {priced.over != null ? <Tick value={priced.over} className="font-condensed font-bold text-foreground">{odds(priced.over)}</Tick> : <span>—</span>}</span>
-                                          <span className="inline-flex items-center gap-tight whitespace-nowrap">U {priced.under != null ? <Tick value={priced.under} className="font-condensed font-bold text-foreground">{odds(priced.under)}</Tick> : <span>—</span>}</span>
-                                        </span>
-                                      </button>
-                                      <BookTable books={priced.books} shown={[overB?.source, underB?.source]} />
-                                    </span>
-                                  ) : <span className="text-footnote text-muted-foreground">—</span>}
-                                </TableCell>
-                                <TableCell className="px-gutter py-snug text-right tabular-nums">
-                                  <b className="text-primary">{pc(l.pOver)}</b>{" "}
-                                  <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span>
-                                </TableCell>
-                                <TableCell className="px-gutter py-snug text-right tabular-nums">
-                                  <b>{pc(l.pUnder)}</b>{" "}
-                                  <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span>
-                                </TableCell>
-                              </TableRow>
-                              );
-                            })}
+                            {ladder.map((l: any) => (
+                              <LadderRow key={l.line} line={l.line} summary={l} priced={book.find((b) => b.line === l.line) ?? null}
+                                selected={l.line === line} onPick={() => set({ ml: l.line })} />
+                            ))}
                           </TableBody>
                         </Table>
                       </section>
