@@ -642,6 +642,13 @@ function oversTapeReset(prior, teams) {
   return bat.overs != null && was.overs != null && bat.overs < was.overs - 0.05;
 }
 
+/** The previous row's innings that are over: every innings before the latest one (the latest is being batted, and its fresh score is the live page's). Empty when there is no previous row. */
+function carriedInnings(prior, live) {
+  const was = (prior?.innings || []).filter((i) => i.runs != null);
+  const top = Math.max(0, ...was.map((i) => Number(i.n) || 0), ...(live?.innings || []).map((i) => Number(i.n) || 0));
+  return was.filter((i) => (Number(i.n) || 0) < top);
+}
+
 /**
  * One live row from the three Source A pages. `row` is the schedule entry (id, URL, format, start; scores up to ~5 min old), `live` the match page
  * (fresh scores, current pair, partnership, run rates), `card` the scorecard (every innings). Either page may be null: the row then keeps what it has.
@@ -654,13 +661,16 @@ export function buildMatch(row, live, card, prior = null) {
     if (!o) return t;
     return { ...t, ...(o.display ? { display: o.display, runs: o.runs, wkts: o.wkts, overs: o.overs } : {}), batting: o.batting };
   });
-  const innings = [...(card?.innings || [])];
-  for (const i of live?.innings || []) if (!innings.some((x) => teamKey(x.team) === teamKey(i.team))) innings.push(i); // a scorecard page cached a beat behind
+  // The scorecard page is the one that lists every innings; when a poll cannot read it, the innings already over (the previous row's, never the one being batted) are carried, so a side's first innings does not
+  // vanish from the card for a poll ("Yet to bat" for a side that made 446) and come back on the next.
+  const haveCard = !!card?.innings?.length;
+  const innings = haveCard ? [...card.innings] : carriedInnings(prior, live);
+  for (const i of live?.innings || []) if (haveCard ? !innings.some((x) => teamKey(x.team) === teamKey(i.team)) : !innings.some((x) => x.n === i.n && teamKey(x.team) === teamKey(i.team))) innings.push(i); // a scorecard page cached a beat behind
   const cardPlayers = card?.players || [];
   // Pages give a side one innings; a side that has batted twice, or batted with no score shown, gets its line from the card ("152 & 112/10 (35.5 ov)")
   const ovText = (o) => (o == null ? "" : ` (${Number.isInteger(o) ? o.toFixed(1) : o} ov)`);
   const lined = teams.map((t) => {
-    const mine = (card?.innings || []).filter((i) => teamKey(i.team) === teamKey(t.name) && i.runs != null);
+    const mine = (haveCard ? card.innings : innings).filter((i) => teamKey(i.team) === teamKey(t.name) && i.runs != null);
     if (!mine.length || (mine.length === 1 && (t.display || !mine[0].runs))) return t;
     const last = mine[mine.length - 1];
     const display = [...mine.slice(0, -1).map((i) => (i.wkts != null && i.wkts < 10 ? `${i.runs}/${i.wkts}` : `${i.runs}`)), `${last.runs}${last.wkts != null ? `/${last.wkts}` : ""}${ovText(last.overs)}`].join(" & ");

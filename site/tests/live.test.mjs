@@ -1146,3 +1146,16 @@ test("lineStanding: a server entry is found by the innings of its line, so a fir
   assert.deepEqual(lineStanding(served, { ...l, inn: 1 }, TEST_IDN), { v: 40, state: "final", verdict: "cleared" });
   assert.equal(lineStanding(served, { ...l, inn: 2 }, TEST_IDN), null);
 });
+
+test("a poll that cannot read the scorecard keeps the innings already over, so a side's first innings does not vanish for a poll", () => {
+  const row = { id: "t", status: "live", fmt: "Test", start: "", teams: [{ name: "Pakistan", abbr: "PAK" }, { name: "Sri Lanka", abbr: "SL" }] };
+  const prior = { innings: [{ n: 1, team: "Pakistan", runs: 434, wkts: 9, overs: 130 }, { n: 2, team: "Sri Lanka", runs: 446, wkts: 10, overs: 117.2 }, { n: 3, team: "Pakistan", runs: 20, wkts: 1, overs: 6.4 }] };
+  const live = { summary: "", teams: [{ name: "Pakistan", abbr: "PAK", display: "24/1 (6.5 ov)", runs: 24, wkts: 1, overs: 6.5, batting: true }, { name: "Sri Lanka", abbr: "SL" }], innings: [{ n: 3, team: "Pakistan", runs: 24, wkts: 1, overs: 6.5 }] };
+  const m = buildMatch(row, live, null, prior);
+  assert.equal(teamScore(m, "Pakistan").display, "434/9 & 24/1 (6.5 ov)");
+  assert.equal(teamScore(m, "Sri Lanka").display, "446/10 (117.2 ov)");
+  assert.deepEqual(m.innings.map((i) => [i.n, i.team, i.runs]), [[1, "Pakistan", 434], [2, "Sri Lanka", 446], [3, "Pakistan", 24]]); // the latest innings is the live page's, never the carried copy
+  // with no previous row nothing is invented, and with the scorecard page the card wins
+  assert.equal(teamScore(buildMatch(row, live, null), "Sri Lanka").display ?? "", "");
+  assert.deepEqual(buildMatch(row, live, null, { innings: [{ n: 3, team: "Pakistan", runs: 20, wkts: 1, overs: 6.4 }] }).innings.map((i) => i.n), [3], "the innings being batted is not carried");
+});
