@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-12 18:00 IST
+# Cricket value bets - 2026-11-12 18:36 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1284 prices
+- **moviodds_bet365**: ok, 1364 prices
 - **smarkets**: ok, 291 prices
 - **feedg**: ok, 24 prices, 3 events
 - **feedk**: ok, 196 prices, 9 events
-- **feede**: ok, 348 prices, 10 events
+- **feede**: ok, 374 prices, 11 events
 - **feedf**: ok, 218 prices, 7 events
-- **feedh**: ok, 950 prices, 38 events
+- **feedh**: ok, 1020 prices, 39 events
 
-Matches starting in next 168h: **18**, markets priced: **282**, value bets: **0** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **19**, markets priced: **289**, value bets: **0** (new alerts: 0). Min edge 5%.
 
 _No value bets passed the filters this run._
 
@@ -21,4 +21,4 @@ _No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male)
 
-Runtime 111.0s. Snapshot: `odds_20261112T123038Z.jsonl.gz`
+Runtime 109.6s. Snapshot: `odds_20261112T130637Z.jsonl.gz`
