@@ -95,24 +95,24 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
     <section aria-label="Match overview" className="flex flex-col gap-snug">
       {backBtn}
       {actions}
-      <div className="flex min-w-0 flex-col gap-snug rounded-2xl bg-card px-inset py-snug ring-1 ring-inset ring-hairline">
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote">
+      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-inset ring-hairline">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote">
           <span className={cn("label-cap font-bold", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
           <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
           {f.series && <span className="text-muted-foreground">{f.series}</span>}
         </div>
-        <div className="divide-y divide-hairline border-y border-hairline">
+        <div className="divide-y divide-dashed divide-hairline border-y border-hairline">
           {sides.map(([name, ix], i) => {
             const score = scores[i];
             return (
-              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight py-tight">
+              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-inset py-tight">
                 <TeamName name={name} ix={ix} />
                 {hasScore && (score?.display || on) && <LiveScore live={on && !session} s={score} size="lg" />}
               </div>
             );
           })}
         </div>
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-callout">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-callout">
           <span className="font-medium">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
           {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}

@@ -295,11 +295,11 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   if (board.crr != null) meta.push(<span key="c"><span className="text-muted-foreground">CRR</span> {board.crr.toFixed(2)}</span>);
   if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
   return (
-    <section aria-label="Live scoreboard" className="flex flex-col gap-tight">
+    <section aria-label="Live scoreboard" className="flex flex-col divide-y divide-dashed divide-hairline border-t border-hairline">
       {(!!board.batters.length || bw) && (
-        <div className="grid grid-cols-3 divide-x divide-hairline rounded-lg bg-background/60">
+        <div className="grid grid-cols-3 divide-x divide-dashed divide-hairline bg-background/60">
           {[board.batters[0], board.batters[1], bw].map((player, i) => (
-            <div key={i} className="grid min-w-0 content-start gap-hair p-tight">
+            <div key={i} className="grid min-w-0 content-start gap-hair px-tight py-snug first:pl-inset last:pr-inset">
               <div className="label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
               {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
             </div>
@@ -307,9 +307,9 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
         </div>
       )}
       {!!board.overs.length && (
-        <div className="min-w-0 py-tight"><Overs overs={board.overs} /></div>
+        <div className="min-w-0 px-inset py-snug"><Overs overs={board.overs} /></div>
       )}
-      {!!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div>}
+      {!!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote tabular-nums">{meta}</div>}
     </section>
   );
 }
@@ -318,14 +318,14 @@ export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[
   const [open, setOpen] = useState(false);
   const panelId = useId();
   return (
-    <div className="flex min-w-0 flex-col gap-snug">
+    <div className="min-w-0 border-t border-hairline">
       <button type="button" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((value) => !value)}
-        className="flex min-h-control w-full items-center gap-snug rounded-lg bg-background/60 px-snug text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring">
+        className="flex min-h-control w-full items-center gap-snug bg-background/60 px-inset text-callout font-medium outline-none hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
         <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
         {open ? "Hide scorecard" : "Full scorecard"}
         <ChevronDownIcon className={cn("ml-auto size-4 shrink-0 text-muted-foreground transition-transform motion-reduce:transition-none", open && "rotate-180")} aria-hidden />
       </button>
-      <div id={panelId} hidden={!open}>
+      <div id={panelId} hidden={!open} className="border-t border-dashed border-hairline px-inset py-snug">
         {open && <ScorecardBody match={match} teams={teams} />}
       </div>
     </div>
