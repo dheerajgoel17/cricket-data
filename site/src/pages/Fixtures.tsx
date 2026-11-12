@@ -18,6 +18,7 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
 import { liveBlurb, liveCard, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
+import { fixtureTeamBackground } from "@/lib/team-colors";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, useNow } from "@/lib/clock";
@@ -95,7 +96,8 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
     <section aria-label="Match overview" className="flex flex-col gap-snug">
       {backBtn}
       {actions}
-      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-inset ring-hairline">
+      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-inset ring-hairline"
+        style={{ backgroundImage: fixtureTeamBackground(f.a, f.b) }}>
         <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote">
           <span className={cn("label-cap font-bold", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
           <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
