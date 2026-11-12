@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { router } from "expo-router";
 import type { HomePhase } from "@site/lib/home-phase";
 import { EMPTY_PHASE } from "@/lib/rail";
 import { fancyFm } from "@cricket/engine/fancy-edge.js";
@@ -21,10 +19,9 @@ import { useHotView } from "@/lib/use-hot";
 import { useRail } from "@/lib/use-rail";
 import { EmptyState } from "@/ui/empty-state";
 import { OverviewRow } from "@/ui/fancy-row";
-import { ChevronRight } from "@/ui/icons";
 import { MatchChips } from "@/ui/match-chip";
 import { MarketTape, type TapeRow } from "@/ui/market-tape";
-import { Skeleton, Working } from "@/ui/motion";
+import { Working } from "@/ui/motion";
 import { PropRow } from "@/ui/prop-row";
 import { color, space, type } from "@/ui/tokens";
 
@@ -97,19 +94,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   return (
     <View style={styles.wrap}>
       {!isLoading && tape.length ? <View style={styles.pad}><MarketTape rows={tape} /></View> : null}
-      <View style={[styles.head, styles.pad]}>
-        <Text style={styles.headTitle}>Props</Text>
-        <View style={styles.links}>
-          <Press onPress={() => router.navigate("/props" as never)} hitSlop={8} style={styles.seeAll} accessibilityRole="link">
-            <Text style={styles.seeAllText}>Player props</Text>
-            <ChevronRight color={color.primary} />
-          </Press>
-          <Press onPress={() => router.navigate("/fancy" as never)} hitSlop={8} style={styles.seeAll} accessibilityRole="link">
-            <Text style={styles.seeAllText}>Fancy</Text>
-            <ChevronRight color={color.primary} />
-          </Press>
-        </View>
-      </View>
+      <View style={styles.pad}><Text style={styles.headTitle}>Props</Text></View>
       {loading && !blocks.length ? (
         <Working label="Scoring today's lines…" rows={4} />
       ) : error && !blocks.length ? (
@@ -146,24 +131,16 @@ export function HotHome({ phase }: { phase: HomePhase }) {
 export function HotHomeSkeleton() {
   return (
     <View style={styles.wrap}>
-      <View style={[styles.head, styles.pad]}>
-        <Text style={styles.headTitle}>Props</Text>
-        <View style={styles.links}><Skeleton style={styles.skLink} /><Skeleton style={styles.skLink} /></View>
-      </View>
+      <View style={styles.pad}><Text style={styles.headTitle}>Props</Text></View>
       <Working label="Loading today's lines…" rows={4} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  skLink: { width: 54, height: 12, borderRadius: 6 },
   wrap: { gap: space.group, paddingTop: space.group },
   pad: { paddingHorizontal: space.gutter },
   body: { gap: space.stack },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  head: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
   headTitle: { ...type.title, color: color.foreground },
-  links: { flexDirection: "row", alignItems: "center", gap: space.stack },
-  seeAll: { flexDirection: "row", alignItems: "center" },
-  seeAllText: { ...type.footnote, color: color.primary },
 });

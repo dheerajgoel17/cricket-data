@@ -1,7 +1,7 @@
 import { liveForFixture } from "@cricket/engine/live.js";
 import { keepMsFor } from "@cricket/engine/lines.js";
 
-/** The three buckets the home floating bar switches: a match in play, one yet to start, one that has a result. */
+/** The three buckets the home phase tabs switch: a match in play, one yet to start, one that has a result. */
 export type HomePhase = "live" | "pre" | "final";
 export const HOME_PHASES: [HomePhase, string][] = [["live", "In play"], ["pre", "Pre-match"], ["final", "Completed"]];
 

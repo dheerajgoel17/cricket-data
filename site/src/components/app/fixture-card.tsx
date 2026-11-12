@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { AvatarGroup } from "@/components/ui/avatar";
@@ -13,16 +12,9 @@ import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, matchDateLabel, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamAvatar, TeamBadge, usePreloadTeams } from "./badges";
-import { PillGroup } from "./pill-group";
 import { Tick } from "./tick";
 
-import { seriesChips } from "@cricket/engine/props-view.js";
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
-/** Short chip label: drops the year, "in <place>" and "tour of <host>" tails so names aren't cut mid-word. */
-const shortSeries = (n: string) => {
-  const t = n.replace(/\s+\d{4}([-/]\d{2,4})?$/, "").replace(/\s+in\s+[A-Z][\w ]*$/, "").replace(/\s+tour of\s.*$/i, " tour").trim();
-  return t.length > 30 ? `${t.slice(0, 29)}…` : t;
-};
 const hasTime = (f: any) => f.start.length > 10;
 const city = (v: string) => (v || "").split(",")[0].replace(/\(.*\)/, "").trim();
 
@@ -73,7 +65,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
     <motion.div className="h-full" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(i, 6) * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <Card className="h-full gap-0 rounded-2xl border-0 bg-surface py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-hover">
+      <Card className="h-full gap-0 rounded-2xl border-0 bg-card py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-raised">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
             {session ? <span className="label-cap text-footnote text-destructive">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
@@ -135,26 +127,18 @@ export function MatchChip({ f }: { f: any }) {
   );
 }
 
-/** Series chips over a native snap rail of FixtureCards (iOS momentum, one-card snap). On a phone each card is `--fixture-card` (80% of the screen) so the next match peeks; from `lg` the token is a fixed rem. The home phase bar (In play / Pre-match / Resulted) picks which cards sit here. */
+/** Native snap rail of FixtureCards (iOS momentum, one-card snap). On a phone each card is `--fixture-card` (80% of the screen) so the next match peeks; from `lg` the token is a fixed rem. The home phase tabs (In play / Pre-match / Completed) pick which cards sit here. */
 export function FixtureRail({ fx }: { fx: any[] }) {
   usePreloadTeams(fx.slice(0, 8).flatMap((f) => [f.a, f.b]));
-  const [sel, setSel] = useState("all");
-  const chips = useMemo(() => {
-    return seriesChips(fx, seriesName, (f: any) => !f.noProps); // series with priced matches first, then the biggest
-  }, [fx]);
-  const shown = sel === "all" ? fx : fx.filter((f) => seriesName(f) === sel);
   if (!fx.length) return null;
   return (
-    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="flex flex-col gap-stack" aria-label="Matches">
-      <PillGroup layoutId="series-chip" label="Filter by series" value={sel} onChange={setSel}
-        items={[["all", <>All <span className="ml-1.5 text-footnote text-muted-foreground">{fx.length}</span></>], ...chips.map(([n, k]) => [n, <span key={n} title={n}>{shortSeries(n)} <span className="ml-1 text-footnote text-muted-foreground">{k}</span></span>] as [string, React.ReactNode])]} />
+    <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} aria-label="Matches">
       <div
-        key={sel}
         role="list"
         aria-label="Match cards"
         className="-mx-gutter flex snap-x snap-mandatory gap-snug overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [scroll-padding-inline:var(--gutter)] [&::-webkit-scrollbar]:hidden"
       >
-        {shown.map((f, i) => (
+        {fx.map((f, i) => (
           <div key={`${f.id}${f.a}${f.b}`} role="listitem" className="w-(--fixture-card) shrink-0 snap-start">
             <FixtureCard f={f} i={i} />
           </div>

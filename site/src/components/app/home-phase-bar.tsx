@@ -1,45 +1,40 @@
 import { NavLink } from "react-router-dom";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { motion, useReducedMotion } from "motion/react";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MORE_NAV } from "@/components/layout/nav";
 import { track } from "@/lib/analytics";
 import { HOME_PHASES, type HomePhase } from "@/lib/home-phase";
-import { cn } from "@/lib/utils";
 
-/** Match-state controls for the fixture rail and props feed. */
+/** Match-state underline tabs (In play / Pre-match / Completed): left-aligned, content-width, edge-to-edge hairline, equal stack padding, theme primary on the selected tab. */
 export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; counts: Record<HomePhase, number>; onChange: (p: HomePhase) => void }) {
-  const reduce = useReducedMotion();
-  const pick = (p: HomePhase) => { if (p === value) return; track("home_phase", { phase: p }); onChange(p); };
+  const pick = (p: string) => {
+    if (p === value) return;
+    track("home_phase", { phase: p });
+    onChange(p as HomePhase);
+  };
   return (
-    <nav
-      aria-label="Match state"
-      className="flex"
-    >
-      <div className="flex max-w-full flex-wrap items-center gap-hair rounded-[var(--chip-radius)] bg-card p-hair ring-1 ring-hairline">
-        <div role="group" aria-label="Fixture phase" className="flex flex-wrap">
-          {HOME_PHASES.map(([id, label]) => {
-            const on = value === id, n = counts[id];
-            return (
-              <button
+    <nav data-flush aria-label="Match state" className="-mx-gutter border-b border-hairline px-gutter">
+      <div className="flex min-w-0 items-stretch gap-snug">
+        <Tabs value={value} onValueChange={pick} className="min-w-0 flex-1 gap-0">
+          <TabsList variant="line" aria-label="Fixture phase" className="h-auto w-full justify-start gap-stack rounded-none bg-transparent p-0 group-data-[orientation=horizontal]/tabs:h-auto">
+            {HOME_PHASES.map(([id, label]) => (
+              <TabsTrigger
                 key={id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => pick(id)}
-                className={cn("relative h-control shrink-0 rounded-[var(--chip-radius)] px-snug text-callout font-medium", on ? "text-background" : "text-muted-foreground")}
+                value={id}
+                className="h-auto flex-none justify-start rounded-none border-0 bg-transparent px-0 py-stack text-callout font-medium text-muted-foreground shadow-none after:bg-primary group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-0 group-data-[orientation=horizontal]/tabs:after:h-0.5 data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent dark:data-[state=active]:text-primary"
               >
-                {on && <motion.span layoutId="home-phase" aria-hidden className="absolute inset-0 rounded-[var(--chip-radius)] bg-foreground" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
-                <span className="relative flex items-center gap-hair">
+                <span className="flex items-center gap-hair">
                   {label}
-                  <span className="text-caption font-medium tabular-nums opacity-70">{n}</span>
+                  <span className="text-caption font-medium tabular-nums opacity-70">{counts[id]}</span>
                 </span>
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         <Sheet>
           <SheetTrigger asChild>
-            <button type="button" aria-label="More" className="grid size-control shrink-0 place-items-center rounded-[var(--chip-radius)] text-muted-foreground hover:bg-surface-hover hover:text-foreground">
+            <button type="button" aria-label="More" className="my-auto grid size-control shrink-0 place-items-center rounded-[var(--chip-radius)] text-muted-foreground hover:bg-surface-hover hover:text-foreground">
               <EllipsisHorizontalIcon className="size-5" />
             </button>
           </SheetTrigger>

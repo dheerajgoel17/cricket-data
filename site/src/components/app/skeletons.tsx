@@ -122,9 +122,8 @@ export function FancySkeleton() {
 /** The home rail while its inputs load (fixtures, bookmaker lines, rail settings): series chips, two fixture cards. */
 export function RailSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-stack">
-      <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
-      <div className="-mx-gutter flex gap-snug overflow-hidden px-gutter">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}</div>
+    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter">
+      {[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}
     </div>
   );
 }
