@@ -23,5 +23,20 @@
   "edge": 0.0523,
   "start_utc": "2026-11-13T03:30:00Z",
   "alerted_at": "2026-11-12T01:34:11.533001+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-15|bowler_milestone||Hasan Mahmud 5+ yes|4.5|over": {
+  "edge": 0.2319,
+  "start_utc": "2026-11-15T08:00:00Z",
+  "alerted_at": "2026-11-12T16:32:43.568004+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-15|bowler_milestone||Taijul Islam 5+ yes|4.5|over": {
+  "edge": 0.1855,
+  "start_utc": "2026-11-15T08:00:00Z",
+  "alerted_at": "2026-11-12T16:32:43.568004+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-15|bowler_milestone||Mehidy Hasan Miraz 5+ yes|4.5|over": {
+  "edge": 0.1423,
+  "start_utc": "2026-11-15T08:00:00Z",
+  "alerted_at": "2026-11-12T16:32:43.568004+00:00"
  }
 }
