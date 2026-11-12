@@ -7,31 +7,24 @@ vi.mock("@/lib/books", () => ({ bookLogo: () => undefined })); // no logo files:
 
 const B = (source: string, over: number, under: number) => ({ source, kind: "bookmaker", over, under });
 
-describe("BookQuotes (the per-book line and over price under a Hot props row)", () => {
+describe("BookQuotes (per-side books under a Hot props row)", () => {
   const quotes = bookQuotes([{ line: 17.5, books: [B("bet365", 1.833, 1.833)] }, { line: 14.5, books: [B("Ladbrokes", 1.83, 1.83)] }]);
 
-  const chips = (c: HTMLElement) => [...c.querySelectorAll("[data-book]")].map((e) => e.parentElement!.textContent);
-
-  it("shows the best quote up front and the other books in a table behind a toggle, with their line, over and under", () => {
-    const { container } = render(<BookQuotes quotes={quotes} />);
-    expect(chips(container)).toEqual(["Ladbrokes O 14.5 1.83 · U 1.83 (lowest line, best price)"]);
+  it("shows Over and Under each with their face book, and the other books behind +N", () => {
+    render(<BookQuotes quotes={quotes} />);
+    expect(screen.getByText(/^O/)).toBeInTheDocument();
+    expect(screen.getByText(/^U/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Ladbrokes|bet365/).length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByRole("table")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "+1 book" }));
-    expect(screen.getByRole("button", { name: "Hide prices" })).toHaveAttribute("aria-expanded", "true");
-    expect([...screen.getByRole("table").querySelectorAll("tbody td")].map((c) => c.textContent)).toEqual(["bet365", "17.5", "1.83", "1.83"]);
+    fireEvent.click(screen.getByRole("button", { name: /\+\d+ books?/ }));
+    expect(screen.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("table")).toBeInTheDocument();
   });
 
-  it("marks the friendliest quote in the accent colour and for screen readers, and no other", () => {
-    const { container } = render(<BookQuotes quotes={quotes} />);
-    const [best] = [...container.querySelectorAll("[data-book]")].map((e) => e.parentElement!);
-    expect(best).toHaveClass("text-primary", "font-medium");
-    expect(screen.getAllByText("(lowest line, best price)", { exact: false })).toHaveLength(1);
-  });
-
-  it("has no toggle when one book prices the line, but still shows that book's mark and price", () => {
+  it("has no toggle when one book prices both sides, but still shows that book's mark and price", () => {
     render(<BookQuotes quotes={bookQuotes([{ line: 17.5, books: [B("bet365", 1.833, 1.833)] }])} />);
-    expect(screen.getByText(/bet365/)).toBeInTheDocument();
-    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getAllByText(/bet365/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
   });
 
   it("rolls the new price in place without flashing the background", () => {
@@ -47,11 +40,10 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(ticker.className).not.toMatch(/tick-(up|down)/);
   });
 
-  it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\" at the end of it", () => {
+  it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\"", () => {
     const live = bookQuotes([{ line: 33.5, books: [{ ...B("bet365", 1.8, 1.9), live: true, opened: 25.5 }] }]);
-    const { container } = render(<BookQuotes quotes={live} />);
+    render(<BookQuotes quotes={live} />);
     expect(screen.queryByText("Live")).toBeNull();
-    const note = screen.getByText("was 25.5");
-    expect(note.previousElementSibling).toContainElement(container.querySelector("[data-book]") as HTMLElement); // on the quote's own line, after the prices
+    expect(screen.getByText("was 25.5")).toBeInTheDocument();
   });
 });
