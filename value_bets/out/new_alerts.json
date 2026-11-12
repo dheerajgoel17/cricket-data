@@ -1,4 +1,66 @@
 {
- "generated_at_ist": "2026-11-12 06:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-12 07:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Australia|England|2026-11-13",
+   "match": "Australia vs England",
+   "start_utc": "2026-11-13T03:30:00Z",
+   "start_ist": "2026-11-13 09:00 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Joe Root To Score 50",
+   "team_scope": "",
+   "selection": "Joe Root 50+ no",
+   "player_matched_as": "Joe Root",
+   "player_id": "a343262c",
+   "player_team": "England",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "under",
+   "best_odds": 1.5,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 1.5,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0667,
+   "implied_prob": 0.6667,
+   "fair_odds": 1.425,
+   "fair_prob": 0.7015,
+   "model_prob": 0.7187,
+   "market_prob": 0.6875,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0523,
+   "edge_pct": 5.23,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 72% vs market 69% for 50+ runs; form 47.8 runs/inn recency-weighted ODI (n_eff 23.7; last 5: 5, 69, 33, 18, 15), bats in 93% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 18 inns avg 29.1; weather: cloud cover 100%",
+   "notes": "2 market source(s) for fair price; model 0.719 vs market 0.688; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 23.7,
+    "expected": 42.54,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.93,
+    "venue_matched": null,
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 59,
+    "cloud_pct": 100,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "01b664f00b31879f",
+   "alert_key": "male|Australia|England|2026-11-13|batter_milestone||Joe Root 50+ no|49.5|under",
+   "alerted_at_ist": "2026-11-12 07:04 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }

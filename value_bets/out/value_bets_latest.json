@@ -1,55 +1,54 @@
 {
- "generated_at_utc": "2026-11-12T00:30:38Z",
- "generated_at_ist": "2026-11-12 06:00 IST",
- "runtime_secs": 201.1,
+ "generated_at_utc": "2026-11-12T01:30:34Z",
+ "generated_at_ist": "2026-11-12 07:00 IST",
+ "runtime_secs": 219.5,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-11",
-  "commit": "8c6fe7f1a7"
+  "commit": "0852ff7ee3"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 1734,
-   "secs": 1.7
+   "secs": 0.7
+  },
+  "feedk": {
+   "status": "error",
+   "reason": "HTTPError: HTTP Error 410: Gone",
+   "secs": 1.9
   },
   "smarkets": {
    "status": "ok",
-   "rows": 430,
+   "rows": 446,
    "secs": 2.4
-  },
-  "feedk": {
-   "status": "ok",
-   "rows": 212,
-   "secs": 13.6,
-   "events": 5
   },
   "feedg": {
    "status": "ok",
    "rows": 40,
-   "secs": 29.3,
+   "secs": 27.5,
    "events": 5
   },
   "feede": {
    "status": "ok",
    "rows": 538,
-   "secs": 45.4,
+   "secs": 44.2,
    "events": 17
   },
   "feedh": {
    "status": "ok",
    "rows": 1182,
-   "secs": 80.2,
+   "secs": 80.7,
    "events": 33
   },
   "feedf": {
    "status": "ok",
-   "rows": 318,
-   "secs": 80.8,
+   "rows": 422,
+   "secs": 97.8,
    "events": 17
   }
  },
- "snapshot": "odds_20261112T003038Z.jsonl.gz",
+ "snapshot": "odds_20261112T013034Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,24 +119,24 @@
  },
  "stats": {
   "events_in_window": 30,
-  "rows_in_window": 4323,
-  "selections_with_model": 2484,
-  "selections_with_market_fair": 2620,
-  "markets_in_window": 412,
-  "value_bets": 0,
+  "rows_in_window": 4227,
+  "selections_with_model": 2470,
+  "selections_with_market_fair": 2612,
+  "markets_in_window": 414,
+  "value_bets": 1,
   "dropped_by_filter": {
    "odds_range": 34,
-   "model_market_gap": 1009,
-   "loose_name_match": 8,
+   "model_market_gap": 1012,
    "market_disabled": 1,
-   "model_disagrees": 16,
+   "model_disagrees": 10,
    "model_only_no_market": 178,
-   "policy_max_odds": 3,
+   "loose_name_match": 5,
+   "policy_max_odds": 2,
    "suspect_edge": 2,
    "policy_min_edge": 1
   },
   "suspect_edges": 2,
-  "innings_milestones_unmodelled": 38,
+  "innings_milestones_unmodelled": 14,
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 647,
@@ -156,20 +155,20 @@
     "corr": 0.666
    },
    "batter_runs": {
-    "n_prices": 668,
+    "n_prices": 664,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.645,
-    "corr": 0.15
+    "mean_abs_logit_diff": 0.656,
+    "corr": -0.212
    },
    "batter_sixes": {
     "n_prices": 76,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.513,
-    "corr": 0.746
+    "mean_abs_logit_diff": 0.511,
+    "corr": 0.75
    },
    "batter_fours": {
     "n_prices": 76,
@@ -188,12 +187,12 @@
     "corr": 0.856
    },
    "batter_milestone": {
-    "n_prices": 804,
-    "mean_model_p": 0.414,
-    "mean_market_p": 0.445,
-    "mean_logit_diff_model_minus_market": -0.218,
-    "mean_abs_logit_diff": 0.778,
-    "corr": 0.976
+    "n_prices": 736,
+    "mean_model_p": 0.417,
+    "mean_market_p": 0.446,
+    "mean_logit_diff_model_minus_market": -0.214,
+    "mean_abs_logit_diff": 0.809,
+    "corr": 0.977
    },
    "bowler_milestone": {
     "n_prices": 175,
@@ -259,7 +258,6 @@
    "sources": [
     "feede_lb",
     "feedg_f",
-    "feedk_leoal",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -361,6 +359,7 @@
     "India U19"
    ],
    "sources": [
+    "feedf_p",
     "feedh_d"
    ]
   },
@@ -374,6 +373,7 @@
     "Pakistan U19"
    ],
    "sources": [
+    "feedf_p",
     "feedh_d"
    ]
   },
@@ -452,7 +452,6 @@
    "sources": [
     "feede_lb",
     "feedg_f",
-    "feedk_leoal",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -468,6 +467,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_p",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -483,6 +483,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_p",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -545,7 +546,6 @@
     "feedf_p",
     "feedg_f",
     "feedh_d",
-    "feedk_leoal",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -563,7 +563,6 @@
     "feede_lb",
     "feedg_f",
     "feedh_d",
-    "feedk_leoal",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -581,7 +580,6 @@
     "feede_lb",
     "feedg_f",
     "feedh_d",
-    "feedk_leoal",
     "moviodds_bet365"
    ]
   },
@@ -659,7 +657,64 @@
    ]
   }
  ],
- "value_bets": [],
+ "value_bets": [
+  {
+   "event_key": "male|Australia|England|2026-11-13",
+   "match": "Australia vs England",
+   "start_utc": "2026-11-13T03:30:00Z",
+   "start_ist": "2026-11-13 09:00 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Joe Root To Score 50",
+   "team_scope": "",
+   "selection": "Joe Root 50+ no",
+   "player_matched_as": "Joe Root",
+   "player_id": "a343262c",
+   "player_team": "England",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "under",
+   "best_odds": 1.5,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 1.5,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0667,
+   "implied_prob": 0.6667,
+   "fair_odds": 1.425,
+   "fair_prob": 0.7015,
+   "model_prob": 0.7187,
+   "market_prob": 0.6875,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0523,
+   "edge_pct": 5.23,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 72% vs market 69% for 50+ runs; form 47.8 runs/inn recency-weighted ODI (n_eff 23.7; last 5: 5, 69, 33, 18, 15), bats in 93% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 18 inns avg 29.1; weather: cloud cover 100%",
+   "notes": "2 market source(s) for fair price; model 0.719 vs market 0.688; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 23.7,
+    "expected": 42.54,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.93,
+    "venue_matched": null,
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 59,
+    "cloud_pct": 100,
+    "source": "Open-Meteo forecast"
+   }
+  }
+ ],
  "suspect_not_alerted": [
   {
    "match": "New Zealand vs India",
@@ -669,10 +724,10 @@
    "selection": "RG Sharma 100+ yes",
    "odds": 10.0,
    "source": "moviodds_bet365",
-   "fair_prob": 0.1358,
+   "fair_prob": 0.1427,
    "model_prob": 0.1278,
-   "market_prob": 0.1423,
-   "edge_pct": 35.76,
+   "market_prob": 0.1549,
+   "edge_pct": 42.71,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "market_fair_from": "anchored on moviodds_bet365 O/U 30.5 (de-vigged 0.500)"
   },
@@ -684,10 +739,10 @@
    "selection": "RG Sharma 100+ yes",
    "odds": 10.0,
    "source": "moviodds_bet365",
-   "fair_prob": 0.1363,
+   "fair_prob": 0.1411,
    "model_prob": 0.1278,
-   "market_prob": 0.1432,
-   "edge_pct": 36.27,
+   "market_prob": 0.1519,
+   "edge_pct": 41.07,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "market_fair_from": [
     "anchored on moviodds_bet365 O/U 30.5 (de-vigged 0.500)"
@@ -939,24 +994,24 @@
   }
  },
  "log": [
-  "[06:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[06:00 IST] history: 23999 matches, last 2026-11-11, players 432259",
-  "[06:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1734, 'secs': 1.7}",
-  "[06:02 IST] source smarkets: {'status': 'ok', 'rows': 430, 'secs': 2.4}",
-  "[06:02 IST] source feedk: {'status': 'ok', 'rows': 212, 'secs': 13.6, 'events': 5}",
-  "[06:02 IST] source feedg: {'status': 'ok', 'rows': 40, 'secs': 29.3, 'events': 5}",
-  "[06:02 IST] source feede: {'status': 'ok', 'rows': 538, 'secs': 45.4, 'events': 17}",
-  "[06:02 IST] source feedh: {'status': 'ok', 'rows': 1182, 'secs': 80.2, 'events': 33}",
-  "[06:02 IST] source feedf: {'status': 'ok', 'rows': 318, 'secs': 80.8, 'events': 17}",
-  "[06:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[06:02 IST] 39 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[06:02 IST] 32 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[06:02 IST] 38 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[06:02 IST] held back 38 player and 45 fancy lines first priced after their match started (not pre-match prices)",
-  "[06:02 IST] book lines: 412 player lines from 7 source(s)",
-  "[06:02 IST] 68 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[06:03 IST] weather: forecasts for 12 events, 0 failed",
-  "[06:03 IST] prop model: 1443 prop selections modelled, 503 milestone ladder prices anchored to O/U",
-  "[06:03 IST] ledger upsert model: {'upserted': 0, 'skipped_settled': 0}"
+  "[07:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[07:00 IST] history: 23999 matches, last 2026-11-11, players 432259",
+  "[07:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1734, 'secs': 0.7}",
+  "[07:02 IST] source feedk: {'status': 'error', 'reason': 'HTTPError: HTTP Error 410: Gone', 'secs': 1.9}",
+  "[07:02 IST] source smarkets: {'status': 'ok', 'rows': 446, 'secs': 2.4}",
+  "[07:02 IST] source feedg: {'status': 'ok', 'rows': 40, 'secs': 27.5, 'events': 5}",
+  "[07:02 IST] source feede: {'status': 'ok', 'rows': 538, 'secs': 44.2, 'events': 17}",
+  "[07:02 IST] source feedh: {'status': 'ok', 'rows': 1182, 'secs': 80.7, 'events': 33}",
+  "[07:02 IST] source feedf: {'status': 'ok', 'rows': 422, 'secs': 97.8, 'events': 17}",
+  "[07:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[07:02 IST] 39 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[07:02 IST] 32 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[07:02 IST] 14 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[07:02 IST] held back 35 player and 45 fancy lines first priced after their match started (not pre-match prices)",
+  "[07:02 IST] book lines: 390 player lines from 6 source(s)",
+  "[07:02 IST] 56 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[07:04 IST] weather: forecasts for 12 events, 0 failed",
+  "[07:04 IST] prop model: 1429 prop selections modelled, 455 milestone ladder prices anchored to O/U",
+  "[07:04 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
