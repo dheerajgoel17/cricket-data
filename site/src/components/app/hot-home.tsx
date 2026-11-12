@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ChartBarIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import { ChartBarIcon } from "@heroicons/react/24/outline";
 import { modelSide, sideRate } from "@cricket/engine/props-view.js";
 import { sameFixture } from "@cricket/engine/lines.js";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
@@ -88,13 +88,7 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   return (
     <section aria-label="Props" className="flex flex-col gap-stack">
       <div className="empty:hidden">{isLoading ? <TapeSkeleton /> : <MarketTape rows={tapeRows} />}</div>
-      <div className="flex flex-wrap items-baseline justify-between gap-snug">
-        <h2 className="text-title font-bold tracking-tight">Props</h2>
-        <span className="flex items-center gap-stack text-footnote font-medium">
-          <Link to="/props" className="inline-flex items-center text-primary">Player props<ChevronRightIcon className="size-4" aria-hidden /></Link>
-          <Link to="/fancy" className="inline-flex items-center text-primary">Fancy<ChevronRightIcon className="size-4" aria-hidden /></Link>
-        </span>
-      </div>
+      <h2 className="text-title font-bold tracking-tight">Props</h2>
       {loading ? <RowsSkeleton /> : blocks.length ? (
         <div className="flex flex-col gap-stack">
           <PillGroup

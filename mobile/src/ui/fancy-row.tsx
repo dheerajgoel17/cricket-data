@@ -38,8 +38,9 @@ export function BookList({ books, shown }: { books: { source: string; over: numb
 }
 
 /**
- * One market's row, in the props-list style: its name, how the ground has gone, the book's line and price(s), the model's edge on the better side (and which side), and the other
- * books behind "+N books". `standing` is the 15 s live so-far, the same words as a player prop.
+ * One market's row, in the props-list style: its name, how the ground has gone, the available over/under lines
+ * (named when they differ so a side listed elsewhere is never a dash), one face book per side (+N accordion for the rest),
+ * the model's edge on the better side. `standing` is the 15 s live so-far, the same words as a player prop.
  */
 export function OverviewRow({ r, onOpen, active, standing, sub, extra }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string; extra?: ReactNode }) {
   const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
@@ -62,8 +63,8 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra }: { r: an
             {r.at ? (() => {
               const ground = shortVenue(r.venue);
               const hits = r.at.side === "over" ? r.at.over : r.at.under;
-              const lean = r.at.side === r.side && r.edge != null;
-              return <Text style={[styles.at, lean && { color: color.primary, fontFamily: font.medium }]} numberOfLines={1}>{hits}/{r.at.n} {r.at.side}{ground ? ` at ${ground}` : ""}</Text>;
+              const leanAt = r.at.side === r.side && r.edge != null;
+              return <Text style={[styles.at, leanAt && { color: color.primary, fontFamily: font.medium }]} numberOfLines={1}>{hits}/{r.at.n} {r.at.side}{ground ? ` at ${ground}` : ""}</Text>;
             })() : null}
           </View>
           <View style={styles.prices}>

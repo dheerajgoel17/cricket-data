@@ -65,6 +65,9 @@ export const ROUTES = {
   contact: { title: "Contact Fancy.cash", description: "Email Fancy.cash for business, tech issues, privacy or general questions: tech@fancy.cash." },
 };
 
+/** Nested paths that must stay out of search (not first-segment ROUTES). */
+export const NOINDEX_PREFIXES = ["/admin/"];
+
 /** Typed URLs only (`/privacy-policy`, `/terms-of-use`, `/docs`). Not in ROUTES, so they are not prebuilt, listed in the sitemap, or linked from crawler nav. */
 export const UNLISTED = {
   "privacy-policy": { title: "Privacy policy", description: "What Fancy.cash stores on your device, the functional cookies it uses, and the anonymous analytics it may collect." },
@@ -79,12 +82,16 @@ export const fullTitle = (t) => (!t ? BRAND : String(t).includes(BRAND) ? String
  * The description and robots hint of a path. A page names itself (`pageTitle`); a page with a name of its own (a player, a match, a team) gets a description built from it.
  */
 export function pageMeta(pathname, pageTitle = "") {
-  const seg = String(pathname || "/").split("/").filter(Boolean)[0] || "";
+  const path = String(pathname || "/");
+  if (NOINDEX_PREFIXES.some((p) => path === p.slice(0, -1) || path.startsWith(p))) {
+    return { description: DEFAULT_DESC, noindex: true };
+  }
+  const seg = path.split("/").filter(Boolean)[0] || "";
   const hidden = UNLISTED[UNLISTED_ALIAS[seg] || seg];
   const fixed = ROUTES[seg];
   const name = String(pageTitle || "").split(" | ")[0].split(": ")[0].trim(); // "Harry Brook: stats, hit rates and form | Fancy.cash" -> "Harry Brook"
-  if (hidden && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: hidden.description, noindex: true };
-  if (fixed && !/\//.test(String(pathname || "/").replace(/^\/+|\/+$/g, ""))) return { description: fixed.description, noindex: !!fixed.noindex };
+  if (hidden && !/\//.test(path.replace(/^\/+|\/+$/g, ""))) return { description: hidden.description, noindex: true };
+  if (fixed && !/\//.test(path.replace(/^\/+|\/+$/g, ""))) return { description: fixed.description, noindex: !!fixed.noindex };
   const by = { player: "hit rates over any line, recent form and listed lines", fixture: "player stats, hit rates and listed lines", team: "form, venue record and the player grid", venue: "ground stats, runs, sixes and fours", league: "season stats (most runs, most wickets, best figures), team tables, match totals and top scores" };
   return { description: `${name || BRAND}: ${by[seg] || "stats, hit rates and fair prices"}. Free on ${BRAND}.`, noindex: false };
 }

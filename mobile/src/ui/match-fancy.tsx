@@ -9,10 +9,10 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
-import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
+import { fancyByLine, fancyFor, fancyHeadline } from "@cricket/engine/lines.js";
+import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, fancySample, firstInnsMs, innTag, parseFm, peerFancyFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { abbr, odds, pc } from "@site/lib/format";
@@ -54,7 +54,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   const store: any = stats.data?.store;
   const liveMatch = liveMatchFor(live.data, doc, fx);
   const insets = useSafeAreaInsets();
-  const [sc, setSc] = useState(start?.sc ?? "-1"), [fmId, setFmId] = useState(start?.fm ?? ""), [win, setWin] = useState(WINDOWS.includes(Number(start?.mw)) ? Number(start?.mw) : 20), [here, setHere] = useState(start?.mv === "1"), [ml, setMl] = useState<number>();
+  const [sc, setSc] = useState(start?.sc ?? "-1"), [fmId, setFmId] = useState(start?.fm ?? ""), [win, setWin] = useState(WINDOWS.includes(Number(start?.mw)) ? Number(start?.mw) : 10), [here, setHere] = useState(start?.mv === "1"), [ml, setMl] = useState<number>();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draftWin, setDraftWin] = useState(win), [draftHere, setDraftHere] = useState(here);
   const fxInfo = useMemo(() => fxInfoOf(fx), [fx]);
@@ -68,22 +68,20 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   const scopes = [["-1", "Match", (MATCH_KEYS as [string, string][]).some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS as [string, string][], name)] as const)].filter(([, , on]) => on);
   const scope = scopes.some(([v]) => v === sc) ? Number(sc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
-  const keys = (scope < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][];
-  const keyList = keys.flatMap(([k, lab]) => (scope < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc, fxInfo, k, team?.[0] ?? null, inn), inn, scope) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
-  const fm = keyList.some(([k]) => k === fmId) ? fmId : keyList[0]?.[0] || "";
+  const keysFor = (scNum: number) => {
+    const t = teams.find(([, i]) => i === scNum);
+    return ((scNum < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][]).flatMap(([k, lab]) => (scNum < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, t?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc, fxInfo, k, t?.[0] ?? null, inn), inn, scNum) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
+  };
+  const keyList = keysFor(scope);
+  const fm = keyList.some(([k]) => k === fmId) ? fmId : peerFancyFm(fmId, keyList) || keyList[0]?.[0] || "";
   const { key, inn } = parseFm(fm) as { key: string; inn: number };
-  const marketLabel = (k: string) => keys.find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : (((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string));
+  const marketLabel = (k: string) => ((scope < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][]).find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : (((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string));
 
   // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
   const venueIdx = useMemo(() => (store ? ((venueIndices as any)(store, fx.venue) as number[]) : []), [store, fx.venue]);
-  const hereMatches = (n: number): number[] => (scope < 0 ? (selectMatches as any)(store, { fmt: fmtIdx, gender, venue: venueIdx, lastN: n }) : (selectMatches as any)(store, { fmt: fmtIdx, gender, venue: venueIdx, team: scope, lastN: n }));
+  const hereMatches = (n: number): number[] => (store ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: n, venue: venueIdx }) as number[] : []);
   const useHere = here && venueIdx.length > 0;
-  const ms = useMemo(() => {
-    if (!store) return [] as number[];
-    if (useHere) return hereMatches(win);
-    const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => (selectMatches as any)(store, { fmt: fmtIdx, gender, team: i, lastN: win }) as number[]);
-    return [...new Set(sets.flat())].sort((a, b) => a - b);
-  }, [store, teams, scope, fmtIdx, win, useHere, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ms = useMemo(() => (store ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: win, venue: useHere ? venueIdx : undefined }) as number[] : []), [store, teams, scope, fmtIdx, win, useHere, venueIdx]);
   const bookedNow = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc, fxInfo, key, team?.[0] ?? null, inn)), [doc, fxInfo, key, team, inn]);
   const batFirstNow = batFirstBooked(bookedNow, inn, scope) as boolean;
   const scoredMs = useMemo(() => (store && batFirstNow ? (firstInnsMs(store, ms, scope) as number[]) : ms), [ms, batFirstNow, store, scope]);
@@ -94,7 +92,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     if (!store) return [] as any[];
     const ground = venueIdx.length ? hereMatches(10) : undefined;
     const inns = scope < 0 ? [0] : (FANCY_INNS as number[]);
-    return inns.flatMap((n) => (buildOverview as any)({ store, doc, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys, label: marketLabel, ground, inn: n }))
+    return inns.flatMap((n) => (buildOverview as any)({ store, doc, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys: scope < 0 ? MATCH_KEYS : TEAM_KEYS, label: marketLabel, ground, inn: n }))
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -115,7 +113,31 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookHere = book.find((b) => b.line === line);
-  const choose = (p: { sc?: string; fm?: string }) => { if (p.sc !== undefined) setSc(p.sc); if (p.fm !== undefined) setFmId(p.fm); setMl(undefined); };
+  const bookMain = book.find((l) => l.over != null && l.under != null) ?? book.find((l) => l.over != null) ?? book[0];
+  const head = useMemo(() => fancyHeadline(book) as { over: (typeof book)[number] | null; under: (typeof book)[number] | null }, [book]);
+  const faceBook = (lane: (typeof book)[number] | null | undefined, side: "over" | "under") => (lane && lane[side] != null ? lane.books.find((x) => x[side] === lane[side]) : null);
+  const overFace = faceBook(head.over, "over"), underFace = faceBook(head.under, "under");
+  const headBooks = useMemo(() => [...new Map([...(head.over?.books ?? []), ...(head.under?.books ?? [])].map((x) => [x.source, x])).values()], [head]);
+  const lineOn = (fmNext: string, scNum: number, at: number) => {
+    const { key: k, inn: i } = parseFm(fmNext) as { key: string; inn: number };
+    if (!fmNext || k === "top_batter") return false;
+    const t = teams.find(([, ix]) => ix === scNum);
+    return (fancyByLine(fancyLines(doc, fxInfo, k, scNum < 0 ? null : t?.[0] ?? null, i)) as { line: number }[]).some((b) => b.line === at);
+  };
+  const choose = (p: { sc?: string; fm?: string }) => {
+    if (p.sc !== undefined) {
+      const next = Number(p.sc), nextFm = peerFancyFm(fm, keysFor(next)) || p.fm || "";
+      setSc(p.sc);
+      setFmId(nextFm);
+      setMl(nextFm && lineOn(nextFm, next, line) ? line : undefined);
+    } else if (p.fm !== undefined) {
+      setFmId(p.fm);
+      setMl(lineOn(p.fm, scope, line) ? line : undefined);
+    } else setMl(undefined);
+  };
+  useEffect(() => {
+    if (fmId && fm && fmId !== fm && peerFancyFm(fmId, keyList) === fm) setFmId(fm);
+  }, [fmId, fm]); // eslint-disable-line react-hooks/exhaustive-deps
   const openMarket = (k: string) => {
     if (mode === "list") {
       push(fancyMarketPath(fx.id, { fm: k, sc: scope, mw: win, mv: here ? "1" : "" }));
@@ -123,7 +145,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     }
     choose({ fm: k });
   };
-  const activeN = (win !== 20 ? 1 : 0) + (here ? 1 : 0);
+  const activeN = (win !== 10 ? 1 : 0) + (here ? 1 : 0);
 
   // how this market has gone at the ground, set against the sample on screen
   const ground = useMemo(() => {
@@ -156,7 +178,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     <View style={styles.root}>
       <View style={styles.filterRow}>
         {scopes.length > 1 ? (
-          <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v, fm: mode === "list" ? "" : fm })} /></View>
+          <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
         ) : <View style={styles.chipFlex} />}
         <Press scale={1} onPress={() => setFiltersOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
           <Ionicons name="options-outline" size={16} color={color.foreground} />
@@ -166,9 +188,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       </View>
       {activeN > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
-          {win !== 20 ? <Press scale={1} onPress={() => { setWin(20); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Window L{win}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
+          {win !== 10 ? <Press scale={1} onPress={() => { setWin(10); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Window L{win}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
           {here ? <Press scale={1} onPress={() => { setHere(false); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>At {venueName}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
-          <Press scale={1} onPress={() => { setWin(20); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+          <Press scale={1} onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
         </ScrollView>
       ) : null}
       <Modal visible={filtersOpen} animationType="slide" transparent onRequestClose={() => setFiltersOpen(false)}>
@@ -194,7 +216,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
             </>
           ) : null}
           <View style={styles.sheetFoot}>
-            <Press scale={1} onPress={() => { setDraftWin(20); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
+            <Press scale={1} onPress={() => { setDraftWin(10); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
             <Press scale={1} onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
           </View>
         </View>
@@ -202,6 +224,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
+          {mode === "list" && overview.length === 0 && liveList.length === 0 ? (
+            <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
+          ) : null}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) ? (
             <View style={{ gap: space.snug }}>
               <Text style={styles.h2}>Bookmaker lines</Text>
@@ -226,7 +251,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 <View style={styles.titleRow}>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
-                    <Text style={styles.note}>last {rep.n} matches</Text>
+                    <Text style={styles.note}>{useHere ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} matches`} · void excluded</Text>
                   </View>
                   <Press scale={1} onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>
                 </View>
@@ -239,23 +264,31 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 <ChartBars entries={entries} line={line} side="over" height={200} />
                 <View style={styles.stepRow}>
                   <LineStepper value={line} label="O/U" min={0} onStep={(d) => setMl(d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2)} />
-                  {book.filter((b) => b.line !== line).map((b) => (
-                    <Press scale={1} key={b.line} onPress={() => setMl(b.line)} accessibilityRole="button" style={styles.lineBtn}>
-                      {b.books.map((x) => <BookBadge key={x.source} source={x.source} />)}<Text style={styles.lineBtnText}>line {b.line}</Text>
+                  {bookMain && bookMain.line !== line ? (
+                    <Press scale={1} onPress={() => setMl(bookMain.line)} accessibilityRole="button" style={styles.lineBtn}>
+                      {bookMain.books[0] ? <BookBadge source={bookMain.books[0].source} /> : null}<Text style={styles.lineBtnText}>main {bookMain.line}</Text>
                     </Press>
-                  ))}
+                  ) : null}
                 </View>
                 <View style={styles.cards}>
                   {(["over", "under"] as const).map((side) => {
                     const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
-                    const b = bookHere && bookHere[side] != null ? bookHere.books.find((x) => x[side] === bookHere[side]) : null;
+                    const lane = side === "over" ? head.over : head.under;
+                    const face = side === "over" ? overFace : underFace;
+                    const jump = !!(lane && lane.line !== line);
+                    const price = face ? (
+                      <View style={styles.sideBook}>
+                        <BookBadge source={face.source} />
+                        <Text style={styles.sidePrice}>{jump ? `${side[0]!.toUpperCase()} ${lane!.line} ` : ""}{odds(face[side])}</Text>
+                      </View>
+                    ) : <Text style={styles.note}>—</Text>;
                     return (
                       <View key={side} style={styles.side}>
                         <Text style={styles.sideKey}>{side} {line}</Text>
                         <Text style={[styles.sideNum, side === "over" && { color: color.primary }]}>{pct1(p)}</Text>
                         <Meter value={p ?? 0} tone={side === "over" ? color.primary : "rgba(255,255,255,0.7)"} />
                         <Text style={styles.note}>{hit} of {rep.n} · fair {odds(fair)}</Text>
-                        {b ? <View style={styles.sideBook}><BookBadge source={b.source} /><Text style={styles.sidePrice}>{odds(b[side])}</Text></View> : null}
+                        {jump ? <Press scale={1} onPress={() => setMl(lane!.line)} accessibilityRole="button" accessibilityLabel={`Use ${side} line ${lane!.line}`}>{price}</Press> : price}
                       </View>
                     );
                   })}
@@ -266,18 +299,40 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                     {useHere ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
                   </Text>
                 ) : null}
-                {bookHere ? <BookList books={bookHere.books} shown={(["over", "under"] as const).map((s) => (bookHere[s] != null ? bookHere.books.find((x) => x[s] === bookHere[s])?.source : undefined))} /> : null}
+                {headBooks.length > 0 ? <BookList books={headBooks} shown={[overFace?.source, underFace?.source]} /> : null}
                 {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
 
                 <View style={styles.ladder}>
-                  <View style={styles.ladderHead}><Text style={[styles.th, { flex: 1 }]}>Line</Text><Text style={[styles.th, styles.col]}>Over</Text><Text style={[styles.th, styles.col]}>Under</Text></View>
-                  {ladder.map((l: any) => (
+                  <View style={styles.ladderHead}>
+                    <Text style={[styles.th, { width: 40 }]}>Line</Text>
+                    <Text style={[styles.th, { flex: 1 }]}>Book</Text>
+                    <Text style={[styles.th, styles.col]}>Over</Text>
+                    <Text style={[styles.th, styles.col]}>Under</Text>
+                  </View>
+                  {ladder.map((l: any) => {
+                    const priced = book.find((b) => b.line === l.line);
+                    const overB = priced?.over != null ? priced.books.find((x) => x.over === priced.over) : null;
+                    const underB = priced?.under != null ? priced.books.find((x) => x.under === priced.under) : null;
+                    const face = overB || underB;
+                    return (
                     <Press scale={1} key={l.line} onPress={() => setMl(l.line)} accessibilityRole="button" style={({ pressed }) => [styles.ladderRow, l.line === line && styles.ladderOn, pressed && { opacity: 0.6 }]}>
-                      <View style={styles.lineCell}><Text style={styles.ladderLine}>{l.line}</Text>{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</View>
+                      <Text style={[styles.ladderLine, { width: 40 }]}>{l.line}</Text>
+                      <View style={[styles.lineCell, { flex: 1, flexDirection: "column", alignItems: "flex-start", gap: 2 }]}>
+                        {priced && face ? (
+                          <>
+                            <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.tight }}>
+                              <BookBadge source={face.source} />
+                              <Text style={styles.fair}>O {odds(priced.over)} · U {odds(priced.under)}</Text>
+                            </View>
+                            <BookList books={priced.books} shown={[overB?.source, underB?.source]} />
+                          </>
+                        ) : <Text style={styles.fair}>—</Text>}
+                      </View>
                       <Text style={[styles.col, styles.cellNum]}><Text style={{ color: color.primary }}>{pc(l.pOver)}</Text> <Text style={styles.fair}>{odds(l.fairOver)}</Text></Text>
                       <Text style={[styles.col, styles.cellNum]}>{pc(l.pUnder)} <Text style={styles.fair}>{odds(l.fairUnder)}</Text></Text>
                     </Press>
-                  ))}
+                    );
+                  })}
                 </View>
               </View>
             ) : null}

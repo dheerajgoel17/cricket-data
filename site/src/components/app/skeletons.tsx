@@ -46,24 +46,42 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/** Match header while the fixture list loads: two sides, score in the middle. */
+/** Match header + live strip while the fixture loads: edge-to-edge under the top bar. */
 export function MatchHeaderSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-tight pt-snug">
-      <Skeleton className="size-control rounded-full" />
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-snug">
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-28" /><Skeleton className="h-4 w-24" /></div>
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
+    <div data-flush aria-hidden className="-mx-gutter flex flex-col border-b border-hairline bg-card">
+      <div className="flex flex-col gap-tight px-gutter py-snug">
+        <Skeleton className="h-3 w-40" />
+        <div className="flex items-center justify-between gap-snug">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-6 w-24" />
+        </div>
+        <div className="flex items-center justify-between gap-snug">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <Skeleton className="h-4 w-56" />
+      </div>
+      <div className="grid grid-cols-3 divide-x divide-dashed divide-hairline border-t border-hairline bg-background/60">
+        {[0, 1, 2].map((n) => (
+          <div key={n} className="grid gap-hair px-tight py-snug first:pl-gutter last:pr-gutter">
+            <Skeleton className="h-3 w-12" />
+            <Skeleton className="size-8 rounded-full" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-snug border-t border-hairline px-gutter py-tight">
+        <Skeleton className="h-6 w-full rounded-md" />
       </div>
     </div>
   );
 }
 
-/** Live board + scorecard accordion: pair, partnership, bowler, then batting rows. */
+/** Standalone scorecard placeholder (scorecard route). */
 export function ScorecardSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
+    <div aria-hidden className="-mx-gutter flex flex-col gap-stack border-y border-hairline bg-card px-gutter py-inset">
       <div className="flex items-center gap-snug">
         <Skeleton className="size-16 rounded-full" />
         <div className="grid flex-1 justify-items-center gap-tight"><Skeleton className="h-3 w-16" /><Skeleton className="h-6 w-12" /></div>
@@ -83,21 +101,24 @@ export function ScorecardSkeleton() {
   );
 }
 
-/** High-odds / low-odds tape while the live lines settle. Same 80vw peek rail as the fixture cards on a phone. */
+/** High-odds ticket while the live lines settle. */
 export function TapeSkeleton() {
   return (
-    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
-      {[0, 1].map((k) => (
-        <div key={k} className="flex w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:w-auto">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-48" />
-          {[0, 1].map((n) => (
-            <div key={n} className="flex min-h-row items-center gap-snug">
-              <Skeleton className="size-control rounded-full" />
-              <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3 w-20" /></div>
-              <Skeleton className="h-5 w-12 rounded-md" />
-            </div>
-          ))}
+    <div aria-hidden className="relative flex min-w-0 flex-col gap-tight rounded-2xl bg-primary/80 p-inset">
+      <div className="flex flex-col gap-tight">
+        <Skeleton className="h-5 w-36 bg-primary-foreground/25" />
+        <Skeleton className="h-3 w-52 bg-primary-foreground/20" />
+      </div>
+      <div className="relative h-0 py-snug">
+        <div className="absolute inset-x-5 top-1/2 border-t border-dashed border-primary-foreground/35" />
+        <span className="absolute top-1/2 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+        <span className="absolute top-1/2 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
+      </div>
+      {[0, 1].map((n) => (
+        <div key={n} className="flex min-h-row items-center gap-snug py-tight">
+          <Skeleton className="size-control rounded-full bg-primary-foreground/25" />
+          <div className="grid flex-1 gap-tight"><Skeleton className="h-3.5 w-28 bg-primary-foreground/25" /><Skeleton className="h-3 w-20 bg-primary-foreground/20" /></div>
+          <Skeleton className="h-6 w-12 rounded-md bg-primary-foreground/25" />
         </div>
       ))}
     </div>
@@ -122,9 +143,8 @@ export function FancySkeleton() {
 /** The home rail while its inputs load (fixtures, bookmaker lines, rail settings): series chips, two fixture cards. */
 export function RailSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-stack">
-      <div className="flex gap-snug overflow-hidden">{[16, 24, 20, 14].map((w, n) => <Skeleton key={n} className="h-control shrink-0 rounded-full" style={{ width: `${w * 4}px` }} />)}</div>
-      <div className="-mx-gutter flex gap-snug overflow-hidden px-gutter">{[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}</div>
+    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter">
+      {[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}
     </div>
   );
 }

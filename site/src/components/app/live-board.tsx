@@ -295,7 +295,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
       {(!!board.batters.length || bw) && (
         <div className="grid grid-cols-3 divide-x divide-dashed divide-hairline bg-background/60">
           {[board.batters[0], board.batters[1], bw].map((player, i) => (
-            <div key={i} className="grid min-w-0 content-start gap-hair px-tight py-snug first:pl-inset last:pr-inset">
+            <div key={i} className="grid min-w-0 content-start gap-hair px-tight py-snug first:pl-gutter last:pr-gutter">
               <div className="label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
               {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
             </div>
@@ -303,7 +303,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
         </div>
       )}
       {!!board.overs.length && (
-        <div className="min-w-0 px-inset py-snug"><Overs overs={board.overs} /></div>
+        <div className="min-w-0 px-gutter py-snug"><Overs overs={board.overs} /></div>
       )}
     </section>
   );
@@ -325,13 +325,13 @@ export function ScorecardAccordion({ match, teams, inPlay }: { match: any; teams
   return (
     <Accordion type="single" collapsible value={section} onValueChange={setSection} className="min-w-0 border-t border-hairline">
       <AccordionItem value="scorecard">
-        <AccordionTrigger className="min-h-control gap-snug rounded-none bg-background/60 px-inset py-tight text-callout hover:bg-surface-hover hover:no-underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&>svg]:motion-reduce:transition-none">
+        <AccordionTrigger className="min-h-control gap-snug rounded-none bg-background/60 px-gutter py-tight text-callout hover:bg-surface-hover hover:no-underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&>svg]:motion-reduce:transition-none">
           <span className="flex min-w-0 items-center gap-snug">
             <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
             {section ? "Hide scorecard" : "Full scorecard"}
           </span>
         </AccordionTrigger>
-        <AccordionContent className="flex flex-col gap-snug border-t border-dashed border-hairline px-inset py-snug">
+        <AccordionContent className="flex flex-col gap-snug border-t border-dashed border-hairline px-gutter py-snug">
           {inPlay && <LiveScorecardDetails match={match} teams={teams} />}
           <ScorecardBody match={match} teams={teams} />
         </AccordionContent>

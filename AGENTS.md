@@ -31,6 +31,7 @@ cd mobile && npm ci && npm run typecheck && npm test   # the iOS / Android app (
 7. YAML workflows: lint with `actionlint`; never put `: ` unquoted inside a one-line `run:`.
 8. Prefer editing existing modules over adding abstractions; match the surrounding style (compact, few comments, explain non-obvious rules in docstrings). For site UI: reuse existing page structure (dedicated drill-in routes, FixtureCard, chips, session badges) before inventing sheets or new chrome — docs/SITE.md "UI structure: reuse first".
 9. Props are never deleted: `value_bets/archive/` (one file per match, written by the pipeline) only grows; never add a job or script that removes or trims it, and keep the fixture page's fallback to it working.
+10. **Ads:** when adding a new user-facing page or major surface, ask whether it needs an ad placement. If yes, extend the slot catalogue (`site/src/lib/ad-slots.ts` + `ad_slots` seed), mount `AdSlot` / `StatsAd`, and update docs/SITE.md "Ads". Manual creatives (dashboard `/admin/ads`) override AdSense; empty slots must not reserve layout.
 
 ## Where to look
 * Pre-match lines are only ever added before a match starts: `booklines.hold_started` (called by `pipeline.run` before the archive) drops any line a started match did not already have, because a Test is re-listed between days with in-play prices that no flag marks (docs/VALUE_BETS.md). Never add a way for a started match's new line into `book_lines.json` or the archive.

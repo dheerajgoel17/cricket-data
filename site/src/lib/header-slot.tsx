@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 type Slot = { el: HTMLElement | null; setEl: (e: HTMLElement | null) => void; active: boolean; setActive: (a: boolean) => void; flush: boolean; setFlush: (f: boolean) => void };
 const Ctx = createContext<Slot | null>(null);
 
-/** Lets a page put its own actions in the top bar. While a page does, the bar drops the logo, search and account and keeps the back button and those actions. */
+/** Lets a page put its own actions in the top bar. On phones the bar drops the logo/search/account for those actions; from lg the brand mark stays and the slot holds trailing actions (e.g. share). Prefer `Crumbs` / `Link` for desktop navigation instead of a back button. */
 export function HeaderSlotProvider({ children }: { children: ReactNode }) {
   const [el, setEl] = useState<HTMLElement | null>(null);
   const [active, setActive] = useState(false);

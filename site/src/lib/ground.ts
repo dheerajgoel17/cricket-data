@@ -10,7 +10,7 @@ import { matchDateLabel, pretty } from "./format";
 
 export type GenderFilter = "" | "male" | "female";
 
-/** Label on the Filters chip (same place Match Fancy shows L20). */
+/** Label on the Filters chip (same place Match Fancy shows L10). */
 export function genderFilterLabel(g: GenderFilter): string {
   if (g === "female") return "Women";
   if (g === "male") return "Men";
@@ -22,7 +22,7 @@ export const pairKey = (date: string, a: string, b: string) => `${String(date).s
 
 export const MARKET_CHIPS: [string, string][] = [
   ["match_runs", "Match runs"], ["match_sixes", "Match sixes"], ["match_fours", "Match fours"],
-  ["match_50s", "50s"], ["highest_over", "Highest over"], ["top_score", "Top score"], ["top_batter", "Top batter"],
+  ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["top_score", "Top score"], ["top_batter", "Top batter"],
 ];
 
 /** Stadium + city from a "Ground, City, …" venue string. */

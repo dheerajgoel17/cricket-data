@@ -19,6 +19,7 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useQ } from "@/components/app/forms";
 import { Button } from "@/components/ui/button";
 import { setTitle } from "@/lib/title";
+import { StatsAd } from "@/components/app/stats-ad";
 void localWhen; void num; void tzName;
 
 // ------------------------------------------------------------------ tools
@@ -89,7 +90,7 @@ const GLOSS: [string, string, string, string][] = [
   ["50s", "Basic", "Markets", "Innings of 50-99 runs (100+ are centuries)."],
   ["Double-digit scores", "Basic", "Markets", "Batters reaching 10 or more."],
   ["Single-digit scores", "Basic", "Markets", "Scores of 1-9. Ducks (out for 0) are not single-digit."],
-  ["Highest over", "Intermediate", "Markets", "Most runs conceded in a single over of the match."],
+  ["Highest runs in an over", "Intermediate", "Markets", "Most runs scored in a single over of the match."],
   ["Most runs conceded", "Intermediate", "Markets", "The largest number of runs conceded by one bowler in the match."],
   ["Top batter", "Intermediate", "Markets", "Highest scorer in the match, or for the team batting first. Ties are shown separately."],
   ["Void rules", "Intermediate", "Rules", "T20 and ODI summary markets are void unless 80% of the overs are bowled in both innings; Tests unless there is a result or 300 (5-day) / 200 (4-day) overs."],
@@ -110,6 +111,7 @@ export function GlossaryPage() {
   const list = GLOSS.filter((g) => (c === "All" || g[2] === c) && (l === "All" || g[1] === l) && (!t || (g[0] + g[3]).toLowerCase().includes(t.toLowerCase())));
   return (
     <div>
+      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Cricket stats explained"]]} />
       <PageTitle sub="Every market, rule and number on this site, in plain words.">Cricket stats explained</PageTitle>
       <Card className="mb-3 flex-row flex-wrap items-center gap-3 p-4 shadow-none">
@@ -139,6 +141,7 @@ export function AboutPage() {
   const list = (xs: string[]) => <ul className="list-disc pl-5">{xs.map((r) => <li key={r} className="my-1 text-muted-foreground">{r}</li>)}</ul>;
   return (
     <div>
+      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Rules & data"]]} />
       <PageTitle>Rules, definitions and data</PageTitle>
       <Card className="px-4 shadow-none"><Accordion type="single" collapsible defaultValue="rules">
@@ -164,6 +167,7 @@ export function PlayersPage() {
   const change = (v: string) => { setText(v); setQ({ q: v }); };
   return (
     <div className="flex flex-col gap-stack">
+      <StatsAd />
       <h1 className="text-title font-bold tracking-tight">Players</h1>
       <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
         <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
@@ -209,6 +213,7 @@ export function TeamsPage() {
   }, [tab, text, store, rz]);
   return (
     <div>
+      <StatsAd />
       <PageTitle>Teams &amp; venues</PageTitle>
       <div className="mb-3 flex gap-2">{(["teams", "venues"] as const).map((k) => <Button key={k} variant={tab === k ? "secondary" : "ghost"} className="rounded-full capitalize" onClick={() => setQ({ tab: k })}>{k}</Button>)}</div>
       <Input type="search" aria-label={`Search ${tab}`} placeholder={`Search ${tab}`} value={text} onChange={(e) => setText(e.target.value)} className="mb-3" />

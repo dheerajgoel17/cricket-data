@@ -5,7 +5,7 @@ export function fancyMarketPath(id: string, o: { fm: string; sc?: number | strin
   const q = new URLSearchParams();
   if (o.fm) q.set("fm", o.fm);
   if (o.sc != null && o.sc !== "" && String(o.sc) !== "-1") q.set("sc", String(o.sc));
-  if (o.mw != null && o.mw !== "" && Number(o.mw) !== 20) q.set("mw", String(o.mw));
+  if (o.mw != null && o.mw !== "" && Number(o.mw) !== 10) q.set("mw", String(o.mw));
   if (o.mv === "1") q.set("mv", "1");
   if (o.ml != null && o.ml !== "") q.set("ml", String(o.ml));
   const s = q.toString();
@@ -13,7 +13,7 @@ export function fancyMarketPath(id: string, o: { fm: string; sc?: number | strin
 }
 
 
-/** Open the market and the exact line displayed on its row. */
+/** Open the market on the line the row shows (the better side's own line when over and under sit on different lines). */
 export function fancyRowPath(id: string, row: {
   key: string; inn?: number; scope: number; line: number;
   side?: "over" | "under" | null; overLine?: number | null; underLine?: number | null;

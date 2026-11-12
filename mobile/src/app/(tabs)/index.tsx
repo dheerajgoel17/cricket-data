@@ -3,19 +3,17 @@ import { mark, onRender } from "@/lib/perf";
 import { FlatList, Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { layoutWidth } from "@/lib/fit";
 import type { HomePhase } from "@site/lib/home-phase";
-import { seriesName, shortSeries } from "@/lib/format";
-import { EMPTY_PHASE, phaseView, seriesChips, type RailItem } from "@/lib/rail";
+import { EMPTY_PHASE, phaseView, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
-import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
 import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
 import { CardSkeleton } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
-import { color, FIXTURE_CARD_SHARE, radius, space } from "@/ui/tokens";
+import { color, FIXTURE_CARD_SHARE, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 export default function Fixtures() {
@@ -27,13 +25,8 @@ export default function Fixtures() {
   const inset = useScreenInsets();
   const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [asked, setAsked] = useState<HomePhase>();
-  const [series, setSeries] = useState("all");
 
-  const { counts, phase, shown: inPhase } = useMemo(() => phaseView(items, asked), [items, asked]);
-  const seriesCounts = useMemo(() => seriesChips(inPhase, seriesName), [inPhase]); // every series in the bucket: those with props first, then the biggest
-  const sel = seriesCounts.some(([n]) => n === series) ? series : "all";
-  const shown = useMemo(() => (sel === "all" ? inPhase : inPhase.filter((i) => seriesName(i.fixture) === sel)), [inPhase, sel]);
-  const chips = useMemo<[string, string, number][]>(() => [["all", "All", inPhase.length], ...seriesCounts.map(([n, k]) => [n, shortSeries(n), k] as [string, string, number])], [inPhase, seriesCounts]);
+  const { counts, phase, shown } = useMemo(() => phaseView(items, asked), [items, asked]);
 
   const cardW = Math.round(width * FIXTURE_CARD_SHARE);
   const gap = space.snug;
@@ -45,14 +38,13 @@ export default function Fixtures() {
         contentContainerStyle={{ paddingBottom: inset.bottom + 96 }}
         refreshControl={<RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}
         showsVerticalScrollIndicator={false}>
-        {ready && inPhase.length > 0 ? <Chips items={chips} value={sel} onChange={setSeries} /> : null}
         {!ready ? (
           error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
         ) : shown.length === 0 ? (
           <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
         ) : (
           <FlatList<RailItem>
-            key={`${phase}|${sel}`}
+            key={phase}
             horizontal
             data={shown}
             keyExtractor={(i) => `${i.fixture.id}${i.fixture.a}${i.fixture.b}`}
@@ -65,7 +57,7 @@ export default function Fixtures() {
             snapToInterval={cardW + gap}
             snapToAlignment="start"
             decelerationRate="fast"
-            contentContainerStyle={{ paddingLeft: space.gutter, paddingRight: Math.max(space.gutter, width - cardW - space.gutter), paddingTop: space.snug }}
+            contentContainerStyle={{ paddingLeft: space.gutter, paddingRight: Math.max(space.gutter, width - cardW - space.gutter), paddingTop: space.stack }}
             showsHorizontalScrollIndicator={false}
           />
         )}
@@ -78,7 +70,9 @@ export default function Fixtures() {
 }
 
 function TimedFixtureCard({ item }: { item: RailItem }) {
-  const now = useNow();
+  // Stumps · Day N countdown goes to mm:ss under one hour — tick every second then.
+  const stumps = /stumps|close of (?:play|day)|end of (?:the )?day/i.test(String(item.live?.summary || item.live?.session || ""));
+  const now = useNow(stumps ? 1000 : 30_000);
   return <FixtureCard item={item} now={now} />;
 }
 
@@ -94,5 +88,5 @@ function RailSkeleton({ width }: { width: number }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
-  skeletonRow: { overflow: "hidden", flexDirection: "row", gap: space.snug, paddingTop: space.snug, paddingHorizontal: space.gutter },
+  skeletonRow: { overflow: "hidden", flexDirection: "row", gap: space.snug, paddingTop: space.stack, paddingHorizontal: space.gutter },
 });

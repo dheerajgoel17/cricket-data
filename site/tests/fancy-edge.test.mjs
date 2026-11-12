@@ -3,8 +3,9 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { WINDOW, collectOverview, fancyEdgeAlerts, fancyFm, fancyInputs, fancyOverview, innTag, istLabel, marketRow, parseFm } from "@cricket/engine/fancy-edge.js";
+import { WINDOW, collectOverview, fancyEdgeAlerts, fancyFm, fancyInputs, fancyOverview, fancySample, innTag, istLabel, marketRow, parseFm, peerFancyFm } from "@cricket/engine/fancy-edge.js";
 import { Store } from "@cricket/engine/store.js";
+import { FORMATS } from "@cricket/engine/util.js";
 import { buildDoc } from "../scripts/fancy-alerts.mjs";
 
 const near = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) < eps, `${a} is not ${b}`);
@@ -45,6 +46,22 @@ test("a market row is the better side's shrunk chance x best price - 1, hand-com
   assert.deepEqual(r.at, { n: 10, over: 0, under: 10, side: "under" }); // the last ten at the ground, all under
   assert.deepEqual(r.last.map((x) => x.s), Array(10).fill("miss"));
   assert.equal(r.batFirst, false);
+});
+
+test("available over and under lines: over@4.5 with under@3.5 when that is how the books list them", () => {
+  const store = synthetic(), { ms, ground } = fancyInputs(store, fixture()), fxInfo = { a: "Alpha", b: "Beta", fmt: "T20", startMs: Date.parse(START) };
+  const d = doc(
+    { match: "Alpha vs Beta", home: "Alpha", away: "Beta", start_utc: START, fmt: "T20", key: "match_runs", scope: "match", team: null, line: 4.5, over: 1.9, under: null, source: "fancy", kind: "bookmaker" },
+    { match: "Alpha vs Beta", home: "Alpha", away: "Beta", start_utc: START, fmt: "T20", key: "match_runs", scope: "match", team: null, line: 3.5, over: null, under: 1.85, source: "fancy", kind: "bookmaker" },
+    { match: "Alpha vs Beta", home: "Alpha", away: "Beta", start_utc: START, fmt: "T20", key: "match_runs", scope: "match", team: null, line: 4.5, over: 1.9, under: null, source: "other", kind: "bookmaker" },
+  );
+  const r = marketRow({ store, doc: d, fxInfo, ms, scope: -1, teamName: null, key: "match_runs", ground });
+  assert.equal(r.overLine, 4.5);
+  assert.equal(r.underLine, 3.5);
+  assert.equal(r.over, 1.9);
+  assert.equal(r.under, 1.85);
+  assert.equal(r.overBook, "fancy", "one face book when two quote the same over price");
+  assert.ok(r.books.some((b) => b.source === "other"), "the twin stays in books for +N");
 });
 
 test("the other side wins when the history is over; a market the books do not list, or too few games, give no edge", () => {
@@ -156,6 +173,25 @@ test("a market's link id carries its innings and reads back; a Test side's innin
   assert.deepEqual(parseFm("match_runs:7"), { key: "match_runs", inn: 0 }); // only 1 and 2 are innings
   assert.deepEqual(parseFm(undefined), { key: "", inn: 0 });
   assert.deepEqual([innTag(0), innTag(1), innTag(2)], ["", "1st inns", "2nd inns"]);
+});
+
+test("peerFancyFm keeps Fours when switching Match ↔ team; fancySample caps Match L10 at ten", () => {
+  const matchList = [["match_fours", "Fours"], ["match_sixes", "Sixes"], ["match_runs", "Total runs"]];
+  const teamList = [["team_total_fours", "Fours"], ["team_total_sixes", "Sixes"], ["team_total_runs:1", "1st inns · Runs"]];
+  assert.equal(peerFancyFm("team_total_fours", matchList), "match_fours");
+  assert.equal(peerFancyFm("match_fours", teamList), "team_total_fours");
+  assert.equal(peerFancyFm("team_total_runs:2", matchList), "match_runs");
+  assert.equal(peerFancyFm("overs_5", matchList), null);
+  assert.equal(peerFancyFm("overs_5", [["overs_5", "5 overs"]]), "overs_5");
+  assert.equal(peerFancyFm("missing", matchList), null);
+  const store = synthetic(), f = fixture(), teams = [[f.a, f.a_ix], [f.b, f.b_ix]];
+  const fmt = FORMATS.indexOf("T20");
+  const uncapped = fancySample(store, { fmt, gender: 0, teams, scope: -1, lastN: 20 });
+  const capped = fancySample(store, { fmt, gender: 0, teams, scope: -1, lastN: 10 });
+  assert.ok(uncapped.length > 10);
+  assert.equal(capped.length, 10);
+  assert.deepEqual(capped, uncapped.slice(-10));
+  assert.ok(fancySample(store, { fmt, gender: 0, teams, scope: 0, lastN: 10 }).length <= 10);
 });
 
 test("the labelled overview names each market and puts the side's short name in front of a team total", () => {

@@ -1,27 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
 import { fancyRowPath } from "@/lib/fancy-path";
+import { fancySplitNote } from "@/lib/fancy-split";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { StandingMark, Tick, type Standing } from "./tick";
-import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
+import { fancyByLine, fancyFor, fancyHeadline } from "@cricket/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
-import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
+import { LadderRow, type LadderPriced } from "./line-ladder";
+import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { useLinesLive } from "@/hooks/useLinesLive";
+import { HeaderActions } from "@/lib/header-slot";
 import { abbr, fixtureStart, num, odds, pc, shortVenue } from "@/lib/format";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
@@ -35,7 +40,8 @@ import { LiveBadge, LiveOpened, LineProgress, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
-import { EmptyNote, PageTitle } from "./page";
+import { AdSlot } from "./ad-slot";
+import { Crumbs, EmptyNote } from "./page";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
@@ -53,10 +59,21 @@ const scoreMarket = score as (store: any, ms: number[], scope: number, k: string
 const firstInnsMs = firstInns as (store: any, ms: number[], scope: number) => number[];
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => { line: number; over: number; under: number; source: string; bat_first?: boolean }[];
-type BookLine = { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] };
+type BookLine = LadderPriced;
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$|^overs_/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
+/** Book line closest to evens (same idea as player-prop `main`); falls back to the first two-sided, then any. */
+const mainBookLine = (book: BookLine[]) => {
+  const two = book.filter((l) => l.over != null && l.under != null);
+  const pool = two.length ? two : book.filter((l) => l.over != null);
+  if (!pool.length) return book[0] ?? null;
+  return pool.reduce((best, l) => {
+    const p = l.over && l.under ? (1 / l.over) / (1 / l.over + 1 / l.under) : 0.5;
+    const bp = best.over && best.under ? (1 / best.over) / (1 / best.over + 1 / best.under) : 0.5;
+    return Math.abs(p - 0.5) < Math.abs(bp - 0.5) - 1e-9 ? l : best;
+  });
+};
 
 /** Every market the books price on these matches, scored on the same matches and ranked by the better side's edge: one row per market with the book's line(s), the edge, and the last ten results against the line (`engine/fancy-edge.js`). `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. Live so-far is overlaid later (`fancyStanding`), not baked in here. */
 export const buildOverview = buildOverviewRows as (o: { store: any; doc: any; fxInfo: any; ms: number[]; scope: number; teamName: string | null; keys: [string, string][]; label: (k: string) => string; ground?: number[]; inn?: number; nameInLabel?: boolean }) => any[];
@@ -67,11 +84,11 @@ export const collectOverview = collectOverviewRows as (o: { store: any; doc: any
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
 
-/** One market's row — same chrome as a player PropRow: title, condensed line, books, model edge + last-N bars. `standing` is the 15 s live so-far (`fancyStanding`). */
+/** One market's row — same chrome as a player PropRow: title, available over/under lines (named when they differ), one face book per side (+N accordion for the rest), model edge + last-N bars. */
 export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null }) {
   const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
-  const mark = standing ?? r.standing;
   const split = r.overLine != null && r.underLine != null && r.overLine !== r.underLine;
+  const mark = standing ?? r.standing;
   const lean = r.side === "under" ? "U" : "O";
   const leanLine = r.side === "under" && r.underLine != null ? r.underLine : r.overLine != null ? r.overLine : r.line;
   return (
@@ -107,7 +124,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
           ) : (
             <>
               <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap">{underSrc && underSrc !== overSrc && <BookMark source={underSrc} />}U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
             </>
           )}
           {r.live && <LiveOpened opened={r.opened} line={r.line} />}
@@ -131,7 +148,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any; /** `list` is the fixture tab (chips + bookmaker lines); `detail` is `/fixture/:id/fancy` (one market's chart, like a player page). */ mode?: "list" | "detail" };
 
 /**
- * Match Fancy: whole-match and team-total markets (runs, session overs, extras, sixes, fours, boundaries, 50s, top over, top score, top batter) over the teams' last N matches
+ * Match Fancy: whole-match and team-total markets (runs, session overs, extras, sixes, fours, boundaries, 50s, highest runs in an over, top score, top batter) over the teams' last N matches
  * in this format. A Test team's 1st/2nd innings total is its own row, scored on that turn only. The list mode shows every priced market in the props-list style; tapping a row
  * opens `/fixture/:id/fancy` with the median, a chart of every recent match against the line, over / under shares and fair prices, and a tappable line ladder. Filters
  * (window + ground) sit behind the same chip row + Filters button pattern as Player props.
@@ -151,25 +168,38 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
   const scope = scopes.some(([v]) => v === wantSc) ? Number(wantSc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
-  const keyList = (scope < 0 ? MATCH_KEYS : TEAM_KEYS).flatMap(([k, lab]) => (scope < 0 ? [0] : FANCY_INNS).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc.data, fxInfo, k, team?.[0] ?? null, inn), inn, scope) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
+  const keysFor = (sc: number) => {
+    const t = teams.find(([, i]) => i === sc);
+    return (sc < 0 ? MATCH_KEYS : TEAM_KEYS).flatMap(([k, lab]) => (sc < 0 ? [0] : FANCY_INNS).filter((inn) => booked(k, t?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc.data, fxInfo, k, t?.[0] ?? null, inn), inn, sc) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
+  };
+  const keyList = keysFor(scope);
   const wantFm = String(q.fm || "");
-  const fm = keyList.some(([k]) => k === wantFm) ? wantFm : keyList[0]?.[0] || "";
+  const fm = keyList.some(([k]) => k === wantFm) ? wantFm : peerFm(wantFm, keyList) || keyList[0]?.[0] || "";
   const { key, inn } = parseFm(fm);
-  const win = WINDOWS.includes(Number(q.mw)) ? Number(q.mw) : 20;
+  const win = WINDOWS.includes(Number(q.mw)) ? Number(q.mw) : 10;
   const fmtIdx = FORMATS.indexOf(fmt);
   const marketLabel = (k: string) => (scope < 0 ? MATCH_KEYS : TEAM_KEYS).find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : ((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string);
+  const setScope = (v: string) => {
+    const next = Number(v), nextFm = peerFm(fm, keysFor(next)) || "";
+    const keep = nextFm !== "" && lineOn(nextFm, next, line);
+    set({ sc: v === "-1" ? "" : v, fm: nextFm, ...(keep ? { ml: line } : {}) }, keep);
+  };
+  const setMarket = (v: string) => {
+    const keep = lineOn(v, scope, line);
+    set({ fm: v, ...(keep ? { ml: line } : {}) }, keep);
+  };
+  // keep the URL on the remapped market when Match ↔ team keys differ (Fours stays Fours)
+  useEffect(() => {
+    if (wantFm && fm && wantFm !== fm && peerFm(wantFm, keyList) === fm) set({ fm });
+  }, [wantFm, fm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
   const venueIdx = useMemo(() => (venueIndices as (s: any, n: string) => number[])(store, fx.venue), [store, fx.venue]);
   const gender = fx.gender === "female" ? 1 : 0;
   const venueName = String(fx.venue || "").split(",")[0].trim();
   const here = q.mv === "1" && venueIdx.length > 0;
-  const hereMatches = (n: number) => (scope < 0 ? selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, lastN: n }) : selectMatches(store, { fmt: fmtIdx, gender, venue: venueIdx, team: scope, lastN: n })) as number[];
-  const ms = useMemo(() => {
-    if (here) return hereMatches(win);
-    const sets = (scope < 0 ? teams : teams.filter(([, i]) => i === scope)).map(([, i]) => selectMatches(store, { fmt: fmtIdx, gender, team: i, lastN: win }) as number[]);
-    return [...new Set(sets.flat())].sort((a, b) => a - b);
-  }, [store, teams, scope, fmtIdx, win, here, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+  const hereMatches = (n: number) => sampleMs(store, { fmt: fmtIdx, gender, teams, scope, lastN: n, venue: venueIdx }) as number[];
+  const ms = useMemo(() => sampleMs(store, { fmt: fmtIdx, gender, teams, scope, lastN: win, venue: here ? venueIdx : undefined }) as number[], [store, teams, scope, fmtIdx, win, here, venueIdx]);
   const bookedNow = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc.data, fxInfo, key, team?.[0] ?? null, inn)), [doc.data, fxInfo, key, team, inn]);
   const batFirstNow = batFirstBooked(bookedNow, inn, scope);
   const scoredMs = useMemo(() => (batFirstNow ? firstInnsMs(store, ms, scope) : ms), [ms, batFirstNow, store, scope]);
@@ -186,7 +216,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
 
   const book = useMemo(() => byLine(bookedNow), [bookedNow]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
-  const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : (book.find((l) => l.over != null && l.under != null) ?? book.find((l) => l.over != null) ?? book[0])?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
+  const bookMain = useMemo(() => mainBookLine(book), [book]);
+  // default the meter on the bookie main line (closest to evens); research ladder only when no book prices this market
+  const line = q.ml !== undefined && q.ml !== "" && Number.isFinite(Number(q.ml)) ? Number(q.ml) : bookMain?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
   const liveSoFar = (key && key !== "top_batter" ? fancyStanding(liveMatch, { key, team: team?.[0] ?? null, inn, line, batFirst: batFirstNow }) : null) as Standing | null;
   const rep: any = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, scoredMs, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
   // ladder rows: the engine's lines around the median plus the bookmaker's own line(s), computed on the same matches
@@ -197,8 +229,20 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc.data, { a: fx.a, b: fx.b }) : []), [doc.data, fx.a, fx.b, mode]);
-  const set = (p: Record<string, unknown>) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: "" } : {}) });
+  /** Keep the meter on `at` when that line is still priced after a scope/market switch; else fall back to the bookie main. */
+  const lineOn = (fmId: string, sc: number, at: number) => {
+    const { key: k, inn: i } = parseFm(fmId);
+    if (!fmId || k === "top_batter") return false;
+    const t = teams.find(([, ix]) => ix === sc);
+    return byLine(fancyLines(doc.data, fxInfo, k, sc < 0 ? null : t?.[0] ?? null, i)).some((b) => b.line === at);
+  };
+  const set = (p: Record<string, unknown>, keepLine = false) => setQ({ ...p, ...(p.sc !== undefined || p.fm !== undefined ? { ml: keepLine ? (p.ml ?? q.ml ?? "") : "" } : {}) });
   const bookHere = book.find((b) => b.line === line); // every book's prices at the line being looked at
+  // available over/under across lines (so under@3.5 shows beside over@4.5 instead of a dash); one face book per side, rest in +N
+  const head = useMemo(() => fancyHeadline(book), [book]);
+  const faceBook = (lane: typeof head.over, side: "over" | "under") => (lane && lane[side] != null ? lane.books.find((x: BookLine["books"][number]) => x[side] === lane[side]) : null);
+  const overFace = faceBook(head.over, "over"), underFace = faceBook(head.under, "under");
+  const splitNote = fancySplitNote(head.over?.line, head.under?.line, overFace?.source, underFace?.source);
   // the shared text: the pick (the side the sample favours, at its best listed price), how the ground has gone and the recent matches; the link is the match's card
   const shareLine = () => {
     if (!rep) return;
@@ -232,37 +276,73 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   };
   const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
   const activeFilters: { key: string; label: string; value: string }[] = [];
-  if (win !== 20) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
-  if (here) activeFilters.push({ key: "mv", label: "Sample", value: `At ${venueName}` });
+  if (win !== 10) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
+  if (here) activeFilters.push({ key: "mv", label: "Ground", value: `At ${venueName}` });
   const detailTitle = [team?.[0], innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", key ? marketLabel(key) : "Match Fancy"].filter(Boolean).join(" · ");
+  const groundNote = ground
+    ? `${ground.differs ? "Ground differs. " : ""}At ${venueName}, last ${ground.n} ${fmt} ${scope >= 0 ? `of ${team?.[0]}` : "matches"}: ${ground.under} under ${line}, ${ground.over} over${ground.max != null ? ` · highest ${ground.max}` : ""}${here ? "" : ` (teams' form: ${rep?.summary.under} of ${rep?.n} under)`}.`
+    : "";
+  const faceBadge = (lane: (typeof book)[number] | null | undefined) => {
+    const src = lane?.books[0]?.source;
+    return src ? <BookBadge key={src} source={src} /> : null;
+  };
+  const fancyListPath = `/fixture/${fx.id}?tab=fancy`;
+  const matchPath = `/fixture/${fx.id}`;
   return (
-    <div className="flex min-w-0 flex-col gap-stack">
-      {mode === "detail" && <PageTitle sub={`${fx.a} v ${fx.b} · ${fmt}`}>{detailTitle}</PageTitle>}
-      <div className={cn("flex flex-col gap-snug", mode === "detail" && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
-        <div className="flex items-center gap-snug">
+    <div className="flex min-w-0 flex-col gap-snug" {...(mode === "detail" ? { "data-flush": true } : {})}>
+      {mode === "detail" && (
+        <HeaderActions>
+          {/* Desktop keeps the brand mark (chips name the market); phone still gets title + match. */}
+          <h1 className="sr-only">{detailTitle}</h1>
+          <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
+            <p className="truncate text-body font-semibold tracking-tight">{detailTitle}</p>
+            <p className="truncate text-footnote text-muted-foreground">{fx.a} v {fx.b} · {fmt}</p>
+          </div>
+          <span className="hidden flex-1 lg:block" aria-hidden />
+          <button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control shrink-0 place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <ArrowUpOnSquareIcon className="size-5" />
+          </button>
+        </HeaderActions>
+      )}
+      {mode === "detail" && (
+        <div className="hidden px-gutter lg:block">
+          <Crumbs items={[[`${abbr(fx.a)} v ${abbr(fx.b)}`, matchPath], ["Match Fancy", fancyListPath], [key ? marketLabel(key) : "Market"]]} />
+        </div>
+      )}
+      {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
+      <div className={cn("flex flex-col", mode === "detail" ? "sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150" : "gap-snug")}>
+        {/* HomePhaseBar shape: edge-to-edge hairline, scope tabs + L10 on one row, market pills under. */}
+        <div className={cn("flex min-w-0 items-stretch gap-snug border-b border-hairline", mode === "detail" && "px-gutter")}>
           {scopes.length > 1 ? (
-            <PillGroup layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={(v) => set({ sc: v === "-1" ? "" : v, ...(mode === "list" ? { fm: "" } : {}) })}
+            <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
               className="min-w-0 flex-1"
               items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
           ) : <span className="min-w-0 flex-1" />}
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />L{win}
             {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
           </Button>
         </div>
+        {mode === "detail" && keyList.length > 1 && (
+          <div className="px-gutter py-tight">
+            <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
+          </div>
+        )}
         {activeFilters.length > 0 && (
-          <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+          <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", mode === "detail" ? "px-gutter pb-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
             {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
             <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
       </div>
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
-        onApply={({ win: w, here: h }) => set({ mw: w === 20 ? "" : String(w), mv: h ? "1" : "" })} />
+        onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
         <>
+          {mode === "list" && overview.length === 0 && liveList.length === 0 && (
+            <EmptyNote title="No bookmaker lines">No priced fancy markets for this scope yet.</EmptyNote>)}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <ul className="-mx-gutter">
@@ -282,63 +362,147 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
 
           {mode === "detail" && (
             <div className="flex min-w-0 flex-col gap-snug">
-              {keyList.length > 1 && <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={(v) => set({ fm: v })} items={keyList} />}
               <AnimatedHeight>
               <AnimatePresence mode="wait" initial={false}>
-                <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-stack">
+                <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-snug">
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
-                    <>
-                      <section className="flex flex-col gap-stack">
-                        <div className="flex items-baseline justify-between gap-snug"><h2 className="text-body font-medium">Recent results</h2><span className="flex items-center gap-snug text-footnote text-muted-foreground">last {rep.n} matches<button type="button" aria-label="Share this line" onClick={shareLine} className="grid size-control place-items-center rounded-full bg-secondary text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button></span></div>
+                    <div className="flex flex-col gap-snug lg:grid lg:grid-cols-2 lg:items-start lg:gap-section">
+                      <section className="flex min-w-0 flex-col gap-snug">
+                        <div className="flex items-baseline justify-between gap-snug">
+                          <div className="grid min-w-0 gap-hair">
+                            <h2 className="text-body font-medium">Recent results</h2>
+                            <p className="text-footnote text-muted-foreground">{here ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} ${fmt}`} · void excluded</p>
+                          </div>
+                          {groundNote ? (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button type="button" aria-label="Ground note" className={cn("grid size-control shrink-0 place-items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring", ground?.differs ? "bg-amber/15 text-amber" : "bg-secondary text-muted-foreground hover:text-foreground")}>
+                                  <InformationCircleIcon className="size-5" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent side="bottom" align="end" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
+                                <span className="font-medium">At this ground</span>
+                                <span className={ground?.differs ? "text-amber" : "text-muted-foreground"}>{groundNote}</span>
+                              </PopoverContent>
+                            </Popover>
+                          ) : null}
+                        </div>
                         {liveSoFar != null && <p className="text-callout text-primary"><StandingMark standing={liveSoFar} line={line} /></p>}
-                        <div className="flex items-end gap-group">
-                          <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={rep.summary.median} format={(n) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
-                          <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-bold tabular-nums" value={rep.summary.mean} format={(n) => n.toFixed(1)} /></div>
-                          <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-bold tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></span></div>
+                        <div className="grid grid-cols-3 gap-snug">
+                          {([
+                            ["Typical", rep.summary.median, "Middle result in this sample (median).", (n: number) => (Number.isInteger(rep.summary.median) ? String(Math.round(n)) : n.toFixed(1))],
+                            ["Average", rep.summary.mean, "Mean across the same matches.", (n: number) => n.toFixed(1)],
+                            ["Low–high", null, "Lowest and highest result in the sample.", null],
+                          ] as const).map(([lab, val, tip, fmtN]) => (
+                            <div key={lab} className="grid min-w-0 gap-hair">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="label-cap inline-flex w-fit items-center gap-hair text-callout leading-tight text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+                                    {lab}<InformationCircleIcon className="size-3.5 opacity-70" aria-hidden />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
+                              </Popover>
+                              {lab === "Low–high" ? (
+                                <b className="font-condensed text-metric font-medium leading-none tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></b>
+                              ) : (
+                                <AnimatedNumber className="font-condensed text-metric font-medium leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
+                              )}
+                            </div>
+                          ))}
                         </div>
                         <ValueBars values={rep.values} line={line} labels={barLabels} />
-                        <div className="flex flex-wrap items-center gap-snug">
+                        <div className="flex flex-wrap items-center justify-center gap-snug lg:justify-start">
                           <LineStepper value={line} label="O/U" min={0} onStep={(d) => set({ ml: d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2 })} />
-                          {book.filter((b) => b.line !== line).map((b) => <Button key={b.line} variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: b.line })}>{b.books.map((x) => <BookBadge key={x.source} source={x.source} />)} line {b.line}</Button>)}
+                          {/* Jump home to the bookie main; other booked lines live in the ladder (no duplicate chip row). */}
+                          {bookMain && bookMain.line !== line && (
+                            <Button variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ml: bookMain.line })}>
+                              {faceBadge(bookMain)} main {bookMain.line}
+                            </Button>
+                          )}
                         </div>
-                        <div className="grid grid-cols-2 gap-snug">
-                          {(["over", "under"] as const).map((side) => {
-                            const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
-                            return (
-                              <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
-                                <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
-                                <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
-                                <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
-                                <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
-                                {bookHere && (() => { const b = bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side]) : null; return b && (
-                                  <div className="flex items-baseline justify-between gap-tight border-t border-hairline pt-tight text-footnote">
-                                    <span className="min-w-0 truncate text-muted-foreground"><BookBadge source={b.source} /></span>
-                                    <b className="tabular-nums text-primary">{odds(b[side])}</b>
-                                  </div>); })()}
-                              </div>);
-                          })}
+                        {/* Hit rates for the meter line; book Over/Under are independent lanes (often different books or lines on Fancy). */}
+                        <div className="grid gap-snug border-t border-hairline pt-snug">
+                          <div className="grid min-w-0 grid-cols-2 gap-snug">
+                            {(["over", "under"] as const).map((side) => {
+                              const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
+                              return (
+                                <div key={side} className="flex min-w-0 flex-col gap-tight">
+                                  <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
+                                  <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
+                                  <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
+                                </div>);
+                            })}
+                          </div>
+                          {(head.over || head.under) && (
+                            <div className="grid gap-tight border-t border-hairline pt-snug" aria-label="Book prices">
+                              <div className="grid grid-cols-2 gap-snug">
+                                {([
+                                  ["over", head.over, overFace] as const,
+                                  ["under", head.under, underFace] as const,
+                                ]).map(([side, lane, face]) => {
+                                  const jump = !!(lane && lane.line !== line);
+                                  const body = face ? (
+                                    <span className="grid justify-items-start gap-hair text-left">
+                                      <span className="label-cap text-caption text-muted-foreground">{side} {lane!.line}</span>
+                                      <span className="flex min-w-0 items-center gap-tight">
+                                        <Tick value={face[side]} className="shrink-0 font-condensed text-title font-bold leading-none tabular-nums text-primary">{odds(face[side])}</Tick>
+                                        <BookBadge source={face.source} className="min-w-0 truncate" />
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span className="grid justify-items-start gap-hair text-left">
+                                      <span className="label-cap text-caption text-muted-foreground">{side}</span>
+                                      <span className="text-footnote text-muted-foreground">—</span>
+                                    </span>
+                                  );
+                                  return jump ? (
+                                    <button key={side} type="button" onClick={() => set({ ml: lane!.line })} aria-label={`Use ${side} line ${lane!.line}`}
+                                      className="rounded-sm text-left outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring">
+                                      {body}
+                                    </button>
+                                  ) : <div key={side} className="text-left">{body}</div>;
+                                })}
+                              </div>
+                              {splitNote && <p className="text-footnote text-muted-foreground">{splitNote}</p>}
+                              {bookHere && (
+                                <BookTable books={bookHere.books} shown={[
+                                  bookHere.over != null ? bookHere.books.find((x) => x.over === bookHere.over)?.source : undefined,
+                                  bookHere.under != null ? bookHere.books.find((x) => x.under === bookHere.under)?.source : undefined,
+                                ]} />
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {ground && (
-                          <p className={cn("text-footnote", ground.differs ? "text-amber" : "text-muted-foreground")}>
-                            {ground.differs && <b className="font-medium">Ground differs. </b>}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
-                            {here ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
-                          </p>)}
-                        {bookHere && <BookTable books={bookHere.books} shown={(["over", "under"] as const).map((side) => (bookHere[side] != null ? bookHere.books.find((x: any) => x[side] === bookHere[side])?.source : undefined))} />}
-                        {rep.n < 10 && <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p>}
+                        {rep.n < 10 && <p className="text-footnote text-amber">Few matches ({rep.n}): treat these with caution.</p>}
                       </section>
 
-                      <section className="overflow-hidden border-y border-hairline" aria-label="Line ladder">
-                        <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
-                        {ladder.map((l: any, i: number) => (
-                          <motion.button key={l.line} type="button" onClick={() => set({ ml: l.line })} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
-                            className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-inset py-snug text-left text-body transition-colors active:bg-accent">
-                            {l.line === line && <motion.span layoutId="ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                            <span className="relative flex items-center gap-tight font-medium tabular-nums">{l.line}{book.find((b) => b.line === l.line)?.books.map((x) => <BookBadge key={x.source} source={x.source} />)}</span>
-                            <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
-                            <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
-                          </motion.button>))}
+                      {/* Phone: full-bleed under the chart. Desktop: equal sticky column; panel scrolls so the page does not. */}
+                      <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
+                        <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
+                          <h2 className="text-body font-medium">Lines</h2>
+                          <span className="text-footnote text-muted-foreground">Tap a row</span>
+                        </div>
+                        <Table className="table-fixed">
+                          <TableHeader>
+                            <TableRow className="hover:bg-transparent">
+                              <TableHead className="h-auto w-[3rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
+                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
+                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
+                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit O</TableHead>
+                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit U</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {ladder.map((l: any) => (
+                              <LadderRow key={l.line} line={l.line} summary={l} priced={book.find((b) => b.line === l.line) ?? null}
+                                selected={l.line === line} onPick={() => set({ ml: l.line })} />
+                            ))}
+                          </TableBody>
+                        </Table>
                       </section>
-                    </>)}
+                    </div>)}
                 </motion.div>
               </AnimatePresence>
               </AnimatedHeight>

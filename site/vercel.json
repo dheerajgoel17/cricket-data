@@ -42,6 +42,9 @@
     },
     "api/state.js": {
       "maxDuration": 10
+    },
+    "api/ads-admin.js": {
+      "maxDuration": 15
     }
   },
   "headers": [

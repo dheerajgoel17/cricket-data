@@ -7,7 +7,7 @@ export function Chip({ on, onClick, children, className, ...rest }: { on?: boole
   return (
     <button type="button" aria-pressed={on} onClick={onClick} {...rest}
       className={cn("inline-flex h-control shrink-0 items-center gap-tight whitespace-nowrap rounded-[var(--chip-radius)] px-snug text-callout font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring active:opacity-70",
-        on ? "bg-foreground text-background" : "bg-card text-foreground hover:bg-surface-raised", className)}>
+        on ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-surface-raised", className)}>
       {children}
     </button>
   );

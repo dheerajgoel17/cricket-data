@@ -18,7 +18,7 @@ export function FancyFilters({ open, onOpenChange, win, here, venueName, hasVenu
   useEffect(() => { if (open) { setDraftWin(win); setDraftHere(here); } }, [open, win, here]);
   const dirty = draftWin !== win || draftHere !== here;
   const apply = () => { onApply({ win: draftWin, here: draftHere }); onOpenChange(false); };
-  const clear = () => { setDraftWin(20); setDraftHere(false); };
+  const clear = () => { setDraftWin(10); setDraftHere(false); };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -33,7 +33,7 @@ export function FancyFilters({ open, onOpenChange, win, here, venueName, hasVenu
           <section className="flex flex-col gap-snug">
             <h3 className="text-body font-medium">Hit-rate window</h3>
             <div className="flex flex-wrap gap-snug">{WINDOWS.map((n) => <Chip key={n} on={draftWin === n} onClick={() => setDraftWin(n)}>L{n}</Chip>)}</div>
-            <p className="text-footnote text-muted-foreground">How many recent matches in this format to score each market against.</p>
+            <p className="text-footnote text-muted-foreground">How many recent matches in this format to score each market against. Default is last 10, same as player props.</p>
           </section>
           {hasVenue && (
             <section className="flex flex-col gap-snug">
@@ -47,7 +47,7 @@ export function FancyFilters({ open, onOpenChange, win, here, venueName, hasVenu
           )}
         </div>
         <footer className="flex shrink-0 items-center gap-snug border-t border-hairline bg-background px-gutter pt-snug pb-[max(var(--space-snug),env(safe-area-inset-bottom))]">
-          <Button type="button" variant="secondary" className="h-(--touch) flex-1 rounded-full text-body" disabled={draftWin === 20 && !draftHere} onClick={clear}>Clear</Button>
+          <Button type="button" variant="secondary" className="h-(--touch) flex-1 rounded-full text-body" disabled={draftWin === 10 && !draftHere} onClick={clear}>Clear</Button>
           <Button type="button" className="h-(--touch) flex-[2] rounded-full bg-primary text-body font-medium text-primary-foreground" onClick={apply}>{dirty ? "Apply" : "Done"}</Button>
         </footer>
       </SheetContent>

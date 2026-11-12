@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // What a fixture card shows, worked out as the site's FixtureCard does (site/src/components/app/fixture-card.tsx, a React component and so not importable):
 // the live feed's word, the scores, the status line. `playState` mirrors site/src/lib/play-state.ts. Moves into the engine with the rail composition in Phase 1.
-import { clockStartedMs, liveBlurb, sessionLabel, teamScore } from "@cricket/engine/live.js";
+import { clockStartedMs, liveBlurb, nextTestDayLine, sessionBadge, sessionLabel, teamScore } from "@cricket/engine/live.js";
 import { hasTime, startsIn } from "@/lib/format";
 import { fixtureStart, fixtureState, type RailItem } from "@/lib/rail";
 
@@ -42,8 +42,10 @@ export function cardModel(item: Pick<RailItem, "fixture" | "live">, now = Date.n
   const state = played.state, hasScore = played.hasScore || scores !== liveScores;
   const [final, delayed, live, started] = [state === "final", state === "delayed", state === "live", state === "started"];
   const blurb = liveBlurb(match);
-  const session = sessionLabel(blurb) || match?.session || "";
-  const status = blurb || (final ? f.result || "Match completed" : live ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
+  const sessionSummary = blurb || match?.session || "";
+  const session = sessionBadge(sessionSummary);
+  const nextDay = nextTestDayLine(f.start, sessionSummary, now);
+  const status = nextDay || blurb || (final ? f.result || "Match completed" : live && !sessionLabel(sessionSummary) ? "Match in progress" : started ? NO_SCORE : delayed ? "Start delayed" : timed ? startsIn(ms) : "Start time to be confirmed");
   const winner = final ? [f.a, f.b].find((t: string) => status.toLowerCase().includes(`${t.toLowerCase()} won`)) : undefined;
   const sides = [f.a, f.b].map((name: string, k: number) => ({ name, score: scores[k], lost: !!winner && name !== winner }));
   return { live, final, delayed, started, session, status, sides, hasScore, timed, when };

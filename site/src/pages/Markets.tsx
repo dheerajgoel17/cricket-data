@@ -24,9 +24,10 @@ import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/compone
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
+import { StatsAd } from "@/components/app/stats-ad";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
-const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
+const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
 
 // ------------------------------------------------------------------ competitions
 export function CompetitionsPage() {
@@ -39,6 +40,7 @@ export function CompetitionsPage() {
   const rows = all.filter(([e]) => !t || store.events[e].toLowerCase().includes(t)).slice(0, 80);
   return (
     <div>
+      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
@@ -73,6 +75,7 @@ export function LeaguePage() {
   const name = store.events[e];
   return (
     <div>
+      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions", "/competitions"], [name]]} />
       <EntityHero badge={<LeagueBadge name={name} size="xl" />} name={name} sub={`${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}`} meta={[data.fmtName, `${data.tt.size} teams`]} />
       <PillTabs layoutId="lg-tab" scrollable tabs={[["stats", "Stats"], ["overview", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
@@ -131,6 +134,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const tabs: [string, string][] = isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]];
   return (
     <div>
+      <StatsAd />
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : (ground ? `${ground.total} matches` : "Ground")}
         meta={isTeam ? [`${fmtName} markets`, "team markets use the side batting first"] : [fmtName, ...(ground?.by || [])]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />

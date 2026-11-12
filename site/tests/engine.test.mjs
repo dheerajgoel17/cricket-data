@@ -86,6 +86,9 @@ test("session runs after n overs: the tape, all-out before n, rain incomplete (h
   assert.equal(oversScore([10, 22, 31, 40, 48, 55], inn(150, 4), 1), 10, "first over is the first checkpoint");
   assert.equal(oversScore([10, 22, 31, 40, 48, 55], inn(80, 10), 10), 80, "all out before 10 overs: the innings total stands");
   assert.equal(oversScore([10, 22, 31, 40], inn(40, 3), 10), null, "rain after 4 overs is unknown, not zero");
+  assert.equal(oversScore([10, 22], inn(45, 10), 10), 45, "all out after 2 overs with a tape: innings total for the 10-over market");
+  assert.equal(oversScore([], inn(402, 10), 1), null, "empty tape: never the full innings as 1st over");
+  assert.equal(oversScore(undefined, inn(402, 10), 1), null, "missing tape: same");
   const store = { M: { inn: [[inn(150, 4)]], ov: [[[10, 22, 31, 40, 48, 55]]] } };
   store.M.inn[0][0][0] = 0;
   assert.deepEqual(teamOversReport(store, [0], 0, 6).values, [55]);

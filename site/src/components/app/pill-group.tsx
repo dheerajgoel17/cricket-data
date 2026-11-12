@@ -5,13 +5,16 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 /**
- * Single-select pill group (shadcn ToggleGroup): one bordered rounded container, and the active highlight is a shared-layout Motion element
- * that slides between items (instant under reduced motion). The active item is scrolled into view when the row overflows.
- * `layoutId` must be unique per group on a page.
+ * Single-select pill group (shadcn ToggleGroup). Variants:
+ * - default / outlined: filled primary selected pill (parent filters)
+ * - segmented: raised thumb in a track
+ * - sub: quieter text row (underline on selected); put a hairline on the parent row (home phase bar), not on this group
+ * Motion slide is instant under reduced motion. `layoutId` must be unique per group.
  */
-export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName, segmented, resetValue }: {
+export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName, segmented, sub, resetValue }: {
   items: [string, ReactNode][]; value: string; onChange: (v: string) => void; layoutId: string; label: string; className?: string; itemClassName?: string;
-  /** One rounded track with a raised thumb (segmented control); each segment is as wide as its label. Default is separate rounded chips with a filled pill that slides to the selected one. */ segmented?: boolean;
+  /** One rounded track with a raised thumb (segmented control); each segment is as wide as its label. */ segmented?: boolean;
+  /** Quiet text chips: selected = primary text + underline (no pill fill). */ sub?: boolean;
   /** Outlined filters. Pressing the selected filter again restores this default. */
   resetValue?: string;
 }) {
@@ -27,22 +30,30 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
   }, [value, reduce]);
   return (
     <ToggleGroup ref={ref} type="single" value={value} onValueChange={(v) => { if (v) onChange(v); else if (resetValue != null && value !== resetValue) onChange(resetValue); }} variant="outline" spacing={segmented ? 0 : 2} aria-label={label}
-      className={cn("justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", segmented ? "h-control w-fit max-w-full rounded-[var(--chip-radius)] bg-card p-0.5" : "h-auto w-full gap-tight bg-transparent", className)}>
+      className={cn("justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        segmented ? "h-control w-fit max-w-full rounded-[var(--chip-radius)] bg-card p-0.5"
+          : sub ? "h-auto w-full gap-stack bg-transparent"
+            : "h-auto w-full gap-tight bg-transparent",
+        className)}>
       {items.map(([v, l]) => {
         const clearable = value === v && outlined && v !== resetValue;
+        const on = value === v;
         return (
           <ToggleGroupItem key={v} value={v} title={clearable ? "Clear filter" : undefined}
             className={cn(
               "relative shrink-0 font-medium transition-colors",
-              outlined
-                ? "h-control rounded-[var(--chip-radius)] border! border-foreground/40! bg-background! px-3.5 text-callout text-foreground! shadow-none data-[state=on]:border-primary! data-[state=on]:bg-[color-mix(in_oklab,var(--foreground)_82%,var(--primary))]! data-[state=on]:text-background!"
-                : segmented
-                  ? "h-full flex-none rounded-[var(--chip-radius)] border-0 bg-transparent px-3 text-callout data-[spacing=0]:rounded-[var(--chip-radius)] data-[spacing=0]:first:rounded-[var(--chip-radius)] data-[spacing=0]:last:rounded-[var(--chip-radius)] hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground"
-                  : "h-control rounded-[var(--chip-radius)] border-0 bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-background data-[state=off]:text-foreground/80",
+              sub
+                ? "h-auto rounded-none border-0 bg-transparent px-0 py-stack text-callout shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-primary data-[state=off]:text-muted-foreground"
+                : outlined
+                  ? "h-control rounded-[var(--chip-radius)] border! border-hairline! bg-card! px-3.5 text-callout text-foreground! shadow-none hover:bg-surface-hover data-[state=on]:border-transparent! data-[state=on]:bg-transparent! data-[state=on]:text-primary-foreground!"
+                  : segmented
+                    ? "h-full flex-none rounded-[var(--chip-radius)] border-0 bg-transparent px-3 text-callout data-[spacing=0]:rounded-[var(--chip-radius)] data-[spacing=0]:first:rounded-[var(--chip-radius)] data-[spacing=0]:last:rounded-[var(--chip-radius)] hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=off]:text-muted-foreground"
+                    : "h-control rounded-[var(--chip-radius)] border-0 bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-primary-foreground data-[state=off]:text-foreground/80",
               itemClassName,
             )}>
-            {!outlined && value === v && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 rounded-[var(--chip-radius)]", segmented ? "bg-secondary shadow-sm" : "bg-foreground")} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
-            <span className="relative flex items-center gap-hair">{l}{clearable && <XMarkIcon className="size-4 shrink-0" aria-hidden />}</span>
+            {on && !sub && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 rounded-[var(--chip-radius)]", segmented ? "bg-secondary shadow-sm" : "bg-primary")} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
+            {on && sub && <motion.span layoutId={layoutId} aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-primary" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
+            <span className="relative flex items-center gap-hair">{l}{clearable && <XMarkIcon className="size-3.5 shrink-0 opacity-70" aria-hidden />}</span>
           </ToggleGroupItem>
         );
       })}

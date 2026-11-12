@@ -21,7 +21,7 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | `DATA_WRAP_KEY` | GitHub secret | `openssl rand -hex 32` | wrap small JSON at build and `/api/live` at runtime; `site.yml` injects it as a Vercel **build** env (so `seo.mjs` can unwrap fixtures) and a runtime env (gate header + live wrap). `value-bets.yml` uses it to unwrap `/api/live` when storing results. Do not paste it into the repo |
 | `VITE_GA_MEASUREMENT_ID` | GitHub secret | GA4 measurement id (`G-…`) | inlined at the Vercel build (`site.yml` `--build-env`). Empty or unset: no Google tag. Never commit the id |
 | `SITE_URL` | GitHub variable | repo Settings -> Variables | sitemap.xml / robots.txt; the `value-bets.yml` step that reads `<SITE_URL>/api/live` to store finished matches' results in the archive (skipped when unset); and local `npm run dev` (copy into gitignored `site/.env.local`) which then proxies `/data`, `/api/gate` and `/api/live` so the UI uses production JSON and scores |
-| `ADSENSE_SLOT` | GitHub variable (optional) | repo Settings -> Variables | the slot id (digits, public) of the display ad unit at the foot of each stats page (`site/src/components/app/ad-slot.tsx`; never on pages with prices, props or fancy lines, `site/src/lib/ads.ts`). The unit "stats footer" is built in as the default; unset or empty uses it; set the variable to another unit's id, or to `none` to draw no unit |
+| `ADSENSE_SLOT` | GitHub variable (optional) | repo Settings -> Variables | AdSense display unit id for top strips when no manual creative is set (`site/src/components/app/ad-slot.tsx`, allowlist in `site/src/lib/ad-slots.ts`). Default unit "stats footer"; `none` draws no network unit. Manual ads from `/admin/ads` override it |
 | `INPLAY_LOG` | GitHub variable | repo Settings -> Variables | `storage` saves changed in-play lines as compressed files and enables grading. `1` selects the SQL log. Apply the migration for the selected mode before setting the variable. Unset disables logging. The same run then also reads `SITE_URL` (the live scores) and the secret `DATA_WRAP_KEY` (to unwrap them) |
 | `XAI_API_KEY`, `XAI_MODEL` | Vercel env (Production) | `vercel env add` or dashboard | `site/api/ask.js` |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Vercel env (optional) | same | `site/api/ask.js` fallback |
@@ -39,6 +39,22 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 **Source hosts live in the environment, never in the tree.** No tracked file names a data source's host (`scripts/check_public_safe.py` fails on it, comparing hashes so the script lists none), and committed data stores host-relative links. Locally put the same names in a git-ignored `site/.env.local` (the dev server loads it into the API handlers) or export them before running Python. Tests use placeholder hosts (`tests/conftest.py`, `site/tests/*`).
 
 Never commit `.env*`, tokens, or keys. `site/.env.local` created by `vercel link` must be deleted (it holds an OIDC token).
+
+## Manual ads dashboard
+Migration `supabase/migrations/20261112_manual_ads.sql`: tables `ad_admins`, `ad_slots`, `ad_placements`, bucket `ad-creatives`, helper `is_ad_admin()`. Apply in the Supabase SQL editor (or CLI).
+
+**Bootstrap the first admin** (service role / SQL editor), after that person has signed up on the site:
+
+```sql
+insert into public.ad_admins (user_id, email)
+select id, email from auth.users where lower(email) = lower('you@example.com');
+```
+
+Further admins: open `/admin/ads` → Admins → add their email (they must already have an Auth user). Passwords are only in Supabase Auth — never in `ad_admins`.
+
+**Vercel:** `api/ads-admin.js` needs runtime `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_KEY` (same service role secret GitHub already holds for assets sync). Add the service key to the Vercel project env if it is not there yet. Client uploads and placement CRUD use the anon key + JWT + RLS.
+
+**Creatives:** GIF/PNG/WebP/JPEG up to 2 MB in `ad-creatives`. Public read URLs. Highest `priority` wins per slot among enabled, in-window rows.
 
 **Anti-scrape (silent, browsers are not prompted):** set `DATA_WRAP_KEY`. The Site workflow wraps the smaller `/data` JSON files (not `index.json` / `matches.json` / shards: those are too big to decrypt on a phone) and `/api/live` wraps the same way, so a Network-tab response is `{v, iv, ct}` rather than scores. `/api/gate` puts the key in the `X-Cd-K` header, not the JSON body. The Edge middleware requires the `/api/gate` cookie (known scraper UAs are refused; `meta.json` stays readable). A 403 on `/data` is `no-store` so a first-request cookie race is not cached as "Data not found". The hourly archive job unwraps `/api/live` with the same secret. This is a speed bump, not a secret from a real browser: the page still has to unwrap to draw numbers.
 

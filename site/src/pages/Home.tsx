@@ -29,11 +29,13 @@ export function HomePage() {
   const phase = pickHomePhase(counts, q.view);
   const shown = fixtures.filter((f) => (f.noProps ? phase === "pre" : phaseOf(stateOf(f)) === phase));
   return (
-    <div className="flex flex-col gap-section">
+    <div className="flex flex-col">
       <h1 className="sr-only">Cricket fixtures</h1>
       <HomePhaseBar value={phase} counts={counts} onChange={(p) => setQ({ view: p })} />
-      {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
-      <HotHome phase={phase} />
+      <div className="flex flex-col gap-section pt-stack">
+        {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
+        <HotHome phase={phase} />
+      </div>
     </div>
   );
 }

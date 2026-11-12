@@ -17,12 +17,12 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { liveBlurb, liveCard, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
+import { liveBlurb, liveCard, nextTestDayLine, sessionBadge, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
 import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
-import { HeaderActions } from "@/lib/header-slot";
+import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -40,7 +40,7 @@ import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
-import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton, ScorecardSkeleton } from "@/components/app/skeletons";
+import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
 
@@ -59,15 +59,19 @@ function TeamName({ name, ix }: { name: string; ix: number }) {
 
 /** One match header for scheduled, live and completed fixtures. */
 function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) {
+  useHeaderFlush(true);
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const now = useNow(1000);
   const { state } = playState(f, match, now);
   const final = state === "final", on = state === "live";
-  const blurb = liveBlurb(match) || (final ? f.result || "" : state === "started" ? NO_SCORE : "");
-  const session = !final && (sessionLabel(blurb) || match?.session);
-  const badge = session || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
+  const rawBlurb = liveBlurb(match);
+  const sessionSummary = rawBlurb || match?.session || "";
+  const session = !final && (sessionLabel(sessionSummary) || "");
+  const badge = (!final && sessionBadge(sessionSummary)) || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
   const livePulse = on && !session;
+  const nextDay = !final ? nextTestDayLine(f.start, sessionSummary, now) : "";
+  const blurb = nextDay || rawBlurb || (final ? f.result || "" : state === "started" ? NO_SCORE : "");
   const sides: [string, number][] = [[f.a, f.a_ix], [f.b, f.b_ix]];
   const knownSides = sides.filter(([, i]) => i >= 0);
   const innings = liveCard(match);
@@ -83,20 +87,22 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
   const start = `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`;
   const actions = (
     <HeaderActions>
-      {live && <LiveFeed />}
-      <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
-      className={cn("grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring",)}><ArrowUpOnSquareIcon className="size-5" /></button>
+      <div className="ml-auto flex shrink-0 items-center gap-snug">
+        {live && <LiveFeed />}
+        <button type="button" aria-label="Share" onClick={() => { track("share", { kind: "fixture" }); void sendShare(matchShareText({ a: f.a, b: f.b, when: `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`, venue: f.venue, series: f.series, url: shareFixtureUrl(location.origin, f.id) }) || shareFixtureUrl(location.origin, f.id), `${f.a} v ${f.b}`, () => toast("Copied")); }}
+          className="grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring"><ArrowUpOnSquareIcon className="size-5" /></button>
+      </div>
     </HeaderActions>
   );
   const backBtn = (
     <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 hidden items-center rounded-lg px-1 py-tight text-body text-primary lg:flex transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
   );
   return (
-    <section aria-label="Match overview" className="flex flex-col gap-snug">
+    <section data-flush aria-label="Match overview" className="flex flex-col gap-snug">
       {backBtn}
       {actions}
-      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-inset ring-hairline">
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote">
+      <div className="-mx-gutter flex min-w-0 flex-col overflow-hidden border-b border-hairline bg-card">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-footnote">
           <span className={cn("label-cap font-bold", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
           <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
           {f.series && <span className="text-muted-foreground">{f.series}</span>}
@@ -105,14 +111,14 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
           {sides.map(([name, ix], i) => {
             const score = scores[i];
             return (
-              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-inset py-tight">
+              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-gutter py-tight">
                 <TeamName name={name} ix={ix} />
                 {hasScore && (score?.display || on) && <LiveScore live={on && !session} s={score} size="lg" />}
               </div>
             );
           })}
         </div>
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-callout">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-callout">
           <span className="font-medium">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
           {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
@@ -167,7 +173,7 @@ export function FixturePage() {
   const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
-  if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><ScorecardSkeleton /><RowsSkeleton /></div>;
+  if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
       <EmptyNote title="Fixture gone">That match is no longer in the schedule.</EmptyNote>
@@ -177,22 +183,16 @@ export function FixturePage() {
   if (fx.fmt === "FC" && !cardDetail) return <div><h1 className="sr-only">{fx.a} v {fx.b}</h1><MatchHeader f={fx} match={match} live={false} /><Panel title="First-class match"><Muted>First-class cricket is not part of the stats here, so there is no player grid for this match.</Muted></Panel></div>;
   if (fancyDetail) {
     setTitle(`Match Fancy · ${fx.a} v ${fx.b}`);
-    return (
-      <div className="flex flex-col gap-snug">
-        <Link to={`/fixture/${fx.id}?tab=fancy`} className="inline-flex w-fit items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronLeftIcon className="size-4" aria-hidden />Match Fancy
-        </Link>
-        <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />
-      </div>
-    );
+    // phone header back only (player / ground pattern) — no second in-content “Match Fancy” crumb
+    return <MatchFancy fx={fx} teams={known} fmt={fmt} q={q} setQ={setQ} doc={doc} mode="detail" />;
   }
   if (cardDetail) {
     setTitle(`${fx.a} v ${fx.b} scorecard`);
     return (
       <div className="flex flex-col gap-stack">
-        <Link to={`/fixture/${fx.id}`} className="inline-flex w-fit min-w-0 items-center gap-tight text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronLeftIcon className="size-4 shrink-0" aria-hidden /><span className="truncate">{fx.a} v {fx.b}</span>
-        </Link>
+        <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav(`/fixture/${fx.id}`))} className="hidden size-control place-items-center rounded-full bg-secondary text-primary lg:grid">
+          <ChevronLeftIcon className="size-5" />
+        </button>
         <PageTitle sub={match?.session || liveBlurb(match) || undefined}>Scorecard</PageTitle>
         {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyNote title="No scorecard yet">There is no card for this match from our source yet. It shows here once play has started.</EmptyNote>}
       </div>

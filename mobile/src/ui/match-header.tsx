@@ -26,7 +26,7 @@ export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem;
     <View style={bare ? styles.bare : styles.box}>
       <View style={styles.top}>
         <View style={styles.state}>
-          {m.session ? <Text style={[styles.cap, { color: color.destructive }]}>{m.session}</Text>
+          {m.session ? <Text style={[styles.cap, { color: color.amber }]}>{m.session}</Text>
             : m.live ? <><LiveDot /><Text style={[styles.cap, { color: color.destructive }]}>Live</Text></>
             : <Text style={styles.cap}>{m.final ? "Final" : m.delayed ? "Delayed" : m.started ? "Started" : "Upcoming"}</Text>}
           <Text style={styles.cap}>· {f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</Text>

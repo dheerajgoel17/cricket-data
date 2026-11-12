@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
+import { StatsAd } from "@/components/app/stats-ad";
 import { EmptyNote } from "@/components/app/page";
 import { ListSkeleton } from "@/components/app/skeletons";
 import { AnimatedNumber } from "@/components/app/animated-number";
@@ -413,7 +414,12 @@ export function VenueGroundPage() {
   const { id } = useParams();
   const idx = Number(id);
   if (!(idx >= 0 && idx < store.venues.length)) return <EmptyNote>Unknown ground.</EmptyNote>;
-  return <FixtureGroundPanel venue={store.venues[idx]} />;
+  return (
+    <div className="flex flex-col gap-snug">
+      <StatsAd />
+      <FixtureGroundPanel venue={store.venues[idx]} />
+    </div>
+  );
 }
 
 /** Venue line on the match header: opens the fixture's ground page (not a sheet). */
