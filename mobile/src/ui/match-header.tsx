@@ -1,6 +1,5 @@
 import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
-import { LinearGradient } from "expo-linear-gradient";
 import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,20 +11,19 @@ import type { RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { LiveDot } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, type } from "@/ui/tokens";
 
 /**
  * The match at the top of its page, in a container (the site's `MatchHeader`): its state and format with a share button, both sides with their crests and, when it is on or
  * over, their scores, otherwise the kick-off and a live countdown; then the status line, and the series and ground.
  */
-export function MatchHeader({ item, onShare, onGround }: { item: RailItem; onShare?: () => void; onGround?: () => void }) {
+export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem; onShare?: () => void; onGround?: () => void; bare?: boolean }) {
   const now = useNow(1000); // only this header ticks every second; the page under it does not re-render
   const f = item.fixture, m = cardModel(item, now);
   const place = shortVenue(f.venue) || f.venue;
   const ms = m.when.getTime() - now;
   return (
-    <View style={styles.box}>
-      {m.live ? <LinearGradient pointerEvents="none" colors={["rgba(255,69,58,0.18)", "rgba(255,69,58,0)"]} start={{ x: 0, y: 0 }} end={{ x: 0.9, y: 0.6 }} style={[StyleSheet.absoluteFill, { borderRadius: radius.card }]} /> : null}
+    <View style={bare ? styles.bare : styles.box}>
       <View style={styles.top}>
         <View style={styles.state}>
           {m.session ? <Text style={[styles.cap, { color: color.destructive }]}>{m.session}</Text>
@@ -77,7 +75,8 @@ export function MatchHeader({ item, onShare, onGround }: { item: RailItem; onSha
 }
 
 const styles = StyleSheet.create({
-  box: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  box: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  bare: { gap: space.snug },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   state: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },

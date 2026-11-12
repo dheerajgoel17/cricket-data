@@ -45,9 +45,9 @@ export function useHotHome(phase: HomePhase) {
   const { cards } = useFancyCards(true);
 
   const props = useMemo(() => {
-    const strict = rows.filter((r) => r.l10.played >= HOME_PLAYED);
+    const strict = rows.filter((r) => r.l10.played >= HOME_PLAYED || r.quotes?.some((q: any) => q.live));
     if (strict.length >= 3 || !scoring) return strict;
-    return rows.filter((r) => r.l10.played >= HOME_PLAYED_SOFT);
+    return rows.filter((r) => r.l10.played >= HOME_PLAYED_SOFT || r.quotes?.some((q: any) => q.live));
   }, [rows, scoring]);
 
   const fancyById = useMemo(() => {

@@ -8,7 +8,8 @@ import { fancyStanding } from "@cricket/engine/live.js";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { span, timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
-import { linesQuery, liveQuery } from "@/lib/queries";
+import { liveQuery } from "@/lib/queries";
+import { useLinesLive } from "@/lib/use-lines-live";
 import { fixtureStart, liveMatchFor } from "@/lib/rail";
 import { useRail } from "@/lib/use-rail";
 
@@ -22,13 +23,13 @@ export const fxInfoOf = (f: any) => ({ a: f.a, b: f.b, fmt: f.fmt, startMs: fixt
 
 /** The cards follow the home rail: matches in play first, then standing. A finished match has nothing left to bet on, so it is not listed. */
 export function useFancyCards(enabled = true) {
-  const stats = useQuery(storeQuery), lines = useQuery(linesQuery), live = useQuery(liveQuery);
+  const stats = useQuery(storeQuery), lines = useLinesLive(), live = useQuery(liveQuery);
   const { items, ready: railReady } = useRail();
   const store = stats.data?.store;
   const fixtures = useMemo(() => items.filter((i) => !i.noProps && i.state !== "final" && fixtureBooks(lines.data, i.fixture).fancy).map((i) => i.fixture), [items, lines.data]);
   const ids = fixtures.map(idOf).join("|");
   const q = useQuery({
-    queryKey: ["fancy-cards", lines.data?.generated_at_utc ?? "", ids],
+    queryKey: ["fancy-cards", lines.data?.generated_at_utc ?? "", lines.data?.live_sig ?? "", ids],
     enabled: enabled && !!store && railReady && !!lines.data,
     staleTime: 10 * 60_000,
     queryFn: async (): Promise<FancyCard[]> => {

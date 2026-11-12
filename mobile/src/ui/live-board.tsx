@@ -14,7 +14,7 @@ import { Press } from "@/ui/press";
 import { RecentForm, FormHeadline } from "@/ui/recent-form";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, numLg, radius, space, tonal, type } from "@/ui/tokens";
+import { cap, color, font, num, numLg, radius, space, type } from "@/ui/tokens";
 import { recentForms } from "@/lib/form";
 
 type Side = [string, number];
@@ -111,12 +111,12 @@ function Stat({ k, v }: { k: string; v: ReactNode }) {
 }
 
 /** The match as it stands: the pair at the crease with their partnership, the last wicket, the bowler, this over's deliveries and the run rates. So far only, never used for settlement. */
-export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
+export function LiveBoard({ match, teams, flat }: { match: any; teams?: Side[]; flat?: boolean }) {
   const board = liveBoard(match);
   if (!board) return null;
   const bowlOv = ov(board.bowler);
   return (
-    <View style={[styles.board, tonal, { borderRadius: radius.card }]} accessibilityLabel="Live scoreboard">
+    <View style={flat ? styles.flat : [styles.board, { backgroundColor: color.card, borderRadius: radius.card }]} accessibilityLabel="Live scoreboard">
       {board.batters[0] ? (
         <View style={styles.pair}>
           <BatterEnd p={board.batters[0]} sides={teams} />
@@ -221,9 +221,35 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   );
 }
 
+/**
+ * The page's header while a match is on (the site's `ScorecardCard`): the match header, the live strip (batters, bowler, this over) and a "Full scorecard" row that opens the whole
+ * card in place, all in one container, so the props start higher up the screen.
+ */
+export function ScorecardCard({ match, teams, header }: { match: any; teams?: Side[]; header: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const full = cardInns(match).length > 0, strip = !!liveBoard(match);
+  return (
+    <View style={styles.cardBox} accessibilityLabel="Scorecard">
+      {header}
+      {strip ? <><View style={styles.rule} /><LiveBoard match={match} teams={teams} flat /></> : null}
+      {full ? (
+        <>
+          <View style={styles.rule} />
+          <Press scale={1} onPress={() => setOpen((o) => !o)} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.fullRow}>
+            <Ionicons name="grid-outline" size={18} color={color["muted-foreground"]} />
+            <Text style={styles.fullText}>{open ? "Hide scorecard" : "Full scorecard"}</Text>
+            <Ionicons name={open ? "chevron-up" : "chevron-down"} size={16} color={color["muted-foreground"]} />
+          </Press>
+          {open ? <ScorecardBody match={match} teams={teams} /> : null}
+        </>
+      ) : null}
+    </View>
+  );
+}
+
 /** The scorecard and each side's recent form, as two closed rows under the match so the props stay first. */
-export function MatchAccordions({ match, teams, fmt, store }: { match?: any; teams: Side[]; fmt: string; store: any }) {
-  const card = match ? cardInns(match) : [];
+export function MatchAccordions({ match, teams, fmt, store, noCard }: { match?: any; teams: Side[]; fmt: string; store: any; noCard?: boolean }) {
+  const card = match && !noCard ? cardInns(match) : [];
   const form = useMemo(() => (store ? recentForms(store, teams, fmt) : []), [store, teams, fmt]);
   const showForm = form.some((f) => f.games.length);
   if (!card.length && !showForm) return null;
@@ -251,6 +277,11 @@ const styles = StyleSheet.create({
   muted: { ...type.footnote, color: color["muted-foreground"] },
   strongMuted: { fontFamily: font.medium, color: color.foreground },
   board: { padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
+  cardBox: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  flat: { gap: space.snug },
+  rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: -space.inset },
+  fullRow: { flexDirection: "row", alignItems: "center", gap: space.tight, minHeight: 44 },
+  fullText: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
   pair: { flexDirection: "row", alignItems: "stretch", gap: space.snug },
   end: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   endText: { flex: 1, minWidth: 0, gap: 2 },

@@ -32,7 +32,7 @@ import { Chips } from "@/ui/chips";
 import { InfoButton } from "@/ui/info-button";
 import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
-import { LiveBoard, MatchAccordions } from "@/ui/live-board";
+import { MatchAccordions, ScorecardCard } from "@/ui/live-board";
 import { MatchFancy } from "@/ui/match-fancy";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
@@ -106,9 +106,12 @@ export default function FixturePage() {
             </View>
           ) : (
             <>
-              <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
-              {item.live?.status === "live" ? <View style={{ paddingTop: space.snug }}><LiveBoard match={item.live} teams={known} /></View> : null}
-              {f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} /> : null}
+              {item.live?.status === "live" ? (
+                <View style={styles.pad}><ScorecardCard match={item.live} teams={known} header={<MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />} /></View>
+              ) : (
+                <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
+              )}
+              {f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
               {f.fmt === "FC" ? (
                 <Text style={[styles.empty, styles.pad]}>First-class cricket is not part of the stats here, so there are no player props for this match.</Text>
               ) : tab === "props" ? (
@@ -120,7 +123,7 @@ export default function FixturePage() {
                     <Text style={[styles.empty, styles.pad]}>Could not score this match's lines. Go back and try again.</Text>
                   ) : shown.length ? (
                     <View>
-                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}`} r={r} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
                       {scoring ? <Working label="Scoring more lines…" /> : null}
                     </View>
                   ) : scoring ? (
