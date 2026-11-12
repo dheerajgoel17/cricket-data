@@ -1,6 +1,6 @@
-/** Catalogue of banner slots: sizes and which paths mount them. Keep in sync with `ad_slots` seed in supabase/migrations/20261112_manual_ads.sql. */
+/** Catalogue of banner slots: sizes and which paths mount them. Keep in sync with `ad_slots` seeds in supabase/migrations/20261112_manual_ads.sql and 20261112_ad_slots_props.sql. */
 
-export type AdSlotId = "fancy_detail_top" | "stats_top";
+export type AdSlotId = "fancy_detail_top" | "stats_top" | "player_detail_top" | "props_list_top";
 
 export type AdSlotDef = {
   id: AdSlotId;
@@ -16,6 +16,18 @@ export const AD_SLOTS: AdSlotDef[] = [
     label: "Match Fancy detail top strip",
     sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
     paths: [/^\/fixture\/[^/]+\/fancy\/?$/],
+  },
+  {
+    id: "player_detail_top",
+    label: "Player prop detail top strip",
+    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
+    paths: [/^\/player\/[^/]+\/?$/],
+  },
+  {
+    id: "props_list_top",
+    label: "Player props list top strip",
+    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
+    paths: [/^\/props\/?$/],
   },
   {
     id: "stats_top",

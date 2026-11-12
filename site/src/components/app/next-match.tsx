@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { track } from "@/lib/analytics";
-import { bookQuotes } from "@cricket/engine/lines.js";
 import { nextMatchRates } from "@cricket/engine/next-match.js";
 import { localWhen, odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { OddsTable } from "./odds-table";
 import { MatchStatus } from "./match-status";
 import { TeamBadge } from "./badges";
-import { StandingMark, Tick, type Standing } from "./tick";
+import { StandingMark, type Standing } from "./tick";
 
-const CARD = "rounded-2xl bg-card p-inset ring-1 ring-hairline";
 const tone = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.6 ? "text-primary" : p <= 0.25 ? "text-miss" : "text-foreground");
 
 export type NextMatchInfo = {
@@ -34,7 +31,7 @@ export type LineSoFar = Standing;
 /** Shown when this stat has no listed book line: the chart still uses history so a fair line is readable. */
 export function UnpricedNote({ statLabel, className }: { statLabel: string; className?: string }) {
   return (
-    <p role="status" className={cn("flex gap-snug rounded-xl bg-secondary/60 p-snug text-callout", className)}>
+    <p role="status" className={cn("flex gap-snug text-callout", className)}>
       <InformationCircleIcon aria-hidden className="relative top-px size-4 shrink-0 text-muted-foreground" />
       <span>
         <span className="font-medium text-foreground">No book is offering odds for {statLabel}</span>
@@ -48,95 +45,84 @@ export function UnpricedNote({ statLabel, className }: { statLabel: string; clas
 function RateRow({ label, r, side, line }: { label: string; r: { p: number | null; hits: number; played: number; fair: number | null }; side: string; line: number }) {
   if (r.played < 1) {
     return (
-      <div className="flex items-baseline justify-between gap-snug text-callout">
-        <span className="min-w-0 truncate text-muted-foreground">{label}</span>
-        <span className="text-muted-foreground">No data</span>
+      <div className="grid gap-hair text-left">
+        <span className="label-cap text-caption text-muted-foreground">{label}</span>
+        <span className="text-footnote text-muted-foreground">No data</span>
       </div>
     );
   }
   return (
-    <div className="flex items-baseline justify-between gap-snug text-callout">
-      <span className="min-w-0 truncate text-muted-foreground">{label}</span>
-      <span className="shrink-0 tabular-nums">
-        <b className={cn("font-medium", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
-        {" "}<span className="text-muted-foreground">{r.hits} of {r.played}</span>
-        {" "}<span className="text-muted-foreground" title={`fair ${side} ${line}`}>fair {odds(r.fair)}</span>
+    <div className="grid gap-hair text-left">
+      <span className="label-cap text-caption text-muted-foreground">{label}</span>
+      <span className="tabular-nums">
+        <b className={cn("font-condensed text-title font-bold leading-none", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
+        <span className="ml-tight text-footnote text-muted-foreground">{r.hits}/{r.played} · fair {odds(r.fair)}</span>
       </span>
+      <span className="sr-only">{side} {line}</span>
     </div>
   );
 }
 
 /**
- * Next match on the player page: who and when, the books' prices on this line, and how he has gone over/under it at that ground and against that side
- * (the games on the chart, this format, filters applied). A match that has started or just finished stays here with the listed line and whether it cleared.
+ * This / next match card on the player page: who and when, standing, ground / opponent hit rates.
+ * Book prices live in the chart strip and line ladder — not repeated here.
  */
 export function NextMatch({ next, entries, line, side, book, statLabel, fmt, standing, out }: {
   next: NextMatchInfo; entries: any[]; line: number; side: string; book?: any; statLabel: string; fmt?: string;
   standing?: LineSoFar | null; out?: boolean;
 }) {
   const { here, versus } = nextMatchRates(entries, next, line, side);
-  const bookAt = book?.lines?.find((l: any) => l.line === line) || null;
-  const quotes = bookQuotes(bookAt ? [bookAt] : []);
-  const best = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
   const ground = next.ground.split(",")[0];
   const heading = next.phase && next.phase !== "upcoming" ? "This match" : "Next match";
   return (
-    <div className={cn("grid gap-stack", CARD, out && "opacity-60")}>
-      <div className="grid gap-snug">
-        <div className="flex items-start justify-between gap-snug">
-          <span className="label-cap text-footnote text-muted-foreground">{heading}</span>
-          {next.phase === "live" || next.phase === "final" ? <MatchStatus phase={next.phase} className="shrink-0 text-footnote" /> : <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>}
-        </div>
-        <div className="flex min-w-0 flex-wrap items-center gap-snug">
-          {next.team ? (
-            <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
-              <TeamBadge name={next.team} size="sm" eager />
-              <span className="min-w-0 truncate text-body font-medium">{next.team}</span>
-            </span>
-          ) : null}
-          {next.team && next.opp ? <span className="shrink-0 text-footnote text-muted-foreground">vs</span> : null}
-          {next.opp ? (
-            <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
-              <TeamBadge name={next.opp} size="sm" eager />
-              <span className="min-w-0 truncate text-body font-medium">{next.opp}</span>
-            </span>
-          ) : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
-          {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
-        </div>
-        {next.ground ? <span className="text-callout text-muted-foreground">{next.ground}{next.competition ? ` · ${next.competition}` : ""}</span> : null}
+    <section className={cn("grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline", out && "opacity-60")} aria-label={heading}>
+      <div className="flex items-baseline justify-between gap-snug">
+        <h2 className="label-cap text-footnote text-muted-foreground">{heading}</h2>
+        {next.phase === "live" || next.phase === "final"
+          ? <MatchStatus phase={next.phase} className="shrink-0 text-footnote" />
+          : <span className="shrink-0 text-footnote tabular-nums text-muted-foreground">{localWhen(next.start)}</span>}
       </div>
-
-      {book ? (
-        <div className="grid gap-hair border-t border-hairline pt-snug">
-          <div className="flex flex-wrap items-baseline justify-between gap-snug">
-            <span className="text-body font-medium tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span>
-              {standing != null && <> · <StandingMark standing={standing} line={line} /></>}
-            </span>
-            {best > 1 ? <Tick value={best} className="text-callout font-medium tabular-nums text-foreground">{odds(best)}</Tick> : null}
-          </div>
-          {quotes.length ? (
-            <OddsTable lines={quotes.map((q: any) => ({ line: q.line, books: [{ source: q.source, over: q.over, under: q.under, underAt: q.underAt }] }))} />
-          ) : book.main && book.main.line !== line ? (
-            <p className="text-callout text-muted-foreground">Books price {book.main.line} on this match, not {line}.</p>
-          ) : null}
-        </div>
-      ) : (
-        <div className="grid gap-snug border-t border-hairline pt-snug">
-          <p role="status" className="text-callout">
-            <span className="font-medium text-foreground">No listed odds</span>
-            <span className="text-muted-foreground"> · no book is offering {statLabel} on this match</span>
-          </p>
-          <span className="text-body font-medium tabular-nums">{side === "over" ? "O" : "U"} {line} <span className="font-medium text-muted-foreground">{statLabel}</span></span>
-        </div>
+      <div className="flex min-w-0 flex-wrap items-center gap-snug">
+        {next.team ? (
+          <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
+            <TeamBadge name={next.team} size="sm" eager />
+            <span className="min-w-0 truncate text-body font-medium">{next.team}</span>
+          </span>
+        ) : null}
+        {next.team && next.opp ? <span className="shrink-0 text-footnote text-muted-foreground">vs</span> : null}
+        {next.opp ? (
+          <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
+            <TeamBadge name={next.opp} size="sm" eager />
+            <span className="min-w-0 truncate text-body font-medium">{next.opp}</span>
+          </span>
+        ) : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
+        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
+      </div>
+      {(next.ground || next.competition) ? (
+        <p className="truncate text-footnote text-muted-foreground">
+          {[ground || next.ground, next.competition, fmt].filter(Boolean).join(" · ")}
+        </p>
+      ) : null}
+      {book && standing != null && (
+        <p className="text-callout text-primary">
+          <span className="font-medium tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
+          {" · "}
+          <StandingMark standing={standing} line={line} />
+        </p>
       )}
-
+      {!book && (
+        <p role="status" className="text-callout">
+          <span className="font-medium text-foreground">No listed odds</span>
+          <span className="text-muted-foreground"> · no book is offering {statLabel} on this match</span>
+        </p>
+      )}
       {(next.ground || next.opp) ? (
-        <div className="grid gap-snug border-t border-hairline pt-snug sm:grid-cols-2">
-          {next.ground ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`At ${ground}`} r={here} side={side} line={line} /></div> : null}
-          {next.opp ? <div className="rounded-xl bg-secondary/60 p-snug"><RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /></div> : null}
+        <div className="grid grid-cols-2 gap-snug border-t border-hairline pt-snug">
+          {next.ground ? <RateRow label={`At ${ground}`} r={here} side={side} line={line} /> : <span />}
+          {next.opp ? <RateRow label={`Vs ${next.opp}`} r={versus} side={side} line={line} /> : null}
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }
 

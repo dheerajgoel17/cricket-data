@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useId, useMemo, useState, type ReactNode } from "react";
-import { track } from "@/lib/analytics";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
@@ -32,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
+import { BookTable } from "./book-table";
 import { TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
 import { MiniBars } from "./mini-bars";
@@ -43,7 +43,6 @@ import { PlayerName } from "./player-name";
 import { BatterSpot, LiveBadge, LiveOpened, LineProgress } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
-import { propKey } from "@/lib/saved";
 
 const MAX_ROWS = 30;
 type Win = "season" | "h2h" | "ven" | "l5" | "l10";
@@ -145,51 +144,50 @@ const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={
 /** List card: face + name, hero OVER line (condensed), book price, model edge. */
 type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
 
-/** The book's mark and price are always shown, even when it is the only book. With 2+ books the lowest line (best price at it) is in the accent colour and a "+N books" toggle opens the rest. */
+/** Face Over and Under each own their book (shared line is the usual player-prop case); extras sit behind `BookTable` (+N books). */
 export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; className?: string; rowLine?: number }) {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const [top, ...rest] = quotes;
-  if (!top) return null;
-  const compact = rowLine != null;
-  const comparison = compact ? quotes : rest;
-  const underLine = top.underAt?.line ?? top.line;
-  const underPrice = top.underAt?.price ?? top.under;
+  if (!quotes.length) return null;
+  const overQ = quotes.reduce<Quote | null>((best, q) => {
+    if (q.over == null) return best;
+    if (!best || (q.over > (best.over ?? 0)) || (q.over === best.over && q.line < best.line)) return q;
+    return best;
+  }, null);
+  const underQ = quotes.reduce<Quote | null>((best, q) => {
+    const price = q.underAt?.price ?? q.under;
+    const line = q.underAt?.line ?? q.line;
+    if (price == null) return best;
+    const bestPrice = best ? (best.underAt?.price ?? best.under) : null;
+    const bestLine = best ? (best.underAt?.line ?? best.line) : Infinity;
+    if (bestPrice == null || price > bestPrice || (price === bestPrice && line > bestLine)) return q;
+    return best;
+  }, null);
+  const overLine = overQ?.line;
+  const underLine = underQ ? (underQ.underAt?.line ?? underQ.line) : undefined;
+  const underPrice = underQ ? (underQ.underAt?.price ?? underQ.under) : null;
+  const shown = [overQ?.source, underQ?.source];
+  const books = quotes.map((q) => ({ source: q.source, over: q.over, under: q.underAt?.price ?? q.under }));
+  const splitLine = overLine != null && underLine != null && overLine !== underLine;
+  const live = quotes.find((q) => q.live);
   return (
-    <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)}>
+    <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)} onClick={(e) => e.stopPropagation()}>
       <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
-        <span className={cn("inline-flex flex-wrap items-center gap-tight whitespace-nowrap font-condensed", top.best && "font-medium text-primary")}>
-          <BookBadge source={top.source} />{" "}
-          {compact ? (
-            <>
-              <span className="inline-flex items-center gap-tight">
-                <span className="text-muted-foreground">Over{top.over != null && top.line !== rowLine ? ` ${top.line}` : ""}</span>
-                <Tick quiet value={top.over} className="text-body font-bold text-foreground">{odds(top.over)}</Tick>
-              </span>
-              <span className="inline-flex items-center gap-tight">
-                <span className="text-muted-foreground">Under{underPrice != null && underLine !== rowLine ? ` ${underLine}` : ""}</span>
-                <Tick quiet value={underPrice} className="text-body font-bold text-foreground">{odds(underPrice)}</Tick>
-              </span>
-            </>
-          ) : top.over == null
-            ? <><span className="font-bold">U {top.line}</span> <span className="text-body font-bold text-foreground">{odds(top.under)}</span></>
-            : <><span className="font-bold">O {top.line}</span> <Tick quiet value={top.over} className={cn("text-body font-bold", top.best ? "text-primary" : "text-foreground")}>{odds(top.over)}</Tick>{top.underAt ? <span className="text-muted-foreground"> · U {top.underAt.line} {odds(top.underAt.price)}</span> : top.under != null ? <span className="text-muted-foreground"> · U {odds(top.under)}</span> : null}</>}
-          {!compact && top.best && <span className="sr-only"> (lowest line, best price)</span>}
-        </span>
-        {top.live && <LiveOpened opened={top.opened} line={top.line} label={compact ? "Opened at" : undefined} />}
-        {comparison.length > 0 && (
-          <button type="button" aria-expanded={open} aria-controls={id} className="relative z-10 inline-flex min-h-8 items-center gap-hair rounded-full px-tight font-medium text-foreground/70 hover:bg-hairline"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); if (!open) track("books_open"); }}>
-            {open ? "Hide prices" : compact ? (quotes.length === 1 ? "Book prices" : `Compare ${quotes.length} books`) : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
-          </button>
+        {overQ?.over != null && (
+          <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
+            <span className="text-muted-foreground">O{splitLine || (rowLine != null && overLine !== rowLine) ? ` ${overLine}` : ""}</span>
+            <Tick quiet value={overQ.over} className="text-body font-bold text-foreground">{odds(overQ.over)}</Tick>
+            <BookBadge source={overQ.source} className="min-w-0 truncate" />
+          </span>
         )}
+        {underPrice != null && (
+          <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
+            <span className="text-muted-foreground">U{splitLine || (rowLine != null && underLine !== rowLine) ? ` ${underLine}` : ""}</span>
+            <Tick quiet value={underPrice} className="text-body font-bold text-foreground">{odds(underPrice)}</Tick>
+            <BookBadge source={underQ!.source} className="min-w-0 truncate" />
+          </span>
+        )}
+        {live && <LiveOpened opened={live.opened} line={live.line} label={rowLine != null ? "Opened at" : undefined} />}
       </div>
-            {open && (
-        <table id={id} className="relative z-10 w-full max-w-sm text-left font-condensed">
-          <thead><tr className="label-cap text-footnote"><th className="py-hair font-medium">Book</th><th className="py-hair font-medium">Line</th><th className="py-hair font-medium">Over</th><th className="py-hair font-medium">Under</th></tr></thead>
-          <tbody>{comparison.map((q) => <tr key={q.source}><td className="py-hair"><BookBadge source={q.source} /></td><td className="font-bold">{q.line}</td><td className="font-bold"><Tick quiet value={q.over}>{odds(q.over)}</Tick></td><td>{q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)}</td></tr>)}</tbody>
-        </table>
-      )}
+      <BookTable books={books} shown={shown} />
     </div>
   );
 }
@@ -419,22 +417,22 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
           items={[["all", "All"], ...matchChips.map((f) => [f.id, <MatchChip key={f.id} f={f} />] as [string, ReactNode])]}
         />
       )}
-      <div className={cn("flex flex-col gap-snug", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
-      {/* one chip row for the prop type, plus a Filters button (count of active filters on it) that opens the filter view: full screen on a phone, a right drawer from lg */}
-      <div className="flex items-center gap-snug">
-        <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-        <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-          className="relative h-control rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-          <AdjustmentsHorizontalIcon className="size-4" />Filters
-          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
-        </Button>
-      </div>
-      {active.length > 0 && (
-        <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
-          {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
-          <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+      <div className={cn("flex flex-col", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150")}>
+        {/* HomePhaseBar / Fancy shape: hairline chip row + Filters, prop pills under when sticky on /props. */}
+        <div className={cn("flex min-w-0 items-stretch gap-snug border-b border-hairline", urlState && "px-gutter")}>
+          <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            <AdjustmentsHorizontalIcon className="size-4" />Filters
+            {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
+          </Button>
         </div>
-      )}
+        {active.length > 0 && (
+          <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", urlState ? "px-gutter pb-tight pt-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
+            {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
+            <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+          </div>
+        )}
       </div>
       <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={sc} onApply={(s) => update({ ...s, stat: sc.stat === s.stat ? sc.stat : s.stat })} choices={choices} />
       <AnimatedHeight>

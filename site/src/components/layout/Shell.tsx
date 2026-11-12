@@ -94,7 +94,7 @@ export function Shell() {
   }, [key]);
   return (
     <HeaderSlotProvider>
-    <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))] lg:pb-0">
+    <SidebarProvider className="min-h-screen flex-col pb-[calc(var(--phone-dock-h,calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))))] lg:pb-0">
       <a href="#main" className="sr-only z-[70] focus:not-sr-only focus:fixed focus:left-gutter focus:top-snug focus:rounded-lg focus:bg-card focus:p-snug">Skip to content</a>
       <div className="sticky top-0 z-50"><Header /></div>
       <div className="flex flex-1">

@@ -12,13 +12,14 @@ import { fancySplitNote } from "@/lib/fancy-split";
 import { Button } from "@/components/ui/button";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { StandingMark, Tick, type Standing } from "./tick";
 import { fancyByLine, fancyFor, fancyHeadline } from "@cricket/engine/lines.js";
 import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
+import { LadderRow, type LadderPriced } from "./line-ladder";
 import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -58,7 +59,7 @@ const scoreMarket = score as (store: any, ms: number[], scope: number, k: string
 const firstInnsMs = firstInns as (store: any, ms: number[], scope: number) => number[];
 const topList = topBatters as (store: any, ms: number[], o: { team?: number | null; scope: string }) => { n: number; rows: any[] };
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => { line: number; over: number; under: number; source: string; bat_first?: boolean }[];
-type BookLine = { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] };
+type BookLine = LadderPriced;
 const byLine = fancyByLine as (entries: ReturnType<typeof fancyLines>) => BookLine[];
 const stepOf = (key: string) => (/runs$|score$|^overs_/.test(key) ? 5 : 1);
 const pct1 = (r: number) => `${(r * 100).toFixed(1)}%`;
@@ -82,55 +83,6 @@ export const collectOverview = collectOverviewRows as (o: { store: any; doc: any
 
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
-
-/** Best book for one side at a line: price + that book's mark on one row — never pairs the other side under the same badge. */
-function SideBook({ priced, side }: { priced?: BookLine | null; side: "over" | "under" }) {
-  const face = priced?.[side] != null ? priced.books.find((x) => x[side] === priced[side]) : null;
-  const p = face?.[side] ?? null;
-  if (p == null) return <span className="text-footnote text-muted-foreground">—</span>;
-  return (
-    <span className="flex min-w-0 max-w-full items-center gap-tight overflow-hidden">
-      <Tick value={p} className="shrink-0 font-condensed text-body font-bold leading-none tabular-nums text-primary">{odds(p)}</Tick>
-      <BookBadge source={face!.source} className="min-w-0 max-w-full truncate" />
-    </span>
-  );
-}
-
-/** One ladder line: Over and Under each own their book; extras sit behind the shared +N books accordion. */
-function LadderRow({ line, summary, priced, selected, onPick }: {
-  line: number; summary: { pOver: number; pUnder: number; fairOver: number; fairUnder: number }; priced: BookLine | null; selected: boolean; onPick: () => void;
-}) {
-  const overSrc = priced?.over != null ? priced.books.find((x) => x.over === priced.over)?.source : undefined;
-  const underSrc = priced?.under != null ? priced.books.find((x) => x.under === priced.under)?.source : undefined;
-  return (
-    <TableRow data-state={selected ? "selected" : undefined}
-      className="cursor-pointer border-hairline active:bg-primary/10 data-[state=selected]:bg-primary/15"
-      onClick={onPick}>
-      <TableCell className="w-[3rem] px-snug py-tight align-middle font-medium tabular-nums">{line}</TableCell>
-      <TableCell className="min-w-0 overflow-hidden whitespace-normal px-snug py-tight align-middle">
-        <span className="grid min-w-0 justify-items-start gap-hair" onClick={(e) => e.stopPropagation()}>
-          <SideBook priced={priced} side="over" />
-          {priced && <BookTable books={priced.books} shown={[overSrc, underSrc]} />}
-        </span>
-      </TableCell>
-      <TableCell className="min-w-0 overflow-hidden whitespace-normal px-snug py-tight align-middle">
-        <SideBook priced={priced} side="under" />
-      </TableCell>
-      <TableCell className="w-[3.75rem] whitespace-normal px-snug py-tight align-middle tabular-nums">
-        <span className="grid justify-items-start gap-hair text-left">
-          <b className="text-primary leading-none">{pc(summary.pOver)}</b>
-          <span className="text-footnote leading-none text-muted-foreground">{odds(summary.fairOver)}</span>
-        </span>
-      </TableCell>
-      <TableCell className="w-[3.75rem] whitespace-normal px-snug py-tight align-middle tabular-nums">
-        <span className="grid justify-items-start gap-hair text-left">
-          <b className="leading-none">{pc(summary.pUnder)}</b>
-          <span className="text-footnote leading-none text-muted-foreground">{odds(summary.fairUnder)}</span>
-        </span>
-      </TableCell>
-    </TableRow>
-  );
-}
 
 /** One market's row — same chrome as a player PropRow: title, available over/under lines (named when they differ), one face book per side (+N accordion for the rest), model edge + last-N bars. */
 export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null }) {

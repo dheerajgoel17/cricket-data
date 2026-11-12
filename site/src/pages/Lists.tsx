@@ -8,6 +8,7 @@ import { fancyMarketPath } from "@/lib/fancy-path";
 import { setTitle } from "@/lib/title";
 import { EmptyState } from "@/components/app/empty-state";
 import { HotProps } from "@/components/app/hot-props";
+import { AdSlot } from "@/components/app/ad-slot";
 import { BookTable } from "@/components/app/book-table";
 import { OverviewRow, fancyFm } from "@/components/app/match-fancy";
 import { useFancyCards } from "@/hooks/useFancyCards";
@@ -32,6 +33,7 @@ export function PropsPage() {
   }, [search, nav]);
   return (
     <div className="flex flex-col gap-stack">
+      <AdSlot slotId="props_list_top" />
       <h1 className="text-title font-bold tracking-tight lg:text-display">Player props</h1>
       <HotProps syncUrl />
     </div>
