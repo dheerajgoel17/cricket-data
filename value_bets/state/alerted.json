@@ -23,10 +23,5 @@
   "edge": 0.0523,
   "start_utc": "2026-11-13T03:30:00Z",
   "alerted_at": "2026-11-12T01:34:11.533001+00:00"
- },
- "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-12|batter_milestone||Ellyse Perry 50+ no|49.5|under": {
-  "edge": 0.053,
-  "start_utc": "2026-11-12T08:10:00Z",
-  "alerted_at": "2026-11-12T03:34:24.113786+00:00"
  }
 }
