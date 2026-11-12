@@ -9,12 +9,13 @@ import { city, dayLabel, localTime, seriesName } from "@/lib/format";
 import { openFixture } from "@/lib/nav";
 import type { RailItem } from "@/lib/rail";
 import { ChevronRight } from "@/ui/icons";
-import { LiveDot } from "@/ui/motion";
+import { LiveDot, Skeleton } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
 import { cap, color, font, radius, space, type } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
-function LiveScore({ s, dim }: { s: any | null; dim?: boolean }) {
+function LiveScore({ s, dim, pending }: { s: any | null; dim?: boolean; pending?: boolean }) {
+  if (pending && !s?.display) return <Skeleton style={styles.pendingScore} />; // the scores are still on their way: not "Yet to bat"
   if (!s?.display) return <Text style={styles.yet}>Yet to bat</Text>;
   const overs = s.overs != null ? `${Number.isInteger(s.overs) ? Number(s.overs).toFixed(1) : s.overs} ov` : "";
   return (
@@ -50,7 +51,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
             <TeamBadge name={s.name} />
             <Text style={[styles.team, s.lost && styles.lost]} numberOfLines={1}>{s.name}</Text>
             {m.hasScore || m.live ? (
-              <LiveScore s={s.score} dim={s.lost} />
+              <LiveScore s={s.score} dim={s.lost} pending={m.live && !item.live} />
             ) : k === 0 && !m.final ? (
               <View style={styles.when}>
                 <Text style={styles.whenDay}>{dayLabel(m.when, now)}</Text>
@@ -87,6 +88,7 @@ const styles = StyleSheet.create({
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
   total: { fontFamily: font.data, fontSize: 18, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  pendingScore: { width: 64, height: 16, borderRadius: 8 },
   yet: { ...type.callout, color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },

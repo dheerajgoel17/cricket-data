@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
 import { mark, onRender, PROFILE } from "@/lib/perf";
-import { watchAppState } from "@/lib/queries";
+import { fixturesQuery, hotRowsQuery, linesQuery, liveQuery, watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
 import { SignInSheet } from "@/ui/sign-in-sheet";
 import { WebFrame } from "@/ui/web-frame";
@@ -19,6 +19,8 @@ import { color, font } from "@/ui/tokens";
 void SplashScreen.preventAutoHideAsync();
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
+// the feeds the Home rail reads start loading as the bundle runs, not when the Fixtures screen mounts after the fonts: the scores, the schedule, the books and the published hot rows are then already on their way (or in) by the first paint
+for (const q of [liveQuery, fixturesQuery, linesQuery, hotRowsQuery]) void client.prefetchQuery(q as never);
 
 // Dark only, in the site's colours. Setting the theme here also avoids a white flash behind the iOS 26 tab bar.
 const theme = {
