@@ -317,11 +317,14 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                     return (
                     <Press scale={1} key={l.line} onPress={() => setMl(l.line)} accessibilityRole="button" style={({ pressed }) => [styles.ladderRow, l.line === line && styles.ladderOn, pressed && { opacity: 0.6 }]}>
                       <Text style={[styles.ladderLine, { width: 40 }]}>{l.line}</Text>
-                      <View style={[styles.lineCell, { flex: 1 }]}>
+                      <View style={[styles.lineCell, { flex: 1, flexDirection: "column", alignItems: "flex-start", gap: 2 }]}>
                         {priced && face ? (
                           <>
-                            <BookBadge source={face.source} />
-                            <Text style={styles.fair}>O {odds(priced.over)} · U {odds(priced.under)}</Text>
+                            <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.tight }}>
+                              <BookBadge source={face.source} />
+                              <Text style={styles.fair}>O {odds(priced.over)} · U {odds(priced.under)}</Text>
+                            </View>
+                            <BookList books={priced.books} shown={[overB?.source, underB?.source]} />
                           </>
                         ) : <Text style={styles.fair}>—</Text>}
                       </View>

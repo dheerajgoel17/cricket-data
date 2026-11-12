@@ -481,14 +481,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 className="cursor-pointer border-hairline active:bg-primary/10 data-[state=selected]:bg-primary/15"
                                 onClick={() => set({ ml: l.line })}>
                                 <TableCell className="px-gutter py-snug font-medium tabular-nums">{l.line}</TableCell>
-                                <TableCell className="px-gutter py-snug">
+                                <TableCell className="px-gutter py-snug" onClick={(e) => e.stopPropagation()}>
                                   {priced && face ? (
                                     <span className="grid gap-hair">
-                                      <BookBadge source={face.source} />
-                                      <span className="inline-flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
-                                        <span className="inline-flex items-center gap-tight whitespace-nowrap">O {priced.over != null ? <Tick value={priced.over} className="font-condensed font-bold text-foreground">{odds(priced.over)}</Tick> : <span>—</span>}</span>
-                                        <span className="inline-flex items-center gap-tight whitespace-nowrap">U {priced.under != null ? <Tick value={priced.under} className="font-condensed font-bold text-foreground">{odds(priced.under)}</Tick> : <span>—</span>}</span>
-                                      </span>
+                                      <button type="button" className="grid justify-items-start gap-hair text-left outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => set({ ml: l.line })}>
+                                        <BookBadge source={face.source} />
+                                        <span className="inline-flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
+                                          <span className="inline-flex items-center gap-tight whitespace-nowrap">O {priced.over != null ? <Tick value={priced.over} className="font-condensed font-bold text-foreground">{odds(priced.over)}</Tick> : <span>—</span>}</span>
+                                          <span className="inline-flex items-center gap-tight whitespace-nowrap">U {priced.under != null ? <Tick value={priced.under} className="font-condensed font-bold text-foreground">{odds(priced.under)}</Tick> : <span>—</span>}</span>
+                                        </span>
+                                      </button>
+                                      <BookTable books={priced.books} shown={[overB?.source, underB?.source]} />
                                     </span>
                                   ) : <span className="text-footnote text-muted-foreground">—</span>}
                                 </TableCell>
