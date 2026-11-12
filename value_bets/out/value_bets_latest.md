@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-12 22:00 IST
+# Cricket value bets - 2026-11-12 23:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1768 prices
-- **smarkets**: ok, 628 prices
-- **feedg**: ok, 24 prices, 3 events
+- **moviodds_bet365**: ok, 1814 prices
+- **smarkets**: ok, 693 prices
+- **feedg**: ok, 32 prices, 4 events
 - **feedk**: ok, 196 prices, 9 events
-- **feede**: ok, 480 prices, 18 events
-- **feedf**: ok, 358 prices, 9 events
-- **feedh**: ok, 1849 prices, 60 events
+- **feede**: ok, 516 prices, 19 events
+- **feedf**: ok, 404 prices, 11 events
+- **feedh**: ok, 1980 prices, 67 events
 
-Matches starting in next 168h: **47**, markets priced: **486**, value bets: **3** (new alerts: 3). Min edge 5%.
+Matches starting in next 168h: **54**, markets priced: **520**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +28,6 @@ Matches starting in next 168h: **47**, markets priced: **486**, value bets: **3*
 - 11-13 07:30 IST New Zealand vs India / Batter Milestones / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.3%, model 0.1278, market 0.1415
 - 11-13 07:30 IST New Zealand vs India / Batsman to score a Hundred in the match / RG Sharma 100+ yes @ 10.00 (moviodds_bet365): edge 35.9%, model 0.1278, market 0.1426
 
-Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), CDB A (male), Cdb A (male), Central Hinds (W) (female), Central Hinds (male), Diasqua Little Sai Wan Cricket Club (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Border (W) (female), CDB A (male), Cdb A (male), Central Hinds (W) (female), Central Hinds (male), Diasqua Little Sai Wan Cricket Club (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Lokseva Academy (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Recon Tactical Free State (W) (female), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female), USA (W) (female)
 
-Runtime 126.3s. Snapshot: `odds_20261112T163038Z.jsonl.gz`
+Runtime 178.8s. Snapshot: `odds_20261112T173030Z.jsonl.gz`
