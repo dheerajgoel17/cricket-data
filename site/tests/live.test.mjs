@@ -319,6 +319,56 @@ test("parseCardPage batting, extras, FOW, yet-to-bat, bowling (hand-computed)", 
   assert.equal(hasCard(m), true);
 });
 
+test("a Test side's first-innings not-out is not the live pair once they bat again", () => {
+  // PAK 434/9 then 52/1: Saqib Khan finished the first dig not out; the match page can still name him
+  // as batter 2 while Mohammad Taha is the actual partner. The board must show the current dig only.
+  const m = {
+    status: "live",
+    fmt: "Test",
+    teams: [
+      { name: "Pakistan", abbr: "PAK", batting: true, runs: 52, wkts: 1, overs: 21.0, display: "434/9 & 52/1 (21.0 ov)" },
+      { name: "Sri Lanka", abbr: "SL", batting: false, runs: 446, wkts: 10, overs: 117.2, display: "446/10 (117.2 ov)" },
+    ],
+    players: [
+      { name: "Saqib Khan", team: "Pakistan", runs: 5, balls: 12, out: false }, // 1st inns survivor
+      { name: "Azan Awais", team: "Pakistan", runs: 22, balls: 65, out: false, strike: true },
+      { name: "Mohammad Tayyab Arif", team: "Pakistan", runs: 11, balls: 8, out: true },
+      { name: "Mohammad Taha", team: "Pakistan", runs: 19, balls: 53, out: false },
+      { name: "Saqib Khan", team: "Pakistan", runs: 0, balls: 5, out: false }, // match-page append, wrong
+      { name: "Milan Rathnayake", team: "Sri Lanka", wickets: 0, conceded: 13, ballsBowled: 35, current: true },
+    ],
+    card: [
+      {
+        team: "Pakistan", n: 1,
+        batters: [
+          { name: "Saqib Khan", runs: 5, balls: 12, out: false },
+        ],
+        fow: [],
+      },
+      {
+        team: "Sri Lanka", n: 2,
+        batters: [{ name: "Pathum Nissanka", runs: 50, balls: 80, out: true }],
+        fow: [],
+      },
+      {
+        team: "Pakistan", n: 3,
+        batters: [
+          { name: "Azan Awais", runs: 22, balls: 65, out: false },
+          { name: "Mohammad Tayyab Arif", runs: 11, balls: 8, out: true },
+          { name: "Mohammad Taha", runs: 19, balls: 53, out: false },
+        ],
+        fow: [{ name: "Mohammad Tayyab Arif", runs: 14, balls: 15, wkts: 1 }],
+        yetToBat: ["Babar Azam", "Saqib Khan"],
+      },
+    ],
+  };
+  const board = liveBoard(m);
+  assert.deepEqual(board.batters.map((p) => p.name), ["Azan Awais", "Mohammad Taha"]);
+  assert.equal(board.batters[0].strike, true);
+  assert.equal(board.lastWicket.name, "Mohammad Tayyab Arif");
+  assert.equal(board.bowler.name, "Milan Rathnayake");
+});
+
 test("India's chase has started: the board, scores and card follow the second innings, not New Zealand's finished one", () => {
   const m = chase();
   assert.equal(m.status, "live");

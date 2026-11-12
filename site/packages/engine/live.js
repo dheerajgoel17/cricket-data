@@ -861,7 +861,18 @@ export function liveBoard(match) {
   if (!players.length) return null;
   const bat = (match.teams || []).find((t) => t.batting);
   const onBat = (team) => !bat || teamKey(team) === teamKey(bat.name) || (!!bat.abbr && teamKey(team) === teamKey(bat.abbr));
-  const raw = players.filter((p) => p.runs != null && !p.out && onBat(p.team)).map(withSr);
+  // A Test side that bats twice still has its first-innings survivor as !out in `players`. Drop those
+  // names unless they are also not out in the side's current card innings (same dig again).
+  const turns = (match.card || []).filter((i) => onBat(i.team) && (i.batters || []).length);
+  const current = turns.length ? turns[turns.length - 1] : null;
+  const currentNotOut = (current?.batters || []).filter((p) => !p.out);
+  const priorOnly = [];
+  for (const inn of turns.slice(0, -1)) {
+    for (const p of inn.batters || []) {
+      if (!p.out && !currentNotOut.some((c) => namesMatch(c.name, p.name))) priorOnly.push(p.name);
+    }
+  }
+  const raw = players.filter((p) => p.runs != null && !p.out && onBat(p.team) && !priorOnly.some((n) => namesMatch(n, p.name))).map(withSr);
   const strike = raw.find((p) => p.strike);
   const batters = strike ? [strike, ...raw.filter((p) => p !== strike)] : raw;
   const outs = players.filter((p) => p.out && p.runs != null && onBat(p.team)).map(withSr);

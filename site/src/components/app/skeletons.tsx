@@ -46,24 +46,42 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-/** Match header while the fixture list loads: two sides, score in the middle. */
+/** Match header + live strip while the fixture loads: edge-to-edge under the top bar. */
 export function MatchHeaderSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-tight pt-snug">
-      <Skeleton className="size-control rounded-full" />
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-snug">
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-3.5 w-20" /><Skeleton className="h-8 w-28" /><Skeleton className="h-4 w-24" /></div>
-        <div className="grid justify-items-center gap-tight"><Skeleton className="h-12 w-[72px] rounded-md" /><Skeleton className="h-4 w-20" /></div>
+    <div data-flush aria-hidden className="-mx-gutter flex flex-col border-b border-hairline bg-card">
+      <div className="flex flex-col gap-tight px-gutter py-snug">
+        <Skeleton className="h-3 w-40" />
+        <div className="flex items-center justify-between gap-snug">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-6 w-24" />
+        </div>
+        <div className="flex items-center justify-between gap-snug">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <Skeleton className="h-4 w-56" />
+      </div>
+      <div className="grid grid-cols-3 divide-x divide-dashed divide-hairline border-t border-hairline bg-background/60">
+        {[0, 1, 2].map((n) => (
+          <div key={n} className="grid gap-hair px-tight py-snug first:pl-gutter last:pr-gutter">
+            <Skeleton className="h-3 w-12" />
+            <Skeleton className="size-8 rounded-full" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center gap-snug border-t border-hairline px-gutter py-tight">
+        <Skeleton className="h-6 w-full rounded-md" />
       </div>
     </div>
   );
 }
 
-/** Live board + scorecard accordion: pair, partnership, bowler, then batting rows. */
+/** Standalone scorecard placeholder (scorecard route). */
 export function ScorecardSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
+    <div aria-hidden className="-mx-gutter flex flex-col gap-stack border-y border-hairline bg-card px-gutter py-inset">
       <div className="flex items-center gap-snug">
         <Skeleton className="size-16 rounded-full" />
         <div className="grid flex-1 justify-items-center gap-tight"><Skeleton className="h-3 w-16" /><Skeleton className="h-6 w-12" /></div>

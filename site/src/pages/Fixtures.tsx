@@ -22,7 +22,7 @@ import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
-import { HeaderActions } from "@/lib/header-slot";
+import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -40,7 +40,7 @@ import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
-import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton, ScorecardSkeleton } from "@/components/app/skeletons";
+import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
 import { Input } from "@/components/ui/input";
 
@@ -59,6 +59,7 @@ function TeamName({ name, ix }: { name: string; ix: number }) {
 
 /** One match header for scheduled, live and completed fixtures. */
 function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) {
+  useHeaderFlush(true);
   const nav = useNavigate();
   const when = fixtureStart(f), timed = f.start.length > 10;
   const now = useNow(1000);
@@ -92,11 +93,11 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
     <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 hidden items-center rounded-lg px-1 py-tight text-body text-primary lg:flex transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
   );
   return (
-    <section aria-label="Match overview" className="flex flex-col gap-snug">
+    <section data-flush aria-label="Match overview" className="flex flex-col gap-snug">
       {backBtn}
       {actions}
-      <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-inset ring-hairline">
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote">
+      <div className="-mx-gutter flex min-w-0 flex-col overflow-hidden border-b border-hairline bg-card">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-footnote">
           <span className={cn("label-cap font-bold", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
           <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
           {f.series && <span className="text-muted-foreground">{f.series}</span>}
@@ -105,14 +106,14 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
           {sides.map(([name, ix], i) => {
             const score = scores[i];
             return (
-              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-inset py-tight">
+              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-gutter py-tight">
                 <TeamName name={name} ix={ix} />
                 {hasScore && (score?.display || on) && <LiveScore live={on && !session} s={score} size="lg" />}
               </div>
             );
           })}
         </div>
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-callout">
+        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-callout">
           <span className="font-medium">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
           {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
@@ -167,7 +168,7 @@ export function FixturePage() {
   const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
-  if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><ScorecardSkeleton /><RowsSkeleton /></div>;
+  if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
       <EmptyNote title="Fixture gone">That match is no longer in the schedule.</EmptyNote>
