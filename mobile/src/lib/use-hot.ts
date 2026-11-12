@@ -10,20 +10,21 @@ import { storeQuery } from "@/lib/data";
 import { hotSnapKey, readHotSnap, writeHotSnap } from "@/lib/hot-cache";
 import { scoreHotRows, type Row } from "@/lib/hot";
 import { sideRate, withModelSide } from "@/lib/model-side";
-import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
+import { fixturesQuery, liveQuery } from "@/lib/queries";
+import { useLinesLive } from "@/lib/use-lines-live";
 
 /** The scored rows (see `scoreHotRows`) for a day (`{ day }`) or one match (`{ teams }`), put in the cache as they come. `scoring` is true while more are still arriving. */
 export function useHotRows(scope?: HotScope, doc?: any) {
-  const stats = useQuery(storeQuery), linesQ = useQuery(linesQuery), fixtures = useQuery(fixturesQuery);
+  const stats = useQuery(storeQuery), linesQ = useLinesLive(), fixtures = useQuery(fixturesQuery);
   const lines = { data: doc ?? linesQ.data }; // `doc`: the book doc with an archived match added, for that match's own page
   const qc = useQueryClient();
   const what = !scope ? "none" : "day" in scope ? scope.day : scope.teams.join("|");
   const stamp = new Date().toDateString();
-  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, doc ? lines.data?.lines?.length : ""];
+  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, lines.data?.live_sig ?? "", doc ? lines.data?.lines?.length : ""];
   // a day's rows kept from the last launch (not for one match's own page, which adds an archived match to the lines)
   const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
   const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
-  const generated = String(lines.data?.generated_at_utc ?? "");
+  const generated = `${lines.data?.generated_at_utc ?? ""}|${lines.data?.live_sig ?? ""}`; // the live lines count: a kept row of the same book file but other live lines is not the answer
   const rows = useQuery({
     queryKey: key,
     enabled: !!scope && !!lines.data && fixtures.isSuccess && (!!stats.data || !!snap),

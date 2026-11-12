@@ -38,7 +38,7 @@ function PlayerProps() {
       <AppHeader title="Player props" info={<InfoButton topic="player-props" />} />
       <FlashList
         data={isLoading ? [] : shown}
-        keyExtractor={(r) => `${r.idx}${r.stat}${r.start}${r.inn}`}
+        keyExtractor={(r) => `${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`}
         renderItem={({ item, index }) => <PropRow r={item} i={index} soFar={soFarOf(item)} out={outOf(item)} />}
         ListHeaderComponent={header}
         ListEmptyComponent={

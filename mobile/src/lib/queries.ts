@@ -34,6 +34,21 @@ export const liveQuery = queryOptions({
   initialDataUpdatedAt: () => readLive()?.t,
 });
 
+/** In-play lines (a batter's innings runs, a side's innings total, the other live markets) from /api/inplay: null when the route is down or has nothing. Polled every ~15 s, but only while a match is on (see `useLinesLive`). */
+export const inplayQuery = queryOptions({
+  queryKey: ["inplay-lines"],
+  queryFn: async (): Promise<any | null> => { try { return await getJson("/api/inplay"); } catch { return null; } },
+  refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, retry: false,
+});
+
+/** The Home rail's published settings (`config/home_rail.json`, read at view time like the site's `loadRail`, so a change needs no release); null when it cannot be read, and the built-in ones apply. */
+const RAIL_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/config/home_rail.json";
+export const railConfigQuery = queryOptions({
+  queryKey: ["home-rail-config"],
+  queryFn: async (): Promise<any | null> => { try { const r = await fetch(RAIL_URL, { headers: { "cache-control": "no-cache" } }); return r.ok ? await r.json() : null; } catch { return null; } },
+  staleTime: 10 * 60_000, retry: false,
+});
+
 /** react-query on a phone: polling follows whether the app is in front, not a browser tab's focus. */
 export function watchAppState(): () => void {
   const sub = AppState.addEventListener("change", (s) => focusManager.setFocused(s === "active"));

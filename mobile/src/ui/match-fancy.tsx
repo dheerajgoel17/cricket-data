@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fancyByLine, fancyFor } from "@cricket/engine/lines.js";
-import { FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
+import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, firstInnsMs, innTag, parseFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, selectMatches, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { fancyShareText } from "@cricket/engine/share-text.js";
@@ -27,6 +27,9 @@ import { ChartBars } from "@/ui/charts";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
+import { LiveMarketRow } from "@/ui/live-market-row";
+import { TeamSpot } from "@/ui/live-spot";
+import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -66,7 +69,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   const scope = scopes.some(([v]) => v === sc) ? Number(sc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
   const keys = (scope < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][];
-  const keyList = keys.flatMap(([k, lab]) => (scope < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn), lab].filter(Boolean).join(" · ")] as [string, string]));
+  const keyList = keys.flatMap(([k, lab]) => (scope < 0 ? [0] : (FANCY_INNS as number[])).filter((inn) => booked(k, team?.[0] ?? null, inn)).map((inn) => [fancyFm(k, inn), [innTag(inn, fx.fmt === "Test", k), batFirstBooked(fancyLines(doc, fxInfo, k, team?.[0] ?? null, inn), inn, scope) ? BAT_FIRST_TAG : "", lab].filter(Boolean).join(" · ")] as [string, string]));
   const fm = keyList.some(([k]) => k === fmId) ? fmId : keyList[0]?.[0] || "";
   const { key, inn } = parseFm(fm) as { key: string; inn: number };
   const marketLabel = (k: string) => keys.find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : (((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string));
@@ -95,6 +98,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // the other live markets (over / under lines and picks), from the in-play merge: prices only
+  const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
 
   const book = useMemo(() => (fancyByLine(bookedNow) as { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] }[]), [bookedNow]);
   const base = useMemo(() => (!store || !key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -141,7 +147,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     const lean = pO != null && pU != null && pO !== pU ? (pO > pU ? "over" : "under") : null;
     const vms = venueIdx.length ? (batFirstNow ? (firstInnsMs(store, hereMatches(10), scope) as number[]) : hereMatches(10)) : [];
     const url = shareFixtureUrl(SITE_URL, fx.id);
-    const text = (fancyShareText as any)({ a: fx.a, b: fx.b, label: [innTag(inn), team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
+    const text = (fancyShareText as any)({ a: fx.a, b: fx.b, label: [innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", team ? `${team[0]} ` : "", marketLabel(key)].filter(Boolean).join(" ").replace(/\s+/g, " "), line, side: lean, price: lean ? (bookHere as any)?.[lean] : null, values: rep.values, ground: venueName, groundValues: vms.length ? run(key, line, vms).values : [], url });
     void Share.share({ message: text || url, title: `${fx.a} v ${fx.b}` });
   };
 
@@ -196,15 +202,18 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {mode === "list" && overview.length > 0 ? (
+          {mode === "list" && (overview.length > 0 || liveList.length > 0) ? (
             <View style={{ gap: space.snug }}>
               <Text style={styles.h2}>Bookmaker lines</Text>
               {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
               <View style={styles.bleed}>
                 {overview.map((r: any, i: number) => (
                   <View key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-                    <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} />
+                    <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
                   </View>
+                ))}
+                {liveList.map((m, i) => (
+                  <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}><LiveMarketRow m={m} /></View>
                 ))}
               </View>
             </View>
@@ -216,7 +225,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
               <View style={{ gap: space.stack }}>
                 <View style={styles.titleRow}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.h3}>{[innTag(inn), marketLabel(key)].filter(Boolean).join(" · ")}</Text>
+                    <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
                     <Text style={styles.note}>last {rep.n} matches</Text>
                   </View>
                   <Press scale={1} onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>

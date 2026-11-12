@@ -1,8 +1,7 @@
 import { Profiler, useMemo, useState } from "react";
 import { mark, onRender } from "@/lib/perf";
-import { Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { FlatList, Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { layoutWidth } from "@/lib/fit";
-import Animated from "react-native-reanimated";
 import type { HomePhase } from "@site/lib/home-phase";
 import { seriesName, shortSeries } from "@/lib/format";
 import { EMPTY_PHASE, phaseView, seriesChips, type RailItem } from "@/lib/rail";
@@ -12,9 +11,9 @@ import { AppHeader } from "@/ui/brand";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
-import { HotHome } from "@/ui/hot-home";
+import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
-import { enter, Skeleton } from "@/ui/motion";
+import { CardSkeleton } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
 import { color, FIXTURE_CARD_SHARE, radius, space } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
@@ -52,12 +51,12 @@ export default function Fixtures() {
         ) : shown.length === 0 ? (
           <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
         ) : (
-          <Animated.FlatList<RailItem>
+          <FlatList<RailItem>
             key={`${phase}|${sel}`}
             horizontal
             data={shown}
             keyExtractor={(i) => `${i.fixture.id}${i.fixture.a}${i.fixture.b}`}
-            renderItem={({ item, index }) => <Animated.View entering={enter(index)} style={{ width: cardW }}><TimedFixtureCard item={item} /></Animated.View>}
+            renderItem={({ item }) => <View style={{ width: cardW }}><TimedFixtureCard item={item} /></View>}
             ItemSeparatorComponent={() => <View style={{ width: gap }} />}
             getItemLayout={(_, index) => ({ length: cardW + gap, offset: (cardW + gap) * index, index })}
             initialNumToRender={2}
@@ -70,7 +69,7 @@ export default function Fixtures() {
             showsHorizontalScrollIndicator={false}
           />
         )}
-        {ready ? <Profiler id="hothome" onRender={onRender}><HotHome phase={phase} /></Profiler> : null}
+        {ready ? <Profiler id="hothome" onRender={onRender}><HotHome phase={phase} /></Profiler> : error ? null : <HotHomeSkeleton />}
       </ScrollView>
       <TabFade />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
@@ -86,8 +85,8 @@ function TimedFixtureCard({ item }: { item: RailItem }) {
 function RailSkeleton({ width }: { width: number }) {
   return (
     <View style={styles.skeletonRow}>
-      <Skeleton style={[styles.skeleton, { width }]} />
-      <Skeleton style={[styles.skeleton, { width }]} />
+      <CardSkeleton width={width} />
+      <CardSkeleton width={width} />
     </View>
   );
 }
@@ -96,5 +95,4 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
   skeletonRow: { overflow: "hidden", flexDirection: "row", gap: space.snug, paddingTop: space.snug, paddingHorizontal: space.gutter },
-  skeleton: { flexShrink: 0, height: 190, borderRadius: radius.card },
 });
