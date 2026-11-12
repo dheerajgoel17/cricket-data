@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { LeaguesPage } from "./Leagues";
@@ -14,8 +15,16 @@ vi.mock("@cricket/engine/tournament.js", () => ({
   featuredEvents: () => [{ e: 2, name: "Women's Big Bash League", tag: "live" }, { e: 1, name: "Big Bash League", tag: "soon" }, { e: 3, name: "Nepal Premier League", tag: "" }],
 }));
 vi.mock("@/components/app/tournament-stats", () => ({ TournamentStats: ({ eventIdx }: { eventIdx: number }) => <p>stats for {eventIdx}</p> }));
+vi.mock("@/lib/manual-ads", () => ({ fetchManualPlacement: async () => null, creativePublicUrl: () => "" }));
 
-const view = (path = "/leagues") => render(<MemoryRouter initialEntries={[path]}><LeaguesPage /></MemoryRouter>);
+const view = (path = "/leagues") => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={qc}>
+      <MemoryRouter initialEntries={[path]}><LeaguesPage /></MemoryRouter>
+    </QueryClientProvider>,
+  );
+};
 
 describe("LeaguesPage", () => {
   it("opens on the first league (Big Bash, the women's season live), with Live and Soon tags on the chips and the men's season next", () => {

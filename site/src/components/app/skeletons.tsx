@@ -104,10 +104,12 @@ export function ScorecardSkeleton() {
 /** High-odds ticket while the live lines settle. */
 export function TapeSkeleton() {
   return (
-    <div aria-hidden className="relative flex min-w-0 flex-col rounded-2xl bg-primary/80 p-inset">
-      <Skeleton className="h-5 w-36 bg-primary-foreground/25" />
-      <Skeleton className="mt-tight h-3 w-52 bg-primary-foreground/20" />
-      <div className="relative my-snug h-0">
+    <div aria-hidden className="relative flex min-w-0 flex-col gap-tight rounded-2xl bg-primary/80 p-inset">
+      <div className="flex flex-col gap-tight">
+        <Skeleton className="h-5 w-36 bg-primary-foreground/25" />
+        <Skeleton className="h-3 w-52 bg-primary-foreground/20" />
+      </div>
+      <div className="relative h-0 py-snug">
         <div className="absolute inset-x-5 top-1/2 border-t border-dashed border-primary-foreground/35" />
         <span className="absolute top-1/2 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
         <span className="absolute top-1/2 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
