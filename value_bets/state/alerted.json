@@ -28,10 +28,5 @@
   "edge": 0.053,
   "start_utc": "2026-11-12T08:10:00Z",
   "alerted_at": "2026-11-12T03:34:24.113786+00:00"
- },
- "female|Brisbane Heat Women|Melbourne Stars Women|2026-11-12|batter_milestone||Meg Lanning 25+ no|24.5|under": {
-  "edge": 0.0564,
-  "start_utc": "2026-11-12T04:40:00Z",
-  "alerted_at": "2026-11-12T04:33:55.876562+00:00"
  }
 }
