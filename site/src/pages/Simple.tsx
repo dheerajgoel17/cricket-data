@@ -113,7 +113,7 @@ export function GlossaryPage() {
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Cricket stats explained"]]} />
       <PageTitle sub="Every market, rule and number on this site, in plain words.">Cricket stats explained</PageTitle>
       <Card className="mb-3 flex-row flex-wrap items-center gap-3 p-4 shadow-none">
-        <Input type="search" placeholder="Search stats and rules" value={t} onChange={(e) => setT(e.target.value)} className="min-w-52 flex-1" />
+        <Input type="search" aria-label="Search stats and rules" placeholder="Search stats and rules" value={t} onChange={(e) => setT(e.target.value)} className="min-w-52 flex-1" />
         <NativeSelect name="c" options={cats.map((x) => [x, x])} defaultValue={c} onChange={(e) => setC(e.target.value)} />
         <NativeSelect name="l" options={levels.map((x) => [x, x])} defaultValue={l} onChange={(e) => setL(e.target.value)} />
       </Card>
@@ -167,7 +167,7 @@ export function PlayersPage() {
       <h1 className="text-title font-bold tracking-tight">Players</h1>
       <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
         <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
-        <InputGroupInput type="search" autoFocus placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
+        <InputGroupInput type="search" placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
         {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><XMarkIcon className="size-4" /></InputGroupButton></InputGroupAddon>}
       </InputGroup>
       {t.length < 2 ? <p className="text-callout text-muted-foreground">Type at least two letters.</p>
@@ -211,7 +211,7 @@ export function TeamsPage() {
     <div>
       <PageTitle>Teams &amp; venues</PageTitle>
       <div className="mb-3 flex gap-2">{(["teams", "venues"] as const).map((k) => <Button key={k} variant={tab === k ? "secondary" : "ghost"} className="rounded-full capitalize" onClick={() => setQ({ tab: k })}>{k}</Button>)}</div>
-      <Input type="search" placeholder={`Search ${tab}`} value={text} onChange={(e) => setText(e.target.value)} className="mb-3" />
+      <Input type="search" aria-label={`Search ${tab}`} placeholder={`Search ${tab}`} value={text} onChange={(e) => setText(e.target.value)} className="mb-3" />
       <Panel flat><DataTable columns={[tab === "teams" ? "Team" : "Venue", "Matches"]} rows={rows.map(([n, i, c]) => [<Link key={i} className="text-primary" to={`/${tab === "teams" ? "team" : "venue"}/${i}`}>{n}</Link>, c])} /></Panel>
     </div>
   );

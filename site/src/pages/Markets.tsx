@@ -41,7 +41,7 @@ export function CompetitionsPage() {
     <div>
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
-      <Input type="search" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
+      <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
       <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-accent"><LeagueBadge name={store.events[e]} size="md" /><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
     </div>
   );

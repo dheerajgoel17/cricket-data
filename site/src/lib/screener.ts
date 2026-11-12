@@ -77,7 +77,7 @@ export function clearFilter(s: Screener, key: keyof Screener | "all"): Screener 
 }
 
 /** The fields of a row the filters read. `p`: its hit rate in the chosen window; `played` the games behind it. */
-export interface FilterRow { fmt: string; team: string; comp?: string; stat: string; edge: number | null; over: number; live?: boolean; [k: string]: any }
+export interface FilterRow { fmt: string; team: string; comp?: string; stat: string; edge: number | null; over: number; live?: boolean; out?: boolean; [k: string]: any }
 
 /** Narrow by the filters that are about the row itself (day, match and stat are handled where the rows are fetched and ranked). */
 export function narrow<T extends FilterRow>(rows: T[], s: Screener): T[] {
@@ -85,7 +85,7 @@ export function narrow<T extends FilterRow>(rows: T[], s: Screener): T[] {
     if (s.fmt !== "all" && r.fmt !== s.fmt) return false;
     if (s.team !== "all" && norm(r.team) !== norm(s.team)) return false;
     if (s.comp !== "all" && (r.comp || "") !== s.comp) return false;
-    if (s.value && !((r.edge ?? 0) > 0)) return false;
+    if (s.value && (r.out || !((r.edge ?? 0) > 0))) return false;
     if (s.min) { const p = sideRate((r as any)[s.win]?.p ?? null, (r as any).side); if (p == null || p * 100 < s.min) return false; }
     return true;
   });
@@ -104,7 +104,7 @@ export function order<T extends FilterRow>(rows: T[], s: Screener): T[] {
     edge: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.edge ?? -Infinity) - (x.edge ?? -Infinity) || (sideRate((y as any)[s.win]?.p ?? null, (y as any).side) ?? 0) - (sideRate((x as any)[s.win]?.p ?? null, (x as any).side) ?? 0),
     price: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.over || 0) - (x.over || 0) || hotOrder(key(x), key(y)),
   };
-  return [...rows].sort(by[s.sort]);
+  return [...rows].sort((a, b) => Number(!!a.out) - Number(!!b.out) || by[s.sort](a, b));
 }
 
 /** The values a filter can take in these rows (so the filter view lists real choices only), most common first. */

@@ -62,6 +62,9 @@ describe("PropTable", () => {
     expect(screen.queryByRole("img", { name: "40 of 40" })).toBeNull();
     rerender(renderRows(null, true));
     expect(screen.getAllByText("Not in XI")).toHaveLength(2);
+    expect(screen.queryByText("+5%")).toBeNull();
+    expect(screen.queryByText("+5.1")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Book prices" })).toBeNull();
     expect(screen.queryByText("Score unavailable")).toBeNull();
   });
 
@@ -96,7 +99,18 @@ describe("PropTable", () => {
     const r = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
     render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
     expect(screen.getByText("bet365")).toBeInTheDocument();
-    expect(screen.getByText("bet365").closest("a")).toBeTruthy();
+    expect(screen.getByText("bet365").closest("a")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Book prices" }));
+    expect(screen.getByRole("table")).toBeInTheDocument();
+  });
+
+  it("labels both book prices inline and shows a different threshold beside its price", () => {
+    const quotes = [{ source: "bet365", name: "bet365", line: 39.5, over: 1.83, under: null, underAt: { line: 41.5, price: 1.95 }, best: false }];
+    render(<MemoryRouter><ul><PropRow r={{ ...row, quotes, edge: null }} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
+    expect(screen.getByText("O/U 39.5")).toBeInTheDocument();
+    expect(screen.getByText("Over").parentElement).toHaveTextContent(/Over\s*1.83/);
+    expect(screen.getByText("Under 41.5").parentElement).toHaveTextContent(/Under 41.5\s*1.95/);
+    expect(screen.queryByRole("table")).toBeNull();
   });
 
   it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
@@ -123,6 +137,6 @@ describe("a live props row", () => {
     expect(screen.getByRole("img", { name: "30 of 49.5, was 39.5" })).toBeInTheDocument(); // the bar under the quote
     expect(screen.getAllByText("Live")).toHaveLength(1);
     expect(within(screen.getByText("AM Tribe").closest("span.flex") as HTMLElement).getByText("Live")).toBeInTheDocument();
-    expect(screen.getByText("was 39.5")).toBeInTheDocument();
+    expect(screen.getByText("Opened at 39.5")).toBeInTheDocument();
   });
 });

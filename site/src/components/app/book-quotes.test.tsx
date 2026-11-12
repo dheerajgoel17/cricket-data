@@ -17,7 +17,7 @@ describe("BookQuotes (the per-book line and over price under a Hot props row)", 
     expect(chips(container)).toEqual(["Ladbrokes O 14.5 1.83 · U 1.83 (lowest line, best price)"]);
     expect(screen.queryByRole("table")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "+1 book" }));
-    expect(screen.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Hide prices" })).toHaveAttribute("aria-expanded", "true");
     expect([...screen.getByRole("table").querySelectorAll("tbody td")].map((c) => c.textContent)).toEqual(["bet365", "17.5", "1.83", "1.83"]);
   });
 

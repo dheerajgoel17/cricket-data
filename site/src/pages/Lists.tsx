@@ -32,8 +32,8 @@ export function PropsPage() {
   }, [search, nav]);
   return (
     <div className="flex flex-col gap-stack">
-      <h1 className="text-title font-bold tracking-tight lg:hidden">Player props</h1>
-      <HotProps heading="Player props" syncUrl />
+      <h1 className="text-title font-bold tracking-tight lg:text-display">Player props</h1>
+      <HotProps syncUrl />
     </div>
   );
 }

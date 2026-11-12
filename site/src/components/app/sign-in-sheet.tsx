@@ -69,7 +69,7 @@ export function SignInSheet() {
           <div className="flex flex-col gap-stack px-group pb-group">
             {!configured ? (
               <p className="rounded-xl bg-secondary px-inset py-snug text-left text-callout text-muted-foreground">
-                Sign-in is not configured. Set <span className="font-medium text-foreground">VITE_SUPABASE_URL</span> and <span className="font-medium text-foreground">VITE_SUPABASE_ANON_KEY</span> (see Operations), then restart the dev server.
+                Sign-in is currently unavailable. You can still browse fixtures and stats.
               </p>
             ) : (
               <>
