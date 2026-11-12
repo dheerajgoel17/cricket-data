@@ -118,7 +118,7 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
         </div>
         {on && <LiveBoard match={match} teams={knownSides} />}
-        {hasCard(match) && <ScorecardAccordion key={f.id} match={match} teams={knownSides} />}
+        {hasCard(match) && <ScorecardAccordion key={f.id} match={match} teams={knownSides} inPlay={on} />}
       </div>
     </section>
   );

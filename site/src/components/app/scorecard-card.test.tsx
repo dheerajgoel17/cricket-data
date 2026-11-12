@@ -38,16 +38,18 @@ describe("Fixture scorecard", () => {
     expect(screen.getByText("c Mendis b Rathnayake")).toBeInTheDocument();
   });
 
-  it("shows current players, deliveries and run rates in the live strip", () => {
+  it("shows current players and deliveries and keeps run rates in the accordion", () => {
     const live = { ...match, teams: [{ name: "Pakistan", batting: true }], crr: 4.17, thisOver: ["4", "0"], players: [
       { name: "Saud Shakeel", team: "Pakistan", runs: 57, balls: 112, strike: true },
       { name: "Ghori", team: "Pakistan", runs: 7, balls: 10 },
       { name: "Asitha Fernando", team: "Sri Lanka", wickets: 2, conceded: 64, ballsBowled: 92, current: true },
     ] };
-    render(<MemoryRouter><LiveBoard match={live} /></MemoryRouter>);
+    render(<MemoryRouter><LiveBoard match={live} /><ScorecardAccordion match={live} inPlay /></MemoryRouter>);
     expect(screen.getByText("Shakeel")).toBeInTheDocument();
     expect(screen.getByText("2–64")).toBeInTheDocument();
     expect(screen.getByLabelText(/Ball by ball/)).toBeInTheDocument();
+    expect(screen.queryByText("CRR")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Full scorecard" }));
     expect(screen.getByText("CRR")).toBeInTheDocument();
   });
 

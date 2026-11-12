@@ -285,16 +285,11 @@ function LivePlayer({ player, sides, bowling = false }: { player: any; sides?: S
   );
 }
 
-/** Current players, deliveries and chase figures in the fixture header. */
+/** Current players and deliveries in the fixture header. */
 export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   const board = liveBoard(match);
-  if (!board) return null;
+  if (!board || (!board.batters.length && !board.bowler && !board.overs.length)) return null;
   const bw = board.bowler;
-  const meta: ReactNode[] = [];
-  if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-medium text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
-  if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-medium text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
-  if (board.crr != null) meta.push(<span key="c"><span className="text-muted-foreground">CRR</span> {board.crr.toFixed(2)}</span>);
-  if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
   return (
     <section aria-label="Live scoreboard" className="flex flex-col divide-y divide-dashed divide-hairline border-t border-hairline">
       {(!!board.batters.length || bw) && (
@@ -310,12 +305,22 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
       {!!board.overs.length && (
         <div className="min-w-0 px-inset py-snug"><Overs overs={board.overs} /></div>
       )}
-      {!!meta.length && <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-inset py-snug text-footnote tabular-nums">{meta}</div>}
     </section>
   );
 }
 
-export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[] }) {
+function LiveScorecardDetails({ match, teams }: { match: any; teams?: Side[] }) {
+  const board = liveBoard(match);
+  if (!board) return null;
+  const meta: ReactNode[] = [];
+  if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-medium text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
+  if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-medium text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
+  if (board.crr != null) meta.push(<span key="c"><span className="text-muted-foreground">CRR</span> {board.crr.toFixed(2)}</span>);
+  if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
+  return meta.length ? <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div> : null;
+}
+
+export function ScorecardAccordion({ match, teams, inPlay }: { match: any; teams?: Side[]; inPlay?: boolean }) {
   const [section, setSection] = useState("");
   return (
     <Accordion type="single" collapsible value={section} onValueChange={setSection} className="min-w-0 border-t border-hairline">
@@ -326,7 +331,8 @@ export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[
             {section ? "Hide scorecard" : "Full scorecard"}
           </span>
         </AccordionTrigger>
-        <AccordionContent className="border-t border-dashed border-hairline px-inset py-snug">
+        <AccordionContent className="flex flex-col gap-snug border-t border-dashed border-hairline px-inset py-snug">
+          {inPlay && <LiveScorecardDetails match={match} teams={teams} />}
           <ScorecardBody match={match} teams={teams} />
         </AccordionContent>
       </AccordionItem>
