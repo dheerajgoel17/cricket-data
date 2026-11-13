@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-13T16:40:53Z",
+ "generated_at_utc": "2026-11-13T17:40:30Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -418,6 +418,29 @@
    "chance": 0.6333,
    "edge": 0.1717,
    "edge_pct": 17.2,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-17-pakistan-v-sri-lanka|overs_10|Sri Lanka|0|over",
+   "fixture_id": "2026-11-17-pakistan-v-sri-lanka",
+   "match": "Pakistan vs Sri Lanka",
+   "format": "Test",
+   "series": "SL vs PAK 2026",
+   "start_utc": "2026-11-17T04:30:00Z",
+   "start_ist": "2026-11-17 10:00 IST",
+   "key": "overs_10",
+   "team": "Sri Lanka",
+   "inn": 0,
+   "side": "over",
+   "line": 24.5,
+   "best_odds": 1.36,
+   "best_source": "Dafabet",
+   "hits": 17,
+   "played": 18,
+   "window": 20,
+   "chance": 0.8464,
+   "edge": 0.1511,
+   "edge_pct": 15.1,
    "bat_first": false
   }
  ]
