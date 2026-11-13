@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-13 23:28 IST
+# Cricket value bets - 2026-11-14 00:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 2156 prices
-- **smarkets**: ok, 500 prices
+- **smarkets**: ok, 487 prices
 - **feedg**: ok, 16 prices, 2 events
-- **feedk**: ok, 316 prices, 10 events
+- **feedk**: ok, 316 prices, 13 events
 - **feedf**: ok, 296 prices, 11 events
 - **feede**: ok, 832 prices, 28 events
 - **feedh**: ok, 1737 prices, 110 events
 
-Matches starting in next 168h: **65**, markets priced: **583**, value bets: **8** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **67**, markets priced: **583**, value bets: **8** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -36,4 +36,4 @@ Matches starting in next 168h: **65**, markets priced: **583**, value bets: **8*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Central Hinds (W) (female), Central Hinds (male), Diasqua Little Sai Wan Cricket Club (male), Elite Cricket Academy (male), Karnataka (W) (female), Knight Fighters 11 (male), Lokseva Academy (male), Maharashtra (W) (female), North West Dragons (W) (female), Omr Checker (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), Royal Champs (male), Tuskers (W) (female), USA (W) (female), Vidarbha (W) (female)
 
-Runtime 177.4s. Snapshot: `odds_20261113T175815Z.jsonl.gz`
+Runtime 171.8s. Snapshot: `odds_20261113T183035Z.jsonl.gz`
