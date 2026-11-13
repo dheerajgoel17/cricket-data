@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-13T23:30:29Z",
- "generated_at_ist": "2026-11-14 05:00 IST",
- "runtime_secs": 550.2,
+ "generated_at_utc": "2026-11-13T23:47:15Z",
+ "generated_at_ist": "2026-11-14 05:17 IST",
+ "runtime_secs": 213.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-13",
-  "commit": "fd6a1717da"
+  "commit": "b07794fcde"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 2352,
-   "secs": 1.4
+   "secs": 0.8
   },
   "smarkets": {
    "status": "ok",
-   "rows": 509,
-   "secs": 3.9
+   "rows": 546,
+   "secs": 3.3
   },
   "feedg": {
    "status": "ok",
    "rows": 24,
-   "secs": 16.6,
+   "secs": 15.5,
    "events": 3
   },
   "feedk": {
    "status": "ok",
    "rows": 316,
-   "secs": 33.0,
+   "secs": 34.3,
    "events": 13
   },
   "feedf": {
    "status": "ok",
-   "rows": 296,
-   "secs": 68.2,
+   "rows": 312,
+   "secs": 69.9,
    "events": 12
   },
   "feede": {
    "status": "ok",
-   "rows": 834,
-   "secs": 76.5,
-   "events": 28
+   "rows": 850,
+   "secs": 77.0,
+   "events": 29
   },
   "feedh": {
    "status": "ok",
-   "rows": 1689,
-   "secs": 94.6,
-   "events": 107
+   "rows": 1754,
+   "secs": 94.4,
+   "events": 109
   }
  },
- "snapshot": "odds_20261113T233029Z.jsonl.gz",
+ "snapshot": "odds_20261113T234715Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,15 +120,15 @@
  },
  "stats": {
   "events_in_window": 62,
-  "rows_in_window": 5898,
+  "rows_in_window": 6032,
   "selections_with_model": 3053,
-  "selections_with_market_fair": 3585,
-  "markets_in_window": 575,
+  "selections_with_market_fair": 3623,
+  "markets_in_window": 588,
   "value_bets": 7,
   "dropped_by_filter": {
-   "model_market_gap": 1320,
+   "model_market_gap": 1319,
    "liquidity": 1,
-   "odds_range": 25,
+   "odds_range": 27,
    "loose_name_match": 4,
    "market_disabled": 3,
    "policy_max_odds": 5,
@@ -145,8 +145,8 @@
     "n_prices": 636,
     "mean_model_p": 0.051,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.196,
-    "mean_abs_logit_diff": 0.945,
+    "mean_logit_diff_model_minus_market": 0.197,
+    "mean_abs_logit_diff": 0.943,
     "corr": 0.665
    },
    "top_bowler_team": {
@@ -211,15 +211,15 @@
     "mean_market_p": 0.034,
     "mean_logit_diff_model_minus_market": -0.053,
     "mean_abs_logit_diff": 1.086,
-    "corr": 0.64
+    "corr": 0.642
    },
    "top_bowler_match": {
     "n_prices": 215,
-    "mean_model_p": 0.054,
+    "mean_model_p": 0.053,
     "mean_market_p": 0.056,
     "mean_logit_diff_model_minus_market": 0.003,
     "mean_abs_logit_diff": 0.536,
-    "corr": 0.471
+    "corr": 0.473
    }
   }
  },
@@ -827,6 +827,9 @@
     "Emirates Eagles"
    ],
    "sources": [
+    "feede_lb",
+    "feedf_p",
+    "feedh_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -913,6 +916,7 @@
     "Services"
    ],
    "sources": [
+    "feedh_d",
     "smarkets"
    ]
   },
@@ -1535,12 +1539,14 @@
   "Adhyayan Daga",
   "Agha Salman",
   "Ajay Chauhan",
+  "Akif Javed",
   "Ali Naseer",
   "Ali Shabbir",
   "Altamish Ashraf",
   "Aman Rao Perala",
   "Amith Sathvik V P",
   "Amrita Joseph",
+  "Amshi De Silva",
   "Anica Swart",
   "Anmol Kumar",
   "Annie O Neil",
@@ -1570,6 +1576,7 @@
   "Ben Stewart McKinney",
   "Bhanu Anand",
   "Bharati Fulmali",
+  "Bhavuk Jerath",
   "Bishal Saha",
   "Bongile Mfunelwa",
   "Bonnie Berry",
@@ -1595,6 +1602,7 @@
   "Disha Deepak Kasat",
   "Divyaansh Saxena",
   "Don Pasindu Sanjula Soriyabandara",
+  "Dunith Nethmika Wellalage",
   "Dushmantha Chameera",
   "E De Broughe",
   "E Hunter",
@@ -1627,6 +1635,8 @@
   "Habibur Rahman",
   "Hafeez Khan",
   "Haider Ali",
+  "Harshit Kaushik",
+  "Hasan Nawaz",
   "Hasini Perera",
   "Hilal Afghan",
   "Humairaa Kaazi",
@@ -1706,13 +1716,7 @@
   "Mehedi Hasan",
   "Michael Kruiskamp",
   "Mieke van Voorst",
-  "Mikayla Friday",
-  "Milan Rathnayake",
-  "Minnu Mani",
-  "Modiri Litheko",
-  "Mohammad Suleman",
-  "Mohammad Taha",
-  "Mohammad Tayyab Arif"
+  "Mikayla Friday"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1837,27 +1841,25 @@
   }
  },
  "log": [
-  "[05:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[05:00 IST] history: 24057 matches, last 2026-11-13, players 433546",
-  "[05:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2352, 'secs': 1.4}",
-  "[05:02 IST] source smarkets: {'status': 'ok', 'rows': 509, 'secs': 3.9}",
-  "[05:02 IST] source feedg: {'status': 'ok', 'rows': 24, 'secs': 16.6, 'events': 3}",
-  "[05:02 IST] source feedk: {'status': 'ok', 'rows': 316, 'secs': 33.0, 'events': 13}",
-  "[05:02 IST] source feedf: {'status': 'ok', 'rows': 296, 'secs': 68.2, 'events': 12}",
-  "[05:02 IST] source feede: {'status': 'ok', 'rows': 834, 'secs': 76.5, 'events': 28}",
-  "[05:02 IST] source feedh: {'status': 'ok', 'rows': 1689, 'secs': 94.6, 'events': 107}",
-  "[05:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[05:02 IST] 109 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[05:02 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[05:02 IST] 76 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[05:02 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
-  "[05:02 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T11:00:00Z)",
-  "[05:02 IST] book lines: 594 player lines from 7 source(s)",
-  "[05:02 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[05:05 IST] weather failed for female|Brisbane Heat Women|Hobart Hurricanes Women|2026-11-14: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "[05:08 IST] weather failed for female|Adelaide Strikers Women|Perth Scorchers Women|2026-11-14: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "[05:09 IST] weather: forecasts for 19 events, 2 failed",
-  "[05:09 IST] prop model: 1905 prop selections modelled, 633 milestone ladder prices anchored to O/U",
-  "[05:09 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
+  "[05:17 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[05:17 IST] history: 24057 matches, last 2026-11-13, players 433546",
+  "[05:19 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2352, 'secs': 0.8}",
+  "[05:19 IST] source smarkets: {'status': 'ok', 'rows': 546, 'secs': 3.3}",
+  "[05:19 IST] source feedg: {'status': 'ok', 'rows': 24, 'secs': 15.5, 'events': 3}",
+  "[05:19 IST] source feedk: {'status': 'ok', 'rows': 316, 'secs': 34.3, 'events': 13}",
+  "[05:19 IST] source feedf: {'status': 'ok', 'rows': 312, 'secs': 69.9, 'events': 12}",
+  "[05:19 IST] source feede: {'status': 'ok', 'rows': 850, 'secs': 77.0, 'events': 29}",
+  "[05:19 IST] source feedh: {'status': 'ok', 'rows': 1754, 'secs': 94.4, 'events': 109}",
+  "[05:19 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[05:19 IST] 109 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[05:19 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[05:19 IST] 76 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[05:19 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
+  "[05:19 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T11:00:00Z)",
+  "[05:19 IST] book lines: 594 player lines from 7 source(s)",
+  "[05:19 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[05:20 IST] weather: forecasts for 21 events, 0 failed",
+  "[05:20 IST] prop model: 1905 prop selections modelled, 633 milestone ladder prices anchored to O/U",
+  "[05:20 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
  ]
 }
