@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-11-12T11:26:04",
+ "afghanistan_enumerated_at": "2026-11-13T11:09:43",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
@@ -260,6 +260,42 @@
   {
    "canonical_id": "208835",
    "key": "2005-05-07-West Indies-South Africa"
+  },
+  {
+   "canonical_id": "64128",
+   "key": "2005-03-10-Australia-New Zealand"
+  },
+  {
+   "canonical_id": "64917",
+   "key": "2004-12-26-Bangladesh-India"
+  },
+  {
+   "canonical_id": "64913",
+   "key": "2004-12-04-Zimbabwe-England"
+  },
+  {
+   "canonical_id": "64894",
+   "key": "2004-05-01-West Indies-England"
+  },
+  {
+   "canonical_id": "64848",
+   "key": "2003-11-22-West Indies-Zimbabwe"
+  },
+  {
+   "canonical_id": "64041",
+   "key": "2003-08-20-South Africa-England"
+  },
+  {
+   "canonical_id": "64040",
+   "key": "2003-08-13-England-South Africa"
+  },
+  {
+   "canonical_id": "64827",
+   "key": "2003-06-08-West Indies-Sri Lanka"
+  },
+  {
+   "canonical_id": "64820",
+   "key": "2003-05-18-West Indies-Australia"
   }
  ],
  "batch_size": 30,
@@ -3462,6 +3498,102 @@
    "key": "2005-04-01-Sri Lanka-South Africa",
    "match_id": "crex-sa-w-vs-sl-w-24th-match-womens-world-cup-2005-match-updates-D9S",
    "saved_at": "2026-11-12T11:54:03"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-sl-w-17th-match-womens-world-cup-2005-match-updates-D9L",
+   "key": "2005-03-30-Sri Lanka-Australia",
+   "match_id": "crex-aus-w-vs-sl-w-17th-match-womens-world-cup-2005-match-updates-D9L",
+   "saved_at": "2026-11-13T11:09:50"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-11th-odi-womens-world-cup-2005-match-updates-D9F",
+   "key": "2005-03-26-South Africa-India",
+   "match_id": "crex-ind-w-vs-sa-w-11th-odi-womens-world-cup-2005-match-updates-D9F",
+   "saved_at": "2026-11-13T11:10:27"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-sa-w-2nd-odi-england-women-tour-of-south-africa-2005-match-updates-JIZ",
+   "key": "2005-03-15-England-South Africa",
+   "match_id": "crex-eng-w-vs-sa-w-2nd-odi-england-women-tour-of-south-africa-2005-match-updates-JIZ",
+   "saved_at": "2026-11-13T11:11:48"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-sa-w-1st-odi-england-women-tour-of-south-africa-2005-match-updates-JIY",
+   "key": "2005-03-13-South Africa-England",
+   "match_id": "crex-eng-w-vs-sa-w-1st-odi-england-women-tour-of-south-africa-2005-match-updates-JIY",
+   "saved_at": "2026-11-13T11:12:04"
+  },
+  {
+   "crex_url": "/cricket-live-score/sl-vs-zim-1st-test-sri-lanka-tour-of-zimbabwe-test-series-2004-match-updates-C11",
+   "key": "2004-05-06-Zimbabwe-Sri Lanka",
+   "match_id": "crex-sl-vs-zim-1st-test-sri-lanka-tour-of-zimbabwe-test-series-2004-match-updates-C11",
+   "saved_at": "2026-11-13T11:18:40"
+  },
+  {
+   "crex_url": "/cricket-live-score/sl-vs-zim-5th-odi-sri-lanka-tour-of-zimbabwe-odi-series-2004-match-updates-C18",
+   "key": "2004-04-29-Zimbabwe-Sri Lanka",
+   "match_id": "crex-sl-vs-zim-5th-odi-sri-lanka-tour-of-zimbabwe-odi-series-2004-match-updates-C18",
+   "saved_at": "2026-11-13T11:19:02"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-vs-nz-2nd-odi-new-zealand-women-tour-of-india-2003-04-match-updates-EIH",
+   "key": "2003-12-07-New Zealand-India",
+   "match_id": "crex-ind-vs-nz-2nd-odi-new-zealand-women-tour-of-india-2003-04-match-updates-EIH",
+   "saved_at": "2026-11-13T11:25:10"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-vs-nz-1st-odi-new-zealand-women-tour-of-india-2003-04-match-updates-EIG",
+   "key": "2003-12-04-New Zealand-India",
+   "match_id": "crex-ind-vs-nz-1st-odi-new-zealand-women-tour-of-india-2003-04-match-updates-EIG",
+   "saved_at": "2026-11-13T11:25:26"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-vs-nz-1st-test-new-zealand-women-tour-of-india-2003-04-match-updates-EIF",
+   "key": "2003-11-27-New Zealand-India",
+   "match_id": "crex-ind-vs-nz-1st-test-new-zealand-women-tour-of-india-2003-04-match-updates-EIF",
+   "saved_at": "2026-11-13T11:25:49"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-vs-sa-2nd-odi-bangladesh-india-south-africa-in-bangladesh-2003-match-updates-CNL",
+   "key": "2003-04-13-India-South Africa",
+   "match_id": "crex-ind-vs-sa-2nd-odi-bangladesh-india-south-africa-in-bangladesh-2003-match-updates-CNL",
+   "saved_at": "2026-11-13T11:30:17"
+  },
+  {
+   "crex_url": "/cricket-live-score/aus-w-vs-eng-w-1st-test-england-women-tour-of-australia-2002-03-match-updates-EIL",
+   "key": "2003-02-15-England-Australia",
+   "match_id": "crex-aus-w-vs-eng-w-1st-test-england-women-tour-of-australia-2002-03-match-updates-EIL",
+   "saved_at": "2026-11-13T11:31:19"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-1st-test-india-women-tour-of-south-africa-2001-02-match-updates-EM7",
+   "key": "2002-03-19-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-1st-test-india-women-tour-of-south-africa-2001-02-match-updates-EM7",
+   "saved_at": "2026-11-13T11:33:17"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-4th-odi-india-women-tour-of-south-africa-2001-02-match-updates-EM5",
+   "key": "2002-03-16-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-4th-odi-india-women-tour-of-south-africa-2001-02-match-updates-EM5",
+   "saved_at": "2026-11-13T11:33:31"
+  },
+  {
+   "crex_url": "/cricket-live-score/ind-w-vs-sa-w-3rd-odi-india-women-tour-of-south-africa-2001-02-match-updates-EM4",
+   "key": "2002-03-13-India-South Africa",
+   "match_id": "crex-ind-w-vs-sa-w-3rd-odi-india-women-tour-of-south-africa-2001-02-match-updates-EM4",
+   "saved_at": "2026-11-13T11:33:42"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-ind-w-5th-odi-england-women-tour-of-india-2002-match-updates-14DB",
+   "key": "2002-01-24-England-India",
+   "match_id": "crex-eng-w-vs-ind-w-5th-odi-england-women-tour-of-india-2002-match-updates-14DB",
+   "saved_at": "2026-11-13T11:34:50"
+  },
+  {
+   "crex_url": "/cricket-live-score/eng-w-vs-ind-w-4th-odi-england-women-tour-of-india-2002-match-updates-14DA",
+   "key": "2002-01-21-England-India",
+   "match_id": "crex-eng-w-vs-ind-w-4th-odi-england-women-tour-of-india-2002-match-updates-14DA",
+   "saved_at": "2026-11-13T11:35:12"
   }
  ],
  "failed": [],
@@ -17842,3986 +17974,1699 @@
    "checked_at": "2026-11-12T11:53:51",
    "key": "2005-04-02-India-Pakistan",
    "reason": "no Source A match within a day of 2005-04-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-04-01-West Indies-India",
+   "reason": "no Source A match within a day of 2005-04-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-04-01-England-New Zealand",
+   "reason": "no Source A match within a day of 2005-04-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-04-01-Ireland-Australia",
+   "reason": "no Source A match within a day of 2005-04-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-03-31-West Indies-South Africa",
+   "reason": "no Source A match within a day of 2005-03-31 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-03-30-Ireland-West Indies",
+   "reason": "no Source A match within a day of 2005-03-30 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-03-30-New Zealand-India",
+   "reason": "no Source A match within a day of 2005-03-30 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:43",
+   "key": "2005-03-30-South Africa-England",
+   "reason": "no Source A match within a day of 2005-03-30 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:09:55",
+   "key": "2005-03-28-England-India",
+   "reason": "no Source A match within a day of 2005-03-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:00",
+   "key": "2005-03-28-Ireland-New Zealand",
+   "reason": "no Source A match within a day of 2005-03-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:05",
+   "key": "2005-03-28-Australia-South Africa",
+   "reason": "no Source A match within a day of 2005-03-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:10",
+   "key": "2005-03-28-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2005-03-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:15",
+   "key": "2005-03-26-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2005-03-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [
+    "D9F"
+   ],
+   "checked_at": "2026-11-13T11:10:34",
+   "key": "2005-03-26-Sri Lanka-New Zealand",
+   "reason": "rendered 1 candidate page(s) for 2005-03-26; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:39",
+   "key": "2005-03-26-Australia-West Indies",
+   "reason": "no Source A match within a day of 2005-03-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [
+    "D9F"
+   ],
+   "checked_at": "2026-11-13T11:10:46",
+   "key": "2005-03-26-England-Ireland",
+   "reason": "rendered 1 candidate page(s) for 2005-03-26; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:51",
+   "key": "2005-03-24-Pakistan-India",
+   "reason": "no Source A match within a day of 2005-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:10:56",
+   "key": "2005-03-24-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2005-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:01",
+   "key": "2005-03-24-England-Sri Lanka",
+   "reason": "no Source A match within a day of 2005-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:06",
+   "key": "2005-03-24-Ireland-India",
+   "reason": "no Source A match within a day of 2005-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:11",
+   "key": "2005-03-24-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2005-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:16",
+   "key": "2005-03-22-South Africa-Ireland",
+   "reason": "no Source A match within a day of 2005-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:21",
+   "key": "2005-03-22-Sri Lanka-India",
+   "reason": "no Source A match within a day of 2005-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:26",
+   "key": "2005-03-22-England-Australia",
+   "reason": "no Source A match within a day of 2005-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:31",
+   "key": "2005-03-22-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2005-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:36",
+   "key": "2005-03-16-India-Pakistan",
+   "reason": "no Source A match within a day of 2005-03-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:11:53",
+   "key": "2005-03-13-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2005-03-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:09",
+   "key": "2005-03-12-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2005-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:14",
+   "key": "2005-03-08-Pakistan-India",
+   "reason": "no Source A match within a day of 2005-03-08 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:19",
+   "key": "2005-03-05-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2005-03-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:24",
+   "key": "2005-02-22-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2005-02-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:30",
+   "key": "2005-02-19-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2005-02-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:35",
+   "key": "2005-02-06-Australia-Pakistan",
+   "reason": "no Source A match within a day of 2005-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:40",
+   "key": "2005-01-29-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2005-01-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:45",
+   "key": "2005-01-28-West Indies-Pakistan",
+   "reason": "no Source A match within a day of 2005-01-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:50",
+   "key": "2005-01-26-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2005-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:12:55",
+   "key": "2005-01-21-South Africa-England",
+   "reason": "no Source A match within a day of 2005-01-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:00",
+   "key": "2005-01-20-Zimbabwe-Bangladesh",
+   "reason": "no Source A match within a day of 2005-01-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:05",
+   "key": "2005-01-16-Pakistan-Australia",
+   "reason": "no Source A match within a day of 2005-01-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:10",
+   "key": "2005-01-14-Zimbabwe-Bangladesh",
+   "reason": "no Source A match within a day of 2005-01-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:15",
+   "key": "2005-01-14-Australia-West Indies",
+   "reason": "no Source A match within a day of 2005-01-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:20",
+   "key": "2005-01-13-England-South Africa",
+   "reason": "no Source A match within a day of 2005-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:25",
+   "key": "2005-01-10-ICC World XI-Asia XI",
+   "reason": "no Source A match within a day of 2005-01-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:30",
+   "key": "2005-01-06-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2005-01-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:35",
+   "key": "2005-01-02-Pakistan-Australia",
+   "reason": "no Source A match within a day of 2005-01-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:40",
+   "key": "2004-12-28-India-Australia",
+   "reason": "no Source A match within a day of 2004-12-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:45",
+   "key": "2004-12-26-Pakistan-Australia",
+   "reason": "no Source A match within a day of 2004-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:50",
+   "key": "2004-12-26-England-South Africa",
+   "reason": "no Source A match within a day of 2004-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:13:55",
+   "key": "2004-12-26-Sri Lanka-New Zealand",
+   "reason": "no Source A match within a day of 2004-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:00",
+   "key": "2004-12-24-Australia-India",
+   "reason": "no Source A match within a day of 2004-12-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:05",
+   "key": "2004-12-22-Australia-India",
+   "reason": "no Source A match within a day of 2004-12-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:10",
+   "key": "2004-12-19-India-Australia",
+   "reason": "no Source A match within a day of 2004-12-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:15",
+   "key": "2004-12-17-South Africa-England",
+   "reason": "no Source A match within a day of 2004-12-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:20",
+   "key": "2004-12-17-India-Bangladesh",
+   "reason": "no Source A match within a day of 2004-12-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:25",
+   "key": "2004-12-16-Australia-India",
+   "reason": "no Source A match within a day of 2004-12-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:30",
+   "key": "2004-12-13-India-Australia",
+   "reason": "no Source A match within a day of 2004-12-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:35",
+   "key": "2004-12-11-Australia-India",
+   "reason": "no Source A match within a day of 2004-12-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:40",
+   "key": "2004-11-13-India-Pakistan",
+   "reason": "no Source A match within a day of 2004-11-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:45",
+   "key": "2004-11-07-New Zealand-Bangladesh",
+   "reason": "no Source A match within a day of 2004-11-07 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:50",
+   "key": "2004-11-05-Bangladesh-New Zealand",
+   "reason": "no Source A match within a day of 2004-11-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:14:55",
+   "key": "2004-10-28-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2004-10-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:00",
+   "key": "2004-10-26-Australia-India",
+   "reason": "no Source A match within a day of 2004-10-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:05",
+   "key": "2004-10-20-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2004-10-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:10",
+   "key": "2004-10-19-Bangladesh-New Zealand",
+   "reason": "no Source A match within a day of 2004-10-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:15",
+   "key": "2004-10-14-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2004-10-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:20",
+   "key": "2004-10-06-Australia-India",
+   "reason": "no Source A match within a day of 2004-10-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:25",
+   "key": "2004-09-12-Bangladesh-South Africa",
+   "reason": "no Source A match within a day of 2004-09-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:30",
+   "key": "2004-08-28-Australia-Pakistan",
+   "reason": "no Source A match within a day of 2004-08-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:35",
+   "key": "2004-08-25-South Africa-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-08-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:40",
+   "key": "2004-08-22-Sri Lanka-South Africa",
+   "reason": "no Source A match within a day of 2004-08-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:45",
+   "key": "2004-08-21-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-08-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:50",
+   "key": "2004-08-20-South Africa-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-08-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:15:55",
+   "key": "2004-08-17-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-08-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:00",
+   "key": "2004-08-15-England-New Zealand",
+   "reason": "no Source A match within a day of 2004-08-15 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:05",
+   "key": "2004-08-13-England-New Zealand",
+   "reason": "no Source A match within a day of 2004-08-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:10",
+   "key": "2004-08-12-West Indies-England",
+   "reason": "no Source A match within a day of 2004-08-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:15",
+   "key": "2004-08-11-Sri Lanka-South Africa",
+   "reason": "no Source A match within a day of 2004-08-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:20",
+   "key": "2004-08-10-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-08-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:25",
+   "key": "2004-08-06-England-New Zealand",
+   "reason": "no Source A match within a day of 2004-08-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:30",
+   "key": "2004-08-04-Sri Lanka-South Africa",
+   "reason": "no Source A match within a day of 2004-08-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:35",
+   "key": "2004-07-29-Bangladesh-Pakistan",
+   "reason": "no Source A match within a day of 2004-07-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:40",
+   "key": "2004-07-25-New Zealand-Ireland",
+   "reason": "no Source A match within a day of 2004-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:45",
+   "key": "2004-07-25-Pakistan-India",
+   "reason": "no Source A match within a day of 2004-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:50",
+   "key": "2004-07-24-New Zealand-Ireland",
+   "reason": "no Source A match within a day of 2004-07-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:16:55",
+   "key": "2004-07-22-England-West Indies",
+   "reason": "no Source A match within a day of 2004-07-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:00",
+   "key": "2004-07-22-New Zealand-Ireland",
+   "reason": "no Source A match within a day of 2004-07-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:05",
+   "key": "2004-07-21-Bangladesh-India",
+   "reason": "no Source A match within a day of 2004-07-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:10",
+   "key": "2004-07-18-Sri Lanka-India",
+   "reason": "no Source A match within a day of 2004-07-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:15",
+   "key": "2004-07-18-Pakistan-Hong Kong",
+   "reason": "no Source A match within a day of 2004-07-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:20",
+   "key": "2004-07-17-Sri Lanka-United Arab Emirates",
+   "reason": "no Source A match within a day of 2004-07-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:25",
+   "key": "2004-07-16-India-United Arab Emirates",
+   "reason": "no Source A match within a day of 2004-07-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:30",
+   "key": "2004-07-16-Bangladesh-Hong Kong",
+   "reason": "no Source A match within a day of 2004-07-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:36",
+   "key": "2004-07-09-Australia-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-07-09 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:41",
+   "key": "2004-07-04-England-New Zealand",
+   "reason": "no Source A match within a day of 2004-07-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:46",
+   "key": "2004-07-03-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2004-07-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:51",
+   "key": "2004-07-01-Australia-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-07-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:17:56",
+   "key": "2004-06-26-West Indies-New Zealand",
+   "reason": "no Source A match within a day of 2004-06-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:01",
+   "key": "2004-06-10-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-06-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:06",
+   "key": "2004-06-04-Bangladesh-West Indies",
+   "reason": "no Source A match within a day of 2004-06-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:11",
+   "key": "2004-06-03-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-06-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:16",
+   "key": "2004-05-28-Bangladesh-West Indies",
+   "reason": "no Source A match within a day of 2004-05-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:21",
+   "key": "2004-05-20-New Zealand-England",
+   "reason": "no Source A match within a day of 2004-05-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:26",
+   "key": "2004-05-14-Zimbabwe-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-05-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:45",
+   "key": "2004-05-05-West Indies-England",
+   "reason": "no Source A match within a day of 2004-05-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:18:50",
+   "key": "2004-04-29-India-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-04-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:07",
+   "key": "2004-04-25-Sri Lanka-India",
+   "reason": "no Source A match within a day of 2004-04-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:12",
+   "key": "2004-04-25-Zimbabwe-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-04-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:17",
+   "key": "2004-04-22-Zimbabwe-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-04-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:22",
+   "key": "2004-04-21-Sri Lanka-India",
+   "reason": "no Source A match within a day of 2004-04-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:27",
+   "key": "2004-04-19-India-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-04-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:32",
+   "key": "2004-04-18-West Indies-England",
+   "reason": "no Source A match within a day of 2004-04-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:37",
+   "key": "2004-04-17-India-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-04-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:42",
+   "key": "2004-04-05-India-Pakistan",
+   "reason": "no Source A match within a day of 2004-04-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:47",
+   "key": "2004-04-02-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-04-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:52",
+   "key": "2004-04-01-West Indies-England",
+   "reason": "no Source A match within a day of 2004-04-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:19:57",
+   "key": "2004-03-31-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-03-31 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:02",
+   "key": "2004-03-29-West Indies-Pakistan",
+   "reason": "no Source A match within a day of 2004-03-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:07",
+   "key": "2004-03-28-India-Pakistan",
+   "reason": "no Source A match within a day of 2004-03-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:12",
+   "key": "2004-03-27-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-03-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:17",
+   "key": "2004-03-25-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-03-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:22",
+   "key": "2004-03-24-Australia-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-03-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:27",
+   "key": "2004-03-23-West Indies-Pakistan",
+   "reason": "no Source A match within a day of 2004-03-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:32",
+   "key": "2004-03-21-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-03-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:37",
+   "key": "2004-03-19-West Indies-England",
+   "reason": "no Source A match within a day of 2004-03-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:42",
+   "key": "2004-03-16-Australia-Sri Lanka",
+   "reason": "no Source A match within a day of 2004-03-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:47",
+   "key": "2004-03-15-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2004-03-15 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:52",
+   "key": "2004-03-13-India-Pakistan",
+   "reason": "no Source A match within a day of 2004-03-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:20:57",
+   "key": "2004-03-12-India-West Indies",
+   "reason": "no Source A match within a day of 2004-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:02",
+   "key": "2004-03-12-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2004-03-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:07",
+   "key": "2004-03-11-West Indies-England",
+   "reason": "no Source A match within a day of 2004-03-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:12",
+   "key": "2004-03-10-South Africa-New Zealand",
+   "reason": "no Source A match within a day of 2004-03-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:17",
+   "key": "2004-03-10-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2004-03-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:22",
+   "key": "2004-03-06-India-West Indies",
+   "reason": "no Source A match within a day of 2004-03-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:27",
+   "key": "2004-03-03-India-West Indies",
+   "reason": "no Source A match within a day of 2004-03-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:32",
+   "key": "2004-03-01-England-South Africa",
+   "reason": "no Source A match within a day of 2004-03-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:37",
+   "key": "2004-03-01-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2004-03-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:42",
+   "key": "2004-02-29-West Indies-India",
+   "reason": "no Source A match within a day of 2004-02-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:47",
+   "key": "2004-02-29-England-South Africa",
+   "reason": "no Source A match within a day of 2004-02-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:52",
+   "key": "2004-02-29-Sri Lanka-Australia",
+   "reason": "no Source A match within a day of 2004-02-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:21:58",
+   "key": "2004-02-28-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2004-02-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:03",
+   "key": "2004-02-27-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2004-02-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:08",
+   "key": "2004-02-26-Bangladesh-Zimbabwe",
+   "reason": "no Source A match within a day of 2004-02-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:13",
+   "key": "2004-02-26-India-West Indies",
+   "reason": "no Source A match within a day of 2004-02-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:18",
+   "key": "2004-02-25-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2004-02-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:23",
+   "key": "2004-02-25-Sri Lanka-Australia",
+   "reason": "no Source A match within a day of 2004-02-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:28",
+   "key": "2004-02-22-South Africa-England",
+   "reason": "no Source A match within a day of 2004-02-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:33",
+   "key": "2004-02-21-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2004-02-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:38",
+   "key": "2004-02-20-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2004-02-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:43",
+   "key": "2004-02-19-Zimbabwe-Bangladesh",
+   "reason": "no Source A match within a day of 2004-02-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:48",
+   "key": "2004-02-18-England-South Africa",
+   "reason": "no Source A match within a day of 2004-02-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:53",
+   "key": "2004-02-17-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2004-02-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:22:58",
+   "key": "2004-02-17-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2004-02-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:03",
+   "key": "2004-02-15-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2004-02-15 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:08",
+   "key": "2004-02-15-England-South Africa",
+   "reason": "no Source A match within a day of 2004-02-15 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:13",
+   "key": "2004-02-13-New Zealand-South Africa",
+   "reason": "no Source A match within a day of 2004-02-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:18",
+   "key": "2004-02-11-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2004-02-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:23",
+   "key": "2004-02-04-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2004-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:28",
+   "key": "2004-02-03-Zimbabwe-India",
+   "reason": "no Source A match within a day of 2004-02-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:33",
+   "key": "2004-01-28-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2004-01-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:38",
+   "key": "2004-01-26-Australia-Zimbabwe",
+   "reason": "no Source A match within a day of 2004-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:43",
+   "key": "2004-01-24-India-Zimbabwe",
+   "reason": "no Source A match within a day of 2004-01-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:48",
+   "key": "2004-01-17-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2004-01-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:53",
+   "key": "2004-01-16-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2004-01-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:23:58",
+   "key": "2004-01-13-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2004-01-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:03",
+   "key": "2004-01-09-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2004-01-09 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:08",
+   "key": "2004-01-06-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2004-01-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:13",
+   "key": "2004-01-02-South Africa-West Indies",
+   "reason": "no Source A match within a day of 2004-01-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:18",
+   "key": "2003-12-26-India-Australia",
+   "reason": "no Source A match within a day of 2003-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:23",
+   "key": "2003-12-26-West Indies-South Africa",
+   "reason": "no Source A match within a day of 2003-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:28",
+   "key": "2003-12-26-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2003-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:33",
+   "key": "2003-12-19-New Zealand-Pakistan",
+   "reason": "no Source A match within a day of 2003-12-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:38",
+   "key": "2003-12-16-India-New Zealand",
+   "reason": "no Source A match within a day of 2003-12-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:43",
+   "key": "2003-12-13-New Zealand-India",
+   "reason": "no Source A match within a day of 2003-12-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:48",
+   "key": "2003-12-12-Australia-India",
+   "reason": "no Source A match within a day of 2003-12-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:53",
+   "key": "2003-12-10-Sri Lanka-England",
+   "reason": "no Source A match within a day of 2003-12-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:24:58",
+   "key": "2003-12-10-India-New Zealand",
+   "reason": "no Source A match within a day of 2003-12-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:25:15",
+   "key": "2003-12-07-Pakistan-New Zealand",
+   "reason": "no Source A match within a day of 2003-12-07 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:25:31",
+   "key": "2003-12-03-Pakistan-New Zealand",
+   "reason": "no Source A match within a day of 2003-12-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:25:36",
+   "key": "2003-12-02-Sri Lanka-England",
+   "reason": "no Source A match within a day of 2003-12-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:25:54",
+   "key": "2003-11-18-Australia-India",
+   "reason": "no Source A match within a day of 2003-11-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:25:59",
+   "key": "2003-11-12-Australia-India",
+   "reason": "no Source A match within a day of 2003-11-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:04",
+   "key": "2003-11-09-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2003-11-09 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:09",
+   "key": "2003-11-04-Zimbabwe-West Indies",
+   "reason": "no Source A match within a day of 2003-11-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:14",
+   "key": "2003-10-08-India-New Zealand",
+   "reason": "no Source A match within a day of 2003-10-08 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:19",
+   "key": "2003-09-15-Pakistan-Bangladesh",
+   "reason": "no Source A match within a day of 2003-09-15 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:24",
+   "key": "2003-09-12-Pakistan-Bangladesh",
+   "reason": "no Source A match within a day of 2003-09-12 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:29",
+   "key": "2003-08-27-Bangladesh-Pakistan",
+   "reason": "no Source A match within a day of 2003-08-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:34",
+   "key": "2003-08-20-Bangladesh-Pakistan",
+   "reason": "no Source A match within a day of 2003-08-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:39",
+   "key": "2003-08-17-South Africa-England",
+   "reason": "no Source A match within a day of 2003-08-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:44",
+   "key": "2003-08-16-South Africa-England",
+   "reason": "no Source A match within a day of 2003-08-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:49",
+   "key": "2003-08-07-South Africa-England",
+   "reason": "no Source A match within a day of 2003-08-07 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:54",
+   "key": "2003-07-31-England-South Africa",
+   "reason": "no Source A match within a day of 2003-07-31 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:26:59",
+   "key": "2003-07-26-Netherlands-Pakistan",
+   "reason": "no Source A match within a day of 2003-07-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:04",
+   "key": "2003-07-26-Ireland-Scotland",
+   "reason": "no Source A match within a day of 2003-07-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:09",
+   "key": "2003-07-26-Japan-West Indies",
+   "reason": "no Source A match within a day of 2003-07-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:14",
+   "key": "2003-07-25-Bangladesh-Australia",
+   "reason": "no Source A match within a day of 2003-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:19",
+   "key": "2003-07-25-Scotland-Japan",
+   "reason": "no Source A match within a day of 2003-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:24",
+   "key": "2003-07-25-Ireland-Netherlands",
+   "reason": "no Source A match within a day of 2003-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:29",
+   "key": "2003-07-25-Pakistan-West Indies",
+   "reason": "no Source A match within a day of 2003-07-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:34",
+   "key": "2003-07-23-Netherlands-Japan",
+   "reason": "no Source A match within a day of 2003-07-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:39",
+   "key": "2003-07-23-Pakistan-Ireland",
+   "reason": "no Source A match within a day of 2003-07-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:44",
+   "key": "2003-07-23-Scotland-West Indies",
+   "reason": "no Source A match within a day of 2003-07-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:49",
+   "key": "2003-07-22-Pakistan-Scotland",
+   "reason": "no Source A match within a day of 2003-07-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:54",
+   "key": "2003-07-22-Netherlands-West Indies",
+   "reason": "no Source A match within a day of 2003-07-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:27:59",
+   "key": "2003-07-22-Japan-Ireland",
+   "reason": "no Source A match within a day of 2003-07-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:04",
+   "key": "2003-07-21-Netherlands-Scotland",
+   "reason": "no Source A match within a day of 2003-07-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:09",
+   "key": "2003-07-21-Ireland-West Indies",
+   "reason": "no Source A match within a day of 2003-07-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:14",
+   "key": "2003-07-21-Pakistan-Japan",
+   "reason": "no Source A match within a day of 2003-07-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:19",
+   "key": "2003-07-08-South Africa-England",
+   "reason": "no Source A match within a day of 2003-07-08 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:24",
+   "key": "2003-07-05-Zimbabwe-South Africa",
+   "reason": "no Source A match within a day of 2003-07-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:29",
+   "key": "2003-06-27-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2003-06-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:34",
+   "key": "2003-06-20-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2003-06-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:39",
+   "key": "2003-06-05-England-Zimbabwe",
+   "reason": "no Source A match within a day of 2003-06-05 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:44",
+   "key": "2003-05-25-West Indies-Australia",
+   "reason": "no Source A match within a day of 2003-05-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:49",
+   "key": "2003-05-24-Australia-West Indies",
+   "reason": "no Source A match within a day of 2003-05-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:54",
+   "key": "2003-05-22-England-Zimbabwe",
+   "reason": "no Source A match within a day of 2003-05-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:28:59",
+   "key": "2003-05-21-Australia-West Indies",
+   "reason": "no Source A match within a day of 2003-05-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:04",
+   "key": "2003-05-20-Pakistan-New Zealand",
+   "reason": "no Source A match within a day of 2003-05-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:09",
+   "key": "2003-05-18-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2003-05-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:14",
+   "key": "2003-05-13-New Zealand-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-05-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:19",
+   "key": "2003-05-03-New Zealand-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-05-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:24",
+   "key": "2003-05-01-Australia-West Indies",
+   "reason": "no Source A match within a day of 2003-05-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:29",
+   "key": "2003-05-01-South Africa-Bangladesh",
+   "reason": "no Source A match within a day of 2003-05-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:34",
+   "key": "2003-04-25-New Zealand-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-04-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:39",
+   "key": "2003-04-24-Bangladesh-South Africa",
+   "reason": "no Source A match within a day of 2003-04-24 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:44",
+   "key": "2003-04-19-Australia-West Indies",
+   "reason": "no Source A match within a day of 2003-04-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:49",
+   "key": "2003-04-18-India-South Africa",
+   "reason": "no Source A match within a day of 2003-04-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:54",
+   "key": "2003-04-17-South Africa-Bangladesh",
+   "reason": "no Source A match within a day of 2003-04-17 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:29:59",
+   "key": "2003-04-16-Bangladesh-India",
+   "reason": "no Source A match within a day of 2003-04-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [
+    "CNL"
+   ],
+   "checked_at": "2026-11-13T11:30:07",
+   "key": "2003-04-14-South Africa-Bangladesh",
+   "reason": "rendered 1 candidate page(s) for 2003-04-14; none confirmed"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:22",
+   "key": "2003-04-11-India-Bangladesh",
+   "reason": "no Source A match within a day of 2003-04-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:27",
+   "key": "2003-04-10-West Indies-Australia",
+   "reason": "no Source A match within a day of 2003-04-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:32",
+   "key": "2003-03-23-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-03-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:37",
+   "key": "2003-03-22-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-03-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:42",
+   "key": "2003-03-20-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2003-03-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:47",
+   "key": "2003-03-18-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2003-03-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:52",
+   "key": "2003-03-16-West Indies-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-03-16 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:30:57",
+   "key": "2003-03-13-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2003-03-13 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:02",
+   "key": "2003-03-04-West Indies-Kenya",
+   "reason": "no Source A match within a day of 2003-03-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:07",
+   "key": "2003-02-20-Australia-Netherlands",
+   "reason": "no Source A match within a day of 2003-02-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:24",
+   "key": "2003-02-14-Bangladesh-Sri Lanka",
+   "reason": "no Source A match within a day of 2003-02-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:29",
+   "key": "2003-02-08-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2003-02-08 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:35",
+   "key": "2003-02-07-England-India",
+   "reason": "no Source A match within a day of 2003-02-07 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:40",
+   "key": "2003-02-06-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2003-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:45",
+   "key": "2003-02-06-England-India",
+   "reason": "no Source A match within a day of 2003-02-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:50",
+   "key": "2003-02-04-India-Australia",
+   "reason": "no Source A match within a day of 2003-02-04 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:31:55",
+   "key": "2003-02-03-England-New Zealand",
+   "reason": "no Source A match within a day of 2003-02-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:00",
+   "key": "2003-02-02-Australia-England",
+   "reason": "no Source A match within a day of 2003-02-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:05",
+   "key": "2003-02-02-New Zealand-India",
+   "reason": "no Source A match within a day of 2003-02-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:10",
+   "key": "2003-02-01-Australia-India",
+   "reason": "no Source A match within a day of 2003-02-01 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:15",
+   "key": "2003-01-30-England-New Zealand",
+   "reason": "no Source A match within a day of 2003-01-30 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:20",
+   "key": "2003-01-29-England-Australia",
+   "reason": "no Source A match within a day of 2003-01-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:25",
+   "key": "2003-01-28-New Zealand-India",
+   "reason": "no Source A match within a day of 2003-01-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:30",
+   "key": "2003-01-27-England-India",
+   "reason": "no Source A match within a day of 2003-01-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:35",
+   "key": "2003-01-26-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2003-01-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:40",
+   "key": "2003-01-11-New Zealand-India",
+   "reason": "no Source A match within a day of 2003-01-11 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:45",
+   "key": "2002-12-26-India-New Zealand",
+   "reason": "no Source A match within a day of 2002-12-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:50",
+   "key": "2002-06-28-New Zealand-Netherlands",
+   "reason": "no Source A match within a day of 2002-06-28 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:32:55",
+   "key": "2002-06-26-New Zealand-Netherlands",
+   "reason": "no Source A match within a day of 2002-06-26 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:33:00",
+   "key": "2002-06-25-New Zealand-Netherlands",
+   "reason": "no Source A match within a day of 2002-06-25 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:33:05",
+   "key": "2002-06-21-New Zealand-West Indies",
+   "reason": "no Source A match within a day of 2002-06-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:33:47",
+   "key": "2002-03-10-India-South Africa",
+   "reason": "no Source A match within a day of 2002-03-10 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:33:52",
+   "key": "2002-03-07-South Africa-India",
+   "reason": "no Source A match within a day of 2002-03-07 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:33:57",
+   "key": "2002-03-06-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2002-03-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:02",
+   "key": "2002-03-03-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2002-03-03 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:07",
+   "key": "2002-03-02-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2002-03-02 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:12",
+   "key": "2002-02-23-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2002-02-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:17",
+   "key": "2002-02-21-New Zealand-Australia",
+   "reason": "no Source A match within a day of 2002-02-21 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:22",
+   "key": "2002-02-20-Australia-New Zealand",
+   "reason": "no Source A match within a day of 2002-02-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:27",
+   "key": "2002-01-30-Pakistan-Sri Lanka",
+   "reason": "no Source A match within a day of 2002-01-30 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:32",
+   "key": "2002-01-29-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2002-01-29 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:37",
+   "key": "2002-01-27-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2002-01-27 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:34:55",
+   "key": "2002-01-23-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2002-01-23 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:00",
+   "key": "2002-01-22-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2002-01-22 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:17",
+   "key": "2002-01-20-Sri Lanka-Pakistan",
+   "reason": "no Source A match within a day of 2002-01-20 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:22",
+   "key": "2002-01-14-England-India",
+   "reason": "no Source A match within a day of 2002-01-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:27",
+   "key": "2002-01-09-India-England",
+   "reason": "no Source A match within a day of 2002-01-09 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:32",
+   "key": "2002-01-08-England-India",
+   "reason": "no Source A match within a day of 2002-01-08 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:37",
+   "key": "2002-01-06-England-India",
+   "reason": "no Source A match within a day of 2002-01-06 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:42",
+   "key": "2001-12-19-Sri Lanka-West Indies",
+   "reason": "no Source A match within a day of 2001-12-19 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:47",
+   "key": "2001-12-18-New Zealand-Bangladesh",
+   "reason": "no Source A match within a day of 2001-12-18 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
+  },
+  {
+   "checked": [],
+   "checked_at": "2026-11-13T11:35:52",
+   "key": "2001-12-14-Australia-South Africa",
+   "reason": "no Source A match within a day of 2001-12-14 with plausible teams (sitemap covers 1955-01-15..2026-11-11)"
   }
  ],
- "pending": [
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-04-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-04-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-04-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-03-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-02-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-02-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-02-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "ICC World XI",
-   "team_b": "Asia XI"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2005-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-12-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-11-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-11-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-11-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-10-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-09-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-08-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Hong Kong"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "United Arab Emirates"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Hong Kong"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-07-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-06-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-06-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-06-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-06-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-05-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-04-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-31",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-12",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-03-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-29",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-11",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-02-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-28",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-06",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2004-01-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-07",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-12-02",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-09",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-11-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-10-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-09-15",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-09-12",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-17",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-08-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-31",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Japan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "Japan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Japan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Scotland",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Japan",
-   "team_b": "Ireland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Netherlands",
-   "team_b": "Scotland"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Ireland",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Japan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-07-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Zimbabwe",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-06-27",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-06-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-06-08",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-06-05",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-22",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Zimbabwe"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-03",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-05-01",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-25",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-24",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-17",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-16",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-13",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-04-10",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-18",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-03-04",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "West Indies",
-   "team_b": "Kenya"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-20",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-15",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Bangladesh",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-04",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-02-01",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2003-01-11",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-12-26",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-06-28",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-06-26",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-06-25",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Netherlands"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-06-21",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-19",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-16",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-13",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-10",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "South Africa"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-07",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "South Africa",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-03",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-03-02",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-02-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-02-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Australia"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-02-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "New Zealand"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-30",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Pakistan",
-   "team_b": "Sri Lanka"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-29",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-27",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-24",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-23",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-22",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-21",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-20",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "Pakistan"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-14",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-09",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "India",
-   "team_b": "England"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-08",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2002-01-06",
-   "gender": "female",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "England",
-   "team_b": "India"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2001-12-19",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "ODI",
-   "rejected_ids": [],
-   "team_a": "Sri Lanka",
-   "team_b": "West Indies"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2001-12-18",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "New Zealand",
-   "team_b": "Bangladesh"
-  },
-  {
-   "attempts": 0,
-   "category": "cricsheet_missing",
-   "crex_url": null,
-   "date": "2001-12-14",
-   "gender": "male",
-   "last_attempt": null,
-   "last_error": null,
-   "match_type": "Test",
-   "rejected_ids": [],
-   "team_a": "Australia",
-   "team_b": "South Africa"
-  }
- ]
+ "pending": []
 }
