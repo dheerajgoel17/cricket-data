@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-13 07:00 IST
+# Cricket value bets - 2026-11-13 07:32 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2141 prices
-- **smarkets**: ok, 667 prices
+- **moviodds_bet365**: ok, 1827 prices
+- **smarkets**: ok, 681 prices
 - **feedg**: ok, 32 prices, 4 events
-- **feedk**: ok, 288 prices, 11 events
-- **feede**: ok, 482 prices, 20 events
+- **feedk**: ok, 232 prices, 10 events
+- **feede**: ok, 482 prices, 19 events
+- **feedh**: ok, 1854 prices, 69 events
 - **feedf**: ok, 392 prices, 16 events
-- **feedh**: ok, 1866 prices, 70 events
 
-Matches starting in next 168h: **57**, markets priced: **561**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **56**, markets priced: **516**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,4 +26,4 @@ Matches starting in next 168h: **57**, markets priced: **561**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Border (W) (female), CDB A (male), Cdb A (male), Central Hinds (W) (female), Central Hinds (male), Diasqua Little Sai Wan Cricket Club (male), Fairfirst Insurance (male), HNB (male), Hayleys Group A (male), Hnb A (male), Knight Fighters 11 (male), Lokseva Academy (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Recon Tactical Free State (W) (female), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female), UAE (W) (female), USA (W) (female)
 
-Runtime 165.0s. Snapshot: `odds_20261113T013028Z.jsonl.gz`
+Runtime 467.3s. Snapshot: `odds_20261113T020219Z.jsonl.gz`
