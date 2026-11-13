@@ -257,9 +257,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 </View>
                 {liveSoFar != null ? <Text style={styles.live}><StandingMark standing={liveSoFar} line={line} /></Text> : null}
                 <View style={styles.stats}>
-                  <Stat k="Median" v={short(rep.summary.median)} big />
-                  <Stat k="Mean" v={rep.summary.mean == null ? "–" : rep.summary.mean.toFixed(1)} />
-                  <Stat k="Range" v={`${short(rep.summary.min, 0)}–${short(rep.summary.max, 0)}`} />
+                  <Stat k="Typical" v={short(rep.summary.median)} big />
+                  <Stat k="Average" v={rep.summary.mean == null ? "–" : rep.summary.mean.toFixed(1)} />
+                  <Stat k="Low–high" v={`${short(rep.summary.min, 0)}–${short(rep.summary.max, 0)}`} />
                 </View>
                 <ChartBars entries={entries} line={line} side="over" height={200} />
                 <View style={styles.stepRow}>

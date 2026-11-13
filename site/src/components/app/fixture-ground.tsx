@@ -8,18 +8,19 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon, CloudIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon, CloudIcon, InformationCircleIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
 import { useNow } from "@/lib/clock";
-import { odds, pc } from "@/lib/format";
-import { filterGames, genderFilterLabel, groundGames, majorityFormat, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter, type TourStatus } from "@/lib/ground";
+import { matchDateLabel, odds, pc } from "@/lib/format";
+import { filterGames, genderFilterLabel, groundGames, groundSummary, majorityFormat, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter, type GroundSummary, type TourStatus } from "@/lib/ground";
 import { setTitle } from "@/lib/title";
 import { fetchVenueWx, groundClock } from "@/lib/venue-wx";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
@@ -66,12 +67,148 @@ function useVenueGround(venue?: string) {
   return { ...g, isLoading };
 }
 
+/** Flat label + value — Player props / Match Fancy Audit-free Metric (no filled tile). */
 function Metric({ k, v }: { k: string; v: ReactNode }) {
   return (
-    <div className="grid min-w-0 gap-hair rounded-2xl bg-secondary/60 px-snug py-snug">
-      <span className="label-cap text-caption text-muted-foreground">{k}</span>
-      <b className="font-condensed text-metric font-bold leading-none tabular-nums tracking-tight">{v}</b>
+    <div className="grid min-w-0 gap-hair">
+      <span className="label-cap text-callout leading-tight text-muted-foreground">{k}</span>
+      <b className="break-words font-condensed text-metric font-medium leading-none tabular-nums">{v}</b>
     </div>
+  );
+}
+
+const num0 = (n: number | null | undefined) => (n == null ? "—" : String(Math.round(n)));
+const num1 = (n: number | null | undefined) => (n == null ? "—" : n.toFixed(1));
+
+/** One cell in the 2x2 Facts grid (tournament Stats / Player Metric). */
+function Fact({ k, v }: { k: string; v: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-hair px-snug py-snug">
+      <dt className="label-cap truncate text-muted-foreground">{k}</dt>
+      <dd className="font-condensed text-metric font-medium tabular-nums">{v}</dd>
+    </div>
+  );
+}
+
+function statsTip(s: GroundSummary): string {
+  const parts = [
+    `Averages over ${s.counted} void-excluded ${s.firstN ? `${s.firstN} 1st` : "0 1st"} / ${s.secondN} 2nd inns.`,
+    s.decided ? `Chase ${num0(s.chaseWinPct)}% · defend ${num0(s.defendWinPct)}% of ${s.decided} decided.` : null,
+    s.powerplayOvers
+      ? (s.avgPowerplay == null
+        ? `Powerplay (overs 1–${s.powerplayOvers}): no full over tape in this sample.`
+        : `Powerplay (overs 1–${s.powerplayOvers}): ${s.powerplayN} with a full tape.`)
+      : null,
+  ];
+  return parts.filter(Boolean).join(" ");
+}
+
+/**
+ * Venue intelligence for the active format + gender (same sample as Markets).
+ * Always a 2x2 Facts grid + full-width hairline secondary rows (Fancy Typical/Average shape).
+ */
+function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
+  const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
+  const ms = useMemo(() => selectMatches(store, {
+    fmt: FORMATS.indexOf(fmtName),
+    venue: venueIndexes,
+    gender: gender === "female" ? 1 : gender === "male" ? 0 : null,
+  }) as number[], [store, venueIndexes, fmtName, gender]);
+  const s = useMemo(() => groundSummary(store, ms, fmtName), [store, ms, fmtName]);
+  if (!s.counted) return null;
+  const hi = s.highestFirst;
+  const showPp = s.powerplayOvers != null;
+  // Always 2x2: when the format has no powerplay, Extras fills the fourth cell.
+  const primary: [string, ReactNode][] = [
+    ["1st inns avg", num0(s.avgFirst)],
+    ["2nd inns avg", num0(s.avgSecond)],
+    ["Chase win", s.chaseWinPct == null ? "—" : `${num0(s.chaseWinPct)}%`],
+    showPp
+      ? [`PP 1–${s.powerplayOvers}`, s.avgPowerplay == null ? "—" : num0(s.avgPowerplay)]
+      : ["Extras / match", num1(s.avgExtras)],
+  ];
+  // One labelled figure per row (Fancy rhythm) — not "20.4 4s · 3.4 6s · 45%".
+  const secondary: [string, ReactNode][] = [
+    ["Fours / inns", num1(s.foursPerInns)],
+    ["Sixes / inns", num1(s.sixesPerInns)],
+  ];
+  if (s.boundaryRunPct != null) secondary.push(["Boundary runs", `${num0(s.boundaryRunPct)}%`]);
+  if (showPp) secondary.push(["Extras / match", num1(s.avgExtras)]);
+  secondary.push(["Highest 1st", (
+    <span className="tabular-nums">
+      {hi ? hi.runs : "—"}
+      {hi ? <span className="text-callout font-normal text-muted-foreground"> · {hi.a} vs {hi.b}, {matchDateLabel(hi.date)}</span> : null}
+    </span>
+  )]);
+  return (
+    <section className="flex flex-col gap-snug" aria-label="Ground stats">
+      <div className="flex items-baseline justify-between gap-snug">
+        <div className="flex min-w-0 items-center gap-tight">
+          <h2 className="text-title font-medium tracking-tight">Ground stats</h2>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button type="button" aria-label="About ground stats" className="grid size-5 shrink-0 place-items-center rounded-full text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+                <InformationCircleIcon className="size-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="start" className="max-w-64 text-callout text-muted-foreground">{statsTip(s)}</PopoverContent>
+          </Popover>
+        </div>
+        <span className="shrink-0 text-callout tabular-nums text-muted-foreground">{s.counted} · {fmtName} · void excluded</span>
+      </div>
+      {/* One bordered block (no gap between 2x2 and rows) — same continuous hairline stack as Fancy lists. */}
+      <div className="overflow-hidden border border-hairline">
+        <dl className="grid grid-cols-2 divide-x divide-y divide-hairline">
+          {primary.map(([k, v]) => (
+            <Fact key={k} k={k} v={v} />
+          ))}
+        </dl>
+        <dl className="border-t border-hairline">
+          {secondary.map(([k, v]) => (
+            <div key={k} className="flex min-h-11 items-center justify-between gap-snug border-t border-hairline px-snug py-snug first:border-t-0">
+              <dt className="label-cap shrink-0 text-muted-foreground">{k}</dt>
+              <dd className="min-w-0 text-right font-condensed text-metric font-medium tabular-nums">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      {s.counted < 10 ? <p className="text-footnote text-amber" role="status">Small sample ({s.counted} matches): treat these with caution.</p> : null}
+    </section>
+  );
+}
+
+/** Past games listed before Show more (embedded Ground chip stays short; full page a bit longer). */
+const MATCH_PAGE_EMBED = 4;
+const MATCH_PAGE_FULL = 8;
+
+function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
+  const [shown, setShown] = useState(pageSize);
+  useEffect(() => { setShown(pageSize); }, [list, pageSize]);
+  return (
+    <section className="flex flex-col gap-snug">
+      <div className="flex items-baseline justify-between gap-snug">
+        <h2 className="text-title font-medium tracking-tight">Matches</h2>
+        <span className="font-condensed text-callout font-medium tabular-nums text-muted-foreground">{list.length}</span>
+      </div>
+      {!list.length ? (
+        <EmptyNote title="No matches">Nothing at this ground for the filters you picked.</EmptyNote>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
+            {list.slice(0, shown).map((f, i) => (
+              <li key={f.id || f._key || `${f.a}-${f.b}-${f.start}`}>
+                <FixtureCard f={f} i={Math.min(i, 6)} />
+              </li>
+            ))}
+          </ul>
+          {list.length > shown ? (
+            <Button type="button" variant="secondary" className="h-control w-full rounded-2xl text-callout shadow-none" onClick={() => setShown((n) => n + pageSize)}>
+              Show more · {list.length - shown} left
+            </Button>
+          ) : null}
+        </>
+      )}
+    </section>
   );
 }
 
@@ -157,7 +294,7 @@ function TourChip({ from, fixtureId, atGround, now }: { from: FromFx; fixtureId:
   );
 }
 
-/** Match Fancy–shaped markets: median/mean/range, bars, O/U at the main line, compact ladder — not the Ask ResultView chrome. Format comes from the sticky bar (one format only). */
+/** Match Fancy–shaped markets: Typical / Average / Low–high (with tips), bars, O/U, ladder. Format from the sticky bar (one format only). */
 function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
   const reduce = useReducedMotion();
   const [market, setMarket] = useState("match_runs");
@@ -179,7 +316,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
   const atLine = activeLine == null ? null : (ladder.find((l: any) => l.line === activeLine) || null);
 
   return (
-    <section className="flex flex-col gap-stack">
+    <section className="flex flex-col gap-snug">
       <div className="flex items-baseline justify-between gap-snug">
         <h2 className="text-title font-medium tracking-tight">Markets</h2>
         <span className="text-callout tabular-nums text-muted-foreground">{ms.length} matches</span>
@@ -192,15 +329,15 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
       {!ms.length ? (
         <EmptyNote title="No matches">Nothing in {fmtName} at this ground for these filters.</EmptyNote>
       ) : isTop && tops ? (
-        <section className="overflow-hidden border-y border-hairline" aria-label="Top batter">
-          <p className="px-inset py-snug text-footnote text-muted-foreground">Highest score in the match · last {tops.n} {fmtName}</p>
+        <section className="-mx-gutter overflow-hidden border-y border-hairline" aria-label="Top batter">
+          <p className="px-gutter py-snug text-footnote text-muted-foreground">Highest score in the match · last {tops.n} {fmtName}</p>
           <ul>
             {tops.rows.map((r: any, i: number) => {
               const max = Math.max(...tops.rows.map((x: any) => x.pSole), 0.0001);
               return (
                 <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
                   <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
-                  <Link to={`/player/${r.player}`} className="relative flex items-center gap-snug px-inset py-snug outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
+                  <Link to={`/player/${r.player}`} className="relative flex items-center gap-snug px-gutter py-snug outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
                     <PlayerBadge idx={r.player} size="sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body font-medium">{r.name}</span>
@@ -215,18 +352,40 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
               );
             })}
           </ul>
-          {!tops.rows.length ? <p className="px-inset pb-snug text-callout text-muted-foreground">Not enough matches.</p> : null}
+          {!tops.rows.length ? <p className="px-gutter pb-snug text-callout text-muted-foreground">Not enough matches.</p> : null}
         </section>
       ) : rep && s && activeLine != null && atLine ? (
-        <div className="flex flex-col gap-stack">
+        <div className="flex flex-col gap-snug">
           <div className="flex items-baseline justify-between gap-snug">
             <h3 className="text-body font-medium">{(MATCH_MARKETS as any)[market]?.label || market}</h3>
             <span className="text-footnote text-muted-foreground">{rep.n} matches · void excluded</span>
           </div>
-          <div className="flex items-end gap-group">
-            <div><div className="text-footnote text-muted-foreground">Median</div><AnimatedNumber className="text-stat font-bold tracking-tight tabular-nums" value={s.median} format={(n) => (Number.isInteger(s.median) ? String(Math.round(n)) : n.toFixed(1))} /></div>
-            <div><div className="text-footnote text-muted-foreground">Mean</div><AnimatedNumber className="text-title font-bold tabular-nums" value={s.mean} format={(n) => n.toFixed(1)} /></div>
-            <div><div className="text-footnote text-muted-foreground">Range</div><span className="text-title font-bold tabular-nums">{s.min == null || s.max == null ? "—" : `${Math.round(s.min)}–${Math.round(s.max)}`}</span></div>
+          <div className="grid grid-cols-3 gap-snug">
+            {([
+              ["Typical", s.median, "Middle result in this sample (median).", (n: number) => (Number.isInteger(s.median) ? String(Math.round(n)) : n.toFixed(1))],
+              ["Average", s.mean, "Mean across the same matches.", (n: number) => n.toFixed(1)],
+              ["Low–high", null, "Lowest and highest result in the sample.", null],
+            ] as const).map(([lab, val, tip, fmtN]) => (
+              <div key={lab} className="grid min-w-0 gap-hair">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="label-cap inline-flex w-fit items-center gap-hair text-callout leading-tight text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+                      {lab}<InformationCircleIcon className="size-3.5 opacity-70" aria-hidden />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
+                </Popover>
+                {lab === "Low–high" ? (
+                  <b className="font-condensed text-metric font-medium leading-none tabular-nums">
+                    {s.min == null || s.max == null ? "—" : (
+                      <><AnimatedNumber value={s.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={s.max} format={(n) => String(Math.round(n))} /></>
+                    )}
+                  </b>
+                ) : (
+                  <AnimatedNumber className="font-condensed text-metric font-medium leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
+                )}
+              </div>
+            ))}
           </div>
           <ValueBars values={rep.values} line={activeLine} />
           <div className="grid grid-cols-2 gap-snug">
@@ -247,11 +406,12 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
             })}
           </div>
           {rep.n < 10 ? <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p> : null}
-          <section className="overflow-hidden border-y border-hairline" aria-label="Line ladder">
-            <div className="grid grid-cols-[1fr_1fr_1fr] px-inset py-tight text-footnote font-medium text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+          {/* Phone: full-bleed like Match Fancy / Player ladder (`-mx-gutter`). */}
+          <section className="-mx-gutter min-w-0 border-y border-hairline" aria-label="Line ladder">
+            <div className="grid grid-cols-[1fr_1fr_1fr] px-gutter py-tight font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
             {ladder.map((l: any, i: number) => (
               <motion.button key={l.line} type="button" onClick={() => setLine(l.line)} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
-                className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-inset py-snug text-left text-body transition-colors active:bg-accent">
+                className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-gutter py-snug text-left text-body transition-colors active:bg-accent">
                 {l.line === activeLine && <motion.span layoutId="ground-ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
                 <span className="relative font-medium tabular-nums">{l.line}</span>
                 <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
@@ -306,30 +466,33 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
 
   const metrics = (
     <>
-  <div className="grid grid-cols-3 gap-snug">
-    <Metric k="Matches" v={atGround.length} />
-    <Metric
-      k="Weather"
-      v={wxQ.isLoading ? "…" : wx ? (
-        <span className="inline-flex items-baseline gap-hair">
-          <CloudIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-          <span>{wx.temp}°</span>
-        </span>
-      ) : "—"}
-    />
-    <Metric k="Local" v={wxQ.isLoading ? "…" : (local || "—")} />
-  </div>
-  {wx ? (
-    <p className="text-callout text-muted-foreground">{wx.label} · ground local time{wx.city && wx.city !== city ? ` · ${wx.city}` : ""}</p>
-  ) : wxQ.isError ? (
-    <p className="text-callout text-muted-foreground">Weather unavailable for this ground</p>
-  ) : null}
+      <div className="grid grid-cols-3 divide-x divide-hairline border-y border-hairline py-snug">
+        <div className="px-snug first:pl-0"><Metric k="Matches" v={atGround.length} /></div>
+        <div className="px-snug">
+          <Metric
+            k="Weather"
+            v={wxQ.isLoading ? "…" : wx ? (
+              <span className="inline-flex items-baseline gap-hair">
+                <CloudIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                <span>{wx.temp}°</span>
+              </span>
+            ) : "—"}
+          />
+        </div>
+        <div className="px-snug last:pr-0"><Metric k="Local" v={wxQ.isLoading ? "…" : (local || "—")} /></div>
+      </div>
+      {wx ? (
+        <p className="text-callout text-muted-foreground">{wx.label} · ground local time{wx.city && wx.city !== city ? ` · ${wx.city}` : ""}</p>
+      ) : wxQ.isError ? (
+        <p className="text-callout text-muted-foreground">Weather unavailable for this ground</p>
+      ) : null}
     </>
   );
   const tour = from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={atGround} now={now} /> : null;
 
+  // Same vertical rhythm as Match Fancy detail (gap-snug throughout).
   return (
-    <div className={cn("flex flex-col", embedded ? "gap-stack" : "gap-section")}>
+    <div className="flex flex-col gap-snug">
       {embedded ? (
         <div className="flex flex-col gap-snug">
           <div className="flex items-center gap-snug">
@@ -385,25 +548,10 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
         </div>
       ) : null}
 
-      <section className="flex flex-col gap-snug">
-        <div className="flex items-baseline justify-between gap-snug">
-          <h2 className="text-title font-medium tracking-tight">Matches</h2>
-          <span className="font-condensed text-callout font-medium tabular-nums text-muted-foreground">{shown.length}</span>
-        </div>
-        {!shown.length ? (
-          <EmptyNote title="No matches">Nothing at this ground for the filters you picked.</EmptyNote>
-        ) : (
-          <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
-            {shown.map((f, i) => (
-              <li key={f.id || f._key || `${f.a}-${f.b}-${f.start}`}>
-                <FixtureCard f={f} i={Math.min(i, 6)} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
+      {/* Fancy rhythm: stats → Markets → collapsed Matches (not a long dump before prices). */}
+      {primary >= 0 ? <GroundStats store={store} venueIndexes={venueIndices} fmt={activeFmt} gender={gender} /> : null}
       {primary >= 0 ? <GroundMarkets store={store} venueIndexes={venueIndices} fmt={activeFmt} gender={gender} /> : null}
+      <GroundMatches key={`${activeFmt}|${gender}`} list={shown} pageSize={embedded ? MATCH_PAGE_EMBED : MATCH_PAGE_FULL} />
     </div>
   );
 }

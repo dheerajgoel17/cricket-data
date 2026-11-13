@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * The ground page's rules, with no DOM: which games count as "at this ground", the tour status, the result line.
+ * The ground page's rules, with no DOM: which games count as "at this ground", the tour status, the result line,
+ * and the ground KPI strip (1st/2nd inns, powerplay, chase/defend, boundaries, extras).
  * The site's `fixture-ground.tsx` and the app's `ground-page.tsx` both import this, so a fix lands in one place.
  */
 import { ballsToOvers } from "@cricket/engine/live.js";
-import { venueIndices, venueStem } from "@cricket/engine/markets.js";
-import { FORMATS } from "@cricket/engine/util.js";
+import { oversScore, venueIndices, venueStem } from "@cricket/engine/markets.js";
+import { FORMATS, round } from "@cricket/engine/util.js";
 import { matchDateLabel, pretty } from "./format";
+
+/** Innings array layout (matches.json / markets.js): runs, 4s, 6s, extras. */
+const IR = 1, IF4 = 4, IF6 = 5, IEX = 15;
 
 export type GenderFilter = "" | "male" | "female";
 
@@ -21,9 +25,97 @@ export const slug = (s: string) => String(s || "").toLowerCase().replace(/[^a-z0
 export const pairKey = (date: string, a: string, b: string) => `${String(date).slice(0, 10)}|${[slug(a), slug(b)].sort().join("|")}`;
 
 export const MARKET_CHIPS: [string, string][] = [
-  ["match_runs", "Match runs"], ["match_sixes", "Match sixes"], ["match_fours", "Match fours"],
-  ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["top_score", "Top score"], ["top_batter", "Top batter"],
+  ["match_runs", "Match runs"], ["first_innings_runs", "1st innings"], ["match_sixes", "Match sixes"], ["match_fours", "Match fours"],
+  ["match_50s", "50s"], ["match_extras", "Extras"], ["highest_over", "Highest runs in an over"], ["top_score", "Top score"], ["top_batter", "Top batter"],
 ];
+
+/**
+ * Powerplay length for the ground KPI (first-N overs of the 1st innings). T20/T10 → 6, ODI/O60 → 10;
+ * Test / The Hundred have no single fielding-restriction block we can average the same way.
+ */
+export function powerplayOvers(fmt: string): number | null {
+  if (fmt === "T20" || fmt === "T10") return 6;
+  if (fmt === "ODI" || fmt === "O60") return 10;
+  return null;
+}
+
+export type GroundHighestFirst = { runs: number; a: string; b: string; date: string; m: number };
+
+/** Venue intelligence KPIs for the match indexes `ms` (same sample Markets uses: one format, void games out). */
+export type GroundSummary = {
+  counted: number;
+  avgFirst: number | null;
+  firstN: number;
+  avgSecond: number | null;
+  secondN: number;
+  powerplayOvers: number | null;
+  avgPowerplay: number | null;
+  powerplayN: number;
+  chaseWinPct: number | null;
+  defendWinPct: number | null;
+  decided: number;
+  foursPerInns: number | null;
+  sixesPerInns: number | null;
+  boundaryRunPct: number | null;
+  avgExtras: number | null;
+  extrasN: number;
+  highestFirst: GroundHighestFirst | null;
+};
+
+/**
+ * Scoring at this ground for the filtered match list (qualified summary matches only for averages;
+ * chase/defend uses every decided result, same rule as tournament `editionSummary`).
+ */
+export function groundSummary(store: any, ms: number[], fmt: string): GroundSummary {
+  const M = store.M;
+  const ppN = powerplayOvers(fmt);
+  let counted = 0, first = 0, firstN = 0, second = 0, secondN = 0;
+  let f4 = 0, f6 = 0, runs = 0, innsN = 0, extras = 0, extrasN = 0;
+  let ppSum = 0, powerplayN = 0, decided = 0, batFirstWins = 0;
+  let highestFirst: GroundHighestFirst | null = null;
+  for (const m of ms) {
+    if (M.r[m] === 0 && M.w[m] >= 0 && M.fi[m] >= 0) {
+      decided++;
+      if (M.w[m] === M.fi[m]) batFirstWins++;
+    }
+    const inn = M.inn?.[m] || [];
+    if (M.q[m] !== 1 || !inn.length) continue;
+    counted++;
+    if (inn[0]) {
+      const r0 = inn[0][IR] || 0;
+      first += r0; firstN++;
+      if (!highestFirst || r0 > highestFirst.runs) {
+        highestFirst = {
+          runs: r0, m, date: M.d[m],
+          a: store.teamName(M.a[m]), b: store.teamName(M.b[m]),
+        };
+      }
+      if (ppN) {
+        const v = oversScore(M.ov?.[m]?.[0], inn[0], ppN);
+        if (v != null) { ppSum += v; powerplayN++; }
+      }
+    }
+    if (inn[1]) { second += inn[1][IR] || 0; secondN++; }
+    let exKnown = inn.length > 0;
+    for (const x of inn) {
+      if (x[IEX] == null) exKnown = false;
+      f4 += x[IF4] || 0; f6 += x[IF6] || 0; runs += x[IR] || 0; innsN++;
+    }
+    if (exKnown) { extras += inn.reduce((s: number, x: any) => s + (x[IEX] || 0), 0); extrasN++; }
+  }
+  const per = (x: number, n: number) => (n ? round(x / n, 2) : null);
+  const defend = decided ? round((100 * batFirstWins) / decided, 1) : null;
+  const chase = decided ? round((100 * (decided - batFirstWins)) / decided, 1) : null;
+  const boundaryRuns = 4 * f4 + 6 * f6;
+  return {
+    counted, avgFirst: per(first, firstN), firstN, avgSecond: per(second, secondN), secondN,
+    powerplayOvers: ppN, avgPowerplay: per(ppSum, powerplayN), powerplayN,
+    chaseWinPct: chase, defendWinPct: defend, decided,
+    foursPerInns: per(f4, innsN), sixesPerInns: per(f6, innsN),
+    boundaryRunPct: runs ? round((100 * boundaryRuns) / runs, 1) : null,
+    avgExtras: per(extras, extrasN), extrasN, highestFirst,
+  };
+}
 
 /** Stadium + city from a "Ground, City, …" venue string. */
 export function venueParts(v: string) {
