@@ -8,7 +8,7 @@ import { sameFixture } from "@cricket/engine/lines.js";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { matchDateLabel, odds, pc } from "@site/lib/format";
-import { genderFilterLabel, groundGames, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
+import { genderFilterLabel, groundGames, groundSummary, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
 import { fetchVenueWx, groundClock } from "@site/lib/venue-wx";
 import { groundMatchFilters } from "@/lib/ground-filters";
 import { storeQuery } from "@/lib/data";
@@ -45,7 +45,8 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
   const store: any = stats.data?.store;
   const g = useMemo(() => (store ? groundGames(store, fixtures.data, venue) : null), [store, fixtures.data, venue]);
   const [fmt, setFmt] = useState(from?.fmt ?? ""), [gender, setGender] = useState<GenderFilter>("");
-  const [section, setSection] = useState<"matches" | "markets">("matches");
+  // From a fixture: open on Markets (Fancy rhythm). Venue list entry keeps Matches first.
+  const [section, setSection] = useState<"matches" | "markets">(fixtureId ? "markets" : "matches");
   const filters = useMemo(() => g && groundMatchFilters(g.atGround, fmt, gender), [g, fmt, gender]);
   const name = g?.label || venue || "Ground";
   const { ground, city } = venueParts(name);
@@ -95,10 +96,73 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
           </View> : null}
         </View>
 
+        {g.primary >= 0 ? <GroundStats store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} /> : null}
+
         {activeSection === "markets"
           ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
           : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
       </ScrollView>
+    </View>
+  );
+}
+
+const num0 = (n: number | null | undefined) => (n == null ? "–" : String(Math.round(n)));
+const num1 = (n: number | null | undefined) => (n == null ? "–" : n.toFixed(1));
+
+/** Same 2x2 + hairline secondary rows as the site ground page (`groundSummary`). */
+function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
+  const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
+  const ms = useMemo(() => selectMatches(store, {
+    fmt: FORMATS.indexOf(fmtName),
+    venue: venueIndexes,
+    gender: gender === "female" ? 1 : gender === "male" ? 0 : null,
+  }) as number[], [store, venueIndexes, fmtName, gender]);
+  const s = useMemo(() => groundSummary(store, ms, fmtName), [store, ms, fmtName]);
+  if (!s.counted) return null;
+  const hi = s.highestFirst;
+  const showPp = s.powerplayOvers != null;
+  const primary: [string, string][] = [
+    ["1st inns avg", num0(s.avgFirst)],
+    ["2nd inns avg", num0(s.avgSecond)],
+    ["Chase win", s.chaseWinPct == null ? "–" : `${num0(s.chaseWinPct)}%`],
+    showPp
+      ? [`PP 1–${s.powerplayOvers}`, s.avgPowerplay == null ? "–" : num0(s.avgPowerplay)]
+      : ["Extras / match", num1(s.avgExtras)],
+  ];
+  // One labelled figure per row (same as site) — not a jammed 4s · 6s · % string.
+  const secondary: [string, string][] = [
+    ["Fours / inns", num1(s.foursPerInns)],
+    ["Sixes / inns", num1(s.sixesPerInns)],
+  ];
+  if (s.boundaryRunPct != null) secondary.push(["Boundary runs", `${num0(s.boundaryRunPct)}%`]);
+  if (showPp) secondary.push(["Extras / match", num1(s.avgExtras)]);
+  secondary.push(["Highest 1st", hi ? `${hi.runs} · ${hi.a} vs ${hi.b}, ${matchDateLabel(hi.date)}` : "–"]);
+  return (
+    <View style={[styles.pad, { gap: space.snug }]}>
+      <View style={styles.titleRow}>
+        <Text style={styles.h2} accessibilityRole="header">Ground stats</Text>
+        <Text style={styles.note}>{s.counted} · {fmtName} · void excluded</Text>
+      </View>
+      {/* One continuous block — no gap between 2x2 and secondary rows (matches site / Fancy). */}
+      <View style={styles.factsBlock}>
+        <View style={styles.grid2}>
+          {primary.map(([k, v], i) => (
+            <View key={k} style={[styles.gridCell, i % 2 === 1 && styles.gridCellR, i >= 2 && styles.gridCellB]}>
+              <Text style={styles.kpiK} numberOfLines={1}>{k}</Text>
+              <Text style={styles.kpiV}>{v}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.secList}>
+          {secondary.map(([k, v], i) => (
+            <View key={k} style={[styles.secRow, i === 0 && { borderTopWidth: 0 }]}>
+              <Text style={styles.kpiK}>{k}</Text>
+              <Text style={styles.secVal} numberOfLines={2}>{v}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+      {s.counted < 10 ? <Text style={styles.warn}>Small sample ({s.counted} matches): treat these with caution.</Text> : null}
     </View>
   );
 }
@@ -167,7 +231,7 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
   );
 }
 
-/** Match-Fancy-shaped markets from the games at this ground: median / mean / range, bars, over / under at a line, and the ladder. One format (the chips above). */
+/** Match-Fancy-shaped markets: Typical / Average / Low–high, bars, O/U, edge-to-edge line ladder. One format (the chips above). */
 function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venueIndexes: number[]; fmt: string; gender: GenderFilter }) {
   const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [market, setMarket] = useState("match_runs"), [line, setLine] = useState<number | null>(null);
@@ -206,41 +270,46 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
             {!tops.rows.length ? <Text style={styles.note}>Not enough matches.</Text> : null}
           </View>
         ) : rep && s && active != null && at ? (
-          <View style={styles.marketCard}>
-            <View style={styles.titleRow}>
-              <Text style={styles.h3}>{(MATCH_MARKETS as any)[market]?.label || market}</Text>
-              <Text style={styles.note}>{rep.n} matches · void excluded</Text>
+          <View style={{ gap: space.stack }}>
+            <View style={styles.marketCard}>
+              <View style={styles.titleRow}>
+                <Text style={styles.h3}>{(MATCH_MARKETS as any)[market]?.label || market}</Text>
+                <Text style={styles.note}>{rep.n} matches · void excluded</Text>
+              </View>
+              <View style={styles.stats}>
+                <Stat k="Typical" v={short(s.median)} big />
+                <Stat k="Average" v={s.mean == null ? "–" : s.mean.toFixed(1)} />
+                <Stat k="Low–high" v={s.min == null || s.max == null ? "–" : `${Math.round(s.min)}–${Math.round(s.max)}`} />
+              </View>
+              <MiniBars last={(rep.values as number[]).slice(-40).map((v) => ({ v, s: v > active ? "hit" : "miss" }))} line={active} width={width - 2 * (space.gutter + space.inset + 1)} />
+              <View style={styles.cards}>
+                {(["over", "under"] as const).map((side) => {
+                  const p: number | null = at[side === "over" ? "pOver" : "pUnder"] ?? null, fair = at[side === "over" ? "fairOver" : "fairUnder"], hit = at[side];
+                  return (
+                    <View key={side} style={styles.side}>
+                      <Text style={styles.sideKey}>{side} {active}</Text>
+                      <Text style={[styles.big, side === "over" && { color: color.primary }]}>{pct1(p)}</Text>
+                      <Text style={styles.note}>{hit != null ? `${hit} of ${rep.n}` : "–"} · fair {odds(fair)}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+              {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
+              <Text style={styles.h3}>Compare lines</Text>
             </View>
-            <View style={styles.stats}>
-              <Stat k="Median" v={short(s.median)} big />
-              <Stat k="Mean" v={s.mean == null ? "–" : s.mean.toFixed(1)} />
-              <Stat k="Range" v={s.min == null || s.max == null ? "–" : `${Math.round(s.min)}–${Math.round(s.max)}`} />
+            {/* Edge-to-edge like Match Fancy ladder (bleed past page gutter). */}
+            <View style={styles.bleed}>
+              <DataTable
+                columns={["Line", "Over", "Under"]}
+                flex={[1, 1.3, 1.3]}
+                highlight={ladder.findIndex((l) => l.line === active)}
+                rows={ladder.map((l) => [
+                  <Press key={l.line} scale={1} onPress={() => setLine(l.line)} accessibilityRole="button" accessibilityLabel={`Line ${l.line}`}><Text style={styles.lineNum}>{l.line}</Text></Press>,
+                  <Text key="o" style={styles.cellNum}><Text style={{ color: color.primary }}>{pc(l.pOver)}</Text> <Text style={styles.fair}>{odds(l.fairOver)}</Text></Text>,
+                  <Text key="u" style={styles.cellNum}>{pc(l.pUnder)} <Text style={styles.fair}>{odds(l.fairUnder)}</Text></Text>,
+                ])}
+              />
             </View>
-            <MiniBars last={(rep.values as number[]).slice(-40).map((v) => ({ v, s: v > active ? "hit" : "miss" }))} line={active} width={width - 2 * (space.gutter + space.inset + 1)} />
-            <View style={styles.cards}>
-              {(["over", "under"] as const).map((side) => {
-                const p: number | null = at[side === "over" ? "pOver" : "pUnder"] ?? null, fair = at[side === "over" ? "fairOver" : "fairUnder"], hit = at[side];
-                return (
-                  <View key={side} style={styles.side}>
-                    <Text style={styles.sideKey}>{side} {active}</Text>
-                    <Text style={[styles.big, side === "over" && { color: color.primary }]}>{pct1(p)}</Text>
-                    <Text style={styles.note}>{hit != null ? `${hit} of ${rep.n}` : "–"} · fair {odds(fair)}</Text>
-                  </View>
-                );
-              })}
-            </View>
-            {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
-            <Text style={styles.h3}>Compare lines</Text>
-            <DataTable
-              columns={["Line", "Over", "Under"]}
-              flex={[1, 1.3, 1.3]}
-              highlight={ladder.findIndex((l) => l.line === active)}
-              rows={ladder.map((l) => [
-                <Press key={l.line} scale={1} onPress={() => setLine(l.line)} accessibilityRole="button" accessibilityLabel={`Line ${l.line}`}><Text style={styles.lineNum}>{l.line}</Text></Press>,
-                <Text key="o" style={styles.cellNum}><Text style={{ color: color.primary }}>{pc(l.pOver)}</Text> <Text style={styles.fair}>{odds(l.fairOver)}</Text></Text>,
-                <Text key="u" style={styles.cellNum}>{pc(l.pUnder)} <Text style={styles.fair}>{odds(l.fairUnder)}</Text></Text>,
-              ])}
-            />
           </View>
         ) : (
           <EmptyState compact title="No sample" body={`Not enough ${fmtName} matches for this market.`} />
@@ -257,6 +326,7 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter },
+  bleed: { marginHorizontal: -space.gutter },
   stack: { gap: space.stack },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
   hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
@@ -272,6 +342,17 @@ const styles = StyleSheet.create({
   name: { ...type.display, color: color.foreground },
   city: { ...type.body, color: color["muted-foreground"] },
   metrics: { flexDirection: "row" },
+  factsBlock: { borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, overflow: "hidden" },
+  grid2: { flexDirection: "row", flexWrap: "wrap" },
+  gridCell: { width: "50%", gap: space.hair, paddingHorizontal: space.snug, paddingVertical: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderRightWidth: StyleSheet.hairlineWidth, borderColor: color.hairline },
+  gridCellR: { borderRightWidth: 0 },
+  gridCellB: { borderBottomWidth: StyleSheet.hairlineWidth },
+  secList: { borderTopWidth: 0 },
+  secRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, minHeight: 44, paddingHorizontal: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: 20, color: color.foreground },
+  kpiK: { ...cap, color: color["muted-foreground"] },
+  kpiV: { ...num, fontSize: 22, color: color.foreground },
+  warn: { ...type.footnote, color: color.amber },
   note: { ...type.footnote, color: color["muted-foreground"] },
   tour: { ...tonal, borderRadius: radius.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
   crests: { flexDirection: "row", alignItems: "center" },
