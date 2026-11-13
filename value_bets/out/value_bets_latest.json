@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-13T18:30:35Z",
- "generated_at_ist": "2026-11-14 00:00 IST",
- "runtime_secs": 171.8,
+ "generated_at_utc": "2026-11-13T19:30:36Z",
+ "generated_at_ist": "2026-11-14 01:00 IST",
+ "runtime_secs": 176.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-13",
-  "commit": "bb592f5212"
+  "commit": "b071fe849a"
  },
  "sources": {
-  "moviodds_bet365": {
-   "status": "ok",
-   "rows": 2156,
-   "secs": 2.5
-  },
   "smarkets": {
    "status": "ok",
    "rows": 487,
-   "secs": 2.7
+   "secs": 2.2
+  },
+  "moviodds_bet365": {
+   "status": "ok",
+   "rows": 2158,
+   "secs": 2.4
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 10.7,
+   "secs": 11.0,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 316,
-   "secs": 34.4,
+   "secs": 33.5,
    "events": 13
   },
   "feedf": {
    "status": "ok",
    "rows": 296,
-   "secs": 61.3,
+   "secs": 62.2,
    "events": 11
   },
   "feede": {
    "status": "ok",
    "rows": 832,
-   "secs": 72.7,
+   "secs": 71.1,
    "events": 28
   },
   "feedh": {
    "status": "ok",
-   "rows": 1737,
-   "secs": 87.0,
-   "events": 110
+   "rows": 1725,
+   "secs": 88.7,
+   "events": 114
   }
  },
- "snapshot": "odds_20261113T183035Z.jsonl.gz",
+ "snapshot": "odds_20261113T193036Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,20 +120,19 @@
  },
  "stats": {
   "events_in_window": 67,
-  "rows_in_window": 5752,
+  "rows_in_window": 5742,
   "selections_with_model": 3066,
-  "selections_with_market_fair": 3509,
-  "markets_in_window": 583,
+  "selections_with_market_fair": 3497,
+  "markets_in_window": 578,
   "value_bets": 8,
   "dropped_by_filter": {
-   "model_market_gap": 1334,
-   "liquidity": 1,
-   "odds_range": 26,
+   "odds_range": 30,
+   "model_only_no_market": 255,
+   "model_market_gap": 1365,
+   "rarely_selected": 3,
    "market_disabled": 3,
    "policy_max_odds": 5,
-   "model_only_no_market": 255,
    "model_disagrees": 7,
-   "rarely_selected": 1,
    "loose_name_match": 3,
    "small_sample": 3,
    "policy_min_edge": 1
@@ -143,19 +142,19 @@
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 636,
-    "mean_model_p": 0.051,
+    "mean_model_p": 0.07,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.198,
-    "mean_abs_logit_diff": 0.944,
-    "corr": 0.665
+    "mean_logit_diff_model_minus_market": 0.517,
+    "mean_abs_logit_diff": 1.028,
+    "corr": 0.687
    },
    "top_bowler_team": {
     "n_prices": 249,
     "mean_model_p": 0.108,
     "mean_market_p": 0.108,
     "mean_logit_diff_model_minus_market": -0.015,
-    "mean_abs_logit_diff": 0.435,
-    "corr": 0.573
+    "mean_abs_logit_diff": 0.436,
+    "corr": 0.572
    },
    "batter_runs": {
     "n_prices": 934,
@@ -210,16 +209,16 @@
     "mean_model_p": 0.016,
     "mean_market_p": 0.034,
     "mean_logit_diff_model_minus_market": -0.052,
-    "mean_abs_logit_diff": 1.088,
-    "corr": 0.652
+    "mean_abs_logit_diff": 1.096,
+    "corr": 0.646
    },
    "top_bowler_match": {
     "n_prices": 204,
     "mean_model_p": 0.051,
     "mean_market_p": 0.054,
     "mean_logit_diff_model_minus_market": 0.003,
-    "mean_abs_logit_diff": 0.55,
-    "corr": 0.453
+    "mean_abs_logit_diff": 0.553,
+    "corr": 0.448
    }
   }
  },
@@ -366,6 +365,7 @@
    "sources": [
     "feede_lb",
     "feedh_d",
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -733,20 +733,6 @@
    ]
   },
   {
-   "event": "female|Rwanda Women|Uganda Women|2026-11-14",
-   "start_ist": "2026-11-14 16:30 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Rwanda Women",
-    "Uganda Women"
-   ],
-   "sources": [
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
-  {
    "event": "male|Delhi|Jammu & Kashmir|2026-11-14",
    "start_ist": "2026-11-14 16:30 IST",
    "format": "T20",
@@ -773,6 +759,20 @@
    "sources": [
     "feede_lb",
     "feedh_d",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "female|Rwanda Women|Uganda Women|2026-11-14",
+   "start_ist": "2026-11-14 16:30 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Rwanda Women",
+    "Uganda Women"
+   ],
+   "sources": [
+    "moviodds_bet365",
     "smarkets"
    ]
   },
@@ -966,7 +966,6 @@
     "Services"
    ],
    "sources": [
-    "feedh_d",
     "smarkets"
    ]
   },
@@ -1030,19 +1029,6 @@
    ]
   },
   {
-   "event": "male|Thailand|Zimbabwe|2026-11-15",
-   "start_ist": "2026-11-15 10:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": [
-    "Thailand",
-    "Zimbabwe"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|Netherlands|Pakistan|2026-11-15",
    "start_ist": "2026-11-15 10:30 IST",
    "format": "T20",
@@ -1050,6 +1036,19 @@
    "teams_matched": [
     "Netherlands",
     "Pakistan"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Thailand|Zimbabwe|2026-11-15",
+   "start_ist": "2026-11-15 10:30 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": [
+    "Thailand",
+    "Zimbabwe"
    ],
    "sources": [
     "feedh_d"
@@ -1072,19 +1071,6 @@
    ]
   },
   {
-   "event": "male|Papua New Guinea|Sri Lanka|2026-11-15",
-   "start_ist": "2026-11-15 14:45 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": [
-    "Papua New Guinea",
-    "Sri Lanka"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|Scotland|United Arab Emirates|2026-11-15",
    "start_ist": "2026-11-15 14:45 IST",
    "format": "ODI",
@@ -1092,6 +1078,19 @@
    "teams_matched": [
     "Scotland",
     "United Arab Emirates"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Papua New Guinea|Sri Lanka|2026-11-15",
+   "start_ist": "2026-11-15 14:45 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": [
+    "Papua New Guinea",
+    "Sri Lanka"
    ],
    "sources": [
     "feedh_d"
@@ -1675,7 +1674,6 @@
   "Ben Stewart McKinney",
   "Bhanu Anand",
   "Bharati Fulmali",
-  "Bhavuk Jerath",
   "Bishal Saha",
   "Bongile Mfunelwa",
   "Bonnie Berry",
@@ -1806,7 +1804,6 @@
   "Milan Rathnayake",
   "Minnu Mani",
   "Modiri Litheko",
-  "Mohammad Huzafah",
   "Mohammad Suleman",
   "Mohammad Taha",
   "Mohammad Tayyab Arif",
@@ -1824,7 +1821,9 @@
   "Nidhi Dhrmuniya",
   "Nikki Siribhagwan Prasad",
   "Noor Ullah Ayobi",
-  "Noor ul Rahman"
+  "Noor ul Rahman",
+  "O Porter",
+  "Odean Smith"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1949,25 +1948,25 @@
   }
  },
  "log": [
-  "[00:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:00 IST] history: 24056 matches, last 2026-11-13, players 433524",
-  "[00:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2156, 'secs': 2.5}",
-  "[00:02 IST] source smarkets: {'status': 'ok', 'rows': 487, 'secs': 2.7}",
-  "[00:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 10.7, 'events': 2}",
-  "[00:02 IST] source feedk: {'status': 'ok', 'rows': 316, 'secs': 34.4, 'events': 13}",
-  "[00:02 IST] source feedf: {'status': 'ok', 'rows': 296, 'secs': 61.3, 'events': 11}",
-  "[00:02 IST] source feede: {'status': 'ok', 'rows': 832, 'secs': 72.7, 'events': 28}",
-  "[00:02 IST] source feedh: {'status': 'ok', 'rows': 1737, 'secs': 87.0, 'events': 110}",
-  "[00:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:02 IST] 65 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[00:02 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[00:02 IST] 76 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[00:02 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
-  "[00:02 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T11:00:00Z)",
-  "[00:02 IST] book lines: 602 player lines from 7 source(s)",
-  "[00:02 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[00:03 IST] weather: forecasts for 21 events, 0 failed",
-  "[00:03 IST] prop model: 1925 prop selections modelled, 633 milestone ladder prices anchored to O/U",
-  "[00:03 IST] ledger upsert model: {'upserted': 8, 'skipped_settled': 0}"
+  "[01:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[01:00 IST] history: 24057 matches, last 2026-11-13, players 433546",
+  "[01:02 IST] source smarkets: {'status': 'ok', 'rows': 487, 'secs': 2.2}",
+  "[01:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2158, 'secs': 2.4}",
+  "[01:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.0, 'events': 2}",
+  "[01:02 IST] source feedk: {'status': 'ok', 'rows': 316, 'secs': 33.5, 'events': 13}",
+  "[01:02 IST] source feedf: {'status': 'ok', 'rows': 296, 'secs': 62.2, 'events': 11}",
+  "[01:02 IST] source feede: {'status': 'ok', 'rows': 832, 'secs': 71.1, 'events': 28}",
+  "[01:02 IST] source feedh: {'status': 'ok', 'rows': 1725, 'secs': 88.7, 'events': 114}",
+  "[01:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[01:02 IST] 65 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[01:02 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[01:02 IST] 76 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[01:02 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
+  "[01:02 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T11:00:00Z)",
+  "[01:02 IST] book lines: 602 player lines from 7 source(s)",
+  "[01:02 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[01:03 IST] weather: forecasts for 21 events, 0 failed",
+  "[01:03 IST] prop model: 1925 prop selections modelled, 633 milestone ladder prices anchored to O/U",
+  "[01:03 IST] ledger upsert model: {'upserted': 8, 'skipped_settled': 0}"
  ]
 }
