@@ -4,7 +4,7 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { Brand, Header } from "@/components/layout/Header";
 import { IosTabBar } from "@/components/layout/IosTabBar";
 import { HeaderSlotProvider } from "@/lib/header-slot";
-import { goProduct, isDesignCataloguePath, isDesignHost } from "@/lib/design-host";
+import { goProduct, isDesignCataloguePath, isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -136,7 +136,7 @@ export function DesignFooter() {
       <DesignShell className="flex flex-wrap items-center justify-between gap-stack py-group">
         <div className="grid gap-hair">
           <Brand />
-          <a href="https://fancy.cash/" className={cn("text-footnote text-muted-foreground underline underline-offset-4", focusRing)}>fancy.cash</a>
+          <a href={`${PRODUCT_ORIGIN}/`} className={cn("text-footnote text-muted-foreground underline underline-offset-4", focusRing)}>fancy.cash</a>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-stack">
           {NAV_LINKS.map(({ to, title }) => (

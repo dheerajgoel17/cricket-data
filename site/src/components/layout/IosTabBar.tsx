@@ -27,7 +27,8 @@ const ICON: Record<string, [string, string]> = {
 export function IosTabBar() {
   const { pathname } = useLocation();
   const nav = useNavigate();
-  const current = TAB_NAV.find((t) => t.match(pathname))?.to ?? "";
+  // Catalogue host is not a product route — never light a tab as selected (clicks still goProduct).
+  const current = isDesignHost() ? "" : (TAB_NAV.find((t) => t.match(pathname))?.to ?? "");
   const slot = slotForPath(pathname);
   const dock = useRef<HTMLDivElement>(null);
   useEffect(() => {

@@ -1,6 +1,6 @@
-import { lazy, StrictMode, Suspense } from "react";
+import { lazy, StrictMode, Suspense, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
 import "./index.css";
@@ -8,7 +8,7 @@ import { App } from "./App";
 import { DataProvider } from "@/lib/data";
 import { AuthProvider } from "@/lib/auth";
 import { prefetchFeeds } from "@/lib/queries";
-import { DESIGN_SYSTEM_HOST } from "@/lib/design-host";
+import { DESIGN_SYSTEM_HOST, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { SignInSheet } from "@/components/app/sign-in-sheet";
@@ -26,6 +26,14 @@ if (isDesignPage) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#ffffff");
 } else if (/^\/design-system\/?$/.test(location.pathname)) {
   location.replace(`https://${designHost}/${location.search}${location.hash}`);
+}
+
+/** Stray OAuth hits on the design host must finish on the product AuthCallback. */
+function DesignAuthHandoff() {
+  useEffect(() => {
+    location.replace(`${PRODUCT_ORIGIN}/auth/callback${location.search}${location.hash}`);
+  }, []);
+  return <p className="p-gutter text-callout text-muted-foreground">Continuing sign-in…</p>;
 }
 
 const client = new QueryClient({ defaultOptions: { queries: { staleTime: 5 * 60_000, refetchOnWindowFocus: false, retry: 1 } } });
@@ -54,7 +62,10 @@ createRoot(document.getElementById("root")!).render(
               <AuthProvider>
                 <DataProvider>
                   <Suspense fallback={designFallback}>
-                    <DesignSystem />
+                    <Routes>
+                      <Route path="/auth/callback" element={<DesignAuthHandoff />} />
+                      <Route path="*" element={<DesignSystem />} />
+                    </Routes>
                   </Suspense>
                 </DataProvider>
                 <SignInSheet />

@@ -59,11 +59,25 @@ it("design-host helpers keep catalogue paths local", () => {
   expect(isDesignCataloguePath("/docs/type")).toBe(true);
   expect(isDesignCataloguePath("/search")).toBe(true);
   expect(isDesignCataloguePath("/saved")).toBe(false);
+  expect(isDesignCataloguePath("/auth/callback")).toBe(false);
   expect(isDesignCataloguePath("/props")).toBe(false);
   expect(typeof goProduct).toBe("function");
   expect(typeof isDesignHost()).toBe("boolean");
   expect(isDesignHost("design.fancy.cash")).toBe(true);
   expect(isDesignHost("fancy.cash")).toBe(false);
+});
+
+it("docs footer and Saved link target PRODUCT_ORIGIN", async () => {
+  const { PRODUCT_ORIGIN } = await import("@/lib/design-host");
+  render(wrap(
+    <DesignDocsShell groups={groups} currentId="color" topicPath={(id) => `/docs/${id}`}>
+      <p>Content</p>
+    </DesignDocsShell>,
+  ));
+  expect(screen.getByRole("link", { name: "fancy.cash" })).toHaveAttribute("href", `${PRODUCT_ORIGIN}/`);
+  const saved = screen.getByRole("link", { name: "Saved", hidden: true });
+  // Off design host Saved is an in-app Link; on design host it is PRODUCT_ORIGIN/saved (covered when hostname matches).
+  expect(saved.getAttribute("href")).toMatch(/\/saved$/);
 });
 
 it("docs shell mounts product Header search and sidebar topics", () => {

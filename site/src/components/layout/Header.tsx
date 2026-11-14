@@ -4,7 +4,7 @@ import { BRAND } from "@/lib/brand";
 import { BookmarkIcon, ChevronLeftIcon, MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth";
 import { useSaved } from "@/lib/saved";
-import { goProduct, isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
+import { isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 import { isTopLevel } from "./nav";
