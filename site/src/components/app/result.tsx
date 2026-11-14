@@ -23,9 +23,10 @@ export function SplitTables({ splits, title = (k: string) => k }: { splits: Reco
   return (
     <Accordion type="multiple" defaultValue={items.filter(([k]) => k === "opposition" || k === "venue_type").map(([k]) => k)} className="flex flex-col gap-stack">
       {items.map(([kind, rows]) => (
-        <AccordionItem key={kind} value={kind} className="border-0">
+        // Pull to page edges so TABLE_BLEED hairlines are not clipped by AccordionContent overflow-hidden.
+        <AccordionItem key={kind} value={kind} className="-mx-gutter border-0 px-gutter">
           <AccordionTrigger className="px-0"><span className="flex flex-1 items-center gap-snug">Split by {title(kind).replace("_", " ")} <Badge variant="secondary">{rows.length}</Badge></span></AccordionTrigger>
-          <AccordionContent className="overflow-x-auto">
+          <AccordionContent className="flex flex-col gap-stack">
             <RateHeatStrip rows={rows} title={`Hit rate by ${title(kind).replace("_", " ")}`} />
             <DataTable bleed columns={[title(kind).replace("_", " "), "n", "Median", "Mean", "Over %", "Fair over"]} rows={rows.map((x) => [x.label, x.n, num(x.median), num(x.mean), <HitCell p={x.pOver} />, <OddsText>{odds(x.fairOver)}</OddsText>])} />
           </AccordionContent>

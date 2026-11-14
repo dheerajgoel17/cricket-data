@@ -52,7 +52,7 @@ import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
 import { AdSlot } from "@/components/app/ad-slot";
-import { Crumbs, DataTable, DetailSplit, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
+import { Crumbs, DataTable, DetailSplit, StickyFilterBand, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
@@ -225,25 +225,30 @@ function PlayerScreen({ idx }: { idx: number }) {
           <ArrowUpOnSquareIcon className="size-5" />
         </button>
       </HeaderActions>
-      <div className="hidden lg:block">
+      <div className="hidden pt-stack lg:block">
         <Crumbs items={[["Player props", "/props"], [name], [statLabel]]} />
       </div>
       <AdSlot slotId="player_detail_top" />
-      <div className="sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150">
-        <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
-          {fmts.length > 1 ? (
-            <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
-              className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
-          ) : <span className="min-w-0 flex-1" />}
+      <StickyFilterBand>
+        {/* Fancy shape: format + Filters under one hairline; Test innings sit in that same parent block (not a third padded band — avoids a jumpy gap when the row appears). Stats stay the single filled row below. */}
+        <div className="border-b border-hairline">
+          <div className="flex min-w-0 items-stretch gap-snug px-gutter">
+            {fmts.length > 1 ? (
+              <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
+                className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
+            ) : <span className="min-w-0 flex-1" />}
+            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              <AdjustmentsHorizontalIcon className="size-4" />Filters
+              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+            </Button>
+          </div>
           {testBat && (
-            <PillGroup sub layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
-              className="min-w-0 shrink" items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
+            <div className="px-gutter pb-tight">
+              <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+                items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
+            </div>
           )}
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-          </Button>
         </div>
         <div className="px-gutter py-tight">
           <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
@@ -257,7 +262,7 @@ function PlayerScreen({ idx }: { idx: number }) {
             <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
-      </div>
+      </StickyFilterBand>
       <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
@@ -346,35 +351,18 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const [side, setSide] = useState<string>(c ? c.side : "over");
   const [win, setWin] = useState<number>(entries.length >= 10 ? 10 : 0) // the last 10 games first;
   const phone = useIsMobile();
-  const [tab, setTab] = useState<string>(() => {
-    const t = ["logs", "splits", "corr", "lines"].includes(q.tab) ? q.tab : "logs";
-    return t;
-  });
+  const [tab, setTab] = useState<string>(["logs", "splits", "corr", "lines"].includes(q.tab) ? q.tab : "logs");
   const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const [logCount, setLogCount] = useState(30);
   const tabRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const keep = (patch: Record<string, unknown>) => { const next = new URLSearchParams(location.search); for (const [k, v] of Object.entries(patch)) { if (v === "" || v == null) next.delete(k); else next.set(k, String(v)); } history.replaceState(null, "", `${location.pathname}?${next}`); };
-  // Desktop puts Game log in the sticky rail; keep the bottom tab on phone only.
-  useEffect(() => {
-    if (!phone && tab === "logs") {
-      const next = "splits";
-      setTab(next);
-      keep({ tab: next });
-    }
-  }, [phone]); // eslint-disable-line react-hooks/exhaustive-deps
   const switchTab = (t: string) => {
     setTab(t); keep({ tab: t });
     requestAnimationFrame(() => tabRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }));
   };
-  const openLog = (e: any) => setGame({ e, s: barState(e, line, side) as string });
-  const logValue = (e: any) => {
-    const s = barState(e, line, side) as string;
-    if (e.value != null) return e.value;
-    return s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP";
-  };
   const tabItems: [string, string][] = [
-    ...(phone ? [["logs", "Game log"] as [string, string]] : []),
+    ["logs", "Game log"],
     ["splits", "Splits"],
     ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []),
     ...(!book ? [["lines", "Research"] as [string, string]] : []),
@@ -418,7 +406,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const out = !!(book && next?.priced && asLine && lineNotIn(liveMatch, asLine, identity));
 
   return (
-    <div className="flex flex-col gap-stack">
+    <div className="flex flex-col gap-section">
       {!entries.length || !cur ? (
         <>
           {!book ? <UnpricedNote statLabel={res.statLabel} /> : null}
@@ -437,8 +425,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </div>
         </>
       ) : (
-      <DetailSplit>
-        <section className="flex min-w-0 flex-col gap-snug">
+      <DetailSplit className={!book ? "lg:grid-cols-1" : undefined}>
+        <section className="flex min-w-0 flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-snug", CARD)}>
             <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-snug">
               <Metric k={`${cur.label} avg`} v={<Arrow up={cur.mean == null ? null : cur.mean > line}>{num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)}</Arrow>} />
@@ -478,7 +466,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             })}
           </div>
           {mix.out > 0 || cur.played < 5 ? (
-            <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
+            <p className={cn("text-center text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
               {mix.out > 0 ? (
                 <>
                   <b className="font-label tabular-nums">{mix.out}</b> void or not in the XI left out
@@ -496,16 +484,16 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
               {cur.played < 5 ? <>{mix.out > 0 ? " " : ""}Too few for a steady read{active.length ? ": relax a filter" : ""}.{active.length > 0 ? <> <button type="button" className="font-label underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></> : null}</> : null}
             </p>
           ) : null}
-          {/* Fancy strip: hit-rate meters, then independent Over / Under book lanes. */}
-          <div className="grid gap-snug border-t border-hairline pt-snug">
-            <div className="grid min-w-0 grid-cols-2 gap-snug">
+          {/* Ground-style bordered blocks: hit-rate meters, then Over / Under book lanes. */}
+          <div className="overflow-hidden border border-hairline">
+            <div className="grid min-w-0 grid-cols-2 divide-x divide-hairline">
               {(["over", "under"] as const).map((lane) => {
                 const hist = windowRate(entries, cur.n, line, lane);
                 const p = hist.p, fair = p ? 1 / p : null;
                 return (
                   <button key={lane} type="button" onClick={() => { setSide(lane); keep({ line, side: lane }); }}
-                    className={cn("flex min-w-0 flex-col gap-tight rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-ring", side === lane && "opacity-100", side !== lane && "opacity-70")}>
-                    <div className="text-footnote font-label capitalize text-muted-foreground">{lane} {line}</div>
+                    className={cn("flex min-w-0 flex-col gap-tight px-snug py-snug text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset", side === lane ? "bg-secondary/40" : "hover:bg-secondary/20")}>
+                    <div className="label-cap text-caption text-muted-foreground">{lane} {line}</div>
                     <b className={cn("text-title font-emphasis tabular-nums", lane === "over" ? "text-primary" : "text-foreground")}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</b>
                     <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><div className={cn("h-full rounded-full", lane === "over" ? "bg-primary" : "bg-foreground/70")} style={{ width: `${(p ?? 0) * 100}%` }} /></div>
                     <div className="text-footnote text-muted-foreground">{hist.hits} of {hist.played} · fair {odds(fair)}</div>
@@ -514,22 +502,24 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
               })}
             </div>
             {(pricedAt || (book && !bookAt)) && (
-              <div className="grid gap-tight border-t border-hairline pt-snug" aria-label="Book prices">
+              <div className="border-t border-hairline" aria-label="Book prices">
                 {pricedAt ? (
                   <>
-                    <div className="grid grid-cols-2 gap-snug">
+                    <div className="grid grid-cols-2 divide-x divide-hairline">
                       {(["over", "under"] as const).map((lane) => (
-                        <div key={lane} className="grid justify-items-start gap-hair text-left">
+                        <div key={lane} className="grid justify-items-start gap-hair px-snug py-snug text-left">
                           <span className="label-cap text-caption text-muted-foreground">{lane} {line}</span>
                           <SideBook priced={pricedAt} side={lane} />
                         </div>
                       ))}
                     </div>
-                    {splitNote && <p className="text-footnote text-muted-foreground">{splitNote}</p>}
-                    <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                    {splitNote && <p className="border-t border-hairline px-snug py-tight text-footnote text-muted-foreground">{splitNote}</p>}
+                    <div className="border-t border-hairline px-snug py-snug">
+                      <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                    </div>
                   </>
                 ) : (
-                  <p className="text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
+                  <p className="px-snug py-snug text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
                 )}
               </div>
             )}
@@ -537,57 +527,37 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
         </section>
 
-        <StickyPanel label={book ? "Lines and game log" : "Game log"} className={book ? undefined : "hidden lg:block"}>
-          {book ? (
-            <>
-              <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-                <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
-                <span className="flex items-center gap-snug text-footnote text-muted-foreground">
-                  {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
-                  <span>Tap a row</span>
-                </span>
-              </div>
-              <Table className="table-fixed">
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
-                    <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
-                    <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
-                    <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
-                    <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {book.lines.map((l: any) => (
-                    <LadderRow key={l.line} line={l.line} summary={ladderSummary(l.line)}
-                      priced={pricedFromBooks(l.line, l.books)} selected={l.line === line} onPick={() => pickLine(l.line)} />
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          ) : null}
-          {/* Desktop: dense game log fills the rail under Lines. Phone keeps the Game log tab below. */}
-          <div className={cn("hidden flex-col gap-snug lg:flex", book && "border-t border-hairline")}>
-            <div className="flex items-baseline justify-between gap-snug px-gutter py-snug">
-              <h2 className="text-body font-emphasis">Game log</h2>
-              <span className="text-footnote text-muted-foreground">Tap a row</span>
+        {book && (
+          <StickyPanel label="Line ladder">
+            <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
+              <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
+              <span className="flex items-center gap-snug text-footnote text-muted-foreground">
+                {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
+                <span>Tap a row</span>
+              </span>
             </div>
-            <DataTable
-              columns={["Date", "Opponent", "Venue", res.statLabel, c?.auxLabel || "", "No."]}
-              rows={logs.slice(0, logCount).map((e) => [e.date, e.opp, e.venueName || "", logValue(e), e.aux ?? "–", e.pos ?? "–"])}
-              onRowClick={(i) => openLog(logs[i])}
-            />
-            {logs.length > logCount ? (
-              <div className="px-gutter pb-snug">
-                <Button variant="secondary" className="h-control w-full rounded-full" onClick={() => setLogCount(logCount + 30)}>Show more ({logs.length - logCount} left)</Button>
-              </div>
-            ) : null}
-          </div>
-        </StickyPanel>
+            <Table className="table-fixed">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {book.lines.map((l: any) => (
+                  <LadderRow key={l.line} line={l.line} summary={ladderSummary(l.line)}
+                    priced={pricedFromBooks(l.line, l.books)} selected={l.line === line} onPick={() => pickLine(l.line)} />
+                ))}
+              </TableBody>
+            </Table>
+          </StickyPanel>
+        )}
       </DetailSplit>
       )}
 
-      {tabItems.length > 0 && (
       <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
         <PillGroup segmented layoutId="pl-tab" label="Sections" value={tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0]} onChange={switchTab} items={tabItems} />
         <AnimatedHeight>
@@ -600,7 +570,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                 <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
               </div>
             )}
-            {tab === "logs" && phone && (
+            {tab === "logs" && (
               <>
                 <ul className={cn(TABLE_BLEED, "divide-y divide-hairline")}>
                   {logs.slice(0, logCount).map((e, i) => {
@@ -623,7 +593,6 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </motion.div>
         </AnimatedHeight>
       </div>
-      )}
 
       <Sheet open={!!game} onOpenChange={(o) => !o && setGame(null)}>
         <SheetContent side="bottom" className="z-[70] mx-auto max-w-xl rounded-t-2xl">

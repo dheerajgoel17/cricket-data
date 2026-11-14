@@ -31,7 +31,8 @@ export function OutcomeDonut({ slices, center, caption }: { slices: Slice[]; cen
 export function RateHeatStrip({ rows, title }: { rows: { label: string; pOver: number | null; n: number }[]; title: string }) {
   if (rows.length < 5) return null;
   return (
-    <div className="flex flex-col gap-tight" aria-label={title}>
+    <div className="flex flex-col gap-snug" aria-label={title}>
+      <p className="label-cap text-footnote text-muted-foreground">{title}</p>
       <div className="flex gap-hair overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {rows.map((r) => (
           <span key={r.label} title={`${r.label} ${r.pOver == null ? "–" : pc(r.pOver)} · ${r.n}`}
@@ -40,7 +41,6 @@ export function RateHeatStrip({ rows, title }: { rows: { label: string; pOver: n
           </span>
         ))}
       </div>
-      <p className="text-caption text-muted-foreground">{title}</p>
     </div>
   );
 }

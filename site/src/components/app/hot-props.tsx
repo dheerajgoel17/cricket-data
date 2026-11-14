@@ -23,6 +23,7 @@ import { arrangeFixtures, homeTeam } from "@/lib/priority";
 import { useFixtures } from "@/hooks/useEngine";
 import { useData } from "@/lib/data";
 import { EmptyState } from "./empty-state";
+import { StickyFilterBand } from "./page";
 import { EMPTY_PHASE } from "./home-phase-bar";
 import { byShard, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, norm, otherHotCount, pool, prioritizeHotGroups } from "@/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@/lib/home-phase";
@@ -71,8 +72,9 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const today = new Date().toDateString();
   const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
   const scopeKey = ["hot-props", scope] as const;
-  // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below)
-  const key = [...scopeKey, fixtures.isLoading, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null];
+  // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below).
+  // Do not put fixtures.isLoading in the key: flipping true→false used to open a new cache entry and flash HomePropsSkeleton on remount.
+  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null];
   const liveLines = useMemo(() => archive ? [] : hotLines((doc.data?.lines || []).filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, doc.data, teams, day]);
   const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   const rows = useQuery({
@@ -448,23 +450,41 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
           items={[["all", "All"], ...matchChips.map((f) => [f.id, <MatchChip key={f.id} f={f} />] as [string, ReactNode])]}
         />
       )}
-      <div className={cn("flex flex-col", urlState && "sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150")}>
-        {/* HomePhaseBar / Fancy shape: hairline chip row + Filters, prop pills under when sticky on /props. */}
-        <div className={cn("flex min-w-0 items-stretch gap-snug border-b border-hairline", urlState && "px-gutter")}>
-          <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-          </Button>
-        </div>
-        {active.length > 0 && (
-          <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", urlState ? "px-gutter pb-tight pt-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
-            {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
-            <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+      {urlState ? (
+        <StickyFilterBand>
+          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
+            <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              <AdjustmentsHorizontalIcon className="size-4" />Filters
+              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
+            </Button>
           </div>
-        )}
-      </div>
+          {active.length > 0 && (
+            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight pt-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+              {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
+              <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            </div>
+          )}
+        </StickyFilterBand>
+      ) : (
+        <div className="flex flex-col">
+          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline">
+            <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              <AdjustmentsHorizontalIcon className="size-4" />Filters
+              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
+            </Button>
+          </div>
+          {active.length > 0 && (
+            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+              {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
+              <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            </div>
+          )}
+        </div>
+      )}
       <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={sc} onApply={(s) => update({ ...s, stat: sc.stat === s.stat ? sc.stat : s.stat })} choices={choices} />
       <AnimatedHeight>
         {waiting ? <RowsSkeleton /> : !rows.length ? (

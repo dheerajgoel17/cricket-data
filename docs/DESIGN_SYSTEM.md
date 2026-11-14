@@ -41,8 +41,9 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | 404 | `EmptyState` in `App.tsx` | Catch-all `*` route |
 | Forms | `LiveForm`, `Field`, `Segmented` (`forms.tsx`) | Pair tool, contact-ish inputs, live filters |
 | Metric / stat tile | `Metric`, `StatTile`, `StatGridCards` | Glance figures on Player / Odds / ResultView |
-| Detail board | `DetailSplit`, `StickyPanel` | Player / Match Fancy / Ground chart + sticky Lines (and Player game log) rail at `lg+` |
-| Card directory | `CardGrid` | Fancy list, Ground matches, Competitions index — 1 → 2 (`md`) → 3 (`xl`) |
+| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Shared sticky chip/filter recipe. Flush header (`bg-card`) when the band leads the page (Player, Match Fancy detail, Fixture scorecard tabs). Without flush when a title/hero sits above (`/props`, Ground full page) |
+| Detail board | `DetailSplit`, `StickyPanel` | Player / Match Fancy / Ground chart + sticky Lines rail at `lg+` (game log stays in bottom tabs) |
+| Card directory | `CardGrid` | Fancy list — 1 → 2 (`md`) → 3 (`xl`) |
 | Chips / filters | `Chip`, `PillGroup`, `PillTabs`, `ScreenerFilters` | Format, scope, section tabs, screener; `PillTabs` = documented twin of `PillGroup` (taller control) |
 | Active filter chip | screener / ground filter dismissibles | Clearable “on” filters |
 | Dense stats table | `DataTable` (`bleed`, `TABLE_HEAD`) | Player Splits / When it hits / Research; ResultView |
@@ -69,7 +70,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- |
 | default (phone) | Single column, bottom tab bar, edge bleed on stats tables, sheets for filters |
 | `md` (768+) | Wider gutters; some two-column glances |
-| `lg` (1024+) | Sidebar nav; `DetailSplit` + `StickyPanel` (asymmetric chart \| rail); Fancy `CardGrid`; Fixture Form two teams; `lg:mx-0` ends table bleed |
+| `lg` (1024+) | Sidebar nav; `DetailSplit` + `StickyPanel` (asymmetric chart \| Lines rail); Fancy `CardGrid`; Fixture Form two teams; `lg:mx-0` ends table bleed |
 
 Details per surface: [Endpoint matrix (web)](#endpoint-matrix-web).
 
@@ -168,7 +169,7 @@ Full `App.tsx` route checklist:
 | Surface | Phone | `md` | `lg+` | Stats tables |
 | --- | --- | --- | --- | --- |
 | Home rail | Snap cards, tab bar | Same | Sidebar + rail; tape above full-width props | — |
-| Player stats | Bleed game-log list; section pills | Same | `DetailSplit` + sticky Lines + dense game-log `DataTable`; Splits tabs | `TABLE_HEAD` + bleed |
+| Player stats | Bleed game-log list; section pills | Same | `DetailSplit` + sticky Lines; Game log / Splits / When it hits tabs | `TABLE_HEAD` + bleed |
 | ResultView (`/pair`, team markets) | Bleed ladders / corr / log / splits | Same | Same | `TABLE_HEAD` + bleed |
 | Markets (competition) | Bleed overview / teams / results | Same | Same | `TABLE_HEAD` + bleed |
 | Simple (teams & venues) | Bleed directory table | Same | Same | `TABLE_HEAD` + bleed |

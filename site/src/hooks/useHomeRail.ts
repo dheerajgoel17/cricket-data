@@ -10,15 +10,15 @@ import { arrangeFixtures, homeTeam, rankFixtures } from "@/lib/priority";
 /** How long the rail waits for its published settings and for the first live scores before it paints with what it has (the viewer sees the skeleton meanwhile). */
 export const RAIL_WAIT_MS = 800, LIVE_WAIT_MS = 1200;
 
-/** False until `ms` after the first render, true after (a re-render then); never starts the timer when `done` already. */
+/** False until `ms` after the first render, true after (a re-render then); never starts the timer when `done` already. When `done` is already true on mount, start ready (remount / Back must not re-wait). */
 function useGaveUp(ms: number, done: boolean): boolean {
-  const [late, setLate] = useState(false);
+  const [late, setLate] = useState(done);
   useEffect(() => {
-    if (done) return;
+    if (done) { setLate(true); return; }
     const t = setTimeout(() => setLate(true), ms);
     return () => clearTimeout(t);
   }, [ms, done]);
-  return late;
+  return done || late;
 }
 
 /**

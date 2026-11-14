@@ -25,7 +25,7 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { StatsAd } from "@/components/app/stats-ad";
-import { DetailSplit, StickyPanel, TABLE_HEAD } from "@/components/app/page";
+import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { cn } from "@/lib/utils";
 import { GroundSkeleton } from "@/components/app/skeletons";
@@ -549,9 +549,13 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
       )}
 
       {atGround.length ? (
-        <div className={cn(!embedded && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
+        embedded ? (
           <GroundFilterBar fx={atGround} fmt={activeFmt} gender={gender} onFmt={setFmt} onGender={setGender} />
-        </div>
+        ) : (
+          <StickyFilterBand className="px-gutter py-tight">
+            <GroundFilterBar fx={atGround} fmt={activeFmt} gender={gender} onFmt={setFmt} onGender={setGender} />
+          </StickyFilterBand>
+        )
       ) : null}
 
       {/* Fancy rhythm: stats → Markets → collapsed Matches (not a long dump before prices). */}

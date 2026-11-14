@@ -41,7 +41,7 @@ import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
-import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { Input } from "@/components/ui/input";
 
@@ -174,7 +174,8 @@ export function FixturePage() {
   const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
-  if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
+  // Soft archive / books fetch: keep header + chrome when fx is already known from the cached schedule (Player → fixture). Full skeleton only on cold first load.
+  if (isLoading && !fx) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
       <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
@@ -208,9 +209,9 @@ export function FixturePage() {
       <MatchHeader f={fx} match={match} live={live} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
-          <div className="sticky top-header z-30 -mx-gutter bg-background/80 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150">
+          <StickyFilterBand className="px-gutter py-tight">
             <PillGroup layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
-          </div>
+          </StickyFilterBand>
           <div ref={bodyRef} className="scroll-mt-32">
           <AnimatedHeight>
             <AnimatePresence mode="wait" initial={false}>

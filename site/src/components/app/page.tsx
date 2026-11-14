@@ -57,7 +57,19 @@ export const StatGridCards = ({ children }: { children: ReactNode }) => (
   <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-stack">{children}</div>
 );
 
-/** Desktop detail board: chart / primary column + sticky side rail (Lines, game log). Phone stacks. */
+/**
+ * Sticky chip / filter band under the shell header (Player, Match Fancy detail, Props, Ground).
+ * Pair with `useHeaderFlush(true)` so the top bar uses `bg-card` and drops its hairline — one continuous surface.
+ */
+export function StickyFilterBand({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn("sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150", className)}>
+      {children}
+    </div>
+  );
+}
+
+/** Desktop detail board: chart / primary column + sticky Lines rail. Phone stacks. */
 export function DetailSplit({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-col gap-snug lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)] lg:items-start lg:gap-section", className)}>

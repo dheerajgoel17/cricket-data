@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { motion, useReducedMotion } from "motion/react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * - default / outlined: filled primary selected pill (parent filters)
  * - segmented: raised thumb in a track
  * - sub: quieter text row (underline on selected); put a hairline on the parent row (home phase bar), not on this group
- * Motion slide is instant under reduced motion. `layoutId` must be unique per group.
+ * Motion slide is instant under reduced motion and on first paint (a newly mounted row must not spring-fly in). `layoutId` must be unique per group.
  */
 export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName, segmented, sub, resetValue }: {
   items: [string, ReactNode][]; value: string; onChange: (v: string) => void; layoutId: string; label: string; className?: string; itemClassName?: string;
@@ -21,13 +21,20 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
   const outlined = resetValue != null;
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  // scroll the overflowing row only — scrollIntoView on the chip was dragging the page up to the chart
+  const seen = useRef<string | null>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => { setReady(true); }, []);
+  // scroll the overflowing row only — scrollIntoView on the chip was dragging the page up to the chart.
+  // First paint / newly mounted row (e.g. Test innings under format) snaps; only later value changes smooth-scroll.
   useEffect(() => {
     const root = ref.current, el = root?.querySelector<HTMLElement>('[data-state="on"]');
     if (!root || !el) return;
+    const first = seen.current === null;
+    seen.current = value;
     const r = el.getBoundingClientRect(), c = root.getBoundingClientRect();
-    root.scrollTo({ left: root.scrollLeft + (r.left - c.left) - (c.width - r.width) / 2, behavior: reduce ? "auto" : "smooth" });
+    root.scrollTo({ left: root.scrollLeft + (r.left - c.left) - (c.width - r.width) / 2, behavior: first || reduce ? "auto" : "smooth" });
   }, [value, reduce]);
+  const thumb = reduce || !ready ? { duration: 0 } : { type: "spring" as const, stiffness: 500, damping: 38 };
   return (
     <ToggleGroup ref={ref} type="single" value={value} onValueChange={(v) => { if (v) onChange(v); else if (resetValue != null && value !== resetValue) onChange(resetValue); }} variant="outline" spacing={segmented ? 0 : 2} aria-label={label}
       className={cn("justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
@@ -51,8 +58,8 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
                     : "h-control rounded-[var(--chip-radius)] border-0 bg-card px-3.5 text-callout hover:bg-card hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-primary-foreground data-[state=off]:text-foreground/80",
               itemClassName,
             )}>
-            {on && !sub && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 rounded-[var(--chip-radius)]", segmented ? "bg-secondary shadow-sm" : "bg-primary")} transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
-            {on && sub && <motion.span layoutId={layoutId} aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-primary" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 38 }} />}
+            {on && !sub && <motion.span layoutId={layoutId} aria-hidden className={cn("absolute inset-0 rounded-[var(--chip-radius)]", segmented ? "bg-secondary shadow-sm" : "bg-primary")} transition={thumb} />}
+            {on && sub && <motion.span layoutId={layoutId} aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-primary" transition={thumb} />}
             <span className="relative flex items-center gap-hair">{l}{clearable && <XMarkIcon className="size-3.5 shrink-0 opacity-70" aria-hidden />}</span>
           </ToggleGroupItem>
         );

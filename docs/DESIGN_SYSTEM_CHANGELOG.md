@@ -15,6 +15,31 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — PillGroup: snap mount; Player Test innings spacing
+- **Path:** `site/src/components/app/pill-group.tsx`, `site/src/pages/Player.tsx`
+- **Change:** Newly mounted pill rows no longer spring-fly the selection thumb or smooth-scroll on first paint (Test innings under format felt random). Innings chips sit inside the format hairline block with one `pb-tight` (not a third padded band); prop pills keep a single `py-tight` below.
+- **Callers:** All `PillGroup` surfaces; Player Test batting filter band
+
+### 2026-11-14 — Player Test: keep format chips when innings scope shows
+- **Path:** `site/src/pages/Player.tsx`
+- **Change:** Test batting innings chips (Both / 1st / 2nd) shared the format row and squeezed T20/ODI/Test/Hundred away. Format + Filters stay the parent row; innings are filled pills on their own row under it (Fancy market-under-scope shape), then prop pills.
+- **Callers:** Player sticky filter band on Test batting stats
+
+### 2026-11-14 — ChartBars width: match Fancy ValueBars flex-1 row
+- **Path:** `site/src/components/app/chart.tsx`, `mini-bars.tsx` (`ValueBars`)
+- **Change:** Player chart left shift / “missing” first bar — y-axis `0`/`9` ticks (grid column, then overlay) sat on the oldest bar. Removed axis ticks entirely (Fancy `ValueBars` has none). Full-width in-flow `flex-1` / `gap-tight` bars; dashed line + value on the right only. No Motion `scaleY`.
+- **Callers:** Player, Match Fancy detail, ResultView, design-system ChartBars stage
+
+### 2026-11-14 — StickyFilterBand + flush header; Game log stays in tabs
+- **Path:** `site/src/components/app/page.tsx` (`StickyFilterBand`), `lib/header-slot.tsx` (`useHeaderFlush`), `DesignSystem.tsx`, docs
+- **Change:** Central sticky chip/filter band (`bg-background/85` blur under header). Pair with `useHeaderFlush(true)` when the band leads the page so the shell header uses `bg-card` and drops its hairline (Player, Match Fancy detail, Fixture tabs). `/props` and Ground full page use the band without flush (title/hero above). Catalogue stage under Data & metrics. Player desktop Game log reverted out of `StickyPanel` — stays in bottom tabs at every breakpoint; rail is Lines only.
+- **Callers:** Player, Match Fancy detail, Props screener, Ground `/fixture/:id/ground` + `/venue/:id`, Fixture chips
+
+### 2026-11-14 — Player polish: crumbs pad, zero bars, O/U blocks, splits bleed
+- **Path:** `Player.tsx`, `chart.tsx`, `viz.tsx`, `result.tsx`, `match-fancy.tsx`
+- **Change:** Desktop crumbs `pt-stack` under flush; ChartBars zeros as visible miss bars; void/XI status centered; O/U meters in ground-style hairline blocks (Player + Match Fancy); RateHeatStrip `label-cap` above cells; SplitTables accordion pulls to edges so TABLE_BLEED dividers reach the gutter; Loaded uses `gap-section` / `gap-stack`.
+- **Callers:** Player, Match Fancy detail, Splits / ResultView heat strip
+
 ### 2026-11-14 — Narrow DetailSplit callers (revert Home / Competitions / Ground matches grids)
 - **Path:** `hot-home.tsx`, `Markets.tsx`, `fixture-ground.tsx`, docs
 - **Change:** Reverted Home tape\|props 2-col (left Props half-width when tape empty), Competitions `CardGrid` of link rows, and Ground matches `CardGrid` of FixtureCards — those broke density rather than helping. `DetailSplit` / `StickyPanel` stay on Player, Match Fancy, Ground markets; `CardGrid` stays on Fancy list + catalogue.

@@ -50,7 +50,7 @@ function AppSidebar() {
   );
 }
 
-/** Page chrome: header, left rail (>= lg), bottom tab bar (phones and tablets), animated route outlet. */
+/** Page chrome: header, left rail (>= lg), bottom tab bar (phones and tablets), stable outlet (no pathname remount). */
 export function Shell() {
   const { pathname, key } = useLocation();
   const action = useNavigationType();
@@ -100,8 +100,8 @@ export function Shell() {
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset id="main" tabIndex={-1} className="min-w-0 overflow-x-clip bg-transparent">
-          {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
-          <div key={pathname} ref={content} className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
+          {/* No key={pathname}: remounting the outlet on every route flashed PageSkeleton / rail skeletons even when feeds were cached (Player → Fixture / Home). Scroll restore stays on pathname below. */}
+          <div ref={content} className="mx-auto w-full min-w-0 max-w-(--content-max) px-gutter pb-section pt-stack has-[[data-flush]]:pt-0">
             <Suspense fallback={<PageSkeleton />}><Outlet /></Suspense>
           </div>
         </SidebarInset>

@@ -20,14 +20,14 @@ import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
-import { DetailSplit, StickyPanel, TABLE_HEAD } from "./page";
+import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "./page";
 import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { useLinesLive } from "@/hooks/useLinesLive";
-import { HeaderActions } from "@/lib/header-slot";
+import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
 import { abbr, fixtureStart, num, odds, pc, shortVenue } from "@/lib/format";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
@@ -163,6 +163,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const lines = useLinesLive();
   const doc = { data: given ?? lines.data, isLoading: lines.isLoading }; // the fixture page passes the book doc with the archive added when the live file has let the match go
   const [filtersOpen, setFiltersOpen] = useState(false);
+  useHeaderFlush(mode === "detail");
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => FANCY_INNS.some((inn) => booked(k, teamName, inn)));
@@ -307,37 +308,59 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         </HeaderActions>
       )}
       {mode === "detail" && (
-        <div className="hidden px-gutter lg:block">
+        <div className="hidden pt-stack lg:block">
           <Crumbs items={[[`${abbr(fx.a)} v ${abbr(fx.b)}`, matchPath], ["Match Fancy", fancyListPath], [key ? marketLabel(key) : "Market"]]} />
         </div>
       )}
       {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
-      <div className={cn("flex flex-col", mode === "detail" ? "sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150" : "gap-snug")}>
-        {/* HomePhaseBar shape: edge-to-edge hairline, scope tabs + L10 on one row, market pills under. */}
-        <div className={cn("flex min-w-0 items-stretch gap-snug border-b border-hairline", mode === "detail" && "px-gutter")}>
-          {scopes.length > 1 ? (
-            <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
-              className="min-w-0 flex-1"
-              items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
-          ) : <span className="min-w-0 flex-1" />}
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />L{win}
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-          </Button>
+      {mode === "detail" ? (
+        <StickyFilterBand>
+          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
+            {scopes.length > 1 ? (
+              <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
+                className="min-w-0 flex-1"
+                items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
+            ) : <span className="min-w-0 flex-1" />}
+            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              <AdjustmentsHorizontalIcon className="size-4" />L{win}
+              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+            </Button>
+          </div>
+          {keyList.length > 1 && (
+            <div className="px-gutter py-tight">
+              <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
+            </div>
+          )}
+          {activeFilters.length > 0 && (
+            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+              {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
+              <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            </div>
+          )}
+        </StickyFilterBand>
+      ) : (
+        <div className="flex flex-col gap-snug">
+          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline">
+            {scopes.length > 1 ? (
+              <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
+                className="min-w-0 flex-1"
+                items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
+            ) : <span className="min-w-0 flex-1" />}
+            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              <AdjustmentsHorizontalIcon className="size-4" />L{win}
+              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+            </Button>
+          </div>
+          {activeFilters.length > 0 && (
+            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+              {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
+              <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            </div>
+          )}
         </div>
-        {mode === "detail" && keyList.length > 1 && (
-          <div className="px-gutter py-tight">
-            <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
-          </div>
-        )}
-        {activeFilters.length > 0 && (
-          <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", mode === "detail" ? "px-gutter pb-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
-            {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
-            <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-          </div>
-        )}
-      </div>
+      )}
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
@@ -423,14 +446,14 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                             </Button>
                           )}
                         </div>
-                        {/* Hit rates for the meter line; book Over/Under are independent lanes (often different books or lines on Fancy). */}
-                        <div className="grid gap-snug border-t border-hairline pt-snug">
-                          <div className="grid min-w-0 grid-cols-2 gap-snug">
+                        {/* Ground-style bordered blocks: hit rates, then independent Over / Under book lanes. */}
+                        <div className="overflow-hidden border border-hairline">
+                          <div className="grid min-w-0 grid-cols-2 divide-x divide-hairline">
                             {(["over", "under"] as const).map((side) => {
                               const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
                               return (
-                                <div key={side} className="flex min-w-0 flex-col gap-tight">
-                                  <div className="text-footnote font-label capitalize text-muted-foreground">{side} {line}</div>
+                                <div key={side} className="flex min-w-0 flex-col gap-tight px-snug py-snug">
+                                  <div className="label-cap text-caption text-muted-foreground">{side} {line}</div>
                                   <AnimatedNumber className={cn("text-title font-emphasis tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                                   <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} /></div>
                                   <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
@@ -438,8 +461,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                             })}
                           </div>
                           {(head.over || head.under) && (
-                            <div className="grid gap-tight border-t border-hairline pt-snug" aria-label="Book prices">
-                              <div className="grid grid-cols-2 gap-snug">
+                            <div className="border-t border-hairline" aria-label="Book prices">
+                              <div className="grid grid-cols-2 divide-x divide-hairline">
                                 {([
                                   ["over", head.over, overFace] as const,
                                   ["under", head.under, underFace] as const,
@@ -461,18 +484,20 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                   );
                                   return jump ? (
                                     <button key={side} type="button" onClick={() => set({ ml: lane!.line })} aria-label={`Use ${side} line ${lane!.line}`}
-                                      className="rounded-sm text-left outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring">
+                                      className="px-snug py-snug text-left outline-none hover:bg-secondary/20 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset">
                                       {body}
                                     </button>
-                                  ) : <div key={side} className="text-left">{body}</div>;
+                                  ) : <div key={side} className="px-snug py-snug text-left">{body}</div>;
                                 })}
                               </div>
-                              {splitNote && <p className="text-footnote text-muted-foreground">{splitNote}</p>}
+                              {splitNote && <p className="border-t border-hairline px-snug py-tight text-footnote text-muted-foreground">{splitNote}</p>}
                               {bookHere && (
-                                <BookTable books={bookHere.books} shown={[
-                                  bookHere.over != null ? bookHere.books.find((x) => x.over === bookHere.over)?.source : undefined,
-                                  bookHere.under != null ? bookHere.books.find((x) => x.under === bookHere.under)?.source : undefined,
-                                ]} />
+                                <div className="border-t border-hairline px-snug py-snug">
+                                  <BookTable books={bookHere.books} shown={[
+                                    bookHere.over != null ? bookHere.books.find((x) => x.over === bookHere.over)?.source : undefined,
+                                    bookHere.under != null ? bookHere.books.find((x) => x.under === bookHere.under)?.source : undefined,
+                                  ]} />
+                                </div>
                               )}
                             </div>
                           )}
