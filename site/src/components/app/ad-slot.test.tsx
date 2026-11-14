@@ -2,6 +2,7 @@ import { render, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { markAdEmpty } from "@/lib/ad-fill";
 import { AdSlot } from "./ad-slot";
 
 const manual = vi.hoisted(() => ({ fetch: vi.fn(), url: vi.fn() }));
@@ -10,7 +11,7 @@ vi.mock("@/lib/manual-ads", () => ({
   creativePublicUrl: (...a: unknown[]) => manual.url(...a),
 }));
 
-const wrap = (path: string, slotId: "fancy_detail_top" | "stats_top" = "fancy_detail_top", adsenseSlot = "1234567890") => {
+const wrap = (path: string, slotId: "fancy_detail_top" | "stats_top" | "player_detail_top" = "fancy_detail_top", adsenseSlot = "1234567890") => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={qc}>
@@ -24,9 +25,13 @@ const wrap = (path: string, slotId: "fancy_detail_top" | "stats_top" = "fancy_de
 beforeEach(() => {
   manual.fetch.mockReset();
   manual.url.mockReset();
+  sessionStorage.clear();
   delete (window as unknown as { adsbygoogle?: unknown }).adsbygoogle;
 });
-afterEach(() => { delete (window as unknown as { adsbygoogle?: unknown }).adsbygoogle; });
+afterEach(() => {
+  sessionStorage.clear();
+  delete (window as unknown as { adsbygoogle?: unknown }).adsbygoogle;
+});
 
 test("manual creative overrides AdSense (image link, no ins)", async () => {
   manual.fetch.mockResolvedValue({
@@ -41,11 +46,27 @@ test("manual creative overrides AdSense (image link, no ins)", async () => {
   expect((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle).toBeUndefined();
 });
 
-test("no manual on allowlisted path mounts AdSense push", async () => {
+test("pending AdSense takes no layout chrome (no border strip)", async () => {
   manual.fetch.mockResolvedValue(null);
   const { container } = wrap("/fixture/2026-11-11-a-v-b/fancy");
   await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
+  const aside = container.querySelector("aside")!;
+  expect(aside.getAttribute("data-ad-fill")).toBe("pending");
+  expect(aside.className).toMatch(/opacity-0/);
+  expect(aside.className).not.toMatch(/border-b/);
   expect((window as unknown as { adsbygoogle: unknown[] }).adsbygoogle).toHaveLength(1);
+});
+
+test("filled AdSense shows the strip chrome", async () => {
+  manual.fetch.mockResolvedValue(null);
+  const { container } = wrap("/leagues", "stats_top");
+  await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
+  const ins = container.querySelector("ins.adsbygoogle")!;
+  ins.setAttribute("data-ad-status", "filled");
+  await waitFor(() => expect(container.querySelector("aside")?.getAttribute("data-ad-fill")).toBe("filled"));
+  const aside = container.querySelector("aside")!;
+  expect(aside.className).toMatch(/border-b/);
+  expect(aside.className).not.toMatch(/opacity-0/);
 });
 
 test("unfilled AdSense collapses to nothing", async () => {
@@ -55,6 +76,16 @@ test("unfilled AdSense collapses to nothing", async () => {
   const ins = container.querySelector("ins.adsbygoogle")!;
   ins.setAttribute("data-ad-status", "unfilled");
   await waitFor(() => expect(container.querySelector("aside")).toBeNull());
+});
+
+test("session-empty short-circuits AdSense remount", async () => {
+  markAdEmpty("stats_top", "1234567890");
+  manual.fetch.mockResolvedValue(null);
+  const { container } = wrap("/leagues", "stats_top");
+  await waitFor(() => expect(manual.fetch).toHaveBeenCalled());
+  expect(container.querySelector("ins.adsbygoogle")).toBeNull();
+  expect(container.querySelector("aside")).toBeNull();
+  expect((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle).toBeUndefined();
 });
 
 test("empty AdSense slot id draws nothing when no manual", async () => {

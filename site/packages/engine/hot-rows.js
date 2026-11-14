@@ -22,6 +22,39 @@ export const isLiveLine = (l) => !!l.books?.some((x) => x.live);
 /** One row per player, stat, match, innings scope and kind of line (pre-match or live): the key a scored row is kept under. */
 export const lineKey = (l) => `${l.pid}|${l.stat}|${l.fmt}|${matchChipId(l.match, l.start_utc, l.fmt)}|${lineScope(l)}|${isLiveLine(l) ? "live" : ""}`;
 
+/** Same identity as `lineKey`, from a scored row (`start` not `start_utc`; live from its quotes). */
+export const rowLineKey = (r) => `${r.pid}|${r.stat}|${r.fmt}|${matchChipId(r.match, r.start, r.fmt)}|${r.inn || 0}|${r.quotes?.some((q) => q.live) ? "live" : ""}`;
+
+/** Pre-match book lines only (history scoring for these is stable across the ~15 s in-play poll). */
+export const prematchLines = (lines) => (lines || []).filter((l) => !isLiveLine(l));
+
+/** Live-priced lines that have no scored row yet (a new batter line that appeared in-play). */
+export function missingLiveLines(rows, lines) {
+  const have = new Set((rows || []).map(rowLineKey));
+  return (lines || []).filter((l) => isLiveLine(l) && !have.has(lineKey(l)));
+}
+
+/**
+ * Refresh prices / the main line on scored rows from the current books+live doc without re-running history.
+ * Live polls move quotes every ~15 s; hit rates stay put.
+ */
+export function patchHotQuotes(rows, lines, now = Date.now()) {
+  if (!rows?.length) return rows || [];
+  if (!lines?.length) return rows;
+  const byKey = new Map((lines || []).map((l) => [lineKey(l), l]));
+  const byChip = groupByChip(lines);
+  return rows.map((r) => {
+    const l = byKey.get(rowLineKey(r));
+    if (!l) return r;
+    const b = booksOf(l, byChip, now);
+    if (!b) return r;
+    const main = b.main;
+    const over = Math.max(...main.books.map((x) => x.over || 0));
+    const under = Math.max(...main.books.map((x) => x.under || 0));
+    return { ...r, line: main.line, over, under, quotes: bookQuotes(b.lines), prior: main.prob ?? null, stored: l.result ?? r.stored };
+  });
+}
+
 /** The lines of a doc grouped by match chip, for `bookLinesFor` (a line is priced against the books of its own match only). */
 export function groupByChip(lines) {
   const by = new Map();

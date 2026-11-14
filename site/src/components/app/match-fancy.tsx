@@ -20,6 +20,7 @@ import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
+import { TABLE_HEAD } from "./page";
 import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -41,7 +42,8 @@ import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
 import { AdSlot } from "./ad-slot";
-import { Crumbs, EmptyNote } from "./page";
+import { Crumbs } from "./page";
+import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
@@ -339,10 +341,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
-      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
+      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
           {mode === "list" && overview.length === 0 && liveList.length === 0 && (
-            <EmptyNote title="No bookmaker lines">No priced fancy markets for this scope yet.</EmptyNote>)}
+            <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <ul className="-mx-gutter">
@@ -430,7 +432,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 <div key={side} className="flex min-w-0 flex-col gap-tight">
                                   <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
                                   <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
-                                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
+                                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} /></div>
                                   <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
                                 </div>);
                             })}
@@ -487,11 +489,11 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                         <Table className="table-fixed">
                           <TableHeader>
                             <TableRow className="hover:bg-transparent">
-                              <TableHead className="h-auto w-[3rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
-                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
-                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
-                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit O</TableHead>
-                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit U</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -524,7 +526,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
       <ul>
         {t.rows.map((r: any, i: number) => (
           <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
-            <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
+            <motion.span aria-hidden className="absolute inset-y-0 left-0 origin-left bg-primary/10" style={{ width: `${(r.pSole / max) * 100}%` }} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
             <Item asChild size="sm" className="relative rounded-none border-0 px-inset py-snug transition-colors active:bg-accent">
               <Link to={`/player/${r.player}`}>
                 <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>

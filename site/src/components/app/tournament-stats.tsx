@@ -17,7 +17,7 @@ import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { PlayerName } from "./player-name";
 import { PlayerAvatar } from "./portrait";
-import { ListSkeleton } from "./skeletons";
+import { LeagueSkeleton } from "./skeletons";
 
 const SHOWN = 5;
 const SPACE = " ", DASH = `${SPACE}–${SPACE}`;
@@ -29,7 +29,9 @@ type Board = { id: string; title: string; head: string; cols: string[]; rows: Ro
 type Leader = { id: string; label: string; head: string; cols: string[]; row: Row };
 
 const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
-const HEAD = "label-cap text-caption font-normal text-muted-foreground";
+/** Denser league-board header (caption). Props/research tables use `TABLE_HEAD` (footnote) instead. */
+export const BOARD_HEAD = "label-cap text-caption font-normal text-muted-foreground";
+const HEAD = BOARD_HEAD;
 
 /** A small "i" that opens a few words of explanation, so the page itself carries none. */
 function Info({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
@@ -120,7 +122,7 @@ function Loading({ done, total }: { done: number; total: number }) {
           <div className="h-full rounded-full bg-primary transition-[width] duration-200" style={{ width: `${total ? (100 * done) / total : 0}%` }} />
         </div>
       </div>
-      <ListSkeleton rows={5} />
+      <LeagueSkeleton />
     </div>
   );
 }

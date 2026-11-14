@@ -10,7 +10,10 @@
     "backgroundColor": "#000000",
     "ios": {
       "bundleIdentifier": "cash.fancy.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CADisableMinimumFrameDurationOnPhone": true
+      }
     },
     "android": {
       "package": "cash.fancy.app",

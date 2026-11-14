@@ -10,7 +10,8 @@ import { odds, pc, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { heatClass, heatStep } from "@/lib/heat";
 import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
-import { EmptyNote, Muted } from "./page";
+import { Muted } from "./page";
+import { EmptyState } from "./empty-state";
 import { MiniBars } from "./mini-bars";
 
 /** Players down, the team's last fixtures across. A cell is the stat value; colour is a heat step from how far it sits from the line. */
@@ -54,7 +55,7 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
   }
   items.sort((a, b) => b.rate - a.rate || b.vals.length - a.vals.length);
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
-  if (!list.length) return <EmptyNote title="No one clears that bar">Lower the hit-rate filter or the line to see more players.</EmptyNote>;
+  if (!list.length) return <EmptyState title="No one clears that bar" body="Lower the hit-rate filter or the line to see more players." />;
   const label = (STATS as any)[stat].label;
   return (
     <ul className="-mx-4 sm:mx-0">

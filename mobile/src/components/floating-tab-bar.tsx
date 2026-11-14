@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { router, usePathname } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,25 +11,20 @@ import { Text } from "@/ui/text";
 import { color, font, TAB_BAR_HEIGHT, type } from "@/ui/tokens";
 
 const PAD = 4, GAP = 2;
+// Tabs are tens/day: no bounce. A short ease-out glide matches iOS selection without feeling delayed.
+const THUMB = { duration: 180, easing: Easing.bezier(0.23, 1, 0.32, 1) };
 
-/** One tab: icon over label; chosen tab tinted, icon pops. */
+/** One tab: icon over label; chosen tab tinted. Press scale only — no icon bounce on select. */
 function TabButton({ t, on }: { t: (typeof TABS)[number]; on: boolean }) {
-  const k = useSharedValue(1);
-  const first = useSharedValue(true);
-  const icon = useAnimatedStyle(() => ({ transform: [{ scale: k.value }] }));
-  useEffect(() => {
-    if (first.value) { first.value = false; return; }
-    if (on) k.value = withSequence(withTiming(0.82, { duration: 70 }), withSpring(1.12, { damping: 7, stiffness: 420 }), withSpring(1, { damping: 12 }));
-  }, [on, k, first]);
   return (
     <Press
-      scale={0.94}
+      scale={0.97}
       accessibilityRole="tab"
       accessibilityLabel={t.label}
       accessibilityState={{ selected: on }}
       onPress={() => { if (!on) { void Haptics.selectionAsync(); router.navigate(t.href as never); } }}
       style={styles.tab}>
-      <Animated.View style={icon}><Ionicons name={on ? t.on : t.icon} size={24} color={on ? color.primary : color["muted-foreground"]} /></Animated.View>
+      <Ionicons name={on ? t.on : t.icon} size={24} color={on ? color.primary : color["muted-foreground"]} />
       <Text style={[styles.label, { color: on ? color.primary : color["muted-foreground"] }]} numberOfLines={1}>{t.label}</Text>
     </Press>
   );
@@ -47,7 +42,7 @@ export function FloatingTabBar() {
   const [w, setW] = useState(0);
   const tabW = w ? (w - PAD * 2 - GAP * (TABS.length - 1)) / TABS.length : 0;
   const x = useSharedValue(index);
-  useEffect(() => { x.value = withSpring(index, { damping: 18, stiffness: 260, mass: 0.85 }); }, [index, x]);
+  useEffect(() => { x.value = withTiming(index, THUMB); }, [index, x]);
   const glide = useAnimatedStyle(() => ({ transform: [{ translateX: x.value * (tabW + GAP) }] }));
   return (
     <View style={[styles.bar, { bottom: insets.bottom + 12, left: width < 360 ? 8 : 16, right: width < 360 ? 8 : 16 }]} pointerEvents="box-none">

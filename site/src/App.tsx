@@ -5,8 +5,20 @@ import { syncAds } from "@/lib/ads";
 import { AppSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
+import { EmptyState } from "@/components/app/empty-state";
+import { Button } from "@/components/ui/button";
 import { useData } from "@/lib/data";
 import { initGa, track, trackPage } from "@/lib/ga";
+
+function NotFoundPage() {
+  return (
+    <EmptyState
+      title="Page not found"
+      body="This address may have changed."
+      action={<Button asChild variant="secondary" className="h-control rounded-full"><Link to="/">Back to fixtures</Link></Button>}
+    />
+  );
+}
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
 
@@ -23,6 +35,7 @@ const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: ()
 const VenuePage = lazy(() => import("@/components/app/fixture-ground").then((m) => ({ default: m.VenueGroundPage })));
 const ContactPage = page(() => import("@/pages/Contact"), "ContactPage");
 const AdminAdsPage = page(() => import("@/pages/AdminAds"), "AdminAdsPage");
+const DesignSystemPage = page(() => import("@/pages/DesignSystem"), "DesignSystemPage");
 
 /** Old links used hash routes (#/player/12?stat=runs): send them to the same path. */
 function LegacyHash() {
@@ -59,6 +72,7 @@ export function App() {
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<HomePage />} />
+            <Route path="design-system" element={<DesignSystemPage />} />
             <Route element={<HistoryGate />}>
             <Route path="fixtures" element={<Navigate to="/" replace />} />
             <Route path="fixture/*" element={<FixturePage />} />
@@ -90,13 +104,7 @@ export function App() {
             <Route path="docs" element={<DisclaimerPage />} />
             <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
             <Route path="responsible" element={<Navigate to="/docs" replace />} />
-            <Route path="*" element={
-              <section className="flex flex-col items-start gap-snug">
-                <h1 className="text-title font-bold">Page not found</h1>
-                <p className="text-muted-foreground">This address may have changed.</p>
-                <Link to="/" className="text-primary underline underline-offset-4">Back to fixtures</Link>
-              </section>
-            } />
+            <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>
         </Routes>

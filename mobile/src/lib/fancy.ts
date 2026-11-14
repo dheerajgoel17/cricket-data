@@ -8,7 +8,7 @@ import { fancyStanding } from "@cricket/engine/live.js";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { span, timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
-import { liveQuery } from "@/lib/queries";
+import { FEED_GC_MS, liveQuery } from "@/lib/queries";
 import { useLinesLive } from "@/lib/use-lines-live";
 import { fixtureStart, liveMatchFor } from "@/lib/rail";
 import { useRail } from "@/lib/use-rail";
@@ -29,9 +29,12 @@ export function useFancyCards(enabled = true) {
   const fixtures = useMemo(() => items.filter((i) => !i.noProps && i.state !== "final" && fixtureBooks(lines.data, i.fixture).fancy).map((i) => i.fixture), [items, lines.data]);
   const ids = fixtures.map(idOf).join("|");
   const q = useQuery({
-    queryKey: ["fancy-cards", lines.data?.generated_at_utc ?? "", lines.data?.live_sig ?? "", ids],
+    // books generation + which matches — not live_sig (so-far is overlaid below from the 15 s poll)
+    queryKey: ["fancy-cards", lines.data?.generated_at_utc ?? "", ids],
     enabled: enabled && !!store && railReady && !!lines.data,
     staleTime: 10 * 60_000,
+    gcTime: FEED_GC_MS,
+    placeholderData: (prev: FancyCard[] | undefined) => prev,
     queryFn: async (): Promise<FancyCard[]> => {
       const out: FancyCard[] = [];
       for (const f of fixtures) {

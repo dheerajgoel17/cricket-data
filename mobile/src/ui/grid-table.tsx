@@ -12,12 +12,15 @@ import { heatStep } from "@site/lib/heat";
 import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
 import { storeQuery } from "@/lib/data";
+import { ActiveChip, ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
+import { EmptyState } from "@/ui/empty-state";
+import { Bleed } from "@/ui/bleed";
 import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, control, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tonal, tint } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -28,7 +31,7 @@ const DEFAULT_HIT = 0.6;
 
 /** A stat value on a tint that says how far it sits from the line: +2 comfortably over, +1 over, 0 on the line, -1 under, -2 well under. */
 const HEAT = {
-  2: ["rgba(39,218,142,0.45)", color.primary], 1: ["rgba(39,218,142,0.2)", color.primary], 0: ["rgba(245,165,36,0.25)", color.amber], [-1]: ["rgba(255,0,0,0.2)", color.miss], [-2]: ["rgba(255,0,0,0.45)", color.miss],
+  2: [tint.primary(0.45), color.primary], 1: [tint.primary(0.2), color.primary], 0: [tint.amber(0.25), color.amber], [-1]: [tint.miss(0.2), color.miss], [-2]: [tint.miss(0.45), color.miss],
 } as Record<number, [string, string]>;
 
 /** Stat chips + Filters button (Props / Fancy pattern) for Grid and Custom line. Line, games window and (on Custom line) the hit-rate floor sit in a sheet. */
@@ -54,9 +57,9 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
       </View>
       {activeN > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
-          {line !== DEFAULT_LINE ? <Press scale={1} onPress={() => onLine(DEFAULT_LINE)} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Line O {line}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
-          {games !== DEFAULT_GAMES ? <Press scale={1} onPress={() => onGames(DEFAULT_GAMES)} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Window L{games}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
-          {withHit && hit !== DEFAULT_HIT ? <Press scale={1} onPress={() => onHit!(DEFAULT_HIT)} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Hit {HITS.find(([v]) => v === hit)?.[1] ?? hit}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
+          {line !== DEFAULT_LINE ? <ActiveChip label={`Line O ${line}`} onClear={() => onLine(DEFAULT_LINE)} /> : null}
+          {games !== DEFAULT_GAMES ? <ActiveChip label={`Window L${games}`} onClear={() => onGames(DEFAULT_GAMES)} /> : null}
+          {withHit && hit !== DEFAULT_HIT ? <ActiveChip label={`Hit ${HITS.find(([v]) => v === hit)?.[1] ?? hit}`} onClear={() => onHit!(DEFAULT_HIT)} /> : null}
           <Press scale={1} onPress={() => { onLine(DEFAULT_LINE); onGames(DEFAULT_GAMES); if (withHit) onHit!(DEFAULT_HIT); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
         </ScrollView>
       ) : null}
@@ -70,19 +73,11 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
           <Text style={styles.sheetSec}>Custom line</Text>
           <LineStepper value={draftLine} label="O" min={0} onStep={(d) => setDraftLine(Math.max(0, Math.round((draftLine + d) * 2) / 2))} />
           <Text style={styles.sheetSec}>Hit-rate window</Text>
-          <View style={styles.sheetChips}>{GAMES.map((n) => (
-            <Press key={n} scale={1} onPress={() => setDraftGames(n)} accessibilityRole="button" style={[styles.sheetChip, draftGames === n && styles.sheetChipOn]}>
-              <Text style={[styles.sheetChipTxt, draftGames === n && styles.sheetChipTxtOn]}>L{n}</Text>
-            </Press>
-          ))}</View>
+          <ChoiceRow>{GAMES.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftGames === n} onPress={() => setDraftGames(n)} />)}</ChoiceRow>
           {withHit ? (
             <>
               <Text style={styles.sheetSec}>Minimum hit rate</Text>
-              <View style={styles.sheetChips}>{HITS.map(([v, l]) => (
-                <Press key={v} scale={1} onPress={() => setDraftHit(v)} accessibilityRole="button" style={[styles.sheetChip, draftHit === v && styles.sheetChipOn]}>
-                  <Text style={[styles.sheetChipTxt, draftHit === v && styles.sheetChipTxtOn]}>{l}</Text>
-                </Press>
-              ))}</View>
+              <ChoiceRow>{HITS.map(([v, l]) => <ChoiceChip key={v} label={l} on={draftHit === v} onPress={() => setDraftHit(v)} />)}</ChoiceRow>
             </>
           ) : null}
           <View style={styles.sheetFoot}>
@@ -101,8 +96,8 @@ const NAME_W = 132, HIT_W = 44, CELL_W = 46, ROW_H = 46;
 export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line: number }) {
   const stats = useQuery(storeQuery);
   const store: any = stats.data?.store;
-  if (!store) return null;
-  if (!g.fx.length) return <Text style={styles.note}>No fixtures for this format.</Text>;
+  if (!store) return <EmptyState compact title="Could not load grid" body="Pull to retry once the stats data is ready." />;
+  if (!g.fx.length) return <EmptyState compact title="No fixtures" body="No fixtures for this format." />;
   const M = store.M;
   return (
     <View style={styles.table}>
@@ -154,7 +149,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
 export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; team: number }[]; line: number; minHit: number; stat: string }) {
   const stats = useQuery(storeQuery);
   const store: any = stats.data?.store;
-  if (!store) return null;
+  if (!store) return <EmptyState compact title="Could not load trends" body="Pull to retry once the stats data is ready." />;
   const items: any[] = [];
   for (const { g, team } of grids) for (const r of g.body) {
     const played = g.fx.filter((m) => r.map.has(m));
@@ -165,10 +160,10 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
   }
   items.sort((a, b) => b.rate - a.rate || b.vals.length - a.vals.length);
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
-  if (!list.length) return <Text style={styles.note}>No player clears that hit rate in the last games. Lower the hit-rate filter or line.</Text>;
+  if (!list.length) return <EmptyState compact title="No clears at this hit rate" body="Lower the hit-rate filter or line." />;
   const label = (STATS as any)[stat].label;
   return (
-    <View style={styles.bleed}>
+    <Bleed style={{ paddingHorizontal: 0 }}>
       {list.map((i, n) => (
         <Press scale={1} key={`${i.p}-${i.team}`} onPress={() => push(`/player/${i.p}`)} accessibilityRole="button" style={({ pressed }) => [styles.trend, n > 0 && styles.sep, pressed && { backgroundColor: color.card }]}>
           <PlayerAvatar pid={store.P.id[i.p]} team={store.teamName(i.team)} size={44} />
@@ -183,7 +178,7 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
           <MiniBars last={i.vals.slice(-10).map((v: number) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" }))} line={line} />
         </Press>
       ))}
-    </View>
+    </Bleed>
   );
 }
 
@@ -196,37 +191,28 @@ const styles = StyleSheet.create({
   filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
   filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
-  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingLeft: space.snug, paddingRight: space.tight, borderRadius: radius.chip, backgroundColor: "rgba(39,218,142,0.15)" },
-  activeChipTxt: { ...type.callout, color: color.primary },
   clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.55)" },
+  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: tint.black(0.55) },
   sheet: { marginTop: "auto", backgroundColor: color.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.snug },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
   sheetTitle: { ...type.title, color: color.foreground },
   sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
-  sheetChips: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
-  sheetChip: { height: control, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, alignItems: "center", justifyContent: "center" },
-  sheetChipOn: { backgroundColor: color.foreground },
-  sheetChipTxt: { ...type.callout, color: color.foreground },
-  sheetChipTxtOn: { color: color.background },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
   sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   sheetClearTxt: { ...type.body, color: color.foreground },
   sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
   sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
   round: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
-  bleed: { marginHorizontal: -space.gutter },
-  note: { ...type.footnote, color: color["muted-foreground"] },
   table: { flexDirection: "row", ...tonal, borderRadius: radius.card, overflow: "hidden" },
   cell: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingHorizontal: space.tight },
   rowStart: { height: ROW_H, flexDirection: "row", alignItems: "center" },
-  th: { ...type.caption, ...cap, color: color["muted-foreground"] },
+  th: { ...type.footnote, ...cap, color: color["muted-foreground"] },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   hit: { ...num, fontSize: 15, textAlign: "center", color: color.primary },
-  date: { ...type.caption, fontSize: 10, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  date: { ...type.caption, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   value: { minWidth: 32, height: 28, borderRadius: 7, paddingHorizontal: 6, alignItems: "center", justifyContent: "center" },
   valueText: { ...num, fontSize: 15 },
-  void: { ...type.caption, fontSize: 9, color: color.amber, borderWidth: 1, borderStyle: "dashed", borderColor: "rgba(245,165,36,0.6)", borderRadius: 5, paddingHorizontal: 3, paddingVertical: 1 },
+  void: { ...type.caption, color: color.amber, borderWidth: 1, borderStyle: "dashed", borderColor: tint.amber(0.6), borderRadius: 5, paddingHorizontal: 3, paddingVertical: 1 },
   dash: { ...type.callout, color: color["muted-foreground"] },
   trend: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug + 2 },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },

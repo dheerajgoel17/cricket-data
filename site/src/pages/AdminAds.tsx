@@ -186,7 +186,7 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
 
       <section className="flex flex-col gap-snug">
         <h2 className="text-body font-medium">All placements {loading ? "…" : `(${rows.length})`}</h2>
-        {!rows.length && !loading ? <p className="text-callout text-muted-foreground">None yet.</p> : (
+        {!rows.length && !loading ? <EmptyState compact title="None yet" body="Save a placement to list it here." /> : (
           <ul className="divide-y divide-hairline overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
             {rows.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center gap-snug px-inset py-snug">

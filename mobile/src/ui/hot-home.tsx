@@ -22,6 +22,7 @@ import { OverviewRow } from "@/ui/fancy-row";
 import { MatchChips } from "@/ui/match-chip";
 import { MarketTape, type TapeRow } from "@/ui/market-tape";
 import { Working } from "@/ui/motion";
+import { TapeSkeleton } from "@/ui/skeletons";
 import { PropRow } from "@/ui/prop-row";
 import { color, space, type } from "@/ui/tokens";
 
@@ -93,7 +94,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   if (fancyReady) mark("fancy-ready");
   return (
     <View style={styles.wrap}>
-      {!isLoading && tape.length ? <View style={styles.pad}><MarketTape rows={tape} /></View> : null}
+      {isLoading ? <View style={styles.pad}><TapeSkeleton /></View> : tape.length ? <View style={styles.pad}><MarketTape rows={tape} /></View> : null}
       <View style={styles.pad}><Text style={styles.headTitle}>Props</Text></View>
       {loading && !blocks.length ? (
         <Working label="Scoring today's lines…" rows={4} />
@@ -131,6 +132,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
 export function HotHomeSkeleton() {
   return (
     <View style={styles.wrap}>
+      <View style={styles.pad}><TapeSkeleton /></View>
       <View style={styles.pad}><Text style={styles.headTitle}>Props</Text></View>
       <Working label="Loading today's lines…" rows={4} />
     </View>

@@ -8,6 +8,7 @@ import { nextMatchRates } from "@cricket/engine/next-match.js";
 import { odds } from "@site/lib/format";
 import { dayLabel, localTime } from "@/lib/format";
 import { BookBadge } from "@/ui/book-badge";
+import { ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { DataTable } from "@/ui/data-table";
 import { LiveDot } from "@/ui/motion";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
@@ -95,7 +96,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
         </View>
         {book ? (
           quotes.length ? (
-            <DataTable columns={["Books", "Line", "Over", "Under"]} flex={[2, 1, 1, 1.4]}
+            <DataTable bleed columns={["Books", "Line", "Over", "Under"]} flex={[2, 1, 1, 1.4]}
               rows={quotes.map((q) => [<BookBadge key={q.source} source={q.source} />, String(q.line), odds(q.over), q.underAt ? `U ${q.underAt.line} ${odds(q.underAt.price)}` : odds(q.under)])} />
           ) : book.main && book.main.line !== line ? <Text style={styles.statLabel}>Books price {book.main.line} on this match, not {line}.</Text> : null
         ) : <Text style={styles.statLabel}>No book is offering {statLabel} on this match; the rates are from his history.</Text>}
@@ -118,16 +119,14 @@ export function NextFilters({ next, filters, onChange }: { next: NextInfo; filte
   return (
     <View style={{ gap: space.snug }}>
       <Text style={styles.chartFilters}>This match</Text>
-      <View style={styles.chipRow}>
+      <ChoiceRow>
         {chips.map(([k, v, label]) => {
           const on = (filters as any)[k] === v;
           return (
-            <Press scale={1} key={k} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { void Haptics.selectionAsync(); onChange({ [k]: on ? "" : v }); }} style={[styles.chip, on && styles.chipOn]}>
-              <Text style={[styles.chipText, on && styles.chipTextOn]}>{on ? `${label} ✓` : `Only ${label}`}</Text>
-            </Press>
+            <ChoiceChip key={k} label={on ? `${label} ✓` : `Only ${label}`} on={on} onPress={() => { void Haptics.selectionAsync(); onChange({ [k]: on ? "" : v }); }} />
           );
         })}
-      </View>
+      </ChoiceRow>
     </View>
   );
 }
@@ -153,10 +152,5 @@ const styles = StyleSheet.create({
   tileNum: { ...numLg, fontSize: 30, letterSpacing: -0.6, lineHeight: 34 },
   tileSub: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   noSample: { ...type.callout, color: color["muted-foreground"], paddingTop: space.tight },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
   chartFilters: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  chip: { height: 34, paddingHorizontal: space.stack - 2, borderRadius: radius.chip, borderWidth: 1, borderColor: color.hairline, backgroundColor: "rgba(28,28,30,0.6)", alignItems: "center", justifyContent: "center" },
-  chipOn: { backgroundColor: color.foreground },
-  chipText: { ...type.callout, color: color.foreground },
-  chipTextOn: { color: color.background },
 });

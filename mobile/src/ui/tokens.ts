@@ -1,7 +1,8 @@
 import { StyleSheet } from "react-native";
-// Colours come straight from the shared token file (site/packages/tokens/tokens.json). Sizes keep the web's role names with native values:
-// close to the site's compact scale, since the app should read as the same product (docs/SITE.md, "UI libraries and the iOS / Android apps").
+// Colours and size roles come from the shared token file (site/packages/tokens/tokens.json).
+// Space / type / radius / control are derived so the app stays on the same contract as the site (docs/DESIGN_SYSTEM.md).
 import tokens from "@cricket/tokens/tokens.json";
+import { remPx } from "@cricket/tokens/rem.js";
 
 export const color = tokens.color;
 
@@ -32,27 +33,78 @@ export const numLg = { fontFamily: font.dataLight, fontVariant: ["tabular-nums" 
  */
 export const tonal = { backgroundColor: "rgba(255,255,255,0.045)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.09)", borderTopColor: "rgba(255,255,255,0.2)" } as const;
 
-/** Web `--gutter`, `--space-*`. */
-export const space = { hair: 4, tight: 6, snug: 10, stack: 16, group: 20, section: 32, inset: 14, gutter: 14 };
+/** Hex token → rgba for heat cells, active chips, and row highlight (avoid copying primary/miss/amber rgba by hand). */
+function hexAlpha(hex: string, a: number) {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(full, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+export const tint = {
+  primary: (a: number) => hexAlpha(color.primary, a),
+  miss: (a: number) => hexAlpha(color.miss, a),
+  amber: (a: number) => hexAlpha(color.amber, a),
+  white: (a: number) => `rgba(255,255,255,${a})`,
+  black: (a: number) => `rgba(0,0,0,${a})`,
+  /** Selected ladder / table row wash (matches web card-on). */
+  row: "rgba(58,58,60,0.45)",
+} as const;
 
-export const radius = { card: 16, chip: 999, sheet: 24 };
+const S = tokens.space;
+const Z = tokens.size;
+const T = tokens.type;
+
+/** Web `--gutter`, `--space-*` (from tokens.json). */
+export const space = {
+  hair: remPx(S["space-hair"]),
+  tight: remPx(S["space-tight"]),
+  snug: remPx(S["space-snug"]),
+  stack: remPx(S["space-stack"]),
+  group: remPx(S["space-group"]),
+  section: remPx(S["space-section"]),
+  inset: remPx(S["space-inset"]),
+  gutter: remPx(Z.gutter),
+};
+
+export const radius = {
+  card: remPx(Z["card-radius"]),
+  chip: remPx(Z["chip-radius"]),
+  sheet: remPx(Z["sheet-radius"]),
+};
+
+/** Shared easing curves (site `tokens.json` motion + Emil / animate-expo). */
+export const ease = {
+  out: [0.23, 1, 0.32, 1] as const,
+  inOut: [0.77, 0, 0.175, 1] as const,
+  drawer: [0.32, 0.72, 0, 1] as const,
+};
+
+const lh = (size: number, ratio: string) => Math.round(size * parseFloat(ratio));
+const ls = (size: number, em: string | undefined) => (em ? Math.round(size * parseFloat(em) * 1000) / 1000 : 0);
+
+const body = remPx(T["fs-body"]);
+const title = remPx(T["fs-title"]);
+const callout = remPx(T["fs-callout"]);
+const footnote = remPx(T["fs-footnote"]);
+const caption = remPx(T["fs-caption"]);
+const display = remPx(T["fs-display"]);
 
 export const type = {
   // Matches the site's cricket-stats Satoshi scale (dense lh, slight negative tracking).
-  display: { fontFamily: font.bold, fontSize: 28, lineHeight: 31, letterSpacing: -0.7 },
-  title: { fontFamily: font.bold, fontSize: 18, lineHeight: 22, letterSpacing: -0.36 },
-  body: { fontFamily: font.medium, fontSize: 15, lineHeight: 19, letterSpacing: -0.15 },
-  callout: { fontFamily: font.medium, fontSize: 13, lineHeight: 17, letterSpacing: -0.065 },
-  footnote: { fontFamily: font.medium, fontSize: 12, lineHeight: 15, letterSpacing: 0 },
-  caption: { fontFamily: font.medium, fontSize: 10, lineHeight: 13, letterSpacing: 0.1 },
+  display: { fontFamily: font.bold, fontSize: display, lineHeight: lh(display, T["fs-display-lh"]), letterSpacing: ls(display, T["fs-display-ls"]) },
+  title: { fontFamily: font.bold, fontSize: title, lineHeight: lh(title, T["fs-title-lh"]), letterSpacing: ls(title, T["fs-title-ls"]) },
+  body: { fontFamily: font.medium, fontSize: body, lineHeight: lh(body, T["fs-body-lh"]), letterSpacing: ls(body, T["fs-body-ls"]) },
+  callout: { fontFamily: font.medium, fontSize: callout, lineHeight: lh(callout, T["fs-callout-lh"]), letterSpacing: ls(callout, T["fs-callout-ls"]) },
+  footnote: { fontFamily: font.medium, fontSize: footnote, lineHeight: lh(footnote, T["fs-footnote-lh"]), letterSpacing: 0 },
+  caption: { fontFamily: font.medium, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
 
 /** The widest the app gets in a browser (`ui/web-frame.tsx`), and so the width its text is fitted to there. */
 export const WEB_MAX_WIDTH = 560;
 
-/** Web `--control` (36 pt), `--header-h` (56 pt). */
-export const control = 36;
-export const HEADER_HEIGHT = 56;
+/** Web `--control` / `--header-h` from tokens.json. */
+export const control = remPx(Z.control);
+export const HEADER_HEIGHT = remPx(Z["header-h"]);
 /** Share of the screen a fixture card takes, so the next match peeks (web `--fixture-card`). */
 export const FIXTURE_CARD_SHARE = 0.8;
 /** Height of the custom Android tab bar (the iOS bar is the system's). */

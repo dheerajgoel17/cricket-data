@@ -43,7 +43,7 @@ function Saved() {
   );
 
   const body = () => {
-    if (loading) return <Working label="Loading…" fill />;
+    if (loading) return <Working label="Loading…" fill shape="list" />;
     if (!user) {
       return (
         <View style={styles.gate}>
@@ -54,7 +54,7 @@ function Saved() {
         </View>
       );
     }
-    if (!store) return <Working label="Loading…" fill />;
+    if (!store) return <Working label="Loading…" fill shape="list" />;
     const players = store.P.id.length;
     const props = list.map((k) => ({ k, p: parsePropKey(k) })).filter((x): x is { k: string; p: NonNullable<ReturnType<typeof parsePropKey>> } => !!x.p && x.p.idx >= 0 && x.p.idx < players);
     const people = list.filter((k) => k.startsWith("player:") || k.startsWith("team:")).map((k) => ({ k, kind: k.split(":")[0], i: Number(k.split(":")[1]) }))

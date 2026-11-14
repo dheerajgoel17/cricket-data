@@ -2,23 +2,20 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { Ionicons } from "@expo/vector-icons";
 import { liveForFixture } from "@cricket/engine/live.js";
 import { FORMATS } from "@cricket/engine/util.js";
-import { goBack } from "@/lib/nav";
 import { useFixtureBooks } from "@/lib/archive";
 import { storeQuery } from "@/lib/data";
 import { liveQuery } from "@/lib/queries";
 import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
+import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchFancy } from "@/ui/match-fancy";
 import { MatchHeader } from "@/ui/match-header";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
-import { Press } from "@/ui/press";
-import { Text } from "@/ui/text";
-import { color, space, type } from "@/ui/tokens";
+import { color, space } from "@/ui/tokens";
 
 /** One fancy market for a fixture: chart, over/under and ladder (the site's `/fixture/:id/fancy`). */
 const one = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
@@ -41,7 +38,7 @@ export default function FancyMarketPage() {
     return (
       <View style={[styles.root, { paddingTop: inset.top }]}>
         <PageHeader title="Fancy" />
-        <Working label="Loading…" />
+        <Working label="Loading…" shape="market" />
       </View>
     );
   }
@@ -49,7 +46,9 @@ export default function FancyMarketPage() {
     return (
       <View style={[styles.root, { paddingTop: inset.top }]}>
         <PageHeader title="Fancy" />
-        <Text style={styles.empty}>That match is no longer in the schedule.</Text>
+        <View style={styles.pad}>
+          <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
+        </View>
       </View>
     );
   }
@@ -58,10 +57,6 @@ export default function FancyMarketPage() {
       <PageHeader title={`${f.a} v ${f.b}`} subtitle="Match Fancy" />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24, paddingHorizontal: space.gutter, gap: space.stack }} showsVerticalScrollIndicator={false}>
         {item ? <MatchHeader item={item} /> : null}
-        <Press scale={1} onPress={goBack} accessibilityRole="button" style={styles.back}>
-          <Ionicons name="chevron-back" size={16} color={color["muted-foreground"]} />
-          <Text style={styles.backTxt}>Match Fancy</Text>
-        </Press>
         <MatchFancy fx={f} teams={known} fmt={fmt} doc={doc} mode="detail" start={start} />
       </ScrollView>
     </View>
@@ -70,7 +65,5 @@ export default function FancyMarketPage() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
-  back: { flexDirection: "row", alignItems: "center", gap: space.tight, alignSelf: "flex-start" },
-  backTxt: { ...type.callout, color: color["muted-foreground"] },
+  pad: { paddingHorizontal: space.gutter, paddingTop: space.stack },
 });

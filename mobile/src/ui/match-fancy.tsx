@@ -24,7 +24,8 @@ import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
-import { Chips } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips } from "@/ui/chips";
+import { Bleed } from "@/ui/bleed";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
 import { LiveMarketRow } from "@/ui/live-market-row";
@@ -34,7 +35,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, control, font, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tonal, tint } from "@/ui/tokens";
 
 
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
@@ -173,14 +174,14 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     void Share.share({ message: text || url, title: `${fx.a} v ${fx.b}` });
   };
 
-  if (!store) return <Working label="Loading…" />;
+  if (!store) return <Working label="Loading…" shape="rows" />;
   return (
     <View style={styles.root}>
       <View style={styles.filterRow}>
         {scopes.length > 1 ? (
           <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
         ) : <View style={styles.chipFlex} />}
-        <Press scale={1} onPress={() => setFiltersOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
+        <Press onPress={() => setFiltersOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
           <Ionicons name="options-outline" size={16} color={color.foreground} />
           <Text style={styles.filterLbl}>L{win}</Text>
           {activeN > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{activeN}</Text></View> : null}
@@ -188,9 +189,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       </View>
       {activeN > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
-          {win !== 10 ? <Press scale={1} onPress={() => { setWin(10); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>Window L{win}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
-          {here ? <Press scale={1} onPress={() => { setHere(false); setMl(undefined); }} accessibilityRole="button" style={styles.activeChip}><Text style={styles.activeChipTxt}>At {venueName}</Text><Ionicons name="close" size={12} color={color.primary} /></Press> : null}
-          <Press scale={1} onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+          {win !== 10 ? <ActiveChip label={`Window L${win}`} onClear={() => { setWin(10); setMl(undefined); }} /> : null}
+          {here ? <ActiveChip label={`At ${venueName}`} onClear={() => { setHere(false); setMl(undefined); }} /> : null}
+          <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
         </ScrollView>
       ) : null}
       <Modal visible={filtersOpen} animationType="slide" transparent onRequestClose={() => setFiltersOpen(false)}>
@@ -198,26 +199,22 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
         <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
           <View style={styles.sheetHead}>
             <Text style={styles.h2}>Filters</Text>
-            <Press scale={1} onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close" style={styles.round}><Ionicons name="close" size={20} color={color.foreground} /></Press>
+            <Press onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close" style={styles.round}><Ionicons name="close" size={20} color={color.foreground} /></Press>
           </View>
           <Text style={styles.sheetSec}>Hit-rate window</Text>
-          <View style={styles.sheetChips}>{WINDOWS.map((n) => (
-            <Press key={n} scale={1} onPress={() => setDraftWin(n)} accessibilityRole="button" style={[styles.sheetChip, draftWin === n && styles.sheetChipOn]}>
-              <Text style={[styles.sheetChipTxt, draftWin === n && styles.sheetChipTxtOn]}>L{n}</Text>
-            </Press>
-          ))}</View>
+          <ChoiceRow>{WINDOWS.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftWin === n} onPress={() => setDraftWin(n)} />)}</ChoiceRow>
           {venueIdx.length > 0 ? (
             <>
               <Text style={styles.sheetSec}>Matches from</Text>
-              <View style={styles.sheetChips}>
-                <Press scale={1} onPress={() => setDraftHere(false)} accessibilityRole="button" style={[styles.sheetChip, !draftHere && styles.sheetChipOn]}><Text style={[styles.sheetChipTxt, !draftHere && styles.sheetChipTxtOn]}>Teams' form</Text></Press>
-                <Press scale={1} onPress={() => setDraftHere(true)} accessibilityRole="button" style={[styles.sheetChip, draftHere && styles.sheetChipOn]}><Text style={[styles.sheetChipTxt, draftHere && styles.sheetChipTxtOn]}>At {venueName}</Text></Press>
-              </View>
+              <ChoiceRow>
+                <ChoiceChip label="Teams' form" on={!draftHere} onPress={() => setDraftHere(false)} />
+                <ChoiceChip label={`At ${venueName}`} on={draftHere} onPress={() => setDraftHere(true)} />
+              </ChoiceRow>
             </>
           ) : null}
           <View style={styles.sheetFoot}>
-            <Press scale={1} onPress={() => { setDraftWin(10); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
-            <Press scale={1} onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
+            <Press onPress={() => { setDraftWin(10); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
+            <Press onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
           </View>
         </View>
       </Modal>
@@ -253,7 +250,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                     <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
                     <Text style={styles.note}>{useHere ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} matches`} · void excluded</Text>
                   </View>
-                  <Press scale={1} onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>
+                  <Press onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>
                 </View>
                 {liveSoFar != null ? <Text style={styles.live}><StandingMark standing={liveSoFar} line={line} /></Text> : null}
                 <View style={styles.stats}>
@@ -286,9 +283,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                       <View key={side} style={styles.side}>
                         <Text style={styles.sideKey}>{side} {line}</Text>
                         <Text style={[styles.sideNum, side === "over" && { color: color.primary }]}>{pct1(p)}</Text>
-                        <Meter value={p ?? 0} tone={side === "over" ? color.primary : "rgba(255,255,255,0.7)"} />
+                        <Meter value={p ?? 0} tone={side === "over" ? color.primary : tint.white(0.7)} />
                         <Text style={styles.note}>{hit} of {rep.n} · fair {odds(fair)}</Text>
-                        {jump ? <Press scale={1} onPress={() => setMl(lane!.line)} accessibilityRole="button" accessibilityLabel={`Use ${side} line ${lane!.line}`}>{price}</Press> : price}
+                        {jump ? <Press onPress={() => setMl(lane!.line)} accessibilityRole="button" accessibilityLabel={`Use ${side} line ${lane!.line}`}>{price}</Press> : price}
                       </View>
                     );
                   })}
@@ -302,7 +299,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 {headBooks.length > 0 ? <BookList books={headBooks} shown={[overFace?.source, underFace?.source]} /> : null}
                 {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
 
-                <View style={styles.ladder}>
+                <Bleed style={styles.ladder}>
                   <View style={styles.ladderHead}>
                     <Text style={[styles.th, { width: 40 }]}>Line</Text>
                     <Text style={[styles.th, { flex: 1 }]}>Book</Text>
@@ -333,7 +330,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                     </Press>
                     );
                   })}
-                </View>
+                </Bleed>
               </View>
             ) : null}
           </View> : null}
@@ -350,7 +347,7 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 /** A share as a bar that fills from the left on the UI thread. */
 function Meter({ value, tone }: { value: number; tone: string }) {
   const w = useSharedValue(0);
-  useEffect(() => { w.value = withTiming(value, { duration: 450 }); }, [value, w]);
+  useEffect(() => { w.value = withTiming(value, { duration: 300 }); }, [value, w]);
   const fill = useAnimatedStyle(() => ({ transform: [{ scaleX: Math.max(w.value, 0.001) }] })); // scale, not width: no layout pass per frame
   return <View style={styles.meter}><Animated.View style={[styles.meterFill, { backgroundColor: tone, transformOrigin: "left" } as object, fill]} /></View>;
 }
@@ -378,7 +375,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
           <View style={{ alignItems: "flex-end" }}><Text style={styles.topPct}>{pct1(r.pSole)}</Text><Text style={styles.note}>fair {odds(r.fairSole)}</Text></View>
         </Press>
       ))}
-      {!t.rows.length ? <Text style={[styles.note, { padding: space.stack }]}>Not enough matches.</Text> : null}
+      {!t.rows.length ? <EmptyState compact title="Not enough matches" body="Need more history for this top-batter market." /> : null}
     </View>
   );
 }
@@ -392,24 +389,16 @@ const styles = StyleSheet.create({
   filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
   filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
-  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingLeft: space.snug, paddingRight: space.tight, borderRadius: radius.chip, backgroundColor: "rgba(39,218,142,0.15)" },
-  activeChipTxt: { ...type.callout, color: color.primary },
   clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.55)" },
+  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: tint.black(0.55) },
   sheet: { marginTop: "auto", backgroundColor: color.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.snug },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
   sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
-  sheetChips: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
-  sheetChip: { height: control, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, alignItems: "center", justifyContent: "center" },
-  sheetChipOn: { backgroundColor: color.foreground },
-  sheetChipTxt: { ...type.callout, color: color.foreground },
-  sheetChipTxtOn: { color: color.background },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
   sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   sheetClearTxt: { ...type.body, color: color.foreground },
   sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
   sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
-  empty: { ...type.callout, color: color["muted-foreground"] },
   h2: { ...type.title, color: color.foreground },
   h3: { ...type.body, fontFamily: font.medium, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
@@ -432,19 +421,20 @@ const styles = StyleSheet.create({
   sidePrice: { ...num, fontSize: 16, color: color.primary },
   meter: { height: 6, borderRadius: 3, backgroundColor: color.hairline, overflow: "hidden" },
   meterFill: { height: "100%", width: "100%", borderRadius: 3 },
-  ladder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  ladder: { borderTopWidth: 0 },
   ladderHead: { flexDirection: "row", alignItems: "center", paddingVertical: space.tight },
-  th: { ...type.caption, ...cap, color: color["muted-foreground"] },
+  /** Same recipe as web TABLE_HEAD: label-cap + footnote. */
+  th: { ...type.footnote, ...cap, color: color["muted-foreground"] },
   col: { width: 112, textAlign: "right" },
   ladderRow: { flexDirection: "row", alignItems: "center", minHeight: 46, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  ladderOn: { backgroundColor: "rgba(58,58,60,0.45)" },
+  ladderOn: { backgroundColor: tint.row },
   lineCell: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.tight },
   ladderLine: { ...num, fontSize: 17, color: color.foreground },
   cellNum: { ...num, fontSize: 16, color: color.foreground },
   fair: { ...type.footnote, color: color["muted-foreground"] },
   top: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
   topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  topFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: "rgba(39,218,142,0.10)" },
+  topFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: tint.primary(0.1) },
   topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
   topPct: { ...num, fontSize: 18, color: color.primary },
 });

@@ -26,7 +26,7 @@ export function BrandMark({ className }: { className?: string }) {
 export function Brand() {
   return (
     <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <BrandMark className="size-9 transition-transform duration-300 group-hover:-rotate-6 group-active:scale-95" />
+      <BrandMark className="size-9 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-rotate-6 group-active:scale-[0.97]" />
       <span className="text-title font-bold leading-none tracking-tight text-foreground">Fancy.cash</span>
     </Link>
   );
@@ -36,7 +36,7 @@ function SavedLink() {
   const { list } = useSaved();
   return (
     <Link to="/saved" aria-label={list.length ? `Saved, ${list.length}` : "Saved"}
-      className="relative grid size-control place-items-center rounded-full bg-muted text-foreground transition hover:bg-surface-hover">
+      className="relative grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]">
       <BookmarkIcon className="size-4" />
       {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-bold text-primary-foreground">{list.length}</span>}
     </Link>
@@ -49,7 +49,7 @@ function AccountControl() {
   if (!user) {
     return (
       <button type="button" aria-label="Sign in" onClick={openSignIn}
-        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition hover:bg-surface-hover">
+        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]">
         <UserCircleIcon className="size-5" />
       </button>
     );
@@ -58,7 +58,7 @@ function AccountControl() {
   return (
     <div className="relative">
       <button type="button" aria-label={`Account, ${label}`} aria-expanded={open} onClick={() => setOpen((v) => !v)}
-        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition hover:bg-surface-hover">
+        className="grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]">
         <UserCircleIcon className="size-5 text-primary" />
       </button>
       {open && (

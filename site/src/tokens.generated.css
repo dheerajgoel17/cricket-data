@@ -51,6 +51,7 @@
 
 :root {
   --radius: 0.75rem;
+  --card-radius: 1rem;
   --header-h: 3.5rem;
   --tabbar-h: 3.0625rem;
   --tabbar-pad: 0rem;
@@ -94,6 +95,9 @@
   --space-group: 1.25rem;
   --space-section: 2rem;
   --space-inset: 0.875rem;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 :root {

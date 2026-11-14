@@ -25,12 +25,13 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { StatsAd } from "@/components/app/stats-ad";
-import { EmptyNote } from "@/components/app/page";
-import { ListSkeleton } from "@/components/app/skeletons";
+import { TABLE_HEAD } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
+import { cn } from "@/lib/utils";
+import { GroundSkeleton } from "@/components/app/skeletons";
 import { AnimatedNumber } from "@/components/app/animated-number";
 import { ValueBars } from "@/components/app/mini-bars";
 import { GroundGenderSheet } from "@/components/app/ground-filters";
-import { cn } from "@/lib/utils";
 
 export { fixtureHasGround, genderFilterLabel, tourDatesAtGround, tourStatusAtGround } from "@/lib/ground";
 export type { GenderFilter } from "@/lib/ground";
@@ -191,7 +192,7 @@ function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
         <span className="font-condensed text-callout font-medium tabular-nums text-muted-foreground">{list.length}</span>
       </div>
       {!list.length ? (
-        <EmptyNote title="No matches">Nothing at this ground for the filters you picked.</EmptyNote>
+        <EmptyState compact title="No matches" body="Nothing at this ground for the filters you picked." />
       ) : (
         <>
           <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
@@ -327,7 +328,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
         ))}
       </div>
       {!ms.length ? (
-        <EmptyNote title="No matches">Nothing in {fmtName} at this ground for these filters.</EmptyNote>
+        <EmptyState compact title="No matches" body={`Nothing in ${fmtName} at this ground for these filters.`} />
       ) : isTop && tops ? (
         <section className="-mx-gutter overflow-hidden border-y border-hairline" aria-label="Top batter">
           <p className="px-gutter py-snug text-footnote text-muted-foreground">Highest score in the match · last {tops.n} {fmtName}</p>
@@ -336,7 +337,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
               const max = Math.max(...tops.rows.map((x: any) => x.pSole), 0.0001);
               return (
                 <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
-                  <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
+                  <motion.span aria-hidden className="absolute inset-y-0 left-0 origin-left bg-primary/10" style={{ width: `${(r.pSole / max) * 100}%` }} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
                   <Link to={`/player/${r.player}`} className="relative flex items-center gap-snug px-gutter py-snug outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
                     <PlayerBadge idx={r.player} size="sm" />
                     <span className="min-w-0 flex-1">
@@ -398,7 +399,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                   <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {activeLine}</div>
                   <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                   <div className="h-1.5 overflow-hidden rounded-full bg-hairline">
-                    <motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} />
+                    <motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} />
                   </div>
                   <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · fair {odds(fair)}</div>
                 </div>
@@ -408,7 +409,11 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           {rep.n < 10 ? <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p> : null}
           {/* Phone: full-bleed like Match Fancy / Player ladder (`-mx-gutter`). */}
           <section className="-mx-gutter min-w-0 border-y border-hairline" aria-label="Line ladder">
-            <div className="grid grid-cols-[1fr_1fr_1fr] px-gutter py-tight font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+            <div className="grid grid-cols-3 px-gutter">
+              <span className={cn(TABLE_HEAD, "px-0")}>Line</span>
+              <span className={cn(TABLE_HEAD, "px-0 text-right")}>Over</span>
+              <span className={cn(TABLE_HEAD, "px-0 text-right")}>Under</span>
+            </div>
             {ladder.map((l: any, i: number) => (
               <motion.button key={l.line} type="button" onClick={() => setLine(l.line)} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
                 className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-gutter py-snug text-left text-body transition-colors active:bg-accent">
@@ -421,7 +426,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           </section>
         </div>
       ) : (
-        <EmptyNote title="No sample">Not enough {fmtName} matches for this market.</EmptyNote>
+        <EmptyState compact title="No sample" body={`Not enough ${fmtName} matches for this market.`} />
       )}
     </section>
   );
@@ -452,10 +457,10 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
   const fromFixture = !!fixtureId;
   if (!embedded) setTitle(`${ground}: matches at this ground`);
 
-  if (!venue) return <EmptyNote title="No venue">This fixture has no ground listed.</EmptyNote>;
-  if (isLoading) return <ListSkeleton rows={3} />;
+  if (!venue) return <EmptyState title="No venue" body="This fixture has no ground listed." />;
+  if (isLoading) return <GroundSkeleton />;
   if (!known && !atGround.length) {
-    return <EmptyNote title="Ground not in data">We could not match “{venue}” to fixtures or stats.</EmptyNote>;
+    return <EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} />;
   }
 
   const back = () => {
@@ -561,7 +566,7 @@ export function VenueGroundPage() {
   const { store } = useData();
   const { id } = useParams();
   const idx = Number(id);
-  if (!(idx >= 0 && idx < store.venues.length)) return <EmptyNote>Unknown ground.</EmptyNote>;
+  if (!(idx >= 0 && idx < store.venues.length)) return <EmptyState title="Unknown ground" body="This ground is not in the stats data." />;
   return (
     <div className="flex flex-col gap-snug">
       <StatsAd />

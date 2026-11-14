@@ -27,11 +27,15 @@ import { BookBadge } from "@/ui/book-badge";
 import { ChartBars, Gauge, OutcomeDonut } from "@/ui/charts";
 import { CountUp } from "@/ui/count-up";
 import { CapsuleTabs } from "@/ui/capsule";
+import { Bleed } from "@/ui/bleed";
+import { ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { DataTable, Metric, Pill } from "@/ui/data-table";
+import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { useScreenInsets } from "@/ui/insets";
 import { LineStepper } from "@/ui/line-stepper";
-import { enter, Skeleton, Working } from "@/ui/motion";
+import { enter } from "@/ui/motion";
+import { PlayerSkeleton } from "@/ui/skeletons";
 import { MatchStatus, NextFilters, NextMatchCard } from "@/ui/next-match";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PlayerPortrait } from "@/ui/player-avatar";
@@ -82,7 +86,8 @@ export default function PlayerPage() {
   const nameFx = useAnimatedStyle(() => ({ transform: [{ translateY: y.value * 0.12 }] }));
 
   const res = s.res.data;
-  const loading = s.loadingStore || s.lines.isLoading || s.res.isLoading || !res;
+  // cached plan / lines: never blank the page on a background refetch
+  const loading = s.loadingStore || (!res && !s.res.isError);
   const patch = (p: Record<string, string>) => { setFilters((f) => ({ ...f, ...p })); setLineQ(undefined); };
   const share = () => {
     const entries = res?.ok ? res.chart?.entries : [];
@@ -97,7 +102,7 @@ export default function PlayerPage() {
     <View style={styles.root}>
       <BlurTargetView ref={target} style={styles.root}>
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
-          {!s.loadingStore && !s.ok ? <Text style={[styles.empty, styles.pad]}>Unknown player.</Text> : (
+          {!s.loadingStore && !s.ok ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
             <>
               <View style={[styles.hero, styles.pad]}>
                 <Animated.View style={[styles.heroLeft, nameFx]}>
@@ -111,9 +116,9 @@ export default function PlayerPage() {
                 {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.side || params.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
               </View>
               {loading ? (
-                <View style={[styles.pad, { gap: space.snug, paddingTop: space.stack }]}><Working label="Reading his games…" /><Skeleton style={{ height: 120 }} /><Skeleton style={{ height: 240 }} /></View>
+                <View style={{ paddingTop: space.stack }} accessibilityRole="progressbar" accessibilityLabel="Reading his games…"><PlayerSkeleton /></View>
               ) : !res.ok ? (
-                <Text style={[styles.empty, styles.pad]}>{res.error}</Text>
+                <View style={styles.pad}><EmptyState title="Could not load games" body={String(res.error || "Try again in a moment.")} /></View>
               ) : (
                 <Loaded key={`${s.stat}-${s.fmtVal}-${JSON.stringify(s.plan.filters)}-${s.plan.venue}-${s.book ? 1 : 0}`} s={s} filters={filters} onFilters={patch} onGame={game} />
               )}
@@ -203,8 +208,11 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
       <View style={[styles.pad, { gap: space.stack, paddingTop: space.snug }]}>
         {!book ? <Unpriced label={label} /> : null}
         {next ? <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
-        <Text style={styles.empty}>No {res.sample?.unit || "games"} match {active.length ? "these filters" : "this selection"}. Relax a filter to see a sample.</Text>
-        {active.length ? <Press scale={1} onPress={clearAll} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Clear filters</Text></Press> : null}
+        <EmptyState
+          title={`No ${res.sample?.unit || "games"}`}
+          body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection."}
+          action={active.length ? <Press scale={1} onPress={clearAll} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Clear filters</Text></Press> : undefined}
+        />
       </View>
     );
   }
@@ -305,16 +313,14 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               const chosen = options.find(([v]) => v === (filters[g.key] ?? ""));
               return (
                 <Accordion key={g.key} title={g.label} value={chosen && chosen[0] ? chosen[1] : "any"} open={openGroup === g.key} onToggle={(o) => setOpenGroup(o ? g.key : null)}>
-                  <View style={styles.optionWrap}>
+                  <ChoiceRow>
                     {options.map(([v, text]) => {
                       const on = (filters[g.key] ?? "") === v;
                       return (
-                        <Press scale={1} key={v || "any"} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => { void Haptics.selectionAsync(); onFilters({ [g.key]: v }); }} style={[styles.option, on && styles.optionOn]}>
-                          <Text style={[styles.optionText, on && styles.optionTextOn]} numberOfLines={1}>{text}</Text>
-                        </Press>
+                        <ChoiceChip key={v || "any"} label={text} on={on} onPress={() => { void Haptics.selectionAsync(); onFilters({ [g.key]: v }); }} />
                       );
                     })}
-                  </View>
+                  </ChoiceRow>
                 </Accordion>
               );
             })}
@@ -347,6 +353,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               const ladder = (res.ladder as any[]).filter((l) => l.n);
               return (
                 <DataTable
+                  bleed
                   columns={["Line", "Over", "Fair", "Under", "Fair"]}
                   flex={[0.9, 1.5, 1, 1.5, 1]}
                   highlight={ladder.findIndex((l) => Math.abs(l.line - line) < 0.01)}
@@ -357,7 +364,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               <View style={{ gap: space.snug }}>
                 <Text style={styles.h3}>When {label.toLowerCase()} {res.plan?.side || "over"} {c?.line ?? res.line} hits</Text>
                 <Text style={styles.noteText}>{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</Text>
-                <DataTable columns={["Prop", "Normal", "If it hits", "Lift"]} flex={[2.3, 1, 1.2, 1.1]}
+                <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} flex={[2.3, 1, 1.2, 1.1]}
                   rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), <Pill key="l" text={`${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}`} tone={x.lift >= 0.1 ? "up" : x.lift <= -0.1 ? "down" : "none"} width={48} />])} />
               </View>
             ) : null}
@@ -365,6 +372,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         ) : null}
         {tab === "logs" ? (
           <Animated.View entering={enter(0)}>
+            <Bleed>
             {[...entries].reverse().slice(0, logCount).map((e, i) => {
               const st = barState(e, line, side) as string;
               const tone = st === "hit" ? color.primary : st === "miss" ? color.miss : st === "push" ? color.amber : color["muted-foreground"];
@@ -380,6 +388,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
                 </Press>
               );
             })}
+            </Bleed>
             {entries.length > logCount ? <Press scale={1} onPress={() => setLogCount(logCount + 30)} style={[styles.button, { alignSelf: "center", marginTop: space.snug }]} accessibilityRole="button"><Text style={styles.buttonText}>Show more ({entries.length - logCount} left)</Text></Press> : null}
           </Animated.View>
         ) : null}
@@ -390,7 +399,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               return (
                 <Accordion key={kind} title={`Split by ${title}`} badge={rows.length} defaultOpen={kind === "opposition" || kind === "venue_type"}>
                   <View style={{ paddingBottom: space.snug }}>
-                    <DataTable columns={[title, "n", "Med", "Mean", "Over", "Fair"]} flex={[2.1, 0.7, 0.9, 1, 1.5, 1]}
+                    <DataTable bleed columns={[title, "n", "Med", "Mean", "Over", "Fair"]} flex={[2.1, 0.7, 0.9, 1, 1.5, 1]}
                       rows={rows.map((x) => [x.label, String(x.n), num(x.median), num(x.mean), <HitCell key="p" p={x.pOver} />, odds(x.fairOver)])} />
                   </View>
                 </Accordion>

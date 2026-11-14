@@ -14,7 +14,7 @@ export default function VenuePage() {
   const inset = useScreenInsets(false);
   const stats = useQuery(storeQuery);
   const store: any = stats.data?.store;
-  if (!store) return <View style={{ flex: 1, backgroundColor: color.background, paddingTop: inset.top }}><PageHeader title="Ground" /><Working label="Loading…" /></View>;
+  if (!store) return <View style={{ flex: 1, backgroundColor: color.background, paddingTop: inset.top }}><PageHeader title="Ground" /><Working label="Loading…" shape="ground" /></View>;
   const i = Number(Array.isArray(idx) ? idx[0] : idx);
   return <GroundPage venue={i >= 0 && i < store.venues.length ? store.venues[i] : undefined} />;
 }

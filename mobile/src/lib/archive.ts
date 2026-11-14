@@ -39,6 +39,6 @@ export function useFixtureBooks(id: string) {
       const i = ts.findIndex((t) => mine(t) && t.n === name);
       return i >= 0 ? i : ts.findIndex((t) => mine(t) && teamKey(t.n) === teamKey(name));
     };
-    return { fx: listed ?? (entry ? archiveFixture(entry, teamIx) : null), doc: entry ? withArchive(lines.data, entry) : lines.data, archived: !!entry, isLoading: fixtures.isLoading || (need && archive.isLoading) };
+    return { fx: listed ?? (entry ? archiveFixture(entry, teamIx) : null), doc: entry ? withArchive(lines.data, entry) : lines.data, archived: !!entry, isLoading: (fixtures.isLoading && !fixtures.data) || (need && archive.isLoading && !entry) };
   }, [listed, entry, lines.data, fixtures.isLoading, need, archive.isLoading, store]);
 }

@@ -41,7 +41,8 @@ import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
-import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
 import { Input } from "@/components/ui/input";
 
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
@@ -176,7 +177,7 @@ export function FixturePage() {
   if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
-      <EmptyNote title="Fixture gone">That match is no longer in the schedule.</EmptyNote>
+      <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
       <Button asChild variant="secondary" className="w-fit rounded-full"><Link to="/">Back to fixtures</Link></Button>
     </div>
   );
@@ -194,7 +195,7 @@ export function FixturePage() {
           <ChevronLeftIcon className="size-5" />
         </button>
         <PageTitle sub={match?.session || liveBlurb(match) || undefined}>Scorecard</PageTitle>
-        {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyNote title="No scorecard yet">There is no card for this match from our source yet. It shows here once play has started.</EmptyNote>}
+        {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyState title="No scorecard yet" body="There is no card for this match from our source yet. It shows here once play has started." />}
       </div>
     );
   }
@@ -276,7 +277,7 @@ export function TrendsPage() {
         <Field label="Games"><NativeSelect name="n" options={GAMES} defaultValue={n} /></Field>
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
-      {!sel ? <EmptyNote title="No fixtures to trend">No upcoming matches with known teams right now.</EmptyNote> : (
+      {!sel ? <EmptyState title="No fixtures to trend" body="No upcoming matches with known teams right now." /> : (
         <div className="flex flex-col gap-snug"><h2 className="text-title font-medium">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <ListSkeleton rows={4} />}
           <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}

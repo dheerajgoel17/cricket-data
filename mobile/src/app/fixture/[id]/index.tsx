@@ -29,6 +29,7 @@ import { storeQuery } from "@/lib/data";
 import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
 import { CapsuleTabs } from "@/ui/capsule";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
@@ -37,7 +38,8 @@ import { MatchFancy } from "@/ui/match-fancy";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { MatchHeader } from "@/ui/match-header";
-import { enter, Skeleton, Working } from "@/ui/motion";
+import { enter, Working } from "@/ui/motion";
+import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
@@ -98,11 +100,14 @@ export default function FixturePage() {
       <BlurTargetView ref={target} style={styles.root}>
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
           {fxLoading ? (
-            <View style={styles.pad}><Skeleton style={{ height: 200 }} /></View>
+            <MatchHeaderSkeleton />
           ) : !f || !item ? (
-            <View style={[styles.pad, { gap: space.snug, alignItems: "flex-start" }]}>
-              <Text style={styles.empty}>That fixture is no longer in the schedule.</Text>
-              <Press onPress={goBack} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Back to fixtures</Text></Press>
+            <View style={styles.pad}>
+              <EmptyState
+                title="Fixture gone"
+                body="That match is no longer in the schedule."
+                action={<Press onPress={goBack} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Back to fixtures</Text></Press>}
+              />
             </View>
           ) : (
             <>
@@ -113,14 +118,14 @@ export default function FixturePage() {
               )}
               {f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
               {f.fmt === "FC" ? (
-                <Text style={[styles.empty, styles.pad]}>First-class cricket is not part of the stats here, so there are no player props for this match.</Text>
+                <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
                 <>
                   <View style={[styles.pad, styles.titleRow]}><Text style={styles.title}>Player props</Text><InfoButton topic="player-props" /></View>
                   {isLoading ? (
                     <Working label="Scoring this match's lines…" rows={4} />
                   ) : error && !here.length ? (
-                    <Text style={[styles.empty, styles.pad]}>Could not score this match's lines. Go back and try again.</Text>
+                    <View style={styles.pad}><EmptyState title="Could not score lines" body="Go back and try again." /></View>
                   ) : shown.length ? (
                     <View>
                       {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
@@ -129,7 +134,7 @@ export default function FixturePage() {
                   ) : scoring ? (
                     <Working label="Scoring this match's lines…" />
                   ) : (
-                    <Text style={[styles.empty, styles.pad]}>No player props are priced for this match yet.</Text>
+                    <View style={styles.pad}><EmptyState title="No props yet" body="No player props are priced for this match yet." /></View>
                   )}
                 </>
               ) : tab === "fancy" ? (
@@ -140,7 +145,9 @@ export default function FixturePage() {
                   {tab === "grid" ? (
                     <>
                       {known.length > 1 ? <View style={styles.bleed}><Chips items={known.map(([name, i]) => [String(i), abbr(name)] as [string, string])} value={String(gridTeam)} onChange={(v) => setGTeam(Number(v))} /></View> : null}
-                      {grids.isLoading || !shownGrid ? <Working label="Reading the players' games…" /> : (
+                      {grids.isLoading && !shownGrid ? <Working label="Reading the players' games…" shape="grid" /> : !shownGrid ? (
+                        <EmptyState compact title="No grid yet" body="Could not load player games for this match." />
+                      ) : (
                         <View style={{ gap: space.snug }}>
                           <View style={styles.gridHead}><TeamBadge name={shownGrid.name} size={24} /><Text style={styles.gridTitle}>{shownGrid.name}</Text><Text style={styles.empty}>{(STATS as any)[gStat].label} over {gLine}</Text></View>
                           <GridTable g={shownGrid.g} teamIdx={shownGrid.team} line={gLine} />
@@ -148,7 +155,7 @@ export default function FixturePage() {
                         </View>
                       )}
                     </>
-                  ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : <Working label="Reading the players' games…" />}
+                  ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
                 </View>
               )}
             </>

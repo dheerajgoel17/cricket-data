@@ -52,7 +52,8 @@ import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
 import { AdSlot } from "@/components/app/ad-slot";
-import { Crumbs, DataTable, EmptyNote } from "@/components/app/page";
+import { Crumbs, DataTable, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
 import { LineStepper } from "@/components/app/line-stepper";
@@ -105,7 +106,7 @@ export function PlayerPage() {
   const { store } = useData();
   const { id } = useParams();
   const idx = Number(id);
-  if (!(idx >= 0 && idx < store.P.id.length)) return <EmptyNote>Unknown player.</EmptyNote>;
+  if (!(idx >= 0 && idx < store.P.id.length)) return <EmptyState title="Unknown player" body="This player is not in the stats data." />;
   return <PlayerScreen key={idx} idx={idx} />;
 }
 
@@ -260,7 +261,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
-        : <EmptyNote>{res.data.error}</EmptyNote>}
+        : <EmptyState title="Could not load games" body={String(res.data.error || "Try again in a moment.")} />}
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="bottom" className="z-[70] mx-auto max-h-[90vh] max-w-xl overflow-y-auto rounded-t-2xl">
           <SheetHeader><SheetTitle>Filters</SheetTitle><SheetDescription>Filters apply as you change them.</SheetDescription></SheetHeader>
@@ -404,7 +405,11 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             </div>
           ) : null}
           <div className="flex flex-col items-start gap-snug" role="status">
-            <p className="text-callout text-muted-foreground">No {res.sample?.unit || "games"} match {active.length ? `these filters (${active.map(([k, v]: [string, unknown]) => `${k ? `${k} ` : ""}${v}`).join(", ")})` : "this selection"}. Relax a filter to see a sample.</p>
+            <EmptyState
+              compact
+              title={`No ${res.sample?.unit || "games"}`}
+              body={active.length ? `No games match these filters (${active.map(([k, v]: [string, unknown]) => `${k ? `${k} ` : ""}${v}`).join(", ")}). Relax a filter to see a sample.` : "No games match this selection. Relax a filter to see a sample."}
+            />
             {active.length > 0 && <Button variant="secondary" className="h-control rounded-full px-snug text-callout" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</Button>}
           </div>
         </>
@@ -521,11 +526,11 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             <Table className="table-fixed">
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-auto w-[3rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
-                  <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
-                  <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
-                  <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit O</TableHead>
-                  <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit U</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -545,24 +550,22 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           items={[["logs", "Game log"], ["splits", "Splits"], ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []), ...(!book ? [["lines", "Research"] as [string, string]] : [])]} />
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
-            {tab === "lines" && !book && (
-              <div className="divide-y divide-hairline border-y border-hairline"><LadderTable ladder={res.ladder} /></div>
-            )}
+            {tab === "lines" && !book && <LadderTable bleed ladder={res.ladder} />}
             {tab === "corr" && res.corr && (
               <div className="flex flex-col gap-snug">
                 <h3 className="text-body font-medium">When {res.statLabel.toLowerCase()} {res.plan.side || "over"} {c?.line ?? res.line} hits</h3>
                 <p className="text-footnote text-muted-foreground">{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</p>
-                <DataTable columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
+                <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
               </div>
             )}
             {tab === "logs" && (
               <>
-                <ul className="divide-y divide-hairline border-y border-hairline">
+                <ul className={cn(TABLE_BLEED, "divide-y divide-hairline")}>
                   {logs.slice(0, logCount).map((e, i) => {
                     const s = barState(e, line, side) as string;
                     return (
                       <li key={i} className="border-t border-hairline first:border-t-0">
-                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-0 py-snug text-left transition-colors active:bg-accent">
+                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-gutter py-snug text-left transition-colors active:bg-accent lg:px-0">
                           <TeamBadge name={e.opp} size="sm" />
                           <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-medium">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
                           <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-bold tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>

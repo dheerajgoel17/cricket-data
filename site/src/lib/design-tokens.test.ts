@@ -8,8 +8,10 @@ const GOVERNED = [
   "components/app/tick.tsx", "components/app/market-tape.tsx", "components/app/next-match.tsx",
   "components/app/line-stepper.tsx", "components/app/viz.tsx",
   "components/layout/Shell.tsx", "components/layout/Header.tsx", "components/layout/GlobalSearch.tsx", "components/layout/IosTabBar.tsx", "pages/Fixtures.tsx", "pages/Home.tsx", "pages/Player.tsx", "pages/Lists.tsx", "components/app/hot-home.tsx", "components/app/home-phase-bar.tsx",
-  "components/app/alt-lines.tsx", "components/app/chip.tsx", "components/app/match-status.tsx", "components/app/note.tsx", "components/app/player-name.tsx", "components/app/odds-table.tsx", "components/app/screener-filters.tsx", "pages/Saved.tsx", "components/app/tournament-stats.tsx", "pages/Leagues.tsx",
+  "components/app/alt-lines.tsx", "components/app/chip.tsx", "components/app/match-status.tsx", "components/app/note.tsx", "components/app/player-name.tsx", "components/app/odds-table.tsx", "components/app/screener-filters.tsx", "pages/Saved.tsx", "components/app/tournament-stats.tsx", "components/app/result.tsx", "pages/Leagues.tsx",
   "components/app/live-spot.tsx", "components/app/live-markets.tsx", "components/app/fixture-ground.tsx", "components/app/ground-filters.tsx", "pages/Contact.tsx",
+  "components/app/page.tsx", "components/app/forms.tsx", "components/app/entity-hero.tsx", "components/app/pill-tabs.tsx", "components/app/chart.tsx", "components/app/star.tsx",
+  "pages/Markets.tsx", "pages/Simple.tsx", "pages/Tools.tsx", "pages/Legal.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";
@@ -30,4 +32,18 @@ describe("design tokens", () => {
     it(`${f} uses the spacing scale`, () => { expect(src(f).match(RAW_SPACE) ?? []).toEqual([]); });
     it(`${f} stacks blocks with gap, not margins`, () => { expect(src(f).match(OWN_MARGIN) ?? []).toEqual([]); });
   }
+});
+
+/** Product pages + app chrome: EmptyState only (EmptyNote stays as a deprecated alias in page.tsx). */
+const PRODUCT = Object.keys(sources).filter((k) => /\/(pages|components\/app)\//.test(k) && !k.endsWith("/page.tsx"));
+
+describe("empty + icon hygiene", () => {
+  it("product pages and app components do not import EmptyNote", () => {
+    const hits = PRODUCT.filter((k) => /\bEmptyNote\b/.test(sources[k] || ""));
+    expect(hits, hits.join(", ")).toEqual([]);
+  });
+  it("product pages and app components do not import lucide-react", () => {
+    const hits = PRODUCT.filter((k) => /from\s+["']lucide-react["']/.test(sources[k] || ""));
+    expect(hits, hits.join(", ")).toEqual([]);
+  });
 });
