@@ -16,9 +16,9 @@ export type SkeletonRoute = {
 };
 
 export const SKELETON_ROUTES: readonly SkeletonRoute[] = [
-  { id: "tabs/home/rail", page: "Home · fixture rail", shape: "card", file: "app/(tabs)/index.tsx" },
-  { id: "tabs/home/props", page: "Home · Props block", shape: "rows", file: "ui/hot-home.tsx" },
-  { id: "tabs/home/tape", page: "Home · market tape", shape: "tape", file: "ui/hot-home.tsx" },
+  { id: "tabs/home-rail", page: "Home · fixture rail", shape: "card", file: "app/(tabs)/index.tsx" },
+  { id: "tabs/home-props", page: "Home · Props block", shape: "rows", file: "ui/hot-home.tsx" },
+  { id: "tabs/home-tape", page: "Home · market tape", shape: "tape", file: "ui/hot-home.tsx" },
   { id: "tabs/props", page: "Player props tab", shape: "rows", file: "app/(tabs)/props.tsx" },
   { id: "tabs/fancy", page: "Fancy tab", shape: "fancy", file: "app/(tabs)/fancy.tsx" },
   { id: "tabs/leagues", page: "Leagues tab", shape: "league", file: "app/(tabs)/leagues.tsx" },

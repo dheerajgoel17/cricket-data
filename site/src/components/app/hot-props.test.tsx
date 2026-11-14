@@ -169,6 +169,9 @@ describe("useHotRows", () => {
     env.store.land(1);
     await settle();
     expect(result.current.data?.map((r) => r.over).sort()).toEqual([1.9, 2.1]);
+    act(() => client.setQueryData(["lines"], { ...env.doc, lines: [env.doc.lines[0]] }));
+    await settle();
+    expect(result.current.data?.map((r) => r.over)).toEqual([1.9]);
   });
 
   it("a fixture page scores just its own match", async () => {

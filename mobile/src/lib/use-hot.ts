@@ -2,8 +2,8 @@
 import { useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { LIVE_TTL_MS, lineNotIn, lineStanding, liveForFixture } from "@cricket/engine/live.js";
-import { missingLiveLines, patchHotQuotes, rowLineKey } from "@cricket/engine/hot-rows.js";
-import { hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
+import { isLiveLine, liveThresholdKey, patchHotQuotes, prematchLines } from "@cricket/engine/hot-rows.js";
+import { hotLines, hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@site/lib/home-phase";
 import { timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
@@ -28,9 +28,10 @@ export function useHotRows(scope?: HotScope, doc?: any) {
   const what = !scope ? "none" : "day" in scope ? scope.day : scope.teams.join("|");
   const stamp = new Date().toDateString();
   const generated = lines.data?.generated_at_utc ?? "";
-  const liveSig = doc ? "" : (lines.data?.live_sig ?? "");
+  const liveLines = useMemo(() => !scope || doc ? [] : hotLines((lines.data?.lines || []).filter(isLiveLine), scope, Date.now()), [scope, doc, lines.data]);
+  const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   // books generation only — live ticks must not invalidate this cache
-  const baseKey = ["hot-rows", what, stamp, generated, doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
+  const baseKey = ["hot-rows-prematch", what, stamp, generated, doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
   const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
   const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
 
@@ -44,7 +45,7 @@ export function useHotRows(scope?: HotScope, doc?: any) {
       if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows;
       const out = await scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
-        lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, seed,
+        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed,
         onRows: (r) => qc.setQueryData(baseKey, r),
       });
       if (snapKey) writeHotSnap(snapKey, generated, out);
@@ -53,41 +54,31 @@ export function useHotRows(scope?: HotScope, doc?: any) {
   });
 
   const liveExtra = useQuery({
-    queryKey: ["hot-rows-live", what, stamp, generated, liveSig],
-    enabled: !!scope && !doc && !!base.data && !!liveSig && !!lines.data,
+    queryKey: ["hot-rows-live", what, stamp, generated, liveKey],
+    enabled: !!scope && liveLines.length > 0 && fixtures.isSuccess,
     staleTime: LIVE_TTL_MS,
-    gcTime: FEED_GC_MS,
-    placeholderData: (prev: Row[] | undefined) => prev,
+    gcTime: 5 * 60_000,
     queryFn: async () => {
-      const missing = missingLiveLines(base.data || [], lines.data.lines || []);
-      if (!missing.length) return [] as Row[];
       return scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
-        lines: missing, fixtures: fixtures.data!, scope: scope!, seed: null,
+        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null,
       });
     },
   });
 
   const data = useMemo(() => {
-    const baseRows = base.data || [];
-    if (!baseRows.length && !liveExtra.data?.length) return baseRows;
-    const keys = new Set(baseRows.map(rowLineKey));
-    const merged = baseRows.slice();
-    for (const r of liveExtra.data || []) {
-      if (!keys.has(rowLineKey(r))) { merged.push(r); keys.add(rowLineKey(r)); }
-    }
-    return patchHotQuotes(merged, lines.data?.lines || []);
+    return patchHotQuotes([...(base.data || []), ...(liveExtra.data || [])], lines.data?.lines || []) as Row[];
   }, [base.data, liveExtra.data, lines.data]);
 
   const day = scope && "day" in scope ? scope.day : -1;
   const otherDay = useMemo(() => (day >= 0 ? otherHotCount(lines.data?.lines || [], day) : 0), [lines.data, day]);
   const scoring = (base.isFetching && !base.isPlaceholderData) || (liveExtra.isFetching && !liveExtra.isPlaceholderData);
-  const isLoading = !!scope && ((base.isLoading && !data.length) || (!data.length && !base.isError && !liveExtra.isError));
+  const isLoading = !!scope && !data.length && (base.isLoading || liveExtra.isLoading || (base.isPending && !stats.isError && !linesQ.isError && !fixtures.isError));
   return {
     data: data as Row[] | undefined,
     isLoading,
     isFetching: base.isFetching || liveExtra.isFetching,
-    isError: base.isError,
+    isError: base.isError || liveExtra.isError || (!base.data && (stats.isError || linesQ.isError || fixtures.isError)),
     isSuccess: !!data?.length || base.isSuccess,
     scoring,
     otherDay,

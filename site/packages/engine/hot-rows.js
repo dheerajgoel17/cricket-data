@@ -28,30 +28,27 @@ export const rowLineKey = (r) => `${r.pid}|${r.stat}|${r.fmt}|${matchChipId(r.ma
 /** Pre-match book lines only (history scoring for these is stable across the ~15 s in-play poll). */
 export const prematchLines = (lines) => (lines || []).filter((l) => !isLiveLine(l));
 
-/** Live-priced lines that have no scored row yet (a new batter line that appeared in-play). */
-export function missingLiveLines(rows, lines) {
-  const have = new Set((rows || []).map(rowLineKey));
-  return (lines || []).filter((l) => isLiveLine(l) && !have.has(lineKey(l)));
+/** Cache identity for live history: quote-only moves leave the scored threshold unchanged. */
+export function liveThresholdKey(lines, now = Date.now()) {
+  const byChip = groupByChip(lines);
+  const unique = new Map(lines.map((l) => [lineKey(l), l]));
+  return [...unique].map(([key, l]) => [key, booksOf(l, byChip, now)?.main.line ?? null])
+    .sort(([a], [b]) => a.localeCompare(b));
 }
 
-/**
- * Refresh prices / the main line on scored rows from the current books+live doc without re-running history.
- * Live polls move quotes every ~15 s; hit rates stay put.
- */
+/** Overlay current quotes only when they still match the scored threshold. */
 export function patchHotQuotes(rows, lines, now = Date.now()) {
-  if (!rows?.length) return rows || [];
-  if (!lines?.length) return rows;
-  const byKey = new Map((lines || []).map((l) => [lineKey(l), l]));
+  const byKey = new Map(lines.map((l) => [lineKey(l), l]));
   const byChip = groupByChip(lines);
-  return rows.map((r) => {
+  return rows.flatMap((r) => {
+    const live = r.quotes?.some((q) => q.live);
     const l = byKey.get(rowLineKey(r));
-    if (!l) return r;
-    const b = booksOf(l, byChip, now);
-    if (!b) return r;
+    const b = l && booksOf(l, byChip, now);
+    if (!b || b.main.line !== r.line) return live ? [] : [r];
     const main = b.main;
     const over = Math.max(...main.books.map((x) => x.over || 0));
     const under = Math.max(...main.books.map((x) => x.under || 0));
-    return { ...r, line: main.line, over, under, quotes: bookQuotes(b.lines), prior: main.prob ?? null, stored: l.result ?? r.stored };
+    return [{ ...r, over, under, quotes: bookQuotes(b.lines), prior: main.prob ?? null, stored: l.result ?? r.stored }];
   });
 }
 
@@ -105,13 +102,16 @@ export function rowOf({ store, l, b, idx, hist, venue, opp }) {
   };
 }
 
-/** Score one line from scratch (the player's files must be loaded: `await store.shard(...)`). Null when the player or his games are not in the data. */
-export async function scoreLine({ store, rz, l, byChip, fixtures, now, year }) {
+/**
+ * Score one line from scratch after loading the player's shard.
+ * @param {{store: any, rz: any, l: any, byChip: Map<any, any>, fixtures: any[], now: number, year: string, innings?: "first" | "second" | null}} options
+ */
+export async function scoreLine({ store, rz, l, byChip, fixtures, now, year, innings = null }) {
   const idx = store.P.id.indexOf(l.pid);
   const b = booksOf(l, byChip, now);
   if (idx < 0 || !b) return null;
   const main = b.main, inn = lineScope(l);
-  const r = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings: null }, split_by: [] }, { playerIdx: idx });
+  const r = await runPlan(store, rz, { kind: "player_prop", stat: l.stat, line: main.line, side: "over", filters: { format: l.fmt, team_innings: inn || null, innings }, split_by: [] }, { playerIdx: idx });
   const entries = r?.ok ? r.chart?.entries || [] : [];
   if (!entries.length) return null;
   const opp = opponentOf(b.match, l.team), venue = venueOf(b, l, fixtures);

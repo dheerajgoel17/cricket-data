@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { LIVE_TTL_MS, liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
-import { groupByChip, missingLiveLines, patchHotQuotes, rowLineKey, scoreLine } from "@cricket/engine/hot-rows.js";
+import { groupByChip, isLiveLine, lineKey, liveThresholdKey, patchHotQuotes, prematchLines, scoreLine } from "@cricket/engine/hot-rows.js";
 import { MarketTape } from "./market-tape";
 import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
@@ -73,7 +73,8 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const scopeKey = ["hot-props", scope] as const;
   // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below)
   const key = [...scopeKey, fixtures.isLoading, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null];
-  const liveSig = archive ? "" : (doc.data?.live_sig ?? "");
+  const liveLines = useMemo(() => archive ? [] : hotLines((doc.data?.lines || []).filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, doc.data, teams, day]);
+  const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   const rows = useQuery({
     queryKey: key,
     placeholderData: (previous, query) => query?.queryKey[1] === scope ? previous : undefined,
@@ -83,7 +84,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
-      const todays = { lines: hotLines(doc.data.lines || [], teams ? { teams, archive: !!archive } : { day }, now) };
+      const todays = { lines: hotLines(prematchLines(doc.data.lines), teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one: that stays (it is the bet we settle) and the live line is added once it is passed
       const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
       const keys = new Map<string, any>();
@@ -139,22 +140,20 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     },
   });
   const liveExtra = useQuery({
-    queryKey: ["hot-props-live", scope, doc.data?.generated_at_utc, liveSig],
-    enabled: !archive && !!rows.data && !!liveSig && !!doc.data && matchesReady !== false,
+    queryKey: ["hot-props-live", scope, doc.data?.generated_at_utc, liveKey],
+    enabled: liveLines.length > 0 && !fixtures.isLoading && matchesReady !== false,
     staleTime: LIVE_TTL_MS,
-    gcTime: 60 * 60_000,
-    placeholderData: (prev: Row[] | undefined) => prev,
+    gcTime: 5 * 60_000,
     queryFn: async (): Promise<Row[]> => {
-      const missing = missingLiveLines(rows.data || [], doc.data.lines || []);
-      if (!missing.length) return [];
+
       const now = Date.now(), year = String(new Date().getFullYear());
-      const byChip = groupByChip(doc.data.lines || []);
+      const byChip = groupByChip(liveLines);
       const out: Row[] = [];
-      for (const l of missing) {
+      for (const [, l] of new Map(liveLines.map((l: any) => [lineKey(l), l]))) {
         const idx = store.P.id.indexOf(l.pid);
         if (idx < 0) continue;
         await store.shard(store.shardOf(idx)).catch(() => {});
-        const r = await scoreLine({ store, rz, l, byChip, fixtures: fixtures.data || [], now, year });
+        const r = await scoreLine({ store, rz, l, byChip, fixtures: fixtures.data || [], now, year, innings: inns === "all" ? null : inns });
         if (!r) continue;
         const fixture = (fixtures.data || []).find((f: any) => sameFixture({ match: r.match, start_utc: r.start, fmt: l.fmt }, f));
         out.push({ ...r, day: hotDay(r.start, l.fmt, now), gender: fixture?.gender === "female" ? 1 : fixture?.gender === "male" ? 0 : null } as Row);
@@ -163,11 +162,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     },
   });
   const data = useMemo((): Row[] => {
-    const base = rows.data || [];
-    const keys = new Set(base.map(rowLineKey));
-    const merged = base.slice();
-    for (const r of liveExtra.data || []) { if (!keys.has(rowLineKey(r))) { merged.push(r); keys.add(rowLineKey(r)); } }
-    return patchHotQuotes(merged, doc.data?.lines || []) as Row[];
+    return patchHotQuotes([...(rows.data || []), ...(liveExtra.data || [])], doc.data?.lines || []) as Row[];
   }, [rows.data, liveExtra.data, doc.data?.lines]);
   const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes

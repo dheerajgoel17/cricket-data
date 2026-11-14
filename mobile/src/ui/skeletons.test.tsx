@@ -93,7 +93,7 @@ describe("skeleton routes (every page / subpage)", () => {
   it("covers tabs, fixture subpages, player, team, league, ground", () => {
     const ids = SKELETON_ROUTES.map((r) => r.id);
     for (const need of [
-      "tabs/home/rail", "tabs/home/props", "tabs/home/tape", "tabs/props", "tabs/fancy", "tabs/leagues", "tabs/saved",
+      "tabs/home-rail", "tabs/home-props", "tabs/home-tape", "tabs/props", "tabs/fancy", "tabs/leagues", "tabs/saved",
       "fixture", "fixture/props", "fixture/fancy", "fixture/grid", "fixture/trends", "fixture/fancy-market", "fixture/ground",
       "player", "team/grid", "team/markets", "team/top", "league", "competitions", "venue", "ground-page", "tournament-stats",
     ]) {

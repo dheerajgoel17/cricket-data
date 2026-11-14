@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { cp, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { booksOf, groupByChip, historyRecord, isLiveLine, lineKey, matchChipId, missingLiveLines, patchHotQuotes, prematchLines, rowLineKey, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
+import { booksOf, groupByChip, historyRecord, isLiveLine, lineKey, matchChipId, liveThresholdKey, patchHotQuotes, prematchLines, rowLineKey, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { buildDoc, wantedLines } from "../scripts/hot-rows.mjs";
 import { fixtureDir, loadFixture } from "./helpers.mjs";
 
@@ -61,12 +61,16 @@ test("live poll helpers: prematch filter, missing live rows, quote patch without
   assert.deepEqual(prematchLines([pre, live]).map(lineKey), [lineKey(pre)]);
   const scored = [{ pid: KOHLI, stat: "runs", fmt: "T20", match: "Alpha vs Beta", start: "2026-11-03T09:00:00Z", inn: 0, line: 20.5, over: 1.9, under: 1.9, quotes: [{ source: "bet365", over: 1.9, under: 1.9, live: true }], l10: { hit: 4, played: 10 }, prior: 0.5 }];
   assert.equal(rowLineKey(scored[0]), lineKey(live));
-  assert.deepEqual(missingLiveLines(scored, [pre, live]), []);
-  assert.equal(missingLiveLines([], [pre, live]).map(lineKey).join(), lineKey(live));
-  const patched = patchHotQuotes(scored, [pre, moved], NOW);
-  assert.equal(patched[0].line, 22.5);
+  const repriced = { ...live, books: [{ ...live.books[0], over: 2.1 }] };
+  assert.deepEqual(liveThresholdKey([live], NOW), liveThresholdKey([repriced], NOW));
+  assert.notDeepEqual(liveThresholdKey([live], NOW), liveThresholdKey([moved], NOW));
+  const patched = patchHotQuotes(scored, [pre, repriced], NOW);
+  assert.equal(patched[0].line, 20.5);
   assert.equal(patched[0].over, 2.1);
-  assert.equal(patched[0].l10.hit, 4, "history is left alone");
+  assert.equal(patched[0].l10.hit, 4);
+  assert.deepEqual(patchHotQuotes(scored, [pre, moved], NOW), []);
+  assert.deepEqual(patchHotQuotes(scored, [pre], NOW), []);
+  assert.deepEqual(patchHotQuotes(scored, [], NOW), []);
 });
 
 test("wantedLines keeps priced pre-match lines inside the window and nothing else", () => {
