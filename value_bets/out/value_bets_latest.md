@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-15 03:00 IST
+# Cricket value bets - 2026-11-15 04:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -9,7 +9,7 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **feedg**: ok, 32 prices, 5 events
 - **feede**: ok, 330 prices, 20 events
 - **feedf**: ok, 476 prices, 13 events
-- **feedh**: ok, 1463 prices, 86 events
+- **feedh**: ok, 1463 prices, 82 events
 
 Matches starting in next 168h: **49**, markets priced: **527**, value bets: **6** (new alerts: 0). Min edge 5%.
 
@@ -32,4 +32,4 @@ Matches starting in next 168h: **49**, markets priced: **527**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Bangla Tigers (male), Border (W) (female), Central Hinds (W) (female), Diasqua Little Sai Wan Cricket Club (male), Dm Jamali Region (male), Faisalabad Region (male), Fata Region (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), Multan Region (male), Nhlangano Legends (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Peshawar Region (male), Quetta Region (male), Rawalpindi Region (male), Recon Tactical Free State (W) (female), Royal Champs (male), Sialkot Blues (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female)
 
-Runtime 179.0s. Snapshot: `odds_20261114T213036Z.jsonl.gz`
+Runtime 116.2s. Snapshot: `odds_20261114T223030Z.jsonl.gz`

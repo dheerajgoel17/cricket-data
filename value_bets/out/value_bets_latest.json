@@ -1,27 +1,27 @@
 {
- "generated_at_utc": "2026-11-14T21:30:36Z",
- "generated_at_ist": "2026-11-15 03:00 IST",
- "runtime_secs": 179.0,
+ "generated_at_utc": "2026-11-14T22:30:30Z",
+ "generated_at_ist": "2026-11-15 04:00 IST",
+ "runtime_secs": 116.2,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-14",
-  "commit": "68cbfdb95b"
+  "commit": "493ae27c88"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 2525,
-   "secs": 1.2
+   "secs": 1.3
   },
   "smarkets": {
    "status": "ok",
    "rows": 544,
-   "secs": 2.6
+   "secs": 1.9
   },
   "feedk": {
    "status": "ok",
    "rows": 236,
-   "secs": 24.2,
+   "secs": 23.3,
    "events": 9
   },
   "feedg": {
@@ -33,23 +33,23 @@
   "feede": {
    "status": "ok",
    "rows": 330,
-   "secs": 54.0,
+   "secs": 51.8,
    "events": 20
   },
   "feedf": {
    "status": "ok",
    "rows": 476,
-   "secs": 73.4,
+   "secs": 71.7,
    "events": 13
   },
   "feedh": {
    "status": "ok",
    "rows": 1463,
-   "secs": 91.0,
-   "events": 86
+   "secs": 77.2,
+   "events": 82
   }
  },
- "snapshot": "odds_20261114T213036Z.jsonl.gz",
+ "snapshot": "odds_20261114T223030Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -127,7 +127,7 @@
   "value_bets": 6,
   "dropped_by_filter": {
    "odds_range": 26,
-   "model_market_gap": 1003,
+   "model_market_gap": 1006,
    "market_disabled": 3,
    "policy_max_odds": 3,
    "model_only_no_market": 291,
@@ -141,11 +141,11 @@
   "innings_milestones_unmodelled": 70,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 699,
+    "n_prices": 697,
     "mean_model_p": 0.051,
     "mean_market_p": 0.068,
     "mean_logit_diff_model_minus_market": 0.157,
-    "mean_abs_logit_diff": 0.928,
+    "mean_abs_logit_diff": 0.931,
     "corr": 0.684
    },
    "top_bowler_team": {
@@ -1573,26 +1573,26 @@
   }
  },
  "log": [
-  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:00 IST] history: 24087 matches, last 2026-11-14, players 434211",
-  "[03:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2525, 'secs': 1.2}",
-  "[03:02 IST] source smarkets: {'status': 'ok', 'rows': 544, 'secs': 2.6}",
-  "[03:02 IST] source feedk: {'status': 'ok', 'rows': 236, 'secs': 24.2, 'events': 9}",
-  "[03:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 27.2, 'events': 5}",
-  "[03:02 IST] source feede: {'status': 'ok', 'rows': 330, 'secs': 54.0, 'events': 20}",
-  "[03:02 IST] source feedf: {'status': 'ok', 'rows': 476, 'secs': 73.4, 'events': 13}",
-  "[03:02 IST] source feedh: {'status': 'ok', 'rows': 1463, 'secs': 91.0, 'events': 86}",
-  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:02 IST] 107 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[03:02 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[03:02 IST] 70 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[03:02 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
-  "[03:02 IST] name map: Queensland Bulls vs Tasmania Tigers -> Queensland vs Tasmania (2026-11-16T00:00:00Z)",
-  "[03:02 IST] name map: Victoria Bushrangers vs Western Australia Warriors -> Victoria vs Western Australia (2026-11-16T03:00:00Z)",
-  "[03:02 IST] book lines: 547 player lines from 7 source(s)",
-  "[03:02 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[03:03 IST] weather: forecasts for 13 events, 0 failed",
-  "[03:03 IST] prop model: 1847 prop selections modelled, 734 milestone ladder prices anchored to O/U",
-  "[03:03 IST] ledger upsert model: {'upserted': 6, 'skipped_settled': 0}"
+  "[04:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[04:00 IST] history: 24087 matches, last 2026-11-14, players 434211",
+  "[04:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2525, 'secs': 1.3}",
+  "[04:02 IST] source smarkets: {'status': 'ok', 'rows': 544, 'secs': 1.9}",
+  "[04:02 IST] source feedk: {'status': 'ok', 'rows': 236, 'secs': 23.3, 'events': 9}",
+  "[04:02 IST] source feedg: {'status': 'ok', 'rows': 32, 'secs': 27.2, 'events': 5}",
+  "[04:02 IST] source feede: {'status': 'ok', 'rows': 330, 'secs': 51.8, 'events': 20}",
+  "[04:02 IST] source feedf: {'status': 'ok', 'rows': 476, 'secs': 71.7, 'events': 13}",
+  "[04:02 IST] source feedh: {'status': 'ok', 'rows': 1463, 'secs': 77.2, 'events': 82}",
+  "[04:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[04:02 IST] 107 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[04:02 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[04:02 IST] 70 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[04:02 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
+  "[04:02 IST] name map: Queensland Bulls vs Tasmania Tigers -> Queensland vs Tasmania (2026-11-16T00:00:00Z)",
+  "[04:02 IST] name map: Victoria Bushrangers vs Western Australia Warriors -> Victoria vs Western Australia (2026-11-16T03:00:00Z)",
+  "[04:02 IST] book lines: 547 player lines from 7 source(s)",
+  "[04:02 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[04:02 IST] weather: forecasts for 13 events, 0 failed",
+  "[04:02 IST] prop model: 1847 prop selections modelled, 734 milestone ladder prices anchored to O/U",
+  "[04:02 IST] ledger upsert model: {'upserted': 6, 'skipped_settled': 0}"
  ]
 }
