@@ -12,6 +12,7 @@ import { heatStep } from "@site/lib/heat";
 import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
 import { storeQuery } from "@/lib/data";
+import { playerLabel } from "@/lib/player-label";
 import { ActiveChip, ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
 import { EmptyState } from "@/ui/empty-state";
@@ -95,10 +96,11 @@ const NAME_W = 132, HIT_W = 44, CELL_W = 46, ROW_H = 46;
 /** Players down, the team's last fixtures across (the site's `GridTable`). A cell is the stat value, tinted by how far it sits from the line; the player names stay put while the fixtures scroll sideways. */
 export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line: number }) {
   const stats = useQuery(storeQuery);
-  const store: any = stats.data?.store;
+  const store: any = stats.data?.store, names = stats.data?.names;
   if (!store) return <EmptyState compact title="Could not load grid" body="Pull to retry once the stats data is ready." />;
   if (!g.fx.length) return <EmptyState compact title="No fixtures" body="No fixtures for this format." />;
   const M = store.M;
+  const label = (i: number) => playerLabel(store, names, i);
   return (
     <View style={styles.table}>
       <View>
@@ -107,10 +109,10 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
           const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key] as number);
           const k = vals.filter((v) => v > line).length;
           return (
-            <Press scale={1} key={p} onPress={() => push(`/player/${p}`)} accessibilityRole="button" accessibilityLabel={store.playerName(p)} style={({ pressed }) => [styles.cell, styles.rowStart, pressed && { opacity: 0.6 }]}>
+            <Press scale={1} key={p} onPress={() => push(`/player/${p}`)} accessibilityRole="button" accessibilityLabel={label(p)} style={({ pressed }) => [styles.cell, styles.rowStart, pressed && { opacity: 0.6 }]}>
               <View style={{ width: NAME_W, flexDirection: "row", alignItems: "center", gap: space.tight }}>
                 <PlayerAvatar pid={store.P.id[p]} team={store.teamName(teamIdx)} size={28} />
-                <Text style={styles.name} numberOfLines={1}>{store.playerName(p)}</Text>
+                <Text style={styles.name} numberOfLines={1}>{label(p)}</Text>
               </View>
               <Text style={[styles.hit, { width: HIT_W }]}>{vals.length ? `${k}/${vals.length}` : "–"}</Text>
             </Press>
@@ -148,7 +150,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
 /** Players whose recent games clear the line most often, as list rows (picture, line and record, hit rate, last-10 bars) (the site's `TrendCards`). */
 export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; team: number }[]; line: number; minHit: number; stat: string }) {
   const stats = useQuery(storeQuery);
-  const store: any = stats.data?.store;
+  const store: any = stats.data?.store, names = stats.data?.names;
   if (!store) return <EmptyState compact title="Could not load trends" body="Pull to retry once the stats data is ready." />;
   const items: any[] = [];
   for (const { g, team } of grids) for (const r of g.body) {
@@ -162,13 +164,14 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
   if (!list.length) return <EmptyState compact title="No clears at this hit rate" body="Lower the hit-rate filter or line." />;
   const label = (STATS as any)[stat].label;
+  const who = (i: number) => playerLabel(store, names, i);
   return (
     <Bleed style={{ paddingHorizontal: 0 }}>
       {list.map((i, n) => (
         <Press scale={1} key={`${i.p}-${i.team}`} onPress={() => push(`/player/${i.p}`)} accessibilityRole="button" style={({ pressed }) => [styles.trend, n > 0 && styles.sep, pressed && { backgroundColor: color.card }]}>
           <PlayerAvatar pid={store.P.id[i.p]} team={store.teamName(i.team)} size={44} />
           <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text style={styles.name} numberOfLines={1}>{store.playerName(i.p)}</Text>
+            <Text style={styles.name} numberOfLines={1}>{who(i.p)}</Text>
             <Text style={styles.desc} numberOfLines={1}><Text style={{ color: color.primary }}>O {line} {label}</Text> · {i.k}/{i.vals.length}</Text>
           </View>
           <View style={{ alignItems: "flex-end", gap: 2 }}>

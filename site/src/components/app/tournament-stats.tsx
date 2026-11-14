@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ChartBarIcon, ChevronDownIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { editionRows, editionSummary, editionsOf, boards as tournamentBoards, trendSeries, TREND_METRICS } from "@cricket/engine/tournament.js";
+import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { useData } from "@/lib/data";
 import { track } from "@/lib/analytics";
 import { abbr } from "@/lib/format";
@@ -175,7 +176,7 @@ function LeaderCard({ l, test }: { l: Leader; test: boolean }) {
 
 /** One list as a table: rank, name with side, the headline figure, then the supporting columns (two on a phone, all from sm). */
 function BoardCard({ b }: { b: Board }) {
-  const { store } = useData();
+  const { store, names } = useData();
   const nav = useNavigate();
   const [all, setAll] = useState(false);
   const shown = all ? b.rows : b.rows.slice(0, SHOWN);
@@ -199,7 +200,7 @@ function BoardCard({ b }: { b: Board }) {
         </TableHeader>
         <TableBody>
           {shown.map((r) => {
-            const player = r.p != null, name = player ? store.playerName(r.p!) : store.teamName(r.t, true), crest = store.teams[r.t]?.n ?? "";
+            const player = r.p != null, name = player ? resolvePlayerLabel(store.playerName(r.p!), { catalogName: names?.[store.P.id[r.p!]] }) : store.teamName(r.t, true), crest = store.teams[r.t]?.n ?? "";
             const sub = r.m == null ? (player ? side(r.t) : "") : `${player ? `${side(r.t)} ` : ""}v ${side(r.q)}${r.date ? ` · ${day(r.date, false)}` : ""}`;
             return (
               <TableRow key={`${r.rank}-${r.p ?? r.t}-${r.m ?? ""}`} className={cn("border-hairline", player && "cursor-pointer")} onClick={(e) => { if (player && !(e.target as HTMLElement).closest("a")) nav(`/player/${r.p}`); }}>

@@ -129,6 +129,11 @@ A priced line's "so far / final / Cleared / Missed / Push / Not in XI" is worked
 Team logos / player photos come from Source A's public sitemaps + image CDN (`$IMG_CDN_BASE`), fallbacks: Wikimedia Commons (Wikidata P2697->P18), flagcdn flags, initials/silhouette.
 The browser tries **our own copy first** (5.6). Images belong to their owners: check terms before commercial use.
 
+**Fallback chains (intentionally not the source's stock assets):**
+* **Face:** our store → source CDN → Commons → our silhouette. The source's stock helmet-and-grey-head avatar (served under every id with no photo) is detected by content hash (`assets_sync.placeholder_ids`) and never shown as a face.
+* **Jersey:** mapped team kit only (`photos.t` / `TEAM_FILL` / `teamJerseys`). The source's plain `AD` shirt is not used — it looks like a real kit when a side is unmapped.
+* **Crest / flag:** source team logo → flagcdn (`engine/flags.js` `flagCode`: parent-nation strips so India A / Afghanistan U19 share the senior flag) → initials. Clubs with neither stay initials.
+
 **Why a player shows the silhouette** (measured 2026-11-09 on the 216 priced players, then the whole player table; each has one fix at the source, none a special case):
 1. *The source's stock avatar passed for a photo.* The source serves one of three stock helmet-and-head pictures under every player id it has no photo for, and the sync stored them like faces: 3151 of 6851 stored pictures, 1711 of the 4855 linked players. Found by content (`assets_sync.placeholder_ids`: one stored hash shared by 20+ players), such a player gets no `c:` photo in `photos.json` (`build.faces`), the Commons photo when Wikidata has one, else our silhouette. His identity link (live scores) is untouched.
 2. *The source's player list drifted.* It loses players from day to day while their pages and images stay up; 1539 players had a photo link in an earlier build (the images are in our store) and none now. `crex_players` remembers every id and name any build saw: `assets_sync.remembered_players` feeds them back (`crex_assets.merge_remembered`). Matching runs on today's list first, exactly as before, so a remembered name can only add a link, never make a working one ambiguous.

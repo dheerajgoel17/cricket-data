@@ -441,11 +441,11 @@ export function DesignSystemPage() {
           <div className="w-full overflow-hidden rounded-lg border border-hairline">
             <div className="flex h-12 items-center gap-snug bg-card px-gutter text-callout font-label">Flush header (bg-card)</div>
             <StickyFilterBand className="static top-auto z-auto mx-0">
-              <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter py-tight">
+              <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
                 <span className="text-callout font-label text-primary underline underline-offset-4">Format</span>
                 <span className="text-callout text-muted-foreground">Filters</span>
               </div>
-              <div className="px-gutter py-tight text-footnote text-muted-foreground">Prop / market pills under</div>
+              <div className="flex flex-col gap-snug px-gutter py-snug text-footnote text-muted-foreground">Innings + prop pills share one gap-snug stack</div>
             </StickyFilterBand>
           </div>
         </PreviewFrame>

@@ -1,7 +1,7 @@
 process.env.VITE_IMG_CDN = "https://img.test";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { leagueLogos, playerPhoto, playerPhotos, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
+import { leagueLogos, playerPhoto, playerPhotos, teamId, teamJerseys, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
 
 const photos = { p: { "4ae1755b": "c:1IG", "bad0cafe": "w:Jos buttler.JPG" }, t: { india: "O", "west indies": "V", "mumbai indians": "F" } };
 
@@ -35,4 +35,17 @@ test("league logos are looked up by the event's folded name, the newest season's
   assert.deepEqual(leagueLogos(photos, "Indian Premier League"), [], "a photos file from before leagues were added");
   const own = { ...lg, base: "https://store.example/storage/v1/object/public/avatars", s: { l: ["1PW"] } };
   assert.deepEqual(leagueLogos(own, "Indian Premier League"), ["https://store.example/storage/v1/object/public/avatars/leagues/1PW.png", "https://img.test/Series/1PW.png"]);
+});
+
+test("team id: photos.t wins; TEAM_FILL covers holes older builds omitted; no AD placeholder jersey", () => {
+  assert.equal(teamId(photos, "India"), "O");
+  assert.equal(teamId(photos, "Afghanistan"), "Y", "fill when t omits a Base side the source lists");
+  assert.equal(teamId({ t: { afghanistan: "XX" } }, "Afghanistan"), "XX", "photos.t wins over fill");
+  assert.equal(teamId(photos, "United States of America"), "CD", "Base spelling vs source united states");
+  assert.equal(teamId(photos, "Pakistan U19-Women"), "NR", "full fold before stripping women");
+  assert.equal(teamId(photos, "India (W)"), "O", "women's side still uses the men's kit id");
+  assert.equal(teamId(photos, "Nowhere XI"), null);
+  assert.deepEqual(teamJerseys(photos, "Afghanistan"), ["https://img.test/jersey/limited/org/Y.png"]);
+  assert.deepEqual(teamJerseys(photos, "Nowhere XI"), []);
+  assert.ok(!teamJerseys(photos, "Nowhere XI").some((u) => /\/AD\.png/.test(u)));
 });

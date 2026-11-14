@@ -10,6 +10,7 @@ import { odds, pc, shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { heatClass, heatStep } from "@/lib/heat";
 import { PlayerBadge, TeamBadge, TeamFlag } from "./badges";
+import { PlayerName } from "./player-name";
 import { Muted } from "./page";
 import { EmptyState } from "./empty-state";
 import { MiniBars } from "./mini-bars";
@@ -30,7 +31,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
           const k = vals.filter((v: number) => v > line).length;
           return (
             <tr key={p} className="border-b border-hairline last:border-b-0">
-              <td className="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-tight"><Link to={`/player/${p}`} className="flex items-center gap-tight hover:text-primary"><PlayerBadge idx={p} size="xs" />{store.playerName(p)}</Link></td>
+              <td className="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-tight"><Link to={`/player/${p}`} className="flex items-center gap-tight hover:text-primary"><PlayerBadge idx={p} size="xs" /><PlayerName idx={p} /></Link></td>
               <td className="px-2 text-center font-label text-primary">{vals.length ? `${k}/${vals.length}` : "–"}</td>
               {g.fx.map((m) => { const x = map.get(m); return (
                 <td key={m} className="px-1 py-hair text-center">{x ? <span className={cn("inline-block min-w-8 rounded-md px-1.5 py-hair font-label", heatClass(heatStep(x[g.def.key], line)))}>{x[g.def.key]}</span>
@@ -66,7 +67,7 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
             <Link to={`/player/${i.p}`}>
               <ItemMedia><PlayerBadge idx={i.p} size="md" /></ItemMedia>
               <ItemContent className="min-w-0 gap-hair">
-                <ItemTitle className="max-w-full"><span className="truncate">{store.playerName(i.p)}</span><TeamFlag name={store.teamName(i.team)} /></ItemTitle>
+                <ItemTitle className="max-w-full"><span className="truncate"><PlayerName idx={i.p} /></span><TeamFlag name={store.teamName(i.team)} /></ItemTitle>
                 <ItemDescription className="truncate text-footnote"><span className="text-primary">O {line} {label}</span> <span className="text-muted-foreground">· {i.k}/{i.vals.length}</span></ItemDescription>
               </ItemContent>
               <ItemActions className="gap-snug">

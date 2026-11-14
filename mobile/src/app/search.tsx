@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { norm } from "@cricket/engine/util.js";
 import { dayKey, dayLabel } from "@site/lib/format";
 import { storeQuery } from "@/lib/data";
+import { playerLabel } from "@/lib/player-label";
 import { fixturePath, goBack, push } from "@/lib/nav";
 import { fixturesQuery } from "@/lib/queries";
 import { useRecents } from "@/lib/saved";
@@ -29,7 +30,8 @@ export default function Search() {
   const { recents } = useRecents();
   const [text, setText] = useState("");
   const query = useDeferredValue(text);
-  const store: any = stats.data?.store, rz: any = stats.data?.rz;
+  const store: any = stats.data?.store, rz: any = stats.data?.rz, names = stats.data?.names;
+  const label = (i: number) => playerLabel(store, names, i);
 
   const found = useMemo(() => {
     const t = query.trim();
@@ -69,7 +71,7 @@ export default function Search() {
             </Section>
             {store && seen.length ? (
               <Section title="Recently viewed">
-                {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={40} />} title={store.playerName(i)} sub={team(i)} onPress={() => open(`/player/${i}`)} />)}
+                {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={40} />} title={label(i)} sub={team(i)} onPress={() => open(`/player/${i}`)} />)}
               </Section>
             ) : null}
           </>
@@ -84,7 +86,7 @@ export default function Search() {
             ) : null}
             {found.players.length ? (
               <Section title="Players">
-                {found.players.map((p: any, n: number) => <ListRow key={p.idx} first={n === 0} left={<PlayerAvatar pid={store.P.id[p.idx]} team={store.teamName(p.team)} size={40} />} title={store.playerName(p.idx)} sub={store.teamName(p.team)} onPress={() => open(`/player/${p.idx}`)} />)}
+                {found.players.map((p: any, n: number) => <ListRow key={p.idx} first={n === 0} left={<PlayerAvatar pid={store.P.id[p.idx]} team={store.teamName(p.team)} size={40} />} title={label(p.idx)} sub={store.teamName(p.team)} onPress={() => open(`/player/${p.idx}`)} />)}
               </Section>
             ) : null}
             {found.teams.length ? (

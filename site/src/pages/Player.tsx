@@ -47,7 +47,7 @@ import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
 import { MatchStatus } from "@/components/app/match-status";
-import { PlayerName } from "@/components/app/player-name";
+import { PlayerName, resolvePlayerLabel } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
@@ -131,7 +131,7 @@ function PlayerHeader({ idx, name, team, teamIx, test, fmts }: { idx: number; na
 }
 
 function PlayerScreen({ idx }: { idx: number }) {
-  const { store } = useData();
+  const { store, names } = useData();
   const nav = useNavigate();
   const rawName = store.playerName(idx), team = store.teamName(store.P.tm[idx]);
   const [version, setVersion] = useState(0);          // bumps when the URL changes through the router (stat, format, filters)
@@ -149,9 +149,9 @@ function PlayerScreen({ idx }: { idx: number }) {
 
   const lines = useQuery(linesQuery);
   const pid = store.P.id[idx];
-  // a player the data knows only by an id (eight hex digits) is shown under the name the books use for him
+  // Data sometimes stores only an eight-hex id: book spelling → names.json → id (same helper as props rows / PlayerName).
   const bookName = (lines.data?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
-  const name = /^[0-9a-f]{8}$/.test(rawName) ? bookName || rawName : rawName;
+  const name = resolvePlayerLabel(rawName, { bookName, catalogName: names?.[pid] });
   setTitle(`${name}: stats, hit rates and form`);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
@@ -217,7 +217,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <HeaderActions>
         <h1 className="sr-only">{name} · {statLabel}</h1>
         <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
-          <p className="truncate text-body font-emphasis tracking-tight">{name}</p>
+          <p className="truncate text-body font-emphasis tracking-tight"><PlayerName idx={idx} always fallback={name} /></p>
           <p className="truncate text-footnote text-muted-foreground">{statLabel}{side ? ` · ${abbr(side)}` : ""}</p>
         </div>
         <span className="hidden flex-1 lg:block" aria-hidden />
@@ -228,33 +228,29 @@ function PlayerScreen({ idx }: { idx: number }) {
       <div className="hidden pt-stack lg:block">
         <Crumbs items={[["Player props", "/props"], [name], [statLabel]]} />
       </div>
-      <AdSlot slotId="player_detail_top" />
+      {/* Ad below the sticky band so an empty/pending unit cannot open a gap under the header that vanishes once the band sticks. */}
       <StickyFilterBand>
-        {/* Fancy shape: format + Filters under one hairline; Test innings sit in that same parent block (not a third padded band — avoids a jumpy gap when the row appears). Stats stay the single filled row below. */}
-        <div className="border-b border-hairline">
-          <div className="flex min-w-0 items-stretch gap-snug px-gutter">
-            {fmts.length > 1 ? (
-              <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
-                className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
-            ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
-          </div>
-          {testBat && (
-            <div className="px-gutter pb-tight">
-              <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
-                items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
-            </div>
-          )}
+        {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
+        <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
+          {fmts.length > 1 ? (
+            <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
+              className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
+          ) : <span className="min-w-0 flex-1" />}
+          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            <AdjustmentsHorizontalIcon className="size-4" />Filters
+            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+          </Button>
         </div>
-        <div className="px-gutter py-tight">
+        <div className="flex flex-col gap-snug px-gutter py-snug">
+          {testBat && (
+            <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+              items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
+          )}
           <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
         </div>
         {activeFilters.length > 0 && (
-          <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+          <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
             {activeFilters.map(([k, v], i) => (
               <ActiveChip key={i} label={k || "Filter"} value={String(v)}
                 onRemove={() => navigateWith(CHIP_CLEAR[k] || Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl"].map((x) => [x, ""])))} />
@@ -263,6 +259,7 @@ function PlayerScreen({ idx }: { idx: number }) {
           </div>
         )}
       </StickyFilterBand>
+      <AdSlot slotId="player_detail_top" />
       <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />

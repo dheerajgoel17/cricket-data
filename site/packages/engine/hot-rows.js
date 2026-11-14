@@ -3,6 +3,7 @@
 // that file back (`seedRow`). Plain ESM, no DOM. Every number is the engine's (`runPlan`, `windowRate`); nothing here is a model.
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture } from "./lines.js";
 import { venueStem } from "./markets.js";
+import { resolvePlayerLabel } from "./player-label.js";
 import { runPlan } from "./plan.js";
 import { barState, windowRate } from "./windows.js";
 
@@ -90,13 +91,14 @@ export const HISTORY_FIELDS = ["idx", "name", "line", "prior", "opp", "venue", "
 /** The venue of a line's fixture, from the schedule. */
 export const venueOf = (b, l, fixtures) => String((fixtures || []).find((f) => sameFixture({ match: b.match, start_utc: b.start_utc, fmt: l.fmt }, f))?.venue || "");
 
-/** The row: the line's own fields (book names, quotes, prices) and a history. `day` is the viewer's, so it is not here. */
-export function rowOf({ store, l, b, idx, hist, venue, opp }) {
+/** The row: the line's own fields (book names, quotes, prices) and a history. `day` is the viewer's, so it is not here. `names` is the optional source full-name map (names.json). */
+export function rowOf({ store, l, b, idx, hist, venue, opp, names }) {
   const main = b.main;
   const over = Math.max(...main.books.map((x) => x.over || 0)), under = Math.max(...main.books.map((x) => x.under || 0));
+  const raw = store.playerName(idx);
   return {
     comp: String(b.competition || l.competition || ""), idx, pid: l.pid, inn: lineScope(l),
-    name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line,
+    name: resolvePlayerLabel(raw, { bookName: l.book_name, catalogName: names?.[l.pid] }), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line,
     fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5: hist.l5, l10: hist.l10, season: hist.season, h2h: hist.h2h, ven: hist.ven, venue, prior: main.prob ?? null, edge: null,
     last: hist.last, settled: hist.settled, stored: l.result ?? null, max: hist.max,
   };
@@ -104,9 +106,9 @@ export function rowOf({ store, l, b, idx, hist, venue, opp }) {
 
 /**
  * Score one line from scratch after loading the player's shard.
- * @param {{store: any, rz: any, l: any, byChip: Map<any, any>, fixtures: any[], now: number, year: string, innings?: "first" | "second" | null}} options
+ * @param {{store: any, rz: any, l: any, byChip: Map<any, any>, fixtures: any[], now: number, year: string, innings?: "first" | "second" | null, names?: Record<string, string> | null}} options
  */
-export async function scoreLine({ store, rz, l, byChip, fixtures, now, year, innings = null }) {
+export async function scoreLine({ store, rz, l, byChip, fixtures, now, year, innings = null, names = null }) {
   const idx = store.P.id.indexOf(l.pid);
   const b = booksOf(l, byChip, now);
   if (idx < 0 || !b) return null;
@@ -115,7 +117,7 @@ export async function scoreLine({ store, rz, l, byChip, fixtures, now, year, inn
   const entries = r?.ok ? r.chart?.entries || [] : [];
   if (!entries.length) return null;
   const opp = opponentOf(b.match, l.team), venue = venueOf(b, l, fixtures);
-  return rowOf({ store, l, b, idx, venue, opp, hist: historyOf({ entries, line: main.line, opp, venue, startUtc: b.start_utc, year }) });
+  return rowOf({ store, l, b, idx, venue, opp, names, hist: historyOf({ entries, line: main.line, opp, venue, startUtc: b.start_utc, year }) });
 }
 
 /** The history of a row, as a file keeps it. */
@@ -124,9 +126,10 @@ export const historyRecord = (row) => Object.fromEntries(HISTORY_FIELDS.map((k) 
 /**
  * A row from a published history and the line's own books, without the player's files or the plan: null when the published line is not the one the books lead with now (the price moved the
  * main line), the player is not in the phone's data or the history is for another build of the data; the caller then scores it from scratch.
+ * @param {{store?: any, l: any, b: any, rec: any, names?: Record<string, string> | null}} options
  */
-export function seedRow({ store, l, b, rec }) {
+export function seedRow({ store, l, b, rec, names = null }) {
   if (!rec || !b || rec.line !== b.main.line) return null;
   if (store && store.P.id[rec.idx] !== l.pid) return null;
-  return rowOf({ store: store ?? { playerName: () => rec.name }, l, b, idx: rec.idx, venue: rec.venue, opp: rec.opp, hist: rec });
+  return rowOf({ store: store ?? { playerName: () => rec.name }, l, b, idx: rec.idx, venue: rec.venue, opp: rec.opp, hist: rec, names });
 }

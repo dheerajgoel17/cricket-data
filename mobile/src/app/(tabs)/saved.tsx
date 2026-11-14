@@ -10,6 +10,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useAuth } from "@/lib/auth";
 import { storeQuery } from "@/lib/data";
+import { playerLabel } from "@/lib/player-label";
 import { openPlayer, push } from "@/lib/nav";
 import { parsePropKey, useRecents, useSaved } from "@/lib/saved";
 import { AppHeader } from "@/ui/brand";
@@ -30,7 +31,8 @@ function Saved() {
   const { user, loading, openSignIn, signOut } = useAuth();
   const { list, toggle } = useSaved();
   const { recents } = useRecents();
-  const store: any = stats.data?.store;
+  const store: any = stats.data?.store, names = stats.data?.names;
+  const label = (i: number) => playerLabel(store, names, i);
 
   const account = user ? (
     <Press accessibilityRole="button" accessibilityLabel="Sign out" onPress={() => void signOut()} style={({ pressed }) => [styles.account, pressed && { opacity: 0.6 }]}>
@@ -74,21 +76,21 @@ function Saved() {
           {props.map(({ k, p }, n) => (
             <ListRow key={k} first={n === 0} chevron={false}
               left={<PlayerAvatar pid={store.P.id[p.idx]} team={team(p.idx)} size={44} />}
-              title={store.playerName(p.idx)}
+              title={label(p.idx)}
               sub={<><Text style={styles.line}>O {p.line}</Text> {(STATS as any)[p.stat]?.label ?? p.stat} · {FORMATS[p.fmt] ?? ""}</>}
               right={remove(k)}
-              onPress={() => openPlayer({ idx: p.idx, stat: p.stat, line: p.line, fmt: FORMATS[p.fmt] ?? "T20" })} label={`${store.playerName(p.idx)}, over ${p.line}`} />
+              onPress={() => openPlayer({ idx: p.idx, stat: p.stat, line: p.line, fmt: FORMATS[p.fmt] ?? "T20" })} label={`${label(p.idx)}, over ${p.line}`} />
           ))}
         </Section>
         <Section title="Players and teams" count={people.length} emptyTitle="No saved players or teams" empty="Tap the star on a player or team page to keep it here.">
           {people.map(({ k, kind, i }, n) => kind === "player" ? (
-            <ListRow key={k} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={store.playerName(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />
+            <ListRow key={k} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={label(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />
           ) : (
             <ListRow key={k} first={n === 0} left={<TeamBadge name={store.teams[i].n} size={44} />} title={store.teamName(i)} sub="Team" onPress={() => push(`/team/${i}`)} />
           ))}
         </Section>
         <Section title="Recently viewed" count={seen.length} emptyTitle="No recent players" empty="Players you open show up here on this device.">
-          {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={store.playerName(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />)}
+          {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={label(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />)}
         </Section>
       </View>
     );

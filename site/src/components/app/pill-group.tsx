@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * Single-select pill group (shadcn ToggleGroup). Variants:
  * - default / outlined: filled primary selected pill (parent filters)
  * - segmented: raised thumb in a track
- * - sub: quieter text row (underline on selected); put a hairline on the parent row (home phase bar), not on this group
+ * - sub: quieter text row (underline on selected, `py-snug`); put a hairline on the parent row (home phase bar), not on this group
  * Motion slide is instant under reduced motion and on first paint (a newly mounted row must not spring-fly in). `layoutId` must be unique per group.
  */
 export function PillGroup({ items, value, onChange, layoutId, label, className, itemClassName, segmented, sub, resetValue }: {
@@ -50,7 +50,7 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
             className={cn(
               "relative shrink-0 font-label transition-colors",
               sub
-                ? "h-auto rounded-none border-0 bg-transparent px-0 py-stack text-callout shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-primary data-[state=off]:text-muted-foreground"
+                ? "h-auto rounded-none border-0 bg-transparent px-0 py-snug text-callout shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-primary data-[state=off]:text-muted-foreground"
                 : outlined
                   ? "h-control rounded-[var(--chip-radius)] border! border-hairline! bg-card! px-3.5 text-callout text-foreground! shadow-none hover:bg-surface-hover data-[state=on]:border-transparent! data-[state=on]:bg-transparent! data-[state=on]:text-primary-foreground!"
                   : segmented

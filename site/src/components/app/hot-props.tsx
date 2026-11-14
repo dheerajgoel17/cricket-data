@@ -13,6 +13,7 @@ import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag }
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { edgeTag, groundNote, modelSide } from "@cricket/engine/props-view.js";
+import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { fmtIndex } from "@cricket/engine/util.js";
 import { venueStem } from "@cricket/engine/markets.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
@@ -64,7 +65,7 @@ interface Row { gender: number | null; comp: string; day: number; idx: number; p
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
 export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
-  const { store, rz, matchesReady } = useData();
+  const { store, rz, matchesReady, names } = useData();
   const qc = useQueryClient();
   const lines = useLinesLive();
   const fixtures = useFixtures(); // each match's ground, for the venue window
@@ -116,7 +117,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         // once the match itself is in the data its result is his latest game: same opponent, within a day of the start
         const lastE = entries[entries.length - 1];
         const settled: number | null | undefined = lastE && norm(lastE.opp) === norm(opp) && Math.abs(Date.parse(String(lastE.date)) - Date.parse(String(b.start_utc).slice(0, 10))) <= 86400e3 ? lastE.value : undefined;
-        out.push({ gender, comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: /^[0-9a-f]{8}$/.test(store.playerName(idx)) ? l.book_name || store.playerName(idx) : store.playerName(idx), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
+        out.push({ gender, comp: String(b.competition || l.competition || ""), day: hotDay(b.start_utc, l.fmt, now), idx, pid: l.pid, inn, name: resolvePlayerLabel(store.playerName(idx), { bookName: l.book_name, catalogName: names?.[l.pid] }), bookName: l.book_name || "", team: l.team, opp, stat: l.stat, line: main.line, fmt: l.fmt, match: b.match, start: b.start_utc, over, under, quotes: bookQuotes(b.lines), l5, l10, season, h2h, ven, venue,
           prior: main.prob ?? null, edge: null, last, settled, stored: l.result ?? null, max: Math.max(main.line * 1.5, ...last.map((x) => x.v ?? 0), 1) }); // `result`: the archive file's stored result for this player and stat
       };
       // Started matches' files go first, and that first file is fetched alone so its rows can show before the rest of the day's files.
@@ -452,10 +453,10 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
       )}
       {urlState ? (
         <StickyFilterBand>
-          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
+          <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
             <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
               <AdjustmentsHorizontalIcon className="size-4" />Filters
               {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
             </Button>
@@ -469,10 +470,10 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col">
-          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline">
+          <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
             <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
               <AdjustmentsHorizontalIcon className="size-4" />Filters
               {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
             </Button>

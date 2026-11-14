@@ -15,6 +15,26 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — Flags: parent-nation codes; kit/face keep honest empties
+- **Path:** `engine/flags.js` (`flagCode`, `FLAG_CODES`), `lib/assets.ts` (`flagUrl`), `share-text.js`
+- **Change:** Flagcdn lookup moved to the engine; U19 / A / Champions / Women strip to the senior flag; added missing nations (USA spellings, Costa Rica, Cameroon, Iran, Ivory Coast, …). Still no source AD jersey or stock helmet face as UI fallbacks.
+- **Callers:** TeamBadge / TeamFlag / mobile team-badge; match share emoji flags
+
+### 2026-11-14 — Player kit: no AD placeholder; format-row py-snug
+- **Path:** `engine/photos.js` (`teamId`, `TEAM_FILL`, `teamJerseys`), `Player.tsx` / `match-fancy.tsx` / `hot-props.tsx` sticky parent row, `build.py` photos `t` backfill, `crex_assets.TEAM_ALIASES`
+- **Change:** Dropped the generic Source A `AD` shirt fallback (looked like a real kit when `photos.t` omitted a side, e.g. Afghanistan). `TEAM_FILL` + build-time re-match of assembled teams cover holes; `teamId` tries full fold before stripping women (U19 Women); USA Base spelling aliased to source `united states`; format/scope + Filters hairline rows use `py-snug`.
+- **Callers:** PlayerPortrait / crests / share cards; Player + Match Fancy + Hot props sticky bands
+
+### 2026-11-14 — Sticky filter rhythm: snug pads, ad under band
+- **Path:** `pill-group.tsx` (`sub` → `py-snug`), `Player.tsx`, `match-fancy.tsx`, docs
+- **Change:** Sub-row `py-stack` left a hole under the flush header that looked like top gap until the band stuck. Filled chip stack uses `gap-snug py-snug` (tight read as missing). `player_detail_top` / `fancy_detail_top` sit below the sticky band so ads cannot open a scroll-top gap above the chips.
+- **Callers:** All `PillGroup sub`; Player + Match Fancy detail sticky bands
+
+### 2026-11-14 — Sticky filter parent row: items-center; equal filled-chip stack
+- **Path:** `Player.tsx`, `match-fancy.tsx`, `hot-props.tsx`, `DesignSystem.tsx`
+- **Change:** Format/scope/prop + Filters used `items-stretch`, so the control-tall row left a dead band under the underline before the next chips. `items-center` on that hairline row everywhere; Player Test innings + prop pills share one filled-chip stack (even vertical rhythm).
+- **Callers:** Player sticky band; Match Fancy; Props screener; catalogue StickyFilterBand stage
+
 ### 2026-11-14 — PillGroup: snap mount; Player Test innings spacing
 - **Path:** `site/src/components/app/pill-group.tsx`, `site/src/pages/Player.tsx`
 - **Change:** Newly mounted pill rows no longer spring-fly the selection thumb or smooth-scroll on first paint (Test innings under format felt random). Innings chips sit inside the format hairline block with one `pb-tight` (not a third padded band); prop pills keep a single `py-tight` below.

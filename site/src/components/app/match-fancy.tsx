@@ -312,28 +312,27 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           <Crumbs items={[[`${abbr(fx.a)} v ${abbr(fx.b)}`, matchPath], ["Match Fancy", fancyListPath], [key ? marketLabel(key) : "Market"]]} />
         </div>
       )}
-      {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
       {mode === "detail" ? (
         <StickyFilterBand>
-          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
+          <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
             {scopes.length > 1 ? (
               <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
             <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
               <AdjustmentsHorizontalIcon className="size-4" />L{win}
               {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
             </Button>
           </div>
           {keyList.length > 1 && (
-            <div className="px-gutter py-tight">
+            <div className="px-gutter py-snug">
               <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
             </div>
           )}
           {activeFilters.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
               {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
               <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
             </div>
@@ -341,14 +340,14 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col gap-snug">
-          <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline">
+          <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
             {scopes.length > 1 ? (
               <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
             <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
               <AdjustmentsHorizontalIcon className="size-4" />L{win}
               {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
             </Button>
@@ -361,6 +360,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           )}
         </div>
       )}
+      {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 

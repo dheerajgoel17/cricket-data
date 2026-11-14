@@ -10,6 +10,7 @@ import { matchPhase, matchSide, pickPricedMatch } from "@cricket/engine/next-mat
 import { runPlan } from "@cricket/engine/plan.js";
 import { SPLITS } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
+import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { FORMATS, fmtIndex } from "@cricket/engine/util.js";
 import { barState, windowRates } from "@cricket/engine/windows.js";
 import { storeQuery } from "@/lib/data";
@@ -32,8 +33,10 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
   const fmts = useMemo(() => FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1), [fm]);
   const doc = lines.data;
   const bookName = (doc?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
-  const short = /^[0-9a-f]{8}$/.test(rawName) ? bookName || rawName : rawName;
-  const name = stats.data?.names?.[pid] || short; // the full name when the data has one ("Jason Smith"), else the scorecard's ("JF Smith")
+  // Same order as the site: book spelling → names.json → raw (never leave a hex id on screen when either exists).
+  const catalogName = stats.data?.names?.[pid];
+  const short = resolvePlayerLabel(rawName, { bookName, catalogName });
+  const name = catalogName || short; // full source name when the data has one ("Jason Smith"), else the resolved short label
   const askedStat = q.stat || "";
   const pricedIn = doc ? fmtIndex(bookFormatFor(doc, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0);

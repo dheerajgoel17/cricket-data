@@ -21,8 +21,12 @@ export function wantedLines(lines, now) {
 export async function buildDoc({ dataDir, linesPath, now = Date.now() }) {
   const read = async (p) => JSON.parse(await readFile(p, "utf8"));
   const store = await createStore({ fetchJson: (p) => read(join(dataDir, p)) });
-  const [doc, fixtures, meta] = await Promise.all([read(linesPath), store.loadFixtures(), read(join(dataDir, "meta.json"))]);
+  const [doc, fixtures, meta, namesFile] = await Promise.all([
+    read(linesPath), store.loadFixtures(), read(join(dataDir, "meta.json")),
+    read(join(dataDir, "names.json")).catch(() => ({})),
+  ]);
   if (!fixtures.length) throw new Error("no fixtures in the built data");
+  const names = namesFile && typeof namesFile === "object" ? namesFile : {};
   const rz = new Resolver(store);
   const year = String(new Date(now).getUTCFullYear());
   const all = wantedLines(doc.lines || [], now);
@@ -37,7 +41,7 @@ export async function buildDoc({ dataDir, linesPath, now = Date.now() }) {
     await store.shard(shard);
     for (const l of group) {
       if (!booksOf(l, byChip, now)) { skipped++; continue; }
-      const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year });
+      const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year, names });
       if (r) { rows[lineKey(l)] = historyRecord(r); scored++; } else skipped++;
     }
   }
