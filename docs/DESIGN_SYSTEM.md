@@ -213,6 +213,8 @@ When you add a product component job, show a Spec on that page and update the ca
 
 * Tokens edit: `site/packages/tokens/tokens.json` → `cd site && npm run tokens`
 * Living page: `/design-system`
+* Component / token history: [DESIGN_SYSTEM_CHANGELOG.md](DESIGN_SYSTEM_CHANGELOG.md) (append on every shared UI change)
+* Centralization (DS ↔ product, variants, merge checklist): `.cursor/rules/design-system-centralization.mdc`
 * Site UI rules: docs/SITE.md (structure, type/spacing, ads)
 * App rules: docs/MOBILE.md, `mobile/AGENTS.md`
 * Agents index: AGENTS.md “Where to look”
@@ -221,3 +223,11 @@ When you add a product component job, show a Spec on that page and update the ca
 ### Standalone catalogue hosting
 
 The catalogue boots independently on `design.fancy.cash` and uses a light documentation palette. Attach that hostname to the web deployment and configure its DNS using the deployment provider's records. Set `VITE_DESIGN_SYSTEM_HOST` at build time to use a different hostname. The legacy `/design-system` URL redirects to the public hostname and preserves section anchors. The token reference still describes the product's shared tokens.
+
+**Layout:** catalogue chrome reuses the **product** shell — `Header` (GlobalSearch, Auth/Sign-in, Saved), shadcn `Sidebar*` (same recipe as `layout/Shell.tsx`), and `IosTabBar`. Docs content uses a wider inset (`px-6` → `lg:px-12`) than product phone gutters so stages are not flush to the rail. The design host boots `AuthProvider` + `DataProvider` + feed prefetch so search has matches/players. Catalogue paths (`/`, `/docs/*`, `/search`) stay local; Saved, tab destinations, and search entity hits hand off to the product origin (`VITE_SITE_URL` or `https://fancy.cash`) via `lib/design-host.ts`. Home hides the docs sidebar but keeps Header + tab bar. `design-light` sets `--sidebar*` for the light rail. Data & metrics includes a live `ChartBars` stage.
+
+**Content column (docs article):** right pane is a shadcn / Atlaskit-style article, not a product drill-in. `DocsArticle` (`docs-article.tsx`) provides `DocsPageHeader` (H1 + lead + source chip), optional **When to use**, body stages, sticky **On this page** TOC (`xl+`), and `DocsPager` prev/next cards. Live demos use `PreviewFrame` (H2 anchor, Preview toolbar, tall centered canvas); `ExampleStage` remains an alias. Reference blocks use `DocPanel`. Search and 404 use `EmptyState`.
+
+**Navigation:** topic tree in `SidebarGroup`s; Foundations / Components / Patterns / Resources via `NAV_LINKS`. Components lands on `/docs/components`.
+
+**Motion page:** `/docs/motion` — live curve demos + PillGroup spring (500 / 38); reduced motion zeroes duration.

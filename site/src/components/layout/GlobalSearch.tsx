@@ -12,6 +12,7 @@ import { dayKey, dayLabel } from "@/lib/format";
 import { norm } from "@/lib/hot-lines";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { PlayerName } from "@/components/app/player-name";
+import { goProduct, isDesignHost } from "@/lib/design-host";
 
 /** (CommandDialog does not expose cmdk's shouldFilter, so each item's value carries the typed text and always passes cmdk's own filter.)
  * Search state shared by the header field (desktop) and the icon button (phones): a shadcn command dialog opened with Cmd/Ctrl+K. Players are typo tolerant (engine resolver), plus teams and grounds. */
@@ -63,7 +64,13 @@ export function SearchDialog({ open, onOpenChange, onCloseAutoFocus }: { open: b
     return { teams: team ? [team] : [], players: rz.players(t, {}, 6) as any[], venues: rz.venues(t, 4) as any[], fixtures: games as any[] };
   }, [query, rz, fixtures.data]);
   const seen = useMemo(() => recents.filter((k) => k.startsWith("player:")).map((k) => +k.split(":")[1]).filter((i) => i >= 0 && i < store.P.id.length).slice(0, 5), [recents, store]);
-  const go = (to: string) => { onOpenChange(false); setText(""); nav(to); };
+  const go = (to: string) => {
+    onOpenChange(false);
+    setText("");
+    // Catalogue host has no product routes — hand off to the live site for entity pages.
+    if (isDesignHost()) goProduct(to);
+    else nav(to);
+  };
   const n = items.teams.length + items.players.length + items.venues.length + items.fixtures.length;
   return (
     <CommandDialog onCloseAutoFocus={onCloseAutoFocus} open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setText(""); }} title="Search" description="Search players, teams, matches and grounds">

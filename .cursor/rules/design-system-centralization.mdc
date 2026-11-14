@@ -1,0 +1,41 @@
+---
+description: Keep product UI and design-system catalogue in sync before merge to main; prefer variants over one-offs; confirm variants with the user; log component changes.
+alwaysApply: true
+---
+
+# Design system ↔ product centralization
+
+Before merging to `main`, UI work must be **centralized**: one shared component (or token), all call sites updated, catalogue and product stay aligned.
+
+## Bidirectional sync
+
+1. **Design-system / shared component changed** (`site/src/components/ui/*`, `site/src/components/app/*`, `site/packages/tokens/*`, `mobile/src/ui/*` twins):
+   - Propagate the change to **every** product usage (web + app where the job is shared).
+   - Update the living catalogue demo on the design host (`site/src/pages/DesignSystem.tsx`, `PreviewFrame` / docs article) in the **same PR**.
+2. **Product page / screen changed first** (`site/src/pages/*`, `mobile/src/app/**`):
+   - If a shared design component or token already covers the job, **edit that component/token** — do not fork styles in the page.
+   - Refresh the matching design-system topic so the catalogue matches production.
+
+## Variants — ask first
+
+- Do **not** invent a one-off class or copy-paste a near-duplicate for a special case.
+- If a call site needs different behaviour/look, **stop and ask the user**: new `variant` / prop, token tweak, or intentional exception.
+- Only after confirmation: add a named variant on the shared component, document it on the design host, and use that variant at the call site.
+
+## Changelog
+
+- Append an entry to [docs/DESIGN_SYSTEM_CHANGELOG.md](docs/DESIGN_SYSTEM_CHANGELOG.md) in the same PR whenever you change a shared component API, visual recipe, token, or catalogue stage.
+- Entry shape: date, component/path, what changed, callers/impact, PR link if known.
+- Do not rewrite history; only append.
+
+## Docs presentation
+
+- Token stacks, class names, file paths, and font stacks on the design host use a **code block** (`<pre><code>`), not plain paragraph text.
+
+## PR checklist (UI)
+
+- [ ] Shared component/token updated (not page-local fork)
+- [ ] All known call sites updated (or confirmed variant after user OK)
+- [ ] Design-system catalogue stage updated
+- [ ] `docs/DESIGN_SYSTEM_CHANGELOG.md` entry added when the shared surface changed
+- [ ] Web/app twins stay job-aligned (`docs/DESIGN_SYSTEM.md`)

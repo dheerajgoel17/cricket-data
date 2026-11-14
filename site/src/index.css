@@ -226,4 +226,13 @@ html, body, #root {
   --miss: var(--destructive);
   --amber: #855200;
   --dnp: #626c67;
+  /* shadcn Sidebar rail — light docs palette (product stays dark via tokens.generated.css) */
+  --sidebar: #f7faf8;
+  --sidebar-foreground: #172522;
+  --sidebar-primary: #08734e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9f0ec;
+  --sidebar-accent-foreground: #172522;
+  --sidebar-border: #d0dbd4;
+  --sidebar-ring: #08734e;
 }

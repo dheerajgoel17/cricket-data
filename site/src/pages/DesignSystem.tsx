@@ -1,29 +1,149 @@
-import { DesignFooter, DesignHeader, DesignHome } from "@/components/design-system/chrome";
+import { DesignDocsShell, DesignHome } from "@/components/design-system/chrome";
+import { DocsArticle, slugify, type TocItem } from "@/components/design-system/docs-article";
+import { DocPanel, PreviewFrame } from "@/components/design-system/example-stage";
 import { Link, useLocation } from "react-router-dom";
 import { DesignReference, TypographyReference, referenceSections } from "@/components/design-system/reference";
+import { MotionDemos } from "@/components/design-system/motion-demos";
 import { useEffect, useState, type ReactNode } from "react";
-import { BookmarkIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  ArrowLeftIcon,
+  BookmarkIcon,
+  InformationCircleIcon,
+  MagnifyingGlassIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
 import tokens from "@cricket/tokens/tokens.json";
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field, LiveForm, NativeSelect } from "@/components/app/forms";
 import { Note } from "@/components/app/note";
-import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StatGridCards, StatTile, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
+import { AnimatedHeight } from "@/components/app/animated-height";
+import { ChartBars } from "@/components/app/chart";
+import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StatGridCards, StatTile, TABLE_HEAD } from "@/components/app/page";
 import { PillGroup } from "@/components/app/pill-group";
 import { PillTabs } from "@/components/app/pill-tabs";
+import { RowsSkeleton } from "@/components/app/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { setTitle, syncMeta } from "@/lib/title";
 import { cn } from "@/lib/utils";
 
+/** Synthetic form chart for the catalogue — hit / miss / DNP / void / push. */
+const CHART_DEMO = [
+  { date: "2026-05-01", opp: "Mumbai Indians", value: 43 },
+  { date: "2026-05-05", opp: "Chennai Super Kings", value: 12 },
+  { date: "2026-05-09", opp: "Delhi Capitals", value: null },
+  { date: "2026-05-13", opp: "Gujarat Titans", value: null, void: true },
+  { date: "2026-05-17", opp: "Punjab Kings", value: 28.5 },
+  { date: "2026-05-21", opp: "Rajasthan Royals", value: 35 },
+  { date: "2026-05-25", opp: "Kolkata Knight Riders", value: 22 },
+  { date: "2026-05-29", opp: "Sunrisers Hyderabad", value: 51 },
+];
+
 const GROUPS: readonly { title: string; sections: readonly (readonly [string, string])[] }[] = [
   { title: "Foundations", sections: [["type", "Typography"], ["color", "Colour"], ["space", "Space & size"], ["motion", "Motion"]] },
-  { title: "Components", sections: [["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["forms", "Forms"], ["icons", "Icons"]] },
+  { title: "Components", sections: [["components", "Overview"], ["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["forms", "Forms"], ["icons", "Icons"]] },
   { title: "Reference", sections: referenceSections },
   { title: "Guidance", sections: [["rules", "Usage rules"]] },
 ] as const;
+
+const PAGE_BLURB: Record<string, string> = {
+  type: "Satoshi for UI. Barlow Condensed for scoreboard figures.",
+  color: "Semantic colour tokens from tokens.json.",
+  space: "Stack gaps and layout sizes used across web and app.",
+  motion: "Curves, springs, and timings used in the product.",
+  components: "Browse product components with live previews.",
+  buttons: "Actions and status badges for CTAs and metadata.",
+  chips: "Filters, segments, and tab twins for scoped choices.",
+  feedback: "Empty, loading, and explanatory notes for every list state.",
+  data: "Titles, metrics, charts, and dense tables.",
+  forms: "Live filters with disabled and invalid states.",
+  icons: "Heroicons jobs used in product chrome.",
+  rules: "Hard constraints for contributors.",
+  search: "Search tokens, components, screens, and patterns.",
+};
+
+const PAGE_WHEN: Record<string, string> = {
+  type: "Pick Satoshi for names and UI copy; Barlow Condensed only for scores, odds, hit rates, and label-cap rails.",
+  color: "Use semantic tokens (primary, miss, amber, dnp) — never hard-code hex in product UI.",
+  space: "Space siblings with parent gap tokens; do not add ad-hoc margins between blocks.",
+  motion: "Reuse tokens.motion and the selection spring; honour prefers-reduced-motion.",
+  buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs.",
+  chips: "Chip / PillGroup for filters; PillTabs when panels switch with the selection.",
+  feedback: "Every empty, unknown, or error list uses EmptyState — never a bare spinner or blank panel.",
+  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats.",
+  forms: "LiveForm for filters that apply as you change them; pair Field with NativeSelect or Input.",
+  icons: "Heroicons only under components/app and pages — never Lucide.",
+  rules: "Follow these before adding a component, page, or token.",
+};
+
+const PAGE_SOURCE: Record<string, string> = {
+  type: "packages/tokens/tokens.json",
+  color: "packages/tokens/tokens.json",
+  space: "packages/tokens/tokens.json",
+  motion: "packages/tokens/tokens.json",
+  buttons: "components/ui/button.tsx",
+  chips: "components/app/pill-group.tsx",
+  feedback: "components/app/empty-state.tsx",
+  data: "components/app/page.tsx · chart.tsx",
+  forms: "components/app/forms.tsx",
+  icons: "@heroicons/react/24/outline",
+};
+
+const PAGE_TOC: Record<string, TocItem[]> = {
+  type: [
+    { id: "satoshi", label: "Satoshi" },
+    { id: "barlow-condensed", label: "Barlow Condensed" },
+    { id: "type-scale", label: "Type scale" },
+  ],
+  space: [
+    { id: slugify("Spacing scale"), label: "Spacing scale" },
+    { id: "layout-sizes", label: "Layout sizes" },
+  ],
+  motion: [
+    { id: slugify("ease-out entrance"), label: "ease-out" },
+    { id: slugify("ease-in-out toggle"), label: "ease-in-out" },
+    { id: slugify("ease-drawer peek"), label: "ease-drawer" },
+    { id: slugify("Selection spring"), label: "Selection spring" },
+    { id: "product-timings", label: "Timings" },
+  ],
+  buttons: [
+    { id: slugify("Variants"), label: "Variants" },
+    { id: slugify("Loading"), label: "Loading" },
+    { id: slugify("Badge"), label: "Badge" },
+  ],
+  chips: [
+    { id: slugify("Chip + ActiveChip"), label: "Chip" },
+    { id: slugify("PillGroup — default"), label: "PillGroup" },
+    { id: slugify("PillGroup — segmented"), label: "Segmented" },
+    { id: slugify("PillGroup — sub"), label: "Sub" },
+    { id: slugify("PillTabs"), label: "PillTabs" },
+  ],
+  feedback: [
+    { id: slugify("EmptyState"), label: "EmptyState" },
+    { id: slugify("Loading skeleton"), label: "Skeleton" },
+    { id: slugify("Unknown / error"), label: "Error" },
+    { id: slugify("Note"), label: "Note" },
+  ],
+  data: [
+    { id: slugify("PageTitle + Crumbs"), label: "PageTitle" },
+    { id: slugify("StatTile + Panel"), label: "StatTile" },
+    { id: slugify("ChartBars"), label: "ChartBars" },
+    { id: `datatable-bleed-${TABLE_HEAD.includes("footnote") ? "table-head" : "head"}`, label: "DataTable" },
+  ],
+  forms: [
+    { id: slugify("LiveForm"), label: "LiveForm" },
+    { id: slugify("Disabled"), label: "Disabled" },
+    { id: slugify("Invalid"), label: "Invalid" },
+  ],
+  icons: [{ id: slugify("Heroicons in product code"), label: "Heroicons" }],
+  rules: [
+    { id: "hard-rules", label: "Hard rules" },
+    { id: "changelog", label: "Changelog" },
+  ],
+};
 
 const WEIGHTS = [
   [`Light · ${tokens.weight["weight-editorial"]}`, "font-editorial"],
@@ -33,30 +153,16 @@ const WEIGHTS = [
   [`Black · ${tokens.weight["weight-brand"]}`, "font-display-heavy"],
 ] as const;
 
-function Spec({ title, job, children }: { title: string; job?: string; children: ReactNode }) {
-  return (
-    <section className="flex flex-col gap-stack rounded-2xl bg-surface ring-1 ring-hairline p-inset">
-      <header className="flex flex-col gap-hair">
-        <h3 className="text-title font-label tracking-tight">{title}</h3>
-        {job ? <p className="text-callout text-muted-foreground">{job}</p> : null}
-      </header>
-      {children}
-    </section>
-  );
-}
+const focusLink = "rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
-function Swatch({ name, value }: { name: string; value: string }) {
-  const isColor = value.startsWith("#") || value.startsWith("rgba") || value.startsWith("rgb");
-  return (
-    <div className="flex min-w-0 flex-col gap-tight overflow-hidden rounded-xl ring-1 ring-hairline">
-      <div className="aspect-[5/3] w-full" style={isColor ? { background: value } : { background: "var(--surface-raised)" }} aria-hidden />
-      <div className="flex flex-col gap-hair px-snug py-tight">
-        <span className="truncate text-callout font-label text-foreground">{name}</span>
-        <code className="truncate text-footnote text-muted-foreground">{value}</code>
-      </div>
-    </div>
-  );
-}
+const COMPONENT_CARDS: readonly { id: string; title: string; detail: string; preview: ReactNode }[] = [
+  { id: "buttons", title: "Buttons", detail: "Primary actions and badges", preview: <Button size="sm">Default</Button> },
+  { id: "chips", title: "Chips & tabs", detail: "Filters and segmented controls", preview: <span className="inline-flex h-8 items-center rounded-full bg-primary px-snug text-footnote font-label text-primary-foreground">T20</span> },
+  { id: "feedback", title: "Empty & notes", detail: "EmptyState, skeletons, Note", preview: <span className="text-footnote text-muted-foreground">Nothing saved yet</span> },
+  { id: "data", title: "Data & metrics", detail: "StatTile, Panel, DataTable", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
+  { id: "forms", title: "Forms", detail: "LiveForm, Field, NativeSelect", preview: <span className="rounded border border-hairline px-snug py-hair text-footnote">Format ▾</span> },
+  { id: "icons", title: "Icons", detail: "Heroicons in product jobs", preview: <StarIcon className="size-5" aria-hidden /> },
+];
 
 function TypeRow({ role, sample, className }: { role: string; sample: string; className: string }) {
   return (
@@ -77,17 +183,33 @@ function SpaceBar({ name, rem }: { name: string; rem: string }) {
   );
 }
 
+function Swatch({ name, value }: { name: string; value: string }) {
+  const isColor = value.startsWith("#") || value.startsWith("rgba") || value.startsWith("rgb");
+  return (
+    <div className="flex min-w-0 flex-col gap-tight overflow-hidden rounded-xl border border-hairline bg-card">
+      <div className="aspect-[5/3] w-full" style={isColor ? { background: value } : { background: "var(--surface-raised)" }} aria-hidden />
+      <div className="flex flex-col gap-hair px-snug py-tight">
+        <span className="truncate text-callout font-label">{name}</span>
+        <code className="truncate text-footnote text-muted-foreground">{value}</code>
+      </div>
+    </div>
+  );
+}
+
 /**
- * Living design-system catalogue at `/design-system`: tokens, type, space, and product
- * component variants for designers and engineers. noindex; not in the sitemap.
+ * Living design-system catalogue: tokens, type, space, motion, and product
+ * component variants. Tool-style shell; noindex; not in the sitemap.
  */
 export function DesignSystemPage() {
   setTitle("Design system");
+  const reduce = useReducedMotion();
   const [pill, setPill] = useState("t20");
   const [seg, setSeg] = useState("over");
   const [sub, setSub] = useState("live");
   const [tab, setTab] = useState("log");
   const [chipOn, setChipOn] = useState(true);
+  const [loadingBtn, setLoadingBtn] = useState(false);
+  const [lineInvalid, setLineInvalid] = useState(false);
 
   const { pathname, hash } = useLocation();
   const topics = GROUPS.flatMap(({ title, sections }) => Array.from(sections).map(([id, label]) => ({ id, label, group: title })));
@@ -97,250 +219,328 @@ export function DesignSystemPage() {
   const index = current ? topics.indexOf(current) : -1;
   const search = pathname === "/search";
   const home = pathname === "/" && !current;
+  const notFound = !home && !search && !current;
   const heading = current?.label ?? (search ? "Search" : home ? "Design system" : "Page not found");
+  const blurb = current ? PAGE_BLURB[current.id] : search ? PAGE_BLURB.search : undefined;
   setTitle(heading);
 
   useEffect(() => {
     syncMeta("/design-system", pathname);
-    if (hash && !legacy) document.getElementById(hash.slice(1))?.scrollIntoView();
-    else window.scrollTo(0, 0);
+    if (hash && !legacy) document.getElementById(hash.slice(1))?.scrollIntoView?.();
+    else window.scrollTo?.(0, 0);
   }, [pathname, hash, legacy]);
 
   const colors = Object.entries(tokens.color).filter(([, v]) => typeof v === "string" && (String(v).startsWith("#") || String(v).startsWith("rgba")));
   const spaces = Object.entries(tokens.space);
   const sizes = Object.entries(tokens.size).filter(([k]) => ["control", "gutter", "row-min", "card-radius", "chip-radius", "header-h", "touch"].includes(k));
 
+  const tableBleedId = `datatable-bleed-${TABLE_HEAD.includes("footnote") ? "table-head" : "head"}`;
+
   const demos: Record<string, ReactNode> = {
-    "type": (
-        <div id="type" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Muted>Satoshi for UI. Barlow Condensed for scoreboard figures (num-cond / label-cap).</Muted>
-          <div className="grid gap-stack xl:grid-cols-2">
-            <Spec title="Satoshi" job="Regular is the default for UI copy. Medium marks controls and Bold marks page titles.">
-              <div>{WEIGHTS.map(([weight, style]) => <TypeRow key={weight} role={weight} sample="Cricket fixtures" className={cn("text-title", style)} />)}</div>
-            </Spec>
-            <Spec title="Barlow Condensed" job="Light for tabular figures. Medium for caps labels and bold for key scores.">
-              <div>{WEIGHTS.filter(([weight]) => !weight.startsWith("Regular")).map(([weight, style]) => <TypeRow key={weight} role={weight} sample="172/4 · 18.2 overs" className={cn("font-condensed text-metric tabular-nums", style)} />)}</div>
-            </Spec>
+    type: (
+      <>
+        <div className="grid gap-stack xl:grid-cols-2">
+          <DocPanel id="satoshi" title="Satoshi">
+            <p className="mb-stack text-callout text-muted-foreground">Regular for UI copy. Medium for controls. Bold for page titles.</p>
+            <div>{WEIGHTS.map(([weight, style]) => <TypeRow key={weight} role={weight} sample="Cricket fixtures" className={cn("text-title", style)} />)}</div>
+          </DocPanel>
+          <DocPanel id="barlow-condensed" title="Barlow Condensed">
+            <p className="mb-stack text-callout text-muted-foreground">Light for tabular figures. Medium for caps. Bold for key scores.</p>
+            <div>{WEIGHTS.filter(([weight]) => !weight.startsWith("Regular")).map(([weight, style]) => <TypeRow key={weight} role={weight} sample="172/4 · 18.2 overs" className={cn("font-condensed text-metric tabular-nums", style)} />)}</div>
+          </DocPanel>
+        </div>
+        <TypographyReference />
+        <DocPanel id="type-scale" title="Type scale">
+          <TypeRow role="display" sample="Harry Brook" className="text-display font-emphasis tracking-tight" />
+          <TypeRow role="title" sample="Player props" className="text-title font-label tracking-tight" />
+          <TypeRow role="body" sample="Hit rates over the listed line, last ten games." className="text-body" />
+          <TypeRow role="callout" sample="Void when in the XI but did not bat." className="text-callout text-muted-foreground" />
+          <TypeRow role="footnote" sample="n 24 · median 42 · fair 1.85" className="text-footnote text-muted-foreground" />
+          <TypeRow role="caption" sample="label-cap uppercase" className="label-cap text-caption text-muted-foreground" />
+          <TypeRow role="stat" sample="1.92" className="text-stat font-label tabular-nums" />
+          <TypeRow role="metric" sample="O 24.5" className="text-metric font-condensed tabular-nums" />
+          <TypeRow role="num-cond" sample="67 · 4/12 · fair 1.48" className="font-condensed text-title tabular-nums text-primary" />
+        </DocPanel>
+      </>
+    ),
+
+    color: (
+      <>
+        <Muted>Prefer primary for positive / selected, miss for under, amber for push / caution.</Muted>
+        <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
+        </div>
+      </>
+    ),
+
+    space: (
+      <>
+        <PreviewFrame title="Spacing scale" description="Parent flex/grid gap — do not margin blocks yourself." source="tokens.space">
+          <div className="flex w-full flex-col gap-snug">
+            {spaces.map(([name, rem]) => <SpaceBar key={name} name={name.replace("space-", "")} rem={String(rem)} />)}
           </div>
-          <TypographyReference />
-          <Panel title="Type scale">
-            <TypeRow role="display" sample="Harry Brook" className="text-display font-emphasis tracking-tight" />
-            <TypeRow role="title" sample="Player props" className="text-title font-label tracking-tight" />
-            <TypeRow role="body" sample="Hit rates over the listed line, last ten games." className="text-body" />
-            <TypeRow role="callout" sample="Void when in the XI but did not bat." className="text-callout text-muted-foreground" />
-            <TypeRow role="footnote" sample="n 24 · median 42 · fair 1.85" className="text-footnote text-muted-foreground" />
-            <TypeRow role="caption" sample="label-cap uppercase" className="label-cap text-caption text-muted-foreground" />
-            <TypeRow role="stat" sample="1.92" className="text-stat font-label tabular-nums" />
-            <TypeRow role="metric" sample="O 24.5" className="text-metric font-condensed tabular-nums" />
-            <TypeRow role="num-cond" sample="67 · 4/12 · fair 1.48" className="font-condensed text-title tabular-nums text-primary" />
-          </Panel>
-        </div>
-    ),
-
-    "color": (
-        <div id="color" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Muted>Semantic tokens from tokens.json. Prefer primary for positive / selected, miss for under, amber for push / caution.</Muted>
-          <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4">
-            {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
-          </div>
-        </div>
-    ),
-
-    "space": (
-        <div id="space" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Muted>Stacks and gaps use hair / tight / snug / stack / group / section. Controls are --control tall.</Muted>
-          <Spec title="Spacing scale" job="Parent flex/grid gap — do not margin blocks yourself.">
-            <div className="flex flex-col gap-snug">
-              {spaces.map(([name, rem]) => <SpaceBar key={name} name={name.replace("space-", "")} rem={String(rem)} />)}
-            </div>
-          </Spec>
-          <Spec title="Layout sizes" job="Touch targets, gutters, radii from tokens.size.">
-            <div className="grid grid-cols-2 gap-snug sm:grid-cols-3">
-              {sizes.map(([k, v]) => (
-                <Card key={k} className="gap-hair px-inset py-snug shadow-none">
-                  <code className="text-footnote text-muted-foreground">{k}</code>
-                  <p className="text-callout font-label">{String(v)}</p>
-                </Card>
-              ))}
-            </div>
-          </Spec>
-        </div>
-    ),
-
-    "motion": (
-        <div id="motion" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Muted>Curves from tokens.motion. Prefer ease-out for entrances; respect prefers-reduced-motion.</Muted>
-          <div className="grid gap-snug sm:grid-cols-3">
-            {Object.entries(tokens.motion).map(([k, v]) => (
-              <Card key={k} className="gap-hair px-inset py-snug shadow-none">
+        </PreviewFrame>
+        <DocPanel id="layout-sizes" title="Layout sizes">
+          <div className="grid grid-cols-2 gap-snug sm:grid-cols-3">
+            {sizes.map(([k, v]) => (
+              <div key={k} className="grid gap-hair rounded-md border border-hairline px-inset py-snug">
                 <code className="text-footnote text-muted-foreground">{k}</code>
-                <p className="break-all text-callout">{String(v)}</p>
-              </Card>
+                <p className="text-callout font-label">{String(v)}</p>
+              </div>
             ))}
           </div>
-        </div>
+        </DocPanel>
+      </>
     ),
 
-    "buttons": (
-        <div id="buttons" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="Button variants" job="Primary actions; product CTAs often use h-control rounded-full secondary/primary.">
-            <div className="flex flex-wrap items-center gap-snug">
-              <Button>Default</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="destructive">Destructive</Button>
-              <Button variant="link">Link</Button>
-              <Button variant="secondary" className="h-control rounded-full">Pill control</Button>
-            </div>
-          </Spec>
-          <Spec title="Badge" job="Quiet status chips; secondary for metadata.">
-            <div className="flex flex-wrap gap-snug">
-              <Badge>Default</Badge>
-              <Badge variant="secondary">Secondary</Badge>
-              <Badge variant="outline">Outline</Badge>
-              <Badge variant="destructive">Destructive</Badge>
-              <Badge className="bg-primary/15 text-primary">Primary wash</Badge>
-            </div>
-          </Spec>
-        </div>
+    motion: <MotionDemos />,
+
+    components: (
+      <div className="grid gap-snug sm:grid-cols-2 xl:grid-cols-3">
+        {COMPONENT_CARDS.map(({ id, title, detail, preview }) => (
+          <Link key={id} to={topicPath(id)} className={cn("group grid overflow-hidden rounded-xl border border-hairline bg-card hover:border-primary/40 hover:bg-surface", focusLink)}>
+            <div className="grid min-h-28 place-items-center border-b border-hairline bg-muted/50 p-inset">{preview}</div>
+            <span className="grid gap-hair p-inset">
+              <span className="text-title font-emphasis">{title}</span>
+              <span className="text-callout text-muted-foreground">{detail}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
     ),
 
-    "chips": (
-        <div id="chips" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="Chip + ActiveChip" job="Single selectable filter; dismissible applied filter.">
-            <div className="flex flex-wrap items-center gap-snug">
-              <Chip on={chipOn} onClick={() => setChipOn((v) => !v)}>Runs</Chip>
-              <Chip on={!chipOn} onClick={() => setChipOn((v) => !v)}>Wickets</Chip>
-              <ActiveChip label="Format" value="T20" onRemove={() => undefined} />
-            </div>
-          </Spec>
-          <Spec title="PillGroup — default" job="Parent filters; selected = primary fill.">
-            <PillGroup layoutId="ds-pill" label="Format" value={pill} onChange={setPill} items={[["t20", "T20"], ["odi", "ODI"], ["test", "Test"]]} />
-          </Spec>
-          <Spec title="PillGroup — segmented" job="Raised thumb in a track (Over / Under).">
-            <PillGroup segmented layoutId="ds-seg" label="Side" value={seg} onChange={setSeg} items={[["over", "Over"], ["under", "Under"]]} />
-          </Spec>
-          <Spec title="PillGroup — sub" job="Quiet underline row (home phase / scope). Put hairline on the parent.">
-            <div className="border-b border-hairline">
-              <PillGroup sub layoutId="ds-sub" label="Phase" value={sub} onChange={setSub} items={[["live", "In play"], ["pre", "Pre-match"], ["done", "Completed"]]} />
-            </div>
-          </Spec>
-          <Spec title="PillTabs" job="Documented twin of PillGroup for TabsContent panels (league / team markets).">
-            <PillTabs layoutId="ds-tabs" value={tab} onChange={setTab} tabs={[["log", "Game log"], ["splits", "Splits"], ["hits", "When it hits"]]}>
-              <p className="text-callout text-muted-foreground">Active panel: {tab}</p>
-            </PillTabs>
-          </Spec>
-        </div>
+    buttons: (
+      <>
+        <PreviewFrame title="Variants" description="Product CTAs often use h-control rounded-full." source="components/ui/button.tsx">
+          <Button>Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="destructive">Destructive</Button>
+          <Button variant="link">Link</Button>
+          <Button variant="secondary" className="h-control rounded-full">Pill control</Button>
+        </PreviewFrame>
+        <PreviewFrame title="Loading" description="Caller-managed: disable and change the label while the request runs.">
+          <Button type="button" disabled={loadingBtn} onClick={() => { setLoadingBtn(true); window.setTimeout(() => setLoadingBtn(false), 1200); }}>
+            {loadingBtn ? "Saving…" : "Save filter"}
+          </Button>
+        </PreviewFrame>
+        <PreviewFrame title="Badge" description="Quiet status chips; secondary for metadata." source="components/ui/badge.tsx">
+          <Badge>Default</Badge>
+          <Badge variant="secondary">Secondary</Badge>
+          <Badge variant="outline">Outline</Badge>
+          <Badge variant="destructive">Destructive</Badge>
+          <Badge className="bg-primary/15 text-primary">Primary wash</Badge>
+        </PreviewFrame>
+      </>
     ),
 
-    "feedback": (
-        <div id="feedback" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="EmptyState" job="Every empty / unknown / error list. Prefer titled EmptyState over plain text.">
-            <div className="grid gap-stack md:grid-cols-2">
-              <EmptyState title="Nothing saved yet" body="Tap the star on a prop, player or team." action={<Button variant="secondary" className="h-control rounded-full">Browse props</Button>} />
-              <EmptyState compact title="No matches" body="Try another format or gender filter." />
-            </div>
-          </Spec>
-          <Spec title="Note" job="How these numbers are worked out — not warnings.">
-            <Note title="Reading tip" items={["Fair price is 1 ÷ historical hit rate.", "Void and DNP rules stay intact across formats."]} />
-          </Spec>
-        </div>
+    chips: (
+      <>
+        <PreviewFrame title="Chip + ActiveChip" description="Single selectable filter; dismissible applied filter." source="components/app/chip.tsx">
+          <Chip on={chipOn} onClick={() => setChipOn((v) => !v)}>Runs</Chip>
+          <Chip on={!chipOn} onClick={() => setChipOn((v) => !v)}>Wickets</Chip>
+          <ActiveChip label="Format" value="T20" onRemove={() => undefined} />
+        </PreviewFrame>
+        <PreviewFrame title="PillGroup — default" description="Parent filters; selected = primary fill." source="components/app/pill-group.tsx">
+          <PillGroup layoutId="ds-pill" label="Format" value={pill} onChange={setPill} items={[["t20", "T20"], ["odi", "ODI"], ["test", "Test"]]} />
+        </PreviewFrame>
+        <PreviewFrame title="PillGroup — segmented" description="Raised thumb in a track (Over / Under).">
+          <PillGroup segmented layoutId="ds-seg" label="Side" value={seg} onChange={setSeg} items={[["over", "Over"], ["under", "Under"]]} />
+        </PreviewFrame>
+        <PreviewFrame title="PillGroup — sub" description="Quiet underline row. Put hairline on the parent." canvasClassName="items-end bg-background">
+          <div className="w-full border-b border-hairline">
+            <PillGroup sub layoutId="ds-sub" label="Phase" value={sub} onChange={setSub} items={[["live", "In play"], ["pre", "Pre-match"], ["done", "Completed"]]} />
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="PillTabs" description="Twin of PillGroup for TabsContent panels." source="components/app/pill-tabs.tsx">
+          <PillTabs layoutId="ds-tabs" value={tab} onChange={setTab} tabs={[["log", "Game log"], ["splits", "Splits"], ["hits", "When it hits"]]}>
+            <p className="text-callout text-muted-foreground">Active panel: {tab}</p>
+          </PillTabs>
+        </PreviewFrame>
+      </>
     ),
 
-    "data": (
-        <div id="data" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="PageTitle + Crumbs" job="Drill-in hierarchy on desktop; phone often uses HeaderActions.">
+    feedback: (
+      <>
+        <PreviewFrame title="EmptyState" description="Every empty / unknown / error list." canvasClassName="items-stretch" source="components/app/empty-state.tsx">
+          <div className="grid w-full gap-stack md:grid-cols-2">
+            <EmptyState title="Nothing saved yet" body="Tap the star on a prop, player or team." action={<Button variant="secondary" className="h-control rounded-full">Browse props</Button>} />
+            <EmptyState compact title="No matches" body="Try another format or gender filter." />
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="Loading skeleton" description="Page-shaped placeholders — never a bare spinner on product lists." canvasClassName="items-stretch">
+          <div className="w-full"><RowsSkeleton rows={3} /></div>
+        </PreviewFrame>
+        <PreviewFrame title="Unknown / error" description="Same EmptyState job with a retry action.">
+          <EmptyState compact title="Couldn’t load props" body="Check the connection and try again." action={<Button type="button" variant="secondary" size="sm">Retry</Button>} />
+        </PreviewFrame>
+        <PreviewFrame title="Note" description="How numbers are worked out — not warnings." source="components/app/note.tsx">
+          <Note title="Reading tip" items={["Fair price is 1 ÷ historical hit rate.", "Void and DNP rules stay intact across formats."]} />
+        </PreviewFrame>
+      </>
+    ),
+
+    data: (
+      <>
+        <PreviewFrame title="PageTitle + Crumbs" description="Drill-in hierarchy on desktop." source="components/app/page.tsx" canvasClassName="items-stretch bg-background">
+          <div className="grid w-full gap-snug">
             <Crumbs items={[["Examples"], ["Example"]]} />
             <PageTitle sub="Supporting line in callout muted.">Example page title</PageTitle>
-          </Spec>
-          <Spec title="StatTile + Panel" job="Glance figures and titled cards.">
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="StatTile + Panel" description="Glance figures and titled reference blocks." canvasClassName="items-stretch">
+          <div className="grid w-full gap-stack">
             <StatGridCards>
               <StatTile k="Hit rate" v="62%" s="last 10" />
               <StatTile k="Fair" v={<OddsText>1.61</OddsText>} s="1 ÷ hit rate" />
               <StatTile k="Line" v="O 24.5" s="best book 1.90" />
             </StatGridCards>
-            <Panel title="Panel">
-              <Muted>Card with a hairline under the title. Use for reference blocks — not around bleed stats tables.</Muted>
-            </Panel>
-          </Spec>
-          <Spec title={`DataTable bleed (${TABLE_HEAD.includes("footnote") ? "TABLE_HEAD" : "head"})`} job="Dense stats: phone edge bleed, label-cap + footnote headers.">
-            <div className={TABLE_BLEED}>
-              <DataTable
-                bleed
-                columns={["Line", "Over", "Fair", "Under"]}
-                rows={[
-                  ["24.5", "1.90", "1.61", "1.95"],
-                  ["25.5", "2.10", "1.85", "1.75"],
-                  ["26.5", "2.40", "2.05", "1.55"],
-                ]}
-              />
-            </div>
-          </Spec>
-        </div>
+            <Panel title="Panel"><Muted>Not for bleed stats tables.</Muted></Panel>
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="ChartBars" description="Last fixtures vs a line — hit / miss / push / DNP / void. Same component as Player and ResultView." canvasClassName="items-stretch bg-card" source="components/app/chart.tsx">
+          <div className="w-full min-w-0 py-snug">
+            <ChartBars entries={CHART_DEMO} line={28.5} side="over" height={220} animateKey="ds-chart" label="Runs over 28.5" />
+          </div>
+        </PreviewFrame>
+        <PreviewFrame
+          id={tableBleedId}
+          title={`DataTable bleed (${TABLE_HEAD.includes("footnote") ? "TABLE_HEAD" : "head"})`}
+          description="Dense stats: phone edge bleed, label-cap + footnote headers. Product uses TABLE_BLEED (-mx-gutter)."
+          canvasClassName="items-stretch bg-background"
+          source="components/app/page.tsx"
+        >
+          <div className="w-full min-w-0">
+            <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
+          </div>
+        </PreviewFrame>
+      </>
     ),
 
-    "forms": (
-        <div id="forms" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="LiveForm + Field + NativeSelect" job="Filters apply as you change them; typed fields debounce.">
-            <LiveForm onValues={() => undefined} className="max-w-xl">
-              <Field label="Format"><NativeSelect name="fmt" options={[["T20", "T20"], ["ODI", "ODI"], ["Test", "Test"]]} /></Field>
-              <Field label="Line"><Input name="line" type="number" step="0.5" defaultValue="24.5" className="w-28" /></Field>
-            </LiveForm>
-          </Spec>
-        </div>
+    forms: (
+      <>
+        <PreviewFrame title="LiveForm" description="Filters apply as you change them; typed fields debounce." source="components/app/forms.tsx">
+          <LiveForm onValues={() => undefined} className="max-w-xl border-0 bg-transparent p-0 shadow-none">
+            <Field label="Format"><NativeSelect name="fmt" options={[["T20", "T20"], ["ODI", "ODI"], ["Test", "Test"]]} /></Field>
+            <Field label="Line"><Input name="line" type="number" step="0.5" defaultValue="24.5" className="w-28" /></Field>
+          </LiveForm>
+        </PreviewFrame>
+        <PreviewFrame title="Disabled" description="Visible but out of the tab order when using native disabled.">
+          <LiveForm onValues={() => undefined} className="max-w-xl border-0 bg-transparent p-0 shadow-none">
+            <Field label="Format"><NativeSelect name="fmt-off" disabled options={[["T20", "T20"]]} /></Field>
+            <Field label="Line"><Input name="line-off" type="number" disabled defaultValue="24.5" className="w-28" /></Field>
+          </LiveForm>
+        </PreviewFrame>
+        <PreviewFrame title="Invalid" description="Caller sets aria-invalid and a short message.">
+          <div className="grid max-w-xl gap-stack">
+            <Field label="Line">
+              <Input name="line-bad" type="number" step="0.5" defaultValue="0" aria-invalid={lineInvalid} aria-describedby={lineInvalid ? "line-bad-msg" : undefined} className="w-28 aria-invalid:border-destructive" onChange={(e) => setLineInvalid(Number(e.currentTarget.value) <= 0)} />
+            </Field>
+            {lineInvalid ? <p id="line-bad-msg" className="text-callout text-destructive">Line must be greater than 0.</p> : null}
+            <Button type="button" size="sm" variant="secondary" onClick={() => setLineInvalid(true)}>Show invalid</Button>
+          </div>
+        </PreviewFrame>
+      </>
     ),
 
-    "icons": (
-        <div id="icons" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Spec title="Heroicons in product code" job="Never Lucide under components/app or pages. shadcn ui/* may still ship CLI Lucide until edited.">
-            <div className="flex items-center gap-stack text-foreground">
-              <InformationCircleIcon className="size-6" aria-hidden />
-              <BookmarkIcon className="size-6" aria-hidden />
-              <span className="text-callout text-muted-foreground">@heroicons/react/24/outline (and /solid for filled)</span>
-            </div>
-          </Spec>
-        </div>
+    icons: (
+      <PreviewFrame title="Heroicons in product code" description="Never Lucide under components/app or pages." source="@heroicons/react/24/outline" canvasClassName="items-stretch">
+        <ul className="grid w-full gap-snug sm:grid-cols-2">
+          {([
+            [InformationCircleIcon, "Info", "Tooltips / how-it-works"],
+            [BookmarkIcon, "Bookmark", "Save affordance (outline)"],
+            [StarIcon, "Star", "Saved / watchlist"],
+            [MagnifyingGlassIcon, "Search", "Global search trigger"],
+            [ArrowLeftIcon, "Back", "Phone header drill-in"],
+          ] as const).map(([Icon, name, job]) => (
+            <li key={name} className="flex items-center gap-stack rounded-lg border border-hairline bg-background px-inset py-snug">
+              <Icon className="size-6 shrink-0" aria-hidden />
+              <span className="grid min-w-0 gap-hair">
+                <span className="text-callout font-label">{name}</span>
+                <span className="text-footnote text-muted-foreground">{job}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </PreviewFrame>
     ),
 
-
-
-    "rules": (
-        <div id="rules" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <Panel title="Hard rules">
-            <ul className="grid gap-snug text-callout text-muted-foreground">
-              <li>All numbers on the site come from the engine / data — never from an LLM.</li>
-              <li>Named type and space roles only on GOVERNED files (design-tokens.test.ts).</li>
-              <li>Empty lists use EmptyState; tables use TABLE_HEAD + optional bleed.</li>
-              <li>Web + app share jobs; native twins when DOM cannot run (Segmented, FlashList, blur).</li>
-              <li>Docs: <code className="text-foreground">docs/DESIGN_SYSTEM.md</code>, <code className="text-foreground">docs/SITE.md</code>.</li>
-            </ul>
-          </Panel>
-        </div>
+    rules: (
+      <>
+        <DocPanel id="hard-rules" title="Hard rules">
+          <ul className="grid gap-snug text-callout text-muted-foreground">
+            <li>All numbers on the site come from the engine / data — never from an LLM.</li>
+            <li>Named type and space roles only on GOVERNED files (design-tokens.test.ts).</li>
+            <li>Empty lists use EmptyState; tables use TABLE_HEAD + optional bleed.</li>
+            <li>Web + app share jobs; native twins when DOM cannot run (Segmented, FlashList, blur).</li>
+            <li>Before merge to main: centralize UI in shared components; ask before adding a variant; update the catalogue and <code className="text-foreground">docs/DESIGN_SYSTEM_CHANGELOG.md</code>.</li>
+            <li>Docs: <code className="text-foreground">docs/DESIGN_SYSTEM.md</code>, <code className="text-foreground">docs/SITE.md</code>, <code className="text-foreground">.cursor/rules/design-system-centralization.mdc</code>.</li>
+          </ul>
+        </DocPanel>
+        <DocPanel id="changelog" title="Changelog">
+          <p className="text-callout text-muted-foreground">
+            Component and token history lives in the repo at{" "}
+            <code className="text-foreground">docs/DESIGN_SYSTEM_CHANGELOG.md</code>
+            {" "}(append-only). Open that file on GitHub or locally to see what changed and which callers to re-check.
+          </p>
+        </DocPanel>
+      </>
     ),
   };
 
-  return <div className="grid gap-section">
-    <DesignHeader />
-    {home ? <DesignHome brandColor={tokens.color.primary} /> : <div className="grid min-w-0 gap-section lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start">
-      <nav aria-label="Documentation" className="flex gap-group overflow-x-auto pb-snug lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:flex-col lg:overflow-y-auto">
-        {GROUPS.map(({ title, sections }) => <div key={title} className="grid shrink-0 gap-hair">
-          <p className="text-footnote font-emphasis text-muted-foreground">{title}</p>
-          {sections.map(([id, label]) => <Link key={id} to={topicPath(id)} aria-current={current?.id === id ? "page" : undefined} className="rounded-md px-tight py-hair whitespace-nowrap hover:bg-surface aria-[current=page]:bg-secondary aria-[current=page]:font-emphasis aria-[current=page]:text-primary">{label}</Link>)}
-        </div>)}
-      </nav>
-      <article key={current?.id ?? pathname} className="grid min-w-0 gap-section pb-section">
-        <div className="grid gap-tight border-b border-hairline pb-stack">
-          <p className="text-callout text-muted-foreground"><Link to="/" className="hover:underline">Design system</Link>{current ? ` / ${current.group}` : ""}</p>
-          <h1 className="text-[clamp(2rem,5vw,3.5rem)] leading-tight font-emphasis tracking-tight">{heading}</h1>
-        </div>
-        {search ? <DesignReference /> : current ? demos[current.id] ?? <DesignReference section={current.id} /> : <p>This documentation page could not be found.</p>}
-        {current && <nav aria-label="Adjacent topics" className="flex flex-wrap justify-between gap-stack border-t border-hairline pt-stack">
-          {topics[index - 1] ? <Link className="text-primary hover:underline" to={topicPath(topics[index - 1].id)}>← {topics[index - 1].label}</Link> : <span />}
-          {topics[index + 1] && <Link className="text-primary hover:underline" to={topicPath(topics[index + 1].id)}>{topics[index + 1].label} →</Link>}
-        </nav>}
-      </article>
-    </div>}
-    <DesignFooter />
-  </div>;
+  const brand = tokens.color.primary;
+  const articleKey = current?.id ?? (search ? "search" : pathname);
+
+  if (home) return <DesignHome brandColor={brand} groups={GROUPS} topicPath={topicPath} />;
+
+  const prevTopic = index > 0 ? topics[index - 1] : null;
+  const nextTopic = index >= 0 && index < topics.length - 1 ? topics[index + 1] : null;
+
+  const articleBody = search
+    ? <DesignReference />
+    : current
+      ? demos[current.id] ?? <DesignReference section={current.id} />
+      : null;
+
+  return (
+    <DesignDocsShell groups={GROUPS} currentId={current?.id} topicPath={topicPath}>
+      <AnimatedHeight>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={articleKey}
+            initial={{ opacity: 0, y: reduce ? 0 : 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.2, ease: [0.23, 1, 0.32, 1] }}
+            className="min-w-0 pb-section"
+          >
+            {notFound ? (
+              <DocsArticle title="Page not found" lead="That documentation URL is not in the catalogue.">
+                <div className="flex flex-wrap gap-snug">
+                  <Button asChild variant="secondary" className="h-control rounded-full"><Link to="/">Design system home</Link></Button>
+                  <Button asChild variant="outline" className="h-control rounded-full"><Link to="/docs/type">Foundations</Link></Button>
+                </div>
+              </DocsArticle>
+            ) : (
+              <DocsArticle
+                title={heading}
+                lead={blurb}
+                group={current?.group ?? (search ? "Reference" : undefined)}
+                source={current ? PAGE_SOURCE[current.id] : undefined}
+                when={current ? PAGE_WHEN[current.id] : undefined}
+                toc={current ? PAGE_TOC[current.id] ?? [] : []}
+                pager={current ? {
+                  prev: prevTopic ? { to: topicPath(prevTopic.id), label: prevTopic.label, group: prevTopic.group } : null,
+                  next: nextTopic ? { to: topicPath(nextTopic.id), label: nextTopic.label, group: nextTopic.group } : null,
+                } : undefined}
+              >
+                {articleBody}
+              </DocsArticle>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </AnimatedHeight>
+    </DesignDocsShell>
+  );
 }

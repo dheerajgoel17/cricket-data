@@ -3,6 +3,7 @@ import tokens from "@cricket/tokens/tokens.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
 import inventory from "./inventory.generated.json";
 
 export const referenceSections = [
@@ -72,7 +73,13 @@ export function TypographyReference() {
     <label className="flex items-center gap-tight"><input type="checkbox" checked={wrap} onChange={(e) => setWrap(e.currentTarget.checked)} /> Wrap specimen</label>
     <p className={wrap ? "max-w-xs text-body" : "max-w-xs truncate text-body"}>Player props and historical hit rates across the last ten matches.</p>
     <p className="text-callout text-muted-foreground">Type size and weight are separate roles. Web display can use a fluid clamp. Native resolves shared rem sizes through its token module and applies width-based fitting. Read the full name in the entity view when a compact row truncates it.</p>
-    <code className="break-words text-footnote">{tokens.font["font-sans-stack"]}</code>
+    <div className="grid gap-tight">
+      <p className="label-cap text-caption text-muted-foreground">font-sans-stack</p>
+      <pre className="overflow-x-auto rounded-xl border border-hairline bg-muted/60 p-inset text-footnote leading-relaxed text-foreground">
+        <code>{tokens.font["font-sans-stack"]}</code>
+      </pre>
+      <Copy value={tokens.font["font-sans-stack"]} />
+    </div>
   </div>;
 }
 
@@ -86,9 +93,16 @@ export function DesignReference({ section }: { section?: string } = {}) {
   );
   const foundTokens = entries.filter(({ group, name, value }) => match(group, name, value));
   const foundPatterns = patterns.filter((entry) => match(...entry));
+  const noHits = query.trim() !== "" && foundTokens.length === 0 && modules.length === 0 && foundPatterns.length === 0;
   return <div className="grid min-w-0 gap-section">
-    <label className="grid gap-tight font-label">Search reference<Input type="search" value={query} onChange={(e) => setQuery(e.currentTarget.value)} placeholder="Search token, component, screen, or pattern" /></label>
+    <label className="grid gap-tight font-label">Search reference
+      <div className="flex flex-wrap items-center gap-snug">
+        <Input type="search" value={query} onChange={(e) => setQuery(e.currentTarget.value)} placeholder="Search token, component, screen, or pattern" className="max-w-xl" />
+        {query.trim() ? <Button type="button" size="sm" variant="ghost" onClick={() => setQuery("")}>Clear</Button> : null}
+      </div>
+    </label>
     <p role="status" className="text-callout text-muted-foreground">{foundTokens.length} tokens · {modules.length} source modules · {foundPatterns.length} patterns</p>
+    {noHits && <EmptyState compact title="No matches" body="Try another token name, module path, or pattern keyword." action={<Button type="button" size="sm" variant="secondary" onClick={() => setQuery("")}>Clear search</Button>} />}
 
     {(!section || section === "token-reference") && <section id="token-reference" className="grid min-w-0 scroll-mt-32 gap-stack">
       <h2 className="text-display font-emphasis">Token reference</h2>
@@ -119,7 +133,7 @@ export function DesignReference({ section }: { section?: string } = {}) {
           {path === "site/src/components/ui/button.tsx" && <ButtonSpec />}
         </div>
       </details>)}
-      {!modules.length && <p>No source modules match this search and platform.</p>}
+      {!modules.length && <EmptyState compact title="No source modules match" body="Adjust the search or platform filter." />}
     </section>}
 
     {(!section || section === "patterns") && <section id="patterns" className="grid scroll-mt-32 gap-stack">
@@ -127,6 +141,7 @@ export function DesignReference({ section }: { section?: string } = {}) {
       {foundPatterns.map(([title, flow, guide, source]) => <section key={title} className="grid gap-snug rounded-xl border border-hairline p-inset">
         <h3 className="text-title font-label">{title}</h3><p className="text-primary">{flow}</p><p>{guide}</p><code className="break-words text-footnote text-muted-foreground">{source}</code>
       </section>)}
+      {!foundPatterns.length && <EmptyState compact title="No patterns match" body="Try another keyword, or clear the search." />}
     </section>}
 
     {(!section || section === "platforms") && <section id="platforms" className="grid min-w-0 scroll-mt-32 gap-stack">

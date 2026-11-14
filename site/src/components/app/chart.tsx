@@ -27,7 +27,7 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
         <div ref={scroller} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="w-max min-w-full">
             <div className="relative" style={{ height }}>
-              <div className="absolute inset-x-0 z-[2] border-t border-dashed border-white/80" style={{ bottom: `${(Math.min(line, top) / top) * 100}%` }}><span className="sticky left-0 inline-block -translate-y-[110%] rounded-sm bg-background/80 px-tight text-body tabular-nums">{line}</span></div>
+              <div className="absolute inset-x-0 z-[2] border-t border-dashed border-foreground/35" style={{ bottom: `${(Math.min(line, top) / top) * 100}%` }}><span className="sticky left-0 inline-block -translate-y-[110%] rounded-sm bg-background/80 px-tight text-body tabular-nums">{line}</span></div>
               <div className="absolute inset-0 flex items-end gap-hair">
                 {entries.map((e, i) => {
                   const s = barState(e, line, side) as string;

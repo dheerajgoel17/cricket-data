@@ -4,6 +4,7 @@ import { BRAND } from "@/lib/brand";
 import { BookmarkIcon, ChevronLeftIcon, MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth";
 import { useSaved } from "@/lib/saved";
+import { goProduct, isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 import { isTopLevel } from "./nav";
@@ -34,11 +35,22 @@ export function Brand() {
 
 function SavedLink() {
   const { list } = useSaved();
+  const label = list.length ? `Saved, ${list.length}` : "Saved";
+  const className = "relative grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]";
+  const badge = list.length > 0 ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-emphasis text-primary-foreground">{list.length}</span> : null;
+  // Design host has no /saved route — open the product app.
+  if (isDesignHost()) {
+    return (
+      <a href={`${PRODUCT_ORIGIN}/saved`} aria-label={label} className={className}>
+        <BookmarkIcon className="size-4" />
+        {badge}
+      </a>
+    );
+  }
   return (
-    <Link to="/saved" aria-label={list.length ? `Saved, ${list.length}` : "Saved"}
-      className="relative grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]">
+    <Link to="/saved" aria-label={label} className={className}>
       <BookmarkIcon className="size-4" />
-      {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-emphasis text-primary-foreground">{list.length}</span>}
+      {badge}
     </Link>
   );
 }

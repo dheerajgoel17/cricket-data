@@ -21,7 +21,7 @@ it("filters platform modules and drives the production Button variant and state"
   expect(button).toHaveAttribute("data-variant", "destructive");
   expect(button).toBeDisabled();
   fireEvent.change(screen.getByLabelText("Platform"), { target: { value: "ios" } });
-  expect(screen.getByText("No source modules match this search and platform.")).toBeVisible();
+  expect(screen.getByText("No source modules match")).toBeVisible();
 });
 
 it("lists the shared type scale and toggles specimen wrapping", () => {
@@ -29,4 +29,6 @@ it("lists the shared type scale and toggles specimen wrapping", () => {
   expect(within(screen.getByRole("table")).getByText("fs-caption")).toBeVisible();
   fireEvent.click(screen.getByRole("checkbox", { name: "Wrap specimen" }));
   expect(screen.getByText(/Player props and historical/)).toHaveClass("truncate");
+  expect(screen.getByText("font-sans-stack")).toBeVisible();
+  expect(screen.getByText(/Satoshi/).closest("pre")).toBeTruthy();
 });
