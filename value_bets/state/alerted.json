@@ -38,5 +38,10 @@
   "edge": 0.06,
   "start_utc": "2026-11-15T03:30:00Z",
   "alerted_at": "2026-11-13T12:39:31.841445+00:00"
+ },
+ "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-15|batter_runs||Ellyse Perry under 25.5|25.5|under": {
+  "edge": 0.0605,
+  "start_utc": "2026-11-15T00:00:00Z",
+  "alerted_at": "2026-11-14T23:40:14.002345+00:00"
  }
 }

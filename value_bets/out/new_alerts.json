@@ -1,4 +1,61 @@
 {
- "generated_at_ist": "2026-11-15 04:45 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-15 05:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-15",
+   "match": "Sydney Sixers vs Melbourne Renegades",
+   "start_utc": "2026-11-15T00:00:00Z",
+   "start_ist": "2026-11-15 05:30 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_runs",
+   "market": "Ellyse Perry - Over/Under 25.5 Runs",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 25.5",
+   "player_matched_as": "Ellyse Perry",
+   "player_id": "be150fc8",
+   "player_team": "Sydney Sixers Women",
+   "stat": "runs",
+   "inn": 0,
+   "line": 25.5,
+   "side": "under",
+   "best_odds": 2.1,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 2.1,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.075,
+   "implied_prob": 0.4762,
+   "fair_odds": 1.98,
+   "fair_prob": 0.505,
+   "model_prob": 0.5808,
+   "market_prob": 0.443,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0605,
+   "edge_pct": 6.05,
+   "kelly_quarter_stake_pct": 1.38,
+   "n_sources": 1,
+   "confidence": "low",
+   "why": "Model 58% vs market 44% for under 25.5 runs; form 31.7 runs/inn recency-weighted T20 (n_eff 75.3; last 5: 30, 59, 84, 3, 58), bats in 95% of games played; at North Sydney Oval: 38 inns avg 39.2; vs Melbourne Renegades Women: 1 inns avg 30.0; context adj: team H2H context +1%",
+   "notes": "1 market source(s) for fair price; model 0.581 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 75.3,
+    "expected": 31.12,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.954,
+    "venue_matched": "north sydney oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "d33deb77587451ce",
+   "alert_key": "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-15|batter_runs||Ellyse Perry under 25.5|25.5|under",
+   "alerted_at_ist": "2026-11-15 05:10 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
