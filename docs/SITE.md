@@ -210,7 +210,7 @@ Dense numeric tables share one edge contract (`TABLE_BLEED` / `TABLE_HEAD` in `c
 
 ## Type and spacing scales (no hard-coded sizes)
 Sizes are named by role and defined once, in `site/src/index.css` (`:root` plus `@theme`). Pages and shared components use the names, never `text-[13px]`, `text-sm`, `mt-5` or `gap-3`.
-`site/src/lib/design-tokens.test.ts` fails the build if a governed file does; add a file to its `GOVERNED` list when its page is migrated (the old pages are not yet).
+`site/src/lib/design-tokens.test.ts` fails the build if a governed file does; add a file to its `GOVERNED` list when a product page or shared app component is migrated (product pages and `components/app/*` are enrolled; leave catalogue/infra pages out).
 
 Web values (16 px rem). Native apps remap the names, not these numbers.
 

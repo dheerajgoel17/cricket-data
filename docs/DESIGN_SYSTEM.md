@@ -2,7 +2,7 @@
 
 Fancy.cash has **two design systems** that share one contract: tokens, type roles, spacing roles, and component **jobs**. The web DS lives in `site/` (responsive). The app DS lives in `mobile/src/ui` (React Native). Reuse a web pattern on native only when it works; otherwise ship a **native-designed twin** with the same job and tokens.
 
-No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`components/app`, `pages`, `mobile/src`): Heroicons / Ionicons — never Lucide.** (shadcn `components/ui/*` may still ship CLI Lucide until those files are edited.)
+No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
 
 ## Foundations (shared)
 
@@ -148,16 +148,16 @@ Full `App.tsx` route checklist:
 | `/leagues`, `/league/:id` | Aligned | Boards + markets |
 | `/props`, `/fancy` | Aligned | Screener lists |
 | `/player/:id` | Aligned | Bleed tables + EmptyState |
-| `/teams`, `/team/:id` | Aligned / Partial | Directory bleed; team markets ResultView |
+| `/teams`, `/team/:id` | Aligned | Directory bleed; team markets ResultView |
 | `/venue/:id` | Aligned | Ground |
-| `/competitions` | Partial | Markets list; EmptyState |
-| `/pair` | Partial | ResultView host (not Ask); EmptyState idle |
+| `/competitions` | Aligned | Markets list; EmptyState; GOVERNED |
+| `/pair` | Aligned | ResultView host (not Ask); EmptyState idle; GOVERNED |
 | `/saved` | Aligned | EmptyState |
 | `/contact` | Aligned | Mailto Card; GOVERNED |
 | `/tools`, `/odds`, `/glossary`, `/about`, `/players` | Secondary | Simple hub; tokens + EmptyState + PillGroup |
 | `/trends` | Secondary | Tools-adjacent GridFilterBar |
 | `/privacy-policy`, `/terms-of-use`, `/docs` | Secondary | Legal; GOVERNED |
-| `/admin/ads` | Secondary | Admin light pass |
+| `/admin/ads` | Secondary | Admin; GOVERNED |
 | `/auth/callback` | Infra | Auth only |
 | `/design-system` | Catalogue | Living DS page; noindex; More nav |
 | `*` | Aligned | EmptyState 404 |
@@ -205,7 +205,7 @@ Full `App.tsx` route checklist:
 
 ## Living catalogue (web)
 
-**`/design-system`** (`site/src/pages/DesignSystem.tsx`) is the in-product reference: colour / type / space / motion swatches and live variants of buttons, chips, PillGroup / PillTabs, EmptyState, Note, StatTile, DataTable bleed, forms, and icons. Linked from More → Design system. `noindex` (UNLISTED); no ads; loads without waiting on `matches.json`.
+**`/design-system`** (`site/src/pages/DesignSystem.tsx`) is the in-product reference: colour / type / space / motion swatches and live variants of buttons, chips, PillGroup / PillTabs, EmptyState, Note, StatTile, DataTable bleed, TeamBadge sizes, BookTable, LadderRow, forms, and icons. Linked from More → Design system. `noindex` (UNLISTED); no ads; loads without waiting on `matches.json`.
 
 When you add a product component job, show a Spec on that page and update the catalogue tables above.
 

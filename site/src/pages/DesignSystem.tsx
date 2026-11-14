@@ -14,9 +14,12 @@ import {
   StarIcon,
 } from "@heroicons/react/24/outline";
 import tokens from "@cricket/tokens/tokens.json";
+import { LeagueBadge, TeamBadge, TeamFlag } from "@/components/app/badges";
+import { BookTable } from "@/components/app/book-table";
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field, LiveForm, NativeSelect } from "@/components/app/forms";
+import { LadderRow, pricedFromBooks } from "@/components/app/line-ladder";
 import { Note } from "@/components/app/note";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { ChartBars } from "@/components/app/chart";
@@ -27,8 +30,20 @@ import { RowsSkeleton } from "@/components/app/skeletons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { setTitle, syncMeta } from "@/lib/title";
 import { cn } from "@/lib/utils";
+
+const BOOK_DEMO = [
+  { source: "book_a", over: 1.9, under: 1.95 },
+  { source: "book_b", over: 1.85, under: 2.05 },
+  { source: "book_c", over: 2.0, under: 1.88 },
+];
+const LADDER_DEMO = [
+  { line: 24.5, books: BOOK_DEMO },
+  { line: 25.5, books: [{ source: "book_a", over: 2.1, under: 1.75 }, { source: "book_b", over: 2.05, under: 1.8 }] },
+  { line: 26.5, books: [{ source: "book_a", over: 2.4, under: 1.55 }, { source: "book_c", over: 2.35, under: 1.6 }] },
+];
 
 /** Synthetic form chart for the catalogue — hit / miss / DNP / void / push. */
 const CHART_DEMO = [
@@ -58,7 +73,7 @@ const PAGE_BLURB: Record<string, string> = {
   buttons: "Actions and status badges for CTAs and metadata.",
   chips: "Filters, segments, and tab twins for scoped choices.",
   feedback: "Empty, loading, and explanatory notes for every list state.",
-  data: "Titles, metrics, charts, and dense tables.",
+  data: "Titles, metrics, charts, dense tables, badges, and priced ladders.",
   forms: "Live filters with disabled and invalid states.",
   icons: "Heroicons jobs used in product chrome.",
   rules: "Hard constraints for contributors.",
@@ -73,9 +88,9 @@ const PAGE_WHEN: Record<string, string> = {
   buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs.",
   chips: "Chip / PillGroup for filters; PillTabs when panels switch with the selection.",
   feedback: "Every empty, unknown, or error list uses EmptyState — never a bare spinner or blank panel.",
-  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats.",
+  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; TeamBadge sizes; LadderRow + BookTable for priced lines.",
   forms: "LiveForm for filters that apply as you change them; pair Field with NativeSelect or Input.",
-  icons: "Heroicons only under components/app and pages — never Lucide.",
+  icons: "Heroicons only under components/app, components/ui, and pages — never Lucide.",
   rules: "Follow these before adding a component, page, or token.",
 };
 
@@ -87,7 +102,7 @@ const PAGE_SOURCE: Record<string, string> = {
   buttons: "components/ui/button.tsx",
   chips: "components/app/pill-group.tsx",
   feedback: "components/app/empty-state.tsx",
-  data: "components/app/page.tsx · chart.tsx",
+  data: "components/app/page.tsx · chart.tsx · badges.tsx · line-ladder.tsx · book-table.tsx",
   forms: "components/app/forms.tsx",
   icons: "@heroicons/react/24/outline",
 };
@@ -132,6 +147,9 @@ const PAGE_TOC: Record<string, TocItem[]> = {
     { id: slugify("StatTile + Panel"), label: "StatTile" },
     { id: slugify("ChartBars"), label: "ChartBars" },
     { id: `datatable-bleed-${TABLE_HEAD.includes("footnote") ? "table-head" : "head"}`, label: "DataTable" },
+    { id: slugify("TeamBadge sizes"), label: "Badges" },
+    { id: slugify("BookTable"), label: "BookTable" },
+    { id: slugify("LadderRow"), label: "LadderRow" },
   ],
   forms: [
     { id: slugify("LiveForm"), label: "LiveForm" },
@@ -159,7 +177,7 @@ const COMPONENT_CARDS: readonly { id: string; title: string; detail: string; pre
   { id: "buttons", title: "Buttons", detail: "Primary actions and badges", preview: <Button size="sm">Default</Button> },
   { id: "chips", title: "Chips & tabs", detail: "Filters and segmented controls", preview: <span className="inline-flex h-8 items-center rounded-full bg-primary px-snug text-footnote font-label text-primary-foreground">T20</span> },
   { id: "feedback", title: "Empty & notes", detail: "EmptyState, skeletons, Note", preview: <span className="text-footnote text-muted-foreground">Nothing saved yet</span> },
-  { id: "data", title: "Data & metrics", detail: "StatTile, Panel, DataTable", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
+  { id: "data", title: "Data & metrics", detail: "StatTile, Panel, DataTable, badges, ladder", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
   { id: "forms", title: "Forms", detail: "LiveForm, Field, NativeSelect", preview: <span className="rounded border border-hairline px-snug py-hair text-footnote">Format ▾</span> },
   { id: "icons", title: "Icons", detail: "Heroicons in product jobs", preview: <StarIcon className="size-5" aria-hidden /> },
 ];
@@ -210,6 +228,7 @@ export function DesignSystemPage() {
   const [chipOn, setChipOn] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
   const [lineInvalid, setLineInvalid] = useState(false);
+  const [ladderLine, setLadderLine] = useState(24.5);
 
   const { pathname, hash } = useLocation();
   const topics = GROUPS.flatMap(({ title, sections }) => Array.from(sections).map(([id, label]) => ({ id, label, group: title })));
@@ -415,6 +434,57 @@ export function DesignSystemPage() {
             <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
           </div>
         </PreviewFrame>
+        <PreviewFrame title="TeamBadge sizes" description="xs/sm/md initials use text-caption; lg/xl use callout/title. Flag for tight rows." source="components/app/badges.tsx">
+          <div className="flex flex-wrap items-end gap-stack">
+            {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
+              <div key={size} className="grid justify-items-center gap-hair">
+                <TeamBadge name="India" size={size} />
+                <code className="label-cap text-caption text-muted-foreground">{size}</code>
+              </div>
+            ))}
+            <div className="grid justify-items-center gap-hair">
+              <LeagueBadge name="IPL" size="md" />
+              <code className="label-cap text-caption text-muted-foreground">league</code>
+            </div>
+            <div className="grid justify-items-center gap-hair">
+              <TeamFlag name="Australia" />
+              <code className="label-cap text-caption text-muted-foreground">flag</code>
+            </div>
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="BookTable" description="Extra books behind +N — face prices stay up front." source="components/app/book-table.tsx" canvasClassName="items-stretch">
+          <BookTable books={BOOK_DEMO} shown={["book_a"]} className="w-full" />
+        </PreviewFrame>
+        <PreviewFrame title="LadderRow" description="Priced line ladder: best book per side, extras via BookTable." source="components/app/line-ladder.tsx" canvasClassName="items-stretch bg-background">
+          <div className="w-full min-w-0 overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")}>Hit O</TableHead>
+                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")}>Hit U</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {LADDER_DEMO.map(({ line, books }) => {
+                  const priced = pricedFromBooks(line, books);
+                  return (
+                    <LadderRow
+                      key={line}
+                      line={line}
+                      priced={priced}
+                      selected={ladderLine === line}
+                      onPick={() => setLadderLine(line)}
+                      summary={{ pOver: 0.55, pUnder: 0.45, fairOver: 1.82, fairUnder: 2.22 }}
+                    />
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </PreviewFrame>
       </>
     ),
 
@@ -445,7 +515,7 @@ export function DesignSystemPage() {
     ),
 
     icons: (
-      <PreviewFrame title="Heroicons in product code" description="Never Lucide under components/app or pages." source="@heroicons/react/24/outline" canvasClassName="items-stretch">
+      <PreviewFrame title="Heroicons in product code" description="Never Lucide under components/app, components/ui, or pages." source="@heroicons/react/24/outline" canvasClassName="items-stretch">
         <ul className="grid w-full gap-snug sm:grid-cols-2">
           {([
             [InformationCircleIcon, "Info", "Tooltips / how-it-works"],

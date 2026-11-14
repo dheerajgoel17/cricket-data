@@ -90,7 +90,7 @@ export function SignInSheet() {
                   <span className="h-px flex-1 bg-hairline" />
                 </div>
 
-                <form className="grid gap-snug" onSubmit={submit}>
+                <form className="grid gap-stack" onSubmit={submit}>
                   <div className="grid gap-tight text-left">
                     <Label htmlFor="cph-email" className="text-footnote text-muted-foreground">Email</Label>
                     <Input
@@ -119,7 +119,7 @@ export function SignInSheet() {
                       required
                     />
                   </div>
-                  <Button type="submit" disabled={busy} className="mt-tight h-11 w-full rounded-full text-body font-label">
+                  <Button type="submit" disabled={busy} className="h-11 w-full rounded-full text-body font-label">
                     {mode === "in" ? "Sign in with email" : "Create account"}
                   </Button>
                 </form>
