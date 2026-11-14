@@ -34,7 +34,7 @@ export function PropsPage() {
   return (
     <div className="flex flex-col gap-stack">
       <AdSlot slotId="props_list_top" />
-      <h1 className="text-title font-bold tracking-tight lg:text-display">Player props</h1>
+      <h1 className="text-title font-emphasis tracking-tight lg:text-display">Player props</h1>
       <HotProps syncUrl />
     </div>
   );
@@ -51,7 +51,7 @@ export function FancyPage() {
   if (!ready) return <RowsSkeleton />;
   return (
     <div className="flex flex-col gap-stack">
-      <h1 className="text-title font-bold tracking-tight">Fancy</h1>
+      <h1 className="text-title font-emphasis tracking-tight">Fancy</h1>
       {!rows.length ? (
         <EmptyState
           icon={<PuzzlePieceIcon />}
@@ -78,15 +78,15 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
       <div className="h-full border-b border-hairline pb-stack">
         <div className="flex h-full flex-col gap-snug">
           <Link to={to()} className="flex flex-col gap-snug outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
+            <div className="flex items-center gap-tight text-footnote font-label text-muted-foreground">
               <span className="label-cap text-footnote">{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
               {ground && <span className="ml-auto min-w-0 truncate" title={f.venue}>{ground}</span>}
             </div>
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
               {[f.a, f.b].map((t: string, k: number) => (
                 <div key={t} className="contents">
-                  <div className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-medium">{t}</span></div>
-                  {k === 0 && <span className="row-span-2 grid justify-items-end text-right"><span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span><span className="text-callout font-medium tabular-nums">{localTime(when)}</span></span>}
+                  <div className="flex min-w-0 items-center gap-snug" title={t}><TeamBadge name={t} size="md" eager /><span className="truncate text-body font-label">{t}</span></div>
+                  {k === 0 && <span className="row-span-2 grid justify-items-end text-right"><span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span><span className="text-callout font-label tabular-nums">{localTime(when)}</span></span>}
                 </div>
               ))}
             </div>
@@ -98,7 +98,7 @@ function FancyCard({ f, ms, rows, i }: { f: any; ms: number[]; rows: any[]; i: n
           ) : <p className="border-t border-hairline py-snug text-callout text-muted-foreground">{ms.length ? "Lines are up; none of them score on past matches in this format." : "Lines are up; no past matches to score them on."}</p>}
           <Link to={to()} className="mt-auto flex items-center justify-between gap-snug pt-tight outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <span className="truncate text-caption text-muted-foreground">{f.series || ""}{ms.length ? ` · last ${ms.length} matches` : ""}</span>
-            <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
+            <span className="inline-flex shrink-0 items-center text-footnote font-label text-primary">{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}<ChevronRightIcon className="size-4" aria-hidden /></span>
           </Link>
         </div>
       </div>

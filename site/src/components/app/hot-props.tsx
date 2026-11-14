@@ -205,14 +205,14 @@ export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; cl
         {overQ?.over != null && (
           <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
             <span className="text-muted-foreground">O{splitLine || (rowLine != null && overLine !== rowLine) ? ` ${overLine}` : ""}</span>
-            <Tick quiet value={overQ.over} className="text-body font-bold text-foreground">{odds(overQ.over)}</Tick>
+            <Tick quiet value={overQ.over} className="text-body font-emphasis text-foreground">{odds(overQ.over)}</Tick>
             <BookBadge source={overQ.source} className="min-w-0 truncate" />
           </span>
         )}
         {underPrice != null && (
           <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
             <span className="text-muted-foreground">U{splitLine || (rowLine != null && underLine !== rowLine) ? ` ${underLine}` : ""}</span>
-            <Tick quiet value={underPrice} className="text-body font-bold text-foreground">{odds(underPrice)}</Tick>
+            <Tick quiet value={underPrice} className="text-body font-emphasis text-foreground">{odds(underPrice)}</Tick>
             <BookBadge source={underQ!.source} className="min-w-0 truncate" />
           </span>
         )}
@@ -243,14 +243,14 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
       <div className="grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left">
         <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
         <span className="grid min-w-0 gap-hair">
-          <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug">
+          <span className="flex min-w-0 items-center gap-tight text-body font-label leading-snug">
             <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`} className="truncate outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring"><PlayerName idx={r.idx} fallback={r.name} /></Link>
             <TeamFlag name={r.team} />
             {!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
-            {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}
+            {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}
           </span>
           <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-            <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `O/U ${r.line}`}</span>
+            <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `O/U ${r.line}`}</span>
             <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
           </span>
           {!out && (r.quotes.length ? <BookQuotes quotes={r.quotes} rowLine={r.line} /> : (
@@ -259,7 +259,7 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
           <PropProgress r={r} soFar={soFar} out={out} />
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
             {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
-            {ground && <span className={cn("truncate", ground.tone === "good" ? "font-medium text-primary" : ground.tone === "bad" ? "font-medium text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
+            {ground && <span className={cn("truncate", ground.tone === "good" ? "font-label text-primary" : ground.tone === "bad" ? "font-label text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
             <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
           </span>
         </span>
@@ -267,7 +267,7 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
           {!out && <span className="grid justify-items-end gap-hair text-right">
             <span className="flex items-baseline gap-tight whitespace-nowrap">
               <span className="label-cap text-caption text-muted-foreground">Model</span>
-              <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+              <span className={cn("font-condensed text-title font-emphasis leading-none tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
             </span>
             {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
           </span>}
@@ -280,7 +280,7 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
 }
 
 function RateCell({ p, n }: { p: number | null; n?: number }) {
-  return <span className={cn("font-condensed text-body font-medium tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-normal text-muted-foreground"> · {n}</span> : null}</span>;
+  return <span className={cn("font-condensed text-body font-label tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-copy text-muted-foreground"> · {n}</span> : null}</span>;
 }
 
 function ColHead({ id, label, win, onWin, align, className }: { id?: Win; label: string; win: Win; onWin: (w: Win) => void; align?: "right"; className?: string }) {
@@ -328,9 +328,9 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                   <span className="flex items-center gap-snug">
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0 gap-hair">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-medium leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="flex min-w-0 items-center gap-tight text-body font-label leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-                        <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums">{out ? r.line : `${r.side === "under" ? "Under" : "Over"} ${r.line}`}</span>
+                        <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums">{out ? r.line : `${r.side === "under" ? "Under" : "Over"} ${r.line}`}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
                       </span>
                       {!out && r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
@@ -339,11 +339,11 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                   </span>
                 </td>
                 {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-title font-bold tabular-nums">{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-medium text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
+                <td className="px-snug py-snug font-condensed text-title font-emphasis tabular-nums">{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-label text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
                 <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-condensed text-title font-bold tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-medium text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
+                <td className={cn("px-snug py-snug text-right font-condensed text-title font-emphasis tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
                 <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
@@ -455,13 +455,13 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
             className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
+            {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
           </Button>
         </div>
         {active.length > 0 && (
           <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", urlState ? "px-gutter pb-tight pt-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
             {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
-            <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
       </div>
@@ -473,7 +473,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
               icon={<ChartBarIcon />}
               title={phase ? EMPTY_PHASE[phase].title : active.length ? "No props match these filters" : "No rows in this window"}
               body={phase ? EMPTY_PHASE[phase].body : active.length ? "Clear a filter to see the rest of the day's lines." : "Open Filters to widen the day, match or sample window."}
-              action={active.length ? <button type="button" className="text-callout font-medium text-primary underline-offset-2 hover:underline" onClick={() => update(clearFilter(sc, "all"))}>Clear filters</button> : undefined}
+              action={active.length ? <button type="button" className="text-callout font-label text-primary underline-offset-2 hover:underline" onClick={() => update(clearFilter(sc, "all"))}>Clear filters</button> : undefined}
             />
           </div>
         ) : (

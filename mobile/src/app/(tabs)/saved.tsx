@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   remove: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
   signBtn: { alignSelf: "center", height: 44, minWidth: 160, paddingHorizontal: space.group, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  signLabel: { ...type.body, fontFamily: font.semibold, color: color["primary-foreground"] },
+  signLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
   account: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });
 

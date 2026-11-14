@@ -27,7 +27,7 @@ export function Brand() {
   return (
     <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <BrandMark className="size-9 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-rotate-6 group-active:scale-[0.97]" />
-      <span className="text-title font-bold leading-none tracking-tight text-foreground">Fancy.cash</span>
+      <span className="text-title font-emphasis leading-none tracking-tight text-foreground">Fancy.cash</span>
     </Link>
   );
 }
@@ -38,7 +38,7 @@ function SavedLink() {
     <Link to="/saved" aria-label={list.length ? `Saved, ${list.length}` : "Saved"}
       className="relative grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]">
       <BookmarkIcon className="size-4" />
-      {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-bold text-primary-foreground">{list.length}</span>}
+      {list.length > 0 && <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-emphasis text-primary-foreground">{list.length}</span>}
     </Link>
   );
 }

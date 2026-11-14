@@ -76,7 +76,7 @@ function Metric({ k, v, tone, className, text }: { k: string; v: ReactNode; tone
   return (
     <div className={cn("grid min-w-0 gap-hair", className)}>
       <span className="label-cap text-callout leading-tight text-muted-foreground">{k}</span>
-      <b className={cn(text ? "line-clamp-2 break-words text-body font-medium leading-snug" : "break-words font-condensed text-metric font-medium leading-none tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
+      <b className={cn(text ? "line-clamp-2 break-words text-body font-label leading-snug" : "break-words font-condensed text-metric font-label leading-none tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
     </div>
   );
 }
@@ -118,7 +118,7 @@ function PlayerHeader({ idx, name, team, teamIx, test, fmts }: { idx: number; na
   return (
     <section className="flex items-end justify-between gap-snug border-b border-hairline">
       <div className="grid min-w-0 flex-1 content-start gap-tight pt-stack">
-        <h1 className="text-display font-bold leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
+        <h1 className="text-display font-emphasis leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
         <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span><span className="block">{fmts.map(([, f]) => f).join(" · ")}</span>{profile && <span className="block">{profile}</span>}</p>
         <div className="flex items-center gap-snug py-stack">
           <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid size-(--touch) place-items-center rounded-full bg-secondary active:opacity-70"><TeamBadge name={team} size="sm" /></Link>
@@ -217,7 +217,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <HeaderActions>
         <h1 className="sr-only">{name} · {statLabel}</h1>
         <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
-          <p className="truncate text-body font-semibold tracking-tight">{name}</p>
+          <p className="truncate text-body font-emphasis tracking-tight">{name}</p>
           <p className="truncate text-footnote text-muted-foreground">{statLabel}{side ? ` · ${abbr(side)}` : ""}</p>
         </div>
         <span className="hidden flex-1 lg:block" aria-hidden />
@@ -242,7 +242,7 @@ function PlayerScreen({ idx }: { idx: number }) {
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
             className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
           </Button>
         </div>
         <div className="px-gutter py-tight">
@@ -254,7 +254,7 @@ function PlayerScreen({ idx }: { idx: number }) {
               <ActiveChip key={i} label={k || "Filter"} value={String(v)}
                 onRemove={() => navigateWith(CHIP_CLEAR[k] || Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl"].map((x) => [x, ""])))} />
             ))}
-            <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
       </div>
@@ -423,7 +423,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
               <Metric k="Hit rate" v={<Arrow up={cur.p == null ? null : cur.p >= 0.5}>{cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`}</Arrow>} />
               <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
               <Metric text k="Opponent" v={next?.opp ? <span className="grid gap-hair"><span>{abbr(next.opp)}</span><MatchStatus phase={next.phase || "upcoming"} start={next.start} className="text-callout text-muted-foreground" /></span> : "–"} />
-              <Metric text k="Prop" v={book ? res.statLabel : <span className="grid gap-hair"><span>{res.statLabel}</span><span className="text-callout font-medium text-muted-foreground">Not listed</span></span>} />
+              <Metric text k="Prop" v={book ? res.statLabel : <span className="grid gap-hair"><span>{res.statLabel}</span><span className="text-callout font-label text-muted-foreground">Not listed</span></span>} />
             </div>
             <div className="hidden shrink-0 rounded-2xl border border-hairline bg-card px-snug py-snug sm:block">
               {mixSlices.length >= 3
@@ -449,7 +449,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                 <button key={w.n} type="button" role="radio" aria-checked={on} onClick={() => setWin(w.n)}
                   className={cn("grid min-w-[3.25rem] flex-1 justify-items-center gap-hair rounded-lg px-tight py-tight outline-none focus-visible:ring-2 focus-visible:ring-ring", on ? "bg-secondary" : "hover:bg-secondary/50")}>
                   <span className="label-cap text-caption text-muted-foreground">{w.label}</span>
-                  <b className={cn("font-condensed text-callout font-bold tabular-nums", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b>
+                  <b className={cn("font-condensed text-callout font-emphasis tabular-nums", bandText[band(w.p) as keyof typeof bandText])}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</b>
                 </button>
               );
             })}
@@ -458,19 +458,19 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
               {mix.out > 0 ? (
                 <>
-                  <b className="font-medium tabular-nums">{mix.out}</b> void or not in the XI left out
+                  <b className="font-label tabular-nums">{mix.out}</b> void or not in the XI left out
                   {" · "}
-                  <b className="font-medium tabular-nums">{cur.played}</b> {res.sample?.unit || "games"} counted.
+                  <b className="font-label tabular-nums">{cur.played}</b> {res.sample?.unit || "games"} counted.
                   <Popover>
                     <PopoverTrigger asChild><button type="button" aria-label="About this chart" className="ml-tight inline-grid size-5 place-items-center rounded-full align-middle text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"><InformationCircleIcon className="size-4" /></button></PopoverTrigger>
                     <PopoverContent side="top" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
-                      <span><b className="font-medium">{res.statLabel} {side} {line}</b>{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}.</span>
+                      <span><b className="font-label">{res.statLabel} {side} {line}</b>{scope ? `, ${SCOPE_LABEL[scope].toLowerCase()} only (what he made in his side's ${scope === 1 ? "first" : "second"} innings of each Test)` : ""}.</span>
                       <span>Green cleared, red missed. DNP / VOID fixtures are not counted as misses.</span>
                     </PopoverContent>
                   </Popover>
                 </>
               ) : null}
-              {cur.played < 5 ? <>{mix.out > 0 ? " " : ""}Too few for a steady read{active.length ? ": relax a filter" : ""}.{active.length > 0 ? <> <button type="button" className="font-medium underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></> : null}</> : null}
+              {cur.played < 5 ? <>{mix.out > 0 ? " " : ""}Too few for a steady read{active.length ? ": relax a filter" : ""}.{active.length > 0 ? <> <button type="button" className="font-label underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></> : null}</> : null}
             </p>
           ) : null}
           {/* Fancy strip: hit-rate meters, then independent Over / Under book lanes. */}
@@ -482,8 +482,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                 return (
                   <button key={lane} type="button" onClick={() => { setSide(lane); keep({ line, side: lane }); }}
                     className={cn("flex min-w-0 flex-col gap-tight rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-ring", side === lane && "opacity-100", side !== lane && "opacity-70")}>
-                    <div className="text-footnote font-medium capitalize text-muted-foreground">{lane} {line}</div>
-                    <b className={cn("text-title font-bold tabular-nums", lane === "over" ? "text-primary" : "text-foreground")}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</b>
+                    <div className="text-footnote font-label capitalize text-muted-foreground">{lane} {line}</div>
+                    <b className={cn("text-title font-emphasis tabular-nums", lane === "over" ? "text-primary" : "text-foreground")}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</b>
                     <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><div className={cn("h-full rounded-full", lane === "over" ? "bg-primary" : "bg-foreground/70")} style={{ width: `${(p ?? 0) * 100}%` }} /></div>
                     <div className="text-footnote text-muted-foreground">{hist.hits} of {hist.played} · fair {odds(fair)}</div>
                   </button>
@@ -517,9 +517,9 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
         {book && cur && (
           <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
             <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-              <h2 className="text-body font-medium">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
+              <h2 className="text-body font-label">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
               <span className="flex items-center gap-snug text-footnote text-muted-foreground">
-                {edge != null && <span className={cn("font-medium tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
+                {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
                 <span>Tap a row</span>
               </span>
             </div>
@@ -553,7 +553,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             {tab === "lines" && !book && <LadderTable bleed ladder={res.ladder} />}
             {tab === "corr" && res.corr && (
               <div className="flex flex-col gap-snug">
-                <h3 className="text-body font-medium">When {res.statLabel.toLowerCase()} {res.plan.side || "over"} {c?.line ?? res.line} hits</h3>
+                <h3 className="text-body font-label">When {res.statLabel.toLowerCase()} {res.plan.side || "over"} {c?.line ?? res.line} hits</h3>
                 <p className="text-footnote text-muted-foreground">{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</p>
                 <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
               </div>
@@ -567,8 +567,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                       <li key={i} className="border-t border-hairline first:border-t-0">
                         <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-gutter py-snug text-left transition-colors active:bg-accent lg:px-0">
                           <TeamBadge name={e.opp} size="sm" />
-                          <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-medium">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
-                          <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-bold tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
+                          <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-label">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
+                          <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-emphasis tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
                         </button>
                       </li>
                     );
@@ -587,7 +587,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           {game && <><SheetHeader><SheetTitle>{name} · {shortDate(game.e.date)}</SheetTitle><SheetDescription className="sr-only">Game details</SheetDescription></SheetHeader>
             <div className="px-gutter pb-section">{[["Date", game.e.date], ["Opponent", game.e.opp], game.e.venueName ? ["Venue", game.e.venueName] : null,
               [res.statLabel, game.e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[game.s] : String(game.e.value)],
-              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between gap-snug border-b border-hairline py-snug text-body last:border-b-0"><span className="text-muted-foreground">{k}</span><b className="text-right font-medium">{v}</b></div>)}</div></>}
+              game.e.value != null && c.auxLabel ? [c.auxLabel, game.e.aux ?? "–"] : null, game.e.pos ? ["Batting position", `No. ${game.e.pos}`] : null].filter(Boolean).map(([k, v]: any) => <div key={k} className="flex justify-between gap-snug border-b border-hairline py-snug text-body last:border-b-0"><span className="text-muted-foreground">{k}</span><b className="text-right font-label">{v}</b></div>)}</div></>}
         </SheetContent>
       </Sheet>
     </div>

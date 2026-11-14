@@ -10,7 +10,7 @@ import { RateHeatStrip } from "./viz";
 import { rateClass } from "@/lib/heat";
 import { cn } from "@/lib/utils";
 
-export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-snug py-tight font-medium", rateClass(p))}>{pc(p)}</span>);
+export const HitCell = ({ p }: { p: number | null }) => (p == null ? <>–</> : <span className={cn("rounded-md px-snug py-tight font-label", rateClass(p))}>{pc(p)}</span>);
 
 export const LadderTable = ({ ladder, label = "Line", bleed }: { ladder: any[]; label?: string; bleed?: boolean }) => (
   <DataTable bleed={bleed} columns={[label, "Over %", "Fair over", "Under %", "Fair under", "n"]}
@@ -42,7 +42,7 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
     <div className="grid gap-stack">
       <Card className="gap-hair border-l-4 border-l-primary px-inset py-snug shadow-none">
         {source ? <Badge variant="secondary" className="w-fit">{source}</Badge> : null}
-        <h2 className="text-title font-medium leading-snug">{r.headline}</h2>
+        <h2 className="text-title font-label leading-snug">{r.headline}</h2>
         <Muted>Sample size: {r.sample.n} {r.sample.unit}.</Muted>
         <Chips list={r.filters} />
       </Card>
@@ -50,7 +50,7 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
       {r.kind === "partnership" && <Partnership r={r} />}
       {r.kind === "match_market" && r.tables.filter((t: any) => t.n).map((t: any) => (
         <div key={t.label} className="flex flex-col gap-snug">
-          <h3 className="text-body font-medium">{t.label}</h3>
+          <h3 className="text-body font-label">{t.label}</h3>
           <Muted>{`n=${t.n} · median ${num(t.summary.median)} · mean ${num(t.summary.mean)} · range ${num(t.summary.min)}–${num(t.summary.max)}`}</Muted>
           {t.summary.line != null && <p className="text-body">Over {t.summary.line}: {pc(t.summary.pOver)} (fair <OddsText>{odds(t.summary.fairOver)}</OddsText>) · Under: {pc(t.summary.pUnder)} (fair <OddsText>{odds(t.summary.fairUnder)}</OddsText>)</p>}
           <LadderTable bleed ladder={t.ladder} />
@@ -83,17 +83,17 @@ function PlayerProp({ r }: { r: any }) {
         <div className="text-center"><Link className="text-callout text-primary" to={`/player/${r.player.idx}?stat=${r.plan.stat}${Number.isInteger(r.fmt) ? `&fmt=${r.fmt}` : ""}${r.line != null ? `&line=${r.line}` : ""}&side=${r.chart.side}`}>Open the full player page →</Link></div></Panel> : null}
       {r.corr ? (
         <div className="flex flex-col gap-snug">
-          <h3 className="text-body font-medium">When {r.statLabel.toLowerCase()} {side} {r.chart?.line ?? r.line} hits</h3>
+          <h3 className="text-body font-label">When {r.statLabel.toLowerCase()} {side} {r.chart?.line ?? r.line} hits</h3>
           <Muted>{r.corr.n} of {r.corr.of} {r.sample.unit}. Shows how often his other props also clear in those games versus his normal rate.</Muted>
           <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} rows={r.corr.rows.map((c: any) => [`${c.label} over ${c.line}`, pc(c.base), pc(c.cond), `${c.lift >= 0 ? "+" : ""}${Math.round(c.lift * 100)}pp`])} />
         </div>
       ) : null}
       <div className="flex flex-col gap-snug">
-        <h3 className="text-body font-medium">Game log</h3>
+        <h3 className="text-body font-label">Game log</h3>
         <DataTable bleed columns={["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."]}
           rows={logs.map((e: any) => [e.date, e.opp, e.venueName || "", e.value == null ? <Badge variant="outline">{e.void ? "VOID: in XI, did not bat/bowl" : e.unknown ? "N/A: XI not recorded" : "DNP"}</Badge> : e.value, e.aux ?? "–", e.pos ?? "–"])} />
       </div>
-      <h2 className="text-title font-medium">Hit rate at every line</h2>
+      <h2 className="text-title font-label">Hit rate at every line</h2>
       <LadderTable bleed ladder={r.ladder} />
       <SplitTables splits={r.splits} />
     </>
@@ -125,7 +125,7 @@ function Partnership({ r }: { r: any }) {
       ) : null}
       {r.last.length ? (
         <div className="flex flex-col gap-snug">
-          <h2 className="text-title font-medium">Latest stands</h2>
+          <h2 className="text-title font-label">Latest stands</h2>
           <DataTable bleed columns={["Date", "Opponent", "Venue", "Runs", "Balls", "Wicket", "First out"]} rows={r.last.map((x: any) => [x.date, x.opp, x.venue, x.runs, x.balls, x.wicket, x.out])} />
         </div>
       ) : null}

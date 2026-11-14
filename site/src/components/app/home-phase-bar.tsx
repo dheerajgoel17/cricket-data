@@ -10,7 +10,7 @@ import { HOME_PHASES, type HomePhase } from "@/lib/home-phase";
 /** Line-tab chrome for the home phase bar: primary text + underline on the hairline; no focus/active chrome. */
 const phaseTab = cn(
   "h-auto flex-none justify-start rounded-none border-0 bg-transparent px-0 py-stack outline-none",
-  "text-callout font-medium text-muted-foreground shadow-none hover:text-foreground",
+  "text-callout font-label text-muted-foreground shadow-none hover:text-foreground",
   "after:bg-primary group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-0 group-data-[orientation=horizontal]/tabs:after:h-0.5",
   "data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none",
   "dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent dark:data-[state=active]:text-primary",
@@ -34,7 +34,7 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
               <TabsTrigger key={id} value={id} className={phaseTab}>
                 <span className="flex items-center gap-hair">
                   {label}
-                  <span className="text-caption font-medium tabular-nums opacity-70">{counts[id]}</span>
+                  <span className="text-caption font-label tabular-nums opacity-70">{counts[id]}</span>
                 </span>
               </TabsTrigger>
             ))}
@@ -49,8 +49,8 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
           <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
             <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />
             <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
-              <SheetTitle className="text-title font-bold tracking-tight">More</SheetTitle>
-              <SheetClose className="text-body font-medium text-primary active:opacity-50">Done</SheetClose>
+              <SheetTitle className="text-title font-emphasis tracking-tight">More</SheetTitle>
+              <SheetClose className="text-body font-label text-primary active:opacity-50">Done</SheetClose>
             </SheetHeader>
             <SheetDescription className="sr-only">Players, tools and the rest of the site</SheetDescription>
             <ul className="grid gap-hair pt-group">

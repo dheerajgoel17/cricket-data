@@ -57,7 +57,7 @@ export function SignInSheet() {
           <div className="flex flex-col items-center gap-snug px-group pb-snug pt-group text-center">
             <BrandMark className="size-12" />
             <div className="grid gap-hair">
-              <DialogTitle className="text-title font-bold tracking-tight text-foreground">
+              <DialogTitle className="text-title font-emphasis tracking-tight text-foreground">
                 {mode === "in" ? "Sign in to save" : "Create a free account"}
               </DialogTitle>
               <DialogDescription className="text-balance text-callout text-muted-foreground">
@@ -78,7 +78,7 @@ export function SignInSheet() {
                   variant="secondary"
                   disabled={busy}
                   onClick={google}
-                  className="h-11 w-full gap-snug rounded-full text-body font-medium"
+                  className="h-11 w-full gap-snug rounded-full text-body font-label"
                 >
                   <GoogleGlyph className="size-5" />
                   Continue with Google
@@ -119,7 +119,7 @@ export function SignInSheet() {
                       required
                     />
                   </div>
-                  <Button type="submit" disabled={busy} className="mt-tight h-11 w-full rounded-full text-body font-medium">
+                  <Button type="submit" disabled={busy} className="mt-tight h-11 w-full rounded-full text-body font-label">
                     {mode === "in" ? "Sign in with email" : "Create account"}
                   </Button>
                 </form>
@@ -127,13 +127,13 @@ export function SignInSheet() {
                 <p className="text-center text-callout text-muted-foreground">
                   {mode === "in" ? (
                     <>No account?{" "}
-                      <button type="button" className="font-medium text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMode("up")}>
+                      <button type="button" className="font-label text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMode("up")}>
                         Create one free
                       </button>
                     </>
                   ) : (
                     <>Already have an account?{" "}
-                      <button type="button" className="font-medium text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMode("in")}>
+                      <button type="button" className="font-label text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMode("in")}>
                         Sign in
                       </button>
                     </>

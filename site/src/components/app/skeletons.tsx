@@ -145,27 +145,56 @@ export function FancySkeleton() {
 export function RailSkeleton() {
   return (
     <div data-skeleton="rail" aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter">
-      {[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}
+      {[0, 1, 2].map((n) => (
+        <div key={n} className="flex min-h-48 w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-inset ring-hairline">
+          <div className="flex justify-between gap-snug"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-24" /></div>
+          {[0, 1].map((team) => <div key={team} className="flex items-center gap-snug"><Skeleton className="size-control shrink-0 rounded-full" /><Skeleton className="h-4 w-24" /></div>)}
+          <div className="mt-auto flex items-end justify-between gap-snug pt-tight"><div className="grid gap-hair"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-28" /></div><Skeleton className="h-3 w-12" /></div>
+        </div>
+      ))}
     </div>
   );
 }
 
-/** The whole app while the data files and the page code load: header bar, series chips, two fixture cards, a props list. Both waits render this, so a refresh shows one skeleton, not two "Loading" messages. */
+export function HomePropsSkeleton() {
+  return (
+    <div data-skeleton="home-props" aria-hidden className="flex min-w-0 flex-col gap-stack">
+      <div className="flex gap-tight overflow-hidden">
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-control w-32 shrink-0 rounded-full" />)}
+      </div>
+      <RowsSkeleton rows={3} />
+    </div>
+  );
+}
+
+/** Content fallback inside the mounted shell. */
+export function PageSkeleton() {
+  return <div role="status" aria-label="Loading page"><RowsSkeleton rows={3} /></div>;
+}
+
+/** Cold start, before the application shell can mount. */
 export function AppSkeleton() {
   return (
     <div data-skeleton="app" role="status" aria-label="Loading" className="min-h-screen">
-      <div aria-hidden className="flex h-14 items-center gap-snug border-b border-border/60 px-gutter md:h-[60px]">
-        <Skeleton className="size-6 rounded-md" /><Skeleton className="h-5 w-24" />
-        <Skeleton className="mx-auto hidden h-control max-w-[560px] flex-1 rounded-full md:block" />
-        <Skeleton className="ml-auto size-control rounded-full md:ml-0" />
+      <div aria-hidden className="flex h-(--header-h) items-center gap-snug border-b border-hairline px-gutter">
+        <Skeleton className="size-control rounded-lg" /><Skeleton className="h-5 w-24" />
+        <Skeleton className="ml-auto size-control rounded-full" /><Skeleton className="size-control rounded-full" />
       </div>
       <div aria-hidden className="flex">
-        <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug md:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
-        <div className="mx-auto flex w-full min-w-0 max-w-[900px] flex-col gap-section px-gutter pb-section pt-stack">
-          <RailSkeleton />
-          <TapeSkeleton />
-          <div className="flex flex-col gap-stack"><Skeleton className="h-5 w-40" /><RowsSkeleton rows={6} /></div>
+        <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug lg:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
+        <div className="mx-auto flex w-full min-w-0 max-w-(--content-max) flex-col px-gutter pb-section">
+          <div className="-mx-gutter flex h-12 items-center gap-stack border-b border-hairline px-gutter">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-3 w-16" />)}
+            <Skeleton className="ml-auto h-3 w-5" />
+          </div>
+          <div className="flex flex-col gap-section pt-stack">
+            <RailSkeleton />
+            <section className="flex flex-col gap-stack"><h2 className="text-title font-emphasis tracking-tight">Props</h2><HomePropsSkeleton /></section>
+          </div>
         </div>
+      </div>
+      <div aria-hidden className="fixed inset-x-0 bottom-0 flex h-[calc(var(--tabbar-h)+env(safe-area-inset-bottom))] items-center justify-around border-t border-hairline bg-background lg:hidden">
+        {Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="size-5 rounded-md" />)}
       </div>
     </div>
   );
@@ -226,9 +255,10 @@ export function LeagueSkeleton() {
 
 /** Named shapes used by the route catalogue and tests. */
 export type SkeletonShape =
-  | "rows" | "grid" | "list" | "match" | "scorecard" | "tape" | "fancy" | "rail" | "app" | "player" | "ground" | "league";
+  | "home-props" | "rows" | "grid" | "list" | "match" | "scorecard" | "tape" | "fancy" | "rail" | "app" | "player" | "ground" | "league";
 
 export const SKELETON_BY_SHAPE: Record<SkeletonShape, () => ReactNode> = {
+  "home-props": () => <HomePropsSkeleton />,
   rows: () => <RowsSkeleton />,
   grid: () => <GridSkeleton />,
   list: () => <ListSkeleton />,

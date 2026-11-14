@@ -33,14 +33,14 @@ export function ToolsPage() {
     <div className="flex flex-col gap-stack">
       <Crumbs items={[["Home", "/"], ["Tools"]]} />
       <PageTitle sub="Cricket stats and data, completely free: no login, no paywall, no betting.">Free cricket stats tools</PageTitle>
-      <div className="flex flex-wrap gap-hair">{["100% free", "No registration", "Ball-by-ball data"].map((x) => <Badge key={x} variant="secondary" className="rounded-full px-snug py-tight font-normal">{x}</Badge>)}</div>
+      <div className="flex flex-wrap gap-hair">{["100% free", "No registration", "Ball-by-ball data"].map((x) => <Badge key={x} variant="secondary" className="rounded-full px-snug py-tight font-copy">{x}</Badge>)}</div>
       <div className="grid gap-stack [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
         {TOOLS.map(([r, t, d, b], i) => (
           <motion.div key={r} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} whileHover={{ y: -3 }}>
             <Link to={`/${r}`}>
               <Card className="h-full gap-hair px-inset py-stack shadow-none transition-colors hover:bg-surface-raised">
                 {b ? <Badge className="w-fit bg-primary/15 text-primary">{b}</Badge> : null}
-                <h3 className="text-title font-medium">{t}</h3>
+                <h3 className="text-title font-label">{t}</h3>
                 <Muted>{d}</Muted>
                 <OddsText>Open →</OddsText>
               </Card>
@@ -186,7 +186,7 @@ export function PlayersPage() {
   return (
     <div className="flex flex-col gap-stack">
       <StatsAd />
-      <h1 className="text-title font-bold tracking-tight">Players</h1>
+      <h1 className="text-title font-emphasis tracking-tight">Players</h1>
       <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
         <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
         <InputGroupInput type="search" placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
@@ -201,7 +201,7 @@ export function PlayersPage() {
                   <Link to={`/player/${p.idx}`}>
                     <ItemMedia><PlayerBadge idx={p.idx} size="md" className="size-control" /></ItemMedia>
                     <ItemContent className="min-w-0 gap-hair">
-                      <ItemTitle className="max-w-full text-body font-medium leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
+                      <ItemTitle className="max-w-full text-body font-label leading-snug"><span className="truncate">{p.name}</span></ItemTitle>
                       <ItemDescription className="truncate text-callout text-muted-foreground">{store.teamName(p.team)} · {FORMATS.filter((_: string, i: number) => (store.P.fm[p.idx] >> i) & 1).join(" ")}{p.last ? ` · last ${p.last}` : ""}</ItemDescription>
                     </ItemContent>
                     <ItemActions className="gap-tight text-footnote tabular-nums text-muted-foreground">{store.P.n[p.idx]} inns<ChevronRightIcon className="size-4" aria-hidden /></ItemActions>

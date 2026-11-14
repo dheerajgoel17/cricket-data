@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { syncAds } from "@/lib/ads";
-import { AppSkeleton } from "@/components/app/skeletons";
+import { AppSkeleton, PageSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
 import { EmptyState } from "@/components/app/empty-state";
@@ -59,7 +59,7 @@ function Analytics() {
 /** Every page except home reads matches.json. Home paints the rail from the fixture file while that download finishes. */
 function HistoryGate() {
   const { matchesReady } = useData();
-  if (matchesReady === false) return <AppSkeleton />;
+  if (matchesReady === false) return <PageSkeleton />;
   return <Outlet />;
 }
 

@@ -48,7 +48,7 @@ export function CompetitionsPage() {
         {rows.map(([e, c]) => (
           <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug last:border-b-0 hover:bg-accent">
             <LeagueBadge name={store.events[e]} size="md" />
-            <span className="flex-1 text-body font-medium">{store.events[e]}</span>
+            <span className="flex-1 text-body font-label">{store.events[e]}</span>
             <span className="text-callout text-muted-foreground">{c} matches</span>
             <ArrowRightIcon className="size-4 text-muted-foreground" />
           </Link>
@@ -157,12 +157,12 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         </TabsContent>}
         <TabsContent value="markets" className="flex flex-col gap-stack">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top" className="flex flex-col gap-stack">
-          <h2 className="text-title font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
+          <h2 className="text-title font-label">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
           {top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>
       <Card className="gap-hair px-inset py-stack shadow-none">
-        <h3 className="text-title font-medium">About {label}</h3>
+        <h3 className="text-title font-label">About {label}</h3>
         <Muted>{isTeam ? `${label} ${fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.` : `${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted>
       </Card>
       <Link to="/teams" className="sr-only">Teams</Link>

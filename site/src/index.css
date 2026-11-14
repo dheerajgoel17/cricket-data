@@ -3,6 +3,7 @@
 @import "@ionic/core/css/core.css"; /* variables and utility classes only; used by the phone tab bar */
 /* Cricket stats pairing: Satoshi (≈ Crex Diatype) for UI text; Barlow Condensed for scores, odds, hit rates, label-cap and brand. */
 @import "../fonts/satoshi/satoshi.css";
+@import "@fontsource/barlow-condensed/300.css";
 @import "@fontsource/barlow-condensed/500.css";
 @import "@fontsource/barlow-condensed/700.css";
 @import "@fontsource/barlow-condensed/900.css";
@@ -71,10 +72,15 @@
 }
 
 /* Type — Satoshi for names/UI; Barlow Condensed for scoreboard figures and uppercase rail labels. */
-@utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; line-height: 1.2; }
-@utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; font-weight: 700; }
+@utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: var(--weight-label); line-height: 1.2; }
+@utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; font-weight: var(--weight-editorial); }
 
 @theme inline {
+  --font-weight-editorial: var(--weight-editorial);
+  --font-weight-copy: var(--weight-copy);
+  --font-weight-label: var(--weight-label);
+  --font-weight-emphasis: var(--weight-emphasis);
+  --font-weight-display-heavy: var(--weight-brand);
   --font-sans: var(--font-sans-stack);
   --font-condensed: "Barlow Condensed", "Arial Narrow", sans-serif;
   --font-brand: "Barlow Condensed", "Arial Narrow", sans-serif;
@@ -127,7 +133,7 @@
     scroll-behavior: smooth;
   }
   /* 14 px base (Crex-like); names/rows bump via text-body (15). Antialiased keeps Satoshi crisp on dark. */
-  body { @apply bg-background text-foreground font-sans antialiased font-normal; font-size: var(--body-size); line-height: 1.35; letter-spacing: -0.005em; }
+  body { @apply bg-background text-foreground font-sans antialiased font-copy; font-size: var(--body-size); line-height: 1.35; letter-spacing: -0.005em; }
   a { color: inherit; }
   button, a, [role="button"] { touch-action: manipulation; }
   button, [role="button"] { -webkit-user-select: none; user-select: none; }

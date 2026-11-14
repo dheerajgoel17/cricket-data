@@ -41,7 +41,7 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
         return (
           <ToggleGroupItem key={v} value={v} title={clearable ? "Clear filter" : undefined}
             className={cn(
-              "relative shrink-0 font-medium transition-colors",
+              "relative shrink-0 font-label transition-colors",
               sub
                 ? "h-auto rounded-none border-0 bg-transparent px-0 py-stack text-callout shadow-none hover:bg-transparent hover:text-foreground data-[state=on]:bg-transparent data-[state=on]:text-primary data-[state=off]:text-muted-foreground"
                 : outlined

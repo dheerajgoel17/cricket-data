@@ -13,6 +13,8 @@ No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`
 | Layout roles | gutter, control, row-min, header-h | CSS vars + utility classes | `space.gutter`, `control`, `HEADER_HEIGHT` |
 | Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list | Same role names; values from tokens |
 
+Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
+
 **Decision rule**
 
 1. Name the **job** once (e.g. “dense numeric stats table”).

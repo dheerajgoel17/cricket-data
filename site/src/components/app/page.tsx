@@ -9,7 +9,7 @@ import { EmptyState } from "./empty-state";
 
 export const PageTitle = ({ children, sub }: { children: ReactNode; sub?: ReactNode }) => (
   <header className="flex flex-col gap-tight">
-    <h1 className="text-display font-medium tracking-tight">{children}</h1>
+    <h1 className="text-display font-emphasis tracking-tight">{children}</h1>
     {sub ? <p className="text-callout text-muted-foreground">{sub}</p> : null}
   </header>
 );
@@ -25,7 +25,7 @@ export function Crumbs({ items }: { items: [string, string?][] }) {
         <Fragment key={label + i}>
           {i > 0 && <ChevronRightIcon className="size-3.5 opacity-50" aria-hidden />}
           {i === items.length - 1 || !to ? (
-            <span className="rounded-full bg-secondary px-snug py-tight font-medium text-foreground">{label}</span>
+            <span className="rounded-full bg-secondary px-snug py-tight font-label text-foreground">{label}</span>
           ) : (
             <Link to={to} className="hover:text-foreground">{label}</Link>
           )}
@@ -39,7 +39,7 @@ export function Crumbs({ items }: { items: [string, string?][] }) {
 export function Panel({ title, children, className, flat }: { title?: ReactNode; children: ReactNode; className?: string; flat?: boolean }) {
   return (
     <Card className={cn("gap-0 overflow-hidden py-0 shadow-none", className)}>
-      {title ? <h3 className="border-b border-hairline px-inset py-snug text-title font-medium">{title}</h3> : null}
+      {title ? <h3 className="border-b border-hairline px-inset py-snug text-title font-label">{title}</h3> : null}
       <div className={flat ? "p-0" : "p-inset"}>{children}</div>
     </Card>
   );
@@ -48,7 +48,7 @@ export function Panel({ title, children, className, flat }: { title?: ReactNode;
 export const StatTile = ({ k, v, s }: { k: string; v: ReactNode; s?: ReactNode }) => (
   <Card className="gap-0 px-inset py-snug shadow-none">
     <div className="label-cap text-footnote text-muted-foreground">{k}</div>
-    <div className="text-stat font-medium leading-tight">{v}</div>
+    <div className="text-stat font-label leading-tight">{v}</div>
     {s ? <div className="text-footnote text-muted-foreground">{s}</div> : null}
   </Card>
 );
@@ -60,19 +60,19 @@ export const StatGridCards = ({ children }: { children: ReactNode }) => (
 export const Chips = ({ list }: { list: [string, unknown][] }) => (
   <div className="flex flex-wrap gap-hair">
     {list.map(([k, v], i) => (
-      <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-callout font-normal">
-        {k ? <b className="mr-hair font-medium text-muted-foreground">{k}:</b> : null}
+      <Badge key={i} variant="secondary" className="rounded-full px-snug py-tight text-callout font-copy">
+        {k ? <b className="mr-hair font-label text-muted-foreground">{k}:</b> : null}
         {String(v)}
       </Badge>
     ))}
   </div>
 );
 
-export const OddsText = ({ children }: { children: ReactNode }) => <span className="font-medium tabular-nums text-primary">{children}</span>;
+export const OddsText = ({ children }: { children: ReactNode }) => <span className="font-label tabular-nums text-primary">{children}</span>;
 
 /** Dense stats-table header: label-cap + footnote. Shared by DataTable and the Player Lines ladder. */
 export const TABLE_HEAD =
-  "h-auto px-snug py-tight text-left label-cap text-footnote font-medium text-muted-foreground";
+  "h-auto px-snug py-tight text-left label-cap text-footnote font-label text-muted-foreground";
 
 /** Phone edge bleed for stats tables / game logs: full-bleed hairlines, inset again from `lg`. */
 export const TABLE_BLEED = "-mx-gutter border-y border-hairline lg:mx-0";

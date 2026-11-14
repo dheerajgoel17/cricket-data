@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export function Chip({ on, onClick, children, className, ...rest }: { on?: boolean; onClick?: () => void; children: ReactNode; className?: string } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">) {
   return (
     <button type="button" aria-pressed={on} onClick={onClick} {...rest}
-      className={cn("inline-flex h-control shrink-0 items-center gap-tight whitespace-nowrap rounded-[var(--chip-radius)] px-snug text-callout font-medium outline-none transition-[transform,colors] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]",
+      className={cn("inline-flex h-control shrink-0 items-center gap-tight whitespace-nowrap rounded-[var(--chip-radius)] px-snug text-callout font-label outline-none transition-[transform,colors] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]",
         on ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-surface-raised", className)}>
       {children}
     </button>
@@ -17,7 +17,7 @@ export function Chip({ on, onClick, children, className, ...rest }: { on?: boole
 export function ActiveChip({ label, value, onRemove }: { label: string; value: string; onRemove: () => void }) {
   return (
     <span className="inline-flex h-control shrink-0 items-center gap-hair rounded-[var(--chip-radius)] bg-primary/15 pl-snug text-callout text-primary">
-      <span className="text-muted-foreground">{label}</span><b className="font-medium">{value}</b>
+      <span className="text-muted-foreground">{label}</span><b className="font-label">{value}</b>
       <button type="button" aria-label={`Remove ${label} filter`} onClick={onRemove} className="grid size-control place-items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring active:opacity-60"><XMarkIcon className="size-3.5" /></button>
     </span>
   );

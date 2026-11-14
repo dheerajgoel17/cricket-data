@@ -62,7 +62,7 @@ export function ContactPage() {
     <div className="flex flex-col gap-section">
       <header className="flex flex-col gap-snug">
         <p className="label-cap text-footnote text-primary">Contact</p>
-        <h1 className="text-display font-bold tracking-tight">Get in touch</h1>
+        <h1 className="text-display font-emphasis tracking-tight">Get in touch</h1>
         <p className="max-w-prose text-body text-muted-foreground">
           Fancy.cash is a free cricket stats site. Write for business, tech issues, privacy, or anything else —
           one inbox, we read it.
@@ -76,7 +76,7 @@ export function ContactPage() {
               <EnvelopeIcon className="size-5" aria-hidden />
             </span>
             <div className="min-w-0">
-              <CardTitle className="text-title font-bold tracking-tight">Email</CardTitle>
+              <CardTitle className="text-title font-emphasis tracking-tight">Email</CardTitle>
               <CardDescription className="text-callout">Opens your mail app with the subject filled in.</CardDescription>
             </div>
           </div>
@@ -84,7 +84,7 @@ export function ContactPage() {
         <CardContent className="flex flex-col gap-stack px-inset">
           <a
             href={mailTo("Hello")}
-            className="font-condensed text-stat font-bold tracking-tight text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+            className="font-condensed text-stat font-emphasis tracking-tight text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
           >
             {INBOX}
           </a>
@@ -98,7 +98,7 @@ export function ContactPage() {
       </Card>
 
       <section className="flex flex-col gap-snug" aria-label="What to write about">
-        <h2 className="text-title font-medium tracking-tight">What is it about?</h2>
+        <h2 className="text-title font-label tracking-tight">What is it about?</h2>
         <ul className="grid gap-snug sm:grid-cols-2">
           {TOPICS.map((t) => {
             const Icon = t.icon;
@@ -109,7 +109,7 @@ export function ContactPage() {
                     <span className="grid size-control place-items-center rounded-full bg-secondary text-foreground">
                       <Icon className="size-5" aria-hidden />
                     </span>
-                    <CardTitle className="text-body font-medium">{t.title}</CardTitle>
+                    <CardTitle className="text-body font-label">{t.title}</CardTitle>
                     <CardDescription className="text-callout text-muted-foreground">{t.blurb}</CardDescription>
                   </CardHeader>
                   <CardContent className="px-inset">
@@ -127,7 +127,7 @@ export function ContactPage() {
       <Separator className="bg-hairline" />
 
       <section className="flex flex-col gap-snug text-callout text-muted-foreground">
-        <h2 className="text-body font-medium text-foreground">Before you write</h2>
+        <h2 className="text-body font-label text-foreground">Before you write</h2>
         <ul className="flex list-disc flex-col gap-tight pl-5">
           <li>Include the page URL, match, player or ground when reporting a wrong number.</li>
           <li>We do not take wagers or place bets for anyone; listed prices are market data next to history.</li>

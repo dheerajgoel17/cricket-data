@@ -15,27 +15,25 @@ import { Input } from "@/components/ui/input";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
 
-/** In-page sections for the living design-system catalogue (designers + engineers). */
-const SECTIONS: [string, string][] = [
-  ["intro", "Overview"],
-  ["color", "Colour"],
-  ["type", "Typography"],
-  ["space", "Space & size"],
-  ["motion", "Motion"],
-  ["buttons", "Buttons"],
-  ["chips", "Chips & tabs"],
-  ["feedback", "Empty & notes"],
-  ["data", "Data & metrics"],
-  ["forms", "Forms"],
-  ["icons", "Icons"],
-  ["rules", "Rules"],
-];
+const GROUPS = [
+  { title: "Foundations", sections: [["type", "Typography"], ["color", "Colour"], ["space", "Space & size"], ["motion", "Motion"]] },
+  { title: "Components", sections: [["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["forms", "Forms"], ["icons", "Icons"]] },
+  { title: "Guidance", sections: [["rules", "Usage rules"]] },
+] as const;
+
+const WEIGHTS = [
+  [`Light · ${tokens.weight["weight-editorial"]}`, "font-editorial"],
+  [`Regular · ${tokens.weight["weight-copy"]}`, "font-copy"],
+  [`Medium · ${tokens.weight["weight-label"]}`, "font-label"],
+  [`Bold · ${tokens.weight["weight-emphasis"]}`, "font-emphasis"],
+  [`Black · ${tokens.weight["weight-brand"]}`, "font-display-heavy"],
+] as const;
 
 function Spec({ title, job, children }: { title: string; job?: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-stack rounded-2xl bg-surface ring-1 ring-hairline p-inset">
       <header className="flex flex-col gap-hair">
-        <h3 className="text-title font-medium tracking-tight">{title}</h3>
+        <h3 className="text-title font-label tracking-tight">{title}</h3>
         {job ? <p className="text-callout text-muted-foreground">{job}</p> : null}
       </header>
       {children}
@@ -49,7 +47,7 @@ function Swatch({ name, value }: { name: string; value: string }) {
     <div className="flex min-w-0 flex-col gap-tight overflow-hidden rounded-xl ring-1 ring-hairline">
       <div className="aspect-[5/3] w-full" style={isColor ? { background: value } : { background: "var(--surface-raised)" }} aria-hidden />
       <div className="flex flex-col gap-hair px-snug py-tight">
-        <span className="truncate text-callout font-medium text-foreground">{name}</span>
+        <span className="truncate text-callout font-label text-foreground">{name}</span>
         <code className="truncate text-footnote text-muted-foreground">{value}</code>
       </div>
     </div>
@@ -100,68 +98,73 @@ export function DesignSystemPage() {
   return (
     <div className="flex flex-col gap-section lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start lg:gap-group">
       <nav aria-label="Design system sections" className="sticky top-[calc(var(--header-h)+0.5rem)] z-10 -mx-gutter overflow-x-auto border-b border-hairline bg-background/90 px-gutter py-snug backdrop-blur-md lg:mx-0 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-        <div className="flex flex-col gap-snug">
-        <p className="hidden label-cap text-footnote text-muted-foreground lg:block">On this page</p>
-        <ul className="flex gap-snug lg:flex-col lg:gap-tight">
-          {SECTIONS.map(([id, label]) => (
-            <li key={id}>
-              <a href={`#${id}`} className="inline-flex h-control items-center whitespace-nowrap rounded-full px-snug text-callout text-muted-foreground hover:bg-secondary hover:text-foreground lg:h-auto lg:rounded-md lg:px-snug lg:py-tight">
-                {label}
-              </a>
-            </li>
+        <div className="flex w-max gap-stack lg:w-full lg:flex-col lg:gap-group">
+          <a href="#intro" className="self-start rounded-lg px-snug py-tight text-callout font-label hover:bg-secondary">Overview</a>
+          {GROUPS.map(({ title, sections }) => (
+            <div key={title} className="flex gap-hair lg:flex-col">
+              <p className="hidden px-snug text-footnote font-label text-muted-foreground lg:block">{title}</p>
+              <ul className="flex gap-hair lg:flex-col">
+                {sections.map(([id, label]) => (
+                  <li key={id}><a href={`#${id}`} className="block whitespace-nowrap rounded-lg px-snug py-tight text-callout text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">{label}</a></li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
         </div>
       </nav>
 
       <div className="flex min-w-0 flex-col gap-section">
-        <div id="intro" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <Crumbs items={[["Home", "/"], ["Design system"]]} />
-          <PageTitle sub="Living catalogue of Fancy.cash tokens and product components. Same contract as the iOS / Android app. Source: packages/tokens + docs/DESIGN_SYSTEM.md.">
-            Design system
-          </PageTitle>
-          <div className="flex flex-wrap gap-hair">
-            {["Dark only", "Free MIT", "Heroicons", "Decimal odds", "Web + App"].map((x) => (
-              <Badge key={x} variant="secondary" className="rounded-full px-snug py-tight font-normal">{x}</Badge>
-            ))}
-          </div>
-          <Note
-            title="How to use this page"
-            items={[
-              "Pick a job first (empty list, dense table, filter chip), then the component.",
-              "Edit tokens in site/packages/tokens/tokens.json, then npm run tokens.",
-              "Product code uses named roles (text-body, gap-stack) — never raw text-sm / gap-4.",
-              "App twins live in mobile/src/ui with the same jobs and token names.",
-            ]}
-          />
+        <div id="intro" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <header className="grid gap-group overflow-hidden rounded-2xl border border-hairline bg-card p-group sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <div className="flex min-w-0 flex-col gap-snug">
+              <h1 className="text-display font-label tracking-tight">Fancy.cash Design System</h1>
+              <p className="max-w-prose text-body text-muted-foreground">Shared foundations, live components, and usage guidance for web and native apps.</p>
+              <div className="flex flex-wrap gap-tight">
+                <Button asChild variant="secondary"><a href="#type">Explore typography</a></Button>
+                <Button asChild variant="ghost"><a href="#buttons">Browse components</a></Button>
+              </div>
+            </div>
+            <div aria-hidden className="hidden border-l border-hairline pl-group text-right sm:block">
+              <div className="font-condensed text-stat font-editorial tabular-nums text-primary">172/4</div>
+              <div className="font-condensed text-title font-editorial tabular-nums text-muted-foreground">18.2 overs</div>
+            </div>
+          </header>
         </div>
 
-        <div id="color" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Colour</h2>
+        <div id="type" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Typography</h2>
+          <Muted>Satoshi for UI. Barlow Condensed for scoreboard figures (num-cond / label-cap).</Muted>
+          <div className="grid gap-stack xl:grid-cols-2">
+            <Spec title="Satoshi" job="Regular is the default for UI copy. Medium marks controls and Bold marks page titles.">
+              <div>{WEIGHTS.map(([weight, style]) => <TypeRow key={weight} role={weight} sample="Cricket fixtures" className={cn("text-title", style)} />)}</div>
+            </Spec>
+            <Spec title="Barlow Condensed" job="Light for tabular figures. Medium for caps labels and bold for key scores.">
+              <div>{WEIGHTS.filter(([weight]) => !weight.startsWith("Regular")).map(([weight, style]) => <TypeRow key={weight} role={weight} sample="172/4 · 18.2 overs" className={cn("font-condensed text-metric tabular-nums", style)} />)}</div>
+            </Spec>
+          </div>
+          <Panel title="Type scale">
+            <TypeRow role="display" sample="Harry Brook" className="text-display font-label tracking-tight" />
+            <TypeRow role="title" sample="Player props" className="text-title font-label tracking-tight" />
+            <TypeRow role="body" sample="Hit rates over the listed line, last ten games." className="text-body" />
+            <TypeRow role="callout" sample="Void when in the XI but did not bat." className="text-callout text-muted-foreground" />
+            <TypeRow role="footnote" sample="n 24 · median 42 · fair 1.85" className="text-footnote text-muted-foreground" />
+            <TypeRow role="caption" sample="label-cap uppercase" className="label-cap text-caption text-muted-foreground" />
+            <TypeRow role="stat" sample="1.92" className="text-stat font-label tabular-nums" />
+            <TypeRow role="metric" sample="O 24.5" className="text-metric font-condensed tabular-nums" />
+            <TypeRow role="num-cond" sample="67 · 4/12 · fair 1.48" className="font-condensed text-title tabular-nums text-primary" />
+          </Panel>
+        </div>
+
+        <div id="color" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Colour</h2>
           <Muted>Semantic tokens from tokens.json. Prefer primary for positive / selected, miss for under, amber for push / caution.</Muted>
           <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4">
             {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
           </div>
         </div>
 
-        <div id="type" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Typography</h2>
-          <Muted>Satoshi for UI. Barlow Condensed for scoreboard figures (num-cond / label-cap).</Muted>
-          <Panel title="Type scale">
-            <TypeRow role="display" sample="Harry Brook" className="text-display font-medium tracking-tight" />
-            <TypeRow role="title" sample="Player props" className="text-title font-medium tracking-tight" />
-            <TypeRow role="body" sample="Hit rates over the listed line, last ten games." className="text-body" />
-            <TypeRow role="callout" sample="Void when in the XI but did not bat." className="text-callout text-muted-foreground" />
-            <TypeRow role="footnote" sample="n 24 · median 42 · fair 1.85" className="text-footnote text-muted-foreground" />
-            <TypeRow role="caption" sample="label-cap uppercase" className="label-cap text-caption text-muted-foreground" />
-            <TypeRow role="stat" sample="1.92" className="text-stat font-medium tabular-nums" />
-            <TypeRow role="metric" sample="O 24.5" className="text-metric font-condensed tabular-nums" />
-            <TypeRow role="num-cond" sample="67 · 4/12 · fair 1.48" className="font-condensed text-title tabular-nums text-primary" />
-          </Panel>
-        </div>
-
-        <div id="space" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Space &amp; size</h2>
+        <div id="space" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Space &amp; size</h2>
           <Muted>Stacks and gaps use hair / tight / snug / stack / group / section. Controls are --control tall.</Muted>
           <Spec title="Spacing scale" job="Parent flex/grid gap — do not margin blocks yourself.">
             <div className="flex flex-col gap-snug">
@@ -173,15 +176,15 @@ export function DesignSystemPage() {
               {sizes.map(([k, v]) => (
                 <Card key={k} className="gap-hair px-inset py-snug shadow-none">
                   <code className="text-footnote text-muted-foreground">{k}</code>
-                  <p className="text-callout font-medium">{String(v)}</p>
+                  <p className="text-callout font-label">{String(v)}</p>
                 </Card>
               ))}
             </div>
           </Spec>
         </div>
 
-        <div id="motion" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Motion</h2>
+        <div id="motion" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Motion</h2>
           <Muted>Curves from tokens.motion. Prefer ease-out for entrances; respect prefers-reduced-motion.</Muted>
           <div className="grid gap-snug sm:grid-cols-3">
             {Object.entries(tokens.motion).map(([k, v]) => (
@@ -193,8 +196,8 @@ export function DesignSystemPage() {
           </div>
         </div>
 
-        <div id="buttons" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Buttons</h2>
+        <div id="buttons" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Buttons</h2>
           <Spec title="Button variants" job="Primary actions; product CTAs often use h-control rounded-full secondary/primary.">
             <div className="flex flex-wrap items-center gap-snug">
               <Button>Default</Button>
@@ -217,8 +220,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="chips" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Chips &amp; tabs</h2>
+        <div id="chips" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Chips &amp; tabs</h2>
           <Spec title="Chip + ActiveChip" job="Single selectable filter; dismissible applied filter.">
             <div className="flex flex-wrap items-center gap-snug">
               <Chip on={chipOn} onClick={() => setChipOn((v) => !v)}>Runs</Chip>
@@ -244,8 +247,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="feedback" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Empty states &amp; notes</h2>
+        <div id="feedback" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Empty states &amp; notes</h2>
           <Spec title="EmptyState" job="Every empty / unknown / error list. Prefer titled EmptyState over plain text.">
             <div className="grid gap-stack md:grid-cols-2">
               <EmptyState title="Nothing saved yet" body="Tap the star on a prop, player or team." action={<Button variant="secondary" className="h-control rounded-full">Browse props</Button>} />
@@ -257,8 +260,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="data" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Data &amp; metrics</h2>
+        <div id="data" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Data &amp; metrics</h2>
           <Spec title="PageTitle + Crumbs" job="Drill-in hierarchy on desktop; phone often uses HeaderActions.">
             <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Example"]]} />
             <PageTitle sub="Supporting line in callout muted.">Example page title</PageTitle>
@@ -288,8 +291,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="forms" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Forms</h2>
+        <div id="forms" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Forms</h2>
           <Spec title="LiveForm + Field + NativeSelect" job="Filters apply as you change them; typed fields debounce.">
             <LiveForm onValues={() => undefined} className="max-w-xl">
               <Field label="Format"><NativeSelect name="fmt" options={[["T20", "T20"], ["ODI", "ODI"], ["Test", "Test"]]} /></Field>
@@ -298,8 +301,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="icons" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Icons</h2>
+        <div id="icons" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Icons</h2>
           <Spec title="Heroicons in product code" job="Never Lucide under components/app or pages. shadcn ui/* may still ship CLI Lucide until edited.">
             <div className="flex items-center gap-stack text-foreground">
               <InformationCircleIcon className="size-6" aria-hidden />
@@ -309,8 +312,8 @@ export function DesignSystemPage() {
           </Spec>
         </div>
 
-        <div id="rules" className="flex scroll-mt-[calc(var(--header-h)+var(--space-stack))] flex-col gap-stack">
-          <h2 className="text-display font-medium tracking-tight">Rules</h2>
+        <div id="rules" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
+          <h2 className="text-display font-label tracking-tight">Rules</h2>
           <Panel title="Hard rules">
             <ul className="grid gap-snug text-callout text-muted-foreground">
               <li>All numbers on the site come from the engine / data — never from an LLM.</li>

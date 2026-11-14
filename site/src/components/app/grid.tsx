@@ -22,8 +22,8 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
     <Card className="overflow-x-auto rounded-2xl border-0 py-0 shadow-none ring-1 ring-hairline">
       <table className="w-full text-callout">
         <thead><tr className="border-b border-hairline text-muted-foreground">
-          <th className="sticky left-0 z-10 bg-card px-3 py-tight text-left text-footnote font-medium">Player</th><th className="px-2 text-footnote font-medium">Hit</th>
-          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-tight font-normal"><div className="grid justify-items-center gap-hair text-caption"><TeamBadge name={store.teamName(opp, true)} size="xs" />{shortDate(M.d[m])}</div></th>; })}
+          <th className="sticky left-0 z-10 bg-card px-3 py-tight text-left text-footnote font-label">Player</th><th className="px-2 text-footnote font-label">Hit</th>
+          {g.fx.map((m) => { const opp = M.a[m] === teamIdx ? M.b[m] : M.a[m]; return <th key={m} className="px-1 py-tight font-copy"><div className="grid justify-items-center gap-hair text-caption"><TeamBadge name={store.teamName(opp, true)} size="xs" />{shortDate(M.d[m])}</div></th>; })}
         </tr></thead>
         <tbody>{g.body.map(({ p, map, xi }) => {
           const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key]);
@@ -31,9 +31,9 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
           return (
             <tr key={p} className="border-b border-hairline last:border-b-0">
               <td className="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-tight"><Link to={`/player/${p}`} className="flex items-center gap-tight hover:text-primary"><PlayerBadge idx={p} size="xs" />{store.playerName(p)}</Link></td>
-              <td className="px-2 text-center font-medium text-primary">{vals.length ? `${k}/${vals.length}` : "–"}</td>
+              <td className="px-2 text-center font-label text-primary">{vals.length ? `${k}/${vals.length}` : "–"}</td>
               {g.fx.map((m) => { const x = map.get(m); return (
-                <td key={m} className="px-1 py-hair text-center">{x ? <span className={cn("inline-block min-w-8 rounded-md px-1.5 py-hair font-medium", heatClass(heatStep(x[g.def.key], line)))}>{x[g.def.key]}</span>
+                <td key={m} className="px-1 py-hair text-center">{x ? <span className={cn("inline-block min-w-8 rounded-md px-1.5 py-hair font-label", heatClass(heatStep(x[g.def.key], line)))}>{x[g.def.key]}</span>
                   : xi?.has(m) && store.M.xq?.[m] !== 0 ? <span title="In the XI but did not bat/bowl: bet void" className="rounded-md border border-dashed border-amber/60 px-1 text-caption text-amber">VOID</span> : <span className="text-muted-foreground">–</span>}</td>); })}
             </tr>);
         })}</tbody>
@@ -70,7 +70,7 @@ export function TrendCards({ grids, line, minHit, stat }: { grids: { g: Grid; te
                 <ItemDescription className="truncate text-footnote"><span className="text-primary">O {line} {label}</span> <span className="text-muted-foreground">· {i.k}/{i.vals.length}</span></ItemDescription>
               </ItemContent>
               <ItemActions className="gap-snug">
-                <span className="grid justify-items-end text-right"><b className="text-body font-medium tabular-nums text-primary">{pc(i.rate)}</b><span className="text-caption text-muted-foreground">fair {odds(i.rate ? 1 / i.rate : null)}</span></span>
+                <span className="grid justify-items-end text-right"><b className="text-body font-label tabular-nums text-primary">{pc(i.rate)}</b><span className="text-caption text-muted-foreground">fair {odds(i.rate ? 1 / i.rate : null)}</span></span>
                 <MiniBars last={i.vals.slice(-10).map((v: number) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" }))} line={line} />
               </ItemActions>
             </Link>

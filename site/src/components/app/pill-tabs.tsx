@@ -14,7 +14,7 @@ export function PillTabs({ tabs, value, onChange, layoutId, scrollable, classNam
     <Tabs value={value} onValueChange={onChange} className={cn("gap-stack", className)}>
       <TabsList className={cn("h-auto w-full justify-start gap-hair rounded-none bg-transparent p-0", scrollable ? "overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" : "flex-wrap", listClassName)}>
         {tabs.map(([id, label]) => (
-          <TabsTrigger key={id} value={id} className="relative h-control flex-none rounded-full border-0 px-inset text-body font-medium text-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none">
+          <TabsTrigger key={id} value={id} className="relative h-control flex-none rounded-full border-0 px-inset text-body font-label text-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none">
             {value === id && <motion.span layoutId={layoutId} className="absolute inset-0 rounded-full bg-accent" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
             <span className="relative">{label}</span>
           </TabsTrigger>

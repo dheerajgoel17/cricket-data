@@ -11,21 +11,25 @@ export const color = tokens.color;
  * Barlow Condensed for numbers and 11 pt uppercase labels (scoreboard figures). One family
  * name per weight — React Native has no variable-weight lookup. Loaded in `app/_layout.tsx`.
  */
+const satoshi = { 300: "Satoshi-Light", 400: "Satoshi-Regular", 500: "Satoshi-Medium", 700: "Satoshi-Bold", 900: "Satoshi-Black" } as const;
+const W = tokens.weight;
+
 export const font = {
-  regular: "Satoshi-Regular",
-  medium: "Satoshi-Medium",
-  semibold: "Satoshi-Bold",
-  bold: "Satoshi-Bold",
+  light: satoshi[W["weight-editorial"] as keyof typeof satoshi],
+  regular: satoshi[W["weight-copy"] as keyof typeof satoshi],
+  medium: satoshi[W["weight-label"] as keyof typeof satoshi],
+  bold: satoshi[W["weight-emphasis"] as keyof typeof satoshi],
   data: "BarlowCondensed_700Bold",
+  dataDefault: "BarlowCondensed_300Light",
   dataLight: "BarlowCondensed_500Medium",
 } as const;
 
 /** The site's `label-cap`: an 11 pt uppercase label in Barlow Condensed with +4% tracking. */
 export const cap = { fontFamily: font.dataLight, textTransform: "uppercase" as const, fontSize: 11, lineHeight: 13, letterSpacing: 0.44 };
-/** A small number (up to 17 pt) in Condensed Bold, tabular. */
-export const num = { fontFamily: font.data, fontVariant: ["tabular-nums" as const], letterSpacing: -0.15 };
-/** A big figure (20 pt and up) in Condensed Medium; tracking ~-2% of size. */
-export const numLg = { fontFamily: font.dataLight, fontVariant: ["tabular-nums" as const], letterSpacing: -0.4 };
+/** A small tabular number in Barlow Condensed Light. */
+export const num = { fontFamily: font.dataDefault, fontVariant: ["tabular-nums" as const], letterSpacing: -0.15 };
+/** A big figure (20 pt and up) in Condensed Light; tracking ~-2% of size. */
+export const numLg = { fontFamily: font.dataDefault, fontVariant: ["tabular-nums" as const], letterSpacing: -0.4 };
 
 /**
  * A tonal surface (a card): a faint light wash over the black with a thin ring whose top edge is the brightest, as if lit from above. Quieter than a grey block and it reads as raised.
@@ -93,10 +97,10 @@ export const type = {
   // Matches the site's cricket-stats Satoshi scale (dense lh, slight negative tracking).
   display: { fontFamily: font.bold, fontSize: display, lineHeight: lh(display, T["fs-display-lh"]), letterSpacing: ls(display, T["fs-display-ls"]) },
   title: { fontFamily: font.bold, fontSize: title, lineHeight: lh(title, T["fs-title-lh"]), letterSpacing: ls(title, T["fs-title-ls"]) },
-  body: { fontFamily: font.medium, fontSize: body, lineHeight: lh(body, T["fs-body-lh"]), letterSpacing: ls(body, T["fs-body-ls"]) },
-  callout: { fontFamily: font.medium, fontSize: callout, lineHeight: lh(callout, T["fs-callout-lh"]), letterSpacing: ls(callout, T["fs-callout-ls"]) },
-  footnote: { fontFamily: font.medium, fontSize: footnote, lineHeight: lh(footnote, T["fs-footnote-lh"]), letterSpacing: 0 },
-  caption: { fontFamily: font.medium, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
+  body: { fontFamily: font.regular, fontSize: body, lineHeight: lh(body, T["fs-body-lh"]), letterSpacing: ls(body, T["fs-body-ls"]) },
+  callout: { fontFamily: font.regular, fontSize: callout, lineHeight: lh(callout, T["fs-callout-lh"]), letterSpacing: ls(callout, T["fs-callout-ls"]) },
+  footnote: { fontFamily: font.regular, fontSize: footnote, lineHeight: lh(footnote, T["fs-footnote-lh"]), letterSpacing: 0 },
+  caption: { fontFamily: font.regular, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
 
 /** The widest the app gets in a browser (`ui/web-frame.tsx`), and so the width its text is fitted to there. */

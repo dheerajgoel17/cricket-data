@@ -30,7 +30,7 @@ type Leader = { id: string; label: string; head: string; cols: string[]; row: Ro
 
 const CARD = "rounded-2xl bg-card ring-1 ring-hairline";
 /** Denser league-board header (caption). Props/research tables use `TABLE_HEAD` (footnote) instead. */
-export const BOARD_HEAD = "label-cap text-caption font-normal text-muted-foreground";
+export const BOARD_HEAD = "label-cap text-caption font-copy text-muted-foreground";
 const HEAD = BOARD_HEAD;
 
 /** A small "i" that opens a few words of explanation, so the page itself carries none. */
@@ -64,8 +64,8 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
     <div className="flex flex-col gap-stack">
       <div className="flex items-center gap-snug">
         {eds.length > 1 && <SeasonSelect eds={eds} value={ed.key} onChange={(k) => { track("stats_season", { season: k }); onSeason(k); }} />}
-        <Badge variant="secondary" className="h-control px-snug text-callout font-normal">{ed.fmt}</Badge>
-        <Badge variant="secondary" className="h-control min-w-0 px-snug text-callout font-normal"><span className="truncate">{range(ed.from, ed.to)}</span></Badge>
+        <Badge variant="secondary" className="h-control px-snug text-callout font-copy">{ed.fmt}</Badge>
+        <Badge variant="secondary" className="h-control min-w-0 px-snug text-callout font-copy"><span className="truncate">{range(ed.from, ed.to)}</span></Badge>
         <Info label="About these stats" className="ml-auto">
           <p>{ed.fmt} matches only, never mixed with another format.</p>
           <p>Super overs are ignored. Retired hurt is not an out.</p>
@@ -77,7 +77,7 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
       {rows.isError ? (
         <div role="alert" className={cn(CARD, "flex items-center justify-between gap-snug p-inset")}>
           <p className="text-callout">Could not read the player files.</p>
-          <button type="button" onClick={() => rows.refetch()} className="h-control shrink-0 rounded-[var(--chip-radius)] bg-foreground px-snug text-callout font-medium text-background active:opacity-70">Try again</button>
+          <button type="button" onClick={() => rows.refetch()} className="h-control shrink-0 rounded-[var(--chip-radius)] bg-foreground px-snug text-callout font-label text-background active:opacity-70">Try again</button>
         </div>
       ) : !result ? <Loading done={read[0]} total={read[1]} />
         : !result.groups.some((g: any) => g.boards.length) ? <EmptyState icon={<ChartBarIcon />} title="No player records yet" body="This season has no counted matches in the data yet." />
@@ -89,7 +89,7 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
 
 function SeasonSelect({ eds, value, onChange }: { eds: any[]; value: string; onChange: (k: string) => void }) {
   return (
-    <select aria-label="Season" value={value} onChange={(e) => onChange(e.target.value)} className="h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout font-medium text-foreground outline-none ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-ring">
+    <select aria-label="Season" value={value} onChange={(e) => onChange(e.target.value)} className="h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout font-label text-foreground outline-none ring-1 ring-hairline focus-visible:ring-2 focus-visible:ring-ring">
       {eds.map((x) => <option key={x.key} value={x.key}>{x.name}</option>)}
     </select>
   );
@@ -106,7 +106,7 @@ function Facts({ s }: { s: any }) {
       {cells.map(([k, v]) => (
         <div key={k} className="flex min-w-0 flex-col gap-hair px-snug">
           <dt className={cn(HEAD, "truncate")}>{k}</dt>
-          <dd className="num-cond text-metric font-bold">{v}</dd>
+          <dd className="num-cond text-metric font-emphasis">{v}</dd>
         </div>
       ))}
     </dl>
@@ -161,11 +161,11 @@ function LeaderCard({ l, test }: { l: Leader; test: boolean }) {
       <span className="flex items-center gap-snug">
         <PlayerAvatar idx={r.p!} team={team} test={test} className="size-14" />
         <span className="grid min-w-0 flex-1 gap-hair">
-          <span className="truncate text-body font-medium"><PlayerName idx={r.p!} /></span>
+          <span className="truncate text-body font-label"><PlayerName idx={r.p!} /></span>
           <span className="flex items-center gap-tight text-footnote text-muted-foreground"><TeamBadge name={team} size="xs" />{abbr(team)}</span>
         </span>
         <span className="grid justify-items-end gap-hair">
-          <span className="num-cond text-stat font-bold leading-none text-primary">{r.v}</span>
+          <span className="num-cond text-stat font-emphasis leading-none text-primary">{r.v}</span>
           <span className={HEAD}>{l.head}</span>
         </span>
       </span>
@@ -185,7 +185,7 @@ function BoardCard({ b }: { b: Board }) {
   return (
     <section aria-label={b.title} className={cn(CARD, "flex min-w-0 flex-col overflow-hidden")}>
       <header className="flex items-center justify-between gap-snug pl-inset pr-tight pt-tight">
-        <h3 className="text-body font-medium">{b.title}</h3>
+        <h3 className="text-body font-label">{b.title}</h3>
         {b.note ? <Info label={`About ${b.title}`}><p>{b.note}</p></Info> : <span className="h-control" />}
       </header>
       <Table className="text-callout">
@@ -208,12 +208,12 @@ function BoardCard({ b }: { b: Board }) {
                   <span className="flex items-center gap-snug">
                     {player ? <PlayerBadge idx={r.p!} size="md" className="max-sm:hidden" /> : <TeamBadge name={crest} size="md" className="max-sm:hidden" />}
                     <span className="grid min-w-0 gap-hair">
-                      <span className="truncate font-medium">{player ? <Link to={`/player/${r.p}`} title={name} className="hover:underline"><PlayerName idx={r.p!} /></Link> : name}</span>
+                      <span className="truncate font-label">{player ? <Link to={`/player/${r.p}`} title={name} className="hover:underline"><PlayerName idx={r.p!} /></Link> : name}</span>
                       <span className="flex items-center gap-tight truncate text-footnote text-muted-foreground">{player && r.m == null && <TeamBadge name={crest} size="xs" />}{sub}</span>
                     </span>
                   </span>
                 </TableCell>
-                <TableCell className={cn(num, "font-bold", r.rank === 1 && "text-primary")}>{r.v}</TableCell>
+                <TableCell className={cn(num, "font-emphasis", r.rank === 1 && "text-primary")}>{r.v}</TableCell>
                 {r.cells.map((c, i) => <TableCell key={i} className={cn(num, "text-muted-foreground", edge(i))}>{c}</TableCell>)}
               </TableRow>
             );
@@ -221,7 +221,7 @@ function BoardCard({ b }: { b: Board }) {
         </TableBody>
       </Table>
       {b.rows.length > SHOWN && (
-        <button type="button" aria-expanded={all} onClick={() => { track("stats_more", { board: b.id }); setAll(!all); }} className="flex h-control items-center justify-center gap-tight border-t border-hairline text-callout font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
+        <button type="button" aria-expanded={all} onClick={() => { track("stats_more", { board: b.id }); setAll(!all); }} className="flex h-control items-center justify-center gap-tight border-t border-hairline text-callout font-label text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
           {all ? "Show less" : `Show all ${b.rows.length}`}
           <ChevronDownIcon className={cn("size-4 transition-transform", all && "rotate-180")} aria-hidden />
         </button>
@@ -242,7 +242,7 @@ function Trends({ points, current, onPick }: { points: any[]; current: string; o
   return (
     <section aria-label="Season by season" className={cn(CARD, "flex flex-col gap-snug p-inset")}>
       <div className="flex items-center justify-between gap-snug">
-        <h3 className="text-body font-medium">Season by season</h3>
+        <h3 className="text-body font-label">Season by season</h3>
         <Info label="About season by season" className="-mr-tight"><p>Seasons with at least three counted matches, matches that count for summary markets only (void games out). Tap a bar to open that season.</p></Info>
       </div>
       <PillGroup layoutId={`trend-${id}`} label="Measure" value={metric} onChange={setMetric} items={TREND_METRICS.map((x: any) => [x.id, x.label] as [string, string])} />
@@ -255,7 +255,7 @@ function Trends({ points, current, onPick }: { points: any[]; current: string; o
       </div>
       <div className="grid grid-cols-3 items-center text-footnote tabular-nums text-muted-foreground">
         <span>{points[0].label}</span>
-        <span className="text-center font-medium text-foreground">{at >= 0 ? `${points[at].label}${SPACE}·${SPACE}${read(at)}` : ""}</span>
+        <span className="text-center font-label text-foreground">{at >= 0 ? `${points[at].label}${SPACE}·${SPACE}${read(at)}` : ""}</span>
         <span className="text-right">{points[points.length - 1].label}</span>
       </div>
     </section>

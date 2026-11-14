@@ -59,5 +59,5 @@ const styles = StyleSheet.create({
   row: { flex: 1, flexDirection: "row", padding: PAD, gap: GAP },
   thumb: { position: "absolute", left: PAD, top: PAD, bottom: PAD, borderRadius: TAB_BAR_HEIGHT / 2 - PAD, backgroundColor: "rgba(120,120,128,0.30)" },
   tab: { flex: 1, minWidth: 0, alignItems: "center", justifyContent: "center", gap: 1 },
-  label: { ...type.caption, fontFamily: font.semibold, maxWidth: "100%" },
+  label: { ...type.caption, fontFamily: font.medium, maxWidth: "100%" },
 });

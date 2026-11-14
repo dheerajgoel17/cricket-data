@@ -18,13 +18,13 @@ const overs = (o: number) => (Number.isInteger(o) ? o.toFixed(1) : String(o));
 
 /** The small red mark of a row whose line is a live price: it sits beside the row's name (the player, the market), never on the line. */
 export function LiveBadge({ className }: { className?: string }) {
-  return <span className={cn("label-cap shrink-0 text-caption font-bold text-miss", className)}>Live</span>;
+  return <span className={cn("label-cap shrink-0 text-caption font-emphasis text-miss", className)}>Live</span>;
 }
 
 /** Where the line stood before the match, in two words and a number ("was 31.5"); nothing when it has not moved. */
 export function LiveOpened({ opened, line, className, label = "was" }: { opened?: number | null; line?: number | null; className?: string; label?: string }) {
   if (opened == null || line == null || opened === line) return null;
-  return <span className={cn("whitespace-nowrap text-footnote font-normal tabular-nums text-muted-foreground", className)}>{label} {opened}</span>;
+  return <span className={cn("whitespace-nowrap text-footnote font-copy tabular-nums text-muted-foreground", className)}>{label} {opened}</span>;
 }
 
 /**
@@ -75,7 +75,7 @@ export function TeamSpot({ r, fx, teams, className }: { r: any; fx: any; teams: 
   const [lo, hi] = rep.band as [number, number];
   return (
     <p className={cn("text-footnote text-muted-foreground", className)} title={`${inn!.runs}/${inn!.wkts} after ${overs(inn!.overs)} ov, ${lo}–${hi} runs in ${rep.n} past ${fx.fmt} innings · median finish ${rep.summary.median}`}>
-      Similar team innings: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < MIN_SAMPLE ? " · small sample" : ""}
+      Similar team innings: <span className="font-label text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < MIN_SAMPLE ? " · small sample" : ""}
     </p>
   );
 }
@@ -97,10 +97,10 @@ export function BatterSpot({ r, className }: { r: any; className?: string }) {
   return (
     <span className={cn("text-footnote text-muted-foreground", className)}>
       {!!rep?.n && <span className="block" title={`${bat.runs} off ${bat.balls}, ${rep.n} of his innings · median finish ${rep.summary.median}`}>
-        Batter’s own history: <span className="font-medium text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+        Batter’s own history: <span className="font-label text-foreground">{rep.summary.over} over · {rep.summary.under} under</span> · {rep.n} innings{rep.n < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
       {counts && <span className="block" title="Recent T20 or ODI innings in the same format with similar runs, balls faced and runs needed to go over. Each batter innings counts once here.">
-        Similar in-play lines: <span className="font-medium text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} on the line`}</span> · {counts.over + counts.under + counts.push} innings{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
+        Similar in-play lines: <span className="font-label text-foreground">{counts.over} over · {counts.under} under{counts.push > 0 && ` · ${counts.push} on the line`}</span> · {counts.over + counts.under + counts.push} innings{counts.over + counts.under < PLAYER_MIN_SAMPLE ? " · small sample" : ""}
       </span>}
     </span>
   );

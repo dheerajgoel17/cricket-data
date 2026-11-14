@@ -14,8 +14,7 @@ export type SkeletonRoute = {
 export const SKELETON_ROUTES: readonly SkeletonRoute[] = [
   { id: "app", page: "App shell", shape: "app", file: "components/app/skeletons.tsx" },
   { id: "home/rail", page: "Home · fixture rail", shape: "rail", file: "pages/Home.tsx" },
-  { id: "home/tape", page: "Home · market tape", shape: "tape", file: "components/app/hot-home.tsx" },
-  { id: "home/props", page: "Home · Props block", shape: "rows", file: "components/app/hot-home.tsx" },
+  { id: "home/props", page: "Home · Props block", shape: "home-props", file: "components/app/hot-home.tsx" },
   { id: "props", page: "Player props / Lists", shape: "rows", file: "pages/Lists.tsx" },
   { id: "hot-props", page: "Hot props scoring", shape: "rows", file: "components/app/hot-props.tsx" },
   { id: "fixture", page: "Fixture · header + props", shape: "match", file: "pages/Fixtures.tsx" },
@@ -32,5 +31,5 @@ export const SKELETON_ROUTES: readonly SkeletonRoute[] = [
 ] as const;
 
 export const SKELETON_SHAPES: readonly SkeletonShape[] = [
-  "rows", "grid", "list", "match", "scorecard", "tape", "fancy", "rail", "app", "player", "ground", "league",
+  "home-props", "rows", "grid", "list", "match", "scorecard", "tape", "fancy", "rail", "app", "player", "ground", "league",
 ];

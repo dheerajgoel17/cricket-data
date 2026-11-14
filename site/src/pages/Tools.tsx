@@ -45,7 +45,7 @@ export function PairPage() {
         <Field label="Opposition"><Input list="dl-teams" value={opp} onChange={(e) => setOpp(e.target.value)} className="w-40" /></Field>
         <Field label="Venue"><Input list="dl-venues" value={ven} onChange={(e) => setVen(e.target.value)} className="w-44" /></Field>
         <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={vt} onChange={(e) => setVt(e.target.value)} /></Field>
-        <Button type="submit" className="h-control rounded-full font-medium">Compare</Button>
+        <Button type="submit" className="h-control rounded-full font-label">Compare</Button>
       </form>
       {!ready ? <EmptyState compact title="Pick two batters" body="See who gets out first, and how big their stands are." /> : res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}
     </div>

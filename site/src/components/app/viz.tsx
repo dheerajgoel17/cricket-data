@@ -35,7 +35,7 @@ export function RateHeatStrip({ rows, title }: { rows: { label: string; pOver: n
       <div className="flex gap-hair overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {rows.map((r) => (
           <span key={r.label} title={`${r.label} ${r.pOver == null ? "–" : pc(r.pOver)} · ${r.n}`}
-            className={cn("grid h-10 min-w-10 shrink-0 place-items-center rounded-md text-caption font-medium tabular-nums", rateClass(r.pOver))}>
+            className={cn("grid h-10 min-w-10 shrink-0 place-items-center rounded-md text-caption font-label tabular-nums", rateClass(r.pOver))}>
             {r.pOver == null ? "–" : `${Math.round(r.pOver * 100)}`}
           </span>
         ))}

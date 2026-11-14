@@ -24,13 +24,13 @@ export function LiveScore({ s, size = "md", className, live = false }: { live?: 
     return <span className={cn("shrink-0 text-muted-foreground", size === "lg" ? "text-callout" : "text-footnote", className)}>Yet to bat</span>;
   }
   const total = scoreLabel(s);
-  const totalClass = cn("font-condensed font-bold leading-none tracking-tight", size === "lg" ? "text-title" : "text-body");
+  const totalClass = cn("font-condensed font-emphasis leading-none tracking-tight", size === "lg" ? "text-title" : "text-body");
   // Include wickets so a dismissal can animate the score even when no runs were scored.
   const change = s.runs == null ? null : s.runs + (s.wkts ?? 0) / 100;
   return (
     <span className={cn("inline-flex shrink-0 items-baseline gap-tight tabular-nums", className)}>
       {live ? <Tick quiet value={change} className={cn(totalClass, "px-0")}>{total}</Tick> : <span className={totalClass}>{total}</span>}
-      {s.overs != null && <span className="font-condensed text-footnote font-medium text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
+      {s.overs != null && <span className="font-condensed text-footnote font-label text-muted-foreground">{Number.isInteger(s.overs) ? s.overs.toFixed(1) : s.overs} ov</span>}
     </span>
   );
 }
@@ -70,7 +70,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
     <Link to={f.id ? `/fixture/${f.id}` : f.a_ix >= 0 ? `/team/${f.a_ix}` : "/teams"} className="group block h-full rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <Card className="h-full gap-0 rounded-2xl border-0 bg-card py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-raised">
         <div className="flex h-full flex-col gap-snug p-inset">
-          <div className="flex items-center gap-tight text-footnote font-medium text-muted-foreground">
+          <div className="flex items-center gap-tight text-footnote font-label text-muted-foreground">
             {session ? <span className="label-cap text-footnote text-amber">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
@@ -85,20 +85,20 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
               <div key={t} className="contents">
                 <div className="flex min-w-0 items-center gap-snug" title={t}>
                   <TeamBadge name={t} size="md" eager />
-                  <span className={cn("truncate text-body font-medium", lost(t) && "font-medium text-muted-foreground")}>{t}</span>
+                  <span className={cn("truncate text-body font-label", lost(t) && "font-label text-muted-foreground")}>{t}</span>
                 </div>
                 {hasScore || live ? <LiveScore live={live && !session} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
-                    {timed && <span className="text-callout font-medium tabular-nums">{localTime(when)}</span>}
+                    {timed && <span className="text-callout font-label tabular-nums">{localTime(when)}</span>}
                   </span>
                 ) : null}
               </div>
             ))}
           </div>
           <div className="mt-auto flex items-center justify-between gap-snug pt-tight">
-            <div className="grid min-w-0"><span className="truncate text-footnote font-medium">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
-            {f.noProps && !final ? <span className="shrink-0 text-footnote text-muted-foreground">{cta}</span> : <span className="inline-flex shrink-0 items-center text-footnote font-medium text-primary">{cta}<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
+            <div className="grid min-w-0"><span className="truncate text-footnote font-label">{status}</span><span className="truncate text-caption text-muted-foreground">{seriesName(f)}</span></div>
+            {f.noProps && !final ? <span className="shrink-0 text-footnote text-muted-foreground">{cta}</span> : <span className="inline-flex shrink-0 items-center text-footnote font-label text-primary">{cta}<ChevronRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>}
           </div>
         </div>
       </Card>
@@ -121,9 +121,9 @@ export function MatchChip({ f }: { f: any }) {
         <TeamAvatar name={f.b} size="xs" eager />
       </AvatarGroup>
       <span className="grid min-w-0 text-left leading-tight">
-        <span className="truncate text-caption font-medium">{abbr(f.a)} v {abbr(f.b)}</span>
+        <span className="truncate text-caption font-label">{abbr(f.a)} v {abbr(f.b)}</span>
         {live
-          ? <Badge variant={session ? "secondary" : "destructive"} className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-medium">{sub}</Badge>
+          ? <Badge variant={session ? "secondary" : "destructive"} className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-label">{sub}</Badge>
           : <span className="truncate text-caption opacity-70">{sub}</span>}
       </span>
     </span>

@@ -38,7 +38,7 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
                       {e.value == null
                         ? <div className="h-5 w-full self-end bg-dnp" />
                         : <motion.div initial={{ scaleY: 0.05, opacity: 0 }} animate={{ scaleY: 1, opacity: 1 }} transition={{ duration: 0.3, delay: Math.min(i * 0.012, 0.4), ease: [0.23, 1, 0.32, 1] }} style={{ height: `${pct}%`, transformOrigin: "bottom" }}
-                            className={cn("flex w-full items-end justify-center pb-hair text-callout font-medium", s === "miss" ? "bg-miss text-white" : s === "push" ? "bg-amber text-background" : "bg-hit text-background")}>{e.value}</motion.div>}
+                            className={cn("flex w-full items-end justify-center pb-hair text-callout font-label", s === "miss" ? "bg-miss text-white" : s === "push" ? "bg-amber text-background" : "bg-hit text-background")}>{e.value}</motion.div>}
                     </button>
                   );
                 })}

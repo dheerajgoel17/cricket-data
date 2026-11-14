@@ -4,7 +4,7 @@ import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { BarlowCondensed_500Medium, BarlowCondensed_700Bold } from "@expo-google-fonts/barlow-condensed";
+import { BarlowCondensed_300Light, BarlowCondensed_500Medium, BarlowCondensed_700Bold } from "@expo-google-fonts/barlow-condensed";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -31,9 +31,11 @@ const theme = {
 export default function RootLayout() {
   // Satoshi for UI; Barlow Condensed for scoreboard figures / caps labels.
   const [fonts, fontError] = useFonts({
+    [font.light]: require("../../assets/fonts/Satoshi-Light.ttf"),
     [font.regular]: require("../../assets/fonts/Satoshi-Regular.ttf"),
     [font.medium]: require("../../assets/fonts/Satoshi-Medium.ttf"),
     [font.bold]: require("../../assets/fonts/Satoshi-Bold.ttf"),
+    [font.dataDefault]: BarlowCondensed_300Light,
     [font.data]: BarlowCondensed_700Bold,
     [font.dataLight]: BarlowCondensed_500Medium,
   });

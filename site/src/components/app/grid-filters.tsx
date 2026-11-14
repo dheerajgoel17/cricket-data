@@ -33,24 +33,24 @@ export function GridLineSheet({ open, onOpenChange, line, games, hit, onApply }:
       <SheetContent side={wide ? "right" : "bottom"} showCloseButton={false}
         className={wide ? "w-[26rem] max-w-full gap-0 border-l border-hairline sm:max-w-[26rem]" : "h-auto max-h-[85dvh] gap-0 rounded-t-[1.25rem] border-0 pt-snug"}>
         <header className="flex h-header shrink-0 items-center justify-between gap-snug border-b border-hairline px-gutter">
-          <SheetTitle className="text-title font-bold tracking-tight">Filters</SheetTitle>
+          <SheetTitle className="text-title font-emphasis tracking-tight">Filters</SheetTitle>
           <SheetDescription className="sr-only">Set the custom line, how many recent games to score, and the minimum hit rate.</SheetDescription>
           <button type="button" aria-label="Close filters" onClick={() => onOpenChange(false)} className="grid size-control place-items-center rounded-full bg-secondary outline-none focus-visible:ring-2 focus-visible:ring-ring"><XMarkIcon className="size-5" /></button>
         </header>
         <div className="flex flex-col gap-stack overflow-y-auto px-gutter py-stack">
           <section className="flex flex-col gap-snug">
-            <h3 className="text-body font-medium">Custom line</h3>
+            <h3 className="text-body font-label">Custom line</h3>
             <LineStepper value={draftLine} label="O" min={0} onStep={(d) => setDraftLine(Math.max(0, Math.round((draftLine + d) * 2) / 2))} />
             <p className="text-footnote text-muted-foreground">The over line each cell and streak is scored against.</p>
           </section>
           <section className="flex flex-col gap-snug">
-            <h3 className="text-body font-medium">Hit-rate window</h3>
+            <h3 className="text-body font-label">Hit-rate window</h3>
             <div className="flex flex-wrap gap-snug">{GAMES.map((n) => <Chip key={n} on={draftGames === n} onClick={() => setDraftGames(n)}>L{n}</Chip>)}</div>
             <p className="text-footnote text-muted-foreground">How many of each team's recent games in this format to show.</p>
           </section>
           {withHit && (
             <section className="flex flex-col gap-snug">
-              <h3 className="text-body font-medium">Minimum hit rate</h3>
+              <h3 className="text-body font-label">Minimum hit rate</h3>
               <div className="flex flex-wrap gap-snug">{HITS.map(([v, l]) => <Chip key={v} on={draftHit === v} onClick={() => setDraftHit(v)}>{l}</Chip>)}</div>
               <p className="text-footnote text-muted-foreground">Only list players who clear the custom line at least this often in the window.</p>
             </section>
@@ -58,7 +58,7 @@ export function GridLineSheet({ open, onOpenChange, line, games, hit, onApply }:
         </div>
         <footer className="flex shrink-0 items-center gap-snug border-t border-hairline bg-background px-gutter pt-snug pb-[max(var(--space-snug),env(safe-area-inset-bottom))]">
           <Button type="button" variant="secondary" className="h-(--touch) flex-1 rounded-full text-body" disabled={draftLine === DEFAULT_LINE && draftGames === DEFAULT_GAMES && (!withHit || draftHit === DEFAULT_HIT)} onClick={clear}>Clear</Button>
-          <Button type="button" className="h-(--touch) flex-[2] rounded-full bg-primary text-body font-medium text-primary-foreground" onClick={apply}>{dirty ? "Apply" : "Done"}</Button>
+          <Button type="button" className="h-(--touch) flex-[2] rounded-full bg-primary text-body font-label text-primary-foreground" onClick={apply}>{dirty ? "Apply" : "Done"}</Button>
         </footer>
       </SheetContent>
     </Sheet>
@@ -87,13 +87,13 @@ export function GridFilterBar({ stat, line, games, hit, items, setQ }: {
         <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setOpen(true)}
           className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
           <AdjustmentsHorizontalIcon className="size-4" />L{games}
-          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{active.length}</span>}
+          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
         </Button>
       </div>
       {active.length > 0 && (
         <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
           {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => clearKey(f.key)} />)}
-          <button type="button" onClick={() => setQ({ line: "", n: "", ...(hit !== undefined ? { hit: "" } : {}) })} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+          <button type="button" onClick={() => setQ({ line: "", n: "", ...(hit !== undefined ? { hit: "" } : {}) })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
         </div>
       )}
       <GridLineSheet open={open} onOpenChange={setOpen} line={line} games={games} hit={hit}
