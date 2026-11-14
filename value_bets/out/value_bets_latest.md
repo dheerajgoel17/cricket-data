@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-15 04:00 IST
+# Cricket value bets - 2026-11-15 04:45 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 2525 prices
-- **smarkets**: ok, 544 prices
+- **smarkets**: ok, 515 prices
+- **feedg**: ok, 24 prices, 4 events
 - **feedk**: ok, 236 prices, 9 events
-- **feedg**: ok, 32 prices, 5 events
-- **feede**: ok, 330 prices, 20 events
-- **feedf**: ok, 476 prices, 13 events
-- **feedh**: ok, 1463 prices, 82 events
+- **feede**: ok, 298 prices, 20 events
+- **feedf**: ok, 424 prices, 13 events
+- **feedh**: ok, 1339 prices, 81 events
 
-Matches starting in next 168h: **49**, markets priced: **527**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **49**, markets priced: **516**, value bets: **6** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,4 +32,4 @@ Matches starting in next 168h: **49**, markets priced: **527**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Bangla Tigers (male), Border (W) (female), Central Hinds (W) (female), Diasqua Little Sai Wan Cricket Club (male), Dm Jamali Region (male), Faisalabad Region (male), Fata Region (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), Multan Region (male), Nhlangano Legends (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Peshawar Region (male), Quetta Region (male), Rawalpindi Region (male), Recon Tactical Free State (W) (female), Royal Champs (male), Sialkot Blues (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female)
 
-Runtime 116.2s. Snapshot: `odds_20261114T223030Z.jsonl.gz`
+Runtime 123.7s. Snapshot: `odds_20261114T231529Z.jsonl.gz`
