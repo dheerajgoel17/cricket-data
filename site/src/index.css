@@ -195,3 +195,35 @@ html, body, #root {
   background-color: var(--background);
   color: var(--foreground);
 }
+
+/* Documentation surfaces on the standalone design host. Product tokens stay dark. */
+:root.design-light {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #172522;
+  --card: #f4f7f5;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --primary: #08734e;
+  --primary-foreground: #ffffff;
+  --secondary: #e9f0ec;
+  --secondary-foreground: var(--foreground);
+  --muted: #edf2ef;
+  --muted-foreground: #53645d;
+  --accent: #e2eee7;
+  --accent-foreground: var(--foreground);
+  --destructive: #b4232c;
+  --border: #d0dbd4;
+  --input: #aabbb1;
+  --ring: var(--primary);
+  --hairline: var(--border);
+  --surface: #f7faf8;
+  --surface-hover: #eaf2ed;
+  --surface-raised: #e2eee7;
+  --focus-ring: var(--primary);
+  --hit: var(--primary);
+  --miss: var(--destructive);
+  --amber: #855200;
+  --dnp: #626c67;
+}

@@ -145,7 +145,7 @@ function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIn
     <section className="flex flex-col gap-snug" aria-label="Ground stats">
       <div className="flex items-baseline justify-between gap-snug">
         <div className="flex min-w-0 items-center gap-tight">
-          <h2 className="text-title font-label tracking-tight">Ground stats</h2>
+          <h2 className="text-title font-emphasis tracking-tight">Ground stats</h2>
           <Popover>
             <PopoverTrigger asChild>
               <button type="button" aria-label="About ground stats" className="grid size-5 shrink-0 place-items-center rounded-full text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
@@ -188,7 +188,7 @@ function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
   return (
     <section className="flex flex-col gap-snug">
       <div className="flex items-baseline justify-between gap-snug">
-        <h2 className="text-title font-label tracking-tight">Matches</h2>
+        <h2 className="text-title font-emphasis tracking-tight">Matches</h2>
         <span className="font-condensed text-callout font-label tabular-nums text-muted-foreground">{list.length}</span>
       </div>
       {!list.length ? (
@@ -319,7 +319,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
   return (
     <section className="flex flex-col gap-snug">
       <div className="flex items-baseline justify-between gap-snug">
-        <h2 className="text-title font-label tracking-tight">Markets</h2>
+        <h2 className="text-title font-emphasis tracking-tight">Markets</h2>
         <span className="text-callout tabular-nums text-muted-foreground">{ms.length} matches</span>
       </div>
       <div className="flex flex-nowrap items-center gap-tight overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="toolbar" aria-label="Market">

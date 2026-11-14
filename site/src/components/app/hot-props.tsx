@@ -243,7 +243,7 @@ export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Wi
       <div className="grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left">
         <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
         <span className="grid min-w-0 gap-hair">
-          <span className="flex min-w-0 items-center gap-tight text-body font-label leading-snug">
+          <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
             <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`} className="truncate outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring"><PlayerName idx={r.idx} fallback={r.name} /></Link>
             <TeamFlag name={r.team} />
             {!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
@@ -328,7 +328,7 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
                   <span className="flex items-center gap-snug">
                     <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
                     <span className="grid min-w-0 gap-hair">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-label leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}</span>
+                      <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}</span>
                       <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
                         <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums">{out ? r.line : `${r.side === "under" ? "Under" : "Over"} ${r.line}`}</span>
                         <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>

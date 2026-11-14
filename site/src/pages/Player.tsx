@@ -517,7 +517,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
         {book && cur && (
           <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
             <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-              <h2 className="text-body font-label">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
+              <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
               <span className="flex items-center gap-snug text-footnote text-muted-foreground">
                 {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
                 <span>Tap a row</span>

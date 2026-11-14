@@ -372,7 +372,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                       <section className="flex min-w-0 flex-col gap-snug">
                         <div className="flex items-baseline justify-between gap-snug">
                           <div className="grid min-w-0 gap-hair">
-                            <h2 className="text-body font-label">Recent results</h2>
+                            <h2 className="text-body font-emphasis">Recent results</h2>
                             <p className="text-footnote text-muted-foreground">{here ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} ${fmt}`} · void excluded</p>
                           </div>
                           {groundNote ? (
@@ -483,7 +483,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                       {/* Phone: full-bleed under the chart. Desktop: equal sticky column; panel scrolls so the page does not. */}
                       <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
                         <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-                          <h2 className="text-body font-label">Lines</h2>
+                          <h2 className="text-body font-emphasis">Lines</h2>
                           <span className="text-footnote text-muted-foreground">Tap a row</span>
                         </div>
                         <Table className="table-fixed">
@@ -522,7 +522,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
   const max = Math.max(...t.rows.map((r: any) => r.pSole), 0.0001);
   return (
     <section className="overflow-hidden border-y border-hairline">
-      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-label">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
+      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-emphasis">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
       <ul>
         {t.rows.map((r: any, i: number) => (
           <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">

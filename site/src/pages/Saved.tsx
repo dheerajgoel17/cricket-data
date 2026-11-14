@@ -19,7 +19,7 @@ const CARD = "overflow-hidden rounded-2xl bg-card ring-1 ring-hairline";
 function Section({ icon, title, count, emptyTitle, emptyBody, children }: { icon: ReactNode; title: string; count: number; emptyTitle: string; emptyBody: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-snug" aria-label={title}>
-      <h2 className="flex items-center gap-tight text-body font-label">{icon}{title}{count > 0 && <span className="text-callout font-copy tabular-nums text-muted-foreground">{count}</span>}</h2>
+      <h2 className="flex items-center gap-tight text-body font-emphasis">{icon}{title}{count > 0 && <span className="text-callout font-copy tabular-nums text-muted-foreground">{count}</span>}</h2>
       {count ? <ul className={CARD}>{children}</ul> : <EmptyState compact icon={icon} title={emptyTitle} body={emptyBody} />}
     </section>
   );

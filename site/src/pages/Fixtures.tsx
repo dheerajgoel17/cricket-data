@@ -234,7 +234,7 @@ export function FixturePage() {
               </div>
               {grids.isLoading || !shown ? <GridSkeleton /> : (
                 <section className="flex flex-col gap-snug">
-                  <h2 className="flex items-center gap-tight text-body font-label"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-copy text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                  <h2 className="flex items-center gap-tight text-body font-emphasis"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-copy text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                   <GridTable g={shown.g} teamIdx={shown.team} line={line} />
                 </section>)}
             </>)}
@@ -278,7 +278,7 @@ export function TrendsPage() {
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
       {!sel ? <EmptyState title="No fixtures to trend" body="No upcoming matches with known teams right now." /> : (
-        <div className="flex flex-col gap-snug"><h2 className="text-title font-label">{sel.a} v {sel.b}</h2>
+        <div className="flex flex-col gap-snug"><h2 className="text-title font-emphasis">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <ListSkeleton rows={4} />}
           <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
     </div>

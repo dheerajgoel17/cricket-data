@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   place: { marginLeft: "auto", flexShrink: 1 },
   sides: { gap: space.snug },
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  team: { ...type.body, color: color.foreground, flex: 1 },
+  team: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
   lost: { color: color["muted-foreground"] },
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
   total: { fontFamily: font.data, fontSize: 18, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },

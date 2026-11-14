@@ -98,7 +98,7 @@ export function ContactPage() {
       </Card>
 
       <section className="flex flex-col gap-snug" aria-label="What to write about">
-        <h2 className="text-title font-label tracking-tight">What is it about?</h2>
+        <h2 className="text-title font-emphasis tracking-tight">What is it about?</h2>
         <ul className="grid gap-snug sm:grid-cols-2">
           {TOPICS.map((t) => {
             const Icon = t.icon;
@@ -127,7 +127,7 @@ export function ContactPage() {
       <Separator className="bg-hairline" />
 
       <section className="flex flex-col gap-snug text-callout text-muted-foreground">
-        <h2 className="text-body font-label text-foreground">Before you write</h2>
+        <h2 className="text-body font-emphasis text-foreground">Before you write</h2>
         <ul className="flex list-disc flex-col gap-tight pl-5">
           <li>Include the page URL, match, player or ground when reporting a wrong number.</li>
           <li>We do not take wagers or place bets for anyone; listed prices are market data next to history.</li>

@@ -35,7 +35,6 @@ const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: ()
 const VenuePage = lazy(() => import("@/components/app/fixture-ground").then((m) => ({ default: m.VenueGroundPage })));
 const ContactPage = page(() => import("@/pages/Contact"), "ContactPage");
 const AdminAdsPage = page(() => import("@/pages/AdminAds"), "AdminAdsPage");
-const DesignSystemPage = page(() => import("@/pages/DesignSystem"), "DesignSystemPage");
 
 /** Old links used hash routes (#/player/12?stat=runs): send them to the same path. */
 function LegacyHash() {
@@ -72,7 +71,6 @@ export function App() {
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<HomePage />} />
-            <Route path="design-system" element={<DesignSystemPage />} />
             <Route element={<HistoryGate />}>
             <Route path="fixtures" element={<Navigate to="/" replace />} />
             <Route path="fixture/*" element={<FixturePage />} />

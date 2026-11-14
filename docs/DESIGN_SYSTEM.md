@@ -217,3 +217,7 @@ When you add a product component job, show a Spec on that page and update the ca
 * App rules: docs/MOBILE.md, `mobile/AGENTS.md`
 * Agents index: AGENTS.md “Where to look”
 * Enforcement: `site/src/lib/design-tokens.test.ts` (GOVERNED + EmptyNote/lucide bans); mobile empty-contract tests under `mobile/src/ui/`
+
+### Standalone catalogue hosting
+
+The catalogue boots independently on `design.fancy.cash` and uses a light documentation palette. Attach that hostname to the web deployment and configure its DNS using the deployment provider's records. Set `VITE_DESIGN_SYSTEM_HOST` at build time to use a different hostname. The legacy `/design-system` URL redirects to the public hostname and preserves section anchors. The token reference still describes the product's shared tokens.

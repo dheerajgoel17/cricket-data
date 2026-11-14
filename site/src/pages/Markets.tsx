@@ -157,7 +157,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         </TabsContent>}
         <TabsContent value="markets" className="flex flex-col gap-stack">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top" className="flex flex-col gap-stack">
-          <h2 className="text-title font-label">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
+          <h2 className="text-title font-emphasis">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
           {top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>

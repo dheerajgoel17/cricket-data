@@ -7,7 +7,7 @@ export function EntityHero({ badge, name, sub, meta = [], save }: { badge?: Reac
     <section className="flex items-center gap-stack border-b border-hairline py-stack md:gap-group md:py-group">
       {badge}
       <div className="flex min-w-0 flex-1 flex-col gap-tight">
-        <h1 className="text-display font-label leading-tight md:text-stat">{name}</h1>
+        <h1 className="text-display font-emphasis leading-tight md:text-stat">{name}</h1>
         {sub ? <p className="text-callout text-muted-foreground">{sub}</p> : null}
         {meta.length ? (
           <div className="flex flex-wrap gap-hair">

@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
 import { goBack } from "@/lib/nav";
 import { ChevronLeft } from "@/ui/icons";
-import { color, space, type } from "@/ui/tokens";
+import { font, color, space, type } from "@/ui/tokens";
 
 /**
  * The bar over a page one level down (a match, a player), as in the reference app: a round back button, the name and what it is centred, and round buttons at the right
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   bar: { height: 56, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter },
   round: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
   mid: { flex: 1, alignItems: "center", gap: 1 },
-  title: { ...type.body, color: color.foreground },
+  title: { ...type.body, fontFamily: font.bold, color: color.foreground },
   subtitle: { ...type.footnote, color: color["muted-foreground"] },
   right: { flexDirection: "row", justifyContent: "flex-end", alignItems: "center", gap: space.tight },
 });

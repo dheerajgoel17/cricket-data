@@ -42,7 +42,7 @@ export function ResultView({ r, source }: { r: any; source?: string }) {
     <div className="grid gap-stack">
       <Card className="gap-hair border-l-4 border-l-primary px-inset py-snug shadow-none">
         {source ? <Badge variant="secondary" className="w-fit">{source}</Badge> : null}
-        <h2 className="text-title font-label leading-snug">{r.headline}</h2>
+        <h2 className="text-title font-emphasis leading-snug">{r.headline}</h2>
         <Muted>Sample size: {r.sample.n} {r.sample.unit}.</Muted>
         <Chips list={r.filters} />
       </Card>
@@ -93,7 +93,7 @@ function PlayerProp({ r }: { r: any }) {
         <DataTable bleed columns={["Date", "Opponent", "Venue", r.statLabel, r.chart?.auxLabel || "", "No."]}
           rows={logs.map((e: any) => [e.date, e.opp, e.venueName || "", e.value == null ? <Badge variant="outline">{e.void ? "VOID: in XI, did not bat/bowl" : e.unknown ? "N/A: XI not recorded" : "DNP"}</Badge> : e.value, e.aux ?? "–", e.pos ?? "–"])} />
       </div>
-      <h2 className="text-title font-label">Hit rate at every line</h2>
+      <h2 className="text-title font-emphasis">Hit rate at every line</h2>
       <LadderTable bleed ladder={r.ladder} />
       <SplitTables splits={r.splits} />
     </>
@@ -125,7 +125,7 @@ function Partnership({ r }: { r: any }) {
       ) : null}
       {r.last.length ? (
         <div className="flex flex-col gap-snug">
-          <h2 className="text-title font-label">Latest stands</h2>
+          <h2 className="text-title font-emphasis">Latest stands</h2>
           <DataTable bleed columns={["Date", "Opponent", "Venue", "Runs", "Balls", "Wicket", "First out"]} rows={r.last.map((x: any) => [x.date, x.opp, x.venue, x.runs, x.balls, x.wicket, x.out])} />
         </div>
       ) : null}

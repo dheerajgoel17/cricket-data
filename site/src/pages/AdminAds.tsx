@@ -168,7 +168,7 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
   return (
     <div className="flex flex-col gap-section">
       <section className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
-        <h2 className="text-body font-label">New placement</h2>
+        <h2 className="text-body font-emphasis">New placement</h2>
         <label className="grid gap-hair text-callout">
           Slot
           <select className="h-control rounded-lg border border-input bg-background px-snug" value={slotId} onChange={(e) => setSlotId(e.target.value as AdSlotId)}>
@@ -185,7 +185,7 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
       </section>
 
       <section className="flex flex-col gap-snug">
-        <h2 className="text-body font-label">All placements {loading ? "…" : `(${rows.length})`}</h2>
+        <h2 className="text-body font-emphasis">All placements {loading ? "…" : `(${rows.length})`}</h2>
         {!rows.length && !loading ? <EmptyState compact title="None yet" body="Save a placement to list it here." /> : (
           <ul className="divide-y divide-hairline overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
             {rows.map((r) => (
@@ -240,7 +240,7 @@ function AdminsPanel({ rows, loading, selfId, onChange }: { rows: { user_id: str
   return (
     <div className="flex flex-col gap-section">
       <section className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
-        <h2 className="text-body font-label">Add admin</h2>
+        <h2 className="text-body font-emphasis">Add admin</h2>
         <p className="text-footnote text-muted-foreground">They must already have signed up (email/password or Google). Passwords stay in Supabase Auth.</p>
         <Input type="email" placeholder="email@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Button type="button" disabled={busy || !email.includes("@")} className="w-fit rounded-full" onClick={() => void add()}>{busy ? "Adding…" : "Add"}</Button>

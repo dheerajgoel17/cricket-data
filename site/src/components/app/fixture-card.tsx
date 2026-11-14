@@ -85,7 +85,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
               <div key={t} className="contents">
                 <div className="flex min-w-0 items-center gap-snug" title={t}>
                   <TeamBadge name={t} size="md" eager />
-                  <span className={cn("truncate text-body font-label", lost(t) && "font-label text-muted-foreground")}>{t}</span>
+                  <span className={cn("truncate text-body font-emphasis", lost(t) && "text-muted-foreground")}>{t}</span>
                 </div>
                 {hasScore || live ? <LiveScore live={live && !session} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
                   <span className="row-span-2 grid justify-items-end text-right">

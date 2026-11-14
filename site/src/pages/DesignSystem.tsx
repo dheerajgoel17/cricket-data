@@ -1,3 +1,6 @@
+import { DesignFooter, DesignHeader, DesignHome } from "@/components/design-system/chrome";
+import { Link, useLocation } from "react-router-dom";
+import { DesignReference, TypographyReference, referenceSections } from "@/components/design-system/reference";
 import { useEffect, useState, type ReactNode } from "react";
 import { BookmarkIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import tokens from "@cricket/tokens/tokens.json";
@@ -12,12 +15,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { setTitle } from "@/lib/title";
+import { setTitle, syncMeta } from "@/lib/title";
 import { cn } from "@/lib/utils";
 
-const GROUPS = [
+const GROUPS: readonly { title: string; sections: readonly (readonly [string, string])[] }[] = [
   { title: "Foundations", sections: [["type", "Typography"], ["color", "Colour"], ["space", "Space & size"], ["motion", "Motion"]] },
   { title: "Components", sections: [["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["forms", "Forms"], ["icons", "Icons"]] },
+  { title: "Reference", sections: referenceSections },
   { title: "Guidance", sections: [["rules", "Usage rules"]] },
 ] as const;
 
@@ -85,54 +89,30 @@ export function DesignSystemPage() {
   const [tab, setTab] = useState("log");
   const [chipOn, setChipOn] = useState(true);
 
+  const { pathname, hash } = useLocation();
+  const topics = GROUPS.flatMap(({ title, sections }) => Array.from(sections).map(([id, label]) => ({ id, label, group: title })));
+  const topicPath = (id: string) => `/docs/${id}`;
+  const legacy = pathname === "/" && topics.some((topic) => "#" + topic.id === hash);
+  const current = topics.find((topic) => legacy ? "#" + topic.id === hash : topicPath(topic.id) === pathname);
+  const index = current ? topics.indexOf(current) : -1;
+  const search = pathname === "/search";
+  const home = pathname === "/" && !current;
+  const heading = current?.label ?? (search ? "Search" : home ? "Design system" : "Page not found");
+  setTitle(heading);
+
   useEffect(() => {
-    const hash = location.hash.slice(1);
-    if (!hash) return;
-    requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }));
-  }, []);
+    syncMeta("/design-system", pathname);
+    if (hash && !legacy) document.getElementById(hash.slice(1))?.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }, [pathname, hash, legacy]);
 
   const colors = Object.entries(tokens.color).filter(([, v]) => typeof v === "string" && (String(v).startsWith("#") || String(v).startsWith("rgba")));
   const spaces = Object.entries(tokens.space);
   const sizes = Object.entries(tokens.size).filter(([k]) => ["control", "gutter", "row-min", "card-radius", "chip-radius", "header-h", "touch"].includes(k));
 
-  return (
-    <div className="flex flex-col gap-section lg:grid lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start lg:gap-group">
-      <nav aria-label="Design system sections" className="sticky top-[calc(var(--header-h)+0.5rem)] z-10 -mx-gutter overflow-x-auto border-b border-hairline bg-background/90 px-gutter py-snug backdrop-blur-md lg:mx-0 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-        <div className="flex w-max gap-stack lg:w-full lg:flex-col lg:gap-group">
-          <a href="#intro" className="self-start rounded-lg px-snug py-tight text-callout font-label hover:bg-secondary">Overview</a>
-          {GROUPS.map(({ title, sections }) => (
-            <div key={title} className="flex gap-hair lg:flex-col">
-              <p className="hidden px-snug text-footnote font-label text-muted-foreground lg:block">{title}</p>
-              <ul className="flex gap-hair lg:flex-col">
-                {sections.map(([id, label]) => (
-                  <li key={id}><a href={`#${id}`} className="block whitespace-nowrap rounded-lg px-snug py-tight text-callout text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">{label}</a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </nav>
-
-      <div className="flex min-w-0 flex-col gap-section">
-        <div id="intro" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <header className="grid gap-group overflow-hidden rounded-2xl border border-hairline bg-card p-group sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-            <div className="flex min-w-0 flex-col gap-snug">
-              <h1 className="text-display font-label tracking-tight">Fancy.cash Design System</h1>
-              <p className="max-w-prose text-body text-muted-foreground">Shared foundations, live components, and usage guidance for web and native apps.</p>
-              <div className="flex flex-wrap gap-tight">
-                <Button asChild variant="secondary"><a href="#type">Explore typography</a></Button>
-                <Button asChild variant="ghost"><a href="#buttons">Browse components</a></Button>
-              </div>
-            </div>
-            <div aria-hidden className="hidden border-l border-hairline pl-group text-right sm:block">
-              <div className="font-condensed text-stat font-editorial tabular-nums text-primary">172/4</div>
-              <div className="font-condensed text-title font-editorial tabular-nums text-muted-foreground">18.2 overs</div>
-            </div>
-          </header>
-        </div>
-
-        <div id="type" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Typography</h2>
+  const demos: Record<string, ReactNode> = {
+    "type": (
+        <div id="type" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Muted>Satoshi for UI. Barlow Condensed for scoreboard figures (num-cond / label-cap).</Muted>
           <div className="grid gap-stack xl:grid-cols-2">
             <Spec title="Satoshi" job="Regular is the default for UI copy. Medium marks controls and Bold marks page titles.">
@@ -142,8 +122,9 @@ export function DesignSystemPage() {
               <div>{WEIGHTS.filter(([weight]) => !weight.startsWith("Regular")).map(([weight, style]) => <TypeRow key={weight} role={weight} sample="172/4 · 18.2 overs" className={cn("font-condensed text-metric tabular-nums", style)} />)}</div>
             </Spec>
           </div>
+          <TypographyReference />
           <Panel title="Type scale">
-            <TypeRow role="display" sample="Harry Brook" className="text-display font-label tracking-tight" />
+            <TypeRow role="display" sample="Harry Brook" className="text-display font-emphasis tracking-tight" />
             <TypeRow role="title" sample="Player props" className="text-title font-label tracking-tight" />
             <TypeRow role="body" sample="Hit rates over the listed line, last ten games." className="text-body" />
             <TypeRow role="callout" sample="Void when in the XI but did not bat." className="text-callout text-muted-foreground" />
@@ -154,17 +135,19 @@ export function DesignSystemPage() {
             <TypeRow role="num-cond" sample="67 · 4/12 · fair 1.48" className="font-condensed text-title tabular-nums text-primary" />
           </Panel>
         </div>
+    ),
 
-        <div id="color" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Colour</h2>
+    "color": (
+        <div id="color" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Muted>Semantic tokens from tokens.json. Prefer primary for positive / selected, miss for under, amber for push / caution.</Muted>
           <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4">
             {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
           </div>
         </div>
+    ),
 
-        <div id="space" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Space &amp; size</h2>
+    "space": (
+        <div id="space" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Muted>Stacks and gaps use hair / tight / snug / stack / group / section. Controls are --control tall.</Muted>
           <Spec title="Spacing scale" job="Parent flex/grid gap — do not margin blocks yourself.">
             <div className="flex flex-col gap-snug">
@@ -182,9 +165,10 @@ export function DesignSystemPage() {
             </div>
           </Spec>
         </div>
+    ),
 
-        <div id="motion" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Motion</h2>
+    "motion": (
+        <div id="motion" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Muted>Curves from tokens.motion. Prefer ease-out for entrances; respect prefers-reduced-motion.</Muted>
           <div className="grid gap-snug sm:grid-cols-3">
             {Object.entries(tokens.motion).map(([k, v]) => (
@@ -195,9 +179,10 @@ export function DesignSystemPage() {
             ))}
           </div>
         </div>
+    ),
 
-        <div id="buttons" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Buttons</h2>
+    "buttons": (
+        <div id="buttons" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="Button variants" job="Primary actions; product CTAs often use h-control rounded-full secondary/primary.">
             <div className="flex flex-wrap items-center gap-snug">
               <Button>Default</Button>
@@ -219,9 +204,10 @@ export function DesignSystemPage() {
             </div>
           </Spec>
         </div>
+    ),
 
-        <div id="chips" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Chips &amp; tabs</h2>
+    "chips": (
+        <div id="chips" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="Chip + ActiveChip" job="Single selectable filter; dismissible applied filter.">
             <div className="flex flex-wrap items-center gap-snug">
               <Chip on={chipOn} onClick={() => setChipOn((v) => !v)}>Runs</Chip>
@@ -246,9 +232,10 @@ export function DesignSystemPage() {
             </PillTabs>
           </Spec>
         </div>
+    ),
 
-        <div id="feedback" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Empty states &amp; notes</h2>
+    "feedback": (
+        <div id="feedback" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="EmptyState" job="Every empty / unknown / error list. Prefer titled EmptyState over plain text.">
             <div className="grid gap-stack md:grid-cols-2">
               <EmptyState title="Nothing saved yet" body="Tap the star on a prop, player or team." action={<Button variant="secondary" className="h-control rounded-full">Browse props</Button>} />
@@ -259,11 +246,12 @@ export function DesignSystemPage() {
             <Note title="Reading tip" items={["Fair price is 1 ÷ historical hit rate.", "Void and DNP rules stay intact across formats."]} />
           </Spec>
         </div>
+    ),
 
-        <div id="data" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Data &amp; metrics</h2>
+    "data": (
+        <div id="data" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="PageTitle + Crumbs" job="Drill-in hierarchy on desktop; phone often uses HeaderActions.">
-            <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Example"]]} />
+            <Crumbs items={[["Examples"], ["Example"]]} />
             <PageTitle sub="Supporting line in callout muted.">Example page title</PageTitle>
           </Spec>
           <Spec title="StatTile + Panel" job="Glance figures and titled cards.">
@@ -290,9 +278,10 @@ export function DesignSystemPage() {
             </div>
           </Spec>
         </div>
+    ),
 
-        <div id="forms" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Forms</h2>
+    "forms": (
+        <div id="forms" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="LiveForm + Field + NativeSelect" job="Filters apply as you change them; typed fields debounce.">
             <LiveForm onValues={() => undefined} className="max-w-xl">
               <Field label="Format"><NativeSelect name="fmt" options={[["T20", "T20"], ["ODI", "ODI"], ["Test", "Test"]]} /></Field>
@@ -300,9 +289,10 @@ export function DesignSystemPage() {
             </LiveForm>
           </Spec>
         </div>
+    ),
 
-        <div id="icons" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Icons</h2>
+    "icons": (
+        <div id="icons" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Spec title="Heroicons in product code" job="Never Lucide under components/app or pages. shadcn ui/* may still ship CLI Lucide until edited.">
             <div className="flex items-center gap-stack text-foreground">
               <InformationCircleIcon className="size-6" aria-hidden />
@@ -311,9 +301,12 @@ export function DesignSystemPage() {
             </div>
           </Spec>
         </div>
+    ),
 
-        <div id="rules" className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--spacing-stack))] flex-col gap-stack">
-          <h2 className="text-display font-label tracking-tight">Rules</h2>
+
+
+    "rules": (
+        <div id="rules" className="flex scroll-mt-[calc(var(--control)+var(--spacing-stack))] flex-col gap-stack">
           <Panel title="Hard rules">
             <ul className="grid gap-snug text-callout text-muted-foreground">
               <li>All numbers on the site come from the engine / data — never from an LLM.</li>
@@ -324,7 +317,30 @@ export function DesignSystemPage() {
             </ul>
           </Panel>
         </div>
-      </div>
-    </div>
-  );
+    ),
+  };
+
+  return <div className="grid gap-section">
+    <DesignHeader />
+    {home ? <DesignHome brandColor={tokens.color.primary} /> : <div className="grid min-w-0 gap-section lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-start">
+      <nav aria-label="Documentation" className="flex gap-group overflow-x-auto pb-snug lg:sticky lg:top-24 lg:max-h-[calc(100dvh-7rem)] lg:flex-col lg:overflow-y-auto">
+        {GROUPS.map(({ title, sections }) => <div key={title} className="grid shrink-0 gap-hair">
+          <p className="text-footnote font-emphasis text-muted-foreground">{title}</p>
+          {sections.map(([id, label]) => <Link key={id} to={topicPath(id)} aria-current={current?.id === id ? "page" : undefined} className="rounded-md px-tight py-hair whitespace-nowrap hover:bg-surface aria-[current=page]:bg-secondary aria-[current=page]:font-emphasis aria-[current=page]:text-primary">{label}</Link>)}
+        </div>)}
+      </nav>
+      <article key={current?.id ?? pathname} className="grid min-w-0 gap-section pb-section">
+        <div className="grid gap-tight border-b border-hairline pb-stack">
+          <p className="text-callout text-muted-foreground"><Link to="/" className="hover:underline">Design system</Link>{current ? ` / ${current.group}` : ""}</p>
+          <h1 className="text-[clamp(2rem,5vw,3.5rem)] leading-tight font-emphasis tracking-tight">{heading}</h1>
+        </div>
+        {search ? <DesignReference /> : current ? demos[current.id] ?? <DesignReference section={current.id} /> : <p>This documentation page could not be found.</p>}
+        {current && <nav aria-label="Adjacent topics" className="flex flex-wrap justify-between gap-stack border-t border-hairline pt-stack">
+          {topics[index - 1] ? <Link className="text-primary hover:underline" to={topicPath(topics[index - 1].id)}>← {topics[index - 1].label}</Link> : <span />}
+          {topics[index + 1] && <Link className="text-primary hover:underline" to={topicPath(topics[index + 1].id)}>{topics[index + 1].label} →</Link>}
+        </nav>}
+      </article>
+    </div>}
+    <DesignFooter />
+  </div>;
 }

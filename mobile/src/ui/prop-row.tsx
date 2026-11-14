@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   pressed: { backgroundColor: color.card },
   main: { flex: 1, minWidth: 0, gap: 3 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  name: { ...type.body, fontSize: 15, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
+  name: { ...type.body, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   descRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: space.snug, rowGap: 2 },
   line: { ...numLg, fontSize: 22, letterSpacing: -0.4, lineHeight: 24, color: color.foreground },

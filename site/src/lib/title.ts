@@ -19,10 +19,10 @@ export function setTitle(t: string) { if (typeof document !== "undefined") docum
 export const useTitle = (t: string) => useEffect(() => { document.title = fullTitle(t); }, [t]);
 
 /** Brings the description, canonical link, robots hint and Open Graph / Twitter / Discord tags in line with the current path and title. */
-export function syncMeta(pathname: string) {
+export function syncMeta(pathname: string, canonicalPathname = pathname) {
   if (typeof document === "undefined") return;
   const { description, noindex } = pageMeta(pathname, document.title);
-  const path = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
+  const path = canonicalPathname === "/" ? "/" : canonicalPathname.replace(/\/+$/, "");
   const url = `${location.origin}${path}`;
   const kind = /^\/(player|fixture|venue)\/([^/?#]+)/.exec(path);
   const image = kind

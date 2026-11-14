@@ -114,7 +114,7 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
       ) : (
         <div className="flex items-center gap-tight">
           <ArrowTrendingDownIcon className="size-4 text-miss" aria-hidden />
-          <h2 className="text-body font-label">Low odds misses</h2>
+          <h2 className="text-body font-emphasis">Low odds misses</h2>
         </div>
       )}
       <p className="text-footnote text-muted-foreground">
