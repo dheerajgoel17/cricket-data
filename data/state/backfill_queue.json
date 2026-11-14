@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-11-13T11:09:43",
+ "afghanistan_enumerated_at": "2026-11-14T10:36:51",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
@@ -3594,6 +3594,12 @@
    "key": "2002-01-21-England-India",
    "match_id": "crex-eng-w-vs-ind-w-4th-odi-england-women-tour-of-india-2002-match-updates-14DA",
    "saved_at": "2026-11-13T11:35:12"
+  },
+  {
+   "crex_url": "/cricket-live-score/afg-vs-ned-2nd-match-world-twenty20-qualifier-2015-match-updates-AGT",
+   "key": "2015-07-09-Afghanistan-Netherlands",
+   "match_id": "crex-afg-vs-ned-2nd-match-world-twenty20-qualifier-2015-match-updates-AGT",
+   "saved_at": "2026-11-14T10:36:58"
   }
  ],
  "failed": [],
