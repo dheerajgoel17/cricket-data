@@ -51,7 +51,7 @@ function Who({ name, team, sides, strike, short, className }: { name: string; te
   const idx = usePlayerIdx(name, team, sides);
   const text = short ? shortName(name) : name;
   const label = <>{text}{strike ? <span className="text-primary">*</span> : null}</>;
-  const cls = cn("truncate font-medium", strike && "text-primary", className);
+  const cls = cn("truncate font-label", strike && "text-primary", className);
   return idx != null ? <Link to={`/player/${idx}`} className={cn(cls, "underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-primary active:opacity-70")}>{label}</Link> : <span className={cls}>{label}</span>;
 }
 
@@ -63,7 +63,7 @@ function ov(p: any) {
 
 function Ball({ b }: { b: string }) {
   return (
-    <span className={cn("grid h-6 min-w-6 shrink-0 place-items-center rounded-md px-hair text-caption font-bold tabular-nums whitespace-nowrap", /w/i.test(b) ? "bg-miss/20 text-miss" : /[456]/.test(b) ? "bg-primary/20 text-primary" : "bg-secondary text-foreground")}>{b}</span>
+    <span className={cn("grid h-6 min-w-6 shrink-0 place-items-center rounded-md px-hair text-caption font-emphasis tabular-nums whitespace-nowrap", /w/i.test(b) ? "bg-miss/20 text-miss" : /[456]/.test(b) ? "bg-primary/20 text-primary" : "bg-secondary text-foreground")}>{b}</span>
   );
 }
 
@@ -98,7 +98,7 @@ function Overs({ overs }: { overs: { n?: number | null; balls: string[] }[] }) {
           {groups.map((o, i) => (
             <span key={o.n ?? i} className="flex shrink-0 items-center gap-snug">
               {i > 0 && <span role="separator" aria-hidden className="h-5 w-px shrink-0 bg-muted-foreground/40" />}
-              <span className="shrink-0 text-callout font-medium tabular-nums text-muted-foreground" title={o.n != null ? `Over ${o.n}` : undefined}>{o.n != null ? o.n : "·"}</span>
+              <span className="shrink-0 text-callout font-label tabular-nums text-muted-foreground" title={o.n != null ? `Over ${o.n}` : undefined}>{o.n != null ? o.n : "·"}</span>
               <span className="flex flex-nowrap items-center gap-hair">
                 {o.balls.map((b, j) => <Ball key={`${b}-${j}`} b={b} />)}
               </span>
@@ -167,8 +167,8 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
       {[inn].map((inn: any) => (
         <div key={innId(inn)} className="flex flex-col">
           <div className="flex items-center gap-snug py-snug">
-            <span className="min-w-0 flex-1 truncate text-callout font-medium">{inn.team || `Innings ${inn.n}`}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</span>
-            <span className="shrink-0 text-footnote font-medium tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
+            <span className="min-w-0 flex-1 truncate text-callout font-label">{inn.team || `Innings ${inn.n}`}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</span>
+            <span className="shrink-0 text-footnote font-label tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
           </div>
           {!!inn.batters?.length && (
             <div className="overflow-x-auto">
@@ -189,13 +189,13 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                       <td className={cn("py-snug", namePadding)}>
                         <div className="flex min-w-0 items-center gap-snug">
                           <div className="min-w-0">
-                            <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-medium" />
+                            <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-label" />
                             {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
                             <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
                           </div>
                         </div>
                       </td>
-                      <Num className="font-medium text-foreground">{p.runs ?? 0}</Num>
+                      <Num className="font-label text-foreground">{p.runs ?? 0}</Num>
                       <Num>{p.balls ?? 0}</Num>
                       <Num>{p.fours ?? 0}</Num>
                       <Num>{p.sixes ?? 0}</Num>
@@ -205,14 +205,14 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                   {inn.extras && (
                     <tr className="border-t border-hairline text-muted-foreground">
                       <td className={cn("py-snug", namePadding)}>Extras</td>
-                      <Num className="font-medium text-foreground">{inn.extras.total}</Num>
+                      <Num className="font-label text-foreground">{inn.extras.total}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
                     </tr>
                   )}
                   {inn.runs != null && (
                     <tr className="border-t border-hairline">
-                      <td className={cn("py-snug font-medium", namePadding)}>Total</td>
-                      <Num className="font-medium text-foreground">{inn.runs}</Num>
+                      <td className={cn("py-snug font-label", namePadding)}>Total</td>
+                      <Num className="font-label text-foreground">{inn.runs}</Num>
                       <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
                     </tr>
                   )}
@@ -222,12 +222,12 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
           )}
           {!!inn.fow?.length && (
             <p className="py-snug text-footnote text-muted-foreground">
-              <span className="font-medium text-foreground">FOW</span>{" "}
-              {inn.fow.map((w: any, k: number) => <Fragment key={`${w.wkts}-${w.name}`}>{k > 0 && " · "}{w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-normal" />{w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})</Fragment>)}
+              <span className="font-label text-foreground">FOW</span>{" "}
+              {inn.fow.map((w: any, k: number) => <Fragment key={`${w.wkts}-${w.name}`}>{k > 0 && " · "}{w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-copy" />{w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})</Fragment>)}
             </p>
           )}
           {!!yet(inn).length && (
-            <p className="py-snug text-footnote text-muted-foreground"><span className="font-medium text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-normal" /></Fragment>)}</p>
+            <p className="py-snug text-footnote text-muted-foreground"><span className="font-label text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-copy" /></Fragment>)}</p>
           )}
           {!!inn.bowlers?.length && (
             <div className="overflow-x-auto">
@@ -247,13 +247,13 @@ export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) 
                     <tr key={p.id || p.name} className="border-t border-hairline">
                       <td className={cn("py-snug", namePadding)}>
                         <div className="flex min-w-0 items-center gap-snug">
-                          <Who name={p.name} team={p.team} sides={teams} className="text-callout font-medium" />
+                          <Who name={p.name} team={p.team} sides={teams} className="text-callout font-label" />
                         </div>
                       </td>
                       <Num>{fmtOv(p.overs)}</Num>
                       <Num>{p.maidens ?? 0}</Num>
                       <Num>{p.conceded ?? 0}</Num>
-                      <Num className="font-medium text-foreground">{p.wickets ?? 0}</Num>
+                      <Num className="font-label text-foreground">{p.wickets ?? 0}</Num>
                       <Num>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Num>
                     </tr>
                   ))}
@@ -313,8 +313,8 @@ function LiveScorecardDetails({ match, teams }: { match: any; teams?: Side[] }) 
   const board = liveBoard(match);
   if (!board) return null;
   const meta: ReactNode[] = [];
-  if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-medium text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
-  if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-medium text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
+  if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-label text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
+  if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-label text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
   if (board.crr != null) meta.push(<span key="c"><span className="text-muted-foreground">CRR</span> {board.crr.toFixed(2)}</span>);
   if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
   return meta.length ? <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div> : null;

@@ -60,7 +60,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
       <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
     </View></View>
   );
-  if (!g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" /></View>;
+  if (!g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" shape="ground" /></View>;
   if (!g.known) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></View>;
 
   const { activeFmt, formats, list, both } = filters;
@@ -297,19 +297,17 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
               {rep.n < 10 ? <Text style={[styles.note, { color: color.amber }]}>Small sample ({rep.n} matches): treat these with caution.</Text> : null}
               <Text style={styles.h3}>Compare lines</Text>
             </View>
-            {/* Edge-to-edge like Match Fancy ladder (bleed past page gutter). */}
-            <View style={styles.bleed}>
-              <DataTable
-                columns={["Line", "Over", "Under"]}
-                flex={[1, 1.3, 1.3]}
-                highlight={ladder.findIndex((l) => l.line === active)}
-                rows={ladder.map((l) => [
-                  <Press key={l.line} scale={1} onPress={() => setLine(l.line)} accessibilityRole="button" accessibilityLabel={`Line ${l.line}`}><Text style={styles.lineNum}>{l.line}</Text></Press>,
-                  <Text key="o" style={styles.cellNum}><Text style={{ color: color.primary }}>{pc(l.pOver)}</Text> <Text style={styles.fair}>{odds(l.fairOver)}</Text></Text>,
-                  <Text key="u" style={styles.cellNum}>{pc(l.pUnder)} <Text style={styles.fair}>{odds(l.fairUnder)}</Text></Text>,
-                ])}
-              />
-            </View>
+            <DataTable
+              bleed
+              columns={["Line", "Over", "Under"]}
+              flex={[1, 1.3, 1.3]}
+              highlight={ladder.findIndex((l) => l.line === active)}
+              rows={ladder.map((l) => [
+                <Press key={l.line} scale={1} onPress={() => setLine(l.line)} accessibilityRole="button" accessibilityLabel={`Line ${l.line}`}><Text style={styles.lineNum}>{l.line}</Text></Press>,
+                <Text key="o" style={styles.cellNum}><Text style={{ color: color.primary }}>{pc(l.pOver)}</Text> <Text style={styles.fair}>{odds(l.fairOver)}</Text></Text>,
+                <Text key="u" style={styles.cellNum}>{pc(l.pUnder)} <Text style={styles.fair}>{odds(l.fairUnder)}</Text></Text>,
+              ])}
+            />
           </View>
         ) : (
           <EmptyState compact title="No sample" body={`Not enough ${fmtName} matches for this market.`} />
@@ -326,7 +324,6 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter },
-  bleed: { marginHorizontal: -space.gutter },
   stack: { gap: space.stack },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
   hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },

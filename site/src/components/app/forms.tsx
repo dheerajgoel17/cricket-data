@@ -19,7 +19,7 @@ export function useQ(): [Q, (patch: Record<string, unknown>, opts?: { replace?: 
 export const useGo = () => { const nav = useNavigate(); return (path: string, q: Record<string, unknown> = {}) => { const qs = new URLSearchParams(Object.entries(q).filter(([, v]) => v != null && v !== "").map(([k, v]) => [k, String(v)])).toString(); nav(`/${path}${qs ? `?${qs}` : ""}`); }; };
 
 export const Field = ({ label, children, className }: { label: string; children: ReactNode; className?: string }) => (
-  <label className={cn("grid gap-1.5", className)}><span className="text-xs font-medium text-muted-foreground">{label}</span>{children}</label>
+  <label className={cn("grid gap-hair", className)}><span className="text-caption font-label text-muted-foreground">{label}</span>{children}</label>
 );
 
 /** Filters apply as you change them (no Update button): selects, checkboxes and dates on change, typed fields shortly after you stop. */
@@ -29,7 +29,7 @@ export function LiveForm({ onValues, children, className, delay = 350 }: { onVal
   const fire = useCallback(() => { if (ref.current) { const fd = new FormData(ref.current); onValues(Object.fromEntries([...fd.entries()].map(([k, v]) => [k, String(v)]))); } }, [onValues]);
   useEffect(() => () => clearTimeout(t.current), []);
   return (
-    <form ref={ref} className={cn("flex flex-wrap items-end gap-3 rounded-lg border bg-card p-4", className)} onSubmit={(e: FormEvent) => { e.preventDefault(); fire(); }}
+    <form ref={ref} className={cn("flex flex-wrap items-end gap-stack rounded-lg border border-hairline bg-card p-inset", className)} onSubmit={(e: FormEvent) => { e.preventDefault(); fire(); }}
       onChange={(e) => { const el = e.target as HTMLElement; if (el.matches("select, input[type=checkbox], input[type=date]")) fire(); }}
       onInput={(e) => { const el = e.target as HTMLElement; if (el.matches("input[type=number], input[type=search], input[type=text]")) { clearTimeout(t.current); t.current = setTimeout(fire, delay); } }}>
       {children}
@@ -40,7 +40,7 @@ export function LiveForm({ onValues, children, className, delay = 350 }: { onVal
 /** Native select styled like shadcn's Input (keeps FormData-based live forms trivial and accessible). */
 export function NativeSelect({ name, options, defaultValue, className, ...rest }: { name: string; options: [string | number, string][]; defaultValue?: string | number; className?: string } & React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select name={name} defaultValue={String(defaultValue ?? "")} className={cn("h-10 rounded-md border border-input bg-input px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring", className)} {...rest}>
+    <select name={name} defaultValue={String(defaultValue ?? "")} className={cn("h-control rounded-md border border-input bg-input px-snug text-callout outline-none focus-visible:ring-2 focus-visible:ring-ring", className)} {...rest}>
       {options.map(([v, l]) => <option key={String(v)} value={String(v)}>{l}</option>)}
     </select>
   );

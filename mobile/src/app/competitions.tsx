@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { storeQuery } from "@/lib/data";
 import { competitions } from "@/lib/league";
 import { useScreenInsets } from "@/ui/insets";
+import { EmptyState } from "@/ui/empty-state";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
@@ -32,13 +33,13 @@ export default function Competitions() {
         <Ionicons name="search" size={18} color={color["muted-foreground"]} />
         <TextInput value={text} onChangeText={setText} autoCorrect={false} autoCapitalize="none" clearButtonMode="while-editing" placeholder="Search competitions" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search competitions" />
       </View>
-      {!store ? <Working label="Loading…" fill /> : (
+      {!store ? <Working label="Loading…" fill shape="comps" /> : (
         <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.list, { paddingBottom: inset.bottom + 24 }]}>
           {rows.length ? (
             <View style={styles.box}>
               {rows.map(([e, c], n) => <ListRow key={e} first={n === 0} left={<LeagueBadge name={store.events[e]} size={40} />} title={store.events[e]} sub={`${c} matches`} onPress={() => push(`/league/${e}`)} />)}
             </View>
-          ) : <Text style={styles.empty}>No competition matches “{text.trim()}”.</Text>}
+          ) : <EmptyState compact title="No matches" body={`No competition matches “${text.trim()}”.`} />}
         </ScrollView>
       )}
       <TabFade withTabBar={false} />

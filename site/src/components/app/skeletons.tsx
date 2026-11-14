@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Skeletons shaped like the real content (same row heights, radii and grids), so the page does not jump when data arrives.
@@ -5,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 /** Props / trends list rows: photo, two text lines, so-far pill, edge. */
 export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div aria-hidden className="-mx-gutter">
+    <div data-skeleton="rows" aria-hidden className="-mx-gutter">
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="flex flex-col gap-tight px-gutter py-snug" style={{ opacity: 1 - i * 0.1 }}>
           <div className="flex items-center gap-snug">
@@ -26,7 +27,7 @@ export function RowsSkeleton({ rows = 6 }: { rows?: number }) {
 /** Player grid: header row and player rows with the game cells. */
 export function GridSkeleton({ rows = 9 }: { rows?: number }) {
   return (
-    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
+    <div data-skeleton="grid" aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
       <div className="flex items-center gap-snug border-b border-hairline px-3 py-snug"><Skeleton className="h-3 w-14" /><Skeleton className="ml-auto h-3 w-6" />{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-8 w-9" />)}</div>
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="flex items-center gap-snug border-b border-hairline px-3 py-tight last:border-0" style={{ opacity: 1 - i * 0.07 }}>
@@ -40,7 +41,7 @@ export function GridSkeleton({ rows = 9 }: { rows?: number }) {
 /** Grouped list of label / value rows (markets). */
 export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
+    <div data-skeleton="list" aria-hidden className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
       {Array.from({ length: rows }, (_, i) => <div key={i} className="flex items-center gap-snug border-b border-hairline px-inset py-snug last:border-0"><Skeleton className="h-3.5 w-36" /><Skeleton className="ml-auto h-3.5 w-10" /><Skeleton className="h-3.5 w-10" /></div>)}
     </div>
   );
@@ -49,7 +50,7 @@ export function ListSkeleton({ rows = 5 }: { rows?: number }) {
 /** Match header + live strip while the fixture loads: edge-to-edge under the top bar. */
 export function MatchHeaderSkeleton() {
   return (
-    <div data-flush aria-hidden className="-mx-gutter flex flex-col border-b border-hairline bg-card">
+    <div data-skeleton="match" data-flush aria-hidden className="-mx-gutter flex flex-col border-b border-hairline bg-card">
       <div className="flex flex-col gap-tight px-gutter py-snug">
         <Skeleton className="h-3 w-40" />
         <div className="flex items-center justify-between gap-snug">
@@ -81,7 +82,7 @@ export function MatchHeaderSkeleton() {
 /** Standalone scorecard placeholder (scorecard route). */
 export function ScorecardSkeleton() {
   return (
-    <div aria-hidden className="-mx-gutter flex flex-col gap-stack border-y border-hairline bg-card px-gutter py-inset">
+    <div data-skeleton="scorecard" aria-hidden className="-mx-gutter flex flex-col gap-stack border-y border-hairline bg-card px-gutter py-inset">
       <div className="flex items-center gap-snug">
         <Skeleton className="size-16 rounded-full" />
         <div className="grid flex-1 justify-items-center gap-tight"><Skeleton className="h-3 w-16" /><Skeleton className="h-6 w-12" /></div>
@@ -104,7 +105,7 @@ export function ScorecardSkeleton() {
 /** High-odds ticket while the live lines settle. */
 export function TapeSkeleton() {
   return (
-    <div aria-hidden className="relative flex min-w-0 flex-col gap-tight rounded-2xl bg-primary/80 p-inset">
+    <div data-skeleton="tape" aria-hidden className="relative flex min-w-0 flex-col gap-tight rounded-2xl bg-primary/80 p-inset">
       <div className="flex flex-col gap-tight">
         <Skeleton className="h-5 w-36 bg-primary-foreground/25" />
         <Skeleton className="h-3 w-52 bg-primary-foreground/20" />
@@ -128,7 +129,7 @@ export function TapeSkeleton() {
 /** Match Fancy while the bookmaker file loads: an overview list, then the panel. */
 export function FancySkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-stack">
+    <div data-skeleton="fancy" aria-hidden className="flex flex-col gap-stack">
       <RowsSkeleton rows={3} />
       <div className="flex flex-col gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline">
         <Skeleton className="h-5 w-40" />
@@ -143,28 +144,57 @@ export function FancySkeleton() {
 /** The home rail while its inputs load (fixtures, bookmaker lines, rail settings): series chips, two fixture cards. */
 export function RailSkeleton() {
   return (
-    <div aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter">
-      {[0, 1].map((n) => <Skeleton key={n} className="h-[168px] w-(--fixture-card) shrink-0 rounded-2xl" />)}
+    <div data-skeleton="rail" aria-hidden className="-mx-gutter flex gap-snug overflow-hidden px-gutter">
+      {[0, 1, 2].map((n) => (
+        <div key={n} className="flex min-h-48 w-(--fixture-card) shrink-0 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-inset ring-hairline">
+          <div className="flex justify-between gap-snug"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-24" /></div>
+          {[0, 1].map((team) => <div key={team} className="flex items-center gap-snug"><Skeleton className="size-control shrink-0 rounded-full" /><Skeleton className="h-4 w-24" /></div>)}
+          <div className="mt-auto flex items-end justify-between gap-snug pt-tight"><div className="grid gap-hair"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-28" /></div><Skeleton className="h-3 w-12" /></div>
+        </div>
+      ))}
     </div>
   );
 }
 
-/** The whole app while the data files and the page code load: header bar, series chips, two fixture cards, a props list. Both waits render this, so a refresh shows one skeleton, not two "Loading" messages. */
+export function HomePropsSkeleton() {
+  return (
+    <div data-skeleton="home-props" aria-hidden className="flex min-w-0 flex-col gap-stack">
+      <div className="flex gap-tight overflow-hidden">
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-control w-32 shrink-0 rounded-full" />)}
+      </div>
+      <RowsSkeleton rows={3} />
+    </div>
+  );
+}
+
+/** Content fallback inside the mounted shell. */
+export function PageSkeleton() {
+  return <div role="status" aria-label="Loading page"><RowsSkeleton rows={3} /></div>;
+}
+
+/** Cold start, before the application shell can mount. */
 export function AppSkeleton() {
   return (
-    <div role="status" aria-label="Loading" className="min-h-screen">
-      <div aria-hidden className="flex h-14 items-center gap-snug border-b border-border/60 px-gutter md:h-[60px]">
-        <Skeleton className="size-6 rounded-md" /><Skeleton className="h-5 w-24" />
-        <Skeleton className="mx-auto hidden h-control max-w-[560px] flex-1 rounded-full md:block" />
-        <Skeleton className="ml-auto size-control rounded-full md:ml-0" />
+    <div data-skeleton="app" role="status" aria-label="Loading" className="min-h-screen">
+      <div aria-hidden className="flex h-(--header-h) items-center gap-snug border-b border-hairline px-gutter">
+        <Skeleton className="size-control rounded-lg" /><Skeleton className="h-5 w-24" />
+        <Skeleton className="ml-auto size-control rounded-full" /><Skeleton className="size-control rounded-full" />
       </div>
       <div aria-hidden className="flex">
-        <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug md:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
-        <div className="mx-auto flex w-full min-w-0 max-w-[900px] flex-col gap-section px-gutter pb-section pt-stack">
-          <RailSkeleton />
-          <TapeSkeleton />
-          <div className="flex flex-col gap-stack"><Skeleton className="h-5 w-40" /><RowsSkeleton rows={6} /></div>
+        <div className="hidden w-64 shrink-0 flex-col gap-snug p-snug lg:flex">{[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-control rounded-xl" />)}</div>
+        <div className="mx-auto flex w-full min-w-0 max-w-(--content-max) flex-col px-gutter pb-section">
+          <div className="-mx-gutter flex h-12 items-center gap-stack border-b border-hairline px-gutter">
+            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-3 w-16" />)}
+            <Skeleton className="ml-auto h-3 w-5" />
+          </div>
+          <div className="flex flex-col gap-section pt-stack">
+            <RailSkeleton />
+            <section className="flex flex-col gap-stack"><h2 className="text-title font-emphasis tracking-tight">Props</h2><HomePropsSkeleton /></section>
+          </div>
         </div>
+      </div>
+      <div aria-hidden className="fixed inset-x-0 bottom-0 flex h-[calc(var(--tabbar-h)+env(safe-area-inset-bottom))] items-center justify-around border-t border-hairline bg-background lg:hidden">
+        {Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="size-5 rounded-md" />)}
       </div>
     </div>
   );
@@ -173,7 +203,7 @@ export function AppSkeleton() {
 /** Player page body: compact metrics, then the chart first (8) beside lines (4); this-match sits under the chart. */
 export function PlayerSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
+    <div data-skeleton="player" aria-hidden className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
       <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline lg:col-span-12">
         <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-6">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
         <Skeleton className="size-20 rounded-full" />
@@ -193,3 +223,52 @@ export function PlayerSkeleton() {
     </div>
   );
 }
+
+/** Ground / venue page: title, metric tiles, then a form list. */
+export function GroundSkeleton() {
+  return (
+    <div data-skeleton="ground" aria-hidden className="flex flex-col gap-stack">
+      <Skeleton className="h-6 w-56" />
+      <Skeleton className="h-3.5 w-40" />
+      <div className="grid grid-cols-2 gap-snug sm:grid-cols-4">
+        {[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-[72px] rounded-2xl" />)}
+      </div>
+      <ListSkeleton rows={4} />
+    </div>
+  );
+}
+
+/** Leagues / competition: chips, then metric tiles and a list. */
+export function LeagueSkeleton() {
+  return (
+    <div data-skeleton="league" aria-hidden className="flex flex-col gap-stack">
+      <div className="flex gap-snug overflow-hidden">
+        {[72, 96, 64, 88].map((w, i) => <Skeleton key={i} className="h-control shrink-0 rounded-full" style={{ width: w }} />)}
+      </div>
+      <div className="grid grid-cols-2 gap-snug sm:grid-cols-4">
+        {[0, 1, 2, 3].map((n) => <Skeleton key={n} className="h-16 rounded-2xl" />)}
+      </div>
+      <ListSkeleton rows={5} />
+    </div>
+  );
+}
+
+/** Named shapes used by the route catalogue and tests. */
+export type SkeletonShape =
+  | "home-props" | "rows" | "grid" | "list" | "match" | "scorecard" | "tape" | "fancy" | "rail" | "app" | "player" | "ground" | "league";
+
+export const SKELETON_BY_SHAPE: Record<SkeletonShape, () => ReactNode> = {
+  "home-props": () => <HomePropsSkeleton />,
+  rows: () => <RowsSkeleton />,
+  grid: () => <GridSkeleton />,
+  list: () => <ListSkeleton />,
+  match: () => <MatchHeaderSkeleton />,
+  scorecard: () => <ScorecardSkeleton />,
+  tape: () => <TapeSkeleton />,
+  fancy: () => <FancySkeleton />,
+  rail: () => <RailSkeleton />,
+  app: () => <AppSkeleton />,
+  player: () => <PlayerSkeleton />,
+  ground: () => <GroundSkeleton />,
+  league: () => <LeagueSkeleton />,
+};

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated from "react-native-reanimated";
 import { scopeTag } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { odds, shortVenue } from "@site/lib/format";
@@ -13,7 +12,6 @@ import { openPlayer } from "@/lib/nav";
 import { BookBadge } from "@/ui/book-badge";
 import { Collapsible, TurnChevron } from "@/ui/collapsible";
 import { MiniBars } from "@/ui/mini-bars";
-import { enter } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
 import { LiveBadge, LiveOpened, LineProgress } from "@/ui/live-bits";
@@ -71,16 +69,15 @@ function AllBooks({ quotes, line }: { quotes: Quote[]; line: number }) {
 }
 
 /** Same chrome as Match Fancy's OverviewRow: title, condensed line, books, model edge (site PropRow). */
-function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing | null; out: boolean }) {
+function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soFar: Standing | null; out: boolean; bars?: boolean }) {
   const label = (STATS as any)[r.stat]?.label;
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const [open, setOpen] = useState(false);
   const live = r.quotes.find((q: Quote) => q.live); // a line the books are pricing in play: the Live mark, "was", and the bar against it
   const ground = groundNote(r.ven) as { hits: number; played: number; tone: "good" | "bad" | "plain" } | null;
-  // Rise-in only for the first rows; Android keeps fewer to hold 60 fps (AGENTS.md).
-  const rise = i < (Platform.OS === "android" ? 4 : 8);
+  // No entering animation: FlashList recycles rows; layout animations on recycled cells hitch scroll (animate-expo).
   return (
-    <Animated.View entering={rise ? enter(i) : undefined}>
+    <View>
       <Press scale={1} onPress={() => openPlayer(r)} accessibilityRole="link" accessibilityLabel={`${r.name}, ${r.line} ${label}${r.over > 1 ? `, over ${odds(r.over)}` : ""}${r.under > 1 ? `, under ${odds(r.under)}` : ""}${r.edge != null ? `, model edge ${(r.edge * 100).toFixed(0)} percent on the ${r.side}` : ""}`} style={({ pressed }) => [styles.row, i > 0 && styles.sep, out && styles.out, pressed && styles.pressed]}>
         <View style={styles.top}>
           <PlayerAvatar pid={r.pid} team={r.team} test={r.fmt === "Test"} size={44} />
@@ -116,12 +113,12 @@ function PropRowView({ r, i, soFar, out }: { r: Row; i: number; soFar: Standing 
               </View>
               {r.edge != null ? <Text style={styles.edgeSide}>{r.edge > 0 ? (r.side === "under" ? "Under" : "Over") : "No edge"}</Text> : null}
             </View>
-            <MiniBars last={r.last} line={r.line} max={r.max} width={76} />
+            {bars ? <MiniBars last={r.last} line={r.line} max={r.max} width={76} /> : null}
           </View>
         </View>
         <Collapsible open={open}><AllBooks quotes={r.quotes} line={r.line} /></Collapsible>
       </Press>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -135,7 +132,7 @@ const styles = StyleSheet.create({
   pressed: { backgroundColor: color.card },
   main: { flex: 1, minWidth: 0, gap: 3 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  name: { ...type.body, fontSize: 15, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
+  name: { ...type.body, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   descRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: space.snug, rowGap: 2 },
   line: { ...numLg, fontSize: 22, letterSpacing: -0.4, lineHeight: 24, color: color.foreground },
@@ -164,4 +161,4 @@ const styles = StyleSheet.create({
 
 type PropRowProps = Parameters<typeof PropRowView>[0];
 /** Re-rendered only when its row, place, or the live standing on it changed: a live poll that moved some other match leaves it alone. */
-export const PropRow = memo(PropRowView, (a: PropRowProps, b: PropRowProps) => a.r === b.r && a.i === b.i && a.out === b.out && JSON.stringify(a.soFar) === JSON.stringify(b.soFar));
+export const PropRow = memo(PropRowView, (a: PropRowProps, b: PropRowProps) => a.r === b.r && a.i === b.i && a.out === b.out && a.bars === b.bars && JSON.stringify(a.soFar) === JSON.stringify(b.soFar));

@@ -21,9 +21,9 @@ const PIN_FIRST = ["big bash"];
 type Pick = { e: number; name: string; tag: "live" | "soon" | "" };
 
 /** The status on a league chip: solid, so it reads on the filled (selected) and the plain chip alike. */
-const Tag = ({ tag }: { tag: "live" | "soon" }) => <span className={cn("rounded-full px-1.5 text-caption font-bold uppercase leading-4", tag === "live" ? "bg-primary text-primary-foreground" : "bg-amber text-background")}>{tag === "live" ? "Live" : "Soon"}</span>;
+const Tag = ({ tag }: { tag: "live" | "soon" }) => <span className={cn("rounded-full px-1.5 text-caption font-emphasis uppercase leading-4", tag === "live" ? "bg-primary text-primary-foreground" : "bg-amber text-background")}>{tag === "live" ? "Live" : "Soon"}</span>;
 
-const more = "inline-flex shrink-0 items-center gap-hair text-callout font-medium text-muted-foreground transition-colors hover:text-foreground";
+const more = "inline-flex shrink-0 items-center gap-hair text-callout font-label text-muted-foreground transition-colors hover:text-foreground";
 
 /** Leagues: pick one (live ones and those about to start first, Big Bash on top), then its season's leaders, lists and trends. Any other league is on /competitions. */
 export function LeaguesPage() {
@@ -42,7 +42,7 @@ export function LeaguesPage() {
       <StatsAd />
       <section aria-label="Leagues" className="flex flex-col gap-snug">
         <header className="flex items-center justify-between gap-snug">
-          <h1 className="text-title font-bold tracking-tight">Leagues</h1>
+          <h1 className="text-title font-emphasis tracking-tight">Leagues</h1>
           <Link to="/competitions" className={more}>All competitions<ArrowRightIcon className="size-3.5" aria-hidden /></Link>
         </header>
         <PillGroup layoutId="leagues-pick" label="League" value={String(e)} onChange={(v) => { track("leagues_pick", { league: store.events[Number(v)] ?? "" }); setQ({ c: v, season: "" }); }}
@@ -50,7 +50,7 @@ export function LeaguesPage() {
       </section>
       <section className="flex flex-col gap-stack">
         <header className="flex items-center justify-between gap-snug">
-          <h2 className="flex min-w-0 items-center gap-snug text-title font-bold"><LeagueBadge name={store.events[e]} size="md" /><span className="truncate">{store.events[e]}</span></h2>
+          <h2 className="flex min-w-0 items-center gap-snug text-title font-emphasis"><LeagueBadge name={store.events[e]} size="md" /><span className="truncate">{store.events[e]}</span></h2>
           <Link to={`/league/${e}`} className={more}>More<ArrowRightIcon className="size-3.5" aria-hidden /></Link>
         </header>
         <TournamentStats eventIdx={e} season={q.season} onSeason={(k) => setQ({ season: k })} />

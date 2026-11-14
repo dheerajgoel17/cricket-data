@@ -5,6 +5,7 @@ import { useLocalSearchParams } from "expo-router";
 import { shortDate } from "@site/lib/format";
 import { INFO } from "@/lib/info";
 import { goBack } from "@/lib/nav";
+import { EmptyState } from "@/ui/empty-state";
 import { color, space, type } from "@/ui/tokens";
 
 type Params = { topic: string; n?: string; d?: string; o?: string; v?: string; x?: string; l?: string; a?: string; p?: string };
@@ -34,7 +35,7 @@ export default function InfoSheet() {
             <Text style={styles.term}>{term}</Text>
             <Text style={styles.text}>{text}</Text>
           </View>
-        )) : <Text style={styles.text}>Nothing to show here.</Text>}
+        )) : <EmptyState compact title="Nothing to show" body="This topic has no info text." />}
       </ScrollView>
     </View>
   );

@@ -1,4 +1,5 @@
 import tokens from "./tokens.json" with { type: "json" };
+export { remPx } from "./rem.js";
 
 /** The design tokens as plain data (same file the web CSS is generated from): colours, sizes, type scale, spacing, chart colours, elevation, breakpoints. */
 export default tokens;

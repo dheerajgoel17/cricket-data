@@ -32,7 +32,7 @@ const SIZES = { xs: "size-5 text-[8px]", sm: "size-6 text-[9px]", md: "size-9 te
 export type BadgeSize = keyof typeof SIZES;
 
 const Circle = ({ size, className, children, title }: { size: BadgeSize; className?: string; children: React.ReactNode; title?: string }) => (
-  <span data-slot="avatar" title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-bold text-muted-foreground", SIZES[size], className)}>{children}</span>
+  <span data-slot="avatar" title={title} className={cn("relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full border bg-secondary font-emphasis text-muted-foreground", SIZES[size], className)}>{children}</span>
 );
 
 /**
@@ -46,7 +46,7 @@ export function TeamBadge({ name, size = "sm", className, eager, bare }: { name:
   if (bare) {
     return (
       <span title={name} className={cn("relative inline-grid shrink-0 place-items-center", SIZES[size], className)}>
-        <Img eager={eager} urls={urls} alt={name} className="size-full object-contain" fallback={<span className="text-[length:inherit] font-bold text-muted-foreground">{initials(name)}</span>} />
+        <Img eager={eager} urls={urls} alt={name} className="size-full object-contain" fallback={<span className="text-[length:inherit] font-emphasis text-muted-foreground">{initials(name)}</span>} />
       </span>
     );
   }
@@ -64,7 +64,7 @@ export function TeamAvatar({ name, size = "sm", eager }: { name: string; size?: 
   return (
     <Avatar size={AVATAR_SIZE[size]} title={name} className={cn("bg-secondary", size === "xs" && "size-5")}>
       {url ? <AvatarImage src={url} alt={name} loading={eager ? "eager" : "lazy"} className="size-full object-contain p-0.5" onError={() => setI((n) => n + 1)} /> : null}
-      <AvatarFallback className="bg-secondary text-[8px] font-bold">{initials(name)}</AvatarFallback>
+      <AvatarFallback className="bg-secondary text-[8px] font-emphasis">{initials(name)}</AvatarFallback>
     </Avatar>
   );
 }
@@ -85,7 +85,7 @@ export function TeamFlag({ name, className }: { name: string; className?: string
   const flag = flagUrl(name, 80);
   const urls = [flag, ...teamLogos(photos, name)].filter(Boolean) as string[];
   return (
-    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-transparent text-[8px] font-bold text-muted-foreground", className)}>
+    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-transparent text-[8px] font-emphasis text-muted-foreground", className)}>
       <Img eager urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} />
     </span>
   );

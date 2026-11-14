@@ -58,7 +58,7 @@ export function AdminAdsPage() {
   if (!user) {
     return (
       <div className="flex flex-col gap-group">
-        <h1 className="text-title font-bold tracking-tight">Ads admin</h1>
+        <h1 className="text-title font-emphasis tracking-tight">Ads admin</h1>
         <EmptyState title="Sign in required" body="Sign in with an ads admin account to manage manual creatives." />
         <Button type="button" disabled={loading} className="h-control w-fit rounded-full" onClick={openSignIn}>Sign in</Button>
       </div>
@@ -68,7 +68,7 @@ export function AdminAdsPage() {
   if (!adminQ.data) {
     return (
       <div className="flex flex-col gap-group">
-        <h1 className="text-title font-bold tracking-tight">Ads admin</h1>
+        <h1 className="text-title font-emphasis tracking-tight">Ads admin</h1>
         <EmptyState title="Not an ads admin" body="Ask an existing admin to add your account email, or bootstrap the first row in Supabase (see OPERATIONS)." />
         <Button asChild variant="secondary" className="w-fit rounded-full"><Link to="/">Home</Link></Button>
       </div>
@@ -79,7 +79,7 @@ export function AdminAdsPage() {
     <div className="flex flex-col gap-section">
       <header className="flex flex-wrap items-end justify-between gap-snug">
         <div>
-          <h1 className="text-title font-bold tracking-tight">Ads admin</h1>
+          <h1 className="text-title font-emphasis tracking-tight">Ads admin</h1>
           <p className="text-footnote text-muted-foreground">Manual creatives override AdSense. Empty slots stay hidden.</p>
         </div>
         <div className="flex gap-tight">
@@ -168,7 +168,7 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
   return (
     <div className="flex flex-col gap-section">
       <section className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
-        <h2 className="text-body font-medium">New placement</h2>
+        <h2 className="text-body font-emphasis">New placement</h2>
         <label className="grid gap-hair text-callout">
           Slot
           <select className="h-control rounded-lg border border-input bg-background px-snug" value={slotId} onChange={(e) => setSlotId(e.target.value as AdSlotId)}>
@@ -185,14 +185,14 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
       </section>
 
       <section className="flex flex-col gap-snug">
-        <h2 className="text-body font-medium">All placements {loading ? "…" : `(${rows.length})`}</h2>
-        {!rows.length && !loading ? <p className="text-callout text-muted-foreground">None yet.</p> : (
+        <h2 className="text-body font-emphasis">All placements {loading ? "…" : `(${rows.length})`}</h2>
+        {!rows.length && !loading ? <EmptyState compact title="None yet" body="Save a placement to list it here." /> : (
           <ul className="divide-y divide-hairline overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
             {rows.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center gap-snug px-inset py-snug">
                 <img src={creativePublicUrl(r.image_path)} alt="" className="h-12 w-24 object-contain bg-muted" />
                 <div className="min-w-0 flex-1 grid gap-hair">
-                  <span className="truncate text-body font-medium">{r.name}</span>
+                  <span className="truncate text-body font-label">{r.name}</span>
                   <span className="truncate text-footnote text-muted-foreground">{r.slot_id} · prio {r.priority} · {r.enabled ? "on" : "off"}</span>
                   <a href={r.href} className="truncate text-footnote text-primary" target="_blank" rel="noreferrer">{r.href}</a>
                 </div>
@@ -240,7 +240,7 @@ function AdminsPanel({ rows, loading, selfId, onChange }: { rows: { user_id: str
   return (
     <div className="flex flex-col gap-section">
       <section className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
-        <h2 className="text-body font-medium">Add admin</h2>
+        <h2 className="text-body font-emphasis">Add admin</h2>
         <p className="text-footnote text-muted-foreground">They must already have signed up (email/password or Google). Passwords stay in Supabase Auth.</p>
         <Input type="email" placeholder="email@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         <Button type="button" disabled={busy || !email.includes("@")} className="w-fit rounded-full" onClick={() => void add()}>{busy ? "Adding…" : "Add"}</Button>

@@ -8,6 +8,7 @@ import { pc } from "@site/lib/format";
 import { storeQuery } from "@/lib/data";
 import { leagueData } from "@/lib/league";
 import { DataTable } from "@/ui/data-table";
+import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
@@ -34,7 +35,7 @@ export default function League() {
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <PageHeader title={name} subtitle={data ? `${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}` : undefined} />
-      {!store ? <Working label="Loading…" fill /> : !valid || !data ? <Text style={styles.empty}>Unknown competition.</Text> : (
+      {!store ? <Working label="Loading…" fill shape="league" /> : !valid || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
             <LeagueBadge name={name} size={56} />
@@ -47,12 +48,12 @@ export default function League() {
           {tab === "stats" ? <TournamentStats eventIdx={e} season={season} onSeason={setSeason} /> : null}
           {tab === "markets" ? (
             <View style={{ gap: space.snug }}>
-              <DataTable columns={["Market", "Median", "Mean", "Matches"]} flex={[2, 1, 1, 1]} rows={data.markets.map((m) => [m.label, m.median, m.mean, String(m.n)])} />
+              <DataTable bleed columns={["Market", "Median", "Mean", "Matches"]} flex={[2, 1, 1, 1]} rows={data.markets.map((m) => [m.label, m.median, m.mean, String(m.n)])} />
               <Text style={styles.note}>{data.fmtName} matches that count for summary markets (void games excluded).</Text>
             </View>
           ) : null}
           {tab === "teams" ? (
-            <DataTable columns={["Team", "P", "W", "L", "Win %"]} flex={[2.4, 0.7, 0.7, 0.7, 1]}
+            <DataTable bleed columns={["Team", "P", "W", "L", "Win %"]} flex={[2.4, 0.7, 0.7, 0.7, 1]}
               rows={data.teams.map(([t, r]) => [store.teamName(t), String(r.n), String(r.w), String(r.l), pc(r.n ? r.w / r.n : null)])} />
           ) : null}
           {tab === "results" ? (

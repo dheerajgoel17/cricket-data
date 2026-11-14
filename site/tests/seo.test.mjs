@@ -19,6 +19,8 @@ test("titles carry the brand once, and a page that names itself gets a descripti
   assert.equal(pageMeta("/terms-of-use").noindex, true);
   assert.equal(pageMeta("/docs").noindex, true);
   assert.equal(pageMeta("/privacy").noindex, true);
+  assert.equal(pageMeta("/design-system").noindex, true);
+  assert.equal(pageMeta("/design-system", "x").description, UNLISTED["design-system"].description);
   assert.equal(pageMeta("/saved", "Saved").noindex, true);
 });
 

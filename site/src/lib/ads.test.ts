@@ -16,7 +16,7 @@ describe("adsAllowed / slotForPath", () => {
     }
   });
   it("keeps home, fixture overview and tools off the catalogue", () => {
-    for (const p of ["/", "/fancy", "/fixture/2026-11-08-a-v-b", "/trends", "/odds", "/tools", "/pair", "/saved", "/privacy-policy", "/admin/ads"]) {
+    for (const p of ["/", "/fancy", "/fixture/2026-11-08-a-v-b", "/trends", "/odds", "/tools", "/pair", "/saved", "/privacy-policy", "/admin/ads", "/design-system"]) {
       expect(slotForPath(p)).toBeNull();
       expect(adsAllowed(p)).toBe(false);
     }

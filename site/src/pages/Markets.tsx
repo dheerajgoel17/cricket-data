@@ -20,7 +20,8 @@ import { PillTabs } from "@/components/app/pill-tabs";
 import { GridTable } from "@/components/app/grid";
 import { LeagueBadge, TeamBadge } from "@/components/app/badges";
 import { StarButton } from "@/components/app/star";
-import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
@@ -29,7 +30,6 @@ import { TournamentStats } from "@/components/app/tournament-stats";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
 
-// ------------------------------------------------------------------ competitions
 export function CompetitionsPage() {
   setTitle("Cricket competitions");
   const { store } = useData();
@@ -39,12 +39,21 @@ export function CompetitionsPage() {
   const t = text.trim().toLowerCase();
   const rows = all.filter(([e]) => !t || store.events[e].toLowerCase().includes(t)).slice(0, 80);
   return (
-    <div>
+    <div className="flex flex-col gap-stack">
       <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
-      <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} className="mb-3" />
-      <Panel flat>{rows.map(([e, c]) => <Link key={e} to={`/league/${e}`} className="flex items-center gap-3.5 border-b px-4 py-3 last:border-b-0 hover:bg-accent"><LeagueBadge name={store.events[e]} size="md" /><span className="flex-1 font-medium">{store.events[e]}</span><span className="text-[13px] text-muted-foreground">{c} matches</span><ArrowRightIcon className="size-4 text-muted-foreground" /></Link>)}</Panel>
+      <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} />
+      <Panel flat>
+        {rows.map(([e, c]) => (
+          <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug last:border-b-0 hover:bg-accent">
+            <LeagueBadge name={store.events[e]} size="md" />
+            <span className="flex-1 text-body font-label">{store.events[e]}</span>
+            <span className="text-callout text-muted-foreground">{c} matches</span>
+            <ArrowRightIcon className="size-4 text-muted-foreground" />
+          </Link>
+        ))}
+      </Panel>
     </div>
   );
 }
@@ -70,25 +79,24 @@ export function LeaguePage() {
     return { ms, fmtName, seasons, tt, teams, mk, recent };
   }, [store, e, valid]);
   setTitle(valid ? `${store.events[e]}: stats, top run-scorers, wicket-takers and totals` : "Competition stats");
-  if (!valid || !data) return <EmptyNote>Unknown competition.</EmptyNote>;
+  if (!valid || !data) return <EmptyState title="Unknown competition" body="That league is not in the data." />;
   const tab = ["stats", "overview", "teams", "results"].includes(q.tab) ? q.tab : "stats";
   const name = store.events[e];
   return (
-    <div>
+    <div className="flex flex-col gap-stack">
       <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions", "/competitions"], [name]]} />
       <EntityHero badge={<LeagueBadge name={name} size="xl" />} name={name} sub={`${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}`} meta={[data.fmtName, `${data.tt.size} teams`]} />
       <PillTabs layoutId="lg-tab" scrollable tabs={[["stats", "Stats"], ["overview", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
         <TabsContent value="stats"><TournamentStats eventIdx={e} season={q.season} onSeason={(k) => setQ({ season: k })} /></TabsContent>
-        <TabsContent value="overview"><Panel flat><DataTable columns={["Market", "Median", "Mean", "Matches"]} rows={data.mk} /></Panel><Muted className="mt-2">{data.fmtName} matches that count for summary markets (void games excluded).</Muted></TabsContent>
-        <TabsContent value="teams"><Panel flat><DataTable columns={["Team", "Played", "Won", "Lost", "Win %"]} rows={data.teams.map(([t, r]: any) => [<Link key={t} className="text-primary" to={`/team/${t}?fmt=${data.fmtName}`}>{store.teamName(t)}</Link>, r.n, r.w, r.l, pc(r.n ? r.w / r.n : null)])} /></Panel></TabsContent>
-        <TabsContent value="results"><Panel flat><DataTable columns={["Date", "Match", "Venue", "Innings runs", "Winner"]} rows={data.recent} /></Panel></TabsContent>
+        <TabsContent value="overview" className="flex flex-col gap-snug"><DataTable bleed columns={["Market", "Median", "Mean", "Matches"]} rows={data.mk} /><Muted>{data.fmtName} matches that count for summary markets (void games excluded).</Muted></TabsContent>
+        <TabsContent value="teams"><DataTable bleed columns={["Team", "Played", "Won", "Lost", "Win %"]} rows={data.teams.map(([t, r]: any) => [<Link key={t} className="text-primary" to={`/team/${t}?fmt=${data.fmtName}`}>{store.teamName(t)}</Link>, r.n, r.w, r.l, pc(r.n ? r.w / r.n : null)])} /></TabsContent>
+        <TabsContent value="results"><DataTable bleed columns={["Date", "Match", "Venue", "Innings runs", "Winner"]} rows={data.recent} /></TabsContent>
       </PillTabs>
     </div>
   );
 }
 
-// ------------------------------------------------------------------ team / venue market pages
 export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const { store } = useData();
   const { id } = useParams();
@@ -119,9 +127,11 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
     return list.find((f) => venueIndices(store, f.venue).includes(idx) && soon(f)) || null;
   }, [fixtures, isTeam, idx, store]);
   setTitle(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length) ? (isTeam ? `${store.teamName(idx)}: stats and player grid` : `${store.venues[idx]}: ground stats`) : isTeam ? "Team stats and player grid" : "Ground stats");
-  if (!(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length))) return <EmptyNote>Unknown {kind}.</EmptyNote>;
+  if (!(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length))) {
+    return <EmptyState title={`Unknown ${kind}`} body={`That ${kind} is not in the data.`} />;
+  }
   const form = (
-    <LiveForm onValues={(v) => setQ({ ...v })} className="mb-3">
+    <LiveForm onValues={(v) => setQ({ ...v })}>
       <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmt} /></Field>
       {isTeam && <Field label="Opposition"><Input name="opp" list="dl-teams" defaultValue={q.opp} className="w-40" /></Field>}
       {isTeam && <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={q.vt} /></Field>}
@@ -133,22 +143,28 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
     </LiveForm>);
   const tabs: [string, string][] = isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]];
   return (
-    <div>
+    <div className="flex flex-col gap-stack">
       <StatsAd />
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : (ground ? `${ground.total} matches` : "Ground")}
         meta={isTeam ? [`${fmtName} markets`, "team markets use the side batting first"] : [fmtName, ...(ground?.by || [])]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
-      {nextFx ? <div className="my-3"><NextMatch f={nextFx} /></div> : null}
+      {nextFx ? <NextMatch f={nextFx} /> : null}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
-        {isTeam && <TabsContent value="grid">
-          <LiveForm onValues={(v) => setQ({ gstat: v.gstat, gline: v.gline })} className="mb-3"><Field label="Stat"><NativeSelect name="gstat" options={Object.entries(STATS).map(([k, v]: any) => [k, v.label])} defaultValue={gstat} /></Field><Field label="Line"><Input name="gline" type="number" step="0.5" defaultValue={gline} className="w-24" /></Field></LiveForm>
-          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted className="mt-2">{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Muted></> : <ListSkeleton rows={4} />}
+        {isTeam && <TabsContent value="grid" className="flex flex-col gap-stack">
+          <LiveForm onValues={(v) => setQ({ gstat: v.gstat, gline: v.gline })}><Field label="Stat"><NativeSelect name="gstat" options={Object.entries(STATS).map(([k, v]: any) => [k, v.label])} defaultValue={gstat} /></Field><Field label="Line"><Input name="gline" type="number" step="0.5" defaultValue={gline} className="w-24" /></Field></LiveForm>
+          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted>{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Muted></> : <ListSkeleton rows={4} />}
         </TabsContent>}
-        <TabsContent value="markets">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
-        <TabsContent value="top"><h2 className="mb-2 text-xl font-medium">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>{top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}</TabsContent>
+        <TabsContent value="markets" className="flex flex-col gap-stack">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
+        <TabsContent value="top" className="flex flex-col gap-stack">
+          <h2 className="text-title font-emphasis">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
+          {top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}
+        </TabsContent>
       </PillTabs>
-      <Card className="mt-4 gap-1 px-4 py-4 shadow-none"><h3 className="text-lg font-medium">About {label}</h3><Muted>{isTeam ? `${label} ${fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.` : `${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted></Card>
+      <Card className="gap-hair px-inset py-stack shadow-none">
+        <h3 className="text-title font-label">About {label}</h3>
+        <Muted>{isTeam ? `${label} ${fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.` : `${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted>
+      </Card>
       <Link to="/teams" className="sr-only">Teams</Link>
     </div>
   );

@@ -47,5 +47,5 @@ const styles = StyleSheet.create({
   thumb: { position: "absolute", top: 2, bottom: 2, left: 2, borderRadius: 999, backgroundColor: "#58585c", shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
   hit: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   text: { ...type.callout, fontFamily: font.regular, color: color.foreground },
-  textOn: { fontFamily: font.semibold },
+  textOn: { fontFamily: font.medium },
 });

@@ -22,13 +22,13 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
   const colStyle = wide ? { flex: "0 0 30px" } : { flex: "1 1 0" };
   return (
     <figure className="m-0" aria-label={label || "Form chart"}>
-      <div className="grid grid-cols-[28px_minmax(0,1fr)] gap-1 font-condensed">
-        <div className="flex flex-col justify-between text-right text-sm leading-none text-foreground" style={{ height }}>{ticks.slice().reverse().map((t) => <span key={t}>{t}</span>)}</div>
+      <div className="grid grid-cols-[28px_minmax(0,1fr)] gap-hair font-condensed">
+        <div className="flex flex-col justify-between text-right text-callout leading-none text-foreground" style={{ height }}>{ticks.slice().reverse().map((t) => <span key={t}>{t}</span>)}</div>
         <div ref={scroller} className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="w-max min-w-full">
             <div className="relative" style={{ height }}>
-              <div className="absolute inset-x-0 z-[2] border-t border-dashed border-white/80" style={{ bottom: `${(Math.min(line, top) / top) * 100}%` }}><span className="sticky left-0 inline-block -translate-y-[110%] rounded-sm bg-background/80 px-tight text-base tabular-nums">{line}</span></div>
-              <div className="absolute inset-0 flex items-end gap-1">
+              <div className="absolute inset-x-0 z-[2] border-t border-dashed border-foreground/35" style={{ bottom: `${(Math.min(line, top) / top) * 100}%` }}><span className="sticky left-0 inline-block -translate-y-[110%] rounded-sm bg-background/80 px-tight text-body tabular-nums">{line}</span></div>
+              <div className="absolute inset-0 flex items-end gap-hair">
                 {entries.map((e, i) => {
                   const s = barState(e, line, side) as string;
                   const tip = `${e.date} v ${e.opp}${e.venueName ? ` · ${e.venueName}` : ""}${e.value == null ? ({ void: " · in the XI, did not bat/bowl: bet void", na: " · XI not recorded", dnp: " · not in the XI" } as any)[s] : ` · ${e.value}`}`;
@@ -37,14 +37,14 @@ export function ChartBars({ entries, line, side, label, onSelect, height = 340, 
                     <button key={`${animateKey}-${i}`} type="button" title={tip} aria-label={tip} onClick={() => onSelect?.(e, s)} style={colStyle} className="flex h-full min-w-0 cursor-pointer items-end border-0 bg-transparent p-0 hover:brightness-110">
                       {e.value == null
                         ? <div className="h-5 w-full self-end bg-dnp" />
-                        : <motion.div initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.45, delay: Math.min(i * 0.012, 0.4), ease: [0.22, 1, 0.36, 1] }} style={{ height: `${pct}%`, transformOrigin: "bottom" }}
-                            className={cn("flex w-full items-end justify-center pb-1 text-[13px] font-medium", s === "miss" ? "bg-miss text-white" : s === "push" ? "bg-amber text-background" : "bg-hit text-background")}>{e.value}</motion.div>}
+                        : <motion.div initial={{ scaleY: 0.05, opacity: 0 }} animate={{ scaleY: 1, opacity: 1 }} transition={{ duration: 0.3, delay: Math.min(i * 0.012, 0.4), ease: [0.23, 1, 0.32, 1] }} style={{ height: `${pct}%`, transformOrigin: "bottom" }}
+                            className={cn("flex w-full items-end justify-center pb-hair text-callout font-label", s === "miss" ? "bg-miss text-white" : s === "push" ? "bg-amber text-background" : "bg-hit text-background")}>{e.value}</motion.div>}
                     </button>
                   );
                 })}
               </div>
             </div>
-            <div className="flex gap-1 pt-1.5">{entries.map((e, i) => <div key={i} style={colStyle} className="grid min-w-0 justify-items-center text-[10.5px] leading-snug text-muted-foreground"><span className="whitespace-nowrap">{shortDate(e.date)}</span><span>{abbr(e.opp)}</span></div>)}</div>
+            <div className="flex gap-hair pt-tight">{entries.map((e, i) => <div key={i} style={colStyle} className="grid min-w-0 justify-items-center text-caption leading-snug text-muted-foreground"><span className="whitespace-nowrap">{shortDate(e.date)}</span><span>{abbr(e.opp)}</span></div>)}</div>
           </div>
         </div>
       </div>

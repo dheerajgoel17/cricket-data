@@ -43,7 +43,7 @@ function Saved() {
   );
 
   const body = () => {
-    if (loading) return <Working label="Loading…" fill />;
+    if (loading) return <Working label="Loading…" fill shape="list" />;
     if (!user) {
       return (
         <View style={styles.gate}>
@@ -54,7 +54,7 @@ function Saved() {
         </View>
       );
     }
-    if (!store) return <Working label="Loading…" fill />;
+    if (!store) return <Working label="Loading…" fill shape="list" />;
     const players = store.P.id.length;
     const props = list.map((k) => ({ k, p: parsePropKey(k) })).filter((x): x is { k: string; p: NonNullable<ReturnType<typeof parsePropKey>> } => !!x.p && x.p.idx >= 0 && x.p.idx < players);
     const people = list.filter((k) => k.startsWith("player:") || k.startsWith("team:")).map((k) => ({ k, kind: k.split(":")[0], i: Number(k.split(":")[1]) }))
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   remove: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
   signBtn: { alignSelf: "center", height: 44, minWidth: 160, paddingHorizontal: space.group, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  signLabel: { ...type.body, fontFamily: font.semibold, color: color["primary-foreground"] },
+  signLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
   account: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });
 

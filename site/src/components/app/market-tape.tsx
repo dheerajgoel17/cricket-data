@@ -60,16 +60,16 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
             <PillGroup segmented layoutId={`tape-${id}`} label="Market tape" value={kind} onChange={(v) => setTab(v as "hit" | "miss")} items={tabs} />
           ) : (
             <div className="flex items-start justify-between gap-snug">
-              <h2 className="flex min-w-0 items-center gap-snug text-title font-bold tracking-tight">
+              <h2 className="flex min-w-0 items-center gap-snug text-title font-emphasis tracking-tight">
                 <ArrowTrendingUpIcon className="size-5 stroke-[2.5]" aria-hidden />
                 High odds hits
               </h2>
-              <span className="label-cap shrink-0 rounded-md border border-primary-foreground/35 px-snug py-hair text-caption font-bold text-primary-foreground">
+              <span className="label-cap shrink-0 rounded-md border border-primary-foreground/35 px-snug py-hair text-caption font-emphasis text-primary-foreground">
                 {list.length} cleared
               </span>
             </div>
           )}
-          <p className="text-footnote font-medium text-primary-foreground/70">
+          <p className="text-footnote font-label text-primary-foreground/70">
             Over at {fmtPrice(HIGH_ODDS)} or longer that has already cleared.
           </p>
         </header>
@@ -87,8 +87,8 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
                 <span className="flex min-w-0 items-center gap-snug">
                   <PlayerBadge idx={r.idx} size="sm" className="size-control ring-1 ring-primary-foreground/20" />
                   <span className="grid min-w-0 gap-hair">
-                    <span className="truncate text-body font-bold tracking-tight">{r.name}</span>
-                    <span className="truncate text-footnote font-medium text-primary-foreground/65">
+                    <span className="truncate text-body font-emphasis tracking-tight">{r.name}</span>
+                    <span className="truncate text-footnote font-label text-primary-foreground/65">
                       O {r.line} {(STATS as Record<string, { label: string }>)[r.stat]?.label}
                     </span>
                   </span>
@@ -114,7 +114,7 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
       ) : (
         <div className="flex items-center gap-tight">
           <ArrowTrendingDownIcon className="size-4 text-miss" aria-hidden />
-          <h2 className="text-body font-medium">Low odds misses</h2>
+          <h2 className="text-body font-emphasis">Low odds misses</h2>
         </div>
       )}
       <p className="text-footnote text-muted-foreground">
@@ -130,14 +130,14 @@ export function MarketTape({ rows, quiet }: { rows: TapeRow[]; quiet?: boolean }
             >
               <PlayerBadge idx={r.idx} size="sm" className="size-control" />
               <span className="grid min-w-0 flex-1 gap-hair">
-                <span className="truncate text-callout font-medium">{r.name}</span>
+                <span className="truncate text-callout font-label">{r.name}</span>
                 <span className="truncate text-footnote text-muted-foreground">
                   O {r.line} {(STATS as Record<string, { label: string }>)[r.stat]?.label}
                 </span>
               </span>
               <span className="grid justify-items-end gap-hair text-right">
-                <Tick quiet={quiet} value={r.over} className="text-callout font-medium tabular-nums text-miss">{fmtPrice(r.over)}</Tick>
-                <span className="text-footnote font-medium text-miss">Missed{r.v != null ? ` · ${r.v}` : ""}</span>
+                <Tick quiet={quiet} value={r.over} className="text-callout font-label tabular-nums text-miss">{fmtPrice(r.over)}</Tick>
+                <span className="text-footnote font-label text-miss">Missed{r.v != null ? ` · ${r.v}` : ""}</span>
               </span>
             </Link>
           </li>

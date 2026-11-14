@@ -1,48 +1,89 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { sideEdge } from "@cricket/engine/stats.js";
-import { lineNotIn, lineStanding, liveForFixture } from "@cricket/engine/live.js";
-import { hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
+import { LIVE_TTL_MS, lineNotIn, lineStanding, liveForFixture } from "@cricket/engine/live.js";
+import { isLiveLine, liveThresholdKey, patchHotQuotes, prematchLines } from "@cricket/engine/hot-rows.js";
+import { hotLines, hotOrder, otherHotCount, type HotScope } from "@site/lib/hot-lines";
 import { lineHomePhase, type HomePhase } from "@site/lib/home-phase";
 import { timed } from "@/lib/perf";
 import { storeQuery } from "@/lib/data";
+import { FEED_GC_MS, fixturesQuery, hotRowsQuery, liveQuery } from "@/lib/queries";
 import { hotSnapKey, readHotSnap, writeHotSnap } from "@/lib/hot-cache";
 import { scoreHotRows, type Row } from "@/lib/hot";
 import { sideRate, withModelSide } from "@/lib/model-side";
-import { fixturesQuery, hotRowsQuery, liveQuery } from "@/lib/queries";
 import { useLinesLive } from "@/lib/use-lines-live";
 
-/** The scored rows (see `scoreHotRows`) for a day (`{ day }`) or one match (`{ teams }`), put in the cache as they come. `scoring` is true while more are still arriving. */
+/**
+ * Scored hot rows for a day or one match.
+ *
+ * History scoring is keyed by the books file generation only — not `live_sig` — so a 15 s
+ * in-play poll does not rebuild the list. New live-priced lines are scored in a small
+ * follow-up query; quote moves are patched onto existing rows (`patchHotQuotes`).
+ */
 export function useHotRows(scope?: HotScope, doc?: any) {
   const stats = useQuery(storeQuery), linesQ = useLinesLive(), fixtures = useQuery(fixturesQuery), seedQ = useQuery(hotRowsQuery);
-  const seed = seedQ.data?.rows ?? null; // the published history of the lines (null: score on the phone)
-  const lines = { data: doc ?? linesQ.data }; // `doc`: the book doc with an archived match added, for that match's own page
+  const seed = seedQ.data?.rows ?? null;
+  const lines = { data: doc ?? linesQ.data };
   const qc = useQueryClient();
   const what = !scope ? "none" : "day" in scope ? scope.day : scope.teams.join("|");
   const stamp = new Date().toDateString();
-  const key = ["hot-rows", what, stamp, lines.data?.generated_at_utc, lines.data?.live_sig ?? "", doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
-  // a day's rows kept from the last launch (not for one match's own page, which adds an archived match to the lines)
+  const generated = lines.data?.generated_at_utc ?? "";
+  const liveLines = useMemo(() => !scope || doc ? [] : hotLines((lines.data?.lines || []).filter(isLiveLine), scope, Date.now()), [scope, doc, lines.data]);
+  const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
+  // books generation only — live ticks must not invalidate this cache
+  const baseKey = ["hot-rows-prematch", what, stamp, generated, doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
   const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
   const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
-  const generated = `${lines.data?.generated_at_utc ?? ""}|${lines.data?.live_sig ?? ""}`; // the live lines count: a kept row of the same book file but other live lines is not the answer
-  const rows = useQuery({
-    queryKey: key,
+
+  const base = useQuery({
+    queryKey: baseKey,
     enabled: !!scope && !!lines.data && fixtures.isSuccess && seedQ.isFetched && (!!stats.data || !!snap || !!seed),
     staleTime: 10 * 60_000,
-    placeholderData: (prev: Row[] | undefined) => prev ?? snap?.rows, // the last launch's rows until the first pass of this one is in
+    gcTime: FEED_GC_MS,
+    placeholderData: (prev: Row[] | undefined) => prev ?? snap?.rows,
     queryFn: async () => {
-      if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows; // the same books file: those rows are the answer
-      // the published history covers most lines: those are rows at once, and the player files are only asked for (`loadStore`) by a line it does not cover
-      const out = await scoreHotRows({ store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery), lines: lines.data.lines || [], fixtures: fixtures.data!, scope: scope!, seed, onRows: (r) => qc.setQueryData(key, r) });
+      if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows;
+      const out = await scoreHotRows({
+        store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
+        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed,
+        onRows: (r) => qc.setQueryData(baseKey, r),
+      });
       if (snapKey) writeHotSnap(snapKey, generated, out);
       return out;
     },
   });
+
+  const liveExtra = useQuery({
+    queryKey: ["hot-rows-live", what, stamp, generated, liveKey],
+    enabled: !!scope && liveLines.length > 0 && fixtures.isSuccess,
+    staleTime: LIVE_TTL_MS,
+    gcTime: 5 * 60_000,
+    queryFn: async () => {
+      return scoreHotRows({
+        store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
+        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null,
+      });
+    },
+  });
+
+  const data = useMemo(() => {
+    return patchHotQuotes([...(base.data || []), ...(liveExtra.data || [])], lines.data?.lines || []) as Row[];
+  }, [base.data, liveExtra.data, lines.data]);
+
   const day = scope && "day" in scope ? scope.day : -1;
-  const otherDay = useMemo(() => (day >= 0 ? otherHotCount(lines.data?.lines || [], day) : 0), [lines.data, day]); // other days' lines, only counted
-  // the store and the book file are idle until they are in: treat that as loading too, so an empty message never flashes
-  return { ...rows, isLoading: !!scope && (rows.isLoading || (!rows.data && !rows.isError)), scoring: rows.isFetching, otherDay };
+  const otherDay = useMemo(() => (day >= 0 ? otherHotCount(lines.data?.lines || [], day) : 0), [lines.data, day]);
+  const scoring = (base.isFetching && !base.isPlaceholderData) || (liveExtra.isFetching && !liveExtra.isPlaceholderData);
+  const isLoading = !!scope && !data.length && (base.isLoading || liveExtra.isLoading || (base.isPending && !stats.isError && !linesQ.isError && !fixtures.isError));
+  return {
+    data: data as Row[] | undefined,
+    isLoading,
+    isFetching: base.isFetching || liveExtra.isFetching,
+    isError: base.isError || liveExtra.isError || (!base.data && (stats.isError || linesQ.isError || fixtures.isError)),
+    isSuccess: !!data?.length || base.isSuccess,
+    scoring,
+    otherDay,
+    status: base.status,
+  };
 }
 
 /** The rows ready to show: edge worked out, the live feed's word on each, and where a line stands so far. Ordered: matches in play, higher hit rate, higher edge. */
@@ -56,10 +97,10 @@ export function useHotView(scope?: HotScope, phase?: HomePhase, doc?: any) {
   const outOf = (r: Row) => lineNotIn(matchOf(r), asLine(r), identity);
   const day = scope && "day" in scope ? scope.day : -1;
   const rows = useMemo(
-    () => timed(`hotView rows day=${day}`, () => (hot.data || [])
-      .map((r) => withModelSide(r))
-      .filter((r) => (day < 0 || r.day === day) && (!phase || lineHomePhase(r, live.data) === phase))
-      .sort((x, y) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y), edge: y.edge }))),
+    () => timed(`hotView rows day=${day}`, () => (hot.data || [] as Row[])
+      .map((r: Row) => withModelSide(r))
+      .filter((r: Row) => (day < 0 || r.day === day) && (!phase || lineHomePhase(r, live.data) === phase))
+      .sort((x: Row, y: Row) => hotOrder({ live: matchOf(x)?.status === "live", p: sideRate(x), edge: x.edge }, { live: matchOf(y)?.status === "live", p: sideRate(y), edge: y.edge }))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [hot.data, live.data, phase, day],
   );

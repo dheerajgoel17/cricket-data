@@ -20,6 +20,7 @@ import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
+import { TABLE_HEAD } from "./page";
 import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -41,7 +42,8 @@ import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { MiniBars, ValueBars } from "./mini-bars";
 import { AdSlot } from "./ad-slot";
-import { Crumbs, EmptyNote } from "./page";
+import { Crumbs } from "./page";
+import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
 
@@ -99,17 +101,17 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         : <span className="grid size-control place-items-center rounded-full bg-secondary text-muted-foreground" aria-hidden><ChartBarIcon className="size-5" /></span>}
       <span className="grid min-w-0 gap-hair">
         <span className="flex min-w-0 items-baseline gap-tight">
-          <span className="truncate text-body font-medium leading-snug">{r.label}</span>
+          <span className="truncate text-body font-label leading-snug">{r.label}</span>
           {r.live && <LiveBadge />}
         </span>
         {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
         <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-          <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
+          <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
           {r.at && (() => {
             const ground = shortVenue(r.venue);
             const hits = r.at.side === "over" ? r.at.over : r.at.under;
             return (
-              <span className={cn("truncate text-footnote", r.at.side === r.side && r.edge != null ? "font-medium text-primary" : "text-muted-foreground")} title={r.venue || undefined}>
+              <span className={cn("truncate text-footnote", r.at.side === r.side && r.edge != null ? "font-label text-primary" : "text-muted-foreground")} title={r.venue || undefined}>
                 {hits}/{r.at.n} {r.at.side}{ground ? ` at ${ground}` : ""}
               </span>
             );
@@ -118,13 +120,13 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         <span className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
           {split ? (
             <>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O {r.overLine} <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U {r.underLine} <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O {r.overLine} <Tick value={r.over} className="font-condensed font-emphasis text-foreground">{odds(r.over)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U {r.underLine} <Tick value={r.under} className="font-condensed font-emphasis text-foreground">{odds(r.under)}</Tick></span>
             </>
           ) : (
             <>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-bold text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U <Tick value={r.under} className="font-condensed font-bold text-foreground">{odds(r.under)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-emphasis text-foreground">{odds(r.over)}</Tick></span>
+              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U <Tick value={r.under} className="font-condensed font-emphasis text-foreground">{odds(r.under)}</Tick></span>
             </>
           )}
           {r.live && <LiveOpened opened={r.opened} line={r.line} />}
@@ -135,7 +137,7 @@ export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOp
         <span className="grid justify-items-end gap-hair text-right">
           <span className="flex items-baseline gap-tight whitespace-nowrap">
             <span className="label-cap text-caption text-muted-foreground">Model</span>
-            <span className={cn("font-condensed text-title font-bold leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
+            <span className={cn("font-condensed text-title font-emphasis leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
           </span>
           {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
         </span>
@@ -295,7 +297,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           {/* Desktop keeps the brand mark (chips name the market); phone still gets title + match. */}
           <h1 className="sr-only">{detailTitle}</h1>
           <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
-            <p className="truncate text-body font-semibold tracking-tight">{detailTitle}</p>
+            <p className="truncate text-body font-emphasis tracking-tight">{detailTitle}</p>
             <p className="truncate text-footnote text-muted-foreground">{fx.a} v {fx.b} · {fmt}</p>
           </div>
           <span className="hidden flex-1 lg:block" aria-hidden />
@@ -321,7 +323,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
             className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />L{win}
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
           </Button>
         </div>
         {mode === "detail" && keyList.length > 1 && (
@@ -332,17 +334,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         {activeFilters.length > 0 && (
           <div className={cn("flex items-center gap-snug overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", mode === "detail" ? "px-gutter pb-tight" : "-mx-gutter px-gutter")} aria-label="Active filters">
             {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
-            <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+            <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
       </div>
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
-      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyNote title="Not enough history">No {fmt} matches to base these markets on yet.</EmptyNote> : (
+      {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
           {mode === "list" && overview.length === 0 && liveList.length === 0 && (
-            <EmptyNote title="No bookmaker lines">No priced fancy markets for this scope yet.</EmptyNote>)}
+            <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <ul className="-mx-gutter">
@@ -370,7 +372,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                       <section className="flex min-w-0 flex-col gap-snug">
                         <div className="flex items-baseline justify-between gap-snug">
                           <div className="grid min-w-0 gap-hair">
-                            <h2 className="text-body font-medium">Recent results</h2>
+                            <h2 className="text-body font-emphasis">Recent results</h2>
                             <p className="text-footnote text-muted-foreground">{here ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} ${fmt}`} · void excluded</p>
                           </div>
                           {groundNote ? (
@@ -381,7 +383,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 </button>
                               </PopoverTrigger>
                               <PopoverContent side="bottom" align="end" className="grid w-72 max-w-[calc(100vw-2rem)] gap-tight text-callout">
-                                <span className="font-medium">At this ground</span>
+                                <span className="font-label">At this ground</span>
                                 <span className={ground?.differs ? "text-amber" : "text-muted-foreground"}>{groundNote}</span>
                               </PopoverContent>
                             </Popover>
@@ -404,9 +406,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                 <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
                               </Popover>
                               {lab === "Low–high" ? (
-                                <b className="font-condensed text-metric font-medium leading-none tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></b>
+                                <b className="font-condensed text-metric font-label leading-none tabular-nums"><AnimatedNumber value={rep.summary.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={rep.summary.max} format={(n) => String(Math.round(n))} /></b>
                               ) : (
-                                <AnimatedNumber className="font-condensed text-metric font-medium leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
+                                <AnimatedNumber className="font-condensed text-metric font-label leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
                               )}
                             </div>
                           ))}
@@ -428,9 +430,9 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                               const p: number | null = rep.summary[side === "over" ? "pOver" : "pUnder"], fair = rep.summary[side === "over" ? "fairOver" : "fairUnder"], hit = rep.summary[side];
                               return (
                                 <div key={side} className="flex min-w-0 flex-col gap-tight">
-                                  <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {line}</div>
-                                  <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
-                                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} /></div>
+                                  <div className="text-footnote font-label capitalize text-muted-foreground">{side} {line}</div>
+                                  <AnimatedNumber className={cn("text-title font-emphasis tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} /></div>
                                   <div className="text-footnote text-muted-foreground">{hit} of {rep.n} · fair {odds(fair)}</div>
                                 </div>);
                             })}
@@ -447,7 +449,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                                     <span className="grid justify-items-start gap-hair text-left">
                                       <span className="label-cap text-caption text-muted-foreground">{side} {lane!.line}</span>
                                       <span className="flex min-w-0 items-center gap-tight">
-                                        <Tick value={face[side]} className="shrink-0 font-condensed text-title font-bold leading-none tabular-nums text-primary">{odds(face[side])}</Tick>
+                                        <Tick value={face[side]} className="shrink-0 font-condensed text-title font-emphasis leading-none tabular-nums text-primary">{odds(face[side])}</Tick>
                                         <BookBadge source={face.source} className="min-w-0 truncate" />
                                       </span>
                                     </span>
@@ -481,17 +483,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                       {/* Phone: full-bleed under the chart. Desktop: equal sticky column; panel scrolls so the page does not. */}
                       <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
                         <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-                          <h2 className="text-body font-medium">Lines</h2>
+                          <h2 className="text-body font-emphasis">Lines</h2>
                           <span className="text-footnote text-muted-foreground">Tap a row</span>
                         </div>
                         <Table className="table-fixed">
                           <TableHeader>
                             <TableRow className="hover:bg-transparent">
-                              <TableHead className="h-auto w-[3rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Line</TableHead>
-                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Over</TableHead>
-                              <TableHead className="h-auto min-w-0 px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground">Under</TableHead>
-                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit O</TableHead>
-                              <TableHead className="h-auto w-[3.75rem] px-snug py-tight text-left font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground" title="Hit rate on the chart">Hit U</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
+                              <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -520,16 +522,16 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
   const max = Math.max(...t.rows.map((r: any) => r.pSole), 0.0001);
   return (
     <section className="overflow-hidden border-y border-hairline">
-      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-medium">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
+      <div className="flex flex-col gap-hair px-inset py-snug"><h2 className="text-body font-emphasis">Top batter</h2><span className="text-footnote text-muted-foreground">{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</span></div>
       <ul>
         {t.rows.map((r: any, i: number) => (
           <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
-            <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
+            <motion.span aria-hidden className="absolute inset-y-0 left-0 origin-left bg-primary/10" style={{ width: `${(r.pSole / max) * 100}%` }} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
             <Item asChild size="sm" className="relative rounded-none border-0 px-inset py-snug transition-colors active:bg-accent">
               <Link to={`/player/${r.player}`}>
                 <ItemMedia><PlayerBadge idx={r.player} size="sm" /></ItemMedia>
-                <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-medium"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
-                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
+                <ItemContent className="min-w-0 gap-hair"><ItemTitle className="max-w-full text-body font-label"><span className="truncate">{r.name}</span></ItemTitle><ItemDescription className="text-callout">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</ItemDescription></ItemContent>
+                <ItemActions className="grid justify-items-end text-right"><AnimatedNumber className="text-body font-label tabular-nums text-primary" value={r.pSole} format={pct1} /><span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span></ItemActions>
               </Link>
             </Item>
           </motion.li>))}

@@ -41,7 +41,8 @@ import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { cn } from "@/lib/utils";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
-import { Crumbs, DataTable, EmptyNote, Muted, PageTitle, Panel } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
 import { Input } from "@/components/ui/input";
 
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
@@ -53,7 +54,7 @@ const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], 
 
 /** A side's crest and name, linking to its team page when it has one. */
 function TeamName({ name, ix }: { name: string; ix: number }) {
-  const body = <><TeamBadge name={name} size="md" className="size-8" eager /><span className="min-w-0 text-body font-semibold leading-tight sm:text-title">{name}</span></>;
+  const body = <><TeamBadge name={name} size="md" className="size-8" eager /><span className="min-w-0 text-body font-emphasis leading-tight sm:text-title">{name}</span></>;
   return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
 }
 
@@ -103,7 +104,7 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
       {actions}
       <div className="-mx-gutter flex min-w-0 flex-col overflow-hidden border-b border-hairline bg-card">
         <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-footnote">
-          <span className={cn("label-cap font-bold", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
+          <span className={cn("label-cap font-emphasis", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
           <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
           {f.series && <span className="text-muted-foreground">{f.series}</span>}
         </div>
@@ -119,7 +120,7 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
           })}
         </div>
         <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-callout">
-          <span className="font-medium">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
+          <span className="font-label">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
           {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
           {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
         </div>
@@ -176,7 +177,7 @@ export function FixturePage() {
   if (isLoading) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
-      <EmptyNote title="Fixture gone">That match is no longer in the schedule.</EmptyNote>
+      <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
       <Button asChild variant="secondary" className="w-fit rounded-full"><Link to="/">Back to fixtures</Link></Button>
     </div>
   );
@@ -194,7 +195,7 @@ export function FixturePage() {
           <ChevronLeftIcon className="size-5" />
         </button>
         <PageTitle sub={match?.session || liveBlurb(match) || undefined}>Scorecard</PageTitle>
-        {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyNote title="No scorecard yet">There is no card for this match from our source yet. It shows here once play has started.</EmptyNote>}
+        {hasCard(match) ? <ScorecardBody match={match} teams={known} /> : <EmptyState title="No scorecard yet" body="There is no card for this match from our source yet. It shows here once play has started." />}
       </div>
     );
   }
@@ -233,7 +234,7 @@ export function FixturePage() {
               </div>
               {grids.isLoading || !shown ? <GridSkeleton /> : (
                 <section className="flex flex-col gap-snug">
-                  <h2 className="flex items-center gap-tight text-body font-medium"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-normal text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
+                  <h2 className="flex items-center gap-tight text-body font-emphasis"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-copy text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
                   <GridTable g={shown.g} teamIdx={shown.team} line={line} />
                 </section>)}
             </>)}
@@ -276,8 +277,8 @@ export function TrendsPage() {
         <Field label="Games"><NativeSelect name="n" options={GAMES} defaultValue={n} /></Field>
         <Field label="Min hit rate"><NativeSelect name="hit" options={HITS} defaultValue={q.hit || "0.6"} /></Field>
       </LiveForm>
-      {!sel ? <EmptyNote title="No fixtures to trend">No upcoming matches with known teams right now.</EmptyNote> : (
-        <div className="flex flex-col gap-snug"><h2 className="text-title font-medium">{sel.a} v {sel.b}</h2>
+      {!sel ? <EmptyState title="No fixtures to trend" body="No upcoming matches with known teams right now." /> : (
+        <div className="flex flex-col gap-snug"><h2 className="text-title font-emphasis">{sel.a} v {sel.b}</h2>
           {grids.data ? <TrendCards grids={grids.data} line={line} minHit={Number(q.hit || 0.6)} stat={stat} /> : <ListSkeleton rows={4} />}
           <Muted>Players whose last {n} {fmt} games for their team cleared {(STATS as any)[stat].label.toLowerCase()} over {line}. Games he did not feature in are excluded.</Muted></div>)}
     </div>

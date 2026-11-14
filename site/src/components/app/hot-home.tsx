@@ -20,7 +20,7 @@ import { PillGroup } from "./pill-group";
 import { mixHomeRows } from "@/lib/hot-lines";
 import { fancyRowPath } from "@/lib/fancy-path";
 import { lineHomePhase, phaseOf, type HomePhase } from "@/lib/home-phase";
-import { RowsSkeleton, TapeSkeleton } from "./skeletons";
+import { HomePropsSkeleton } from "./skeletons";
 
 const PER = 6; // mixed player + fancy rows in the selected fixture's card
 
@@ -84,12 +84,12 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
     return { idx: r.idx, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
   }), [today.data, live.data, identity, phase]);
 
-  const loading = isLoading || !ready;
+  const loading = !blocks.length && (isLoading || tomorrow.isLoading || today.scoring || tomorrow.scoring || !ready);
   return (
     <section aria-label="Props" className="flex flex-col gap-stack">
-      <div className="empty:hidden">{isLoading ? <TapeSkeleton /> : <MarketTape rows={tapeRows} />}</div>
-      <h2 className="text-title font-bold tracking-tight">Props</h2>
-      {loading ? <RowsSkeleton /> : blocks.length ? (
+      <div className="empty:hidden"><MarketTape rows={tapeRows} /></div>
+      <h2 className="text-title font-emphasis tracking-tight">Props</h2>
+      {loading ? <HomePropsSkeleton /> : blocks.length ? (
         <div className="flex flex-col gap-stack">
           <PillGroup
             layoutId="home-fx"

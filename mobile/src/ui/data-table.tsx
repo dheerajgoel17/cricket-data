@@ -2,13 +2,22 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { Ionicons } from "@expo/vector-icons";
-import { cap, color, font, space, type } from "@/ui/tokens";
+import { cap, color, font, space, type, tint } from "@/ui/tokens";
 
-/** A table that fits the width it is given: a header row of small caps, hairlines between rows, the first column left and the numbers right. `flex` weighs the columns (the first one wide by default). */
-export function DataTable({ columns, rows, flex, highlight }: { columns: string[]; rows: ReactNode[][]; flex?: number[]; highlight?: number }) {
+/** Phone edge bleed for stats tables / game logs (mirrors web `TABLE_BLEED`). */
+export const TABLE_BLEED = {
+  marginHorizontal: -space.gutter,
+  borderTopWidth: StyleSheet.hairlineWidth,
+  borderBottomWidth: StyleSheet.hairlineWidth,
+  borderColor: color.hairline,
+  paddingHorizontal: space.gutter,
+} as const;
+
+/** A table that fits the width it is given: a header row of small caps, hairlines between rows, the first column left and the numbers right. `flex` weighs the columns (the first one wide by default). `bleed` applies the Player Props edge contract. */
+export function DataTable({ columns, rows, flex, highlight, bleed }: { columns: string[]; rows: ReactNode[][]; flex?: number[]; highlight?: number; bleed?: boolean }) {
   const f = (i: number) => flex?.[i] ?? (i === 0 ? 2 : 1);
   return (
-    <View>
+    <View style={bleed ? TABLE_BLEED : undefined}>
       <View style={styles.row}>
         {columns.map((c, i) => <Text key={`${i}${c}`} style={[styles.head, { flex: f(i), textAlign: i === 0 ? "left" : "right" }]} numberOfLines={1}>{c}</Text>)}
       </View>
@@ -27,7 +36,7 @@ export function DataTable({ columns, rows, flex, highlight }: { columns: string[
 
 /** A figure in a tinted pill of one width, so a column of them lines up: green from 60%, red to 40%, amber between (the site's hit-rate cell). */
 export function Pill({ text, tone, width = 60 }: { text: string; tone: "up" | "down" | "mid" | "none"; width?: number }) {
-  const bg = tone === "up" ? "rgba(39,218,142,0.2)" : tone === "down" ? "rgba(255,0,0,0.2)" : tone === "mid" ? "rgba(245,165,36,0.2)" : "transparent";
+  const bg = tone === "up" ? tint.primary(0.2) : tone === "down" ? tint.miss(0.2) : tone === "mid" ? tint.amber(0.2) : "transparent";
   const fg = tone === "up" ? color.primary : tone === "down" ? color.miss : tone === "mid" ? color.amber : color["muted-foreground"];
   return <View style={[styles.pill, { width, backgroundColor: bg }]}><Text style={[styles.pillText, { color: fg }]} numberOfLines={1}>{text}</Text></View>;
 }
@@ -62,15 +71,16 @@ export function Metric({ k, children, tone, text, cols = 3, compact }: { k: stri
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", minHeight: 44, gap: space.tight },
-  on: { backgroundColor: "rgba(58,58,60,0.45)", marginHorizontal: -space.tight, paddingHorizontal: space.tight, borderRadius: 8 },
+  on: { backgroundColor: tint.row, marginHorizontal: -space.tight, paddingHorizontal: space.tight, borderRadius: 8 },
   pill: { borderRadius: 7, paddingVertical: 3, alignItems: "center" },
   pillText: { fontFamily: font.data, fontSize: 15, fontVariant: ["tabular-nums"] },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  head: { ...type.caption, color: color["muted-foreground"], ...cap },
+  /** Web `TABLE_HEAD` twin: footnote + label-cap (not caption / BOARD_HEAD). */
+  head: { ...type.footnote, color: color["muted-foreground"], ...cap },
   cell: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground, fontVariant: ["tabular-nums"] },
   first: { fontFamily: font.regular, fontSize: 14, lineHeight: 18 },
   note: { flexDirection: "row", gap: space.snug, borderLeftWidth: 2, borderLeftColor: color.hairline, paddingLeft: space.snug },
-  noteTitle: { ...type.callout, color: "rgba(255,255,255,0.8)", ...cap },
+  noteTitle: { ...type.callout, color: tint.white(0.8), ...cap },
   noteText: { ...type.footnote, lineHeight: 17, color: color["muted-foreground"] },
   metric: { width: "33.33%", gap: 4, paddingRight: space.tight },
   metricKey: { ...type.footnote, color: color["muted-foreground"], ...cap },

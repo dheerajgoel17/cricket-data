@@ -8,6 +8,7 @@ import { defineCustomElement as defineIcon } from "ionicons/components/ion-icon.
 import { bookmark, bookmarkOutline, calendar, calendarOutline, dice, diceOutline, mail, mailOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
 import { AdSlot } from "@/components/app/ad-slot";
 import { slotForPath } from "@/lib/ad-slots";
+import { goProduct, isDesignHost } from "@/lib/design-host";
 import { TAB_NAV } from "./nav";
 
 // Ionic's own iOS tab bar (web components, MIT), not a copy of it: the classic iOS bar, translucent with the hairline on top, 49 pt plus the safe area,
@@ -26,7 +27,8 @@ const ICON: Record<string, [string, string]> = {
 export function IosTabBar() {
   const { pathname } = useLocation();
   const nav = useNavigate();
-  const current = TAB_NAV.find((t) => t.match(pathname))?.to ?? "";
+  // Catalogue host is not a product route — never light a tab as selected (clicks still goProduct).
+  const current = isDesignHost() ? "" : (TAB_NAV.find((t) => t.match(pathname))?.to ?? "");
   const slot = slotForPath(pathname);
   const dock = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -45,7 +47,7 @@ export function IosTabBar() {
         {TAB_NAV.map(({ to, label }) => {
           const on = to === current, [outline, filled] = ICON[to] ?? ICON["/"];
           return (
-            <ion-tab-button key={to} tab={to} selected={on} aria-current={on ? "page" : undefined} onClick={() => nav(to)}>
+            <ion-tab-button key={to} tab={to} selected={on} aria-current={on ? "page" : undefined} onClick={() => (isDesignHost() ? goProduct(to) : nav(to))}>
               <ion-icon icon={on ? filled : outline} aria-hidden="true" />
               <ion-label>{label}</ion-label>
             </ion-tab-button>

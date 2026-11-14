@@ -8,13 +8,13 @@ export function LiveMarketRow({ m }: { m: any }) {
   return (
     <div className="grid gap-hair px-gutter py-snug">
       <span className="flex min-w-0 items-baseline gap-snug">
-        <span className="truncate text-body font-medium leading-snug">{m.market}</span>
+        <span className="truncate text-body font-label leading-snug">{m.market}</span>
         <LiveBadge />
         {m.book && <BookBadge source={m.book} />}
       </span>
       {m.kind === "ou" ? (
         <span className="flex flex-wrap items-baseline gap-x-snug text-callout text-muted-foreground">
-          <span className="font-condensed text-metric font-bold leading-none tracking-tight tabular-nums text-foreground">O/U {m.line}</span>
+          <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">O/U {m.line}</span>
           <span className="font-condensed tabular-nums">O <b className="text-body text-foreground">{odds(m.over)}</b></span>
           <span className="font-condensed tabular-nums">U <b className="text-body text-foreground">{odds(m.under)}</b></span>
         </span>

@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: space.tight,
   },
-  primaryLabel: { ...type.body, fontFamily: font.semibold, color: color["primary-foreground"] },
+  primaryLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
   switchRow: { alignItems: "center", paddingVertical: space.snug },
   switchMuted: { ...type.callout, color: color["muted-foreground"], textAlign: "center" },
   switchLink: { color: color.primary, fontFamily: font.medium },

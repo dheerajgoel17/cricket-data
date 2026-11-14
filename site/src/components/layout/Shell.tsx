@@ -1,4 +1,4 @@
-import { AppSkeleton } from "@/components/app/skeletons";
+import { PageSkeleton } from "@/components/app/skeletons";
 import { Suspense, useLayoutEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
@@ -8,7 +8,7 @@ import { MAIN_NAV, MORE_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
 import { HeaderSlotProvider } from "@/lib/header-slot";
 
-const navBtn = "h-control rounded-lg text-callout font-medium hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
+const navBtn = "h-control rounded-lg text-callout font-label hover:bg-sidebar-accent data-[active=true]:bg-sidebar-accent data-[active=true]:font-label [&[data-active=true]>svg]:text-primary [&>svg]:size-[18px]";
 
 /** shadcn Sidebar under the header: full labels at xl, collapses to an icon rail (Ctrl/Cmd+B or the header trigger). Phones and tablets use the tab bar instead. */
 function AppSidebar() {
@@ -102,7 +102,7 @@ export function Shell() {
         <SidebarInset id="main" tabIndex={-1} className="min-w-0 overflow-x-clip bg-transparent">
           {/* a CSS fade-in, not a mount/unmount sequence: waiting for the old page to animate out before the new one mounted could leave the new one invisible (two mains, one stuck at opacity 0) */}
           <div key={pathname} ref={content} className="mx-auto w-full min-w-0 max-w-(--content-max) animate-in fade-in-0 slide-in-from-bottom-2 px-gutter pb-section pt-stack has-[[data-flush]]:pt-0 duration-200">
-            <Suspense fallback={<AppSkeleton />}><Outlet /></Suspense>
+            <Suspense fallback={<PageSkeleton />}><Outlet /></Suspense>
           </div>
         </SidebarInset>
       </div>

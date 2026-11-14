@@ -2,11 +2,23 @@ import { lazy, Suspense, useEffect } from "react";
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { syncAds } from "@/lib/ads";
-import { AppSkeleton } from "@/components/app/skeletons";
+import { AppSkeleton, PageSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
+import { EmptyState } from "@/components/app/empty-state";
+import { Button } from "@/components/ui/button";
 import { useData } from "@/lib/data";
 import { initGa, track, trackPage } from "@/lib/ga";
+
+function NotFoundPage() {
+  return (
+    <EmptyState
+      title="Page not found"
+      body="This address may have changed."
+      action={<Button asChild variant="secondary" className="h-control rounded-full"><Link to="/">Back to fixtures</Link></Button>}
+    />
+  );
+}
 
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
 
@@ -46,7 +58,7 @@ function Analytics() {
 /** Every page except home reads matches.json. Home paints the rail from the fixture file while that download finishes. */
 function HistoryGate() {
   const { matchesReady } = useData();
-  if (matchesReady === false) return <AppSkeleton />;
+  if (matchesReady === false) return <PageSkeleton />;
   return <Outlet />;
 }
 
@@ -90,13 +102,7 @@ export function App() {
             <Route path="docs" element={<DisclaimerPage />} />
             <Route path="disclaimer" element={<Navigate to="/docs" replace />} />
             <Route path="responsible" element={<Navigate to="/docs" replace />} />
-            <Route path="*" element={
-              <section className="flex flex-col items-start gap-snug">
-                <h1 className="text-title font-bold">Page not found</h1>
-                <p className="text-muted-foreground">This address may have changed.</p>
-                <Link to="/" className="text-primary underline underline-offset-4">Back to fixtures</Link>
-              </section>
-            } />
+            <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>
         </Routes>

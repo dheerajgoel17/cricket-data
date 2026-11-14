@@ -38,8 +38,8 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
     queryFn: () => { setRead([0, store.nshard]); return editionRows(store, ed.ms, { onProgress: (d: number, n: number) => setRead([d, n]) }); },
   });
   const result = useMemo(() => (ed && rows.data ? tournamentBoards(store, ed, rows.data) : null), [store, ed, rows.data]);
-  if (!store) return <Working label="Loading…" />;
-  if (!ed) return <Text style={styles.box}>No matches in the data for this competition.</Text>;
+  if (!store) return <Working label="Loading…" shape="league" />;
+  if (!ed) return <EmptyState title="No matches" body="No matches in the data for this competition." />;
   return (
     <View style={styles.root}>
       {eds.length > 1 ? <View style={styles.bleed}><Chips items={eds.map((x: any) => [x.key, x.name] as [string, string])} value={ed.key} onChange={onSeason} /></View> : null}
@@ -79,7 +79,7 @@ function Facts({ s }: { s: any }) {
 function Loading({ done, total }: { done: number; total: number }) {
   return (
     <View style={styles.loading} accessibilityRole="progressbar" accessibilityLabel="Reading player files">
-      <Working label={total ? `Reading player files ${done} / ${total}` : "Reading player files…"} />
+      <Working label={total ? `Reading player files ${done} / ${total}` : "Reading player files…"} shape="list" />
       <View style={styles.track}><View style={[styles.bar, { width: `${total ? (100 * done) / total : 0}%` }]} /></View>
     </View>
   );

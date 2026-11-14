@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/ui/text";
 import { color } from "@/ui/tokens";
@@ -38,7 +39,7 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
   useEffect(() => {
     if (!ready) return;
     const wait = Math.max(0, MIN_MS - (Date.now() - t0.current));
-    const id = setTimeout(() => { shell.value = withTiming(0, { duration: FADE_MS, easing: Easing.in(Easing.quad) }, (finished) => { if (finished) runOnJS(onDone)(); }); }, wait);
+    const id = setTimeout(() => { shell.value = withTiming(0, { duration: FADE_MS, easing: Easing.bezier(0.23, 1, 0.32, 1) }, (finished) => { if (finished) scheduleOnRN(onDone); }); }, wait);
     return () => clearTimeout(id);
   }, [ready, shell, onDone]);
 

@@ -11,6 +11,7 @@
     "test": "node --test \"tests/*.test.mjs\" && vitest run",
     "test:engine": "node --test \"tests/*.test.mjs\"",
     "serve": "node scripts/serve.mjs",
+    "design:inventory": "node scripts/design-inventory.mjs",
     "tokens": "node scripts/tokens.mjs"
   },
   "engines": {

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // The Props screener's filter state: what the URL says, what is on by default, which filters are active and how rows are narrowed and ordered. Pure (no React,
 // no DOM), so it is tested on its own and a native app can reuse it. Only filters the rows can answer exist: nothing here approximates a missing field.
-import { hotOrder, norm } from "@/lib/hot-lines";
+import { hotOrder, norm } from "./hot-lines";
 import { sideRate } from "@cricket/engine/props-view.js";
 
 export type Win = "season" | "h2h" | "ven" | "l5" | "l10";

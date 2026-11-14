@@ -19,7 +19,7 @@ export function SideBook({ priced, side }: { priced?: LadderPriced | null; side:
   if (p == null) return <span className="text-footnote text-muted-foreground">—</span>;
   return (
     <span className="flex min-w-0 max-w-full items-center gap-tight overflow-hidden">
-      <Tick value={p} className="shrink-0 font-condensed text-body font-bold leading-none tabular-nums text-primary">{odds(p)}</Tick>
+      <Tick value={p} className="shrink-0 font-condensed text-body font-emphasis leading-none tabular-nums text-primary">{odds(p)}</Tick>
       <BookBadge source={face!.source} className="min-w-0 max-w-full truncate" />
     </span>
   );
@@ -39,7 +39,7 @@ export function LadderRow({ line, summary, priced, selected, onPick }: {
     <TableRow data-state={selected ? "selected" : undefined}
       className="cursor-pointer border-hairline active:bg-primary/10 data-[state=selected]:bg-primary/15"
       onClick={onPick}>
-      <TableCell className="w-[3rem] px-snug py-tight align-middle font-medium tabular-nums">{line}</TableCell>
+      <TableCell className="w-[3rem] px-snug py-tight align-middle font-label tabular-nums">{line}</TableCell>
       <TableCell className="min-w-0 overflow-hidden whitespace-normal px-snug py-tight align-middle">
         <span className="grid min-w-0 justify-items-start gap-hair" onClick={(e) => e.stopPropagation()}>
           <SideBook priced={priced} side="over" />

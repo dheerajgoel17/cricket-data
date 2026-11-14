@@ -36,7 +36,7 @@ export function ValueBars({ values, line, labels }: { values: number[]; line: nu
             style={{ height: `${Math.max((v / top) * 100, 4)}%` }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} />
         ))}
         <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ duration: 0.3 }}>
-          <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-caption font-medium tabular-nums text-muted-foreground">{line}</span>
+          <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-caption font-label tabular-nums text-muted-foreground">{line}</span>
         </motion.span>
       </div>
       {each ? (
@@ -44,7 +44,7 @@ export function ValueBars({ values, line, labels }: { values: number[]; line: nu
           {labels!.map((l, i) => <span key={i} className="grid min-w-0 flex-1"><span className="truncate tabular-nums">{values[i]}</span><span className="truncate">{l.text}</span><span className="truncate tabular-nums">{l.date}</span></span>)}
         </div>
       ) : (
-        picked ? <div className="flex justify-between gap-snug text-footnote"><span className="min-w-0 truncate font-medium">{picked.l.text}</span><span className="shrink-0 tabular-nums text-muted-foreground">{picked.l.date} · <b className={cn("font-medium", picked.v > line ? "text-primary" : picked.v < line ? "text-miss" : "text-foreground")}>{picked.v}</b></span></div>
+        picked ? <div className="flex justify-between gap-snug text-footnote"><span className="min-w-0 truncate font-label">{picked.l.text}</span><span className="shrink-0 tabular-nums text-muted-foreground">{picked.l.date} · <b className={cn("font-label", picked.v > line ? "text-primary" : picked.v < line ? "text-miss" : "text-foreground")}>{picked.v}</b></span></div>
         : <div className="flex justify-between text-caption text-muted-foreground"><span>{labels?.[0] ? `Oldest · ${labels[0].date}` : "Oldest"}</span><span>{labels?.length ? `${labels[labels.length - 1].date} · Latest` : "Latest"}</span></div>
       )}
     </div>

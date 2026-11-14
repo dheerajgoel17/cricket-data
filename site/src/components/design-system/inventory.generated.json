@@ -1,0 +1,2609 @@
+[
+  {
+    "path": "mobile/src/app/(tabs)/_layout.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/components/app-tabs.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/contact.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/ui/lazy-tab.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/fancy.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/ui/lazy-tab.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/fancy-row.tsx",
+      "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/index.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "Fixtures"
+    ],
+    "dependencies": [
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/fixture-card.tsx",
+      "mobile/src/ui/hot-home.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/phase-bar.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/leagues.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/ui/lazy-tab.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tournament-stats.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/props.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/ui/lazy-tab.tsx",
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/prop-row.tsx",
+      "mobile/src/ui/screener-filters.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/(tabs)/saved.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [],
+    "dependencies": [
+      "mobile/src/ui/lazy-tab.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/list.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/_layout.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "RootLayout"
+    ],
+    "dependencies": [
+      "mobile/src/ui/animated-splash.tsx",
+      "mobile/src/ui/sign-in-sheet.tsx",
+      "mobile/src/ui/web-frame.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/competitions.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "Competitions"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/list.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/fixture/[id]/_layout.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "FixtureLayout"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/app/fixture/[id]/fancy.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "FancyMarketPage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/match-fancy.tsx",
+      "mobile/src/ui/match-header.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/fixture/[id]/ground.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "FixtureGroundPage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/ground-page.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/fixture/[id]/index.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "FixturePage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/blur-bar.tsx",
+      "mobile/src/ui/capsule.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/grid-table.tsx",
+      "mobile/src/ui/live-board.tsx",
+      "mobile/src/ui/match-fancy.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/match-header.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/skeletons.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/prop-row.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/info/[topic].tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "InfoSheet"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/league/[id].tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "League"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/data-table.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/list.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tournament-stats.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/player/[idx].tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "PlayerPage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/accordion.tsx",
+      "mobile/src/ui/blur-bar.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/charts.tsx",
+      "mobile/src/ui/count-up.tsx",
+      "mobile/src/ui/capsule.tsx",
+      "mobile/src/ui/bleed.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/data-table.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/line-stepper.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/skeletons.tsx",
+      "mobile/src/ui/next-match.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/star.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tick.tsx",
+      "mobile/src/ui/tab-fade.tsx",
+      "mobile/src/ui/window-pills.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/search.tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "Search"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/list.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/team/[idx].tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "Team"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/data-table.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/grid-table.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/star.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tab-fade.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/app/venue/[idx].tsx",
+    "platform": "native",
+    "route": true,
+    "exports": [
+      "VenuePage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/ground-page.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/components/app-tabs.android.tsx",
+    "platform": "android",
+    "route": false,
+    "exports": [
+      "AppTabs"
+    ],
+    "dependencies": [
+      "mobile/src/components/floating-tab-bar.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/components/app-tabs.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "AppTabs"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/components/app-tabs.web.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "AppTabs"
+    ],
+    "dependencies": [
+      "mobile/src/components/floating-tab-bar.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/components/floating-tab-bar.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "FloatingTabBar"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/accordion.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Accordion"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/animated-splash.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "AnimatedSplash"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/bleed.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Bleed"
+    ],
+    "dependencies": [
+      "mobile/src/ui/data-table.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/blur-bar.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "BlurBar",
+      "BlurTargetView"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/book-badge.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "BookBadge"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/brand.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "AppHeader",
+      "BrandMark"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/capsule.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "CapsuleTabs"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/charts.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ChartBars",
+      "Gauge",
+      "OutcomeDonut"
+    ],
+    "dependencies": [
+      "mobile/src/ui/count-up.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/chips.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ActiveChip",
+      "Chips",
+      "ChoiceChip",
+      "ChoiceRow"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/collapsible.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Collapsible",
+      "TurnChevron"
+    ],
+    "dependencies": [
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/count-up.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "CountUp",
+      "ReText"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/data-table.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "DataTable",
+      "Metric",
+      "Note",
+      "Pill",
+      "TABLE"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/empty-state.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "EmptyState"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/fancy-row.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "BookList",
+      "OverviewRow"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/collapsible.tsx",
+      "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/live-bits.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/fixture-card.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "FixtureCard"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/glass.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "GlassSurface"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/grid-table.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "GAMES",
+      "GridFilters",
+      "GridTable",
+      "HITS",
+      "STAT",
+      "TrendList"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/capsule.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/bleed.tsx",
+      "mobile/src/ui/line-stepper.tsx",
+      "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/ground-page.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "GroundPage"
+    ],
+    "dependencies": [
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/data-table.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/fixture-card.tsx",
+      "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/hot-home.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "HotHome",
+      "HotHomeSkeleton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/fancy-row.tsx",
+      "mobile/src/ui/match-chip.tsx",
+      "mobile/src/ui/market-tape.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/skeletons.tsx",
+      "mobile/src/ui/prop-row.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/icons.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ArrowDown",
+      "ArrowUp",
+      "ChevronLeft",
+      "ChevronRight",
+      "Minus",
+      "Plus",
+      "TrendingDown",
+      "TrendingUp"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/info-button.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "InfoButton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/lazy-tab.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/line-stepper.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LineStepper"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/list.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ListRow",
+      "Section"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/live-bits.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LineProgress",
+      "LiveBadge",
+      "LiveOpened",
+      "LiveTrack"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/live-board.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LiveBoard",
+      "MatchAccordions",
+      "ScorecardCard"
+    ],
+    "dependencies": [
+      "mobile/src/ui/accordion.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/recent-form.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/live-market-row.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LiveMarketRow"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/live-bits.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/live-spot.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "BatterSpot",
+      "TeamSpot"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/market-tape.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MarketTape"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/match-chip.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MatchChips"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/match-fancy.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MatchFancy"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/charts.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/bleed.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/fancy-row.tsx",
+      "mobile/src/ui/live-market-row.tsx",
+      "mobile/src/ui/live-spot.tsx",
+      "mobile/src/ui/line-stepper.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/match-header.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MatchHeader"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/mini-bars.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MiniBars"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/motion.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "CardSkeleton",
+      "LiveDot",
+      "Pulse",
+      "RowsSkeleton",
+      "Skeleton",
+      "Working"
+    ],
+    "dependencies": [
+      "mobile/src/ui/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/next-match.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MatchStatus",
+      "NextFilters",
+      "NextMatchCard"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/data-table.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/tick.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/page-header.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "PageHeader",
+      "RoundButton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/phase-bar.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "PhaseBar"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/player-avatar.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "PlayerAvatar",
+      "PlayerFace",
+      "PlayerPortrait"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/press.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Press"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/prop-row.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "PropRow"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/collapsible.tsx",
+      "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/live-bits.tsx",
+      "mobile/src/ui/live-spot.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/recent-form.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "FormChips",
+      "FormHeadline",
+      "RecentForm"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/empty-state.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/screener-filters.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ScreenerFilters"
+    ],
+    "dependencies": [
+      "mobile/src/ui/accordion.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/segmented.ios.tsx",
+    "platform": "ios",
+    "route": false,
+    "exports": [
+      "Segmented"
+    ],
+    "dependencies": [
+      "mobile/src/ui/segmented.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/segmented.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Segmented"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/sign-in-sheet.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "SignInSheet"
+    ],
+    "dependencies": [
+      "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/skeletons.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "CardSkeleton",
+      "CompsSkeleton",
+      "FancyCardSkeleton",
+      "GridSkeleton",
+      "GroundSkeleton",
+      "LeagueSkeleton",
+      "ListSkeleton",
+      "MarketSkeleton",
+      "MatchHeaderSkeleton",
+      "PlayerSkeleton",
+      "RowsSkeleton",
+      "Skeleton",
+      "TapeSkeleton"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/star.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "PropStar",
+      "StarButton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/tab-fade.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "TabFade"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/team-badge.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LeagueBadge",
+      "TeamBadge"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/text.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "AnimatedText",
+      "Text",
+      "TextInput"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/tick.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "StandingMark",
+      "Tick"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/tournament-stats.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "TournamentStats"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/web-frame.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "WebFrame"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/window-pills.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "WindowPills"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/ad-slot.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AdSlot"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/alt-lines.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AltLines"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/odds-table.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/animated-height.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AnimatedHeight"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/animated-number.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AnimatedNumber"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/badges.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LeagueBadge",
+      "PlayerBadge",
+      "PlayerPhoto",
+      "TeamAvatar",
+      "TeamBadge",
+      "TeamFlag"
+    ],
+    "dependencies": [
+      "site/src/components/ui/avatar.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/book-badge.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "BookBadge"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/book-table.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "BookTable"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/chart.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ChartBars"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/chip.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ActiveChip",
+      "Chip"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/empty-state.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "EmptyState"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/entity-hero.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "EntityHero"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/error-boundary.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ErrorBoundary"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/fancy-filters.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "FancyFilters"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/app/chip.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/fixture-card.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "FixtureCard",
+      "FixtureRail",
+      "LiveScore",
+      "MatchChip",
+      "NO"
+    ],
+    "dependencies": [
+      "site/src/components/ui/avatar.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/fixture-ground.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "FixtureGroundPanel",
+      "FixtureVenue",
+      "VenueGroundPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/popover.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/stats-ad.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/animated-number.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/ground-filters.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/forms.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Field",
+      "HOME",
+      "LiveForm",
+      "NativeSelect"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/grid-filters.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "GridFilterBar",
+      "GridLineSheet"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/line-stepper.tsx",
+      "site/src/components/app/pill-group.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/grid.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "GridTable",
+      "TrendCards"
+    ],
+    "dependencies": [
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/item.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/mini-bars.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/ground-filters.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "GroundGenderSheet"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/app/chip.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/home-phase-bar.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "EMPTY",
+      "HomePhaseBar"
+    ],
+    "dependencies": [
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/ui/tabs.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/hot-home.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HotHome"
+    ],
+    "dependencies": [
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/home-phase-bar.tsx",
+      "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/hot-props.tsx",
+      "site/src/components/app/market-tape.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/hot-props.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "BookQuotes",
+      "HotProps",
+      "PropRow",
+      "PropTable"
+    ],
+    "dependencies": [
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/market-tape.tsx",
+      "site/src/components/app/tick.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/home-phase-bar.tsx",
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/screener-filters.tsx",
+      "site/src/components/app/star.tsx",
+      "site/src/components/app/player-name.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/portrait.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/line-ladder.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LadderRow",
+      "SideBook"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/tick.tsx",
+      "site/src/components/ui/table.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/line-stepper.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LineStepper"
+    ],
+    "dependencies": [
+      "site/src/components/ui/input-group.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/live-board.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LiveBoard",
+      "ScorecardAccordion",
+      "ScorecardBody"
+    ],
+    "dependencies": [
+      "site/src/components/ui/accordion.tsx",
+      "site/src/components/app/pill-group.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/live-feed.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LiveFeed"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/live-markets.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LiveMarketRow"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/live-spot.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/live-spot.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "BatterSpot",
+      "LineProgress",
+      "LiveBadge",
+      "LiveOpened",
+      "LiveTrack",
+      "TeamSpot"
+    ],
+    "dependencies": [
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/market-tape.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MarketTape"
+    ],
+    "dependencies": [
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/tick.tsx",
+      "site/src/components/app/badges.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/match-fancy.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MATCH",
+      "MatchFancy",
+      "OverviewRow",
+      "TEAM"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/item.tsx",
+      "site/src/components/ui/popover.tsx",
+      "site/src/components/ui/table.tsx",
+      "site/src/components/app/tick.tsx",
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/line-stepper.tsx",
+      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/line-ladder.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/fancy-filters.tsx",
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/animated-number.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/live-markets.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/ad-slot.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/match-status.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MatchStatus"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/mini-bars.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LABELLED",
+      "MiniBars",
+      "ValueBars"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/next-match.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "NextFilters",
+      "NextMatch",
+      "UnpricedNote"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/app/match-status.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/note.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Note"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/odds-table.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "OddsTable"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/page.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Chips",
+      "Crumbs",
+      "DataTable",
+      "EmptyNote",
+      "Muted",
+      "OddsText",
+      "PageTitle",
+      "Panel",
+      "StatGridCards",
+      "StatTile",
+      "TABLE"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/table.tsx",
+      "site/src/components/app/empty-state.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/pill-group.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PillGroup"
+    ],
+    "dependencies": [
+      "site/src/components/ui/toggle-group.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/pill-tabs.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PillTabs"
+    ],
+    "dependencies": [
+      "site/src/components/ui/tabs.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/player-name.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PlayerName"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/player-picker.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PlayerPicker"
+    ],
+    "dependencies": [
+      "site/src/components/ui/command.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/popover.tsx",
+      "site/src/components/app/badges.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/portrait.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PlayerAvatar",
+      "PlayerPortrait"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/recent-form.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "FormChips",
+      "FormHeadline",
+      "RecentForm"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/result.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HitCell",
+      "LadderTable",
+      "ResultView",
+      "SplitTables"
+    ],
+    "dependencies": [
+      "site/src/components/ui/accordion.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/chart.tsx",
+      "site/src/components/app/viz.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/screener-filters.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ScreenerFilters"
+    ],
+    "dependencies": [
+      "site/src/components/ui/accordion.tsx",
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/ui/switch.tsx",
+      "site/src/components/app/chip.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/sign-in-sheet.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "SignInSheet"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/dialog.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/label.tsx",
+      "site/src/components/layout/Header.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/skeletons.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AppSkeleton",
+      "FancySkeleton",
+      "GridSkeleton",
+      "GroundSkeleton",
+      "HomePropsSkeleton",
+      "LeagueSkeleton",
+      "ListSkeleton",
+      "MatchHeaderSkeleton",
+      "PageSkeleton",
+      "PlayerSkeleton",
+      "RailSkeleton",
+      "RowsSkeleton",
+      "SKELETON",
+      "ScorecardSkeleton",
+      "TapeSkeleton"
+    ],
+    "dependencies": [
+      "site/src/components/ui/skeleton.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/star.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "PropStar",
+      "StarButton"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/stats-ad.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "StatsAd"
+    ],
+    "dependencies": [
+      "site/src/components/app/ad-slot.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/tick.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "StandingMark",
+      "Tick",
+      "TrendArrow"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/tournament-stats.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "BOARD",
+      "TournamentStats"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/popover.tsx",
+      "site/src/components/ui/table.tsx",
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/player-name.tsx",
+      "site/src/components/app/portrait.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/viz.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "OutcomeDonut",
+      "RateHeatStrip"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/layout/GlobalSearch.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "SearchDialog",
+      "SearchField"
+    ],
+    "dependencies": [
+      "site/src/components/ui/command.tsx",
+      "site/src/components/ui/kbd.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/player-name.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/layout/Header.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Brand",
+      "BrandMark",
+      "Header"
+    ],
+    "dependencies": [
+      "site/src/components/ui/sidebar.tsx",
+      "site/src/components/layout/GlobalSearch.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/layout/IosTabBar.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "IosTabBar"
+    ],
+    "dependencies": [
+      "site/src/components/app/ad-slot.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/layout/Shell.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Shell"
+    ],
+    "dependencies": [
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/ui/sidebar.tsx",
+      "site/src/components/layout/Header.tsx",
+      "site/src/components/layout/IosTabBar.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/accordion.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Accordion",
+      "AccordionContent",
+      "AccordionItem",
+      "AccordionTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/avatar.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Avatar",
+      "AvatarBadge",
+      "AvatarFallback",
+      "AvatarGroup",
+      "AvatarGroupCount",
+      "AvatarImage"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/badge.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Badge"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/button.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Button"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/card.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Card",
+      "CardAction",
+      "CardContent",
+      "CardDescription",
+      "CardFooter",
+      "CardHeader",
+      "CardTitle"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/carousel.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Carousel",
+      "CarouselContent",
+      "CarouselItem",
+      "CarouselNext",
+      "CarouselPrevious"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/checkbox.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Checkbox"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/collapsible.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Collapsible",
+      "CollapsibleContent",
+      "CollapsibleTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/command.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Command",
+      "CommandDialog",
+      "CommandEmpty",
+      "CommandGroup",
+      "CommandInput",
+      "CommandItem",
+      "CommandList",
+      "CommandSeparator",
+      "CommandShortcut"
+    ],
+    "dependencies": [
+      "site/src/components/ui/dialog.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/dialog.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Dialog",
+      "DialogClose",
+      "DialogContent",
+      "DialogDescription",
+      "DialogFooter",
+      "DialogHeader",
+      "DialogOverlay",
+      "DialogPortal",
+      "DialogTitle",
+      "DialogTrigger"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/dropdown-menu.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "DropdownMenu",
+      "DropdownMenuCheckboxItem",
+      "DropdownMenuContent",
+      "DropdownMenuGroup",
+      "DropdownMenuItem",
+      "DropdownMenuLabel",
+      "DropdownMenuPortal",
+      "DropdownMenuRadioGroup",
+      "DropdownMenuRadioItem",
+      "DropdownMenuSeparator",
+      "DropdownMenuShortcut",
+      "DropdownMenuSub",
+      "DropdownMenuSubContent",
+      "DropdownMenuSubTrigger",
+      "DropdownMenuTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/input-group.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "InputGroup",
+      "InputGroupAddon",
+      "InputGroupButton",
+      "InputGroupInput",
+      "InputGroupText",
+      "InputGroupTextarea"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/textarea.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/input.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Input"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/item.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Item",
+      "ItemActions",
+      "ItemContent",
+      "ItemDescription",
+      "ItemFooter",
+      "ItemGroup",
+      "ItemHeader",
+      "ItemMedia",
+      "ItemSeparator",
+      "ItemTitle"
+    ],
+    "dependencies": [
+      "site/src/components/ui/separator.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/kbd.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Kbd",
+      "KbdGroup"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/label.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Label"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/popover.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Popover",
+      "PopoverAnchor",
+      "PopoverContent",
+      "PopoverDescription",
+      "PopoverHeader",
+      "PopoverTitle",
+      "PopoverTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/scroll-area.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ScrollArea",
+      "ScrollBar"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/select.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Select",
+      "SelectContent",
+      "SelectGroup",
+      "SelectItem",
+      "SelectLabel",
+      "SelectScrollDownButton",
+      "SelectScrollUpButton",
+      "SelectSeparator",
+      "SelectTrigger",
+      "SelectValue"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/separator.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Separator"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/sheet.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Sheet",
+      "SheetClose",
+      "SheetContent",
+      "SheetDescription",
+      "SheetFooter",
+      "SheetHeader",
+      "SheetTitle",
+      "SheetTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/sidebar.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Sidebar",
+      "SidebarContent",
+      "SidebarFooter",
+      "SidebarGroup",
+      "SidebarGroupAction",
+      "SidebarGroupContent",
+      "SidebarGroupLabel",
+      "SidebarHeader",
+      "SidebarInput",
+      "SidebarInset",
+      "SidebarMenu",
+      "SidebarMenuAction",
+      "SidebarMenuBadge",
+      "SidebarMenuButton",
+      "SidebarMenuItem",
+      "SidebarMenuSkeleton",
+      "SidebarMenuSub",
+      "SidebarMenuSubButton",
+      "SidebarMenuSubItem",
+      "SidebarProvider",
+      "SidebarRail",
+      "SidebarSeparator",
+      "SidebarTrigger"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/separator.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/ui/skeleton.tsx",
+      "site/src/components/ui/tooltip.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/skeleton.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Skeleton"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/sonner.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Toaster"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/switch.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Switch"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/table.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Table",
+      "TableBody",
+      "TableCaption",
+      "TableCell",
+      "TableFooter",
+      "TableHead",
+      "TableHeader",
+      "TableRow"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/tabs.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Tabs",
+      "TabsContent",
+      "TabsList",
+      "TabsTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/textarea.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Textarea"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/toggle-group.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ToggleGroup",
+      "ToggleGroupItem"
+    ],
+    "dependencies": [
+      "site/src/components/ui/toggle.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/ui/toggle.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Toggle"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/ui/tooltip.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "Tooltip",
+      "TooltipContent",
+      "TooltipProvider",
+      "TooltipTrigger"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/pages/AdminAds.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "AdminAdsPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/app/empty-state.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/AuthCallback.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "AuthCallbackPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/empty-state.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Contact.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "ContactPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/separator.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/DesignSystem.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "DesignSystemPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/note.tsx",
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/chart.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/pill-tabs.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Fixtures.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "FixturePage",
+      "TrendsPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/skeleton.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/grid-filters.tsx",
+      "site/src/components/app/hot-props.tsx",
+      "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/grid.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/live-board.tsx",
+      "site/src/components/app/recent-form.tsx",
+      "site/src/components/app/live-feed.tsx",
+      "site/src/components/app/fixture-ground.tsx",
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/ui/input.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Home.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "Countdown",
+      "HomePage",
+      "NextMatch"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/home-phase-bar.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/hot-home.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Leagues.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "LeaguesPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/stats-ad.tsx",
+      "site/src/components/app/tournament-stats.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Legal.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "DisclaimerPage",
+      "PrivacyPage",
+      "TermsPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/page.tsx",
+      "site/src/components/ui/card.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Lists.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "FancyPage",
+      "PropsPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/hot-props.tsx",
+      "site/src/components/app/ad-slot.tsx",
+      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Markets.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "CompetitionsPage",
+      "LeaguePage",
+      "MarketPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/tabs.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/entity-hero.tsx",
+      "site/src/components/app/pill-tabs.tsx",
+      "site/src/components/app/grid.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/star.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/result.tsx",
+      "site/src/pages/Home.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/stats-ad.tsx",
+      "site/src/components/app/tournament-stats.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Player.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "PlayerPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/sheet.tsx",
+      "site/src/components/ui/table.tsx",
+      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/line-ladder.tsx",
+      "site/src/components/app/next-match.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/chart.tsx",
+      "site/src/components/app/animated-height.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/star.tsx",
+      "site/src/components/app/match-status.tsx",
+      "site/src/components/app/player-name.tsx",
+      "site/src/components/app/portrait.tsx",
+      "site/src/components/app/ad-slot.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/result.tsx",
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/line-stepper.tsx",
+      "site/src/components/app/viz.tsx",
+      "site/src/components/app/tick.tsx",
+      "site/src/components/ui/popover.tsx",
+      "site/src/components/app/chip.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Saved.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "SavedPage"
+    ],
+    "dependencies": [
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/player-name.tsx",
+      "site/src/components/ui/button.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Simple.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "AboutPage",
+      "GlossaryPage",
+      "OddsPage",
+      "PlayersPage",
+      "TeamsPage",
+      "ToolsPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/accordion.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/input-group.tsx",
+      "site/src/components/ui/item.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/stats-ad.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Tools.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "PairPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/card.tsx",
+      "site/src/components/ui/checkbox.tsx",
+      "site/src/components/ui/textarea.tsx",
+      "site/src/components/app/forms.tsx",
+      "site/src/components/app/player-picker.tsx",
+      "site/src/components/ui/input.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/result.tsx",
+      "site/src/components/app/skeletons.tsx"
+    ]
+  }
+]

@@ -6,5 +6,10 @@
   "description": "Design tokens shared by the web app and future native apps (tokens.json is the source).",
   "main": "index.js",
   "types": "index.d.ts",
-  "exports": { ".": { "types": "./index.d.ts", "default": "./index.js" }, "./tokens.json": "./tokens.json", "./css": "./css.js" }
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    "./tokens.json": "./tokens.json",
+    "./css": "./css.js",
+    "./rem.js": "./rem.js"
+  }
 }

@@ -51,6 +51,7 @@
 
 :root {
   --radius: 0.75rem;
+  --card-radius: 1rem;
   --header-h: 3.5rem;
   --tabbar-h: 3.0625rem;
   --tabbar-pad: 0rem;
@@ -64,6 +65,11 @@
   --fab: 3.5rem;
   --sheet-radius: 1.5rem;
   --font-sans-stack: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --weight-editorial: 300;
+  --weight-copy: 400;
+  --weight-label: 500;
+  --weight-emphasis: 700;
+  --weight-brand: 900;
   --fs-display: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);
   --fs-display-lh: 1.1;
   --fs-display-ls: -0.025em;
@@ -94,6 +100,9 @@
   --space-group: 1.25rem;
   --space-section: 2rem;
   --space-inset: 0.875rem;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 :root {

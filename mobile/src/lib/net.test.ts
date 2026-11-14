@@ -45,6 +45,24 @@ describe("getJson keeps what it reads", () => {
     expect(calls.filter((c) => c.url.endsWith("/data/wrapped.json"))[1].headers["if-none-match"]).toBe('"w1"');
   });
 
+  test("a 304 returns the same object identity so a quiet live poll does not re-render", async () => {
+    files = { "/api/live": { etag: '"L1"', body: JSON.stringify({ matches: [{ id: "a" }] }) } };
+    const a = await getJson("/api/live");
+    const b = await getJson("/api/live");
+    expect(a).toBe(b);
+  });
+
+  test("the same wrapped ciphertext skips unwrap and reuses the object", async () => {
+    const obj = { matches: [{ status: "live" }] };
+    const wrapped = JSON.stringify(await wrap(obj, "the-secret", new Uint8Array(16).fill(3)));
+    // New ETag each time (as a CDN might), same ciphertext: still one object.
+    files = { "/api/live": { etag: '"a"', body: wrapped } };
+    const first = await getJson("/api/live");
+    files["/api/live"] = { etag: '"b"', body: wrapped };
+    const second = await getJson("/api/live");
+    expect(second).toBe(first);
+  });
+
   test("a changed file (a new ETag) is downloaded again and replaces the kept copy", async () => {
     files = { "/data/changing.json": { etag: '"a"', body: '{"v":1}' } };
     expect(await getJson("/data/changing.json")).toEqual({ v: 1 });

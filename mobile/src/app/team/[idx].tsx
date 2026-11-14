@@ -12,6 +12,7 @@ import { collectGrid } from "@site/lib/grid";
 import { storeQuery } from "@/lib/data";
 import { DataTable, Pill } from "@/ui/data-table";
 import { Chips } from "@/ui/chips";
+import { EmptyState } from "@/ui/empty-state";
 import { GridFilters, GridTable } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
@@ -54,7 +55,7 @@ export default function Team() {
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <PageHeader title={name} subtitle={valid ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={valid ? <StarButton idx={i} kind="team" /> : undefined} />
-      {!store ? <Working label="Loading…" fill /> : !valid ? <Text style={styles.empty}>Unknown team.</Text> : (
+      {!store ? <Working label="Loading…" fill shape="grid" /> : !valid ? <EmptyState title="Unknown team" body="This team is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}><TeamBadge name={store.teams[i].n} size={56} /><Text style={styles.name}>{name}</Text></View>
           <Segmented<string> items={FORMATS.map((f: string) => [f, f] as [string, string])} value={fmt} onChange={setFmt} label="Format" />
@@ -62,7 +63,9 @@ export default function Team() {
           {tab === "grid" ? (
             <>
               <GridFilters stat={stat} line={line} games={games} onStat={setStat} onLine={setLine} onGames={setGames} />
-              {grid.isLoading || !grid.data ? <Working label="Reading the players' games…" /> : (
+              {grid.isLoading && !grid.data ? <Working label="Reading the players' games…" shape="grid" /> : !grid.data ? (
+                <EmptyState compact title="Could not load grid" body="Try again in a moment." />
+              ) : (
                 <View style={{ gap: space.snug }}>
                   <GridTable g={grid.data} teamIdx={i} line={line} />
                   <Text style={styles.note}>{(STATS as any)[stat].label} over {line} across this team's last {grid.data.fx.length} {fmt} fixtures. A dash: not in the XI. VOID: in the XI, did not {(STATS as any)[stat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Text>
@@ -72,14 +75,18 @@ export default function Team() {
           ) : tab === "markets" ? (
             <>
               <View style={styles.bleed}><Chips items={MARKETS} value={market} onChange={setMarket} /></View>
-              {!mk.data ? <Working label="Working out the markets…" rows={4} /> : !mk.data.ok ? <Text style={styles.note}>{mk.data.error}</Text> : (
+              {mk.isLoading && !mk.data ? <Working label="Working out the markets…" shape="list" rows={4} /> : !mk.data ? (
+                <EmptyState compact title="Could not load markets" body="Try again in a moment." />
+              ) : !mk.data.ok ? (
+                <EmptyState compact title="Markets unavailable" body={String(mk.data.error || "Try another format.")} />
+              ) : (
                 <View style={{ gap: space.stack }}>
                   <Text style={styles.headline}>{mk.data.headline}</Text>
                   {mk.data.tables.filter((t: any) => t.n).map((t: any) => (
                     <View key={t.label} style={{ gap: space.snug }}>
                       <Text style={styles.tableTitle}>{t.label}</Text>
                       <Text style={styles.note}>n {t.n} · median {t.summary.median} · mean {t.summary.mean == null ? "–" : Math.round(t.summary.mean * 10) / 10} · range {t.summary.min}–{t.summary.max}</Text>
-                      <DataTable columns={["Line", "Over", "Fair", "Under", "Fair"]} flex={[0.9, 1.5, 1, 1.5, 1]}
+                      <DataTable bleed columns={["Line", "Over", "Fair", "Under", "Fair"]} flex={[0.9, 1.5, 1, 1.5, 1]}
                         rows={t.ladder.filter((l: any) => l.n).map((l: any) => [`${l.line}`, <Pill key="o" text={pc(l.pOver)} tone={l.pOver == null ? "none" : l.pOver >= 0.6 ? "up" : l.pOver <= 0.4 ? "down" : "mid"} />, odds(l.fairOver), <Pill key="u" text={pc(l.pUnder)} tone={l.pUnder == null ? "none" : l.pUnder >= 0.6 ? "up" : l.pUnder <= 0.4 ? "down" : "mid"} />, odds(l.fairUnder)])} />
                     </View>
                   ))}
@@ -88,10 +95,14 @@ export default function Team() {
               )}
             </>
           ) : (
-            !top.data ? <Working label="Working out the top batters…" rows={4} /> : !top.data.ok ? <Text style={styles.note}>{top.data.error}</Text> : (
+            top.isLoading && !top.data ? <Working label="Working out the top batters…" shape="list" rows={4} /> : !top.data ? (
+              <EmptyState compact title="Could not load top batters" body="Try again in a moment." />
+            ) : !top.data.ok ? (
+              <EmptyState compact title="Top batters unavailable" body={String(top.data.error || "Try another format.")} />
+            ) : (
               <View style={{ gap: space.snug }}>
                 <Text style={styles.tableTitle}>Top batter (team batting first)</Text>
-                <DataTable columns={["Batter", "Sole", "Tied", "Share", "Fair"]} flex={[2.4, 0.8, 0.8, 1, 1]}
+                <DataTable bleed columns={["Batter", "Sole", "Tied", "Share", "Fair"]} flex={[2.4, 0.8, 0.8, 1, 1]}
                   rows={top.data.rows.map((x: any) => [x.name, String(x.sole), String(x.tied), pc(x.pSole), odds(x.fairSole)])} />
               </View>
             )

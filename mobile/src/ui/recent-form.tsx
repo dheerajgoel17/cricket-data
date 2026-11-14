@@ -6,8 +6,9 @@ import { Press } from "@/ui/press";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { color, font, space, type } from "@/ui/tokens";
+import { EmptyState } from "@/ui/empty-state";
 
-const CHIP: Record<string, string> = { W: "#2fa84f", L: "#e5484d", T: "#8e8e93", D: "#8e8e93", NR: "#8e8e93" };
+const CHIP: Record<string, string> = { W: color.primary, L: color.miss, T: color["muted-foreground"], D: color["muted-foreground"], NR: color["muted-foreground"] };
 const WORD: Record<string, string> = { W: "Won", L: "Lost", T: "Tied", D: "Drawn", NR: "No result" };
 
 /** W / L / NR chips, oldest to newest; full size underlines the latest, compact is the closed row's size. */
@@ -45,7 +46,7 @@ export function RecentForm({ forms, store, fmt }: { forms: { name: string; idx: 
           <View style={styles.team}>
             <TeamBadge name={name} size={28} />
             <Text style={styles.teamName} numberOfLines={1}>{name}</Text>
-            {games.length ? <FormChips results={games.map((g) => g.result)} /> : <Text style={styles.muted}>No {fmt} results</Text>}
+            {games.length ? <FormChips results={games.map((g) => g.result)} /> : <EmptyState compact title={`No ${fmt} results`} />}
           </View>
           {[...games].reverse().map((g) => (
             <View key={g.m} style={styles.game}>
@@ -64,7 +65,7 @@ export function RecentForm({ forms, store, fmt }: { forms: { name: string; idx: 
 }
 
 const styles = StyleSheet.create({
-  chipText: { fontFamily: font.bold, color: "#fff" },
+  chipText: { fontFamily: font.bold, color: color.background },
   team: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug },
   teamName: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
   game: { flexDirection: "row", alignItems: "center", gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.snug },

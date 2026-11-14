@@ -73,6 +73,7 @@ export const UNLISTED = {
   "privacy-policy": { title: "Privacy policy", description: "What Fancy.cash stores on your device, the functional cookies it uses, and the anonymous analytics it may collect." },
   "terms-of-use": { title: "Terms of use", description: "Rules for using Fancy.cash: a free cricket stats and data site. It does not offer, promote or encourage gambling." },
   docs: { title: "Docs", description: "Fancy.cash is cricket stats and data. Listed prices are market data next to history. We do not offer, promote or encourage gambling." },
+  "design-system": { title: "Design system", description: "Fancy.cash design tokens and component catalogue for designers and engineers." },
 };
 const UNLISTED_ALIAS = { privacy: "privacy-policy", terms: "terms-of-use", disclaimer: "docs" };
 

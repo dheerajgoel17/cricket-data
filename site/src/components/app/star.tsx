@@ -1,10 +1,16 @@
-import { Star } from "lucide-react";
+import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
+import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import { propKey, useSaved } from "@/lib/saved";
 import { useAuth } from "@/lib/auth";
 import { tap } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
+
+function StarMark({ on, className }: { on: boolean; className?: string }) {
+  const Icon = on ? StarSolid : StarOutline;
+  return <Icon className={cn(className, on && "text-amber")} aria-hidden />;
+}
 
 /** Round save button for a player or team (account watchlist). Logged out: opens sign-in. */
 export function StarButton({ kind, idx, className }: { kind: "player" | "team"; idx: number; className?: string }) {
@@ -20,7 +26,7 @@ export function StarButton({ kind, idx, className }: { kind: "player" | "team"; 
         toast(toggle(key) ? "Saved. Find it under Saved." : "Removed from Saved");
       }}
       className={cn("grid size-control shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-secondary text-foreground", className)}>
-      <Star className={cn("size-5", on && "fill-amber stroke-amber")} />
+      <StarMark on={on} className="size-5" />
     </motion.button>
   );
 }
@@ -41,7 +47,7 @@ export function PropStar({ idx, stat, line, fmt, className }: { idx: number; sta
         toast(toggle(key) ? "Added to your watchlist (Saved)" : "Removed from watchlist");
       }}
       className={cn("grid size-control shrink-0 cursor-pointer place-items-center rounded-full text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring active:scale-90", className)}>
-      <Star className={cn("size-[18px]", on && "fill-amber stroke-amber")} />
+      <StarMark on={on} className="size-4" />
     </button>
   );
 }

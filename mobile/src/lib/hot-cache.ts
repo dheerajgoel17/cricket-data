@@ -3,7 +3,7 @@
 import { raw } from "@/lib/storage";
 import type { Row } from "@/lib/hot";
 
-const PREFIX = "hot-rows-v2:";
+const PREFIX = "hot-rows-v3:";
 /** Older than this a snapshot is not shown at all: its prices are too far from the books'. */
 const MAX_AGE_MS = 3 * 60 * 60e3;
 /** Cap JSON size so a huge day cannot fill MMKV. */

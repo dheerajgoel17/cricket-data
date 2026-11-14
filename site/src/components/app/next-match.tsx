@@ -34,7 +34,7 @@ export function UnpricedNote({ statLabel, className }: { statLabel: string; clas
     <p role="status" className={cn("flex gap-snug text-callout", className)}>
       <InformationCircleIcon aria-hidden className="relative top-px size-4 shrink-0 text-muted-foreground" />
       <span>
-        <span className="font-medium text-foreground">No book is offering odds for {statLabel}</span>
+        <span className="font-label text-foreground">No book is offering odds for {statLabel}</span>
         {" "}on this match. Hit rates and fair prices are from his history, not a listed market.
       </span>
     </p>
@@ -55,7 +55,7 @@ function RateRow({ label, r, side, line }: { label: string; r: { p: number | nul
     <div className="grid gap-hair text-left">
       <span className="label-cap text-caption text-muted-foreground">{label}</span>
       <span className="tabular-nums">
-        <b className={cn("font-condensed text-title font-bold leading-none", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
+        <b className={cn("font-condensed text-title font-emphasis leading-none", tone(r.p))}>{r.p == null ? "–" : `${Math.round(r.p * 100)}%`}</b>
         <span className="ml-tight text-footnote text-muted-foreground">{r.hits}/{r.played} · fair {odds(r.fair)}</span>
       </span>
       <span className="sr-only">{side} {line}</span>
@@ -86,17 +86,17 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
         {next.team ? (
           <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
             <TeamBadge name={next.team} size="sm" eager />
-            <span className="min-w-0 truncate text-body font-medium">{next.team}</span>
+            <span className="min-w-0 truncate text-body font-label">{next.team}</span>
           </span>
         ) : null}
         {next.team && next.opp ? <span className="shrink-0 text-footnote text-muted-foreground">vs</span> : null}
         {next.opp ? (
           <span className="inline-flex min-w-0 max-w-[46%] items-center gap-tight">
             <TeamBadge name={next.opp} size="sm" eager />
-            <span className="min-w-0 truncate text-body font-medium">{next.opp}</span>
+            <span className="min-w-0 truncate text-body font-label">{next.opp}</span>
           </span>
-        ) : <span className="min-w-0 truncate text-body font-medium">{next.match}</span>}
-        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-medium text-muted-foreground">Not in XI</Badge> : null}
+        ) : <span className="min-w-0 truncate text-body font-label">{next.match}</span>}
+        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge> : null}
       </div>
       {(next.ground || next.competition) ? (
         <p className="truncate text-footnote text-muted-foreground">
@@ -105,14 +105,14 @@ export function NextMatch({ next, entries, line, side, book, statLabel, fmt, sta
       ) : null}
       {book && standing != null && (
         <p className="text-callout text-primary">
-          <span className="font-medium tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
+          <span className="font-label tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
           {" · "}
           <StandingMark standing={standing} line={line} />
         </p>
       )}
       {!book && (
         <p role="status" className="text-callout">
-          <span className="font-medium text-foreground">No listed odds</span>
+          <span className="font-label text-foreground">No listed odds</span>
           <span className="text-muted-foreground"> · no book is offering {statLabel} on this match</span>
         </p>
       )}

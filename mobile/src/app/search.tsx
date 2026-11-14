@@ -37,13 +37,19 @@ export default function Search() {
     const q = norm(t), now = Date.now(), gap = (f: any) => Math.abs((Date.parse(f.start) || now) - now);
     const team = rz.team(t);
     const games = (fx.data || []).filter((f: any) => f.id && (norm(f.a).includes(q) || norm(f.b).includes(q) || norm(f.series || "").includes(q))).sort((x: any, y: any) => gap(x) - gap(y)).slice(0, 4);
-    return { matches: games as any[], teams: team ? [team] : [], players: rz.players(t, {}, 6) as any[], leagues: (rz.event(t) as number[]).slice(0, 4) };
+    return {
+      matches: games as any[],
+      teams: team ? [team] : [],
+      players: rz.players(t, {}, 6) as any[],
+      leagues: (rz.event(t) as number[]).slice(0, 4),
+      grounds: (rz.venues?.(t, 4) ?? []) as { idx: number; name: string }[],
+    };
   }, [query, rz, fx.data]);
   const seen = useMemo(() => (store ? recents.filter((k) => k.startsWith("player:")).map((k) => Number(k.split(":")[1])).filter((i) => i >= 0 && i < store.P.id.length).slice(0, 5) : []), [recents, store]);
 
   const open = (path: string) => { Keyboard.dismiss(); push(path); };
   const go = (path: string) => { Keyboard.dismiss(); router.navigate(path as never); };
-  const none = found && !found.matches.length && !found.teams.length && !found.players.length && !found.leagues.length;
+  const none = found && !found.matches.length && !found.teams.length && !found.players.length && !found.leagues.length && !found.grounds.length;
   const team = (i: number) => store.teamName(store.P.tm[i]);
 
   return (
@@ -51,9 +57,9 @@ export default function Search() {
       <View style={styles.bar}>
         <View style={styles.field}>
           <Ionicons name="search" size={18} color={color["muted-foreground"]} />
-          <TextInput value={text} onChangeText={setText} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" placeholder="Search players, teams, matches" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search" />
+          <TextInput value={text} onChangeText={setText} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" placeholder="Search players, teams, matches, grounds" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search" />
         </View>
-        <Press scale={1} accessibilityRole="button" onPress={goBack} hitSlop={8}><Text style={styles.cancel}>Cancel</Text></Press>
+        <Press accessibilityRole="button" onPress={goBack} hitSlop={8}><Text style={styles.cancel}>Cancel</Text></Press>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]}>
         {!found ? (
@@ -68,7 +74,7 @@ export default function Search() {
             ) : null}
           </>
         ) : none ? (
-          <EmptyState title="No matches" body={`No player, team, match or league matches “${query.trim()}”.`} />
+          <EmptyState title="No matches" body={`No player, team, match, league or ground matches “${query.trim()}”.`} />
         ) : (
           <>
             {found.matches.length ? (
@@ -84,6 +90,11 @@ export default function Search() {
             {found.teams.length ? (
               <Section title="Teams">
                 {found.teams.map((t: any, n: number) => <ListRow key={t.idx} first={n === 0} left={<TeamBadge name={t.name} size={40} />} title={t.name} sub="Team" onPress={() => open(`/team/${t.idx}`)} />)}
+              </Section>
+            ) : null}
+            {found.grounds.length ? (
+              <Section title="Grounds">
+                {found.grounds.map((v, n) => <ListRow key={v.idx} first={n === 0} title={v.name} sub="Ground" onPress={() => open(`/venue/${v.idx}`)} />)}
               </Section>
             ) : null}
             {found.leagues.length ? (

@@ -36,7 +36,7 @@ export function EmptyState({
         </span>
       ) : null}
       <div className="grid min-w-0 gap-hair">
-        <p className="text-body font-medium text-foreground">{title}</p>
+        <p className="text-body font-label text-foreground">{title}</p>
         {body ? <p className="text-callout text-muted-foreground">{body}</p> : null}
       </div>
       {action ? <div className="pt-tight">{action}</div> : null}

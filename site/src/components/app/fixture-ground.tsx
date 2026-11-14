@@ -25,12 +25,13 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { StatsAd } from "@/components/app/stats-ad";
-import { EmptyNote } from "@/components/app/page";
-import { ListSkeleton } from "@/components/app/skeletons";
+import { TABLE_HEAD } from "@/components/app/page";
+import { EmptyState } from "@/components/app/empty-state";
+import { cn } from "@/lib/utils";
+import { GroundSkeleton } from "@/components/app/skeletons";
 import { AnimatedNumber } from "@/components/app/animated-number";
 import { ValueBars } from "@/components/app/mini-bars";
 import { GroundGenderSheet } from "@/components/app/ground-filters";
-import { cn } from "@/lib/utils";
 
 export { fixtureHasGround, genderFilterLabel, tourDatesAtGround, tourStatusAtGround } from "@/lib/ground";
 export type { GenderFilter } from "@/lib/ground";
@@ -41,7 +42,7 @@ const pct1 = (n: number) => `${(n * 100).toFixed(1)}%`;
 function TourStatusMark({ status }: { status: TourStatus }) {
   if (status === "In progress") {
     return (
-      <span className="inline-flex shrink-0 items-center gap-tight label-cap text-caption font-medium text-miss" role="status">
+      <span className="inline-flex shrink-0 items-center gap-tight label-cap text-caption font-label text-miss" role="status">
         <span aria-hidden className="relative grid size-1.5 place-items-center">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-miss/60 motion-reduce:animate-none" />
           <span className="relative size-1.5 rounded-full bg-miss" />
@@ -72,7 +73,7 @@ function Metric({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="grid min-w-0 gap-hair">
       <span className="label-cap text-callout leading-tight text-muted-foreground">{k}</span>
-      <b className="break-words font-condensed text-metric font-medium leading-none tabular-nums">{v}</b>
+      <b className="break-words font-condensed text-metric font-label leading-none tabular-nums">{v}</b>
     </div>
   );
 }
@@ -85,7 +86,7 @@ function Fact({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col gap-hair px-snug py-snug">
       <dt className="label-cap truncate text-muted-foreground">{k}</dt>
-      <dd className="font-condensed text-metric font-medium tabular-nums">{v}</dd>
+      <dd className="font-condensed text-metric font-label tabular-nums">{v}</dd>
     </div>
   );
 }
@@ -137,14 +138,14 @@ function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIn
   secondary.push(["Highest 1st", (
     <span className="tabular-nums">
       {hi ? hi.runs : "—"}
-      {hi ? <span className="text-callout font-normal text-muted-foreground"> · {hi.a} vs {hi.b}, {matchDateLabel(hi.date)}</span> : null}
+      {hi ? <span className="text-callout font-copy text-muted-foreground"> · {hi.a} vs {hi.b}, {matchDateLabel(hi.date)}</span> : null}
     </span>
   )]);
   return (
     <section className="flex flex-col gap-snug" aria-label="Ground stats">
       <div className="flex items-baseline justify-between gap-snug">
         <div className="flex min-w-0 items-center gap-tight">
-          <h2 className="text-title font-medium tracking-tight">Ground stats</h2>
+          <h2 className="text-title font-emphasis tracking-tight">Ground stats</h2>
           <Popover>
             <PopoverTrigger asChild>
               <button type="button" aria-label="About ground stats" className="grid size-5 shrink-0 place-items-center rounded-full text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
@@ -167,7 +168,7 @@ function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIn
           {secondary.map(([k, v]) => (
             <div key={k} className="flex min-h-11 items-center justify-between gap-snug border-t border-hairline px-snug py-snug first:border-t-0">
               <dt className="label-cap shrink-0 text-muted-foreground">{k}</dt>
-              <dd className="min-w-0 text-right font-condensed text-metric font-medium tabular-nums">{v}</dd>
+              <dd className="min-w-0 text-right font-condensed text-metric font-label tabular-nums">{v}</dd>
             </div>
           ))}
         </dl>
@@ -187,11 +188,11 @@ function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
   return (
     <section className="flex flex-col gap-snug">
       <div className="flex items-baseline justify-between gap-snug">
-        <h2 className="text-title font-medium tracking-tight">Matches</h2>
-        <span className="font-condensed text-callout font-medium tabular-nums text-muted-foreground">{list.length}</span>
+        <h2 className="text-title font-emphasis tracking-tight">Matches</h2>
+        <span className="font-condensed text-callout font-label tabular-nums text-muted-foreground">{list.length}</span>
       </div>
       {!list.length ? (
-        <EmptyNote title="No matches">Nothing at this ground for the filters you picked.</EmptyNote>
+        <EmptyState compact title="No matches" body="Nothing at this ground for the filters you picked." />
       ) : (
         <>
           <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
@@ -243,14 +244,14 @@ function GroundFilterBar({ fx, fmt, gender, onFmt, onGender }: {
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${gender ? ", 1 active" : ""}`} onClick={() => setOpen(true)}
             className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />{gl}
-            {gender ? <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-bold text-primary-foreground ring-2 ring-background">1</span> : null}
+            {gender ? <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">1</span> : null}
           </Button>
         ) : null}
       </div>
       {both && gender ? (
         <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
           <ActiveChip label="Gender" value={gl} onRemove={() => onGender("")} />
-          <button type="button" onClick={() => onGender("")} className="h-control shrink-0 px-snug text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+          <button type="button" onClick={() => onGender("")} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
         </div>
       ) : null}
       {both ? <GroundGenderSheet open={open} onOpenChange={setOpen} gender={gender} onApply={onGender} /> : null}
@@ -285,7 +286,7 @@ function TourChip({ from, fixtureId, atGround, now }: { from: FromFx; fixtureId:
         <TeamBadge name={from.b} size="sm" eager />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-callout font-medium leading-snug">{series}</span>
+        <span className="block truncate text-callout font-label leading-snug">{series}</span>
         <span className="block truncate text-caption text-muted-foreground">{sub}</span>
       </span>
       <TourStatusMark status={status} />
@@ -318,7 +319,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
   return (
     <section className="flex flex-col gap-snug">
       <div className="flex items-baseline justify-between gap-snug">
-        <h2 className="text-title font-medium tracking-tight">Markets</h2>
+        <h2 className="text-title font-emphasis tracking-tight">Markets</h2>
         <span className="text-callout tabular-nums text-muted-foreground">{ms.length} matches</span>
       </div>
       <div className="flex flex-nowrap items-center gap-tight overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="toolbar" aria-label="Market">
@@ -327,7 +328,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
         ))}
       </div>
       {!ms.length ? (
-        <EmptyNote title="No matches">Nothing in {fmtName} at this ground for these filters.</EmptyNote>
+        <EmptyState compact title="No matches" body={`Nothing in ${fmtName} at this ground for these filters.`} />
       ) : isTop && tops ? (
         <section className="-mx-gutter overflow-hidden border-y border-hairline" aria-label="Top batter">
           <p className="px-gutter py-snug text-footnote text-muted-foreground">Highest score in the match · last {tops.n} {fmtName}</p>
@@ -336,15 +337,15 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
               const max = Math.max(...tops.rows.map((x: any) => x.pSole), 0.0001);
               return (
                 <motion.li key={r.player} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 8) * 0.03, duration: 0.3, ease: EASE }} className="relative border-t border-hairline">
-                  <motion.span aria-hidden className="absolute inset-y-0 left-0 bg-primary/10" initial={reduce ? false : { width: 0 }} animate={{ width: `${(r.pSole / max) * 100}%` }} transition={{ duration: 0.6, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
+                  <motion.span aria-hidden className="absolute inset-y-0 left-0 origin-left bg-primary/10" style={{ width: `${(r.pSole / max) * 100}%` }} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03, ease: EASE }} />
                   <Link to={`/player/${r.player}`} className="relative flex items-center gap-snug px-gutter py-snug outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring active:bg-accent">
                     <PlayerBadge idx={r.player} size="sm" />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-body font-medium">{r.name}</span>
+                      <span className="block truncate text-body font-label">{r.name}</span>
                       <span className="text-callout text-muted-foreground">{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {tops.n}</span>
                     </span>
                     <span className="grid justify-items-end text-right">
-                      <AnimatedNumber className="text-body font-medium tabular-nums text-primary" value={r.pSole} format={pct1} />
+                      <AnimatedNumber className="text-body font-label tabular-nums text-primary" value={r.pSole} format={pct1} />
                       <span className="text-footnote text-muted-foreground">fair {odds(r.fairSole)}</span>
                     </span>
                   </Link>
@@ -357,7 +358,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
       ) : rep && s && activeLine != null && atLine ? (
         <div className="flex flex-col gap-snug">
           <div className="flex items-baseline justify-between gap-snug">
-            <h3 className="text-body font-medium">{(MATCH_MARKETS as any)[market]?.label || market}</h3>
+            <h3 className="text-body font-label">{(MATCH_MARKETS as any)[market]?.label || market}</h3>
             <span className="text-footnote text-muted-foreground">{rep.n} matches · void excluded</span>
           </div>
           <div className="grid grid-cols-3 gap-snug">
@@ -376,13 +377,13 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                   <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
                 </Popover>
                 {lab === "Low–high" ? (
-                  <b className="font-condensed text-metric font-medium leading-none tabular-nums">
+                  <b className="font-condensed text-metric font-label leading-none tabular-nums">
                     {s.min == null || s.max == null ? "—" : (
                       <><AnimatedNumber value={s.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={s.max} format={(n) => String(Math.round(n))} /></>
                     )}
                   </b>
                 ) : (
-                  <AnimatedNumber className="font-condensed text-metric font-medium leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
+                  <AnimatedNumber className="font-condensed text-metric font-label leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
                 )}
               </div>
             ))}
@@ -395,10 +396,10 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
               const hit = (atLine as any)[side];
               return (
                 <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
-                  <div className="text-footnote font-medium capitalize text-muted-foreground">{side} {activeLine}</div>
-                  <AnimatedNumber className={cn("text-title font-bold tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                  <div className="text-footnote font-label capitalize text-muted-foreground">{side} {activeLine}</div>
+                  <AnimatedNumber className={cn("text-title font-emphasis tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
                   <div className="h-1.5 overflow-hidden rounded-full bg-hairline">
-                    <motion.div className={cn("h-full rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { width: 0 }} animate={{ width: `${(p ?? 0) * 100}%` }} transition={{ duration: 0.5, ease: EASE }} />
+                    <motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} />
                   </div>
                   <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · fair {odds(fair)}</div>
                 </div>
@@ -408,12 +409,16 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           {rep.n < 10 ? <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p> : null}
           {/* Phone: full-bleed like Match Fancy / Player ladder (`-mx-gutter`). */}
           <section className="-mx-gutter min-w-0 border-y border-hairline" aria-label="Line ladder">
-            <div className="grid grid-cols-[1fr_1fr_1fr] px-gutter py-tight font-condensed text-footnote font-medium uppercase tracking-wide text-muted-foreground"><span>Line</span><span className="text-right">Over</span><span className="text-right">Under</span></div>
+            <div className="grid grid-cols-3 px-gutter">
+              <span className={cn(TABLE_HEAD, "px-0")}>Line</span>
+              <span className={cn(TABLE_HEAD, "px-0 text-right")}>Over</span>
+              <span className={cn(TABLE_HEAD, "px-0 text-right")}>Under</span>
+            </div>
             {ladder.map((l: any, i: number) => (
               <motion.button key={l.line} type="button" onClick={() => setLine(l.line)} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
                 className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-gutter py-snug text-left text-body transition-colors active:bg-accent">
                 {l.line === activeLine && <motion.span layoutId="ground-ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
-                <span className="relative font-medium tabular-nums">{l.line}</span>
+                <span className="relative font-label tabular-nums">{l.line}</span>
                 <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
                 <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
               </motion.button>
@@ -421,7 +426,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           </section>
         </div>
       ) : (
-        <EmptyNote title="No sample">Not enough {fmtName} matches for this market.</EmptyNote>
+        <EmptyState compact title="No sample" body={`Not enough ${fmtName} matches for this market.`} />
       )}
     </section>
   );
@@ -452,10 +457,10 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
   const fromFixture = !!fixtureId;
   if (!embedded) setTitle(`${ground}: matches at this ground`);
 
-  if (!venue) return <EmptyNote title="No venue">This fixture has no ground listed.</EmptyNote>;
-  if (isLoading) return <ListSkeleton rows={3} />;
+  if (!venue) return <EmptyState title="No venue" body="This fixture has no ground listed." />;
+  if (isLoading) return <GroundSkeleton />;
   if (!known && !atGround.length) {
-    return <EmptyNote title="Ground not in data">We could not match “{venue}” to fixtures or stats.</EmptyNote>;
+    return <EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} />;
   }
 
   const back = () => {
@@ -498,10 +503,10 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
           <div className="flex items-center gap-snug">
             <MapPinIcon className="size-5 shrink-0 text-primary" aria-hidden />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-body font-medium">{ground}</p>
+              <p className="truncate text-body font-label">{ground}</p>
               {city ? <p className="truncate text-footnote text-muted-foreground">{city}</p> : null}
             </div>
-            {fixtureId ? <Link to={`/fixture/${fixtureId}/ground`} className="inline-flex shrink-0 items-center gap-hair text-callout font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Full page<ChevronRightIcon className="size-4" aria-hidden /></Link> : null}
+            {fixtureId ? <Link to={`/fixture/${fixtureId}/ground`} className="inline-flex shrink-0 items-center gap-hair text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Full page<ChevronRightIcon className="size-4" aria-hidden /></Link> : null}
           </div>
           {metrics}
           {tour}
@@ -532,7 +537,7 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
             </div>
             <div className="min-w-0 flex-1">
               <p className="label-cap text-footnote text-primary">Ground</p>
-              <h1 className="text-display font-bold leading-tight tracking-tight">{ground}</h1>
+              <h1 className="text-display font-emphasis leading-tight tracking-tight">{ground}</h1>
               {city ? <p className="truncate text-body text-muted-foreground">{city}</p> : null}
             </div>
           </div>
@@ -561,7 +566,7 @@ export function VenueGroundPage() {
   const { store } = useData();
   const { id } = useParams();
   const idx = Number(id);
-  if (!(idx >= 0 && idx < store.venues.length)) return <EmptyNote>Unknown ground.</EmptyNote>;
+  if (!(idx >= 0 && idx < store.venues.length)) return <EmptyState title="Unknown ground" body="This ground is not in the stats data." />;
   return (
     <div className="flex flex-col gap-snug">
       <StatsAd />
