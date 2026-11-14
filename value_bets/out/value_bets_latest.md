@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-14 12:23 IST
+# Cricket value bets - 2026-11-14 13:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2050 prices
-- **smarkets**: ok, 572 prices
-- **feedg**: ok, 16 prices, 2 events
+- **moviodds_bet365**: ok, 2052 prices
+- **smarkets**: ok, 498 prices
+- **feedg**: ok, 8 prices, 2 events
 - **feedk**: ok, 284 prices, 11 events
-- **feede**: ok, 588 prices, 20 events
-- **feedh**: ok, 1488 prices, 63 events
-- **feedf**: ok, 796 prices, 26 events
+- **feede**: ok, 486 prices, 18 events
+- **feedh**: ok, 1184 prices, 42 events
+- **feedf**: ok, 650 prices, 23 events
 
-Matches starting in next 168h: **48**, markets priced: **516**, value bets: **7** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **43**, markets priced: **467**, value bets: **7** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,6 +32,6 @@ Matches starting in next 168h: **48**, markets priced: **516**, value bets: **7*
 - **South Africa vs Bangladesh / Bowler Milestones / Mehidy Hasan Miraz 5+ yes** - why: Model 32% vs market 26% for 5+ wkts; form 3.5 wkts/spell recency-weighted MULTI (n_eff 15.4; last 5: 4, 2, 4, 1, 5), bowls in 94% of games, 36.7 overs/spell; vs South Africa: 5 spells avg 2.2; context adj: opposition strength -1%, venue environment +5%; weather: rain chance up to 92%. Notes: 1 market source(s) for fair price; model 0.323 vs market 0.255; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 3.5 (de-vigged 0.392); price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 92% rain chance, 1.6 mm forecast during the match - shortened match or void props possible
 - **Sydney Thunder vs Melbourne Stars / Amy Jones - Over/Under 18.5 Runs / Amy Jones under 18.5** - why: Model 64% vs market 54% for under 18.5 runs; form 18.6 runs/inn recency-weighted T20 (n_eff 66.6; last 5: 74, 4, 28, 18, 2), bats in 89% of games played; at Drummoyne Oval, Sydney: 3 inns avg 11.7; context adj: team H2H context -6%; weather: rain chance up to 80%, high humidity 80%, cloud cover 79%. Notes: 2 market source(s) for fair price; model 0.638 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 80% rain chance, 0.4 mm forecast during the match - shortened match or void props possible
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), Elite Cricket Academy (male), Karnataka (W) (female), Knight Fighters 11 (male), Lokseva Academy (male), Maharashtra (W) (female), North West Dragons (W) (female), Omr Checker (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), Royal Champs (male), Tuskers (W) (female), USA (W) (female), Vidarbha (W) (female)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), Karnataka (W) (female), Lokseva Academy (male), Maharashtra (W) (female), North West Dragons (W) (female), Omr Checker (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), Royal Champs (male), Tuskers (W) (female), USA (W) (female), Vidarbha (W) (female)
 
-Runtime 260.3s. Snapshot: `odds_20261114T065341Z.jsonl.gz`
+Runtime 456.7s. Snapshot: `odds_20261114T073032Z.jsonl.gz`
