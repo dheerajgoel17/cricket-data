@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-15 00:54 IST
+# Cricket value bets - 2026-11-15 01:03 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
+- **moviodds_bet365**: ok, 2374 prices
 - **smarkets**: ok, 548 prices
-- **moviodds_bet365**: ok, 2010 prices
 - **feedk**: ok, 236 prices, 9 events
 - **feedg**: ok, 32 prices, 5 events
 - **feede**: ok, 330 prices, 20 events
 - **feedf**: ok, 476 prices, 13 events
 - **feedh**: ok, 1501 prices, 87 events
 
-Matches starting in next 168h: **53**, markets priced: **471**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **53**, markets priced: **542**, value bets: **6** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,4 +32,4 @@ Matches starting in next 168h: **53**, markets priced: **471**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Bangla Tigers (male), Border (W) (female), Central Hinds (W) (female), Diasqua Little Sai Wan Cricket Club (male), Dm Jamali Region (male), Faisalabad Region (male), Fata Region (male), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Mountaineers (male), Multan Region (male), Nhlangano Legends (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Peshawar Region (male), Quetta Region (male), Rawalpindi Region (male), Recon Tactical Free State (W) (female), Royal Champs (male), Sialkot Blues (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tuskers (W) (female)
 
-Runtime 336.5s. Snapshot: `odds_20261114T192455Z.jsonl.gz`
+Runtime 164.9s. Snapshot: `odds_20261114T193331Z.jsonl.gz`
