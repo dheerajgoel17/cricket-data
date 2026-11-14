@@ -25,7 +25,7 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { StatsAd } from "@/components/app/stats-ad";
-import { TABLE_HEAD } from "@/components/app/page";
+import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { cn } from "@/lib/utils";
 import { GroundSkeleton } from "@/components/app/skeletons";
@@ -356,75 +356,76 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           {!tops.rows.length ? <p className="px-gutter pb-snug text-callout text-muted-foreground">Not enough matches.</p> : null}
         </section>
       ) : rep && s && activeLine != null && atLine ? (
-        <div className="flex flex-col gap-snug">
-          <div className="flex items-baseline justify-between gap-snug">
-            <h3 className="text-body font-label">{(MATCH_MARKETS as any)[market]?.label || market}</h3>
-            <span className="text-footnote text-muted-foreground">{rep.n} matches · void excluded</span>
-          </div>
-          <div className="grid grid-cols-3 gap-snug">
-            {([
-              ["Typical", s.median, "Middle result in this sample (median).", (n: number) => (Number.isInteger(s.median) ? String(Math.round(n)) : n.toFixed(1))],
-              ["Average", s.mean, "Mean across the same matches.", (n: number) => n.toFixed(1)],
-              ["Low–high", null, "Lowest and highest result in the sample.", null],
-            ] as const).map(([lab, val, tip, fmtN]) => (
-              <div key={lab} className="grid min-w-0 gap-hair">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button type="button" className="label-cap inline-flex w-fit items-center gap-hair text-callout leading-tight text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
-                      {lab}<InformationCircleIcon className="size-3.5 opacity-70" aria-hidden />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
-                </Popover>
-                {lab === "Low–high" ? (
-                  <b className="font-condensed text-metric font-label leading-none tabular-nums">
-                    {s.min == null || s.max == null ? "—" : (
-                      <><AnimatedNumber value={s.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={s.max} format={(n) => String(Math.round(n))} /></>
-                    )}
-                  </b>
-                ) : (
-                  <AnimatedNumber className="font-condensed text-metric font-label leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
-                )}
-              </div>
-            ))}
-          </div>
-          <ValueBars values={rep.values} line={activeLine} />
-          <div className="grid grid-cols-2 gap-snug">
-            {(["over", "under"] as const).map((side) => {
-              const p: number | null = (atLine as any)[side === "over" ? "pOver" : "pUnder"] ?? null;
-              const fair = (atLine as any)[side === "over" ? "fairOver" : "fairUnder"];
-              const hit = (atLine as any)[side];
-              return (
-                <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
-                  <div className="text-footnote font-label capitalize text-muted-foreground">{side} {activeLine}</div>
-                  <AnimatedNumber className={cn("text-title font-emphasis tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
-                  <div className="h-1.5 overflow-hidden rounded-full bg-hairline">
-                    <motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} />
-                  </div>
-                  <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · fair {odds(fair)}</div>
+        <DetailSplit>
+          <div className="flex min-w-0 flex-col gap-snug">
+            <div className="flex items-baseline justify-between gap-snug">
+              <h3 className="text-body font-label">{(MATCH_MARKETS as any)[market]?.label || market}</h3>
+              <span className="text-footnote text-muted-foreground">{rep.n} matches · void excluded</span>
+            </div>
+            <div className="grid grid-cols-3 gap-snug">
+              {([
+                ["Typical", s.median, "Middle result in this sample (median).", (n: number) => (Number.isInteger(s.median) ? String(Math.round(n)) : n.toFixed(1))],
+                ["Average", s.mean, "Mean across the same matches.", (n: number) => n.toFixed(1)],
+                ["Low–high", null, "Lowest and highest result in the sample.", null],
+              ] as const).map(([lab, val, tip, fmtN]) => (
+                <div key={lab} className="grid min-w-0 gap-hair">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button type="button" className="label-cap inline-flex w-fit items-center gap-hair text-callout leading-tight text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
+                        {lab}<InformationCircleIcon className="size-3.5 opacity-70" aria-hidden />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent side="top" align="start" className="max-w-56 text-callout text-muted-foreground">{tip}</PopoverContent>
+                  </Popover>
+                  {lab === "Low–high" ? (
+                    <b className="font-condensed text-metric font-label leading-none tabular-nums">
+                      {s.min == null || s.max == null ? "—" : (
+                        <><AnimatedNumber value={s.min} format={(n) => String(Math.round(n))} />–<AnimatedNumber value={s.max} format={(n) => String(Math.round(n))} /></>
+                      )}
+                    </b>
+                  ) : (
+                    <AnimatedNumber className="font-condensed text-metric font-label leading-none tabular-nums" value={val as number} format={fmtN as (n: number) => string} />
+                  )}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            <ValueBars values={rep.values} line={activeLine} />
+            <div className="grid grid-cols-2 gap-snug">
+              {(["over", "under"] as const).map((side) => {
+                const p: number | null = (atLine as any)[side === "over" ? "pOver" : "pUnder"] ?? null;
+                const fair = (atLine as any)[side === "over" ? "fairOver" : "fairUnder"];
+                const hit = (atLine as any)[side];
+                return (
+                  <div key={side} className="flex flex-col gap-tight border-t border-hairline pt-snug">
+                    <div className="text-footnote font-label capitalize text-muted-foreground">{side} {activeLine}</div>
+                    <AnimatedNumber className={cn("text-title font-emphasis tabular-nums", side === "over" ? "text-primary" : "text-foreground")} value={p} format={pct1} />
+                    <div className="h-1.5 overflow-hidden rounded-full bg-hairline">
+                      <motion.div className={cn("h-full w-full origin-left rounded-full", side === "over" ? "bg-primary" : "bg-foreground/70")} initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: p ?? 0 }} transition={{ duration: 0.3, ease: EASE }} />
+                    </div>
+                    <div className="text-footnote text-muted-foreground">{hit != null ? `${hit} of ${rep.n}` : "—"} · fair {odds(fair)}</div>
+                  </div>
+                );
+              })}
+            </div>
+            {rep.n < 10 ? <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p> : null}
           </div>
-          {rep.n < 10 ? <p className="text-footnote text-amber">Small sample ({rep.n} matches): treat these with caution.</p> : null}
-          {/* Phone: full-bleed like Match Fancy / Player ladder (`-mx-gutter`). */}
-          <section className="-mx-gutter min-w-0 border-y border-hairline" aria-label="Line ladder">
-            <div className="grid grid-cols-3 px-gutter">
+          <StickyPanel label="Line ladder">
+            <div className="grid grid-cols-3 px-gutter lg:px-inset">
               <span className={cn(TABLE_HEAD, "px-0")}>Line</span>
               <span className={cn(TABLE_HEAD, "px-0 text-right")}>Over</span>
               <span className={cn(TABLE_HEAD, "px-0 text-right")}>Under</span>
             </div>
             {ladder.map((l: any, i: number) => (
               <motion.button key={l.line} type="button" onClick={() => setLine(l.line)} initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 7) * 0.03, duration: 0.3, ease: EASE }}
-                className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-gutter py-snug text-left text-body transition-colors active:bg-accent">
+                className="relative grid w-full grid-cols-[1fr_1fr_1fr] items-center border-t border-hairline px-gutter py-snug text-left text-body transition-colors active:bg-accent lg:px-inset">
                 {l.line === activeLine && <motion.span layoutId="ground-ladder-sel" aria-hidden className="absolute inset-0 bg-accent/60" transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }} />}
                 <span className="relative font-label tabular-nums">{l.line}</span>
                 <span className="relative text-right tabular-nums"><b className="text-primary">{pc(l.pOver)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairOver)}</span></span>
                 <span className="relative text-right tabular-nums"><b>{pc(l.pUnder)}</b> <span className="text-footnote text-muted-foreground">{odds(l.fairUnder)}</span></span>
               </motion.button>
             ))}
-          </section>
-        </div>
+          </StickyPanel>
+        </DetailSplit>
       ) : (
         <EmptyState compact title="No sample" body={`Not enough ${fmtName} matches for this market.`} />
       )}
@@ -548,9 +549,13 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
       )}
 
       {atGround.length ? (
-        <div className={cn(!embedded && "sticky top-header z-30 -mx-gutter bg-background/85 px-gutter py-tight backdrop-blur-xl backdrop-saturate-150")}>
+        embedded ? (
           <GroundFilterBar fx={atGround} fmt={activeFmt} gender={gender} onFmt={setFmt} onGender={setGender} />
-        </div>
+        ) : (
+          <StickyFilterBand className="px-gutter py-tight">
+            <GroundFilterBar fx={atGround} fmt={activeFmt} gender={gender} onFmt={setFmt} onGender={setGender} />
+          </StickyFilterBand>
+        )
       ) : null}
 
       {/* Fancy rhythm: stats → Markets → collapsed Matches (not a long dump before prices). */}

@@ -40,8 +40,8 @@ export function SavedPage() {
   const props = list.map((k) => ({ k, p: parsePropKey(k) })).filter((x): x is { k: string; p: NonNullable<ReturnType<typeof parsePropKey>> } => !!x.p && x.p.idx >= 0 && x.p.idx < store.P.id.length);
   const people = list.filter((k) => k.startsWith("player:") || k.startsWith("team:")).map((k) => {
     const [kind, i] = k.split(":");
-    return kind === "player" ? { k, to: `/player/${i}`, name: store.playerName(+i), sub: store.teamName(store.P.tm[+i]), badge: <PlayerBadge idx={+i} /> }
-      : { k, to: `/team/${i}`, name: store.teamName(+i), sub: "Team", badge: <TeamBadge name={store.teams[+i].n} /> };
+    return kind === "player" ? { k, to: `/player/${i}`, idx: +i, name: null as string | null, sub: store.teamName(store.P.tm[+i]), badge: <PlayerBadge idx={+i} /> }
+      : { k, to: `/team/${i}`, idx: null as number | null, name: store.teamName(+i), sub: "Team", badge: <TeamBadge name={store.teams[+i].n} /> };
   });
   const seen = recents.filter((k) => k.startsWith("player:")).map((k) => +k.split(":")[1]).filter((i) => i >= 0 && i < store.P.id.length);
   const none = !props.length && !people.length && !combos.length;
@@ -93,10 +93,10 @@ export function SavedPage() {
         ))}
       </Section>
       <Section icon={<StarIcon className="size-4" />} title="Players and teams" count={people.length} emptyTitle="No saved players or teams" emptyBody="Tap the star on a player or team page to keep it here.">
-        {people.map((it) => <li key={it.k} className="border-t border-hairline first:border-t-0"><Link to={it.to} className={`${rowCls} border-t-0`}>{it.badge}<span className="flex-1 truncate text-body font-label">{it.name}</span><span className="text-callout text-muted-foreground">{it.sub}</span></Link></li>)}
+        {people.map((it) => <li key={it.k} className="border-t border-hairline first:border-t-0"><Link to={it.to} className={`${rowCls} border-t-0`}>{it.badge}<span className="flex-1 truncate text-body font-label">{it.idx != null ? <PlayerName idx={it.idx} /> : it.name}</span><span className="text-callout text-muted-foreground">{it.sub}</span></Link></li>)}
       </Section>
       <Section icon={<ClockIcon className="size-4" />} title="Recently viewed" count={seen.length} emptyTitle="No recent players" emptyBody="Players you open show up here on this device.">
-        {seen.map((i) => <li key={i} className="border-t border-hairline first:border-t-0"><Link to={`/player/${i}`} className={`${rowCls} border-t-0`}><PlayerBadge idx={i} size="md" className="size-control" /><span className="flex-1 truncate text-body font-label">{store.playerName(i)}</span><span className="text-callout text-muted-foreground">{store.teamName(store.P.tm[i])}</span></Link></li>)}
+        {seen.map((i) => <li key={i} className="border-t border-hairline first:border-t-0"><Link to={`/player/${i}`} className={`${rowCls} border-t-0`}><PlayerBadge idx={i} size="md" className="size-control" /><span className="flex-1 truncate text-body font-label"><PlayerName idx={i} /></span><span className="text-callout text-muted-foreground">{store.teamName(store.P.tm[i])}</span></Link></li>)}
       </Section>
     </div>
   );

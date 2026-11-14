@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { cn } from "@/lib/utils";
 import { useData } from "@/lib/data";
 import { flagUrl, leagueLogos, playerPhotos, teamLogos } from "@/lib/assets";
@@ -95,17 +96,21 @@ const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function PlayerBadge({ idx, size = "sm", className }: { idx: number; size?: BadgeSize; className?: string }) {
-  const { store, photos } = useData();
-  const urls = playerPhotos(photos, store.P.id[idx]) as string[];
-  return <Circle size={size} className={className} title={store.playerName(idx)}><Img urls={urls} alt={store.playerName(idx)} className="size-full object-cover" fallback={<Silhouette />} /></Circle>;
+  const { store, photos, names } = useData();
+  const pid = store.P.id[idx];
+  const label = resolvePlayerLabel(store.playerName(idx), { catalogName: names?.[pid] });
+  const urls = playerPhotos(photos, pid) as string[];
+  return <Circle size={size} className={className} title={label}><Img urls={urls} alt={label} className="size-full object-cover" fallback={<Silhouette />} /></Circle>;
 }
 
 /** The hero photo: top-aligned crop, no circle (like props.cash). */
 /** `contain`: show the whole picture (bottom-aligned) instead of cropping it to fill the box: the source avatars are head-and-shoulders, nearly square. */
 export function PlayerPhoto({ idx, className, contain }: { idx: number; className?: string; contain?: boolean }) {
-  const { store, photos } = useData();
-  const urls = playerPhotos(photos, store.P.id[idx]) as string[];
-  return <div className={cn("relative grid place-items-end overflow-hidden", className)}><Img urls={urls} alt={store.playerName(idx)} className={contain ? "size-full object-contain object-bottom" : "size-full object-cover object-top"} fallback={<Silhouette />} /></div>;
+  const { store, photos, names } = useData();
+  const pid = store.P.id[idx];
+  const label = resolvePlayerLabel(store.playerName(idx), { catalogName: names?.[pid] });
+  const urls = playerPhotos(photos, pid) as string[];
+  return <div className={cn("relative grid place-items-end overflow-hidden", className)}><Img urls={urls} alt={label} className={contain ? "size-full object-contain object-bottom" : "size-full object-cover object-top"} fallback={<Silhouette />} /></div>;
 }
 
 /** Preload the primary flag/logo of each team so rows that mount later show them without a shimmer. */

@@ -25,7 +25,7 @@ const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
 const FRAME_MS = 8, REST_MS = 4;
 
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
-export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scope, now = Date.now(), onRows, seed }: { store?: any; rz?: any; loadStore?: () => Promise<{ store: any; rz: any }>; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void; seed?: Record<string, any> | null }): Promise<Row[]> {
+export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scope, now = Date.now(), onRows, seed, names = null }: { store?: any; rz?: any; loadStore?: () => Promise<{ store: any; rz: any }>; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void; seed?: Record<string, any> | null; names?: Record<string, string> | null }): Promise<Row[]> {
   const todays = hotLines(lines || [], scope, now);
   // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one (that stays: it is the bet we settle).
   const keys = new Map<string, any>();
@@ -38,7 +38,7 @@ export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scop
   // lines the published file already scored (the history part; the prices are the books' own, now) need no player files and no plan: they are rows at once
   const todo: any[] = [];
   for (const l of keys.values()) {
-    const row = seed ? seedRow({ store, l, b: booksOf(l, byChip, now), rec: seed[lineKey(l)] }) : null;
+    const row = seed ? seedRow({ store, l, b: booksOf(l, byChip, now), rec: seed[lineKey(l)], names }) : null;
     if (row) out.push({ ...row, day: hotDay(row.start, l.fmt, now) }); else todo.push(l);
   }
   if (out.length) onRows?.([...out]);
@@ -46,7 +46,7 @@ export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scop
   if (!store) ({ store, rz } = await loadStore!());
   const score = async (l: any) => {
     const tp = Date.now();
-    const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year });
+    const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year, names });
     plan += Date.now() - tp;
     if (r) out.push({ ...r, day: hotDay(r.start, l.fmt, now) });
   };

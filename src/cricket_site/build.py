@@ -1051,6 +1051,13 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     build_sitemap(out, A, names, site_url, fx)
     if photos:
         keep = set(A["pids"])
+        # The day's crex_match.json cache freezes `t`. Re-match every Base side in the assembled index so a kit
+        # (e.g. Afghanistan → Y) is not omitted when the cache predates that side appearing in bat/bowl rows.
+        crex_teams = [(cid, nm) for cid, nm, _f in (cx.get("index") or {}).get("teams", [])]
+        if crex_teams:
+            from . import crex_assets as ca
+            for k, v in ca.match_teams([{"name": n, "g": g} for n, g in A["teams"]], crex_teams).items():
+                cx.setdefault("t", {}).setdefault(k, v)
         (out / "photos.json").write_text(json.dumps({"p": faces(cx, keep, stock), "t": cx["t"], "l": cx.get("l", {})}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
         # full names for wide layouts: our names are initials plus surname ("P Rathnayake"); the source lists the full name for every linked player

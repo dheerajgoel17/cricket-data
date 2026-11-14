@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 const env = vi.hoisted(() => ({ data: null as any }));
 vi.mock("@/lib/data", () => ({ useDataMaybe: () => env.data }));
-import { PlayerName } from "./player-name";
+import { PlayerName, resolvePlayerLabel } from "./player-name";
 
 const data = (names: Record<string, string>) => ({ store: { P: { id: ["p0", "p1"] }, playerName: (i: number) => ["P Rathnayake", "abcdef12"][i] }, names });
 
@@ -27,6 +27,16 @@ describe("PlayerName", () => {
     unmount();
     render(<PlayerName idx={1} fallback="Kusal Mendis" />);
     expect(screen.getByText("Kusal Mendis")).toBeInTheDocument();
+  });
+  it("uses the source full name when the store holds only a hex id and no book spelling", () => {
+    env.data = data({ p1: "Hashmatullah Shahidi" });
+    render(<PlayerName idx={1} always fallback="abcdef12" />);
+    expect(screen.getByText("Hashmatullah Shahidi")).toBeInTheDocument();
+    expect(screen.queryByText("abcdef12")).toBeNull();
+  });
+  it("resolvePlayerLabel prefers book then catalog over a hex id", () => {
+    expect(resolvePlayerLabel("4b4af5fb", { bookName: "H Shahidi", catalogName: "Hashmatullah Shahidi" })).toBe("H Shahidi");
+    expect(resolvePlayerLabel("4b4af5fb", { catalogName: "Hashmatullah Shahidi" })).toBe("Hashmatullah Shahidi");
   });
   it("does not throw outside the data provider", () => {
     env.data = null;

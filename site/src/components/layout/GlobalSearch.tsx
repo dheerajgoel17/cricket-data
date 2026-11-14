@@ -80,7 +80,7 @@ export function SearchDialog({ open, onOpenChange, onCloseAutoFocus }: { open: b
         {text.trim().length < 2 && (
           <>
             <CommandGroup heading="Go to">{[["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Saved", "/saved"]].map(([l, to]) => <CommandItem key={to} value={`go ${l}`} onSelect={() => go(to)}>{l}</CommandItem>)}</CommandGroup>
-            {seen.length > 0 && <CommandGroup heading="Recently viewed">{seen.map((i) => <CommandItem key={`r${i}`} value={`recent ${i}`} onSelect={() => go(`/player/${i}`)}><PlayerBadge idx={i} size="xs" />{store.playerName(i)}<span className="ml-auto text-footnote text-muted-foreground">{store.teamName(store.P.tm[i])}</span></CommandItem>)}</CommandGroup>}
+            {seen.length > 0 && <CommandGroup heading="Recently viewed">{seen.map((i) => <CommandItem key={`r${i}`} value={`recent ${i}`} onSelect={() => go(`/player/${i}`)}><PlayerBadge idx={i} size="xs" /><PlayerName idx={i} /><span className="ml-auto text-footnote text-muted-foreground">{store.teamName(store.P.tm[i])}</span></CommandItem>)}</CommandGroup>}
           </>
         )}
         {items.fixtures.length > 0 && <CommandGroup heading="Matches">{items.fixtures.map((f: any) => <CommandItem key={`f${f.id}`} value={`${text} f${f.id}`} onSelect={() => go(`/fixture/${f.id}`)}><TeamBadge name={f.a} size="xs" />{f.a} v {f.b}<span className="ml-auto text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span></CommandItem>)}</CommandGroup>}

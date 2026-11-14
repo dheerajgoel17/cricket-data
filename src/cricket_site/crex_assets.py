@@ -179,6 +179,7 @@ TEAM_ALIASES = {
     "royal challengers bangalore": "royal challengers bengaluru", "kings xi punjab": "punjab kings", "delhi daredevils": "delhi capitals",
     "rising pune supergiants": "rising pune supergiant", "st kitts and nevis patriots": "st kitts nevis patriots", "jammu kashmir": "jammu and kashmir",
     "manchester originals": "manchesters super giants", "hyderabad india": "hyderabad", "lucknow super giants": "lucknow super giants",
+    "united states of america": "united states", "usa": "united states",
 }
 
 

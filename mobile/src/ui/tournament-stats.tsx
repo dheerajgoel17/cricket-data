@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { editionRows, editionSummary, editionsOf, boards as tournamentBoards, trendSeries, TREND_METRICS } from "@cricket/engine/tournament.js";
 import { abbr } from "@site/lib/format";
 import { storeQuery } from "@/lib/data";
+import { playerLabel } from "@/lib/player-label";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -107,15 +108,16 @@ function Lists({ ed, result }: { ed: any; result: any }) {
 /** The headline card of a list: the leader's picture in his team's shirt, his name and side, and the figure. */
 function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }) {
   const stats = useQuery(storeQuery);
-  const store: any = stats.data?.store;
+  const store: any = stats.data?.store, names = stats.data?.names;
   const r = l.row, team = store.teams[r.t]?.n ?? "";
+  const who = playerLabel(store, names, r.p);
   return (
-    <Press scale={1} onPress={() => push(`/player/${r.p}`)} accessibilityRole="button" accessibilityLabel={`${l.label}: ${store.playerName(r.p)}, ${r.v}`} style={({ pressed }) => [styles.leader, { width }, pressed && { opacity: 0.7 }]}>
+    <Press scale={1} onPress={() => push(`/player/${r.p}`)} accessibilityRole="button" accessibilityLabel={`${l.label}: ${who}, ${r.v}`} style={({ pressed }) => [styles.leader, { width }, pressed && { opacity: 0.7 }]}>
       <Text style={styles.cap}>{l.label}</Text>
       <View style={styles.leaderRow}>
         <PlayerAvatar pid={store.P.id[r.p]} team={team} test={test} size={52} />
         <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-          <Text style={styles.leaderName} numberOfLines={1}>{store.playerName(r.p)}</Text>
+          <Text style={styles.leaderName} numberOfLines={1}>{who}</Text>
           <Text style={styles.sub} numberOfLines={1}>{abbr(team)}</Text>
         </View>
         <View style={{ alignItems: "flex-end" }}>
@@ -130,7 +132,7 @@ function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }
 /** One list as a table: rank, name with side, the headline figure, then two supporting columns; the best five, the rest behind "Show all". */
 function BoardCard({ b }: { b: any }) {
   const stats = useQuery(storeQuery);
-  const store: any = stats.data?.store;
+  const store: any = stats.data?.store, names = stats.data?.names;
   const [all, setAll] = useState(false);
   const shown = all ? b.rows : b.rows.slice(0, SHOWN);
   const side = (t?: number) => abbr(store.teams[t ?? -1]?.n ?? "");
@@ -149,7 +151,7 @@ function BoardCard({ b }: { b: any }) {
       </View>
       {shown.map((r: any) => {
         const player = r.p != null, crest = store.teams[r.t]?.n ?? "";
-        const name = player ? store.playerName(r.p) : store.teamName(r.t, true);
+        const name = player ? playerLabel(store, names, r.p) : store.teamName(r.t, true);
         const sub = r.m == null ? (player ? side(r.t) : "") : `${player ? `${side(r.t)} ` : ""}v ${side(r.q)}${r.date ? ` · ${day(r.date, false)}` : ""}`;
         return (
           <Press scale={1} key={`${r.rank}-${r.p ?? r.t}-${r.m ?? ""}`} disabled={!player} onPress={() => push(`/player/${r.p}`)} accessibilityRole={player ? "button" : "text"} style={({ pressed }) => [styles.tr, styles.trSep, pressed && { opacity: 0.6 }]}>

@@ -14,6 +14,7 @@ import { OverviewRow, fancyFm } from "@/components/app/match-fancy";
 import { useFancyCards } from "@/hooks/useFancyCards";
 import { TeamBadge } from "@/components/app/badges";
 import { RowsSkeleton } from "@/components/app/skeletons";
+import { CardGrid } from "@/components/app/page";
 
 /** Player props: the hot props of every priced match, with the day switch and filters the component carries. */
 export function PropsPage() {
@@ -59,9 +60,9 @@ export function FancyPage() {
           body="They open a day or two before a match, once there are past matches to score them on."
         />
       ) : (
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-stack md:grid-cols-2 xl:grid-cols-3">
+        <CardGrid>
           {rows.map((r: any, i: number) => <FancyCard key={r.f.id || `${r.f.a}${r.f.b}${r.f.start}`} {...r} i={i} />)}
-        </div>
+        </CardGrid>
       )}
     </div>
   );

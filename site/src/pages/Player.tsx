@@ -47,12 +47,12 @@ import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
 import { MatchStatus } from "@/components/app/match-status";
-import { PlayerName } from "@/components/app/player-name";
+import { PlayerName, isHexPlayerId, resolvePlayerLabel } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
 import { AdSlot } from "@/components/app/ad-slot";
-import { Crumbs, DataTable, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
+import { Crumbs, DataTable, DetailSplit, StickyFilterBand, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
@@ -131,7 +131,7 @@ function PlayerHeader({ idx, name, team, teamIx, test, fmts }: { idx: number; na
 }
 
 function PlayerScreen({ idx }: { idx: number }) {
-  const { store } = useData();
+  const { store, names } = useData();
   const nav = useNavigate();
   const rawName = store.playerName(idx), team = store.teamName(store.P.tm[idx]);
   const [version, setVersion] = useState(0);          // bumps when the URL changes through the router (stat, format, filters)
@@ -149,9 +149,11 @@ function PlayerScreen({ idx }: { idx: number }) {
 
   const lines = useQuery(linesQuery);
   const pid = store.P.id[idx];
-  // a player the data knows only by an id (eight hex digits) is shown under the name the books use for him
+  // Data sometimes stores only an eight-hex id: book spelling → names.json → id (same helper as props rows / PlayerName).
   const bookName = (lines.data?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
-  const name = /^[0-9a-f]{8}$/.test(rawName) ? bookName || rawName : rawName;
+  const resolved = resolvePlayerLabel(rawName, { bookName, catalogName: names?.[pid] });
+  // Cold deep-link: lines may still be loading — don't put the hex id in the title/crumbs while book_name can still arrive.
+  const name = isHexPlayerId(resolved) && lines.isLoading ? "Player" : resolved;
   setTitle(`${name}: stats, hit rates and form`);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));
@@ -217,7 +219,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <HeaderActions>
         <h1 className="sr-only">{name} · {statLabel}</h1>
         <div className="min-w-0 flex-1 lg:hidden" aria-hidden>
-          <p className="truncate text-body font-emphasis tracking-tight">{name}</p>
+          <p className="truncate text-body font-emphasis tracking-tight"><PlayerName idx={idx} always fallback={name} /></p>
           <p className="truncate text-footnote text-muted-foreground">{statLabel}{side ? ` · ${abbr(side)}` : ""}</p>
         </div>
         <span className="hidden flex-1 lg:block" aria-hidden />
@@ -225,31 +227,32 @@ function PlayerScreen({ idx }: { idx: number }) {
           <ArrowUpOnSquareIcon className="size-5" />
         </button>
       </HeaderActions>
-      <div className="hidden lg:block">
+      <div className="hidden pt-stack lg:block">
         <Crumbs items={[["Player props", "/props"], [name], [statLabel]]} />
       </div>
-      <AdSlot slotId="player_detail_top" />
-      <div className="sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150">
-        <div className="flex min-w-0 items-stretch gap-snug border-b border-hairline px-gutter">
+      {/* Ad below the sticky band so an empty/pending unit cannot open a gap under the header that vanishes once the band sticks. */}
+      <StickyFilterBand>
+        {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
+        <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
           {fmts.length > 1 ? (
             <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
               className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
           ) : <span className="min-w-0 flex-1" />}
-          {testBat && (
-            <PillGroup sub layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
-              className="min-w-0 shrink" items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
-          )}
           <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative my-auto h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
             <AdjustmentsHorizontalIcon className="size-4" />Filters
             {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
           </Button>
         </div>
-        <div className="px-gutter py-tight">
+        <div className="flex flex-col gap-snug px-gutter py-snug">
+          {testBat && (
+            <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+              items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
+          )}
           <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
         </div>
         {activeFilters.length > 0 && (
-          <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+          <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
             {activeFilters.map(([k, v], i) => (
               <ActiveChip key={i} label={k || "Filter"} value={String(v)}
                 onRemove={() => navigateWith(CHIP_CLEAR[k] || Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl"].map((x) => [x, ""])))} />
@@ -257,7 +260,8 @@ function PlayerScreen({ idx }: { idx: number }) {
             <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
           </div>
         )}
-      </div>
+      </StickyFilterBand>
+      <AdSlot slotId="player_detail_top" />
       <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
@@ -345,9 +349,9 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<string>(c ? c.side : "over");
   const [win, setWin] = useState<number>(entries.length >= 10 ? 10 : 0) // the last 10 games first;
+  const phone = useIsMobile();
   const [tab, setTab] = useState<string>(["logs", "splits", "corr", "lines"].includes(q.tab) ? q.tab : "logs");
   const [game, setGame] = useState<{ e: any; s: string } | null>(null);
-  const phone = useIsMobile();
   const [logCount, setLogCount] = useState(30);
   const tabRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
@@ -356,6 +360,12 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
     setTab(t); keep({ tab: t });
     requestAnimationFrame(() => tabRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }));
   };
+  const tabItems: [string, string][] = [
+    ["logs", "Game log"],
+    ["splits", "Splits"],
+    ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []),
+    ...(!book ? [["lines", "Research"] as [string, string]] : []),
+  ];
 
   const ws = entries.length ? windowRates(entries, line, side) : [];
   const cur = ws.find((w: any) => w.n === win) || ws[ws.length - 1];
@@ -395,7 +405,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const out = !!(book && next?.priced && asLine && lineNotIn(liveMatch, asLine, identity));
 
   return (
-    <div className="flex flex-col gap-stack">
+    <div className="flex flex-col gap-section">
       {!entries.length || !cur ? (
         <>
           {!book ? <UnpricedNote statLabel={res.statLabel} /> : null}
@@ -414,8 +424,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </div>
         </>
       ) : (
-      <div className="flex flex-col gap-snug lg:grid lg:grid-cols-2 lg:items-start lg:gap-section">
-        <section className="flex min-w-0 flex-col gap-snug">
+      <DetailSplit className={!book ? "lg:grid-cols-1" : undefined}>
+        <section className="flex min-w-0 flex-col gap-stack">
           <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-snug", CARD)}>
             <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-snug">
               <Metric k={`${cur.label} avg`} v={<Arrow up={cur.mean == null ? null : cur.mean > line}>{num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)}</Arrow>} />
@@ -455,7 +465,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
             })}
           </div>
           {mix.out > 0 || cur.played < 5 ? (
-            <p className={cn("text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
+            <p className={cn("text-center text-footnote", cur.played < 5 ? "text-amber" : "text-muted-foreground")} role="status">
               {mix.out > 0 ? (
                 <>
                   <b className="font-label tabular-nums">{mix.out}</b> void or not in the XI left out
@@ -473,16 +483,16 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
               {cur.played < 5 ? <>{mix.out > 0 ? " " : ""}Too few for a steady read{active.length ? ": relax a filter" : ""}.{active.length > 0 ? <> <button type="button" className="font-label underline-offset-2 hover:underline" onClick={() => navigateWith(Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl", "line", "side"].map((k) => [k, ""])))}>Clear filters</button></> : null}</> : null}
             </p>
           ) : null}
-          {/* Fancy strip: hit-rate meters, then independent Over / Under book lanes. */}
-          <div className="grid gap-snug border-t border-hairline pt-snug">
-            <div className="grid min-w-0 grid-cols-2 gap-snug">
+          {/* Ground-style bordered blocks: hit-rate meters, then Over / Under book lanes. */}
+          <div className="overflow-hidden border border-hairline">
+            <div className="grid min-w-0 grid-cols-2 divide-x divide-hairline">
               {(["over", "under"] as const).map((lane) => {
                 const hist = windowRate(entries, cur.n, line, lane);
                 const p = hist.p, fair = p ? 1 / p : null;
                 return (
                   <button key={lane} type="button" onClick={() => { setSide(lane); keep({ line, side: lane }); }}
-                    className={cn("flex min-w-0 flex-col gap-tight rounded-sm text-left outline-none focus-visible:ring-2 focus-visible:ring-ring", side === lane && "opacity-100", side !== lane && "opacity-70")}>
-                    <div className="text-footnote font-label capitalize text-muted-foreground">{lane} {line}</div>
+                    className={cn("flex min-w-0 flex-col gap-tight px-snug py-snug text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset", side === lane ? "bg-secondary/40" : "hover:bg-secondary/20")}>
+                    <div className="label-cap text-caption text-muted-foreground">{lane} {line}</div>
                     <b className={cn("text-title font-emphasis tabular-nums", lane === "over" ? "text-primary" : "text-foreground")}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</b>
                     <div className="h-1.5 overflow-hidden rounded-full bg-hairline"><div className={cn("h-full rounded-full", lane === "over" ? "bg-primary" : "bg-foreground/70")} style={{ width: `${(p ?? 0) * 100}%` }} /></div>
                     <div className="text-footnote text-muted-foreground">{hist.hits} of {hist.played} · fair {odds(fair)}</div>
@@ -491,22 +501,24 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
               })}
             </div>
             {(pricedAt || (book && !bookAt)) && (
-              <div className="grid gap-tight border-t border-hairline pt-snug" aria-label="Book prices">
+              <div className="border-t border-hairline" aria-label="Book prices">
                 {pricedAt ? (
                   <>
-                    <div className="grid grid-cols-2 gap-snug">
+                    <div className="grid grid-cols-2 divide-x divide-hairline">
                       {(["over", "under"] as const).map((lane) => (
-                        <div key={lane} className="grid justify-items-start gap-hair text-left">
+                        <div key={lane} className="grid justify-items-start gap-hair px-snug py-snug text-left">
                           <span className="label-cap text-caption text-muted-foreground">{lane} {line}</span>
                           <SideBook priced={pricedAt} side={lane} />
                         </div>
                       ))}
                     </div>
-                    {splitNote && <p className="text-footnote text-muted-foreground">{splitNote}</p>}
-                    <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                    {splitNote && <p className="border-t border-hairline px-snug py-tight text-footnote text-muted-foreground">{splitNote}</p>}
+                    <div className="border-t border-hairline px-snug py-snug">
+                      <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                    </div>
                   </>
                 ) : (
-                  <p className="text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
+                  <p className="px-snug py-snug text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
                 )}
               </div>
             )}
@@ -514,8 +526,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
         </section>
 
-        {book && cur && (
-          <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
+        {book && (
+          <StickyPanel label="Line ladder">
             <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
               <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
               <span className="flex items-center gap-snug text-footnote text-muted-foreground">
@@ -540,14 +552,13 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                 ))}
               </TableBody>
             </Table>
-          </section>
+          </StickyPanel>
         )}
-      </div>
+      </DetailSplit>
       )}
 
       <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
-        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={switchTab}
-          items={[["logs", "Game log"], ["splits", "Splits"], ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []), ...(!book ? [["lines", "Research"] as [string, string]] : [])]} />
+        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0]} onChange={switchTab} items={tabItems} />
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
             {tab === "lines" && !book && <LadderTable bleed ladder={res.ladder} />}

@@ -1340,6 +1340,7 @@
       "site/src/components/ui/card.tsx",
       "site/src/components/ui/item.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/player-name.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/mini-bars.tsx"
@@ -1405,6 +1406,7 @@
       "site/src/components/app/market-tape.tsx",
       "site/src/components/app/tick.tsx",
       "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/page.tsx",
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/badge.tsx",
@@ -1611,9 +1613,11 @@
     "platform": "web",
     "route": false,
     "exports": [
+      "CardGrid",
       "Chips",
       "Crumbs",
       "DataTable",
+      "DetailSplit",
       "EmptyNote",
       "Muted",
       "OddsText",
@@ -1621,6 +1625,8 @@
       "Panel",
       "StatGridCards",
       "StatTile",
+      "StickyFilterBand",
+      "StickyPanel",
       "TABLE"
     ],
     "dependencies": [
@@ -2479,7 +2485,8 @@
       "site/src/components/app/book-table.tsx",
       "site/src/components/app/match-fancy.tsx",
       "site/src/components/app/badges.tsx",
-      "site/src/components/app/skeletons.tsx"
+      "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/page.tsx"
     ]
   },
   {

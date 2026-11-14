@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 const BAR: Record<string, string> = { hit: "bg-primary", miss: "bg-miss", push: "bg-amber", dnp: "bg-dnp/50", void: "bg-dnp/50", na: "bg-dnp/50" };
@@ -19,11 +18,10 @@ export type BarLabel = { date: string; text: string };
 
 /**
  * One bar per recent match (oldest left) against the chosen line: green over, red under, amber push. The bars fill the width, and with up to `LABELLED` matches each has its date and
- * opponent under it (more than that would not fit: then the first and last dates only). The bars grow up from the baseline in turn when the data changes.
+ * opponent under it (more than that would not fit: then the first and last dates only). Plain height bars (no Motion scaleY — that left the oldest bar invisible on phone Chrome).
  */
 export const LABELLED = 14;
 export function ValueBars({ values, line, labels }: { values: number[]; line: number; labels?: BarLabel[] }) {
-  const reduce = useReducedMotion();
   const top = Math.max(line * 1.25, ...values, 1);
   const each = !!labels && labels.length === values.length && values.length <= LABELLED;
   const [pick, setPick] = useState<number | null>(null); // with more bars than fit labels, a tap (or hover) on a bar says which match it is
@@ -32,12 +30,12 @@ export function ValueBars({ values, line, labels }: { values: number[]; line: nu
     <div className="flex flex-col gap-tight" role="img" aria-label={`Last ${values.length} matches: ${values.join(", ")}; line ${line}`}>
       <div className="relative flex h-28 items-end gap-tight">
         {values.map((v, i) => (
-          <motion.span key={`${i}-${v}`} onClick={() => setPick(i)} onMouseEnter={() => setPick(i)} title={labels?.[i] ? `${labels[i].date} ${labels[i].text}: ${v}` : String(v)} className={cn("min-w-0 flex-1 origin-bottom rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
-            style={{ height: `${Math.max((v / top) * 100, 4)}%` }} initial={reduce ? false : { scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ delay: Math.min(i, 30) * 0.014, duration: 0.3, ease: [0.22, 1, 0.36, 1] }} />
+          <span key={`${i}-${v}`} onClick={() => setPick(i)} onMouseEnter={() => setPick(i)} title={labels?.[i] ? `${labels[i].date} ${labels[i].text}: ${v}` : String(v)} className={cn("min-w-0 flex-1 rounded-[3px]", v > line ? "bg-primary" : v < line ? "bg-miss" : "bg-amber")}
+            style={{ height: `${Math.max((v / top) * 100, 4)}%` }} />
         ))}
-        <motion.span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" animate={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} transition={{ duration: 0.3 }}>
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/50" style={{ bottom: `${Math.min(100, (line / top) * 100)}%` }}>
           <span className="absolute -top-2.5 right-0 rounded bg-background/80 px-1 text-caption font-label tabular-nums text-muted-foreground">{line}</span>
-        </motion.span>
+        </span>
       </div>
       {each ? (
         <div className="flex gap-tight text-center text-caption leading-tight text-muted-foreground">

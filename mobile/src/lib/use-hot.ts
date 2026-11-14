@@ -45,7 +45,7 @@ export function useHotRows(scope?: HotScope, doc?: any) {
       if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows;
       const out = await scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
-        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed,
+        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed, names: stats.data?.names ?? null,
         onRows: (r) => qc.setQueryData(baseKey, r),
       });
       if (snapKey) writeHotSnap(snapKey, generated, out);
@@ -61,7 +61,7 @@ export function useHotRows(scope?: HotScope, doc?: any) {
     queryFn: async () => {
       return scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore: () => qc.ensureQueryData(storeQuery),
-        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null,
+        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null, names: stats.data?.names ?? null,
       });
     },
   });

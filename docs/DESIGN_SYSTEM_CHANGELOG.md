@@ -15,6 +15,61 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — Flags: parent-nation codes; kit/face keep honest empties
+- **Path:** `engine/flags.js` (`flagCode`, `FLAG_CODES`), `lib/assets.ts` (`flagUrl`), `share-text.js`
+- **Change:** Flagcdn lookup moved to the engine; U19 / A / Champions / Women strip to the senior flag; added missing nations (USA spellings, Costa Rica, Cameroon, Iran, Ivory Coast, …). Still no source AD jersey or stock helmet face as UI fallbacks.
+- **Callers:** TeamBadge / TeamFlag / mobile team-badge; match share emoji flags
+
+### 2026-11-14 — Player kit: no AD placeholder; format-row py-snug
+- **Path:** `engine/photos.js` (`teamId`, `TEAM_FILL`, `teamJerseys`), `Player.tsx` / `match-fancy.tsx` / `hot-props.tsx` sticky parent row, `build.py` photos `t` backfill, `crex_assets.TEAM_ALIASES`
+- **Change:** Dropped the generic Source A `AD` shirt fallback (looked like a real kit when `photos.t` omitted a side, e.g. Afghanistan). `TEAM_FILL` + build-time re-match of assembled teams cover holes; `teamId` tries full fold before stripping women (U19 Women); USA Base spelling aliased to source `united states`; format/scope + Filters hairline rows use `py-snug`.
+- **Callers:** PlayerPortrait / crests / share cards; Player + Match Fancy + Hot props sticky bands
+
+### 2026-11-14 — Sticky filter rhythm: snug pads, ad under band
+- **Path:** `pill-group.tsx` (`sub` → `py-snug`), `Player.tsx`, `match-fancy.tsx`, docs
+- **Change:** Sub-row `py-stack` left a hole under the flush header that looked like top gap until the band stuck. Filled chip stack uses `gap-snug py-snug` (tight read as missing). `player_detail_top` / `fancy_detail_top` sit below the sticky band so ads cannot open a scroll-top gap above the chips.
+- **Callers:** All `PillGroup sub`; Player + Match Fancy detail sticky bands
+
+### 2026-11-14 — Sticky filter parent row: items-center; equal filled-chip stack
+- **Path:** `Player.tsx`, `match-fancy.tsx`, `hot-props.tsx`, `DesignSystem.tsx`
+- **Change:** Format/scope/prop + Filters used `items-stretch`, so the control-tall row left a dead band under the underline before the next chips. `items-center` on that hairline row everywhere; Player Test innings + prop pills share one filled-chip stack (even vertical rhythm).
+- **Callers:** Player sticky band; Match Fancy; Props screener; catalogue StickyFilterBand stage
+
+### 2026-11-14 — PillGroup: snap mount; Player Test innings spacing
+- **Path:** `site/src/components/app/pill-group.tsx`, `site/src/pages/Player.tsx`
+- **Change:** Newly mounted pill rows no longer spring-fly the selection thumb or smooth-scroll on first paint (Test innings under format felt random). Innings chips sit inside the format hairline block with one `pb-tight` (not a third padded band); prop pills keep a single `py-tight` below.
+- **Callers:** All `PillGroup` surfaces; Player Test batting filter band
+
+### 2026-11-14 — Player Test: keep format chips when innings scope shows
+- **Path:** `site/src/pages/Player.tsx`
+- **Change:** Test batting innings chips (Both / 1st / 2nd) shared the format row and squeezed T20/ODI/Test/Hundred away. Format + Filters stay the parent row; innings are filled pills on their own row under it (Fancy market-under-scope shape), then prop pills.
+- **Callers:** Player sticky filter band on Test batting stats
+
+### 2026-11-14 — ChartBars width: match Fancy ValueBars flex-1 row
+- **Path:** `site/src/components/app/chart.tsx`, `mini-bars.tsx` (`ValueBars`)
+- **Change:** Player chart left shift / “missing” first bar — y-axis `0`/`9` ticks (grid column, then overlay) sat on the oldest bar. Removed axis ticks entirely (Fancy `ValueBars` has none). Full-width in-flow `flex-1` / `gap-tight` bars; dashed line + value on the right only. No Motion `scaleY`.
+- **Callers:** Player, Match Fancy detail, ResultView, design-system ChartBars stage
+
+### 2026-11-14 — StickyFilterBand + flush header; Game log stays in tabs
+- **Path:** `site/src/components/app/page.tsx` (`StickyFilterBand`), `lib/header-slot.tsx` (`useHeaderFlush`), `DesignSystem.tsx`, docs
+- **Change:** Central sticky chip/filter band (`bg-background/85` blur under header). Pair with `useHeaderFlush(true)` when the band leads the page so the shell header uses `bg-card` and drops its hairline (Player, Match Fancy detail, Fixture tabs). `/props` and Ground full page use the band without flush (title/hero above). Catalogue stage under Data & metrics. Player desktop Game log reverted out of `StickyPanel` — stays in bottom tabs at every breakpoint; rail is Lines only.
+- **Callers:** Player, Match Fancy detail, Props screener, Ground `/fixture/:id/ground` + `/venue/:id`, Fixture chips
+
+### 2026-11-14 — Player polish: crumbs pad, zero bars, O/U blocks, splits bleed
+- **Path:** `Player.tsx`, `chart.tsx`, `viz.tsx`, `result.tsx`, `match-fancy.tsx`
+- **Change:** Desktop crumbs `pt-stack` under flush; ChartBars zeros as visible miss bars; void/XI status centered; O/U meters in ground-style hairline blocks (Player + Match Fancy); RateHeatStrip `label-cap` above cells; SplitTables accordion pulls to edges so TABLE_BLEED dividers reach the gutter; Loaded uses `gap-section` / `gap-stack`.
+- **Callers:** Player, Match Fancy detail, Splits / ResultView heat strip
+
+### 2026-11-14 — Narrow DetailSplit callers (revert Home / Competitions / Ground matches grids)
+- **Path:** `hot-home.tsx`, `Markets.tsx`, `fixture-ground.tsx`, docs
+- **Change:** Reverted Home tape\|props 2-col (left Props half-width when tape empty), Competitions `CardGrid` of link rows, and Ground matches `CardGrid` of FixtureCards — those broke density rather than helping. `DetailSplit` / `StickyPanel` stay on Player, Match Fancy, Ground markets; `CardGrid` stays on Fancy list + catalogue.
+- **Callers:** Home, `/competitions`, Ground matches list
+
+### 2026-11-14 — DetailSplit, StickyPanel, CardGrid
+- **Path:** `site/src/components/app/page.tsx`, `site/src/pages/DesignSystem.tsx`
+- **Change:** Shared desktop layout jobs — asymmetric `DetailSplit` (chart | rail), `StickyPanel` (sticky max-height bleed rail), `CardGrid` (1/2/3 directory). `DataTable` gains optional `onRowClick`. Catalogue stages under Data & metrics.
+- **Callers:** Player, Match Fancy detail, Ground markets, Fancy list, Fixture Form
+
 ### 2026-11-14 — Drop lucide-react dependency
 - **Path:** `site/package.json`, `site/package-lock.json`, `site/components.json`, `docs/DESIGN_SYSTEM.md`
 - **Change:** Removed unused `lucide-react`; dropped `iconLibrary: lucide` from shadcn config. New CLI components must be converted to Heroicons (import ban in design-tokens.test.ts).

@@ -33,9 +33,13 @@ export function shareText({ entries, line, side = "over", fmt = "", price, groun
 
 const FLAGS = {
   india: "🇮🇳", australia: "🇦🇺", england: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", pakistan: "🇵🇰", "south africa": "🇿🇦", "new zealand": "🇳🇿", "west indies": "🏴‍☠️", "sri lanka": "🇱🇰", bangladesh: "🇧🇩", afghanistan: "🇦🇫",
-  zimbabwe: "🇿🇼", ireland: "🇮🇪", netherlands: "🇳🇱", namibia: "🇳🇦", scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", uae: "🇦🇪", "united arab emirates": "🇦🇪", nepal: "🇳🇵", oman: "🇴🇲", usa: "🇺🇸", canada: "🇨🇦", kenya: "🇰🇪", "papua new guinea": "🇵🇬", "hong kong": "🇭🇰", singapore: "🇸🇬", qatar: "🇶🇦",
+  zimbabwe: "🇿🇼", ireland: "🇮🇪", netherlands: "🇳🇱", namibia: "🇳🇦", scotland: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", uae: "🇦🇪", "united arab emirates": "🇦🇪", nepal: "🇳🇵", oman: "🇴🇲",
+  usa: "🇺🇸", "united states": "🇺🇸", "united states of america": "🇺🇸", canada: "🇨🇦", kenya: "🇰🇪", "papua new guinea": "🇵🇬", "hong kong": "🇭🇰", singapore: "🇸🇬", qatar: "🇶🇦",
 };
-const flag = (n) => FLAGS[String(n || "").toLowerCase().replace(/\s*\(?\bwomen\b\)?|\s*\(w\)/g, "").trim()] || "";
+const flag = (n) => {
+  let s = String(n || "").toLowerCase().replace(/\s*\(?\bwomen\b\)?|\s*\(w\)/g, "").replace(/\s+u19(?:[\s-]*women)?$/i, "").replace(/\s+champions$/i, "").replace(/\s+a$/i, "").replace(/\s+/g, " ").trim();
+  return FLAGS[s] || "";
+};
 const side = (n) => `${String(n || "").toUpperCase()}${flag(n) ? ` ${flag(n)}` : ""}`;
 /** "🏏 NEW ZEALAND 🇳🇿 vs INDIA 🇮🇳" (a flag only for a national side; clubs go without). */
 export const matchTitle = (a, b) => `🏏 ${side(a)} vs ${side(b)}`;

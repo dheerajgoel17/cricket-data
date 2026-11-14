@@ -200,26 +200,25 @@ export function AppSkeleton() {
   );
 }
 
-/** Player page body: compact metrics, then the chart first (8) beside lines (4); this-match sits under the chart. */
+/** Player page body: asymmetric DetailSplit — chart column + sticky Lines/game-log rail. */
 export function PlayerSkeleton() {
   return (
-    <div data-skeleton="player" aria-hidden className="flex flex-col gap-section lg:grid lg:grid-cols-12 lg:items-start">
-      <div className="flex items-center justify-between gap-stack rounded-2xl bg-card p-inset ring-1 ring-hairline lg:col-span-12">
-        <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack lg:grid-cols-6">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
-        <Skeleton className="size-20 rounded-full" />
-      </div>
-      <div className="flex flex-col gap-stack lg:col-span-8 lg:row-start-2">
-        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-control w-40 rounded-full" /><Skeleton className="h-control w-36 rounded-full" /></div>
-        <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline"><Skeleton className="h-[340px] w-full" /><Skeleton className="h-control w-full rounded-full" /><Skeleton className="h-3 w-56" /></div>
-      </div>
-      <div className="flex flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline lg:col-span-5 lg:row-start-3">
-        <Skeleton className="h-3 w-20" />
-        <div className="flex items-center gap-snug"><Skeleton className="size-8 rounded-full" /><Skeleton className="h-4 w-36" /></div>
-        <Skeleton className="h-3 w-48" />
-        <div className="flex items-center justify-between gap-snug"><Skeleton className="h-5 w-32" /><Skeleton className="h-5 w-12 rounded-md" /></div>
+    <div data-skeleton="player" aria-hidden className="flex flex-col gap-snug lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)] lg:items-start lg:gap-section">
+      <div className="flex flex-col gap-snug">
+        <div className="flex items-center justify-between gap-stack border-b border-hairline pb-snug">
+          <div className="grid flex-1 grid-cols-3 gap-x-snug gap-y-stack">{Array.from({ length: 6 }, (_, n) => <div key={n} className="grid gap-tight"><Skeleton className="h-3 w-14" /><Skeleton className="h-6 w-16" /></div>)}</div>
+          <Skeleton className="hidden size-20 rounded-full sm:block" />
+        </div>
+        <Skeleton className="h-[240px] w-full lg:h-[340px]" />
+        <Skeleton className="h-control w-full max-w-xs rounded-full" />
         <div className="grid grid-cols-2 gap-snug"><Skeleton className="h-16 rounded-xl" /><Skeleton className="h-16 rounded-xl" /></div>
       </div>
-      <div className="flex flex-col gap-snug lg:col-span-4 lg:col-start-9 lg:row-start-2"><Skeleton className="h-6 w-24" /><ListSkeleton rows={4} /></div>
+      <div className="flex flex-col gap-snug border border-hairline p-snug">
+        <Skeleton className="h-5 w-24" />
+        <ListSkeleton rows={3} />
+        <Skeleton className="h-5 w-28" />
+        <ListSkeleton rows={5} />
+      </div>
     </div>
   );
 }

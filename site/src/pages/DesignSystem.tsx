@@ -23,7 +23,7 @@ import { LadderRow, pricedFromBooks } from "@/components/app/line-ladder";
 import { Note } from "@/components/app/note";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { ChartBars } from "@/components/app/chart";
-import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StatGridCards, StatTile, TABLE_HEAD } from "@/components/app/page";
+import { CardGrid, Crumbs, DataTable, DetailSplit, Muted, OddsText, PageTitle, Panel, StatGridCards, StatTile, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { PillGroup } from "@/components/app/pill-group";
 import { PillTabs } from "@/components/app/pill-tabs";
 import { RowsSkeleton } from "@/components/app/skeletons";
@@ -88,7 +88,7 @@ const PAGE_WHEN: Record<string, string> = {
   buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs.",
   chips: "Chip / PillGroup for filters; PillTabs when panels switch with the selection.",
   feedback: "Every empty, unknown, or error list uses EmptyState — never a bare spinner or blank panel.",
-  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; TeamBadge sizes; LadderRow + BookTable for priced lines.",
+  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; StickyFilterBand + flush header; DetailSplit + StickyPanel + CardGrid for desktop boards; TeamBadge sizes; LadderRow + BookTable for priced lines.",
   forms: "LiveForm for filters that apply as you change them; pair Field with NativeSelect or Input.",
   icons: "Heroicons only under components/app, components/ui, and pages — never Lucide.",
   rules: "Follow these before adding a component, page, or token.",
@@ -147,6 +147,9 @@ const PAGE_TOC: Record<string, TocItem[]> = {
     { id: slugify("StatTile + Panel"), label: "StatTile" },
     { id: slugify("ChartBars"), label: "ChartBars" },
     { id: `datatable-bleed-${TABLE_HEAD.includes("footnote") ? "table-head" : "head"}`, label: "DataTable" },
+    { id: slugify("StickyFilterBand + flush header"), label: "StickyFilterBand" },
+    { id: slugify("DetailSplit + StickyPanel"), label: "DetailSplit" },
+    { id: slugify("CardGrid"), label: "CardGrid" },
     { id: slugify("TeamBadge sizes"), label: "Badges" },
     { id: slugify("BookTable"), label: "BookTable" },
     { id: slugify("LadderRow"), label: "LadderRow" },
@@ -177,7 +180,7 @@ const COMPONENT_CARDS: readonly { id: string; title: string; detail: string; pre
   { id: "buttons", title: "Buttons", detail: "Primary actions and badges", preview: <Button size="sm">Default</Button> },
   { id: "chips", title: "Chips & tabs", detail: "Filters and segmented controls", preview: <span className="inline-flex h-8 items-center rounded-full bg-primary px-snug text-footnote font-label text-primary-foreground">T20</span> },
   { id: "feedback", title: "Empty & notes", detail: "EmptyState, skeletons, Note", preview: <span className="text-footnote text-muted-foreground">Nothing saved yet</span> },
-  { id: "data", title: "Data & metrics", detail: "StatTile, Panel, DataTable, badges, ladder", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
+  { id: "data", title: "Data & metrics", detail: "StatTile, Panel, StickyFilterBand, DetailSplit, CardGrid", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
   { id: "forms", title: "Forms", detail: "LiveForm, Field, NativeSelect", preview: <span className="rounded border border-hairline px-snug py-hair text-footnote">Format ▾</span> },
   { id: "icons", title: "Icons", detail: "Heroicons in product jobs", preview: <StarIcon className="size-5" aria-hidden /> },
 ];
@@ -418,7 +421,7 @@ export function DesignSystemPage() {
             <Panel title="Panel"><Muted>Not for bleed stats tables.</Muted></Panel>
           </div>
         </PreviewFrame>
-        <PreviewFrame title="ChartBars" description="Last fixtures vs a line — hit / miss / push / DNP / void. Same component as Player and ResultView." canvasClassName="items-stretch bg-card" source="components/app/chart.tsx">
+        <PreviewFrame title="ChartBars" description="Last fixtures vs a line — hit / miss / push / DNP / void. Fancy ValueBars width recipe (flex-1, no y-axis ticks); line badge on the right. Player + ResultView." canvasClassName="items-stretch bg-card" source="components/app/chart.tsx">
           <div className="w-full min-w-0 py-snug">
             <ChartBars entries={CHART_DEMO} line={28.5} side="over" height={220} animateKey="ds-chart" label="Runs over 28.5" />
           </div>
@@ -433,6 +436,41 @@ export function DesignSystemPage() {
           <div className="w-full min-w-0">
             <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
           </div>
+        </PreviewFrame>
+        <PreviewFrame title="StickyFilterBand + flush header" description="Sticky chip/filter band under the shell header. When the band is the first surface under the bar, pair with useHeaderFlush(true) so the top bar uses bg-card and drops its hairline (Player, Match Fancy detail, Ground, Fixture tabs). /props uses the band without flush because the page title sits above it." source="components/app/page.tsx + lib/header-slot.tsx" canvasClassName="items-stretch bg-background">
+          <div className="w-full overflow-hidden rounded-lg border border-hairline">
+            <div className="flex h-12 items-center gap-snug bg-card px-gutter text-callout font-label">Flush header (bg-card)</div>
+            <StickyFilterBand className="static top-auto z-auto mx-0">
+              <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
+                <span className="text-callout font-label text-primary underline underline-offset-4">Format</span>
+                <span className="text-callout text-muted-foreground">Filters</span>
+              </div>
+              <div className="flex flex-col gap-snug px-gutter py-snug text-footnote text-muted-foreground">Innings + prop pills share one gap-snug stack</div>
+            </StickyFilterBand>
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="DetailSplit + StickyPanel" description="Desktop detail board: asymmetric chart column + sticky Lines rail. Phone stacks. Game log stays in bottom tabs (all breakpoints)." source="components/app/page.tsx" canvasClassName="items-stretch bg-background">
+          <DetailSplit className="w-full">
+            <section className="flex min-w-0 flex-col gap-snug rounded-lg border border-hairline bg-card p-inset">
+              <span className="label-cap text-footnote text-muted-foreground">Primary</span>
+              <p className="text-body text-muted-foreground">Chart, meters, books.</p>
+            </section>
+            <StickyPanel label="Side rail demo" className="lg:static lg:max-h-none">
+              <div className="border-b border-hairline px-gutter py-snug lg:px-inset">
+                <h3 className="text-body font-emphasis">Lines</h3>
+              </div>
+              <div className="px-gutter py-snug lg:px-inset">
+                <p className="text-callout text-muted-foreground">Sticky Lines ladder only.</p>
+              </div>
+            </StickyPanel>
+          </DetailSplit>
+        </PreviewFrame>
+        <PreviewFrame title="CardGrid" description="Directory cards: 1 → 2 (md) → 3 (xl). Fancy list." source="components/app/page.tsx" canvasClassName="items-stretch bg-background">
+          <CardGrid className="w-full">
+            {["Match A", "Match B", "Match C"].map((label) => (
+              <div key={label} className="rounded-lg border border-hairline bg-card px-inset py-snug text-body font-label">{label}</div>
+            ))}
+          </CardGrid>
         </PreviewFrame>
         <PreviewFrame title="TeamBadge sizes" description="xs/sm/md initials use text-caption; lg/xl use callout/title. Flag for tight rows." source="components/app/badges.tsx">
           <div className="flex flex-wrap items-end gap-stack">

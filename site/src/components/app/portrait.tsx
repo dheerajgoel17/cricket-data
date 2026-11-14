@@ -7,7 +7,7 @@ import { PlayerPhoto } from "./badges";
 /**
  * A player standing in his team's shirt, laid out the way the source lays out its own player pictures: the face avatar and the shirt are the same width, the shirt
  * is in front and rides up over the bottom third of the avatar (so its collar hides the avatar's cut edge) and only a sliver extends below it. The shirt is the coloured
- * limited-overs kit, or the white one for a Test; a team with no kit gets the plain placeholder shirt, and without any shirt picture it is the face alone.
+ * limited-overs kit, or the white one for a Test; without a mapped kit it is the face alone (no generic placeholder shirt — that looked like a real kit).
  * `className` sets the width; the height follows (the two pictures together are about 1.03 times as tall as wide).
  */
 export function PlayerPortrait({ idx, team, test, className }: { idx: number; team?: string; test?: boolean; className?: string }) {
