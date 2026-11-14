@@ -1,55 +1,55 @@
 {
- "generated_at_utc": "2026-11-14T06:30:32Z",
- "generated_at_ist": "2026-11-14 12:00 IST",
- "runtime_secs": 225.8,
+ "generated_at_utc": "2026-11-14T06:53:41Z",
+ "generated_at_ist": "2026-11-14 12:23 IST",
+ "runtime_secs": 260.3,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-14",
-  "commit": "0418c222e7"
+  "commit": "5830c882f6"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
    "rows": 2050,
-   "secs": 0.4
+   "secs": 0.7
   },
   "smarkets": {
    "status": "ok",
-   "rows": 597,
-   "secs": 2.3
+   "rows": 572,
+   "secs": 2.8
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 10.6,
+   "secs": 11.7,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 284,
-   "secs": 28.5,
+   "secs": 29.5,
    "events": 11
   },
   "feede": {
    "status": "ok",
    "rows": 588,
-   "secs": 52.9,
+   "secs": 54.4,
    "events": 20
   },
   "feedh": {
    "status": "ok",
-   "rows": 1504,
-   "secs": 92.6,
+   "rows": 1488,
+   "secs": 89.2,
    "events": 63
   },
   "feedf": {
    "status": "ok",
    "rows": 796,
-   "secs": 144.8,
+   "secs": 151.9,
    "events": 26
   }
  },
- "snapshot": "odds_20261114T063032Z.jsonl.gz",
+ "snapshot": "odds_20261114T065341Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -120,14 +120,14 @@
  },
  "stats": {
   "events_in_window": 48,
-  "rows_in_window": 5652,
+  "rows_in_window": 5636,
   "selections_with_model": 2645,
   "selections_with_market_fair": 3150,
   "markets_in_window": 516,
   "value_bets": 7,
   "dropped_by_filter": {
    "odds_range": 26,
-   "model_market_gap": 1180,
+   "model_market_gap": 1166,
    "policy_max_odds": 3,
    "model_only_no_market": 237,
    "market_disabled": 2,
@@ -144,9 +144,9 @@
     "n_prices": 583,
     "mean_model_p": 0.052,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": 0.21,
-    "mean_abs_logit_diff": 0.913,
-    "corr": 0.688
+    "mean_logit_diff_model_minus_market": 0.209,
+    "mean_abs_logit_diff": 0.912,
+    "corr": 0.689
    },
    "top_bowler_team": {
     "n_prices": 233,
@@ -157,12 +157,12 @@
     "corr": 0.602
    },
    "batter_runs": {
-    "n_prices": 860,
+    "n_prices": 848,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.677,
-    "corr": 0.179
+    "mean_abs_logit_diff": 0.676,
+    "corr": 0.18
    },
    "batter_sixes": {
     "n_prices": 90,
@@ -235,7 +235,6 @@
    "sources": [
     "feede_lb",
     "feedf_p",
-    "feedh_d",
     "smarkets"
    ]
   },
@@ -1661,25 +1660,25 @@
   }
  },
  "log": [
-  "[12:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[12:00 IST] history: 24059 matches, last 2026-11-14, players 433590",
-  "[12:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2050, 'secs': 0.4}",
-  "[12:03 IST] source smarkets: {'status': 'ok', 'rows': 597, 'secs': 2.3}",
-  "[12:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 10.6, 'events': 2}",
-  "[12:03 IST] source feedk: {'status': 'ok', 'rows': 284, 'secs': 28.5, 'events': 11}",
-  "[12:03 IST] source feede: {'status': 'ok', 'rows': 588, 'secs': 52.9, 'events': 20}",
-  "[12:03 IST] source feedh: {'status': 'ok', 'rows': 1504, 'secs': 92.6, 'events': 63}",
-  "[12:03 IST] source feedf: {'status': 'ok', 'rows': 796, 'secs': 144.8, 'events': 26}",
-  "[12:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[12:03 IST] 103 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[12:03 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[12:03 IST] 70 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[12:03 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
-  "[12:03 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T10:30:00Z)",
-  "[12:03 IST] book lines: 514 player lines from 7 source(s)",
-  "[12:03 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[12:04 IST] weather: forecasts for 18 events, 0 failed",
-  "[12:04 IST] prop model: 1664 prop selections modelled, 539 milestone ladder prices anchored to O/U",
-  "[12:04 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
+  "[12:23 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[12:23 IST] history: 24059 matches, last 2026-11-14, players 433590",
+  "[12:26 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2050, 'secs': 0.7}",
+  "[12:26 IST] source smarkets: {'status': 'ok', 'rows': 572, 'secs': 2.8}",
+  "[12:26 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.7, 'events': 2}",
+  "[12:26 IST] source feedk: {'status': 'ok', 'rows': 284, 'secs': 29.5, 'events': 11}",
+  "[12:26 IST] source feede: {'status': 'ok', 'rows': 588, 'secs': 54.4, 'events': 20}",
+  "[12:26 IST] source feedh: {'status': 'ok', 'rows': 1488, 'secs': 89.2, 'events': 63}",
+  "[12:26 IST] source feedf: {'status': 'ok', 'rows': 796, 'secs': 151.9, 'events': 26}",
+  "[12:26 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[12:26 IST] 103 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[12:26 IST] 46 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[12:26 IST] 70 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[12:26 IST] player performance markets not read yet: {'feedk': ['Player Performance']}",
+  "[12:26 IST] name map: Jammu & Kashmir vs Delhi -> Jammu and Kashmir vs Delhi (2026-11-14T10:30:00Z)",
+  "[12:26 IST] book lines: 514 player lines from 7 source(s)",
+  "[12:26 IST] 88 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[12:27 IST] weather: forecasts for 19 events, 0 failed",
+  "[12:27 IST] prop model: 1664 prop selections modelled, 539 milestone ladder prices anchored to O/U",
+  "[12:28 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
  ]
 }
