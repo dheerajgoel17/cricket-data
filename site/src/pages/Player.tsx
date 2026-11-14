@@ -52,7 +52,7 @@ import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
 import { AdSlot } from "@/components/app/ad-slot";
-import { Crumbs, DataTable, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
+import { Crumbs, DataTable, DetailSplit, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { LadderTable, SplitTables } from "@/components/app/result";
 import { PlayerSkeleton } from "@/components/app/skeletons";
@@ -345,17 +345,40 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<string>(c ? c.side : "over");
   const [win, setWin] = useState<number>(entries.length >= 10 ? 10 : 0) // the last 10 games first;
-  const [tab, setTab] = useState<string>(["logs", "splits", "corr", "lines"].includes(q.tab) ? q.tab : "logs");
-  const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const phone = useIsMobile();
+  const [tab, setTab] = useState<string>(() => {
+    const t = ["logs", "splits", "corr", "lines"].includes(q.tab) ? q.tab : "logs";
+    return t;
+  });
+  const [game, setGame] = useState<{ e: any; s: string } | null>(null);
   const [logCount, setLogCount] = useState(30);
   const tabRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const keep = (patch: Record<string, unknown>) => { const next = new URLSearchParams(location.search); for (const [k, v] of Object.entries(patch)) { if (v === "" || v == null) next.delete(k); else next.set(k, String(v)); } history.replaceState(null, "", `${location.pathname}?${next}`); };
+  // Desktop puts Game log in the sticky rail; keep the bottom tab on phone only.
+  useEffect(() => {
+    if (!phone && tab === "logs") {
+      const next = "splits";
+      setTab(next);
+      keep({ tab: next });
+    }
+  }, [phone]); // eslint-disable-line react-hooks/exhaustive-deps
   const switchTab = (t: string) => {
     setTab(t); keep({ tab: t });
     requestAnimationFrame(() => tabRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" }));
   };
+  const openLog = (e: any) => setGame({ e, s: barState(e, line, side) as string });
+  const logValue = (e: any) => {
+    const s = barState(e, line, side) as string;
+    if (e.value != null) return e.value;
+    return s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP";
+  };
+  const tabItems: [string, string][] = [
+    ...(phone ? [["logs", "Game log"] as [string, string]] : []),
+    ["splits", "Splits"],
+    ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []),
+    ...(!book ? [["lines", "Research"] as [string, string]] : []),
+  ];
 
   const ws = entries.length ? windowRates(entries, line, side) : [];
   const cur = ws.find((w: any) => w.n === win) || ws[ws.length - 1];
@@ -414,7 +437,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </div>
         </>
       ) : (
-      <div className="flex flex-col gap-snug lg:grid lg:grid-cols-2 lg:items-start lg:gap-section">
+      <DetailSplit>
         <section className="flex min-w-0 flex-col gap-snug">
           <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-snug", CARD)}>
             <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-snug">
@@ -514,40 +537,59 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
         </section>
 
-        {book && cur && (
-          <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
-            <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
-              <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
-              <span className="flex items-center gap-snug text-footnote text-muted-foreground">
-                {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
-                <span>Tap a row</span>
-              </span>
+        <StickyPanel label={book ? "Lines and game log" : "Game log"} className={book ? undefined : "hidden lg:block"}>
+          {book ? (
+            <>
+              <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
+                <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
+                <span className="flex items-center gap-snug text-footnote text-muted-foreground">
+                  {edge != null && <span className={cn("font-label tabular-nums", edge >= 0 ? "text-primary" : "text-miss")}>{edge >= 0 ? "+" : ""}{Math.round(edge * 100)}%</span>}
+                  <span>Tap a row</span>
+                </span>
+              </div>
+              <Table className="table-fixed">
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
+                    <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
+                    <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
+                    <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
+                    <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {book.lines.map((l: any) => (
+                    <LadderRow key={l.line} line={l.line} summary={ladderSummary(l.line)}
+                      priced={pricedFromBooks(l.line, l.books)} selected={l.line === line} onPick={() => pickLine(l.line)} />
+                  ))}
+                </TableBody>
+              </Table>
+            </>
+          ) : null}
+          {/* Desktop: dense game log fills the rail under Lines. Phone keeps the Game log tab below. */}
+          <div className={cn("hidden flex-col gap-snug lg:flex", book && "border-t border-hairline")}>
+            <div className="flex items-baseline justify-between gap-snug px-gutter py-snug">
+              <h2 className="text-body font-emphasis">Game log</h2>
+              <span className="text-footnote text-muted-foreground">Tap a row</span>
             </div>
-            <Table className="table-fixed">
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className={cn(TABLE_HEAD, "w-[3rem]")}>Line</TableHead>
-                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Over</TableHead>
-                  <TableHead className={cn(TABLE_HEAD, "min-w-0")}>Under</TableHead>
-                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit O</TableHead>
-                  <TableHead className={cn(TABLE_HEAD, "w-[3.75rem]")} title="Hit rate on the chart">Hit U</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {book.lines.map((l: any) => (
-                  <LadderRow key={l.line} line={l.line} summary={ladderSummary(l.line)}
-                    priced={pricedFromBooks(l.line, l.books)} selected={l.line === line} onPick={() => pickLine(l.line)} />
-                ))}
-              </TableBody>
-            </Table>
-          </section>
-        )}
-      </div>
+            <DataTable
+              columns={["Date", "Opponent", "Venue", res.statLabel, c?.auxLabel || "", "No."]}
+              rows={logs.slice(0, logCount).map((e) => [e.date, e.opp, e.venueName || "", logValue(e), e.aux ?? "–", e.pos ?? "–"])}
+              onRowClick={(i) => openLog(logs[i])}
+            />
+            {logs.length > logCount ? (
+              <div className="px-gutter pb-snug">
+                <Button variant="secondary" className="h-control w-full rounded-full" onClick={() => setLogCount(logCount + 30)}>Show more ({logs.length - logCount} left)</Button>
+              </div>
+            ) : null}
+          </div>
+        </StickyPanel>
+      </DetailSplit>
       )}
 
+      {tabItems.length > 0 && (
       <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
-        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tab} onChange={switchTab}
-          items={[["logs", "Game log"], ["splits", "Splits"], ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []), ...(!book ? [["lines", "Research"] as [string, string]] : [])]} />
+        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0]} onChange={switchTab} items={tabItems} />
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
             {tab === "lines" && !book && <LadderTable bleed ladder={res.ladder} />}
@@ -558,7 +600,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                 <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), `${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}pp`])} />
               </div>
             )}
-            {tab === "logs" && (
+            {tab === "logs" && phone && (
               <>
                 <ul className={cn(TABLE_BLEED, "divide-y divide-hairline")}>
                   {logs.slice(0, logCount).map((e, i) => {
@@ -581,6 +623,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </motion.div>
         </AnimatedHeight>
       </div>
+      )}
 
       <Sheet open={!!game} onOpenChange={(o) => !o && setGame(null)}>
         <SheetContent side="bottom" className="z-[70] mx-auto max-w-xl rounded-t-2xl">

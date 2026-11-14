@@ -87,33 +87,38 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const loading = !blocks.length && (isLoading || tomorrow.isLoading || today.scoring || tomorrow.scoring || !ready);
   return (
     <section aria-label="Props" className="flex flex-col gap-stack">
-      <div className="empty:hidden"><MarketTape rows={tapeRows} /></div>
-      <h2 className="text-title font-emphasis tracking-tight">Props</h2>
-      {loading ? <HomePropsSkeleton /> : blocks.length ? (
-        <div className="flex flex-col gap-stack">
-          <PillGroup
-            layoutId="home-fx"
-            label="Fixture"
-            value={sel}
-            onChange={setPick}
-            items={blocks.map(({ f }) => [f.id, <MatchChip key={f.id} f={f} />] as [string, React.ReactNode])}
-          />
-          {block ? (
-            <ul className="-mx-gutter">
-              {block.items.map((item) => item.kind === "player"
-                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
-                : (
-                  <li key={item.key} className="border-t border-hairline">
-                    <OverviewRow
-                      r={item.r}
-                      onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
-                    />
-                  </li>
-                ))}
-            </ul>
+      <div className="grid gap-stack lg:grid-cols-2 lg:items-start lg:gap-section">
+        <div className="empty:hidden min-w-0"><MarketTape rows={tapeRows} /></div>
+        <div className="flex min-w-0 flex-col gap-stack">
+          <h2 className="text-title font-emphasis tracking-tight">Props</h2>
+          {loading ? <HomePropsSkeleton /> : blocks.length ? (
+            <div className="flex flex-col gap-stack">
+              <PillGroup
+                layoutId="home-fx"
+                label="Fixture"
+                value={sel}
+                onChange={setPick}
+                items={blocks.map(({ f }) => [f.id, <MatchChip key={f.id} f={f} />] as [string, React.ReactNode])}
+              />
+              {block ? (
+                <ul className="-mx-gutter lg:mx-0">
+                  {block.items.map((item) => item.kind === "player"
+                    ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
+                    : (
+                      <li key={item.key} className="border-t border-hairline">
+                        <OverviewRow
+                          r={item.r}
+                          onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
+                        />
+                      </li>
+                    ))}
+                </ul>
+              ) : null}
+            </div>
           ) : null}
         </div>
-      ) : (
+      </div>
+      {!loading && !blocks.length && (
         <EmptyState
           icon={<ChartBarIcon />}
           title={phase ? EMPTY_PHASE[phase].title : "No priced lines yet"}

@@ -67,9 +67,9 @@ export function RecentForm({ teams, fmt }: { teams: [string, number][]; fmt: str
   const forms = useMemo(() => recentForms(store, teams, fmt), [store, teams, fmt]);
   if (!forms.some((f) => f.games.length)) return null;
   return (
-    <div className="flex flex-col" aria-label="Recent form">
+    <div className="grid gap-stack lg:grid-cols-2 lg:items-start" aria-label="Recent form">
       {forms.map(({ name, idx, games }) => (
-        <div key={idx}>
+        <div key={idx} className="min-w-0">
           <div className="flex items-center gap-snug py-snug">
             <TeamBadge name={name} size="sm" />
             <span className="min-w-0 flex-1 truncate text-callout font-label">{name}</span>

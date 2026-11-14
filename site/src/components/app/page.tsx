@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, type HTMLAttributes, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +57,35 @@ export const StatGridCards = ({ children }: { children: ReactNode }) => (
   <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-stack">{children}</div>
 );
 
+/** Desktop detail board: chart / primary column + sticky side rail (Lines, game log). Phone stacks. */
+export function DetailSplit({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cn("flex flex-col gap-snug lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)] lg:items-start lg:gap-section", className)}>
+      {children}
+    </div>
+  );
+}
+
+/** Sticky side rail for detail boards — phone bleeds edge-to-edge; from `lg` bordered panel that scrolls inside the viewport. */
+export function StickyPanel({ children, className, label }: { children: ReactNode; className?: string; label?: string }) {
+  return (
+    <section
+      aria-label={label}
+      className={cn(
+        "-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))] lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline",
+        className,
+      )}
+    >
+      {children}
+    </section>
+  );
+}
+
+/** Directory / card surfaces: one column on phone, two from `md`, three from `xl`. */
+export function CardGrid({ children, className, ...rest }: { children: ReactNode; className?: string } & HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("grid grid-cols-1 gap-stack md:grid-cols-2 xl:grid-cols-3", className)} {...rest}>{children}</div>;
+}
+
 export const Chips = ({ list }: { list: [string, unknown][] }) => (
   <div className="flex flex-wrap gap-hair">
     {list.map(([k, v], i) => (
@@ -83,12 +112,15 @@ export function DataTable({
   rows,
   className,
   bleed,
+  onRowClick,
 }: {
   columns: ReactNode[];
   rows: ReactNode[][];
   className?: string;
   /** Full-bleed on phone (`-mx-gutter` + hairlines); flush from `lg`. */
   bleed?: boolean;
+  /** When set, rows are clickable (e.g. Player game log → sheet). */
+  onRowClick?: (index: number) => void;
 }) {
   const table = (
     <Table className={className}>
@@ -103,7 +135,11 @@ export function DataTable({
       </TableHeader>
       <TableBody>
         {rows.map((r, i) => (
-          <TableRow key={i} className="min-h-row">
+          <TableRow
+            key={i}
+            className={cn("min-h-row", onRowClick && "cursor-pointer transition-colors hover:bg-accent")}
+            onClick={onRowClick ? () => onRowClick(i) : undefined}
+          >
             {r.map((c, j) => (
               <TableCell key={j} className={cn("whitespace-nowrap tabular-nums", j > 0 && "text-right", bleed && j === 0 && "pl-gutter", bleed && j === r.length - 1 && "pr-gutter")}>
                 {c ?? "–"}

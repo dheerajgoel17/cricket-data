@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — DetailSplit, StickyPanel, CardGrid
+- **Path:** `site/src/components/app/page.tsx`, `site/src/pages/DesignSystem.tsx`
+- **Change:** Shared desktop layout jobs — asymmetric `DetailSplit` (chart | rail), `StickyPanel` (sticky max-height bleed rail), `CardGrid` (1/2/3 directory). `DataTable` gains optional `onRowClick`. Catalogue stages under Data & metrics.
+- **Callers:** Player, Match Fancy detail, Ground markets/matches, Fancy list, Home Hot props, Fixture Form, Competitions index
+
 ### 2026-11-14 — Drop lucide-react dependency
 - **Path:** `site/package.json`, `site/package-lock.json`, `site/components.json`, `docs/DESIGN_SYSTEM.md`
 - **Change:** Removed unused `lucide-react`; dropped `iconLibrary: lucide` from shadcn config. New CLI components must be converted to Heroicons (import ban in design-tokens.test.ts).

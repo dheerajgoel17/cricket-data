@@ -20,7 +20,7 @@ import { PillTabs } from "@/components/app/pill-tabs";
 import { GridTable } from "@/components/app/grid";
 import { LeagueBadge, TeamBadge } from "@/components/app/badges";
 import { StarButton } from "@/components/app/star";
-import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { CardGrid, Crumbs, DataTable, Muted, PageTitle } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
@@ -44,16 +44,16 @@ export function CompetitionsPage() {
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} />
-      <Panel flat>
+      <CardGrid>
         {rows.map(([e, c]) => (
-          <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug last:border-b-0 hover:bg-accent">
+          <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug hover:bg-accent">
             <LeagueBadge name={store.events[e]} size="md" />
-            <span className="flex-1 text-body font-label">{store.events[e]}</span>
-            <span className="text-callout text-muted-foreground">{c} matches</span>
-            <ArrowRightIcon className="size-4 text-muted-foreground" />
+            <span className="min-w-0 flex-1 truncate text-body font-label">{store.events[e]}</span>
+            <span className="shrink-0 text-callout text-muted-foreground">{c}</span>
+            <ArrowRightIcon className="size-4 shrink-0 text-muted-foreground" />
           </Link>
         ))}
-      </Panel>
+      </CardGrid>
     </div>
   );
 }

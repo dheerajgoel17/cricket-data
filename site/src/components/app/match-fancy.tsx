@@ -20,7 +20,7 @@ import { BookBadge } from "./book-badge";
 import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
-import { TABLE_HEAD } from "./page";
+import { DetailSplit, StickyPanel, TABLE_HEAD } from "./page";
 import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -368,7 +368,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={`${scope}-${fm}-${win}`} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25, ease: EASE }} className="flex min-w-0 flex-col gap-snug">
                   {key === "top_batter" ? <TopBatters ms={ms} scope={scope} teamName={team?.[0]} /> : rep && (
-                    <div className="flex flex-col gap-snug lg:grid lg:grid-cols-2 lg:items-start lg:gap-section">
+                    <DetailSplit>
                       <section className="flex min-w-0 flex-col gap-snug">
                         <div className="flex items-baseline justify-between gap-snug">
                           <div className="grid min-w-0 gap-hair">
@@ -480,8 +480,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                         {rep.n < 10 && <p className="text-footnote text-amber">Few matches ({rep.n}): treat these with caution.</p>}
                       </section>
 
-                      {/* Phone: full-bleed under the chart. Desktop: equal sticky column; panel scrolls so the page does not. */}
-                      <section className="-mx-gutter min-w-0 border-y border-hairline lg:mx-0 lg:max-h-[calc(100dvh-var(--header-h)-5rem)] lg:overflow-y-auto lg:border lg:border-hairline lg:sticky lg:top-[calc(var(--header-h)+var(--space-stack))]" aria-label="Line ladder">
+                      {/* Phone: full-bleed under the chart. Desktop: asymmetric sticky rail; panel scrolls so the page does not. */}
+                      <StickyPanel label="Line ladder">
                         <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
                           <h2 className="text-body font-emphasis">Lines</h2>
                           <span className="text-footnote text-muted-foreground">Tap a row</span>
@@ -503,8 +503,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                             ))}
                           </TableBody>
                         </Table>
-                      </section>
-                    </div>)}
+                      </StickyPanel>
+                    </DetailSplit>)}
                 </motion.div>
               </AnimatePresence>
               </AnimatedHeight>
