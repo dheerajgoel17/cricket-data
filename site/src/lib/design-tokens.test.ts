@@ -12,6 +12,10 @@ const GOVERNED = [
   "components/app/live-spot.tsx", "components/app/live-markets.tsx", "components/app/fixture-ground.tsx", "components/app/ground-filters.tsx", "pages/Contact.tsx",
   "components/app/page.tsx", "components/app/forms.tsx", "components/app/entity-hero.tsx", "components/app/pill-tabs.tsx", "components/app/chart.tsx", "components/app/star.tsx",
   "pages/Markets.tsx", "pages/Simple.tsx", "pages/Tools.tsx", "pages/Legal.tsx",
+  "components/app/ad-slot.tsx", "components/app/animated-height.tsx", "components/app/animated-number.tsx", "components/app/badges.tsx", "components/app/book-badge.tsx",
+  "components/app/book-table.tsx", "components/app/empty-state.tsx", "components/app/error-boundary.tsx", "components/app/fancy-filters.tsx", "components/app/grid-filters.tsx",
+  "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
+  "pages/AdminAds.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";
@@ -36,14 +40,15 @@ describe("design tokens", () => {
 
 /** Product pages + app chrome: EmptyState only (EmptyNote stays as a deprecated alias in page.tsx). */
 const PRODUCT = Object.keys(sources).filter((k) => /\/(pages|components\/app)\//.test(k) && !k.endsWith("/page.tsx"));
+const UI = Object.keys(sources).filter((k) => /\/components\/ui\//.test(k));
 
 describe("empty + icon hygiene", () => {
   it("product pages and app components do not import EmptyNote", () => {
     const hits = PRODUCT.filter((k) => /\bEmptyNote\b/.test(sources[k] || ""));
     expect(hits, hits.join(", ")).toEqual([]);
   });
-  it("product pages and app components do not import lucide-react", () => {
-    const hits = PRODUCT.filter((k) => /from\s+["']lucide-react["']/.test(sources[k] || ""));
+  it("product pages, app components, and ui primitives do not import lucide-react", () => {
+    const hits = [...PRODUCT, ...UI].filter((k) => /from\s+["']lucide-react["']/.test(sources[k] || ""));
     expect(hits, hits.join(", ")).toEqual([]);
   });
 });

@@ -15,6 +15,31 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — Drop lucide-react dependency
+- **Path:** `site/package.json`, `site/package-lock.json`, `site/components.json`, `docs/DESIGN_SYSTEM.md`
+- **Change:** Removed unused `lucide-react`; dropped `iconLibrary: lucide` from shadcn config. New CLI components must be converted to Heroicons (import ban in design-tokens.test.ts).
+- **Callers:** anyone running `npx shadcn add`
+
+### 2026-11-14 — shadcn ui: Lucide → Heroicons
+- **Path:** `site/src/components/ui/{sheet,dialog,accordion,checkbox,select,command,sidebar,dropdown-menu}.tsx`, `site/src/lib/design-tokens.test.ts`
+- **Change:** Replaced Lucide icons with Heroicons (`XMarkIcon`, chevrons, `CheckIcon`, `MagnifyingGlassIcon`, `Bars3Icon`); radio indicator is a filled span (no CircleIcon). Lucide import ban now covers `components/ui` too.
+- **Callers:** every Sheet/Dialog/Select/Command/Sidebar/Dropdown/Accordion/Checkbox surface
+
+### 2026-11-14 — Catalogue: badges, BookTable, LadderRow
+- **Path:** `site/src/pages/DesignSystem.tsx` (Data & metrics)
+- **Change:** PreviewFrame stages for TeamBadge sizes / LeagueBadge / TeamFlag, BookTable (+N books), and LadderRow priced ladder with synthetic books.
+- **Callers:** design host `/docs/data`
+
+### 2026-11-14 — Badge type roles + GOVERNED expansion
+- **Path:** `site/src/components/app/badges.tsx`, `player-picker.tsx`, `sign-in-sheet.tsx`, `site/src/lib/design-tokens.test.ts`
+- **Change:** Tiny badge initials use `text-caption` (no hard px); silhouette uses translate not margin; picker meta uses `text-footnote`; sign-in form stacks with `gap-stack` (no `mt-tight`). Enrolled remaining product app modules + `AdminAds` in GOVERNED.
+- **Callers:** Home rail chips, AvatarGroup, TeamFlag, PlayerBadge, Tools player picker, Sign-in sheet; all design-token CI checks
+
+### 2026-11-14 — Endpoint matrix Partial → Aligned
+- **Path:** `docs/DESIGN_SYSTEM.md`, `docs/SITE.md`
+- **Change:** `/competitions`, `/pair`, and `/teams`/`/team/:id` marked Aligned (EmptyState, bleed tables, ResultView, GOVERNED). SITE.md GOVERNED note updated — product surfaces enrolled.
+- **Callers:** design handbook only
+
 ### 2026-11-14 — Design-host auth + chrome handoff harden
 - **Path:** `site/src/lib/auth.tsx`, `site/src/pages/AuthCallback.tsx`, `site/src/main.tsx`, `site/src/lib/design-host.ts`, `Header.tsx`, `IosTabBar.tsx`, `GlobalSearch.tsx`, `chrome.tsx`
 - **Change:** Design-host Google/email OAuth finishes on `PRODUCT_ORIGIN/auth/callback?next=`; stray design `/auth/callback` redirects to product; tab bar never selected on catalogue; footer uses `PRODUCT_ORIGIN`.

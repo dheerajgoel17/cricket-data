@@ -17,7 +17,6 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "iconLibrary": "lucide",
   "registries": {
     "@magicui": "https://magicui.design/r/{name}.json",
     "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json",

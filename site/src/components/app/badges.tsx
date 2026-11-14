@@ -28,7 +28,7 @@ function Img({ urls, alt, fallback, className, eager }: { urls: string[]; alt: s
   );
 }
 
-const SIZES = { xs: "size-5 text-[8px]", sm: "size-6 text-[9px]", md: "size-9 text-[10px]", lg: "size-12 text-callout", xl: "size-16 text-title" } as const;
+const SIZES = { xs: "size-5 text-caption", sm: "size-6 text-caption", md: "size-9 text-caption", lg: "size-12 text-callout", xl: "size-16 text-title" } as const;
 export type BadgeSize = keyof typeof SIZES;
 
 const Circle = ({ size, className, children, title }: { size: BadgeSize; className?: string; children: React.ReactNode; title?: string }) => (
@@ -64,7 +64,7 @@ export function TeamAvatar({ name, size = "sm", eager }: { name: string; size?: 
   return (
     <Avatar size={AVATAR_SIZE[size]} title={name} className={cn("bg-secondary", size === "xs" && "size-5")}>
       {url ? <AvatarImage src={url} alt={name} loading={eager ? "eager" : "lazy"} className="size-full object-contain p-0.5" onError={() => setI((n) => n + 1)} /> : null}
-      <AvatarFallback className="bg-secondary text-[8px] font-emphasis">{initials(name)}</AvatarFallback>
+      <AvatarFallback className="bg-secondary text-caption font-emphasis">{initials(name)}</AvatarFallback>
     </Avatar>
   );
 }
@@ -85,13 +85,13 @@ export function TeamFlag({ name, className }: { name: string; className?: string
   const flag = flagUrl(name, 80);
   const urls = [flag, ...teamLogos(photos, name)].filter(Boolean) as string[];
   return (
-    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-transparent text-[8px] font-emphasis text-muted-foreground", className)}>
+    <span title={name} className={cn("relative inline-grid h-4 w-6 shrink-0 place-items-center overflow-hidden rounded-[3px] bg-transparent text-caption font-emphasis text-muted-foreground", className)}>
       <Img eager urls={urls} alt={name} className="size-full object-cover" fallback={initials(name)} />
     </span>
   );
 }
 
-const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="mt-[14%] size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
+const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 -translate-y-[7%] fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
 
 /** Avatar for a player index: photo when we have one, silhouette otherwise. */
 export function PlayerBadge({ idx, size = "sm", className }: { idx: number; size?: BadgeSize; className?: string }) {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "cn"
-import { ChevronDownIcon } from "lucide-react"
+import { ChevronDownIcon } from "@heroicons/react/24/outline"
 import { Accordion as AccordionPrimitive } from "radix-ui"
 
 function Accordion({

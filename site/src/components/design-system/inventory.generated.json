@@ -2362,9 +2362,12 @@
       "DesignSystemPage"
     ],
     "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/book-table.tsx",
       "site/src/components/app/chip.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/forms.tsx",
+      "site/src/components/app/line-ladder.tsx",
       "site/src/components/app/note.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/chart.tsx",
@@ -2374,7 +2377,8 @@
       "site/src/components/app/skeletons.tsx",
       "site/src/components/ui/badge.tsx",
       "site/src/components/ui/button.tsx",
-      "site/src/components/ui/input.tsx"
+      "site/src/components/ui/input.tsx",
+      "site/src/components/ui/table.tsx"
     ]
   },
   {
