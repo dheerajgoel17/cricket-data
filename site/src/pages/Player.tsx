@@ -47,7 +47,7 @@ import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
 import { MatchStatus } from "@/components/app/match-status";
-import { PlayerName, resolvePlayerLabel } from "@/components/app/player-name";
+import { PlayerName, isHexPlayerId, resolvePlayerLabel } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
@@ -151,7 +151,9 @@ function PlayerScreen({ idx }: { idx: number }) {
   const pid = store.P.id[idx];
   // Data sometimes stores only an eight-hex id: book spelling → names.json → id (same helper as props rows / PlayerName).
   const bookName = (lines.data?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
-  const name = resolvePlayerLabel(rawName, { bookName, catalogName: names?.[pid] });
+  const resolved = resolvePlayerLabel(rawName, { bookName, catalogName: names?.[pid] });
+  // Cold deep-link: lines may still be loading — don't put the hex id in the title/crumbs while book_name can still arrive.
+  const name = isHexPlayerId(resolved) && lines.isLoading ? "Player" : resolved;
   setTitle(`${name}: stats, hit rates and form`);
   const pricedIn = lines.data ? fmtIndex(bookFormatFor(lines.data, pid, askedStat, undefined, TEST_KEEP_MS) ?? "") : -1; // a link with no format opens where a book has a line out
   const fmtVal = Number(q.fmt ?? (fmts.some(([i]) => i === pricedIn) ? pricedIn : fmts.length ? fmts[0][0] : 0));

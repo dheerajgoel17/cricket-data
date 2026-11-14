@@ -462,7 +462,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
             </Button>
           </div>
           {active.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-tight pt-tight [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <div className="flex items-center gap-snug overflow-x-auto px-gutter py-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
               {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
               <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
             </div>
