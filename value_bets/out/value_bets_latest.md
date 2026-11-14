@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-14 09:00 IST
+# Cricket value bets - 2026-11-14 10:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2365 prices
-- **smarkets**: ok, 573 prices
-- **feedg**: ok, 24 prices, 3 events
+- **moviodds_bet365**: ok, 2363 prices
+- **smarkets**: ok, 540 prices
+- **feedg**: ok, 18 prices, 3 events
 - **feedk**: ok, 316 prices, 13 events
-- **feede**: ok, 754 prices, 26 events
-- **feedh**: ok, 1716 prices, 72 events
-- **feedf**: ok, 698 prices, 27 events, stopped time budget
+- **feede**: ok, 700 prices, 26 events
+- **feedh**: ok, 1568 prices, 68 events
+- **feedf**: ok, 676 prices, 28 events
 
-Matches starting in next 168h: **59**, markets priced: **591**, value bets: **7** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **57**, markets priced: **578**, value bets: **7** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -34,4 +34,4 @@ Matches starting in next 168h: **59**, markets priced: **591**, value bets: **7*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Central Hinds (W) (female), Diasqua Little Sai Wan Cricket Club (male), Elite Cricket Academy (male), Karnataka (W) (female), Knight Fighters 11 (male), Lokseva Academy (male), Maharashtra (W) (female), North West Dragons (W) (female), Omr Checker (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), Royal Champs (male), Tuskers (W) (female), USA (W) (female), Vidarbha (W) (female)
 
-Runtime 516.7s. Snapshot: `odds_20261114T033036Z.jsonl.gz`
+Runtime 264.6s. Snapshot: `odds_20261114T043031Z.jsonl.gz`

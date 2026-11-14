@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-14T03:40:04Z",
+ "generated_at_utc": "2026-11-14T04:35:45Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -119,29 +119,6 @@
    "chance": 0.494,
    "edge": 0.3535,
    "edge_pct": 35.4,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-14-hobart-hurricanes-women-v-brisbane-heat-women|team_total_sixes|Brisbane Heat Women|0|over",
-   "fixture_id": "2026-11-14-hobart-hurricanes-women-v-brisbane-heat-women",
-   "match": "Hobart Hurricanes Women vs Brisbane Heat Women",
-   "format": "T20",
-   "series": "Womens Big Bash League 2026",
-   "start_utc": "2026-11-14T04:40:00Z",
-   "start_ist": "2026-11-14 10:10 IST",
-   "key": "team_total_sixes",
-   "team": "Brisbane Heat Women",
-   "inn": 0,
-   "side": "over",
-   "line": 2.5,
-   "best_odds": 2.5,
-   "best_source": "bet365",
-   "hits": 12,
-   "played": 20,
-   "window": 20,
-   "chance": 0.525,
-   "edge": 0.3125,
-   "edge_pct": 31.3,
    "bat_first": false
   },
   {
