@@ -25,7 +25,7 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { StatsAd } from "@/components/app/stats-ad";
-import { CardGrid, DetailSplit, StickyPanel, TABLE_HEAD } from "@/components/app/page";
+import { DetailSplit, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { cn } from "@/lib/utils";
 import { GroundSkeleton } from "@/components/app/skeletons";
@@ -195,11 +195,13 @@ function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
         <EmptyState compact title="No matches" body="Nothing at this ground for the filters you picked." />
       ) : (
         <>
-          <CardGrid aria-label="Matches at this ground">
+          <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
             {list.slice(0, shown).map((f, i) => (
-              <FixtureCard key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} f={f} i={Math.min(i, 6)} />
+              <li key={f.id || f._key || `${f.a}-${f.b}-${f.start}`}>
+                <FixtureCard f={f} i={Math.min(i, 6)} />
+              </li>
             ))}
-          </CardGrid>
+          </ul>
           {list.length > shown ? (
             <Button type="button" variant="secondary" className="h-control w-full rounded-2xl text-callout shadow-none" onClick={() => setShown((n) => n + pageSize)}>
               Show more · {list.length - shown} left

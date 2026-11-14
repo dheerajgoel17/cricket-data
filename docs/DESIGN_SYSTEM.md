@@ -69,7 +69,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- |
 | default (phone) | Single column, bottom tab bar, edge bleed on stats tables, sheets for filters |
 | `md` (768+) | Wider gutters; some two-column glances |
-| `lg` (1024+) | Sidebar nav; `DetailSplit` + `StickyPanel` (asymmetric chart \| rail); `CardGrid` densifies directories; Home tape \| props; `lg:mx-0` ends table bleed |
+| `lg` (1024+) | Sidebar nav; `DetailSplit` + `StickyPanel` (asymmetric chart \| rail); Fancy `CardGrid`; Fixture Form two teams; `lg:mx-0` ends table bleed |
 
 Details per surface: [Endpoint matrix (web)](#endpoint-matrix-web).
 
@@ -167,18 +167,18 @@ Full `App.tsx` route checklist:
 
 | Surface | Phone | `md` | `lg+` | Stats tables |
 | --- | --- | --- | --- | --- |
-| Home rail | Snap cards, tab bar | Same | Sidebar + rail; tape \| props `lg:grid-cols-2` | — |
+| Home rail | Snap cards, tab bar | Same | Sidebar + rail; tape above full-width props | — |
 | Player stats | Bleed game-log list; section pills | Same | `DetailSplit` + sticky Lines + dense game-log `DataTable`; Splits tabs | `TABLE_HEAD` + bleed |
 | ResultView (`/pair`, team markets) | Bleed ladders / corr / log / splits | Same | Same | `TABLE_HEAD` + bleed |
 | Markets (competition) | Bleed overview / teams / results | Same | Same | `TABLE_HEAD` + bleed |
 | Simple (teams & venues) | Bleed directory table | Same | Same | `TABLE_HEAD` + bleed |
 | Team / venue | Grid + ResultView markets | Same | Same | ResultView bleed |
-| Competitions / Leagues | Tournament boards in cards | Same | Multi-col boards; competitions `CardGrid` | `BOARD_HEAD` inset |
+| Competitions / Leagues | Tournament boards in cards | Same | Multi-col boards | `BOARD_HEAD` inset |
 | Screener / filters | Sheet | Sheet | Drawer-friendly width | — |
 | Fancy / props lists | Scroll + rows | Fancy `CardGrid` | Wider content; Props `PropTable` | — |
 | Fixture | Scorecard card + chips | Same | Form two teams side-by-side; desktop back + crumbs | — |
 | Match Fancy detail | Edge ladder + `TABLE_HEAD` | Same | `DetailSplit` + `StickyPanel` | `TABLE_HEAD` + bleed layout |
-| Ground | Ladder / rates | Same | `DetailSplit` markets; matches `CardGrid` | bleed |
+| Ground | Ladder / rates | Same | `DetailSplit` markets; matches stay stacked FixtureCards | bleed |
 | Tools / Odds / Glossary / About / Players | Tokens + EmptyState | Same | Same | Odds StatTile; Teams PillGroup |
 | Legal | PageTitle + prose | Same | Same | — |
 | 404 | EmptyState | Same | Same | — |

@@ -452,7 +452,7 @@ export function DesignSystemPage() {
             </StickyPanel>
           </DetailSplit>
         </PreviewFrame>
-        <PreviewFrame title="CardGrid" description="Directory cards: 1 → 2 (md) → 3 (xl). Fancy list and Ground matches." source="components/app/page.tsx" canvasClassName="items-stretch bg-background">
+        <PreviewFrame title="CardGrid" description="Directory cards: 1 → 2 (md) → 3 (xl). Fancy list." source="components/app/page.tsx" canvasClassName="items-stretch bg-background">
           <CardGrid className="w-full">
             {["Match A", "Match B", "Match C"].map((label) => (
               <div key={label} className="rounded-lg border border-hairline bg-card px-inset py-snug text-body font-label">{label}</div>

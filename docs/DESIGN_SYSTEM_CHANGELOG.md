@@ -15,10 +15,15 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — Narrow DetailSplit callers (revert Home / Competitions / Ground matches grids)
+- **Path:** `hot-home.tsx`, `Markets.tsx`, `fixture-ground.tsx`, docs
+- **Change:** Reverted Home tape\|props 2-col (left Props half-width when tape empty), Competitions `CardGrid` of link rows, and Ground matches `CardGrid` of FixtureCards — those broke density rather than helping. `DetailSplit` / `StickyPanel` stay on Player, Match Fancy, Ground markets; `CardGrid` stays on Fancy list + catalogue.
+- **Callers:** Home, `/competitions`, Ground matches list
+
 ### 2026-11-14 — DetailSplit, StickyPanel, CardGrid
 - **Path:** `site/src/components/app/page.tsx`, `site/src/pages/DesignSystem.tsx`
 - **Change:** Shared desktop layout jobs — asymmetric `DetailSplit` (chart | rail), `StickyPanel` (sticky max-height bleed rail), `CardGrid` (1/2/3 directory). `DataTable` gains optional `onRowClick`. Catalogue stages under Data & metrics.
-- **Callers:** Player, Match Fancy detail, Ground markets/matches, Fancy list, Home Hot props, Fixture Form, Competitions index
+- **Callers:** Player, Match Fancy detail, Ground markets, Fancy list, Fixture Form
 
 ### 2026-11-14 — Drop lucide-react dependency
 - **Path:** `site/package.json`, `site/package-lock.json`, `site/components.json`, `docs/DESIGN_SYSTEM.md`
