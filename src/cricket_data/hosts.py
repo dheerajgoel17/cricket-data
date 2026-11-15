@@ -10,7 +10,7 @@
   FEEDH_URL          Feed H's sportsbook root      FEEDH_NAME   the name its prices are published under
   FEEDH_RELAY        Cloudflare Worker relay (or reuse FEEDG_RELAY); Feed H never runs on a laptop
   FEEDI_URL          Feed I's sportsbook root      FEEDI_NAME   the name its prices are published under
-  FEEDI_PARTNER      optional partner id Feed I's guest LineFeed/LiveFeed calls send (same Mumbai relay as Feed H)
+  FEEDI_PARTNER      optional partner id (unused by the current Feed I guest calls; Chrome TLS direct, not the Mumbai relay)
   SRC_B_BASE, SRC_C_BASE, SRC_D_BASE, SRC_E_BASE   the optional scrapers / key-gated APIs that are not enabled by default
   BOARD_IN_BASE + BOARD_IN_FEED   India board JSON (optional; default feed /feed/v1/matches/live)
   BOARD_EN_BASE + BOARD_EN_FEED   England board JSON (optional; default /api/v2/matches.json)

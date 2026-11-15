@@ -214,7 +214,7 @@ def e_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> 
 
 
 def i_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> list[dict]:
-    """Started matches Feed I lists (Mumbai relay; skipped when FEEDI_* unset)."""
+    """Started matches Feed I lists (direct curl_cffi; skipped when FEEDI_* unset)."""
     return feedi.live_matches(now, wanted)
 
 
