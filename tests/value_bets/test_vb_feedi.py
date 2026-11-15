@@ -120,7 +120,7 @@ def test_published_and_skip_without_env(monkeypatch):
     assert feedi.published() == {}
     try:
         feedi.fetch(STAMP)
-        assert False, "expected Skip"
+        raise AssertionError("expected Skip")
     except feedi.Skip:
         pass
 
