@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { entityAccent } from "@cricket/engine/entity-accents.js";
+import { usePageWash } from "@/lib/header-slot";
 
 const DEFAULT_H = 220;
 
@@ -12,6 +13,7 @@ export function HeroWash({
   accent,
   wash = true,
   height = DEFAULT_H,
+  page,
   className,
   children,
   style,
@@ -19,14 +21,17 @@ export function HeroWash({
   accent?: string | null;
   wash?: boolean;
   height?: number;
+  /** Tint the whole top of the page (behind the header and the sticky chips) instead of a block under them. */
+  page?: boolean;
   className?: string;
   children?: ReactNode;
   style?: CSSProperties;
 }) {
   const hex = wash ? accent || "var(--primary)" : null;
+  usePageWash(page ? hex : null);
   return (
     <div className={cn("relative", className)} style={style}>
-      {hex ? (
+      {hex && !page ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 -z-0"

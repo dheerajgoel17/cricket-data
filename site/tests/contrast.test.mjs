@@ -27,3 +27,10 @@ test("status colours reach 3:1 against the page (glyphs and large figures)", () 
     assert.ok(r >= 3, `${k} on background is ${r.toFixed(2)}:1`);
   }
 });
+
+test("form control borders reach 3:1 on the page and on cards (WCAG 1.4.11 non-text contrast)", () => {
+  for (const surface of ["background", "card"]) {
+    const r = contrast(C.input, C[surface]);
+    assert.ok(r >= 3, `input border on ${surface} is ${r.toFixed(2)}:1`);
+  }
+});

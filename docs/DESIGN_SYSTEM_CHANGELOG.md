@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Web: page wash through the chrome; visible form controls
+- **Path:** `site/src/lib/header-slot.tsx` (`usePageWash`, `usePageWashColor`, `useScrolled`), `components/app/hero-wash.tsx` (`page`), `components/layout/Shell.tsx` (`PageWashLayer`, sidebar), `components/layout/Header.tsx`, `components/app/page.tsx` (`StickyFilterBand`), `pages/Player.tsx`, `pages/Markets.tsx`; tokens `input`
+- **Change:** an entity page's tint (player, team) is a page-level layer behind the sidebar, the header, the breadcrumbs and the sticky chips, so the colour flows through them like the app's clear header; they turn solid once the page scrolls. Form control borders (`input`) were #1c1c1e on #1c1c1e cards (invisible); now #6c6c70, 3.25:1 on cards (WCAG 1.4.11), with a contrast test.
+- **Callers:** Player, Team (Markets) pages; every input, select, checkbox and textarea
+
 ### 2026-11-15 — Foundations: contrast, states, icons, grid, elevation, Figma export, OTA
 - **Path:** `site/packages/tokens/` (`tokens.json` +`state` +`icon` +`grid` +`elevation_native`, `grid.js`, `dtcg.js`, `tokens.dtcg.json`), mobile `ui/tokens.ts` (`state`, `icon`), `ui/platform.ts` (`elevation`), `ui/grid.ts`, `site/tests/contrast.test.mjs`, `mobile/app.config.js`, `src/lib/ota.ts`, `scripts/ota-check.mjs`
 - **Change:** `muted-foreground` raised from #8e8e93 to #98989d (it was 4.27:1 on the secondary fill; AA needs 4.5:1; a test now holds every text colour to it). Pressed / disabled / dim opacities are tokens (the app used 0.5 to 0.92 for the same job); icon sizes are a 4-step scale (12 / 16 / 20 / 24); a column grid (4 / 8 / 12) with a shared pure helper tested against `CardGrid`; shadows come from elevation tokens; tokens export as W3C Design Tokens for Figma; the app can receive JavaScript updates over the air (`expo-updates`, free) and `scripts/ota-check.mjs` says whether a change needs a new APK

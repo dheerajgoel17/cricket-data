@@ -1,4 +1,5 @@
 import { Fragment, type HTMLAttributes, type ReactNode } from "react";
+import { usePageWashColor, useScrolled } from "@/lib/header-slot";
 import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
@@ -62,8 +63,10 @@ export const StatGridCards = ({ children }: { children: ReactNode }) => (
  * Pair with `useHeaderFlush(true)` so the top bar uses `bg-card` and drops its hairline — one continuous surface.
  */
 export function StickyFilterBand({ children, className }: { children: ReactNode; className?: string }) {
+  const wash = usePageWashColor(), scrolled = useScrolled();
+  const clear = !!wash && !scrolled; // over a page wash the band is clear until it sticks
   return (
-    <div className={cn("sticky top-header z-30 -mx-gutter bg-background/85 backdrop-blur-xl backdrop-saturate-150", className)}>
+    <div className={cn("sticky top-header z-30 -mx-gutter transition-colors duration-200", clear ? "bg-transparent" : "bg-background/85 backdrop-blur-xl backdrop-saturate-150", className)}>
       {children}
     </div>
   );
