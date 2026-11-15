@@ -14,16 +14,32 @@
 ## Screenshots
 
 <p align="center">
-  <img src="docs/readme/live.png" alt="Live fixtures and player form on the Fancy.cash home screen" width="225" />
+  <img src="docs/readme/live.jpg" alt="Home: live fixtures, the high odds hits card and today's props" width="215" />
   &nbsp;
-  <img src="docs/readme/ground.png" alt="The ground page showing the venue, match filters and live score" width="225" />
+  <img src="docs/readme/props.jpg" alt="Player props: day and match chips, lines, hit-rate bars and edge" width="215" />
+  &nbsp;
+  <img src="docs/readme/fancy.jpg" alt="Fancy: every priced match with its best markets" width="215" />
+</p>
+<p align="center">
+  <img src="docs/readme/fixture.jpg" alt="A live match: scoreboard, batters, Props, Match Fancy, Grid and Custom line" width="215" />
+  &nbsp;
+  <img src="docs/readme/ground.jpg" alt="A ground: weather, match filters, ground stats and past matches" width="215" />
+  &nbsp;
+  <img src="docs/readme/leagues.jpg" alt="Leagues: seasons, leaders and stat tables" width="215" />
 </p>
 
 ## Features
 
-- **Follow live cricket.** See scores, innings summaries, and what’s coming up.
-- **Explore player form.** Compare recent performances against an opponent or at a venue.
-- **Get to know a ground.** Browse past matches, filter by format, and explore scoring patterns.
+- **Follow live cricket.** Scores, innings summaries, ball by ball, and what's coming up, with the lines each book offers.
+- **Player props, with the history behind them.** Every line shows how often the player cleared it (last 5, 10 or all games), the fair price, and the edge against the books.
+- **Fancy markets.** Team and match markets from each side's last matches, with the book's line next to the odds.
+- **Get to know a ground.** Weather, scoring patterns and past matches, filtered by format and gender.
+- **Leagues and teams.** Seasons, leaders and stat tables, and a grid of every player's last games.
+- **Free, no account needed.** Saved lists stay on the phone; sign in only if you want them synced.
+
+## Design
+
+One dark design system for the site and the app: shared tokens (colour, type, spacing, grid, motion), matching components, and guard tests that keep them in step. See the [design system](docs/DESIGN_SYSTEM.md) and the [parity checklist](docs/PARITY_CHECKLIST.md). Tokens also export for Figma (`site/packages/tokens/tokens.dtcg.json`).
 
 ## Download
 
