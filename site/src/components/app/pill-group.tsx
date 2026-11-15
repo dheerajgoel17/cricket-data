@@ -3,7 +3,6 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { motion, useReducedMotion } from "motion/react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { useScrollFade } from "@/hooks/useScrollFade";
 
 /**
  * Single-select pill group (shadcn ToggleGroup). Variants:
@@ -22,7 +21,6 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
   const outlined = resetValue != null;
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  useScrollFade(ref);
   const seen = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
   useEffect(() => { setReady(true); }, []);
@@ -39,7 +37,7 @@ export function PillGroup({ items, value, onChange, layoutId, label, className, 
   const thumb = reduce || !ready ? { duration: 0 } : { type: "spring" as const, stiffness: 500, damping: 38 };
   return (
     <ToggleGroup ref={ref} type="single" value={value} onValueChange={(v) => { if (v) onChange(v); else if (resetValue != null && value !== resetValue) onChange(resetValue); }} variant="outline" spacing={segmented ? 0 : 2} aria-label={label}
-      className={cn("scroll-fade-x justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+      className={cn("justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         segmented ? "h-control w-fit max-w-full rounded-[var(--chip-radius)] bg-card p-0.5"
           : sub ? "h-auto w-full gap-stack bg-transparent"
             : "h-auto w-full gap-tight bg-transparent",

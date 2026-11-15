@@ -40,7 +40,7 @@ Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 ·
 
 **Text roles** (`t.*`, `d.*`, `dStrong.*`, `w.*` in `ui/tokens.ts`): a screen never writes a font family. `t.bodyLabel` / `t.calloutLabel` is a control, chip or row label (Satoshi 500); `t.bodyStrong` a name or the one key line (700); `d.callout` a figure at the label weight (Barlow 500) and `dStrong.callout` the key figure (700); `w.label` is weight only, for a span inside text. Web: `text-*` with `font-label` / `font-emphasis`, `font-condensed tabular-nums`.
 
-**Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone). Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web): the content fades at an edge that has more behind it (a gradient or mask, never a live blur).
+**Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone).Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web) and run edge to edge: no fade or blur at the sides, the screen edge cuts a chip cleanly.
 
 
 ## Foundations scorecard (the designer's view)

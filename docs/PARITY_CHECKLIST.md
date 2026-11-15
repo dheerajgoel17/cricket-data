@@ -27,7 +27,7 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | B1 | Bottom sheet | `Sheet` (shadcn) | `ui/sheet` | code |
 | B2 | Round icon button | header icon buttons | `RoundButton` | code |
 | B3 | Chips / filters | `PillGroup`, `Chip` | `Chips`, `ChoiceChip`, `ActiveChip` | ok (Props seen) |
-| B4 | Scrolling row with edge fade | `ScrollRow`, `PillGroup` (`scroll-fade-x`) | `HScroll` | ok (Props seen); web code only |
+| B4 | Scrolling row, edge to edge (no fade) | `ScrollRow`, `PillGroup` | `HScroll` | code |
 | B5 | Section tabs | `PillTabs` / `Tabs` | `LineTabs` (Home, player, league, team), `Chips` (team formats), `CapsuleTabs` (fixture), `Segmented` (venue, ground) | code (league, team done); gap: venue / ground still use `Segmented` |
 | B6 | Page header | `Header` + `PageTitle` | `PageHeader`, brand bar | code (League no longer repeats its title) |
 | B7 | Fixture card | `fixture-card` | `ui/fixture-card` | ok (Home seen) |
@@ -60,7 +60,7 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | C11 | Page transition | route fade | native stack | code |
 | C12 | Star / save | `star.tsx` | `ui/star` | code |
 | C13 | Reduce motion | `useReducedMotion` | `useReducedMotion` | code |
-| C14 | Edge fade on scroll | mask | gradient | ok / code |
+| C14 | Edge fade on scroll | removed (rows run edge to edge) | removed | decision 2026-11-15 |
 | C15 | Haptics on select | n/a | `Haptics.selectionAsync` | code |
 
 ## C2. Added in the second pass

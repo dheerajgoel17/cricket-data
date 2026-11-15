@@ -75,8 +75,6 @@
 }
 
 /* Type — Satoshi for names/UI; Barlow Condensed for scoreboard figures and uppercase rail labels. */
-/* Edge fade for scrolling rows: --fl / --fr are set by useScrollFade (0 = no fade at that edge). */
-@utility scroll-fade-x { mask-image: linear-gradient(to right, transparent 0, #000 var(--fl, 0px), #000 calc(100% - var(--fr, 0px)), transparent 100%); }
 @utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: var(--weight-label); line-height: 1.2; }
 @utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; font-weight: var(--weight-editorial); }
 
