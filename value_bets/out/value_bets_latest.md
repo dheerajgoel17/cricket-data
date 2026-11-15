@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-15 20:00 IST
+# Cricket value bets - 2026-11-15 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **smarkets**: ok, 561 prices
-- **moviodds_bet365**: ok, 1640 prices
-- **feedg**: ok, 8 prices, 1 events
+- **smarkets**: ok, 657 prices
+- **moviodds_bet365**: ok, 1700 prices
+- **feedg**: ok, 16 prices, 2 events
 - **feedk**: ok, 88 prices, 7 events
-- **feede**: ok, 474 prices, 12 events
-- **feedh**: ok, 1429 prices, 24 events
-- **feedf**: ok, 474 prices, 15 events
+- **feede**: ok, 608 prices, 16 events
+- **feedh**: ok, 1624 prices, 28 events
+- **feedf**: ok, 684 prices, 18 events
 
-Matches starting in next 168h: **39**, markets priced: **432**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **42**, markets priced: **492**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -25,4 +25,4 @@ Matches starting in next 168h: **39**, markets priced: **432**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), Karnataka (W) (female), Maharashtra (W) (female), Nhlangano Legends (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Western Australia Warriors (male)
 
-Runtime 155.9s. Snapshot: `odds_20261115T143033Z.jsonl.gz`
+Runtime 128.6s. Snapshot: `odds_20261115T153035Z.jsonl.gz`
