@@ -1,22 +1,23 @@
-# Cricket value bets - 2026-11-15 23:00 IST
+# Cricket value bets - 2026-11-15 23:25 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1693 prices
-- **smarkets**: ok, 661 prices
+- **moviodds_bet365**: ok, 1725 prices
+- **smarkets**: ok, 708 prices
 - **feedg**: ok, 24 prices, 3 events
 - **feedk**: ok, 88 prices, 7 events
-- **feede**: ok, 628 prices, 19 events
-- **feedh**: ok, 1694 prices, 39 events
-- **feedf**: ok, 684 prices, 19 events
-- **feedi**: ok, 2233 prices, 43 events
+- **feede**: ok, 674 prices, 21 events
+- **feedh**: ok, 1811 prices, 42 events
+- **feedf**: ok, 696 prices, 22 events
+- **feedi**: ok, 2454 prices, 48 events
 
-Matches starting in next 168h: **49**, markets priced: **559**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **51**, markets priced: **591**, value bets: **7** (new alerts: 1). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
 | 11-16 04:30 IST | New South Wales vs South Australia | Bowler Total Match Wickets | HTRY Thornton under 1.5 | 2.00 @ moviodds_bet365 | 1.76 | 0.6032 | 13.3% | 2.00% | medium |
+| 11-16 04:30 IST | New South Wales vs South Australia | Batsman to Score a Fifty in the Match | L Shaw 50+ no | 1.36 @ moviodds_bet365 | 1.27 | 0.8605 | 7.5% | 2.00% | medium |
 | 11-16 13:40 IST | Sydney Thunder (Women) vs Melbourne Stars (Women) | G9181 batter_sixes | Phoebe Litchfield under 0.5 | 1.70 @ feedi_d | 1.55 | 0.6469 | 9.8% | 2.00% | medium |
 | 11-16 13:40 IST | Sydney Thunder (Women) vs Melbourne Stars (Women) | G2506 batter_runs | Amy Jones under 18.5 | 1.85 @ feedi_d | 1.75 | 0.6377 | 5.8% | 1.71% | medium |
 | 11-18 09:00 IST | Australia vs England | G3555 bowler_wickets | Jofra Archer under 1.5 | 2.10 @ feedi_d | 1.71 | 0.616 | 22.6% | 2.00% | medium |
@@ -25,6 +26,7 @@ Matches starting in next 168h: **49**, markets priced: **559**, value bets: **6*
 
 ### Why / notes per bet
 - **New South Wales vs South Australia / Bowler Total Match Wickets / HTRY Thornton under 1.5** - why: Model 60% vs market 54% for under 1.5 wkts; form 1.5 wkts/spell recency-weighted ODI (n_eff 11.2; last 5: 1, 0, 2, 4, 2), bowls in 92% of games, 7.9 overs/spell; at Cricket Central, Sydney Olympic Park: 1 spells avg 1.0; vs New South Wales: 3 spells avg 1.7; weather: rain chance up to 95%. Notes: 2 market source(s) for fair price; model 0.603 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 95% rain chance, 2.8 mm forecast during the match - shortened match or void props possible
+- **New South Wales vs South Australia / Batsman to Score a Fifty in the Match / L Shaw 50+ no** - why: Model 86% vs market 73% for 50+ runs; form 28.4 runs/inn recency-weighted ODI (n_eff 8.6; last 5: 44, 0, 44, 0, 37), bats in 88% of games played; at Cricket Central, Sydney Olympic Park: 5 inns avg 38.4; vs South Australia: 3 inns avg 24.7; weather: rain chance up to 95%. Notes: 4 market source(s) for fair price; model 0.860 vs market 0.730; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 95% rain chance, 2.8 mm forecast during the match - shortened match or void props possible
 - **Sydney Thunder (Women) vs Melbourne Stars (Women) / G9181 batter_sixes / Phoebe Litchfield under 0.5** - why: Model 65% vs market 65% for under 0.5 sixes; form 0.6 sixes/inn recency-weighted T20 (n_eff 68.8; last 5: 0, 1, 1, 1, 0), bats in 95% of games played; at Drummoyne Oval, Sydney: 14 inns avg 0.4; context adj: venue environment +26%; weather: rain chance up to 80%, high humidity 83%. Notes: 2 market source(s) for fair price; model 0.647 vs market 0.645; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 80% rain chance, 0.7 mm forecast during the match - shortened match or void props possible
 - **Sydney Thunder (Women) vs Melbourne Stars (Women) / G2506 batter_runs / Amy Jones under 18.5** - why: Model 64% vs market 52% for under 18.5 runs; form 18.6 runs/inn recency-weighted T20 (n_eff 66.5; last 5: 74, 4, 28, 18, 2), bats in 89% of games played; at Drummoyne Oval, Sydney: 3 inns avg 11.7; context adj: team H2H context -6%; weather: rain chance up to 80%, high humidity 83%. Notes: 3 market source(s) for fair price; model 0.638 vs market 0.518; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 80% rain chance, 0.7 mm forecast during the match - shortened match or void props possible
 - **Australia vs England / G3555 bowler_wickets / Jofra Archer under 1.5** - why: Model 62% vs market 56% for under 1.5 wkts; form 1.4 wkts/spell recency-weighted ODI (n_eff 15.7; last 5: 1, 1, 0, 1, 0), bowls in 94% of games, 8.4 overs/spell; vs Australia: 11 spells avg 1.5. Notes: 2 market source(s) for fair price; model 0.616 vs market 0.558; assumes bet void if player doesn't bat/bowl - check book rules
@@ -41,4 +43,4 @@ Matches starting in next 168h: **49**, markets priced: **559**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Andhra (Women) (female), Bangla Tigers (male), Baroda (W) (female), Baroda (Women) (female), Border (W) (female), Karnataka (W) (female), Karnataka (Women) (female), Lahore Region Whites (male), Maharashtra (W) (female), Maharashtra (Women) (female), Nhlangano Legends (male), Peshawar Blues (male), Railways (W) (female), Railways (Women) (female), Recon Tactical Free State (W) (female), Royal Champs (male), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Vidarbha (Women) (female), Western Australia Warriors (male)
 
-Runtime 228.6s. Snapshot: `odds_20261115T173032Z.jsonl.gz`
+Runtime 245.9s. Snapshot: `odds_20261115T175552Z.jsonl.gz`

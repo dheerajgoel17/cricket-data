@@ -1,4 +1,66 @@
 {
- "generated_at_ist": "2026-11-15 23:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-15 23:25 IST",
+ "alerts": [
+  {
+   "event_key": "male|New South Wales|South Australia|2026-11-15",
+   "match": "New South Wales vs South Australia",
+   "start_utc": "2026-11-15T23:00:00Z",
+   "start_ist": "2026-11-16 04:30 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Batsman to Score a Fifty in the Match",
+   "team_scope": "",
+   "selection": "L Shaw 50+ no",
+   "player_matched_as": "L Shaw",
+   "player_id": "b34e4b15",
+   "player_team": "New South Wales",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "under",
+   "best_odds": 1.364,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 1.364,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0667,
+   "implied_prob": 0.7334,
+   "fair_odds": 1.268,
+   "fair_prob": 0.7886,
+   "model_prob": 0.8605,
+   "market_prob": 0.7298,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0754,
+   "edge_pct": 7.54,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 4,
+   "confidence": "medium",
+   "why": "Model 86% vs market 73% for 50+ runs; form 28.4 runs/inn recency-weighted ODI (n_eff 8.6; last 5: 44, 0, 44, 0, 37), bats in 88% of games played; at Cricket Central, Sydney Olympic Park: 5 inns avg 38.4; vs South Australia: 3 inns avg 24.7; weather: rain chance up to 95%",
+   "notes": "4 market source(s) for fair price; model 0.860 vs market 0.730; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 95% rain chance, 2.8 mm forecast during the match - shortened match or void props possible",
+   "model_detail": {
+    "n_eff": 8.6,
+    "expected": 25.77,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.878,
+    "venue_matched": "cricket central",
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": true,
+   "weather": {
+    "rain_prob_max_pct": 95,
+    "rain_mm_in_window": 2.8,
+    "humidity_pct": 68,
+    "cloud_pct": 68,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "695c4f3c3c52e2a6",
+   "alert_key": "male|New South Wales|South Australia|2026-11-15|batter_milestone||L Shaw 50+ no|49.5|under",
+   "alerted_at_ist": "2026-11-15 23:29 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }

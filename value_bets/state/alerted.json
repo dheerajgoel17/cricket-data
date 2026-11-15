@@ -33,5 +33,10 @@
   "edge": 0.1349,
   "start_utc": "2026-11-18T03:30:00Z",
   "alerted_at": "2026-11-15T17:10:44.829034+00:00"
+ },
+ "male|New South Wales|South Australia|2026-11-15|batter_milestone||L Shaw 50+ no|49.5|under": {
+  "edge": 0.0754,
+  "start_utc": "2026-11-15T23:00:00Z",
+  "alerted_at": "2026-11-15T17:59:57.078472+00:00"
  }
 }
