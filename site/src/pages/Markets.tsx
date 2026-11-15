@@ -16,6 +16,7 @@ import { setTitle } from "@/lib/title";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { EntityHero } from "@/components/app/entity-hero";
+import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { PillTabs } from "@/components/app/pill-tabs";
 import { GridTable } from "@/components/app/grid";
 import { LeagueBadge, TeamBadge } from "@/components/app/badges";
@@ -146,8 +147,14 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
     <div className="flex flex-col gap-stack">
       <StatsAd />
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
-      <EntityHero badge={isTeam ? <TeamBadge name={store.teams[idx].n} size="xl" /> : undefined} name={label} sub={isTeam ? (store.teams[idx].g ? "Women's cricket" : "Men's cricket") : (ground ? `${ground.total} matches` : "Ground")}
-        meta={isTeam ? [`${fmtName} markets`, "team markets use the side batting first"] : [fmtName, ...(ground?.by || [])]} save={isTeam ? <StarButton kind="team" idx={idx} /> : undefined} />
+      {isTeam ? (
+        <HeroWash accent={sideAccent(store.teams[idx].n)} className="-mx-gutter px-gutter">
+          <EntityHero badge={<TeamBadge name={store.teams[idx].n} size="xl" />} name={label} sub={store.teams[idx].g ? "Women's cricket" : "Men's cricket"}
+            meta={[`${fmtName} markets`, "team markets use the side batting first"]} save={<StarButton kind="team" idx={idx} />} />
+        </HeroWash>
+      ) : (
+        <EntityHero name={label} sub={ground ? `${ground.total} matches` : "Ground"} meta={[fmtName, ...(ground?.by || [])]} />
+      )}
       {nextFx ? <NextMatch f={nextFx} /> : null}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>

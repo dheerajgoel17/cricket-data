@@ -7,6 +7,11 @@ These markets are about the whole match or one side (total runs, sixes, fours, b
 a team's sixes / fours / boundaries) rather than a player, so they bypass the player-prop pipeline: they are read straight from the raw feed,
 paired into a line with its over and under decimal prices, and published as ``fancy`` in ``book_lines.json``. Keys match the site's engine
 markets (``site/packages/engine/markets.js``). Back prices only; nothing here prices or recommends a bet.
+
+A Test side session / innings-runs market with no ``inn`` is the side's **1st innings** when scraped pre-match (books do not quote a complete-match
+team total the way they do for ``match_runs``; a "BAN · Runs · CMM" row is wrong). In-play lines that appear only after the start take their
+innings from the live card (``liveMerge`` / the feed's own Inn N tag) — typically 2nd when that side comes in and the session was not offered
+pre-match. ``scope_test_session_fancy`` tags the pre-match case.
 """
 from __future__ import annotations
 
@@ -15,6 +20,34 @@ import re
 from .util import iso, parse_ts
 
 SOURCE = "moviodds_bet365"
+
+# Side session / full-innings run markets on a Test: unscoped pre-match ⇒ 1st innings (never "complete match").
+TEST_SESSION_KEYS = frozenset({
+    "team_total_runs",
+    "overs_1", "overs_5", "overs_6", "overs_10", "overs_15", "overs_20",
+})
+
+
+def needs_test_session_scope(row: dict) -> bool:
+    """True when a Test fancy row is a side session / innings-runs market with no innings yet."""
+    return (
+        row.get("fmt") == "Test"
+        and not row.get("inn")
+        and row.get("key") in TEST_SESSION_KEYS
+        and bool(row.get("team") or (row.get("key") or "").startswith("overs_"))
+    )
+
+
+def scope_test_session_fancy(fancy: list[dict] | None) -> tuple[list[dict], int]:
+    """Tag unscoped Test side session / team-runs fancy as 1st innings. Returns (rows, how many tagged)."""
+    out, n = [], 0
+    for x in fancy or []:
+        if needs_test_session_scope(x):
+            out.append({**x, "inn": 1})
+            n += 1
+        else:
+            out.append(x)
+    return out, n
 
 
 def _fmt(m: dict) -> str | None:
@@ -74,6 +107,7 @@ def _line(q):
 def adapter_fancy(raws: dict) -> list[dict]:
     """The fancy lines other adapters read themselves: a raw feed may carry ``fancy`` in the shape ``match_fancy`` returns (Feed E's match sixes / fours)."""
     out = [x for raw in raws.values() if isinstance(raw, dict) for x in raw.get("fancy") or []]
+    out, _ = scope_test_session_fancy(out)
     return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x.get("inn", 0), x["line"], x["source"]))
 
 
@@ -108,4 +142,5 @@ def match_fancy(raw: dict | None) -> list[dict]:
                 out.append({"match": name, "home": m["home"], "away": m["away"], "start_utc": start, "fmt": fmt,
                             "competition": m.get("league") or None, "key": key, "scope": scope, "team": team,
                             "line": line, "over": px["over"], "under": px["under"], "source": SOURCE, "kind": "bookmaker"})
-    return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x["line"]))
+    out, _ = scope_test_session_fancy(out)
+    return sorted(out, key=lambda x: (x["start_utc"] or "", x["match"], x["key"], x["team"] or "", x.get("inn", 0), x["line"]))

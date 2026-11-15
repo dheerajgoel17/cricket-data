@@ -6,7 +6,7 @@ import * as Haptics from "expo-haptics";
 import { odds } from "@site/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { ChevronDown } from "@/ui/icons";
-import { cap, color, font, space, type } from "@/ui/tokens";
+import { cap, color, font, space, type, t, d, w } from "@/ui/tokens";
 
 type Priced = { source: string; over: number | null; under: number | null };
 
@@ -53,11 +53,11 @@ export function BookTable({ books, shown }: { books: Priced[]; shown: (string | 
 const styles = StyleSheet.create({
   wrap: { gap: 2 },
   toggle: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", paddingHorizontal: space.tight, borderRadius: 999 },
-  toggleText: { ...type.footnote, fontFamily: font.medium, color: "rgba(255,255,255,0.7)" },
+  toggleText: { ...t.footnoteLabel, color: color["text-soft"] },
   table: { maxWidth: 320 },
   head: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  headCell: { ...type.footnote, ...cap, fontFamily: font.medium, color: color["muted-foreground"], width: 52, textAlign: "right" },
+  headCell: { ...type.footnote, ...cap, ...w.label, color: color["muted-foreground"], width: 52, textAlign: "right" },
   bookCol: { flex: 1 },
   row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: 2 },
-  price: { ...type.footnote, fontFamily: font.data, width: 52, textAlign: "right", color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  price: { ...d.footnote, width: 52, textAlign: "right", color: color["muted-foreground"] },
 });

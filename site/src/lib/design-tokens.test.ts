@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 // Pages and shared components that follow the design system (see "Type and spacing scales" in src/index.css and docs/SITE.md):
 // sizes come from named tokens, never from pixel values or raw spacing numbers. Add a file here when its page is migrated.
 const GOVERNED = [
-  "components/app/hot-props.tsx", "components/app/fixture-card.tsx", "components/app/live-board.tsx", "components/app/match-fancy.tsx", "components/app/recent-form.tsx",
+  "components/app/hot-props.tsx", "components/app/fixture-card.tsx", "components/app/match-scoreboard.tsx", "components/app/status-label.tsx", "components/app/live-board.tsx", "components/app/match-fancy.tsx", "components/app/recent-form.tsx",
   "components/app/pill-group.tsx", "components/app/grid.tsx", "components/app/skeletons.tsx", "components/app/mini-bars.tsx", "components/app/live-feed.tsx",
   "components/app/tick.tsx", "components/app/market-tape.tsx", "components/app/next-match.tsx",
   "components/app/line-stepper.tsx", "components/app/viz.tsx",
@@ -14,8 +14,9 @@ const GOVERNED = [
   "pages/Markets.tsx", "pages/Simple.tsx", "pages/Tools.tsx", "pages/Legal.tsx",
   "components/app/ad-slot.tsx", "components/app/animated-height.tsx", "components/app/animated-number.tsx", "components/app/badges.tsx", "components/app/book-badge.tsx",
   "components/app/book-table.tsx", "components/app/empty-state.tsx", "components/app/error-boundary.tsx", "components/app/fancy-filters.tsx", "components/app/grid-filters.tsx",
-  "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
-  "pages/AdminAds.tsx",
+  "components/app/fancy-lines.tsx", "components/app/home-mix-table.tsx", "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx",
+  "components/app/result-stamp.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
+  "pages/AdminAds.tsx", "pages/AuthCallback.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";

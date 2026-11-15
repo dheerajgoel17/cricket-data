@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { SearchField } from "@/ui/search-field";
 import { useDeferredValue, useMemo, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -18,7 +19,8 @@ import { useScreenInsets } from "@/ui/insets";
 import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
-import { color, font, space, type } from "@/ui/tokens";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
+import { color, font, space, type, radius, rhythm, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"], ["Contact", "/contact"]];
@@ -55,12 +57,9 @@ export default function Search() {
   const team = (i: number) => store.teamName(store.P.tm[i]);
 
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       <View style={styles.bar}>
-        <View style={styles.field}>
-          <Ionicons name="search" size={18} color={color["muted-foreground"]} />
-          <TextInput value={text} onChangeText={setText} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" placeholder="Search players, teams, matches, grounds" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search" />
-        </View>
+        <SearchField style={styles.fieldFlex} value={text} onChangeText={setText} autoFocus placeholder="Search players, teams, matches, grounds" label="Search" />
         <Press accessibilityRole="button" onPress={goBack} hitSlop={8}><Text style={styles.cancel}>Cancel</Text></Press>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]}>
@@ -108,15 +107,13 @@ export default function Search() {
         )}
       </ScrollView>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   bar: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
-  field: { flex: 1, height: 40, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
-  input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
+  fieldFlex: { flex: 1 },
   cancel: { ...type.body, color: color.primary },
-  body: { gap: space.group, paddingHorizontal: space.gutter, paddingTop: space.snug },
+  body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.top },
 });

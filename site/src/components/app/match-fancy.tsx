@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterButton } from "@/components/app/chip";
+import { ScrollRow } from "@/components/app/scroll-row";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
@@ -21,7 +23,7 @@ import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
 import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "./page";
-import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
+import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreLiveOuRow, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -29,7 +31,6 @@ import { useData } from "@/lib/data";
 import { useLinesLive } from "@/hooks/useLinesLive";
 import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
 import { abbr, fixtureStart, num, odds, pc, shortVenue } from "@/lib/format";
-import { edgeTag } from "@cricket/engine/props-view.js";
 import { cn } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { ActiveChip } from "./chip";
@@ -37,15 +38,18 @@ import { FancyFilters } from "./fancy-filters";
 import { AnimatedHeight } from "./animated-height";
 import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
-import { LiveBadge, LiveOpened, LineProgress, TeamSpot } from "./live-spot";
+import { TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
-import { MiniBars, ValueBars } from "./mini-bars";
+import { ValueBars } from "./mini-bars";
+import { FancyLines } from "./fancy-lines";
 import { AdSlot } from "./ad-slot";
 import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
+
+export { FancyLines, OverviewRow } from "./fancy-lines";
 
 // the markets the tab lists, with their short labels, are the engine's (the server step scores the same ones)
 export const MATCH_KEYS = MATCH_KEY_LIST as [string, string][];
@@ -84,68 +88,6 @@ export const buildOverview = buildOverviewRows as (o: { store: any; doc: any; fx
 export const collectOverview = collectOverviewRows as (o: { store: any; doc: any; fxInfo: any; ms: number[]; teams: [string, number][]; ground?: number[] }) => any[];
 
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
-const BookMark = ({ source }: { source?: string }) => (source ? <><BookBadge source={source} />{" "}</> : null);
-
-/** One market's row — same chrome as a player PropRow: title, available over/under lines (named when they differ), one face book per side (+N accordion for the rest), model edge + last-N bars. */
-export function OverviewRow({ r, onOpen, active, sub, standing }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null }) {
-  const overSrc = bookSrc(r.overBook, r.books), underSrc = bookSrc(r.underBook, r.books);
-  const split = r.overLine != null && r.underLine != null && r.overLine !== r.underLine;
-  const mark = standing ?? r.standing;
-  const lean = r.side === "under" ? "U" : "O";
-  const leanLine = r.side === "under" && r.underLine != null ? r.underLine : r.overLine != null ? r.overLine : r.line;
-  return (
-    <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
-      className={cn("grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left transition-colors active:bg-card", active && "bg-card")}>
-      {r.team
-        ? <TeamBadge name={r.team} size="md" className="size-control" />
-        : <span className="grid size-control place-items-center rounded-full bg-secondary text-muted-foreground" aria-hidden><ChartBarIcon className="size-5" /></span>}
-      <span className="grid min-w-0 gap-hair">
-        <span className="flex min-w-0 items-baseline gap-tight">
-          <span className="truncate text-body font-label leading-snug">{r.label}</span>
-          {r.live && <LiveBadge />}
-        </span>
-        {sub && <span className="truncate text-footnote text-muted-foreground">{sub}</span>}
-        <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-          <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">{split ? `${lean} ${leanLine}` : `O/U ${r.line}`}</span>
-          {r.at && (() => {
-            const ground = shortVenue(r.venue);
-            const hits = r.at.side === "over" ? r.at.over : r.at.under;
-            return (
-              <span className={cn("truncate text-footnote", r.at.side === r.side && r.edge != null ? "font-label text-primary" : "text-muted-foreground")} title={r.venue || undefined}>
-                {hits}/{r.at.n} {r.at.side}{ground ? ` at ${ground}` : ""}
-              </span>
-            );
-          })()}
-        </span>
-        <span className="flex flex-wrap items-center gap-x-snug gap-y-hair text-callout text-muted-foreground">
-          {split ? (
-            <>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O {r.overLine} <Tick value={r.over} className="font-condensed font-emphasis text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U {r.underLine} <Tick value={r.under} className="font-condensed font-emphasis text-foreground">{odds(r.under)}</Tick></span>
-            </>
-          ) : (
-            <>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={overSrc} />O <Tick value={r.over} className="font-condensed font-emphasis text-foreground">{odds(r.over)}</Tick></span>
-              <span className="inline-flex items-center gap-tight whitespace-nowrap"><BookMark source={underSrc} />U <Tick value={r.under} className="font-condensed font-emphasis text-foreground">{odds(r.under)}</Tick></span>
-            </>
-          )}
-          {r.live && <LiveOpened opened={r.opened} line={r.line} />}
-        </span>
-        <LineProgress standing={mark} live={!!r.live} line={r.line} opened={r.opened} />
-      </span>
-      <span className="grid justify-items-end gap-hair">
-        <span className="grid justify-items-end gap-hair text-right">
-          <span className="flex items-baseline gap-tight whitespace-nowrap">
-            <span className="label-cap text-caption text-muted-foreground">Model</span>
-            <span className={cn("font-condensed text-title font-emphasis leading-none tabular-nums", r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-          </span>
-          {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
-        </span>
-        <MiniBars last={r.last} line={r.line} />
-      </span>
-    </button>
-  );
-}
 
 type Props = { fx: any; teams: [string, number][]; fmt: string; q: Record<string, string>; setQ: (p: Record<string, unknown>) => void; doc?: any; /** `list` is the fixture tab (chips + bookmaker lines); `detail` is `/fixture/:id/fancy` (one market's chart, like a player page). */ mode?: "list" | "detail" };
 
@@ -232,6 +174,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc.data, { a: fx.a, b: fx.b }) : []), [doc.data, fx.a, fx.b, mode]);
+  // same Edge + L10 as scored fancy: overs tape vs the live OU line (no book logo — CompactFancyItem with live)
+  const liveScored = useMemo(() => {
+    if (!liveList.length || !store) return [] as { m: any; r: any }[];
+    const ground = venueIdx.length ? hereMatches(10) : undefined;
+    return liveList.map((m: any) => ({
+      m,
+      r: (scoreLiveOuRow as any)({
+        store, m, sides: [fx.a, fx.b], teams, fmt: fmtIdx, gender, lastN: win, ground, test: fx.fmt === "Test",
+      }),
+    }));
+  }, [liveList, store, teams, fx.a, fx.b, fx.fmt, fmtIdx, gender, win, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
   /** Keep the meter on `at` when that line is still priced after a scope/market switch; else fall back to the bookie main. */
   const lineOn = (fmId: string, sc: number, at: number) => {
     const { key: k, inn: i } = parseFm(fmId);
@@ -277,7 +230,6 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     track("fancy_market", { market: fancyFm(r.key, r.inn || 0) });
     nav(fancyRowPath(fx.id, r, { mw: win, mv: here ? "1" : "" }));
   };
-  const rowFm = (r: { key: string; inn?: number }) => fancyFm(r.key, r.inn || 0);
   const activeFilters: { key: string; label: string; value: string }[] = [];
   if (win !== 10) activeFilters.push({ key: "mw", label: "Window", value: `L${win}` });
   if (here) activeFilters.push({ key: "mv", label: "Ground", value: `At ${venueName}` });
@@ -320,11 +272,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />L{win}
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
+            <FilterButton label={`L${win}`} count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {keyList.length > 1 && (
             <div className="px-gutter py-snug">
@@ -332,10 +280,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
             </div>
           )}
           {activeFilters.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="flex items-center gap-snug px-gutter pb-snug" aria-label="Active filters">
               {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
               <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </StickyFilterBand>
       ) : (
@@ -346,17 +294,13 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />L{win}
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
+            <FilterButton label={`L${win}`} count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {activeFilters.length > 0 && (
-            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">
               {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
               <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </div>
       )}
@@ -370,19 +314,22 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
             <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
-              <ul className="-mx-gutter">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  {overview.map((r, i) => (
-                    <motion.li key={r.id || rowFm(r)} layout="position" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                      transition={{ layout: { type: "spring", stiffness: 420, damping: 38 }, delay: Math.min(i, 6) * 0.03, duration: 0.3, ease: EASE }}
-                      className="border-t border-hairline first:border-t-0">
-                      <OverviewRow r={r} onOpen={() => open(r)} />
-                      <BookTable books={r.books} shown={[r.overBook, r.underBook]} className="px-gutter pb-snug" />
-                      <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug" />
-                    </motion.li>))}
-                  {liveList.map((m, i) => <li key={`live-${i}-${m.market}`} className="border-t border-hairline first:border-t-0"><LiveMarketRow m={m} /></li>)}
-                </AnimatePresence>
-              </ul>
+              <FancyLines
+                rows={overview}
+                density="auto"
+                onOpen={(r) => open(r)}
+                standingOf={(r) => r.standing}
+                afterRow={(r) => <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug lg:px-0 lg:pb-0" />}
+              />
+              {liveScored.length ? (
+                <ul className="-mx-gutter">
+                  {liveScored.map(({ m, r }, i) => (
+                    <li key={`live-${i}-${m.market}`} className="border-t border-hairline first:border-t-0">
+                      <LiveMarketRow m={m} scored={r} />
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </section>)}
 
           {mode === "detail" && (

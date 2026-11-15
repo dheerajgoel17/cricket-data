@@ -9,18 +9,23 @@ import { city, dayLabel, localTime, seriesName } from "@/lib/format";
 import { openFixture } from "@/lib/nav";
 import type { RailItem } from "@/lib/rail";
 import { ChevronRight } from "@/ui/icons";
-import { LiveDot, Skeleton } from "@/ui/motion";
+import { Skeleton } from "@/ui/motion";
+import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, radius, space, type } from "@/ui/tokens";
+import { Tick } from "@/ui/tick";
+import { color, font, radius, space, type, fs, surface, t, d, w } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
-function LiveScore({ s, dim, pending }: { s: any | null; dim?: boolean; pending?: boolean }) {
+export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: boolean; pending?: boolean; live?: boolean }) {
   if (pending && !s?.display) return <Skeleton style={styles.pendingScore} />; // the scores are still on their way: not "Yet to bat"
   if (!s?.display) return <Text style={styles.yet}>Yet to bat</Text>;
+  const total = scoreLabel(s);
   const overs = s.overs != null ? `${Number.isInteger(s.overs) ? Number(s.overs).toFixed(1) : s.overs} ov` : "";
+  // Include wickets so a dismissal can animate the score even when no runs were scored (site LiveScore).
+  const change = s.runs == null ? null : s.runs + (s.wkts ?? 0) / 100;
   return (
     <View style={[styles.score, dim && { opacity: 0.6 }]}>
-      <Text style={styles.total}>{scoreLabel(s)}</Text>
+      {live ? <Tick value={change} style={styles.total}>{total}</Tick> : <Text style={styles.total}>{total}</Text>}
       {overs ? <Text style={styles.overs}>{overs}</Text> : null}
     </View>
   );
@@ -35,11 +40,11 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
     <Press disabled={!link || !f.id} onPress={() => openFixture(f)} accessibilityRole="link" accessibilityLabel={`${f.a} v ${f.b}`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.meta}>
         {m.session ? (
-          <Text style={[styles.cap, styles.session]}>{m.session}</Text>
+          <StatusLabel tone="session" surface="plain">{m.session}</StatusLabel>
         ) : m.live ? (
-          <View style={styles.liveRow}><LiveDot /><Text style={[styles.cap, styles.red]}>Live</Text></View>
+          <StatusLabel tone="live" surface="dot" />
         ) : (
-          <Text style={styles.cap}>{m.final ? "Final" : m.started ? "Started" : "Upcoming"}</Text>
+          <StatusLabel tone="muted" surface="plain">{m.final ? "Final" : m.started ? "Started" : "Upcoming"}</StatusLabel>
         )}
         <Text style={styles.metaText}>·</Text>
         <Text style={styles.metaText}>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</Text>
@@ -51,7 +56,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
             <TeamBadge name={s.name} />
             <Text style={[styles.team, s.lost && styles.lost]} numberOfLines={1}>{s.name}</Text>
             {m.hasScore || m.live ? (
-              <LiveScore s={s.score} dim={s.lost} pending={m.live && !item.live} />
+              <LiveScore s={s.score} dim={s.lost} pending={m.live && !item.live} live={m.live && !m.session} />
             ) : k === 0 && !m.final ? (
               <View style={styles.when}>
                 <Text style={styles.whenDay}>{dayLabel(m.when, now)}</Text>
@@ -66,7 +71,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
           <Text style={styles.statusText} numberOfLines={2}>{m.status}</Text>
           <Text style={styles.series} numberOfLines={1}>{seriesName(f)}</Text>
         </View>
-        {item.noProps ? <Text style={styles.noProps}>No props live yet</Text> : link ? <View style={styles.propsLink}><Text style={styles.props}>Props</Text><ChevronRight color={color.primary} /></View> : null}
+        {item.noProps ? <Text style={styles.noProps}>{m.final ? "Match" : "No props live yet"}</Text> : link ? <View style={styles.propsLink}><Text style={styles.props}>Props</Text><ChevronRight color={color.primary} /></View> : null}
       </View>
     </Press>
   );
@@ -74,27 +79,23 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
 
 const styles = StyleSheet.create({
   // Its own height by default; in the Home rail the cell is held to the tallest card and the card grows to fill it (the site's `h-full`), the foot staying at the bottom.
-  card: { flexGrow: 1, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  card: { flexGrow: 1, ...surface.card, padding: space.inset, gap: space.snug },
   pressed: { backgroundColor: color["surface-hover"] },
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  cap: { ...type.footnote, color: color.foreground, ...cap },
-  red: { color: color.destructive },
-  session: { color: color.amber },
-  liveRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
   metaText: { ...type.footnote, color: color["muted-foreground"] },
   place: { marginLeft: "auto", flexShrink: 1 },
   sides: { gap: space.snug },
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  team: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  team: { ...t.bodyStrong, color: color.foreground, flex: 1 },
   lost: { color: color["muted-foreground"] },
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
-  total: { fontFamily: font.data, fontSize: 18, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
-  overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  total: { ...w.dataStrong, fontSize: fs.title, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
+  overs: { ...d.footnote, color: color["muted-foreground"] },
   pendingScore: { width: 64, height: 16, borderRadius: 8 },
   yet: { ...type.callout, color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  whenTime: { ...d.callout, color: color.foreground },
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight, marginTop: "auto" },
   status: { flex: 1, minWidth: 0 },
   statusText: { ...type.footnote, color: color.foreground },

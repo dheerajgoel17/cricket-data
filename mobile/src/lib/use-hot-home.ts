@@ -5,7 +5,7 @@ import type { HomePhase } from "@site/lib/home-phase";
 import { fancyFm } from "@cricket/engine/fancy-edge.js";
 import { sameFixture } from "@cricket/engine/lines.js";
 import { liveForFixture } from "@cricket/engine/live.js";
-import { mixHomeRows } from "@site/lib/hot-lines";
+import { HOME_TOP, mixHomeRows } from "@site/lib/hot-lines";
 import { phaseOf } from "@site/lib/home-phase";
 import { sideRate } from "@cricket/engine/props-view.js";
 import { useFancyCards } from "@/lib/fancy";
@@ -18,7 +18,6 @@ import { useLive } from "@/lib/use-live";
 import { useRail } from "@/lib/use-rail";
 import type { TapeRow } from "@/ui/market-tape";
 
-const PER = 6;
 /** Prefer the site's L10≥6 bar; while the first wave is still thin, show thinner samples so Home is not blank for seconds. */
 const HOME_PLAYED = 6;
 const HOME_PLAYED_SOFT = 1;
@@ -78,7 +77,7 @@ export function useHotHome(phase: HomePhase) {
       const items = mixHomeRows<MixItem>([
         ...players.map((r) => ({ kind: "player" as const, key: `p:${r.idx}:${r.stat}:${r.start}:${r.inn}`, live: liveNow, edge: r.edge ?? null, p: sideRate(r.l10.p, r.side) ?? 0, r })),
         ...fancy.map(({ r, f: fx }) => ({ kind: "fancy" as const, key: `f:${fx.id}:${r.id || r.key}:${r.inn || 0}`, live: liveNow, edge: r.edge ?? null, p: r.played ? r.hits / r.played : 0, r, f: fx })),
-      ], PER);
+      ], HOME_TOP);
       if (items.length) out.push({ f, items });
     }
     return out;

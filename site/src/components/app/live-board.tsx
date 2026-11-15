@@ -2,21 +2,24 @@
 import { Fragment, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { TableCellsIcon } from "@heroicons/react/24/outline";
-import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
+import { ballsToOvers, formatBall, liveBoard, liveCard, namesMatch, ongoingOverBalls, oversToBalls } from "@cricket/engine/live.js";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PillGroup } from "@/components/app/pill-group";
+import { TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
 import { abbr } from "@/lib/format";
-import { playerPhotos } from "@/lib/assets";
 import { useData } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 type Side = [string, number];
 
+/** Initial + surname for the live strip ("D Warner"); particles kept ("V Kohli" stays short). */
 function shortName(n: string) {
   const p = String(n).trim().split(/\s+/);
   if (p.length < 2) return n;
   const last = p[p.length - 1], particle = p[p.length - 2];
-  return /^(de|den|van|von|el|al|la|le|da|di)$/i.test(particle) ? `${particle} ${last}` : last;
+  const head = p[0][0]?.toUpperCase() || "";
+  if (/^(de|den|van|von|el|al|la|le|da|di)$/i.test(particle)) return `${head} ${particle} ${last}`;
+  return `${head} ${last}`;
 }
 
 function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
@@ -26,25 +29,6 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]) {
     const hits = rz.players(name, teamIdx != null && teamIdx >= 0 ? { team: teamIdx } : {}, 2) as { idx: number; score: number }[];
     return hits.length && hits[0].score >= 8 ? hits[0].idx : null; // the resolver's own bar for "this is the player"; a debutant or unknown name stays plain text
   }, [rz, name, teamIdx]);
-}
-
-const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
-
-/** Photo only, no frame; a silhouette if every URL fails. */
-function Face({ name, photo, team, sides }: { name: string; photo?: string; team?: string; sides?: Side[] }) {
-  const idx = usePlayerIdx(name, team, sides);
-  const { store, photos } = useData();
-  const urls = useMemo(() => {
-    const fromIdx = idx != null ? (playerPhotos(photos, store.P.id[idx]) as string[]) : [];
-    return [photo, ...fromIdx].filter(Boolean) as string[];
-  }, [photo, idx, photos, store]);
-  const [i, setI] = useState(0);
-  const url = urls[i];
-  return (
-    <span title={name} className="relative inline-grid size-6 shrink-0 sm:size-8 place-items-center overflow-hidden rounded-full">
-      {url ? <img src={url} alt="" className="size-full object-cover object-top" onError={() => setI((n) => n + 1)} /> : <Silhouette />}
-    </span>
-  );
 }
 
 function Who({ name, team, sides, strike, short, className }: { name: string; team?: string; sides?: Side[]; strike?: boolean; short?: boolean; className?: string }) {
@@ -61,9 +45,31 @@ function ov(p: any) {
   return Number.isInteger(n) ? n.toFixed(1) : String(n);
 }
 
+function ballTone(b: string) {
+  const s = formatBall(b);
+  if (/^W$/i.test(s)) return "wicket";
+  if (/^[456]$/.test(s)) return "boundary";
+  if (/\d*(WD|NB|LB|B|PEN)$/i.test(s)) return "extra";
+  return "plain";
+}
+
 function Ball({ b }: { b: string }) {
+  const label = formatBall(b);
+  const long = label.length > 1;
+  const tone = ballTone(label);
   return (
-    <span className={cn("grid h-6 min-w-6 shrink-0 place-items-center rounded-md px-hair text-caption font-emphasis tabular-nums whitespace-nowrap", /w/i.test(b) ? "bg-miss/20 text-miss" : /[456]/.test(b) ? "bg-primary/20 text-primary" : "bg-secondary text-foreground")}>{b}</span>
+    <span
+      className={cn(
+        "grid h-6 shrink-0 place-items-center text-caption font-emphasis tabular-nums whitespace-nowrap",
+        long ? "min-w-6 rounded-full px-snug" : "size-6 rounded-full",
+        tone === "wicket" && "bg-miss/25 text-miss",
+        tone === "boundary" && "bg-foreground text-background",
+        tone === "extra" && "bg-muted text-foreground",
+        tone === "plain" && "bg-secondary text-foreground",
+      )}
+    >
+      {label}
+    </span>
   );
 }
 
@@ -128,8 +134,16 @@ function fmtOv(o: number | null | undefined) {
   return Number.isInteger(o) ? o.toFixed(1) : String(o);
 }
 
-function Num({ children, className }: { children: ReactNode; className?: string }) {
-  return <td className={cn("px-tight py-snug text-right text-footnote tabular-nums", className)}>{children}</td>;
+function Num({ children, className, edge }: { children: ReactNode; className?: string; edge?: boolean }) {
+  return <td className={cn("px-snug py-snug text-right text-footnote tabular-nums", edge && "pr-gutter", className)}>{children}</td>;
+}
+
+function Th({ children, edge, end }: { children: ReactNode; edge?: "start" | "end"; end?: boolean }) {
+  return (
+    <th className={cn(TABLE_HEAD, end && "text-right", edge === "start" && "pl-gutter", edge === "end" && "pr-gutter")}>
+      {children}
+    </th>
+  );
 }
 
 /** Is there a scorecard to show (a batter, a bowler or a total on any innings)? */
@@ -148,191 +162,229 @@ export function innLabel(card: any[], k: number) {
   return card.some((i, j) => j !== k && i.team === team) ? `${abbr(team)} ${ORD[nth - 1] ?? `${nth}th`}` : abbr(team);
 }
 
-/** Batting + bowling tables, one innings at a time: a selector over the innings (two in a T20 or ODI, up to four in a Test) that follows the latest one until a tab is picked. So-far only. */
+/**
+ * Full scorecard: team/innings categories (MarketTape-style segmented tabs) → batting (edge-bleed) → FOW / yet to bat → bowling.
+ * No partnership / last-wkt / CRR strip here — that stays on the live strip above. So-far only, never settlement.
+ */
 export function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   const [pick, setPick] = useState<string>();
-  const namePadding = "px-tight";
   const card = cardInns(match);
   if (!card.length) return null;
-  const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
-  const balls = inn.overs != null ? oversToBalls(inn.overs) : null, rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
+  const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1;
+  const inn = card[at];
+  const balls = inn.overs != null ? oversToBalls(inn.overs) : null;
+  const rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
   const onStrike = (name: string) => (match?.players || []).some((p: any) => p.strike && namesMatch(p.name, name));
-  const yet = (inn: any) => (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
+  const yet = (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
+  const multi = card.length > 1;
+  const tabs: [string, ReactNode][] = card.map((i: any, j: number) => {
+    const score = innScore(i) || "—";
+    return [innId(i), <span key={innId(i)} className="min-w-0 truncate">{innLabel(card, j)} · {score}</span>];
+  });
   return (
     <div className="flex flex-col gap-stack">
-      {card.length > 1 && (
-        <PillGroup layoutId="innings-chip" label="Innings" value={innId(inn)} onChange={setPick}
-          items={card.map((i: any, j: number) => [innId(i), <span key={innId(i)}>{innLabel(card, j)} <span className="ml-1 text-footnote opacity-70">{innScore(i) || "—"}</span></span>] as [string, ReactNode])} />
+      {multi ? (
+        <PillGroup
+          segmented
+          layoutId="scorecard-side"
+          label="Innings"
+          value={innId(inn)}
+          onChange={setPick}
+          items={tabs}
+          className="w-full"
+          itemClassName="min-w-0 flex-1 justify-center"
+        />
+      ) : (
+        <div className="flex items-baseline justify-between gap-snug">
+          <h3 className="min-w-0 truncate text-body font-emphasis">{inn.team || `Innings ${inn.n}`}</h3>
+          <span className="shrink-0 font-condensed text-title font-emphasis tabular-nums">
+            {innScore(inn) || "—"}
+            {rr ? <span className="ml-snug text-footnote font-label text-muted-foreground">RR {rr}</span> : null}
+          </span>
+        </div>
       )}
-      {[inn].map((inn: any) => (
-        <div key={innId(inn)} className="flex flex-col">
-          <div className="flex items-center gap-snug py-snug">
-            <span className="min-w-0 flex-1 truncate text-callout font-label">{inn.team || `Innings ${inn.n}`}{card.length > 2 ? ` · ${innLabel(card, at).split(" ")[1] ?? ORD[0]} innings` : ""}</span>
-            <span className="shrink-0 text-footnote font-label tabular-nums">{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</span>
-          </div>
-          {!!inn.batters?.length && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50">
-                <thead>
-                  <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className={cn("py-snug text-left", namePadding)}>Batter</th>
-                    <th className="px-tight py-snug text-right">R</th>
-                    <th className="px-tight py-snug text-right">B</th>
-                    <th className="px-tight py-snug text-right">4s</th>
-                    <th className="px-tight py-snug text-right">6s</th>
-                    <th className="px-tight py-snug text-right">SR</th>
+
+      <div className="flex flex-col gap-snug">
+        {multi && rr ? (
+          <p className="text-footnote text-muted-foreground tabular-nums">RR {rr}</p>
+        ) : null}
+
+        {!!inn.batters?.length && (
+          <div className={cn(TABLE_BLEED, "overflow-x-auto")}>
+            <table className="w-full border-collapse text-footnote">
+              <thead>
+                <tr className="hover:bg-transparent">
+                  <Th edge="start">Batter</Th>
+                  <Th end>R</Th>
+                  <Th end>B</Th>
+                  <Th end>4s</Th>
+                  <Th end>6s</Th>
+                  <Th end edge="end">SR</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {inn.batters.map((p: any) => (
+                  <tr key={p.id || p.name} className="min-h-row border-t border-hairline">
+                    <td className="py-snug pl-gutter pr-snug">
+                      <div className="min-w-0">
+                        <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-label" />
+                        <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
+                      </div>
+                    </td>
+                    <Num className="font-label text-foreground">{p.runs ?? 0}</Num>
+                    <Num>{p.balls ?? 0}</Num>
+                    <Num>{p.fours ?? 0}</Num>
+                    <Num>{p.sixes ?? 0}</Num>
+                    <Num edge>{p.sr != null ? Number(p.sr).toFixed(2) : "—"}</Num>
                   </tr>
-                </thead>
-                <tbody>
-                  {inn.batters.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className={cn("py-snug", namePadding)}>
-                        <div className="flex min-w-0 items-center gap-snug">
-                          <div className="min-w-0">
-                            <Who name={p.name} team={p.team || inn.team} sides={teams} strike={onStrike(p.name)} className="text-callout font-label" />
-                            {!p.out && !onStrike(p.name) ? <span className="text-primary">*</span> : null}
-                            <div className="text-footnote text-muted-foreground">{p.dismissal || (p.out ? "out" : "not out")}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <Num className="font-label text-foreground">{p.runs ?? 0}</Num>
-                      <Num>{p.balls ?? 0}</Num>
-                      <Num>{p.fours ?? 0}</Num>
-                      <Num>{p.sixes ?? 0}</Num>
-                      <Num>{p.sr != null ? Number(p.sr).toFixed(2) : "—"}</Num>
-                    </tr>
-                  ))}
-                  {inn.extras && (
-                    <tr className="border-t border-hairline text-muted-foreground">
-                      <td className={cn("py-snug", namePadding)}>Extras</td>
-                      <Num className="font-label text-foreground">{inn.extras.total}</Num>
-                      <td colSpan={4} className="px-tight py-snug text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
-                    </tr>
-                  )}
-                  {inn.runs != null && (
-                    <tr className="border-t border-hairline">
-                      <td className={cn("py-snug font-label", namePadding)}>Total</td>
-                      <Num className="font-label text-foreground">{inn.runs}</Num>
-                      <td colSpan={4} className="px-tight py-snug text-footnote text-muted-foreground">{inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-          {!!inn.fow?.length && (
-            <p className="py-snug text-footnote text-muted-foreground">
-              <span className="font-label text-foreground">FOW</span>{" "}
-              {inn.fow.map((w: any, k: number) => <Fragment key={`${w.wkts}-${w.name}`}>{k > 0 && " · "}{w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-copy" />{w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})</Fragment>)}
-            </p>
-          )}
-          {!!yet(inn).length && (
-            <p className="py-snug text-footnote text-muted-foreground"><span className="font-label text-foreground">Yet to bat</span> {yet(inn).map((n: string, k: number) => <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-copy" /></Fragment>)}</p>
-          )}
-          {!!inn.bowlers?.length && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-footnote [&_td]:border [&_td]:border-hairline [&_th]:border [&_th]:border-hairline [&_th]:bg-secondary/50">
+                ))}
+                {inn.extras && (
+                  <tr className="border-t border-hairline text-muted-foreground">
+                    <td className="py-snug pl-gutter pr-snug">Extras</td>
+                    <Num className="font-label text-foreground">{inn.extras.total}</Num>
+                    <td colSpan={4} className="px-snug py-snug pr-gutter text-footnote">{extrasText(inn.extras).replace(/^\d+\s*/, "")}</td>
+                  </tr>
+                )}
+                {inn.runs != null && (
+                  <tr className="border-t border-hairline">
+                    <td className="py-snug pl-gutter pr-snug font-label">Total</td>
+                    <Num className="font-label text-foreground">{inn.runs}</Num>
+                    <td colSpan={4} className="px-snug py-snug pr-gutter text-footnote text-muted-foreground">
+                      {inn.wkts != null ? `${inn.wkts} wkts` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {(!!inn.fow?.length || !!yet.length) && (
+          <div className="flex flex-col gap-tight text-footnote text-muted-foreground">
+            {!!inn.fow?.length && (
+              <p>
+                <span className="font-label text-foreground">FOW</span>{" "}
+                {inn.fow.map((w: any, k: number) => (
+                  <Fragment key={`${w.wkts}-${w.name}`}>
+                    {k > 0 && " · "}
+                    {w.wkts}–{w.runs} (<Who name={w.name} team={inn.team} sides={teams} className="font-copy" />
+                    {w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})
+                  </Fragment>
+                ))}
+              </p>
+            )}
+            {!!yet.length && (
+              <p>
+                <span className="font-label text-foreground">Yet to bat</span>{" "}
+                {yet.map((n: string, k: number) => (
+                  <Fragment key={n}>{k > 0 && ", "}<Who name={n} team={inn.team} sides={teams} className="font-copy" /></Fragment>
+                ))}
+              </p>
+            )}
+          </div>
+        )}
+
+        {!!inn.bowlers?.length && (
+          <div className="flex flex-col gap-tight">
+            <h4 className="label-cap text-footnote text-muted-foreground">Bowling</h4>
+            <div className={cn(TABLE_BLEED, "overflow-x-auto")}>
+              <table className="w-full border-collapse text-footnote">
                 <thead>
-                  <tr className="label-cap text-footnote text-muted-foreground">
-                    <th className={cn("py-snug text-left", namePadding)}>Bowler</th>
-                    <th className="px-tight py-snug text-right">O</th>
-                    <th className="px-tight py-snug text-right">M</th>
-                    <th className="px-tight py-snug text-right">R</th>
-                    <th className="px-tight py-snug text-right">W</th>
-                    <th className="px-tight py-snug text-right">Econ</th>
+                  <tr className="hover:bg-transparent">
+                    <Th edge="start">Bowler</Th>
+                    <Th end>O</Th>
+                    <Th end>M</Th>
+                    <Th end>R</Th>
+                    <Th end>W</Th>
+                    <Th end edge="end">Econ</Th>
                   </tr>
                 </thead>
                 <tbody>
                   {inn.bowlers.map((p: any) => (
-                    <tr key={p.id || p.name} className="border-t border-hairline">
-                      <td className={cn("py-snug", namePadding)}>
-                        <div className="flex min-w-0 items-center gap-snug">
-                          <Who name={p.name} team={p.team} sides={teams} className="text-callout font-label" />
-                        </div>
+                    <tr key={p.id || p.name} className="min-h-row border-t border-hairline">
+                      <td className="py-snug pl-gutter pr-snug">
+                        <Who name={p.name} team={p.team} sides={teams} className="text-callout font-label" />
                       </td>
                       <Num>{fmtOv(p.overs)}</Num>
                       <Num>{p.maidens ?? 0}</Num>
                       <Num>{p.conceded ?? 0}</Num>
                       <Num className="font-label text-foreground">{p.wickets ?? 0}</Num>
-                      <Num>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Num>
+                      <Num edge>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Num>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
-      ))}
-      <p className="py-snug text-footnote text-muted-foreground">So far this match. Not used for settlement.</p>
-    </div>
-  );
-}
-
-function LivePlayer({ player, sides, bowling = false }: { player: any; sides?: Side[]; bowling?: boolean }) {
-  const figures = bowling ? `${player.wickets ?? 0}–${player.conceded ?? 0}` : player.runs ?? 0;
-  const detail = bowling ? `${ov(player) ?? "–"} ov` : `${player.balls ?? 0} balls`;
-  return (
-    <div className="flex min-w-0 items-center gap-hair sm:gap-tight">
-      <Face key={player.photo || player.name} name={player.name} photo={player.photo} team={player.team} sides={sides} />
-      <div className="grid min-w-0 gap-hair">
-        <Who name={player.name} team={player.team} sides={sides} strike={!bowling && !!player.strike} short className="text-footnote" />
-        <span className="flex flex-wrap items-baseline gap-x-hair tabular-nums">
-          <b className="font-condensed text-body leading-none">{figures}</b>
-          <span className="text-caption text-muted-foreground">({detail})</span>
-        </span>
+          </div>
+        )}
       </div>
+      <p className="text-footnote text-muted-foreground">So far this match. Not used for settlement.</p>
     </div>
   );
 }
 
-/** Current players and deliveries in the fixture header. */
+/** Current players and deliveries under the fixture scoreboard (bowler + balls | batters). */
 export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
   const board = liveBoard(match);
   if (!board || (!board.batters.length && !board.bowler && !board.overs.length)) return null;
   const bw = board.bowler;
+  const balls = ongoingOverBalls(board);
+  const batters = (board.batters || []).slice(0, 2);
   return (
-    <section aria-label="Live scoreboard" className="flex flex-col divide-y divide-dashed divide-hairline border-t border-hairline">
-      {(!!board.batters.length || bw) && (
-        <div className="grid grid-cols-3 divide-x divide-dashed divide-hairline bg-background/60">
-          {[board.batters[0], board.batters[1], bw].map((player, i) => (
-            <div key={i} className="grid min-w-0 content-start gap-hair px-tight py-snug first:pl-gutter last:pr-gutter">
-              <div className="label-cap text-caption text-muted-foreground">{i === 2 ? "Bowler" : `Batter ${i + 1}`}</div>
-              {player ? <LivePlayer player={player} sides={teams} bowling={i === 2} /> : <span className="text-footnote text-muted-foreground">—</span>}
-            </div>
-          ))}
-        </div>
-      )}
-      {!!board.overs.length && (
-        <div className="min-w-0 px-gutter py-snug"><Overs overs={board.overs} /></div>
-      )}
+    <section aria-label="Live scoreboard" className="grid grid-cols-2 gap-snug border-t border-hairline bg-secondary/40 px-gutter py-snug">
+      <div className="grid min-w-0 content-start gap-tight border-r border-hairline pr-snug">
+        {bw ? (
+          <div className="flex min-w-0 items-baseline justify-between gap-snug">
+            <Who name={bw.name} team={bw.team} sides={teams} short className="min-w-0 truncate text-callout" />
+            <span className="shrink-0 font-condensed text-callout font-emphasis tabular-nums text-muted-foreground">
+              {[ov(bw) ?? "–", bw.conceded ?? 0, bw.wickets ?? 0].join("-")}
+            </span>
+          </div>
+        ) : (
+          <span className="text-footnote text-muted-foreground">—</span>
+        )}
+        {balls.length ? (
+          <div className="flex flex-wrap items-center gap-hair" aria-label={`This over ${balls.join(" ")}`}>
+            {balls.map((b: string, i: number) => <Ball key={`${b}-${i}`} b={b} />)}
+          </div>
+        ) : !!board.overs.length ? (
+          <Overs overs={board.overs} />
+        ) : null}
+      </div>
+      <div className="grid min-w-0 content-start gap-tight pl-snug">
+        {batters.length ? batters.map((p: any) => (
+          <div key={p.name} className="flex min-w-0 items-baseline justify-between gap-snug">
+            <span className="flex min-w-0 items-center gap-hair">
+              <span className={cn("size-1.5 shrink-0 rounded-full", p.strike ? "bg-foreground" : "bg-transparent")} aria-hidden />
+              <Who name={p.name} team={p.team} sides={teams} short className="min-w-0 truncate text-callout" />
+            </span>
+            <span className="shrink-0 font-condensed text-callout tabular-nums">
+              <b className="font-emphasis text-foreground">{p.runs ?? 0}</b>
+              {" "}
+              <span className="text-muted-foreground">{p.balls ?? 0}</span>
+            </span>
+          </div>
+        )) : (
+          <span className="text-footnote text-muted-foreground">—</span>
+        )}
+      </div>
     </section>
   );
 }
 
-function LiveScorecardDetails({ match, teams }: { match: any; teams?: Side[] }) {
-  const board = liveBoard(match);
-  if (!board) return null;
-  const meta: ReactNode[] = [];
-  if (board.partnership) meta.push(<span key="p"><span className="text-muted-foreground">P’ship</span> <b className="font-label text-foreground">{board.partnership.runs ?? 0}</b> ({board.partnership.balls ?? 0})</span>);
-  if (board.lastWicket) meta.push(<span key="w" className="min-w-0 truncate"><span className="text-muted-foreground">Last wkt</span> <Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} short className="font-label text-foreground" /> {board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</span>);
-  if (board.crr != null) meta.push(<span key="c"><span className="text-muted-foreground">CRR</span> {board.crr.toFixed(2)}</span>);
-  if (board.rrr != null) meta.push(<span key="r"><span className="text-muted-foreground">RRR</span> {board.rrr.toFixed(2)}</span>);
-  return meta.length ? <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote tabular-nums">{meta}</div> : null;
-}
-
-export function ScorecardAccordion({ match, teams, inPlay }: { match: any; teams?: Side[]; inPlay?: boolean }) {
+export function ScorecardAccordion({ match, teams }: { match: any; teams?: Side[]; inPlay?: boolean }) {
   const [section, setSection] = useState("");
   return (
     <Accordion type="single" collapsible value={section} onValueChange={setSection} className="min-w-0 border-t border-hairline">
-      <AccordionItem value="scorecard">
+      <AccordionItem value="scorecard" className="border-0">
         <AccordionTrigger className="min-h-control gap-snug rounded-none bg-background/60 px-gutter py-tight text-callout hover:bg-surface-hover hover:no-underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&>svg]:motion-reduce:transition-none">
           <span className="flex min-w-0 items-center gap-snug">
             <TableCellsIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
             {section ? "Hide scorecard" : "Full scorecard"}
           </span>
         </AccordionTrigger>
-        <AccordionContent className="flex flex-col gap-snug border-t border-dashed border-hairline px-gutter py-snug">
-          {inPlay && <LiveScorecardDetails match={match} teams={teams} />}
+        {/* Gutter on the shell so TABLE_BLEED can pull batting/bowling to the card edges. */}
+        <AccordionContent className="flex flex-col gap-0 border-t border-dashed border-hairline px-gutter py-snug">
           <ScorecardBody match={match} teams={teams} />
         </AccordionContent>
       </AccordionItem>

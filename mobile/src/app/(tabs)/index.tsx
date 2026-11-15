@@ -51,50 +51,6 @@ function Fixtures() {
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
-      <View style={{ height: bandH }}>
-        <Profiler id="rail" onRender={onRender}>
-        {!ready ? (
-          error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
-        ) : shown.length === 0 ? (
-          <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
-        ) : (
-          <FlatList<RailItem>
-            key={phase}
-            horizontal
-            data={shown}
-            keyExtractor={(i) => `${i.fixture.id}${i.fixture.a}${i.fixture.b}`}
-            renderItem={({ item, index }) => (
-              <Rise
-                i={index}
-                on={Date.now() - born < 900}
-                style={{ width: cardW, minHeight: railH || undefined, alignSelf: "flex-start" }}
-              >
-                <View
-                  style={styles.cell}
-                  onLayout={(e) => {
-                    const h = Math.ceil(e.nativeEvent.layout.height);
-                    if (h > railH) setRailH((prev) => Math.max(prev, h));
-                  }}
-                >
-                  <RailCard item={item} />
-                </View>
-              </Rise>
-            )}
-            ItemSeparatorComponent={() => <View style={{ width: gap }} />}
-            getItemLayout={(_, index) => ({ length: cardW + gap, offset: (cardW + gap) * index, index })}
-            initialNumToRender={2}
-            windowSize={5}
-            maxToRenderPerBatch={2}
-            removeClippedSubviews={Platform.OS === "android"}
-            snapToInterval={cardW + gap}
-            snapToAlignment="start"
-            decelerationRate="fast"
-            contentContainerStyle={{ paddingLeft: space.gutter, paddingRight: Math.max(space.gutter, width - cardW - space.gutter), paddingTop: space.stack }}
-            showsHorizontalScrollIndicator={false}
-          />
-        )}
-        </Profiler>
-      </View>
       <View style={styles.propsScroll}>
       <ScrollView
         style={styles.propsScroll}
@@ -103,6 +59,50 @@ function Fixtures() {
         showsVerticalScrollIndicator={false}
         removeClippedSubviews={Platform.OS === "android"}
       >
+        <View style={{ height: bandH }}>
+          <Profiler id="rail" onRender={onRender}>
+          {!ready ? (
+            error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
+          ) : shown.length === 0 ? (
+            <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
+          ) : (
+            <FlatList<RailItem>
+              key={phase}
+              horizontal
+              data={shown}
+              keyExtractor={(i) => `${i.fixture.id}${i.fixture.a}${i.fixture.b}`}
+              renderItem={({ item, index }) => (
+                <Rise
+                  i={index}
+                  on={Date.now() - born < 900}
+                  style={{ width: cardW, minHeight: railH || undefined, alignSelf: "flex-start" }}
+                >
+                  <View
+                    style={styles.cell}
+                    onLayout={(e) => {
+                      const h = Math.ceil(e.nativeEvent.layout.height);
+                      if (h > railH) setRailH((prev) => Math.max(prev, h));
+                    }}
+                  >
+                    <RailCard item={item} />
+                  </View>
+                </Rise>
+              )}
+              ItemSeparatorComponent={() => <View style={{ width: gap }} />}
+              getItemLayout={(_, index) => ({ length: cardW + gap, offset: (cardW + gap) * index, index })}
+              initialNumToRender={2}
+              windowSize={5}
+              maxToRenderPerBatch={2}
+              removeClippedSubviews={Platform.OS === "android"}
+              snapToInterval={cardW + gap}
+              snapToAlignment="start"
+              decelerationRate="fast"
+              contentContainerStyle={{ paddingLeft: space.gutter, paddingRight: Math.max(space.gutter, width - cardW - space.gutter), paddingTop: space.stack }}
+              showsHorizontalScrollIndicator={false}
+            />
+          )}
+          </Profiler>
+        </View>
         {ready && propsReady ? <Profiler id="hothome" onRender={onRender}><Appear><HotHome phase={phase} /></Appear></Profiler> : error ? null : <HotHomeSkeleton />}
       </ScrollView>
       <TabFade />

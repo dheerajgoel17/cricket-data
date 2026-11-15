@@ -25,9 +25,9 @@ test("a batter nobody priced before the start gets his live line at once, marked
   expect(typeof out.live_sig).toBe("string");
 });
 
-test("a batter with a pre-match line keeps that row until his runs so far are past it", () => {
+test("a batter with a pre-match line keeps that row only; the live price for the same market stays off the table", () => {
   const out = mergeLiveLines(doc(), inplay(), liveDoc("live"), [], store, rz);
-  expect(out.lines.filter((l: any) => l.pid === "p-other").map((l: any) => l.line)).toEqual([10.5]); // no runs known on the live board: the live 18.5 is not added yet
+  expect(out.lines.filter((l: any) => l.pid === "p-other").map((l: any) => l.line)).toEqual([10.5]); // pre-match market exists: no live 18.5 row
 });
 
 test("repeated live snapshots reuse player links without reusing prices", () => {

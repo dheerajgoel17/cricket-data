@@ -1,3 +1,4 @@
+import { RoundButton } from "@/ui/round-button";
 import { push } from "@/lib/nav";
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
@@ -7,7 +8,7 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle, Defs, G, LinearGradient, Rect, Stop } from "react-native-svg";
-import { color, HEADER_HEIGHT, space, type } from "@/ui/tokens";
+import { color, HEADER_HEIGHT, space, type, fs } from "@/ui/tokens";
 
 /** The Fancy.cash mark: a rounded dark tile with a green F whose top arm ends in a ball (same drawing as the site's `BrandMark`). */
 export function BrandMark({ size = 36 }: { size?: number }) {
@@ -41,9 +42,9 @@ export function AppHeader({ title, info, action }: { title?: string; info?: Reac
         </>
       )}
       {action}
-      <Press accessibilityRole="button" accessibilityLabel="Search" hitSlop={8} onPress={() => { void Haptics.selectionAsync(); push("/search"); }} style={({ pressed }) => [styles.search, pressed && { opacity: 0.6 }]}>
+      <RoundButton label="Search" onPress={() => push("/search")}>
         <Ionicons name="search-outline" size={20} color={color.foreground} />
-      </Press>
+      </RoundButton>
     </View>
   );
 }
@@ -51,7 +52,6 @@ export function AppHeader({ title, info, action }: { title?: string; info?: Reac
 const styles = StyleSheet.create({
   bar: { height: HEADER_HEIGHT, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   titleRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.snug },
-  heading: { ...type.display, fontSize: 28, lineHeight: 34, color: color.foreground, flexShrink: 1 },
+  heading: { ...type.display, fontSize: fs.display, lineHeight: 34, color: color.foreground, flexShrink: 1 },
   word: { ...type.title, color: color.foreground, flex: 1 },
-  search: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });

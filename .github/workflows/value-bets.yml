@@ -133,6 +133,23 @@ jobs:
         run: |
           python -m cricket_site.build --zip .sitecache/all_json.zip --data data --out "$RUNNER_TEMP/site-data" --value-bets value_bets/out > "$RUNNER_TEMP/build.json"
           node site/scripts/fancy-alerts.mjs --data "$RUNNER_TEMP/site-data" --lines value_bets/out/book_lines.json --out value_bets/out/fancy_alerts.json
+      - name: Board scores for priced gaps
+        # Source A miss → Source D currentMatches (SRC_D_BASE + CRICKETDATA_API_KEY) plus optional BOARD_{IN,EN,ZA,AU}_* JSON. CSA T20 has no official free JSON; Source D is the filler. Soft-fail when unset.
+        if: github.event.schedule != '0 7 * * 0'
+        continue-on-error: true
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          SRC_D_BASE: ${{ secrets.SRC_D_BASE }}
+          CRICKETDATA_API_KEY: ${{ secrets.CRICKETDATA_API_KEY }}
+          BOARD_IN_BASE: ${{ secrets.BOARD_IN_BASE }}
+          BOARD_IN_FEED: ${{ secrets.BOARD_IN_FEED }}
+          BOARD_EN_BASE: ${{ secrets.BOARD_EN_BASE }}
+          BOARD_EN_FEED: ${{ secrets.BOARD_EN_FEED }}
+          BOARD_ZA_BASE: ${{ secrets.BOARD_ZA_BASE }}
+          BOARD_ZA_FEED: ${{ secrets.BOARD_ZA_FEED }}
+          BOARD_AU_BASE: ${{ secrets.BOARD_AU_BASE }}
+          BOARD_AU_FEED: ${{ secrets.BOARD_AU_FEED }}
+        run: python -m cricket_data.board_scores --book value_bets/out/book_lines.json --out value_bets/out/board_scores.json
       - name: Store the results of finished matches in the archive
         # the site's live route settles every priced line of a finished match (ids through the identity table); this only writes those results into the match's archive file (added, never changed)
         if: github.event.schedule != '0 7 * * 0' && vars.SITE_URL != ''

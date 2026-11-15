@@ -11,7 +11,7 @@ import { storeQuery } from "@/lib/data";
 import { getJson } from "@/lib/net";
 import { liveQuery } from "@/lib/queries";
 import { Text } from "@/ui/text";
-import { color, font, type } from "@/ui/tokens";
+import { color, font, type, w } from "@/ui/tokens";
 
 // "From here" under a live row, as the site's `live-spot.tsx`: how past innings that were in the same spot went against the row's line. Counts of history, never a model.
 const conditionalReport = conditional as (store: any, ms: number[], o: { team?: number | null; innNo: number; state: { balls: number; runs: number }; target: { kind: string; n?: number }; line?: number | null }) => any;
@@ -67,5 +67,5 @@ export function BatterSpot({ r }: { r: any }) {
 
 const styles = StyleSheet.create({
   note: { ...type.footnote, color: color["muted-foreground"] },
-  strong: { fontFamily: font.medium, color: color.foreground },
+  strong: { ...w.label, color: color.foreground },
 });

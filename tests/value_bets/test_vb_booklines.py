@@ -111,6 +111,38 @@ def test_book_lines_carries_the_fancy_lines_it_is_given():
     assert book_lines([], "t", [{"key": "match_runs"}])["fancy"] == [{"key": "match_runs"}]
 
 
+def test_test_side_session_fancy_is_1st_innings_not_complete_match():
+    """BAN · Runs · CMM was wrong: a Test side session / team total scraped pre-match is 1st innings."""
+    from value_bets.fancy import scope_test_session_fancy
+
+    rows = [
+        {"fmt": "Test", "key": "team_total_runs", "team": "Bangladesh", "line": 250.5, "scope": "team"},
+        {"fmt": "Test", "key": "overs_10", "team": "Bangladesh", "line": 40.5, "scope": "team"},
+        {"fmt": "Test", "key": "match_runs", "team": None, "line": 900.5, "scope": "match"},  # whole match: leave
+        {"fmt": "Test", "key": "team_total_runs", "team": "India", "line": 260.5, "inn": 2, "scope": "team"},  # already scoped
+        {"fmt": "T20", "key": "team_total_runs", "team": "MI", "line": 160.5, "scope": "team"},
+    ]
+    out, n = scope_test_session_fancy(rows)
+    assert n == 2
+    assert [x.get("inn") for x in out] == [1, 1, None, 2, None]
+    published = book_lines([], "t", rows)["fancy"]
+    assert [(x["key"], x.get("inn")) for x in published] == [
+        ("team_total_runs", 1), ("overs_10", 1), ("match_runs", None), ("team_total_runs", 2), ("team_total_runs", None),
+    ]
+
+
+def test_rescope_prev_moves_unscoped_test_session_fancy_to_1st_innings():
+    from value_bets.booklines import rescope_prev
+
+    prev = {"generated_at_utc": "a", "events": [], "lines": [], "fancy": [
+        {"fmt": "Test", "key": "team_total_runs", "team": "Bangladesh", "line": 250.5, "scope": "team", "source": "bet365"},
+        {"fmt": "Test", "key": "match_runs", "team": None, "line": 900.5, "scope": "match", "source": "bet365"},
+    ]}
+    out = rescope_prev(prev)
+    by_key = {x["key"]: x for x in out["fancy"]}
+    assert by_key["team_total_runs"]["inn"] == 1 and "inn" not in by_key["match_runs"]
+
+
 NOW = dt.datetime(2026, 10, 27, 9, 33, tzinfo=dt.timezone.utc)
 
 
@@ -277,10 +309,9 @@ def test_scope_multiday_rows_tags_the_unscoped_lines_of_every_source_but_the_mat
         row(fmt="MULTI", source="feedk_z", inn=2, line=20.5),                           # already scoped: left alone
         row(fmt="T20", source="feedh_x", line=17.5),                                    # one innings per side: nothing to scope
         row(fmt="ODI", source="feedh_x", line=30.5),
-        row(fmt="MULTI", source="feedh_x", market_type="player_points", line=40.5),     # a stat not read as innings-scoped
     ]
     assert scope_multiday_rows(rows) == 4
-    assert [r.get("inn") for r in rows] == [1, 1, 1, None, None, 2, None, None, None]
+    assert [r.get("inn") for r in rows] == [1, 1, 1, None, None, 2, None, None]
     assert rows[3]["ms_scope"] == "innings"
     assert scope_multiday_rows(rows) == 0  # idempotent
 

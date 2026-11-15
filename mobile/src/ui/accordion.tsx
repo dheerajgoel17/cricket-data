@@ -5,26 +5,28 @@ import { Text } from "@/ui/text";
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { ChevronRight } from "@/ui/icons";
-import { color, space, type } from "@/ui/tokens";
+import { color, space, type, duration } from "@/ui/tokens";
 
 /**
  * A collapsible section (the site's accordion): a header with the title, what is chosen inside it, and a chevron that turns; the content's height and fade are animated on the
  * UI thread. `open` / `onToggle` make it controlled (an accordion group); without them it keeps its own state.
  */
-export function Accordion({ title, value, right, defaultOpen = false, open, onToggle, children, badge }: {
+export function Accordion({ title, value, right, defaultOpen = false, open, onToggle, children, badge, flush }: {
   title: string; value?: string; right?: ReactNode; defaultOpen?: boolean; open?: boolean; onToggle?: (open: boolean) => void; children: ReactNode; badge?: string | number;
+  /** Inside fixture `scoreShell`: full-bleed `border-t` + guttered trigger (web ScorecardAccordion twin). */
+  flush?: boolean;
 }) {
   const [own, setOwn] = useState(defaultOpen);
   const isOpen = open ?? own;
   const [h, setH] = useState(0);
   const p = useSharedValue(isOpen ? 1 : 0);
-  useEffect(() => { p.value = withTiming(isOpen ? 1 : 0, { duration: 260, easing: Easing.out(Easing.cubic) }); }, [isOpen, p]);
+  useEffect(() => { p.value = withTiming(isOpen ? 1 : 0, { duration: duration.base, easing: Easing.out(Easing.cubic) }); }, [isOpen, p]);
   const body = useAnimatedStyle(() => ({ height: interpolate(p.value, [0, 1], [0, h]), opacity: p.value }));
   const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: `${interpolate(p.value, [0, 1], [0, 90])}deg` }] }));
   const toggle = () => { void Haptics.selectionAsync(); const next = !isOpen; if (onToggle) onToggle(next); else setOwn(next); };
   return (
-    <View style={styles.item}>
-      <Press scale={1} onPress={toggle} accessibilityRole="button" accessibilityState={{ expanded: isOpen }} style={({ pressed }) => [styles.head, pressed && styles.pressed]}>
+    <View style={flush ? styles.itemFlush : styles.item}>
+      <Press scale={1} onPress={toggle} accessibilityRole="button" accessibilityState={{ expanded: isOpen }} style={({ pressed }) => [styles.head, flush && styles.headFlush, pressed && styles.pressed]}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{title}</Text>
           {badge != null ? <View style={styles.badge}><Text style={styles.badgeText}>{badge}</Text></View> : null}
@@ -41,7 +43,9 @@ export function Accordion({ title, value, right, defaultOpen = false, open, onTo
 
 const styles = StyleSheet.create({
   item: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  itemFlush: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   head: { minHeight: 52, flexDirection: "row", alignItems: "center", gap: space.snug },
+  headFlush: { paddingHorizontal: space.gutter },
   pressed: { opacity: 0.6 },
   titleRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.tight },
   title: { ...type.body, color: color.foreground },

@@ -4,11 +4,12 @@
  * `/venue/:id` (venues list entry). Hero, weather, format chips + gender Filters
  * sheet (Props / Match Fancy pattern), FixtureCards, then Markets (Fancy-shaped ladder).
  */
+import { FilterButton } from "@/components/app/chip";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ChevronLeftIcon, ChevronRightIcon, CloudIcon, InformationCircleIcon, MapPinIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, CloudIcon, InformationCircleIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -241,11 +242,7 @@ function GroundFilterBar({ fx, fmt, gender, onFmt, onGender }: {
           })}
         </div>
         {both ? (
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${gender ? ", 1 active" : ""}`} onClick={() => setOpen(true)}
-            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />{gl}
-            {gender ? <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">1</span> : null}
-          </Button>
+          <FilterButton label={gl} count={(gender ? 1 : 0)} onClick={() => setOpen(true)} />
         ) : null}
       </div>
       {both && gender ? (

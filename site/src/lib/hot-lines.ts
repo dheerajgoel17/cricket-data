@@ -70,6 +70,9 @@ export interface HotKey { live: boolean; p: number | null; edge: number | null }
 /** Hot props order: rows of a match in play first (the live feed's word for it, as the home rail uses), then the higher hit rate, then the higher edge. */
 export const hotOrder = (x: HotKey, y: HotKey): number => Number(y.live) - Number(x.live) || (y.p ?? 0) - (x.p ?? 0) || (y.edge ?? -1) - (x.edge ?? -1);
 
+/** Mixed player + fancy rows on Home (web + app). Fixture / `/props` / Match Fancy keep the full list. */
+export const HOME_TOP = 10;
+
 /**
  * Home Props mix: rank all rows by `hotOrder` first (live → hit rate → edge). When both kinds exist, only then
  * rebalance so each sits in about [⌊n/3⌋, ⌈2n/3⌉] — leave a natural 4+2 alone, fix a 6+0 or 5+1 by swapping the

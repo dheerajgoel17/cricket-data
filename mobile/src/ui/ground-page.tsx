@@ -24,11 +24,13 @@ import { useScreenInsets } from "@/ui/insets";
 import { MiniBars } from "@/ui/mini-bars";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { Press } from "@/ui/press";
-import { Segmented } from "@/ui/segmented";
+import { LineTabs } from "@/ui/line-tabs";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
+import { Bleed } from "@/ui/bleed";
+import { cap, color, font, num, radius, space, type, fs, surface, rhythm, t } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -53,49 +55,40 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
   const name = g?.label || venue || "Ground";
   const { ground, city } = venueParts(name);
   const wx = useQuery({ queryKey: ["venue-wx", name], queryFn: () => fetchVenueWx(name), staleTime: 10 * 60_000, enabled: !!venue });
-  const head = <PageHeader title="Ground" />;
+  const head = <PageHeader title={venue ? ground : "Ground"} subtitle={venue && city ? city : undefined} />;
 
-  if (!venue) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></View>;
+  if (!venue) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></PageAtmosphere>;
   if ((!g && stats.isError) || (fixtures.isError && !fixtures.data)) return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={[styles.pad, styles.stack]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={[styles.pad, styles.stack]}>
       <EmptyState title="Could not load ground" body="Try again to see the matches and market history." />
       <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
-    </View></View>
+    </View></PageAtmosphere>
   );
-  if (!store || !matchesReady || !g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" shape="ground" /></View>;
-  if (!g.known) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></View>;
+  if (!store || !matchesReady || !g || !filters || fixtures.isLoading) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<Working label="Loading…" shape="ground" /></PageAtmosphere>;
+  if (!g.known) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></PageAtmosphere>;
 
   const { activeFmt, formats, list, both } = filters;
   const activeSection = g.primary < 0 ? "matches" : section;
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       {head}
       <ScrollView stickyHeaderIndices={g.primary >= 0 ? [1] : undefined} contentContainerStyle={{ paddingBottom: inset.bottom + space.section }} showsVerticalScrollIndicator={false}>
         <View style={[styles.pad, styles.stack, styles.intro]}>
           <View style={styles.hero}>
-            <View style={styles.heroHead}>
-              <View style={styles.pin}><Ionicons name="location-outline" size={22} color={color.primary} /></View>
-              <View style={styles.heroText}>
-                <Text style={styles.kicker}>Venue overview</Text>
-                <Text style={styles.name} accessibilityRole="header">{ground}</Text>
-                {city ? <Text style={styles.city}>{city}</Text> : null}
-              </View>
-            </View>
             <GroundConditions count={g.atGround.length} weather={wx.data} loading={wx.isLoading} unavailable={wx.isError} />
           </View>
           {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={g.atGround} /> : null}
         </View>
 
-        {g.primary >= 0 ? <View style={[styles.pad, styles.sectionBar]}>
-          <Segmented<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} height={44} items={[["matches", "Matches"], ["markets", "Markets"]]} />
+        {/* Sticky only the short Matches/Markets control — pinning format+gender chips with it is too tall for phone. */}
+        {g.primary >= 0 ? <View style={styles.sectionBar}>
+          <LineTabs<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} items={[["matches", "Matches"], ["markets", "Markets"]]} />
         </View> : null}
 
         <View style={styles.filters}>
           <View style={[styles.pad, styles.titleRow]}><Text style={styles.kicker}>Match filters</Text><Text style={styles.note}>{activeFmt} · {genderFilterLabel(gender)}</Text></View>
           <Chips items={formats} value={activeFmt} onChange={setFmt} />
-          {both ? <View style={styles.pad}>
-            <Segmented<GenderFilter> label="Gender" value={gender} onChange={setGender} items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]]} />
-          </View> : null}
+          {both ? <Chips items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]] as [GenderFilter, string][]} value={gender} onChange={(g) => setGender(g as GenderFilter)} /> : null}
         </View>
 
         {g.primary >= 0 ? <GroundStats store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} /> : null}
@@ -104,7 +97,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
           ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
           : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
       </ScrollView>
-    </View>
+    </PageAtmosphere>
   );
 }
 
@@ -176,10 +169,9 @@ function GroundConditions({ count, weather, loading, unavailable }: { count: num
     <View style={styles.conditions}>
       <View style={styles.metrics}>
         <Metric k="Listed matches">{count}</Metric>
-        <Metric k="Temperature">{loading ? "…" : weather ? `${weather.temp}°` : "–"}</Metric>
-        <Metric k="Local time">{loading ? "…" : local || "–"}</Metric>
+        <Metric k="Temperature" sub={weather?.label || (unavailable ? "Weather unavailable" : undefined)}>{loading ? "…" : weather ? `${weather.temp}°` : "–"}</Metric>
+        <Metric k="Local time" sub={weather?.city || undefined}>{loading ? "…" : local || "–"}</Metric>
       </View>
-      {weather || unavailable ? <Text style={styles.note}>{weather?.label || "Weather unavailable"}{weather?.city ? ` · ${weather.city}` : ""}</Text> : null}
     </View>
   );
 }
@@ -189,7 +181,7 @@ function GroundMatches({ list }: { list: any[] }) {
   const scores = useQuery(liveQuery), lines = useQuery(linesQuery);
   const now = useNow(30_000);
   return (
-    <View style={[styles.pad, styles.stack]}>
+    <View style={[styles.pad, styles.stack, styles.section]}>
       <View style={styles.titleRow}><Text style={styles.h2} accessibilityRole="header">Matches at this ground</Text><Text style={styles.count}>{list.length}</Text></View>
       {!list.length ? <EmptyState compact title="No matches" body="Try another format or gender filter." /> : list.slice(0, shown).map((f) => {
         const historical = f.source === "history";
@@ -227,7 +219,7 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
         <Text style={styles.tourName} numberOfLines={1}>{series}</Text>
         <Text style={styles.note} numberOfLines={1}>{sub}</Text>
       </View>
-      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Ongoing" : status === "Completed" ? "Done" : "Upcoming"}</Text>
+      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Live" : status === "Completed" ? "Done" : "Upcoming"}</Text>
       <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
     </Press>
   );
@@ -255,8 +247,8 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
         {!ms.length ? (
           <EmptyState compact title="No matches" body={`Nothing in ${fmtName} at this ground for these filters.`} />
         ) : isTop && tops ? (
-          <View>
-            <Text style={styles.note}>Highest score in the match · last {tops.n} {fmtName}</Text>
+          <Bleed style={styles.topBleed}>
+            <Text style={[styles.note, styles.topNote]}>Highest score in the match · last {tops.n} {fmtName}</Text>
             {tops.rows.map((r: any) => (
               <Press key={r.player} accessibilityRole="link" onPress={() => openPlayer({ idx: r.player, stat: "runs", line: 0.5, fmt: fmtName })} style={({ pressed }) => [styles.topRow, pressed && { opacity: 0.6 }]}>
                 <View style={{ flex: 1 }}>
@@ -269,8 +261,8 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                 </View>
               </Press>
             ))}
-            {!tops.rows.length ? <Text style={styles.note}>Not enough matches.</Text> : null}
-          </View>
+            {!tops.rows.length ? <Text style={[styles.note, styles.topNote]}>Not enough matches.</Text> : null}
+          </Bleed>
         ) : rep && s && active != null && at ? (
           <View style={{ gap: space.stack }}>
             <View style={styles.marketCard}>
@@ -320,23 +312,23 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
 }
 
 function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
-  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: 34, lineHeight: 38 }]}>{v}</Text></View>;
+  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: fs.stat, lineHeight: 38 }]}>{v}</Text></View>;
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter },
-  stack: { gap: space.stack },
+  stack: { gap: rhythm.between },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
-  hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
+  hero: { ...surface.card, padding: space.inset, gap: space.stack },
   heroHead: { flexDirection: "row", alignItems: "flex-start", gap: space.snug },
   heroText: { flex: 1, minWidth: 0, gap: space.hair },
   sectionBar: { backgroundColor: color.background, paddingVertical: space.hair },
   filters: { paddingTop: space.stack, paddingBottom: space.group },
-  conditions: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug, gap: space.hair },
-  match: { gap: space.hair },
-  marketCard: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
-  pin: { width: 42, height: 42, borderRadius: 12, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  conditions: { gap: space.hair },
+  match: { gap: rhythm.within },
+  section: { paddingTop: rhythm.section },
+  marketCard: { ...surface.card, padding: space.inset, gap: space.stack },
+  pin: { width: 42, height: 42, borderRadius: radius.control, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   kicker: { ...type.footnote, ...cap, color: color.primary },
   name: { ...type.display, color: color.foreground },
   city: { ...type.body, color: color["muted-foreground"] },
@@ -348,31 +340,34 @@ const styles = StyleSheet.create({
   gridCellB: { borderBottomWidth: StyleSheet.hairlineWidth },
   secList: { borderTopWidth: 0 },
   secRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, minHeight: 44, paddingHorizontal: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: 20, color: color.foreground },
+  secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: fs.metric, color: color.foreground },
   kpiK: { ...cap, color: color["muted-foreground"] },
-  kpiV: { ...num, fontSize: 22, color: color.foreground },
+  kpiV: { ...num, fontSize: fs.figure, color: color.foreground },
   warn: { ...type.footnote, color: color.amber },
   note: { ...type.footnote, color: color["muted-foreground"] },
-  tour: { ...tonal, borderRadius: radius.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
+  tour: { ...surface.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
   crests: { flexDirection: "row", alignItems: "center" },
-  tourName: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  tourName: { ...t.calloutLabel, color: color.foreground },
   status: { ...cap },
   titleRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
-  h2: { ...type.title, color: color.foreground },
-  h3: { flexShrink: 1, ...type.body, fontFamily: font.medium, color: color.foreground },
-  count: { ...num, fontSize: 15, color: color["muted-foreground"] },
-  more: { ...tonal, borderRadius: radius.card, height: 44, alignItems: "center", justifyContent: "center" },
+  h2: { ...type.heading, color: color.foreground },
+  h3: { flexShrink: 1, ...t.bodyLabel, color: color.foreground },
+  count: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
+  more: { ...surface.card, height: 44, alignItems: "center", justifyContent: "center" },
   moreText: { ...type.callout, color: color.foreground },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },
   statKey: { ...type.footnote, color: color["muted-foreground"] },
-  statNum: { ...num, fontSize: 22, color: color.foreground },
+  statNum: { ...num, fontSize: fs.figure, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
-  sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
-  big: { ...num, fontSize: 20, color: color.foreground },
-  topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  lineNum: { ...num, fontSize: 17, color: color.foreground },
-  cellNum: { ...num, fontSize: 15, color: color.foreground },
+  sideKey: { ...t.footnoteLabel, color: color["muted-foreground"], textTransform: "capitalize" },
+  big: { ...num, fontSize: fs.metric, color: color.foreground },
+  /** Web twin: `-mx-gutter border-y` Top batter edge band. */
+  topBleed: { marginTop: space.snug },
+  topNote: { paddingHorizontal: space.gutter, paddingVertical: space.snug },
+  topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, paddingHorizontal: space.gutter, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  topName: { ...t.bodyLabel, color: color.foreground },
+  lineNum: { ...num, fontSize: fs.title, color: color.foreground },
+  cellNum: { ...num, fontSize: fs.body, color: color.foreground },
   fair: { ...type.footnote, color: color["muted-foreground"] },
 });

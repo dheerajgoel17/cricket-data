@@ -54,7 +54,7 @@ export const INFO: Record<string, Info> = {
   chart: {
     title: "About this chart",
     points: [
-      ["Bars", "One per game, oldest on the left, against the line. Green cleared, red missed, amber pushed, grey did not play."],
+      ["Bars", "One per game, oldest on the left, against the line. Green cleared, red missed, amber on the line, grey did not play."],
       ["Counted", "Games he did not play, or that were void, are left out of every rate."],
       ["Windows", "L5, L10 and so on look back over that many games; All is every game on the chart."],
     ],

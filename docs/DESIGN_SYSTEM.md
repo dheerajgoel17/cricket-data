@@ -2,7 +2,7 @@
 
 Fancy.cash has **two design systems** that share one contract: tokens, type roles, spacing roles, and component **jobs**. The web DS lives in `site/` (responsive). The app DS lives in `mobile/src/ui` (React Native). Reuse a web pattern on native only when it works; otherwise ship a **native-designed twin** with the same job and tokens.
 
-No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
+No rebrand. No paid UI kit. Dark only — elevated canvas `#0C0C0E` (never true black). Entity pages bind a partial hero wash (scrolling with identity — never a fixed screen wash) from a curated side accent map (`engine/entity-accents.js`); sticky chrome goes solid elevated past the hero; tab/list surfaces stay solid elevated. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
 
 ## Foundations (shared)
 
@@ -11,9 +11,64 @@ No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`
 | Colours, space, type sizes, motion, breakpoints | `site/packages/tokens/tokens.json` | `npm run tokens` → `site/src/tokens.generated.css` + Tailwind roles | `mobile/src/ui/tokens.ts` derives px from the same JSON (`remPx`); `tint.*` for rgba washes |
 | Type pairing | Satoshi UI + Barlow Condensed figures / `label-cap` | `index.css` `@utility label-cap` / `num-cond` | `font`, `cap`, `num`, `numLg` |
 | Layout roles | gutter, control, row-min, header-h | CSS vars + utility classes | `space.gutter`, `control`, `HEADER_HEIGHT` |
-| Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list | Same role names; values from tokens |
+| Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list (all product `pages/*` + `components/app|layout/*` enrolled; catalogue/design-host excluded) | Same role names; values from `tokens.ts`. Micro-gaps of 2 px (icon+label) stay literal; 4/6 px prefer `space.hair` / `space.tight` |
 
-Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
+Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Text honours the phone's font-size setting up to a per-platform cap (`platform.font-scale-max-*`: 1.3 iOS, 1.2 Android), as the web's `rem` follows the browser setting. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
+
+### Scale (one table, both platforms)
+
+| Role | Size (px / pt) | Web | App | Use |
+| --- | --- | --- | --- | --- |
+| caption | 10 | `text-caption` | `fs.caption` / `type.caption` | Badges, axis labels |
+| cap (label) | 11 | `label-cap` | `cap` | Uppercase labels (Barlow Condensed) |
+| footnote | 12 | `text-footnote` | `fs.footnote` / `type.footnote` | Table heads, meta |
+| callout | 13 | `text-callout` | `fs.callout` / `type.callout` | Secondary text, chips, dense cells |
+| body | 15 | `text-body` | `fs.body` / `type.body` | Rows, copy |
+| title | 18 | `text-title` | `fs.title` / `type.title` | Section and row titles |
+| metric | 20 | `text-metric` | `fs.metric` / `metric` | Row hero line (O/U 29.5) |
+| figure | 24 | `text-figure` | `fs.figure` | Stat tiles, score tiles |
+| display | 28 | `text-display` | `fs.display` / `type.display` | Page / player name |
+| stat | 30 | `text-stat` | `fs.stat` | Hero numbers |
+
+Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 · chip 999 (`radius.sm` / `control` / `card` / `sheet` / `chip` in the app). Spacing: `hair` 4 · `tight` 6 · `snug` 10 · `inset`/`gutter` 14 · `stack` 16 · `group` 20 · `section` 32 (the web widens the gutter at `md` / `lg`; a phone keeps 14). Surfaces and washes come from `color.*` (`control-fill`, `control-ring`, `tile`, `segment-track`, `segment-thumb`, `chrome-solid`, `skeleton`, `ink-soft`, `text-soft`) and `tint.*`; a screen never writes a hex / rgba literal or a numeric `fontSize` (`mobile/src/ui/tokens.test.ts` fails the build, the web has `design-tokens.test.ts`).
+
+### Rhythm, weight, surface (the three rules that make pages look alike)
+
+**Rhythm** (`tokens.json` → `rhythm`; app `rhythm`; web `gap-*`): inside one group `snug` 10; between blocks on a page `stack` 16; between major sections `section` 32 (24 at `lg`); under the header `stack` 16; page side inset `gutter` 14 (wider on web at `md` / `lg`). A page body uses these and never a raw gap, so Home, Props, Fancy, fixture, player, team, league, Saved and Search all breathe the same.
+
+**Weight** (bold where hierarchy needs it, never as default): *emphasis* 700 is for identity and the one key figure: team and player names, scores and totals, a row's hero line and its price, status tags, a page's own headline. *label* 500 is for section / card / sheet titles (`type.heading`), secondary numbers (`font.dataLight`), controls and chips. *copy* 400 is body text; *editorial* 300 is for light tabular figures. If everything in a row is bold, nothing is.
+
+**Text roles** (`t.*`, `d.*`, `dStrong.*`, `w.*` in `ui/tokens.ts`): a screen never writes a font family. `t.bodyLabel` / `t.calloutLabel` is a control, chip or row label (Satoshi 500); `t.bodyStrong` a name or the one key line (700); `d.callout` a figure at the label weight (Barlow 500) and `dStrong.callout` the key figure (700); `w.label` is weight only, for a span inside text. Web: `text-*` with `font-label` / `font-emphasis`, `font-condensed tabular-nums`.
+
+**Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone). Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web): the content fades at an edge that has more behind it (a gradient or mask, never a live blur).
+
+### Platform conventions (one design, three native idioms)
+
+Same tokens, same jobs; the idiom of the platform decides the feel. Values live in `tokens.json` → `platform` and `mobile/src/ui/platform.ts`.
+
+| Concern | Web | iOS | Android |
+| --- | --- | --- | --- |
+| Touch target | 44 px comfortable | 44 pt (HIG) | 48 dp (Material); `hitSlopFor(w, h)` tops a smaller drawing up |
+| Press feedback | `:active` scale 0.97, 120 ms; hover tint | `Press` scale 0.97, 120 ms (UI thread) | Same scale on compact controls; full-width rows get Material ripple (`RIPPLE`) |
+| Selection feedback | colour / thumb transition | `Haptics.selectionAsync` on chip, tab, segment | Same (system haptic) |
+| Text | Satoshi / Barlow Condensed, `rem` zoom | Same faces; width-fit under 375 | Same + `includeFontPadding: false`, greedy line breaking (`ui/text.tsx`) |
+| Shadow / elevation | `--shadow-*` | `shadow*` | `elevation` (shadow props are ignored) |
+| Chrome | Header + sidebar at `lg`, docked tab bar on phone | Docked `TabBar`, solid, no glass | Same docked `TabBar`; no blur anywhere |
+| Lists | DOM scroll | FlashList | FlashList |
+| Motion | `motion/react` springs, CSS transitions | Reanimated 4 springs / CSS transitions on the UI thread | Same; only transform + opacity; no layout animation in list rows |
+
+### Motion map (interaction → implementation)
+
+| Interaction | Web | App |
+| --- | --- | --- |
+| Chip / tab switch | `PillGroup` `layoutId` spring glide | `Chips` colour fade 150 ms; `LineTabs` underline spring glide (twin) |
+| Segmented | thumb glide | `Segmented` thumb timing 220 ms |
+| Number change | `AnimatedNumber` / `Tick` 450 ms flash | `Tick` roll + 450 ms wash, `CountUp` |
+| Press | `:active` scale | `Press` |
+| Entrance | `motion` fade-up | `Rise` / `enter` (first rows only), `Appear` over skeletons |
+| Live | pulsing dot | `LiveDot` halo (CSS animation, UI thread) |
+| Loading | skeleton pulse | `Skeleton` opacity pulse |
+| Reduce motion | `useReducedMotion` | `useReducedMotion` / `ReduceMotion.System` everywhere |
 
 **Decision rule**
 
@@ -36,12 +91,13 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- | --- |
 | Page title / crumbs | `PageTitle`, `Crumbs` | Drill-in and desktop hierarchy |
 | Entity hero | `EntityHero` | Player / team / league / venue identity strip |
-| Page header (shell) | layout `Header` + page title | Top chrome; app twin is `PageHeader` |
+| Page atmosphere / hero wash | `HeroWash` (+ `engine/entity-accents.js`) | Hero-bound wash on player/team (scrolls with identity); elevated canvas everywhere |
+| Page header (shell) | layout `Header` + `TabTitle` | Top chrome; tab pages (except Fixtures) put the title in the bar via `TabTitle` / `HeaderActions` — app twin is `AppHeader title=` |
 | Empty section | `EmptyState` | Any list / unknown / error that can be empty — **not** `EmptyNote` (deprecated alias only) |
 | 404 | `EmptyState` in `App.tsx` | Catch-all `*` route |
 | Forms | `LiveForm`, `Field`, `Segmented` (`forms.tsx`) | Pair tool, contact-ish inputs, live filters |
 | Metric / stat tile | `Metric`, `StatTile`, `StatGridCards` | Glance figures on Player / Odds / ResultView |
-| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Shared sticky chip/filter recipe. Flush header (`bg-card`) when the band leads the page (Player, Match Fancy detail, Fixture scorecard tabs). Without flush when a title/hero sits above (`/props`, Ground full page) |
+| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Web sticky chip recipe. **App does not mirror it 1:1** — Player uses BlurBar; Props filters scroll in FlashList header; Fixture CapsuleTabs scroll (sticky fights absolute BlurBar); Ground sticks only the short section control; Fancy detail keeps MatchHeader + scrolling filters |
 | Detail board | `DetailSplit`, `StickyPanel` | Player / Match Fancy / Ground chart + sticky Lines rail at `lg+` (game log stays in bottom tabs) |
 | Card directory | `CardGrid` | Fancy list — 1 → 2 (`md`) → 3 (`xl`) |
 | Chips / filters | `Chip`, `PillGroup`, `PillTabs`, `ScreenerFilters` | Format, scope, section tabs, screener; `PillTabs` = documented twin of `PillGroup` (taller control) |
@@ -100,12 +156,20 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Dense DataTable | `ui/data-table` (`bleed`, head = `type.footnote` + `cap`) | **Native twin** (flex rows, not HTML table) |
 | Game log list | `Bleed` + press rows | Twin of web list |
 | Skeletons | `ui/skeletons` + Reanimated | Twin |
-| Segmented control | `Segmented` | **Native-exclusive** (SwiftUI / Compose) |
+| Segmented control | `Segmented` (JS twin; no system glass Picker) | **Native-exclusive** |
 | Tab bar | Docked `TabBar` (`mobile/src/components/tab-bar.tsx`) | **Native-exclusive** (web preview uses the same docked bar) |
 | Long lists | FlashList | **Native-exclusive** |
-| Blur chrome | `BlurBar` / solid tint (no liquid glass) | **Native-exclusive** |
-| Page header | `PageHeader` | Native chrome |
+| Sticky chrome | `BlurBar merge` + `useChromeScrim` (clear → solid elevated; no liquid glass) | **Native-exclusive** — universal, not player-only |
+| Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
+| Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
+| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters, More); never a hand-built `Modal` |
+| Button | `ui/button` (`Button`: primary / secondary, md at the platform touch height, sm at the control height) | Web twin: `components/ui/button.tsx`; never style a `Press` into a button |
+| Search box | `ui/search-field` (`SearchField`) | One box for Search and Competitions |
+| Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row |
+| Choice latency | `lib/use-choice` (`useChoice`) | Every chip, tab and segmented control highlights in the tap's own frame and runs the real change as a transition |
+| List reflow | `ui/motion` (`Reflow`) | Short lists whose order or membership changes (Saved, market overview): rows glide, a removed row fades. Web twin: `ReflowGroup` / `ReflowItem`. Not for virtualized lists |
+| Round icon button | `ui/round-button` (`RoundButton`) | Native chrome: back, search, account, share, close; web twin is the header icon button |
 
 Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 
@@ -119,15 +183,18 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | --- | --- | --- |
 | Empty state | `EmptyState` | `mobile/src/ui/empty-state` (compatible) |
 | Chips / filters | `Chip` / `PillGroup` / `PillTabs` | `Chips` / `ActiveChip` / `ChoiceChip` / Capsule |
+| Sticky filter band | `StickyFilterBand` (+ flush header) | **Native-designed** — `BlurBar merge` (Player + Fixture); list/header scroll (Props / Fancy); short sticky section only (Ground); no blind web sticky under BlurBar |
+| Fixture scoreboard shell | `-mx-gutter bg-card border-b` | `scoreShell` + flush accordion / live strip — **twin** |
 | Dense DataTable | `DataTable` (DOM) | Native `DataTable` flex rows — **twin** |
 | Game log | bleed list | bleed list — **twin** |
 | Skeletons | CSS shapes | Reanimated shapes — twin |
-| Segmented control | PillGroup / Tabs | **Native-exclusive** Segmented |
+| Segmented control | PillGroup / Tabs | **Native-exclusive** JS `Segmented` |
 | Tab bar | IosTabBar / sidebar | **Native-exclusive** docked `TabBar` |
 | Lists (long) | DOM scroll | **Native-exclusive** FlashList |
-| Blur chrome | CSS / limited | **Native-exclusive** BlurBar / solid tint |
+| Sticky chrome | CSS / limited | **Native-exclusive** `BlurBar merge` + `useChromeScrim` |
 | Sheets | Radix Sheet | Native form sheet / RN modal |
-| Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` |
+| Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` on `PageAtmosphere` |
+| Page atmosphere | `HeroWash` | `PageAtmosphere` + `EntityHeroWash` — twin |
 | Forms | `LiveForm` / Field | Accordion + ChoiceChip / sheets |
 | Metric / StatTile | `Metric` / `StatTile` | `Metric` in `data-table` |
 | Contact | mailto Card | Contact tab |
@@ -178,7 +245,7 @@ Full `App.tsx` route checklist:
 | Team / venue | Grid + ResultView markets | Same | Same | ResultView bleed |
 | Competitions / Leagues | Tournament boards in cards | Same | Multi-col boards | `BOARD_HEAD` inset |
 | Screener / filters | Sheet | Sheet | Drawer-friendly width | — |
-| Fancy / props lists | Scroll + rows | Fancy `CardGrid` | Wider content; Props `PropTable` | — |
+| Fancy / props lists | `PropLines` / `FancyLines` compact (`auto`) | Fancy `CardGrid`: phone edge-to-edge hairlines (`-mx-gutter` section); `md` FixtureCard panels; always compact | Fixture Match Fancy + `/props` dense (`auto` from `lg`) | — |
 | Fixture | Scorecard card + chips | Same | Form two teams side-by-side; desktop back + crumbs | — |
 | Match Fancy detail | Edge ladder + `TABLE_HEAD` | Same | `DetailSplit` + `StickyPanel` | `TABLE_HEAD` + bleed layout |
 | Ground | Ladder / rates | Same | `DetailSplit` markets; matches stay stacked FixtureCards | bleed |

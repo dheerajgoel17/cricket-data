@@ -21,6 +21,8 @@ describe("MarketTape", () => {
     );
     expect(screen.getAllByRole("region", { name: "High odds hits and low odds misses" })).toHaveLength(1); // one card, two tabs
     expect(screen.getByRole("radio", { name: "High odds hits · 1" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "What is the market tape?" })).toBeInTheDocument();
+    expect(screen.queryByText(/Over at .* or longer that has already cleared/)).toBeNull();
     expect(screen.getByText("Long shot")).toBeInTheDocument();
     expect(screen.queryByText("Short miss")).toBeNull();
     expect(screen.getByText("3.20")).toBeInTheDocument();
@@ -29,6 +31,7 @@ describe("MarketTape", () => {
     expect(screen.queryByText("Long shot")).toBeNull();
     expect(screen.queryByText("Quiet")).toBeNull();
     expect(screen.getByText("1.22")).toBeInTheDocument();
+    expect(screen.queryByText(/Over at .* or shorter that has already missed/)).toBeNull();
   });
 
   it("renders nothing when no row has cleared a long shot or missed a short price", () => {

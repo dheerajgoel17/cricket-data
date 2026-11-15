@@ -3,7 +3,7 @@ import { Text } from "@/ui/text";
 import { odds } from "@site/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { Tick } from "@/ui/tick";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, dStrong } from "@/ui/tokens";
 
 export type LadderBook = { source: string; over: number | null; under: number | null };
 export type LadderPriced = {
@@ -35,6 +35,6 @@ export function pricedFromBooks(line: number, books: LadderBook[]): LadderPriced
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: space.tight, maxWidth: "100%", overflow: "hidden" },
-  price: { ...type.body, fontFamily: font.data, fontVariant: ["tabular-nums"], color: color.primary, flexShrink: 0 },
+  price: { ...dStrong.body, color: color.primary, flexShrink: 0 },
   empty: { ...type.footnote, color: color["muted-foreground"] },
 });

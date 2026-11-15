@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { FilterButton } from "@/components/app/chip";
+import { ScrollRow } from "@/components/app/scroll-row";
+import { useCallback, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
@@ -12,7 +14,7 @@ import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { STATS } from "@cricket/engine/rules.js";
-import { edgeTag, groundNote, modelSide } from "@cricket/engine/props-view.js";
+import { edgeTag, modelSide } from "@cricket/engine/props-view.js";
 import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { fmtIndex } from "@cricket/engine/util.js";
 import { venueStem } from "@cricket/engine/markets.js";
@@ -32,18 +34,18 @@ import { abbr, odds, shortVenue } from "@/lib/format";
 import { useLinesLive } from "@/hooks/useLinesLive";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { BookBadge } from "./book-badge";
 import { BookTable } from "./book-table";
 import { TeamFlag } from "./badges";
 import { PillGroup } from "./pill-group";
-import { MiniBars } from "./mini-bars";
+import { MiniBars, MiniBarsSlot, SCAN_ROW_GRID, ScanEdge } from "./mini-bars";
+import { ResultStamp, sideStamp } from "./result-stamp";
 import { MatchChip } from "./fixture-card";
 import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
-import { BatterSpot, LiveBadge, LiveOpened, LineProgress } from "./live-spot";
+import { BatterSpot, InPlayBadge } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 
@@ -176,10 +178,15 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** List card: face + name, hero OVER line (condensed), book price, model edge. */
-type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
+type SoFar = { v: number; state: "live" | "out" | "final" | "void"; verdict: "cleared" | "missed" | "push" | null };
 
-/** Face Over and Under each own their book (shared line is the usual player-prop case); extras sit behind `BookTable` (+N books). */
-export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; className?: string; rowLine?: number }) {
+/**
+ * Face Over and Under prices under a props row. Extras sit behind `BookTable` (+N books).
+ * `marks={false}`: prices only — no bookmaker logos.
+ * `detailOnly`: skip when the dense Over/Under column already covers the same single-line odds
+ * (only render for split O/U lines or +N other books).
+ */
+export function BookQuotes({ quotes, className, rowLine, marks = true, detailOnly = false }: { quotes: Quote[]; className?: string; rowLine?: number; marks?: boolean; detailOnly?: boolean }) {
   if (!quotes.length) return null;
   const overQ = quotes.reduce<Quote | null>((best, q) => {
     if (q.over == null) return best;
@@ -201,94 +208,108 @@ export function BookQuotes({ quotes, className, rowLine }: { quotes: Quote[]; cl
   const shown = [overQ?.source, underQ?.source];
   const books = quotes.map((q) => ({ source: q.source, over: q.over, under: q.underAt?.price ?? q.under }));
   const splitLine = overLine != null && underLine != null && overLine !== underLine;
-  const live = quotes.find((q) => q.live);
+  const lineOff = rowLine != null && ((overLine != null && overLine !== rowLine) || (underLine != null && underLine !== rowLine));
+  const extra = books.filter((b) => !shown.includes(b.source)).length > 0;
+  if (detailOnly && !splitLine && !lineOff && !extra) return null;
   return (
     <div className={cn("flex flex-col gap-hair text-callout tabular-nums text-muted-foreground", className)} onClick={(e) => e.stopPropagation()}>
-      <div className="flex flex-wrap items-center gap-x-snug gap-y-hair">
+      <div className="flex flex-wrap items-center gap-x-tight gap-y-hair">
         {overQ?.over != null && (
-          <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
+          <span className="inline-flex min-w-0 items-center gap-hair whitespace-nowrap font-condensed">
             <span className="text-muted-foreground">O{splitLine || (rowLine != null && overLine !== rowLine) ? ` ${overLine}` : ""}</span>
-            <Tick quiet value={overQ.over} className="text-body font-emphasis text-foreground">{odds(overQ.over)}</Tick>
-            <BookBadge source={overQ.source} className="min-w-0 truncate" />
+            <Tick quiet arrow={marks} value={overQ.over} className={cn("text-body font-emphasis text-foreground", !marks && "px-0")}>{odds(overQ.over)}</Tick>
+            {marks ? <BookBadge source={overQ.source} className="min-w-0 truncate" /> : null}
           </span>
         )}
         {underPrice != null && (
-          <span className="inline-flex min-w-0 items-center gap-tight whitespace-nowrap font-condensed">
+          <span className="inline-flex min-w-0 items-center gap-hair whitespace-nowrap font-condensed">
             <span className="text-muted-foreground">U{splitLine || (rowLine != null && underLine !== rowLine) ? ` ${underLine}` : ""}</span>
-            <Tick quiet value={underPrice} className="text-body font-emphasis text-foreground">{odds(underPrice)}</Tick>
-            <BookBadge source={underQ!.source} className="min-w-0 truncate" />
+            <Tick quiet arrow={marks} value={underPrice} className={cn("text-body font-emphasis text-foreground", !marks && "px-0")}>{odds(underPrice)}</Tick>
+            {marks ? <BookBadge source={underQ!.source} className="min-w-0 truncate" /> : null}
           </span>
         )}
-        {live && <LiveOpened opened={live.opened} line={live.line} label={rowLine != null ? "Opened at" : undefined} />}
       </div>
       <BookTable books={books} shown={shown} />
     </div>
   );
 }
 
-function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
+export function PropProgress({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
   if (out) return null;
   const quote = r.quotes.find((q) => q.live);
+  // Score unavailable / so-far sit on identity — only same-spot history under the line.
+  return quote && (!soFar || soFar.state === "live") ? <BatterSpot r={r} /> : null;
+}
+
+const propHref = (r: Row) => propLineHref(r);
+
+const rowKey = (r: Row) => `${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`;
+
+/** Shared: avatar · name · flag · In Play Market (when line/odds are in-play). Match Live stays on fixtures; Not in XI / void covers non-playing. */
+export function PropLineIdentity({ r, out, linkClass, onNameClick }: { r: Row; out: boolean; linkClass?: string; onNameClick?: (e: MouseEvent) => void }) {
+  const inPlay = !out && r.quotes.some((q: Quote) => q.live);
   return (
-    <>
-      <LineProgress quiet standing={soFar} live={!!quote} line={r.line} opened={quote?.opened} />
-      {quote && (!soFar || soFar.state === "live") && <BatterSpot r={r} />}
-    </>
+    <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
+      <Link to={propHref(r)} className={cn("truncate", linkClass)} onClick={onNameClick}><PlayerName idx={r.idx} fallback={r.name} /></Link>
+      <TeamFlag name={r.team} />
+      {inPlay ? <InPlayBadge /> : null}
+    </span>
   );
 }
 
-/** Same row chrome as Match Fancy's OverviewRow: title, condensed line + caps label, books, model edge + last-N bars. */
-export function PropRow({ r, win, wl, soFar, out, hideMatch }: { r: Row; win: Win; wl: string; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
+/** Graph slot: MiniBars, or Not in XI / Score unavailable in its place. */
+export function PropBarsSlot({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
+  if (out) {
+    return <MiniBarsSlot className="label-cap text-caption font-label text-muted-foreground">Not in XI</MiniBarsSlot>;
+  }
+  const inPlay = r.quotes.some((q: Quote) => q.live);
+  if (inPlay && (soFar == null || (soFar.v == null && soFar.state !== "void"))) {
+    return <MiniBarsSlot className="label-cap text-caption font-label text-muted-foreground">Score unavailable</MiniBarsSlot>;
+  }
+  return <Spark r={r} />;
+}
+
+/** Shared line copy — one line, market title truncates (O/U · line · label · lean price). */
+export function PropLineMeta({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean; density?: "compact" | "dense" }) {
   const label = (STATS as any)[r.stat]?.label as string;
-  const ground = win !== "ven" ? groundNote(r.ven) : null;
+  const scope = scopeTag(r.fmt, r.inn);
+  const under = r.side === "under";
+  const stamp = !out ? sideStamp(r.side, soFar?.verdict ?? null) : null;
+  if (out) {
+    return (
+      <span className="flex min-w-0 items-baseline gap-tight font-condensed text-callout tabular-nums text-muted-foreground">
+        <span className="shrink-0">{r.line}</span>
+        <span className="label-cap min-w-0 truncate text-footnote">{label}</span>
+      </span>
+    );
+  }
+  const price = under ? r.under : r.over;
   return (
-    <li className="relative border-t border-hairline first:border-t-0">
-      <div className="grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto] items-center gap-tight px-gutter py-snug text-left">
-        <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
-        <span className="grid min-w-0 gap-hair">
-          <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
-            <Link to={`/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`} className="truncate outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring"><PlayerName idx={r.idx} fallback={r.name} /></Link>
-            <TeamFlag name={r.team} />
-            {!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}
-            {out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}
-          </span>
-          <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-            <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">{out ? r.line : `O/U ${r.line}`}</span>
-            <span className="label-cap text-footnote"><span className="text-primary">{label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
-          </span>
-          {!out && (r.quotes.length ? <BookQuotes quotes={r.quotes} rowLine={r.line} /> : (
-            <span className="font-condensed text-callout tabular-nums text-muted-foreground">Over <b className="text-foreground">{odds(r.over)}</b> · Under <b className="text-foreground">{odds(r.under)}</b></span>
-          ))}
-          <PropProgress r={r} soFar={soFar} out={out} />
-          <span className="flex min-w-0 flex-wrap items-baseline gap-x-snug gap-y-hair text-footnote text-muted-foreground">
-            {!hideMatch && soFar == null && <span className="truncate">{r.fmt}{r.match ? ` · ${r.match}` : ""}</span>}
-            {ground && <span className={cn("truncate", ground.tone === "good" ? "font-label text-primary" : ground.tone === "bad" ? "font-label text-miss" : undefined)} title={r.venue}>{ground.hits}/{ground.played} at {shortVenue(r.venue)}</span>}
-            <span className={cn("font-condensed tabular-nums", pctClass(r[win].p))}>{r[win].hits} in {wl}</span>
-          </span>
-        </span>
-        <span className="grid self-start justify-items-end gap-hair pt-control">
-          {!out && <span className="grid justify-items-end gap-hair text-right">
-            <span className="flex items-baseline gap-tight whitespace-nowrap">
-              <span className="label-cap text-caption text-muted-foreground">Model</span>
-              <span className={cn("font-condensed text-title font-emphasis leading-none tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}%`}</span>
-            </span>
-            {r.edge != null && <span className="label-cap text-caption text-muted-foreground">{edgeTag(r.edge, r.side)}</span>}
-          </span>}
-          <Spark r={r} />
-        </span>
-      </div>
-      <PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} className="absolute z-10 right-[calc(var(--gutter)-var(--spacing-tight))] top-snug" />
-    </li>
+    <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-label leading-snug text-foreground">
+      <span className={cn("shrink-0", under ? "text-miss" : "text-primary")}>{under ? "U" : "O"}</span>
+      <span className="shrink-0 tabular-nums">{r.line}</span>
+      <span className="min-w-0 truncate">{label}{scope ? ` · ${scope}` : ""}</span>
+      {price > 1 ? <span className="shrink-0 font-condensed tabular-nums text-muted-foreground">{odds(price)}</span> : null}
+      {stamp ? <ResultStamp kind={stamp} /> : null}
+    </span>
   );
 }
 
-function RateCell({ p, n }: { p: number | null; n?: number }) {
+export function RateCell({ p, n }: { p: number | null; n?: number }) {
   return <span className={cn("font-condensed text-body font-label tabular-nums", pctClass(p))}>{pct(p)}{n != null && n > 0 && n < 10 ? <span className="font-copy text-muted-foreground"> · {n}</span> : null}</span>;
 }
 
+/** Player deep-link used by PropLines dense + Home dense mix. */
+export function propLineHref(r: Row) {
+  return `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
+}
+
+/** Header without horizontal pad — callers set pl/pr so edges are not double-padded with cell px. */
+const TH_BASE = "h-auto py-tight text-left label-cap text-footnote font-label whitespace-nowrap";
+
 function ColHead({ id, label, win, onWin, align, className }: { id?: Win; label: string; win: Win; onWin: (w: Win) => void; align?: "right"; className?: string }) {
   const active = !!id && win === id;
-  const cls = cn("px-snug py-tight text-left label-cap text-footnote whitespace-nowrap", align === "right" && "text-right", active ? "text-foreground" : "text-muted-foreground", className);
+  const cls = cn(TH_BASE, align === "right" && "text-right", active ? "text-foreground" : "text-muted-foreground", className ?? "px-snug");
   if (!id) return <th className={cls}>{label}</th>;
   return (
     <th className={cls}>
@@ -299,55 +320,81 @@ function ColHead({ id, label, win, onWin, align, className }: { id?: Win; label:
   );
 }
 
-/** Desktop prop table: one row per priced line, cricket windows as columns (year / H2H / ground), not a copy of another sport's sheet. */
-export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Row[]; win: Win; onWin: (w: Win) => void; bars: boolean; soFarOf: (r: Row) => SoFar | null; outOf: (r: Row) => boolean }) {
+/** Dense table edge pads — gutter once on first/last col (no double px-snug on the page edge). */
+const TD_START = "py-snug pl-gutter pr-snug";
+const TD_MID = "px-snug py-snug";
+const TD_END = "py-snug pl-snug pr-gutter";
+const TH_LINES = "pl-[calc(var(--gutter)+var(--control)+var(--spacing-snug))] pr-snug";
+
+function CompactPropItem({ r, soFar, out }: { r: Row; soFar: SoFar | null; out: boolean }) {
+  return (
+    <li className="relative border-t border-hairline first:border-t-0">
+      <div className={cn(SCAN_ROW_GRID, "text-left")}>
+        <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
+        <span className="grid min-w-0 gap-hair">
+          <PropLineIdentity r={r} out={out} linkClass="outline-none after:absolute after:inset-0 after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-ring" />
+          <PropLineMeta r={r} soFar={soFar} out={out} />
+        </span>
+        {out ? <span className="w-11 shrink-0" aria-hidden /> : <ScanEdge edge={r.edge} />}
+        <PropBarsSlot r={r} soFar={soFar} out={out} />
+      </div>
+    </li>
+  );
+}
+
+function CompactPropList({ rows, soFarOf, outOf }: { rows: Row[]; soFarOf: (r: Row) => SoFar | null; outOf: (r: Row) => boolean }) {
+  return (
+    <ul className="-mx-gutter">
+      {rows.map((r) => (
+        <CompactPropItem key={rowKey(r)} r={r} soFar={soFarOf(r)} out={outOf(r)} />
+      ))}
+    </ul>
+  );
+}
+
+function DensePropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Row[]; win: Win; onWin: (w: Win) => void; bars: boolean; soFarOf: (r: Row) => SoFar | null; outOf: (r: Row) => boolean }) {
   const nav = useNavigate();
   const year = WINS[0][1];
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[44rem] text-callout">
+    <div className="-mx-gutter overflow-x-auto">
+      <table className="w-full min-w-[44rem] border-collapse text-callout">
         <thead>
           <tr className="border-b border-hairline">
-            <ColHead label="Lines" win={win} onWin={onWin} className="pl-[calc(var(--control)+var(--spacing-snug)*2)]" />
-            {bars ? <ColHead id="l10" label="L10 chart" win={win} onWin={onWin} /> : null}
-            <ColHead label="Over / under" win={win} onWin={onWin} />
-            <ColHead id="season" label={year} win={win} onWin={onWin} />
-            <ColHead id="h2h" label="H2H" win={win} onWin={onWin} />
-            <ColHead id="ven" label="Ground" win={win} onWin={onWin} />
-            <ColHead label="Model edge" win={win} onWin={onWin} align="right" />
-            <th className="w-10"><span className="sr-only">Watchlist</span></th>
+            <ColHead label="Lines" win={win} onWin={onWin} className={TH_LINES} />
+            {bars ? <ColHead id="l10" label="L10 chart" win={win} onWin={onWin} className="px-snug" /> : null}
+            <ColHead label="Over / under" win={win} onWin={onWin} className="px-snug" />
+            <ColHead id="season" label={year} win={win} onWin={onWin} className="px-snug" />
+            <ColHead id="h2h" label="H2H" win={win} onWin={onWin} className="px-snug" />
+            <ColHead id="ven" label="Ground" win={win} onWin={onWin} className="px-snug" />
+            <ColHead label="Model edge" win={win} onWin={onWin} align="right" className="pl-snug pr-snug" />
+            <th className={cn(TH_BASE, "w-10 pr-gutter text-muted-foreground")}><span className="sr-only">Watchlist</span></th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => {
             const soFar = soFarOf(r), out = outOf(r);
-            const to = `/player/${r.idx}?stat=${r.stat}&line=${r.line}&fmt=${fmtIndex(r.fmt)}${r.start ? `&start=${encodeURIComponent(r.start)}` : ""}${r.inn ? `&scope=${r.inn}` : ""}`;
+            const to = propHref(r);
             const ground = shortVenue(r.venue);
+            const edgeTone = out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss";
             return (
-              <tr key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`}
-                className="cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover"
-                onClick={() => nav(to)}>
-                <td className="px-snug py-snug">
-                  <span className="flex items-center gap-snug">
-                    <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control" />
-                    <span className="grid min-w-0 gap-hair">
-                      <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug"><Link to={to} className="truncate hover:underline focus-visible:underline" onClick={(e) => e.stopPropagation()}><PlayerName idx={r.idx} fallback={r.name} /></Link><TeamFlag name={r.team} />{!out && r.quotes.some((q: Quote) => q.live) && <LiveBadge />}{out && <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge>}</span>
-                      <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair">
-                        <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums">{out ? r.line : `${r.side === "under" ? "Under" : "Over"} ${r.line}`}</span>
-                        <span className="label-cap text-footnote"><span className="text-primary">{(STATS as any)[r.stat]?.label}</span>{scopeTag(r.fmt, r.inn) && <span className="text-muted-foreground"> · {scopeTag(r.fmt, r.inn)}</span>}</span>
-                      </span>
-                      {!out && r.quotes.length > 0 && <span onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}><BookQuotes quotes={r.quotes} /></span>}
+              <tr key={rowKey(r)} className="cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover" onClick={() => nav(to)}>
+                <td className={TD_START}>
+                  <span className="flex min-w-0 items-start gap-snug">
+                    <PlayerAvatar idx={r.idx} team={r.team} test={r.fmt === "Test"} className="size-control shrink-0" />
+                    <span className="grid min-w-0 flex-1 gap-hair">
+                      <PropLineIdentity r={r} out={out} linkClass="hover:underline focus-visible:underline" onNameClick={(e) => e.stopPropagation()} />
+                      <PropLineMeta r={r} soFar={soFar} out={out} />
                       <PropProgress r={r} soFar={soFar} out={out} />
                     </span>
                   </span>
                 </td>
-                {bars ? <td className="px-snug py-snug"><Spark r={r} /></td> : null}
-                <td className="px-snug py-snug font-condensed text-title font-emphasis tabular-nums">{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-label text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
-                <td className="px-snug py-snug"><RateCell p={r.season.p} n={r.season.played} /></td>
-                <td className="px-snug py-snug"><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
-                <td className="px-snug py-snug" title={r.venue}><span className="grid gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn("px-snug py-snug text-right font-condensed text-title font-emphasis tabular-nums", out || r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss")}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
-                <td className="px-tight"><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
+                {bars ? <td className={TD_MID}><PropBarsSlot r={r} soFar={soFar} out={out} /></td> : null}
+                <td className={cn(TD_MID, "font-condensed text-title font-label tabular-nums")}>{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-label text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
+                <td className={TD_MID}><RateCell p={r.season.p} n={r.season.played} /></td>
+                <td className={TD_MID}><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
+                <td className={TD_MID} title={r.venue}><span className="grid min-w-0 gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
+                <td className={cn(TD_MID, "text-right font-condensed text-title font-label tabular-nums", edgeTone)}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
+                <td className={cn(TD_END, "w-10 pl-tight")}><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );
           })}
@@ -355,6 +402,52 @@ export function PropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Ro
       </table>
     </div>
   );
+}
+
+export type PropLinesDensity = "auto" | "compact" | "dense";
+
+/**
+ * One priced-line surface: compact scan below `lg`, dense research table from `lg`.
+ * Density is viewport-driven (`auto`); pages must not hardcode compact/dense by route.
+ */
+export function PropLines({
+  rows, win = "l10", onWin, bars = true, soFarOf, outOf, density = "auto",
+}: {
+  rows: Row[];
+  win?: Win;
+  onWin?: (w: Win) => void;
+  bars?: boolean;
+  soFarOf: (r: Row) => SoFar | null;
+  outOf: (r: Row) => boolean;
+  density?: PropLinesDensity;
+}) {
+  const showCompact = density === "auto" || density === "compact";
+  const showDense = density === "auto" || density === "dense";
+  const winChange = onWin || (() => {});
+  return (
+    <>
+      {showCompact ? (
+        <div className={density === "auto" ? "lg:hidden" : undefined}>
+          <CompactPropList rows={rows} soFarOf={soFarOf} outOf={outOf} />
+        </div>
+      ) : null}
+      {showDense ? (
+        <div className={density === "auto" ? "hidden lg:block" : undefined}>
+          <DensePropTable rows={rows} win={win} onWin={winChange} bars={bars} soFarOf={soFarOf} outOf={outOf} />
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+/** @deprecated Prefer `PropLines` with `density="compact"`. Single `<li>` for mixed lists (Home). */
+export function PropRow({ r, win: _win = "l10", wl: _wl, soFar, out, hideMatch: _hideMatch }: { r: Row; win?: Win; wl?: string; soFar: SoFar | null; out: boolean; hideMatch?: boolean }) {
+  return <CompactPropItem r={r} soFar={soFar} out={out} />;
+}
+
+/** @deprecated Prefer `PropLines` with `density="dense"` or `auto`. */
+export function PropTable(props: { rows: Row[]; win: Win; onWin: (w: Win) => void; bars: boolean; soFarOf: (r: Row) => SoFar | null; outOf: (r: Row) => boolean }) {
+  return <PropLines {...props} density="dense" />;
 }
 
 /** "Hot player props" for the selected day's matches (today by default, any of the next 10 days from Filters), in the props.cash lines-table style: stat tabs, then one ranked row per bookmaker line. */
@@ -410,7 +503,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
     const have = [...count.keys()].filter((k) => (STATS as any)[k]).sort((x, y) => count.get(y)! - count.get(x)! || order.indexOf(x) - order.indexOf(y));
     return [["all", "All props"], ...have.map((k) => [k, (STATS as any)[k].label])] as [string, string][];
   }, [data]);
-  const need = WINS.find(([k]) => k === win)![2], wl = WINS.find(([k]) => k === win)![1];
+  const need = WINS.find(([k]) => k === win)![2];
   // the edge is worked out from the window shown, so it moves with it; rows of a match in play come first (`hotOrder`), so they follow the live feed
   const scored = useMemo(() => (data || []).map((r) => {
     const match = matchOf(r);
@@ -455,34 +548,26 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         <StickyFilterBand>
           <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-            </Button>
+            <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter py-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="flex items-center gap-snug px-gutter py-snug" aria-label="Active filters">
               {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
               <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col">
           <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-            </Button>
+            <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (
-            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">
               {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
               <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </div>
       )}
@@ -498,14 +583,14 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
             />
           </div>
         ) : (
-          <>
-            <ul className="-mx-gutter lg:hidden">
-              {rows.map((r) => <PropRow key={`${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`} r={r} win={win} wl={wl} soFar={soFarOf(r)} out={r.out} hideMatch={!!teams} />)}
-            </ul>
-            <div className="hidden lg:block">
-              <PropTable rows={rows} win={win} onWin={(w) => update({ win: w })} bars={bars} soFarOf={soFarOf} outOf={(r) => lineNotIn(matchOf(r), asLine(r), identity)} />
-            </div>
-          </>
+          <PropLines
+            rows={rows}
+            win={win}
+            onWin={(w) => update({ win: w })}
+            bars={bars}
+            soFarOf={soFarOf}
+            outOf={(r) => lineNotIn(matchOf(r), asLine(r), identity)}
+          />
         )}
       </AnimatedHeight>
       {/* on a phone the rows come first and the tape follows them (it used to push the first prop below the fold) */}

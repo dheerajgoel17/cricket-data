@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 /** Header destinations. `ids` mark which `/docs/:id` topics light that group. */
 export const NAV_LINKS = [
   { title: "Foundations", detail: "Typography, colour, spacing, and motion.", to: "/docs/type", ids: ["type", "color", "space", "motion"] },
-  { title: "Components", detail: "Buttons, chips, tables, forms, and feedback.", to: "/docs/components", ids: ["components", "buttons", "chips", "feedback", "data", "forms", "icons"] },
+  { title: "Components", detail: "Buttons, chips, tables, forms, and feedback.", to: "/docs/components", ids: ["components", "buttons", "chips", "feedback", "data", "rows", "forms", "icons"] },
   { title: "Patterns", detail: "Research, filtering, and live data flows.", to: "/docs/patterns", ids: ["patterns", "platforms"] },
   { title: "Resources", detail: "Tokens, registry, and source modules.", to: "/docs/component-registry", ids: ["token-reference", "component-registry"] },
 ] as const;

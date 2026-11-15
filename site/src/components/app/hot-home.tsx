@@ -13,16 +13,15 @@ import { useData } from "@/lib/data";
 import { EmptyState } from "./empty-state";
 import { EMPTY_PHASE } from "./home-phase-bar";
 import { MatchChip } from "./fixture-card";
-import { OverviewRow } from "./match-fancy";
+import { OverviewRow } from "./fancy-lines";
+import { HomeMixDenseTable } from "./home-mix-table";
 import { PropRow, useHotRows } from "./hot-props";
 import { MarketTape } from "./market-tape";
 import { PillGroup } from "./pill-group";
-import { mixHomeRows } from "@/lib/hot-lines";
+import { HOME_TOP, mixHomeRows } from "@/lib/hot-lines";
 import { fancyRowPath } from "@/lib/fancy-path";
 import { lineHomePhase, phaseOf, type HomePhase } from "@/lib/home-phase";
 import { HomePropsSkeleton } from "./skeletons";
-
-const PER = 6; // mixed player + fancy rows in the selected fixture's card
 
 type MixItem =
   | { kind: "player"; key: string; live: boolean; edge: number | null; p: number; r: any }
@@ -30,7 +29,11 @@ type MixItem =
 
 type FxBlock = { f: any; items: MixItem[] };
 
-/** Home below the rail: market tape, fixture hashtags, then a flat mixed props list for the chosen match (main fixture first). */
+/**
+ * Home below the rail: market tape, fixture chips, then Top-`HOME_TOP` interleaved props + fancy.
+ * Compact scan list below `lg`; one dense mixed table from `lg` (not separate PropLines / FancyLines).
+ * Fixture pages keep full PropLines / FancyLines.
+ */
 export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const nav = useNavigate();
   const live = useLiveDoc();
@@ -63,13 +66,13 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
     const priced = fixtures.filter((f) => !f.noProps && (!phase || phaseOf(stateOf(f)) === phase));
     const out: FxBlock[] = [];
     for (const f of priced) {
+      const liveNow = stateOf(f) === "live";
       const players = props.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, f));
       const fancy = fancyById.get(f.id) || [];
-      const liveNow = stateOf(f) === "live";
       const items = mixHomeRows<MixItem>([
         ...players.map((r) => ({ kind: "player" as const, key: `p:${r.idx}:${r.stat}:${r.start}:${r.inn}`, live: liveNow, edge: r.edge ?? null, p: sideRate(r.l10.p, r.side) ?? 0, r })),
         ...fancy.map(({ r, f: fx }) => ({ kind: "fancy" as const, key: `f:${fx.id}:${r.id || r.key}:${r.inn || 0}`, live: liveNow, edge: r.edge ?? null, p: r.played ? r.hits / r.played : 0, r, f: fx })),
-      ], PER);
+      ], HOME_TOP);
       if (items.length) out.push({ f, items });
     }
     return out;
@@ -99,18 +102,28 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
             items={blocks.map(({ f }) => [f.id, <MatchChip key={f.id} f={f} />] as [string, React.ReactNode])}
           />
           {block ? (
-            <ul className="-mx-gutter">
-              {block.items.map((item) => item.kind === "player"
-                ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
-                : (
-                  <li key={item.key} className="border-t border-hairline">
-                    <OverviewRow
-                      r={item.r}
-                      onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
-                    />
-                  </li>
-                ))}
-            </ul>
+            <>
+              <ul className="-mx-gutter lg:hidden">
+                {block.items.map((item) => item.kind === "player"
+                  ? <PropRow key={item.key} r={item.r} win="l10" wl="L10" soFar={soFarOf(item.r)} out={false} hideMatch />
+                  : (
+                    <li key={item.key} className="border-t border-hairline">
+                      <OverviewRow
+                        r={item.r}
+                        onOpen={() => nav(fancyRowPath(item.f.id, item.r))}
+                      />
+                    </li>
+                  ))}
+              </ul>
+              <div className="hidden lg:block">
+                <HomeMixDenseTable
+                  items={block.items}
+                  soFarOf={soFarOf}
+                  outOf={outOf}
+                  onOpenFancy={(item) => nav(fancyRowPath(item.f.id, item.r))}
+                />
+              </div>
+            </>
           ) : null}
         </div>
       ) : (

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { TextInput as RNTextInput, type StyleProp, type TextStyle } from "react-native";
 import Animated, { Easing, useAnimatedProps, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { tuned } from "@/ui/text";
+import { FONT_SCALE_MAX } from "@/ui/platform";
 
 const AnimatedInput = Animated.createAnimatedComponent(RNTextInput);
 const flat = { padding: 0, margin: 0 } as const;
@@ -19,12 +20,12 @@ export function CountUp({ value, digits = 0, prefix = "", suffix = "", duration 
     return { text: t, defaultValue: t } as object;
   });
   return (
-    <AnimatedInput editable={false} pointerEvents="none" underlineColorAndroid="transparent" allowFontScaling={false} accessibilityLabel={`${prefix}${value.toFixed(digits)}${suffix}`} style={[flat, tuned(style)] as StyleProp<TextStyle>} animatedProps={props} />
+    <AnimatedInput editable={false} pointerEvents="none" underlineColorAndroid="transparent" maxFontSizeMultiplier={FONT_SCALE_MAX} accessibilityLabel={`${prefix}${value.toFixed(digits)}${suffix}`} style={[flat, tuned(style)] as StyleProp<TextStyle>} animatedProps={props} />
   );
 }
 
 /** A label whose text is a shared value (a chart's tooltip while a finger moves over it): changes without a React render. */
 export function ReText({ text, style }: { text: SharedValue<string>; style?: StyleProp<TextStyle> }) {
   const props = useAnimatedProps(() => ({ text: text.value, defaultValue: text.value }) as object);
-  return <AnimatedInput editable={false} pointerEvents="none" underlineColorAndroid="transparent" allowFontScaling={false} style={[flat, tuned(style)] as StyleProp<TextStyle>} animatedProps={props} />;
+  return <AnimatedInput editable={false} pointerEvents="none" underlineColorAndroid="transparent" maxFontSizeMultiplier={FONT_SCALE_MAX} style={[flat, tuned(style)] as StyleProp<TextStyle>} animatedProps={props} />;
 }

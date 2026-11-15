@@ -1,7 +1,7 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { useState } from "react";
-import Animated, { FadeIn, FadeInDown, ReduceMotion, useReducedMotion } from "react-native-reanimated";
-import { color, space } from "@/ui/tokens";
+import Animated, { FadeIn, FadeInDown, FadeOut, LinearTransition, ReduceMotion, useReducedMotion } from "react-native-reanimated";
+import { color, duration, space, spring } from "@/ui/tokens";
 import { renderSkeleton, type SkeletonShape } from "@/ui/skeletons";
 
 export { CardSkeleton, RowsSkeleton, Skeleton, SkeletonGroup } from "@/ui/skeletons";
@@ -13,7 +13,7 @@ const entrances = new Map<number, ReturnType<typeof FadeInDown.delay>>();
 /** How a card or section comes in on first paint: a short rise that springs to rest. */
 export const enter = (i = 0) => {
   const k = Math.min(i, 6);
-  if (!entrances.has(k)) entrances.set(k, FadeInDown.delay(k * 45).springify(420).dampingRatio(0.9).reduceMotion(ReduceMotion.System));
+  if (!entrances.has(k)) entrances.set(k, FadeInDown.delay(k * 45).springify(spring.enter.duration).dampingRatio(spring.enter.dampingRatio).reduceMotion(ReduceMotion.System));
   return entrances.get(k)!;
 };
 
@@ -79,8 +79,23 @@ export function Working({ label, fill, rows = 3, shape = "rows" }: { label: stri
 
 const styles = StyleSheet.create({
   dotBox: { width: 6, height: 6 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: color.destructive },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: color.miss },
   halo: { position: "absolute", left: 0, top: 0 },
   working: { alignSelf: "stretch", paddingVertical: space.stack },
   workingFill: { flex: 1, minHeight: 280 },
 });
+
+// built on first use (the layout presets are not in the test double of Reanimated)
+let reflow: ReturnType<typeof LinearTransition.duration> | undefined, leave: ReturnType<typeof FadeOut.duration> | undefined;
+/**
+ * A row in a short list whose order or membership changes (Saved, a market overview that re-sorts as prices move): when a sibling is added, removed or moves, this row glides to its new
+ * place (layout transition, UI thread, transform only) and a removed one fades out, instead of the list jumping. Not for virtualized lists (FlashList rows recycle): those keep their order
+ * changes instant. Static when the phone's reduce motion is on. Web twin: `Reflow` in `components/app/reflow.tsx`.
+ */
+export function Reflow({ style, children }: { style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
+  const calm = useReducedMotion();
+  if (calm) return <View style={style}>{children}</View>;
+  reflow ??= LinearTransition.duration(duration.base).reduceMotion(ReduceMotion.System);
+  leave ??= FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
+  return <Animated.View layout={reflow} exiting={leave} style={style}>{children}</Animated.View>;
+}

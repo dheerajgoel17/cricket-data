@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TABS } from "@/lib/tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, TAB_BAR_HEIGHT, type } from "@/ui/tokens";
+import { color, font, TAB_BAR_HEIGHT, type, t } from "@/ui/tokens";
 
 type Props = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
@@ -49,5 +49,5 @@ export function TabBar({ state, emitter, navigateToTab, insets }: Props) {
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", backgroundColor: color.background, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   tab: { flex: 1, minWidth: 0, height: TAB_BAR_HEIGHT, alignItems: "center", justifyContent: "center", gap: 2 },
-  label: { ...type.caption, fontFamily: font.medium, maxWidth: "100%" },
+  label: { ...t.captionLabel, maxWidth: "100%" },
 });

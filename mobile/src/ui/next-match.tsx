@@ -10,10 +10,10 @@ import { dayLabel, localTime } from "@/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { DataTable } from "@/ui/data-table";
-import { LiveDot } from "@/ui/motion";
+import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, num, numLg, radius, space, type, tonal, font } from "@/ui/tokens";
+import { cap, color, num, numLg, radius, space, type, font, fs, surface, t, d } from "@/ui/tokens";
 
 export type NextInfo = { match: string; start: string; competition: string; team?: string; opp: string; ground: string; known?: string; priced?: boolean; phase?: "upcoming" | "live" | "final" };
 
@@ -25,10 +25,10 @@ export function startText(iso: string, now = Date.now()) {
   return `${day === "Today" ? "" : `${day} `}${localTime(d)}`.trim();
 }
 
-/** A match's status beside a side's name: the start time while it is to come, a red pulsing LIVE while it is on, a muted COMPLETED once it is over (the site's `MatchStatus`). */
+/** A match's status beside a side's name (site MatchStatus / StatusLabel). */
 export function MatchStatus({ phase, start }: { phase: "upcoming" | "live" | "final"; start?: string }) {
-  if (phase === "live") return <View style={styles.statusRow}><LiveDot /><Text style={[styles.cap, { color: color.destructive }]}>Live</Text></View>;
-  if (phase === "final") return <Text style={styles.cap}>✓ Completed</Text>;
+  if (phase === "live") return <StatusLabel tone="live" surface="dot" />;
+  if (phase === "final") return <StatusLabel tone="muted" surface="plain">Completed</StatusLabel>;
   return <Text style={styles.when}>{start ? startText(start) : ""}</Text>;
 }
 
@@ -92,7 +92,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
         <View style={styles.lineRow}>
           <Text style={styles.lineText}>{sideLetter} {line} <Text style={styles.statLabel}>{statLabel}</Text></Text>
           {standing != null ? <StandingMark standing={standing} line={line} /> : null}
-          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...numLg, fontSize: 20, letterSpacing: -0.4, color: color.primary }}>{odds(best)}</Tick></View> : null}
+          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...numLg, fontSize: fs.metric, letterSpacing: -0.4, color: color.primary }}>{odds(best)}</Tick></View> : null}
         </View>
         {book ? (
           quotes.length ? (
@@ -132,25 +132,24 @@ export function NextFilters({ next, filters, onChange }: { next: NextInfo; filte
 }
 
 const styles = StyleSheet.create({
-  card: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
+  card: { ...surface.card, padding: space.stack, gap: space.snug },
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  when: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
+  when: { ...d.footnote, color: color["muted-foreground"] },
   teams: { flexDirection: "row", alignItems: "center", gap: space.snug, flexWrap: "wrap" },
   side: { flexDirection: "row", alignItems: "center", gap: space.tight, flexShrink: 1, maxWidth: "46%" },
   vs: { ...type.footnote, color: color["muted-foreground"] },
-  opp: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
+  opp: { ...t.bodyLabel, color: color.foreground, flexShrink: 1 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   ground: { ...type.callout, color: color["muted-foreground"] },
   block: { gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   lineRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  lineText: { ...type.body, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  lineText: { ...d.body, color: color.foreground },
   statLabel: { ...type.callout, color: color["muted-foreground"] },
   tiles: { flexDirection: "row", gap: space.snug },
-  tile: { flex: 1, minWidth: 0, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 14, padding: space.snug + 2, gap: 2 },
-  tileNum: { ...numLg, fontSize: 30, letterSpacing: -0.6, lineHeight: 34 },
-  tileSub: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  tile: { flex: 1, minWidth: 0, backgroundColor: color.tile, borderRadius: radius.card, padding: space.snug + 2, gap: 2 },
+  tileNum: { ...numLg, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 34 },
+  tileSub: { ...d.footnote, color: color["muted-foreground"] },
   noSample: { ...type.callout, color: color["muted-foreground"], paddingTop: space.tight },
   chartFilters: { ...type.footnote, color: color["muted-foreground"], ...cap },
 });

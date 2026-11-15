@@ -14,6 +14,8 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/icon-badge.tsx",
+      "mobile/src/ui/button.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
@@ -31,10 +33,14 @@
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/chips.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/fancy-row.tsx",
+      "mobile/src/ui/fixture-card.tsx",
       "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/match-chip.tsx",
       "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
@@ -61,6 +67,7 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
@@ -99,6 +106,9 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/round-button.tsx",
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/motion.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
@@ -132,11 +142,13 @@
       "Competitions"
     ],
     "dependencies": [
+      "mobile/src/ui/search-field.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
@@ -162,7 +174,8 @@
       "mobile/src/ui/match-fancy.tsx",
       "mobile/src/ui/match-header.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -175,7 +188,8 @@
     "dependencies": [
       "mobile/src/ui/ground-page.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -186,9 +200,11 @@
       "FixturePage"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/blur-bar.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/capsule.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/empty-state.tsx",
@@ -196,7 +212,6 @@
       "mobile/src/ui/grid-table.tsx",
       "mobile/src/ui/live-board.tsx",
       "mobile/src/ui/match-fancy.tsx",
-      "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/match-header.tsx",
       "mobile/src/ui/motion.tsx",
@@ -233,7 +248,8 @@
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
-      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tournament-stats.tsx",
       "mobile/src/ui/tab-fade.tsx"
@@ -271,6 +287,7 @@
       "mobile/src/ui/side-book.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/tab-fade.tsx",
       "mobile/src/ui/window-pills.tsx"
     ]
@@ -283,12 +300,14 @@
       "Search"
     ],
     "dependencies": [
+      "mobile/src/ui/search-field.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
   },
@@ -307,9 +326,11 @@
       "mobile/src/ui/grid-table.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
-      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
+      "mobile/src/ui/blur-bar.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
   },
@@ -323,7 +344,8 @@
     "dependencies": [
       "mobile/src/ui/ground-page.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -428,6 +450,19 @@
       "BrandMark"
     ],
     "dependencies": [
+      "mobile/src/ui/round-button.tsx",
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/button.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Button"
+    ],
+    "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -440,6 +475,7 @@
       "CapsuleTabs"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -467,9 +503,11 @@
       "ActiveChip",
       "Chips",
       "ChoiceChip",
-      "ChoiceRow"
+      "ChoiceRow",
+      "FilterButton"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -521,6 +559,7 @@
       "EmptyState"
     ],
     "dependencies": [
+      "mobile/src/ui/icon-badge.tsx",
       "mobile/src/ui/text.tsx"
     ]
   },
@@ -538,6 +577,7 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/collapsible.tsx",
       "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
       "mobile/src/ui/tick.tsx"
@@ -548,14 +588,17 @@
     "platform": "native",
     "route": false,
     "exports": [
-      "FixtureCard"
+      "FixtureCard",
+      "LiveScore"
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/team-badge.tsx"
+      "mobile/src/ui/status-label.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tick.tsx"
     ]
   },
   {
@@ -571,7 +614,11 @@
       "TrendList"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/h-scroll.tsx",
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/capsule.tsx",
@@ -598,11 +645,22 @@
       "mobile/src/ui/mini-bars.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/press.tsx",
-      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/team-badge.tsx",
-      "mobile/src/ui/text.tsx"
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/bleed.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/h-scroll.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "HScroll"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/hot-home.tsx",
@@ -622,6 +680,15 @@
       "mobile/src/ui/skeletons.tsx",
       "mobile/src/ui/prop-row.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/icon-badge.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "IconBadge"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/icons.tsx",
@@ -705,6 +772,7 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "InPlayBadge",
       "LineProgress",
       "LiveBadge",
       "LiveOpened",
@@ -712,6 +780,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/text.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx"
     ]
   },
@@ -726,9 +795,8 @@
     ],
     "dependencies": [
       "mobile/src/ui/accordion.tsx",
-      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/bleed.tsx",
       "mobile/src/ui/press.tsx",
-      "mobile/src/ui/recent-form.tsx",
       "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -741,9 +809,7 @@
       "LiveMarketRow"
     ],
     "dependencies": [
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/book-badge.tsx",
-      "mobile/src/ui/live-bits.tsx"
+      "mobile/src/ui/fancy-row.tsx"
     ]
   },
   {
@@ -783,6 +849,7 @@
       "MatchChips"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/team-badge.tsx"
@@ -796,7 +863,12 @@
       "MatchFancy"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/h-scroll.tsx",
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/charts.tsx",
@@ -822,8 +894,9 @@
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/team-badge.tsx"
+      "mobile/src/ui/status-label.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tick.tsx"
     ]
   },
   {
@@ -831,6 +904,7 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "MINI",
       "MiniBars"
     ],
     "dependencies": []
@@ -844,6 +918,7 @@
       "CardSkeleton",
       "LiveDot",
       "Pulse",
+      "Reflow",
       "Rise",
       "RowsSkeleton",
       "Skeleton",
@@ -869,10 +944,20 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/data-table.tsx",
-      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx",
       "mobile/src/ui/team-badge.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/page-atmosphere.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "EntityHeroWash",
+      "PageAtmosphere"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/page-header.tsx",
@@ -883,7 +968,7 @@
       "RoundButton"
     ],
     "dependencies": [
-      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx"
     ]
@@ -896,6 +981,7 @@
       "PhaseBar"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
@@ -931,14 +1017,11 @@
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/book-badge.tsx",
-      "mobile/src/ui/book-table.tsx",
       "mobile/src/ui/mini-bars.tsx",
       "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
-      "mobile/src/ui/live-spot.tsx",
-      "mobile/src/ui/star.tsx",
       "mobile/src/ui/tick.tsx"
     ]
   },
@@ -959,6 +1042,27 @@
     ]
   },
   {
+    "path": "mobile/src/ui/result-stamp.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ResultStamp"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "mobile/src/ui/round-button.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ROUND",
+      "RoundButton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
     "path": "mobile/src/ui/screener-filters.tsx",
     "platform": "native",
     "route": false,
@@ -966,20 +1070,23 @@
       "ScreenerFilters"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/accordion.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
   },
   {
-    "path": "mobile/src/ui/segmented.ios.tsx",
-    "platform": "ios",
+    "path": "mobile/src/ui/search-field.tsx",
+    "platform": "native",
     "route": false,
     "exports": [
-      "Segmented"
+      "SearchField"
     ],
     "dependencies": [
-      "mobile/src/ui/segmented.tsx"
+      "mobile/src/ui/text.tsx"
     ]
   },
   {
@@ -992,6 +1099,17 @@
     "dependencies": [
       "mobile/src/ui/text.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/sheet.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Grabber",
+      "Sheet",
+      "SheetBackdrop"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/side-book.tsx",
@@ -1014,6 +1132,8 @@
       "SignInSheet"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
@@ -1051,6 +1171,18 @@
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/status-label.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "StatusLabel"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/motion.tsx"
     ]
   },
   {
@@ -1229,9 +1361,12 @@
     "route": false,
     "exports": [
       "ActiveChip",
-      "Chip"
+      "Chip",
+      "FilterButton"
     ],
-    "dependencies": []
+    "dependencies": [
+      "site/src/components/ui/button.tsx"
+    ]
   },
   {
     "path": "site/src/components/app/empty-state.tsx",
@@ -1278,6 +1413,28 @@
     ]
   },
   {
+    "path": "site/src/components/app/fancy-lines.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "CompactFancyItem",
+      "FancyBooks",
+      "FancyGround",
+      "FancyHitRate",
+      "FancyLineMeta",
+      "FancyLines",
+      "OverviewRow"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/result-stamp.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
     "path": "site/src/components/app/fixture-card.tsx",
     "platform": "web",
     "route": false,
@@ -1292,7 +1449,9 @@
       "site/src/components/ui/avatar.tsx",
       "site/src/components/ui/badge.tsx",
       "site/src/components/ui/card.tsx",
+      "site/src/components/ui/skeleton.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/tick.tsx"
     ]
   },
@@ -1306,6 +1465,7 @@
       "VenueGroundPage"
     ],
     "dependencies": [
+      "site/src/components/app/chip.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/popover.tsx",
       "site/src/components/app/chip.tsx",
@@ -1341,6 +1501,8 @@
       "GridLineSheet"
     ],
     "dependencies": [
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/sheet.tsx",
       "site/src/components/app/chip.tsx",
@@ -1380,6 +1542,32 @@
     ]
   },
   {
+    "path": "site/src/components/app/hero-wash.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HeroWash"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/home-mix-table.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HomeMixDenseTable"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/fancy-lines.tsx",
+      "site/src/components/app/hot-props.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/portrait.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
     "path": "site/src/components/app/home-phase-bar.tsx",
     "platform": "web",
     "route": false,
@@ -1403,7 +1591,8 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/app/fixture-card.tsx",
-      "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/fancy-lines.tsx",
+      "site/src/components/app/home-mix-table.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/market-tape.tsx",
       "site/src/components/app/pill-group.tsx",
@@ -1417,10 +1606,18 @@
     "exports": [
       "BookQuotes",
       "HotProps",
+      "PropBarsSlot",
+      "PropLineIdentity",
+      "PropLineMeta",
+      "PropLines",
+      "PropProgress",
       "PropRow",
-      "PropTable"
+      "PropTable",
+      "RateCell"
     ],
     "dependencies": [
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/market-tape.tsx",
@@ -1429,12 +1626,12 @@
       "site/src/components/app/page.tsx",
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/ui/button.tsx",
-      "site/src/components/ui/badge.tsx",
       "site/src/components/app/book-badge.tsx",
       "site/src/components/app/book-table.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/result-stamp.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/chip.tsx",
       "site/src/components/app/screener-filters.tsx",
@@ -1481,7 +1678,8 @@
     ],
     "dependencies": [
       "site/src/components/ui/accordion.tsx",
-      "site/src/components/app/pill-group.tsx"
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/page.tsx"
     ]
   },
   {
@@ -1501,8 +1699,7 @@
       "LiveMarketRow"
     ],
     "dependencies": [
-      "site/src/components/app/book-badge.tsx",
-      "site/src/components/app/live-spot.tsx"
+      "site/src/components/app/fancy-lines.tsx"
     ]
   },
   {
@@ -1511,6 +1708,7 @@
     "route": false,
     "exports": [
       "BatterSpot",
+      "InPlayBadge",
       "LineProgress",
       "LiveBadge",
       "LiveOpened",
@@ -1518,6 +1716,7 @@
       "TeamSpot"
     ],
     "dependencies": [
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/tick.tsx"
     ]
   },
@@ -1529,6 +1728,7 @@
       "MarketTape"
     ],
     "dependencies": [
+      "site/src/components/ui/popover.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/tick.tsx",
       "site/src/components/app/badges.tsx"
@@ -1539,12 +1739,15 @@
     "platform": "web",
     "route": false,
     "exports": [
+      "FancyLines",
       "MATCH",
       "MatchFancy",
       "OverviewRow",
       "TEAM"
     ],
     "dependencies": [
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/item.tsx",
       "site/src/components/ui/popover.tsx",
@@ -1563,11 +1766,25 @@
       "site/src/components/app/live-spot.tsx",
       "site/src/components/app/live-markets.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/fancy-lines.tsx",
       "site/src/components/app/ad-slot.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/match-scoreboard.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MatchScoreboard"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
+      "site/src/components/app/tick.tsx"
     ]
   },
   {
@@ -1577,7 +1794,9 @@
     "exports": [
       "MatchStatus"
     ],
-    "dependencies": []
+    "dependencies": [
+      "site/src/components/app/status-label.tsx"
+    ]
   },
   {
     "path": "site/src/components/app/mini-bars.tsx",
@@ -1585,7 +1804,11 @@
     "route": false,
     "exports": [
       "LABELLED",
+      "MINI",
       "MiniBars",
+      "MiniBarsSlot",
+      "SCAN",
+      "ScanEdge",
       "ValueBars"
     ],
     "dependencies": []
@@ -1727,6 +1950,25 @@
     ]
   },
   {
+    "path": "site/src/components/app/reflow.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ReflowGroup",
+      "ReflowItem"
+    ],
+    "dependencies": []
+  },
+  {
+    "path": "site/src/components/app/result-stamp.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ResultStamp"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "site/src/components/app/result.tsx",
     "platform": "web",
     "route": false,
@@ -1760,6 +2002,15 @@
       "site/src/components/ui/switch.tsx",
       "site/src/components/app/chip.tsx"
     ]
+  },
+  {
+    "path": "site/src/components/app/scroll-row.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ScrollRow"
+    ],
+    "dependencies": []
   },
   {
     "path": "site/src/components/app/sign-in-sheet.tsx",
@@ -1821,6 +2072,15 @@
     "dependencies": [
       "site/src/components/app/ad-slot.tsx"
     ]
+  },
+  {
+    "path": "site/src/components/app/status-label.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "StatusLabel"
+    ],
+    "dependencies": []
   },
   {
     "path": "site/src/components/app/tick.tsx",
@@ -2393,8 +2653,11 @@
       "site/src/components/app/chip.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/forms.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/line-ladder.tsx",
+      "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/note.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/chart.tsx",
       "site/src/components/app/page.tsx",
@@ -2428,6 +2691,7 @@
       "site/src/components/app/grid.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/live-board.tsx",
       "site/src/components/app/recent-form.tsx",
       "site/src/components/app/live-feed.tsx",
@@ -2502,9 +2766,11 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/ad-slot.tsx",
-      "site/src/components/app/book-table.tsx",
+      "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/pill-group.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/page.tsx"
     ]
@@ -2524,6 +2790,7 @@
       "site/src/components/ui/input.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/entity-hero.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/pill-tabs.tsx",
       "site/src/components/app/grid.tsx",
       "site/src/components/app/badges.tsx",
@@ -2545,6 +2812,7 @@
       "PlayerPage"
     ],
     "dependencies": [
+      "site/src/components/app/chip.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/input.tsx",
       "site/src/components/ui/sheet.tsx",
@@ -2555,6 +2823,7 @@
       "site/src/components/app/forms.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/chart.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/star.tsx",
@@ -2581,6 +2850,7 @@
       "SavedPage"
     ],
     "dependencies": [
+      "site/src/components/app/reflow.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/player-name.tsx",

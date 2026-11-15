@@ -11,7 +11,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens live in packages/tokens/tokens.json (true-black canvas, accent #27DA8E); html.dark stays on so shadcn dark: variants match. Role names (text-body, gap-stack, control, ...) are shared with future native apps. */
+/* Design tokens live in packages/tokens/tokens.json (elevated canvas #0C0C0E, accent #27DA8E); html.dark stays on so shadcn dark: variants match. Role names (text-body, gap-stack, control, ...) are shared with future native apps. */
 :root {
   --ion-background-color: var(--background);
   --ion-text-color: var(--foreground);
@@ -53,6 +53,9 @@
   --text-metric: var(--fs-metric);
   --text-metric--line-height: var(--fs-metric-lh);
   --text-metric--letter-spacing: var(--fs-metric-ls);
+  --text-figure: var(--fs-figure);
+  --text-figure--line-height: var(--fs-figure-lh);
+  --text-figure--letter-spacing: var(--fs-figure-ls);
   --text-stat: var(--fs-stat);
   --text-stat--line-height: var(--fs-stat-lh);
   --text-stat--letter-spacing: var(--fs-stat-ls);
@@ -72,6 +75,8 @@
 }
 
 /* Type — Satoshi for names/UI; Barlow Condensed for scoreboard figures and uppercase rail labels. */
+/* Edge fade for scrolling rows: --fl / --fr are set by useScrollFade (0 = no fade at that edge). */
+@utility scroll-fade-x { mask-image: linear-gradient(to right, transparent 0, #000 var(--fl, 0px), #000 calc(100% - var(--fr, 0px)), transparent 100%); }
 @utility label-cap { font-family: var(--font-condensed); text-transform: uppercase; letter-spacing: 0.04em; font-weight: var(--weight-label); line-height: 1.2; }
 @utility num-cond { font-family: var(--font-condensed); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; font-weight: var(--weight-editorial); }
 

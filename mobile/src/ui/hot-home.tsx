@@ -12,7 +12,7 @@ import { MarketTape } from "@/ui/market-tape";
 import { SkeletonGroup, Working } from "@/ui/motion";
 import { TapeSkeleton } from "@/ui/skeletons";
 import { PropRow } from "@/ui/prop-row";
-import { color, space, type } from "@/ui/tokens";
+import { color, space, type, rhythm } from "@/ui/tokens";
 
 /** Home below the match rail: market tape, fixture hashtags, mixed props for the chosen match. */
 export function HotHome({ phase }: { phase: HomePhase }) {
@@ -69,9 +69,9 @@ export function HotHomeSkeleton() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: space.group, paddingTop: space.group },
+  wrap: { gap: rhythm.between, paddingTop: rhythm.top },
   pad: { paddingHorizontal: space.gutter },
-  body: { gap: space.stack },
+  body: { gap: rhythm.between },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  headTitle: { ...type.title, color: color.foreground },
+  headTitle: { ...type.heading, color: color.foreground },
 });

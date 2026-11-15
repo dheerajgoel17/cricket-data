@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useSharedValue } from "react-native-reanimated";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +28,8 @@ import { useHotView } from "@/lib/use-hot";
 import { useNow } from "@/lib/use-now";
 import { useLater } from "@/lib/use-later";
 import { useStore } from "@/lib/use-store";
-import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
+import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
@@ -36,7 +38,6 @@ import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchAccordions, ScorecardCard } from "@/ui/live-board";
 import { MatchFancy } from "@/ui/match-fancy";
-import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { MatchHeader } from "@/ui/match-header";
 import { enter, Working } from "@/ui/motion";
@@ -44,7 +45,7 @@ import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
-import { color, font, radius, space, type } from "@/ui/tokens";
+import { color, font, radius, space, type, rhythm, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** A match, as on the site's phone page: the match flat on the page (state, sides, kick-off with a live countdown or the score, the pair at the crease, ball by ball, the scorecard), then the page's sections as chips (Props / Match Fancy / Grid / Custom line) with the open one's stat chips and rows under them. */
@@ -89,6 +90,9 @@ export default function FixturePage() {
 
   const target = useRef<ComponentRef<typeof View>>(null);
   const [barH, setBarH] = useState(0);
+  const { onScroll, y } = useCollapseOnScroll();
+  const scrimThreshold = useSharedValue(56);
+  const barScrim = useChromeScrim(y, scrimThreshold);
   const share = () => {
     if (!f) return;
     const url = shareFixtureUrl(SITE_URL, f.id);
@@ -99,9 +103,9 @@ export default function FixturePage() {
   const bodyReady = useLater(!!f && !fxLoading);
 
   return (
-    <View style={styles.root}>
+    <PageAtmosphere>
       <BlurTargetView ref={target} style={styles.root}>
-        <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
+        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
           {fxLoading ? (
             <MatchHeaderSkeleton />
           ) : !f || !item ? (
@@ -109,18 +113,30 @@ export default function FixturePage() {
               <EmptyState
                 title="Fixture gone"
                 body="That match is no longer in the schedule."
-                action={<Press onPress={goBack} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Back to fixtures</Text></Press>}
+                action={<Button variant="secondary" size="sm" label="Back to fixtures" onPress={goBack} />}
               />
             </View>
           ) : (
             <>
               {item.live?.status === "live" ? (
-                <View style={styles.pad}><ScorecardCard match={item.live} teams={known} header={<MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />} /></View>
+                <View style={styles.scoreShell}>
+                  <ScorecardCard
+                    match={item.live}
+                    teams={known}
+                    header={<MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />}
+                  />
+                </View>
               ) : (
-                <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
+                <Animated.View entering={enter(0)} style={styles.scoreShell}>
+                  <MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />
+                  {bodyReady && f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} /> : null}
+                </Animated.View>
               )}
-              {!bodyReady ? <Working label="Loading…" rows={4} /> : f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
-              {bodyReady && f.fmt !== "FC" ? <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View> : null}
+              {!bodyReady ? <Working label="Loading…" rows={4} /> : null}
+              {/* CapsuleTabs scroll with content — sticky under BlurBar hides the band on native. */}
+              {bodyReady && f.fmt !== "FC" ? (
+                <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View>
+              ) : null}
               {!bodyReady ? null : f.fmt === "FC" ? (
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
@@ -167,28 +183,39 @@ export default function FixturePage() {
         </Animated.ScrollView>
       </BlurTargetView>
 
-      <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
-        <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
+      <View
+        style={styles.bar}
+        onLayout={(e) => {
+          const h = Math.round(e.nativeEvent.layout.height);
+          setBarH((prev) => Math.max(prev, h));
+          scrimThreshold.value = Math.max(48, h);
+        }}
+      >
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
+        <BlurBar merge blurTarget={target} style={{ paddingTop: inset.top }}>
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
+  /** Web twin: `-mx-gutter … bg-card border-b` — fill + bottom rule both full width. */
+  scoreShell: {
+    backgroundColor: color.card,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: color.hairline,
+  },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  // the page's sections as chips under the match (Props / Match Fancy / Grid / Custom line), then the stat chips of the open one
-  sections: { paddingTop: space.stack },
+  sections: { paddingTop: rhythm.top },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  gridTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  gridTitle: { ...t.bodyLabel, color: color.foreground },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingTop: space.group, paddingBottom: space.snug },
-  title: { ...type.title, color: color.foreground },
+  title: { ...type.heading, color: color.foreground },
   empty: { ...type.callout, color: color["muted-foreground"] },
-  button: { backgroundColor: color.secondary, borderRadius: radius.chip, paddingHorizontal: space.stack, height: 36, alignItems: "center", justifyContent: "center" },
-  buttonText: { ...type.callout, color: color.foreground },
 });

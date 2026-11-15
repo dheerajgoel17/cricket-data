@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
 import { EmptyState } from "@/ui/empty-state";
 import { ChevronRight } from "@/ui/icons";
-import { cap, color, font, radius, space, tint, type, tonal } from "@/ui/tokens";
+import { cap, color, font, radius, space, tint, type, surface, t, d } from "@/ui/tokens";
 
 /** A titled group of rows in a rounded container (the site's Saved sections): small-caps title with its count, then the rows, or an EmptyState when there are none. */
 export function Section({ title, count, empty, emptyTitle, children }: { title: string; count?: number; empty?: string; emptyTitle?: string; children?: ReactNode }) {
@@ -19,7 +19,7 @@ export function Section({ title, count, empty, emptyTitle, children }: { title: 
 }
 
 /** One row: something at the left (a badge), the title and a line under it, something at the right (a value, a button) and a chevron when it opens something. */
-export function ListRow({ left, title, sub, right, onPress, first, chevron = true, label }: { left?: ReactNode; title: string; sub?: ReactNode; right?: ReactNode; onPress?: () => void; first?: boolean; chevron?: boolean; label?: string }) {
+export function ListRow({ left, title, sub, right, onPress, first, chevron = true, label, flat }: { left?: ReactNode; title: string; sub?: ReactNode; right?: ReactNode; onPress?: () => void; first?: boolean; chevron?: boolean; /** A row in a flat, full-bleed page list (Competitions): inset by the page gutter, not by a card's padding. */ flat?: boolean; label?: string }) {
   const body = (
     <>
       {left}
@@ -31,9 +31,9 @@ export function ListRow({ left, title, sub, right, onPress, first, chevron = tru
       {onPress && chevron ? <ChevronRight color={color["muted-foreground"]} /> : null}
     </>
   );
-  if (!onPress) return <View style={[styles.row, !first && styles.sep]}>{body}</View>;
+  if (!onPress) return <View style={[styles.row, flat && styles.flat, !first && styles.sep]}>{body}</View>;
   return (
-    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, !first && styles.sep, pressed && { backgroundColor: tint.row }]}>
+    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, flat && styles.flat, !first && styles.sep, pressed && { backgroundColor: tint.row }]}>
       {body}
     </Press>
   );
@@ -43,11 +43,12 @@ const styles = StyleSheet.create({
   section: { gap: space.snug },
   head: { flexDirection: "row", alignItems: "center", gap: space.snug },
   title: { ...type.footnote, ...cap, color: color["muted-foreground"] },
-  count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
+  count: { ...d.footnote, color: color["muted-foreground"] },
+  box: { ...surface.card, overflow: "hidden" },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug },
+  flat: { paddingHorizontal: space.gutter },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   text: { flex: 1, minWidth: 0, gap: 1 },
-  rowTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  rowTitle: { ...t.bodyLabel, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
 });

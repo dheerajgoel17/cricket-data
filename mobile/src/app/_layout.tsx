@@ -53,7 +53,7 @@ export default function RootLayout() {
   // the system splash is plain black and is taken down by `AnimatedSplash` as it draws; the app is mounted behind it as soon as its fonts are in, so its data loads while the mark is on screen
   // (one parent for both, so the splash is never remounted, which would restart its drawing)
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: ready ? color.background : "#000000" }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: color.background }}>
     {ready ? (<WebFrame>
     <SafeAreaProvider>
       <QueryClientProvider client={client}>

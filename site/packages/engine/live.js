@@ -369,8 +369,44 @@ export function strikeRate(runs, balls) {
   return Math.round((runs / balls) * 10000) / 100;
 }
 
+/**
+ * Broadcast-style ball chip from Source A overinfo ("nb", "1lb", "wd", "W", "4").
+ * Extras become WD / NB / LB / B / PEN with an optional run prefix (1LB, 2NB).
+ */
+export function formatBall(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (/^w(icket|kt)?$/i.test(s)) return "W";
+  const done = s.match(/^(\d*)(WD|NB|LB|B|PEN|W)$/i);
+  if (done) return `${done[1]}${done[2].toUpperCase()}`;
+  const m = s.match(/^(\d*)\s*[-.]?\s*(wd|wide|nb|no[\s-]?balls?|lb|leg[\s-]?byes?|b|byes?|pen(?:alty)?)$/i);
+  if (m) {
+    const n = m[1] || "";
+    const kind = m[2].toLowerCase();
+    const tag = /^(wd|wide)$/.test(kind) ? "WD"
+      : /^(nb|no)/.test(kind) ? "NB"
+      : /^(lb|leg)/.test(kind) ? "LB"
+      : /^(b|bye)/.test(kind) ? "B"
+      : "PEN";
+    return `${n}${tag}`;
+  }
+  return s;
+}
+
 function overBalls(over) {
-  return (over?.overinfo || []).map((x) => String(x || "").trim()).filter(Boolean);
+  return (over?.overinfo || []).map((x) => formatBall(x)).filter(Boolean);
+}
+
+/** Balls in the over in progress (last group / thisOver) — not a flat “last N” across overs. */
+export function ongoingOverBalls(matchOrBoard) {
+  const thisOver = matchOrBoard?.thisOver;
+  if (Array.isArray(thisOver) && thisOver.length) return thisOver.map(formatBall);
+  const overs = matchOrBoard?.overs;
+  if (Array.isArray(overs) && overs.length) {
+    const last = overs[overs.length - 1];
+    return (last?.balls || []).map(formatBall);
+  }
+  return [];
 }
 
 /** Over number from Source A's `over: "Over 17"` (or a numeric `n`). */
@@ -786,6 +822,37 @@ export function liveForFixture(doc, fixture) {
   return fallback;
 }
 
+/** Team totals present (board supplement or Source A card). */
+export function teamTotalsPresent(match) {
+  return (match?.teams || []).some((t) => t?.runs != null || String(t?.display || "").trim()) || hasCard(match);
+}
+
+/**
+ * Merge hourly board-score rows into a /api/live body for priced gaps Source A did not score.
+ * Source A wins when it already has team totals; board rows only fill holes (never replace).
+ */
+export function mergeBoardLive(liveDoc, boardDoc) {
+  const live = liveDoc && typeof liveDoc === "object" ? liveDoc : { matches: [] };
+  const board = boardDoc?.matches || [];
+  if (!board.length) return live;
+  const out = [...(live.matches || [])];
+  for (const b of board) {
+    const names = (b.teams || []).map((x) => teamKey(x.name)).filter(Boolean);
+    if (names.length < 2 || !teamTotalsPresent(b)) continue;
+    const bt = b.start ? Date.parse(b.start) : NaN;
+    const covered = out.some((m) => {
+      const mn = (m.teams || []).map((x) => teamKey(x.name));
+      if (!(names.every((k) => mn.includes(k)))) return false;
+      if (!sameFmt(b.fmt, m.fmt)) return false;
+      const mt = m.start ? Date.parse(m.start) : NaN;
+      if (Number.isFinite(bt) && Number.isFinite(mt) && Math.abs(mt - bt) >= sameMatchWindowFor(b.fmt, m.fmt)) return false;
+      return teamTotalsPresent(m);
+    });
+    if (!covered) out.push({ ...b, source: b.source || "board" });
+  }
+  return { ...live, matches: out, ...(boardDoc?.generated_at_utc ? { boardAsOf: boardDoc.generated_at_utc } : {}) };
+}
+
 export function teamScore(match, teamName) {
   const k = teamKey(teamName);
   return (match?.teams || []).find((t) => teamKey(t.name) === k || teamKey(t.abbr) === k) || null;
@@ -958,9 +1025,18 @@ export function liveBoard(match) {
     partnership: livePartnership(match, bat, falls),
     crr: Number.isFinite(match.crr) ? match.crr : null,
     rrr: Number.isFinite(match.rrr) ? match.rrr : null,
-    thisOver: Array.isArray(match.thisOver) ? match.thisOver : [],
+    thisOver: Array.isArray(match.thisOver) ? match.thisOver.map(formatBall) : [],
     overs,
   };
+}
+
+/** True when this player is on now: not-out at the crease, or the current bowler. Used for the Live badge on prop rows (not for in-play priced lines). */
+export function onNow(match, name) {
+  if (!match || !name) return false;
+  const board = liveBoard(match);
+  if (!board) return false;
+  if ((board.batters || []).some((p) => namesMatch(p.name, name))) return true;
+  return !!(board.bowler && namesMatch(board.bowler.name, name));
 }
 
 const STAT_FIELD = { runs: "runs", balls: "balls", fours: "fours", sixes: "sixes", wickets: "wickets", runs_conceded: "conceded", balls_bowled: "ballsBowled" };

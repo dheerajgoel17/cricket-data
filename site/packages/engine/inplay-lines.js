@@ -33,6 +33,30 @@ const OVER_RANGE = /\b(?:first|1st|opening)\s+\d+\s+overs?\b|\bovers?\s+\d+\s*-\
 /** Does an over / under market over a stretch of overs belong on the site (the others are dropped)? */
 export const keepLiveOu = (market) => OVER_RANGE.test(String(market || "")) && !NOT_SETTLEABLE.test(String(market || ""));
 
+/**
+ * Map a live OU market name onto a session key we can score (`overs_N`, optional side + innings).
+ * `sides` are the fixture's two team names. Null when the name is not a stretch-of-overs market.
+ */
+export function parseLiveOu(market, sides = []) {
+  const s = String(market || "");
+  if (!keepLiveOu(s)) return null;
+  let n = 0, m;
+  if (/\bpowerplay\b/i.test(s)) n = 6;
+  else if ((m = /(?:first|1st|opening)\s+(\d+)\s+overs?/i.exec(s))) n = +m[1];
+  else if ((m = /overs?\s+(\d+)\s*-\s*(\d+)/i.exec(s))) n = +m[2];
+  else if ((m = /(\d+)\s*-\s*(\d+)\s+overs?/i.exec(s))) n = +m[2];
+  else if ((m = /\b(\d+)\s*-\s*(\d+)\s+over\s+runs\b/i.exec(s))) n = +m[2];
+  else if ((m = /\b(\d+)\s+overs?\s+(?:runs?|session)\b/i.exec(s))) n = +m[1];
+  else if ((m = /\b(\d+)\s+over\s+runs\b/i.exec(s))) n = +m[1];
+  if (!(n > 0 && n <= 100)) return null;
+  let inn = 0;
+  if (/\b2nd\s+inn/i.test(s) || /\binnings\s*[:\s#-]*2\b/i.test(s)) inn = 2;
+  else if (/\b1st\s+inn/i.test(s) || /\binnings\s*[:\s#-]*1\b/i.test(s)) inn = 1;
+  const lower = s.toLowerCase();
+  const team = (sides || []).find((t) => t && lower.includes(String(t).toLowerCase())) || null;
+  return { key: `overs_${n}`, n, team, inn };
+}
+
 const MILESTONE = /milestone|to score (?:a |an |at least )?(?:\d+|fifty|half[- ]?century|hundred|century)|\b\d+\+\s*runs?\b|\b(?:half[- ]?century|century|fifty|hundred)\b/i;
 const NOT_PLAYER_MILESTONE = /most runs|top (?:bat|bowl)|team|partnership|fastest|highest|first (?:wicket|innings)|total/i;
 const rungOf = (s) => {
@@ -142,20 +166,21 @@ function openedOf(entries) {
 }
 
 /**
- * The lines data (`{ lines, fancy }`, what the tables read) with the live lines of started matches added, so the existing tables show them with their own history figures and no table of their own. Live lines are ADDED beside the pre-match ones, never in place of them (the pre-match line is the bet we track and settle):
- * - a batter's innings-runs line becomes a `lines` entry (stat "runs", the book's name, `live: true` on its quote, `opened` the pre-match line nearest evens, else, for a batter nobody priced before the start, `first`: where the live line first stood, stamped by `stampFirst`);
- * - a side's innings-total line becomes a `fancy` entry (`team_total_runs`, its `inn`, `live: true`);
+ * The lines data (`{ lines, fancy }`, what the tables read) with live lines folded in **only when that market was not priced before the start** (a debutant, a 2nd innings nobody listed, a milestone rung with no pre-match line). If the books already offered the market pre-match, the live price stays off the tables (still collected by the snapshot / in-play log for internal tracking); the pre-match row is what the UI shows and settles:
+ * - a batter's innings-runs line with no pre-match runs line in that scope becomes a `lines` entry (`live: true`, `opened` from `first` via `stampFirst`);
+ * - a side's innings-total with no pre-match `team_total_runs` for that side and innings becomes a `fancy` entry (`live: true`);
+ * - a milestone at a rung with no pre-match line at that rung becomes a props row; a rung that was priced stays pre-match only;
  * - every other line (over / under or pick), and a batter who cannot be linked, goes to `live`: `[{ home, away, start_utc, fmt, markets }]`, shown as live rows.
- * `resolve(name, [home, away])` links a book's player name to `{ pid, name, team }` (or null). A Test's "Innings Runs" is the batter's current innings, not the match: `innOf(team, [home, away])` says which of his side's innings that is (1 or 2, or null when the live match is not known), so the live line is his 1st / 2nd innings line (`inn`) and `opened` comes from that scope's pre-match lines only. While a batter has pre-match lines in that scope, the live line is added only once his runs so far (`soFarOf(name, [home, away])`, null when unknown) are past the main one (the line nearest evens, `openedOf`: a stray high line cannot hold it back). A batter with no pre-match line in that scope (a debutant nobody priced, a 2nd innings) shows the live line at once. The same holds for a batter's milestone at a rung he was priced at before the start (added once his runs are past the rung) and, with `teamRunsOf(team, inn, [home, away], fmt)`, for a side's innings total (added once the side's runs in that innings are past its main pre-match line). With no callback the live line is always added. A match the books never priced before it started (no entry in `doc`) takes its fixture from `fixtures`. Returns `doc` itself when there is nothing live.
+ * `resolve(name, [home, away])` links a book's player name to `{ pid, name, team }` (or null). A Test's "Innings Runs" is the batter's current innings: `innOf(team, [home, away])` is 1 or 2. `soFarOf` / `teamRunsOf` are kept for callers but no longer gate what is shown. A match the books never priced before it started takes its fixture from `fixtures`. Returns `doc` itself when there is nothing live.
  * @param {any} doc
  * @param {any} inplay
  * @param {any} [resolve]
  * @param {any[]} [fixtures]
  * @param {((team: string, sides: string[]) => number | null) | null} [innOf]
- * @param {((name: string, sides: string[]) => number | null) | null} [soFarOf]
- * @param {((team: string, inn: number, sides: string[], fmt: string) => number | null) | null} [teamRunsOf]
+ * @param {((name: string, sides: string[]) => number | null) | null} [_soFarOf]
+ * @param {((team: string, inn: number, sides: string[], fmt: string) => number | null) | null} [_teamRunsOf]
  */
-export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soFarOf = null, teamRunsOf = null) {
+export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, _soFarOf = null, _teamRunsOf = null) {
   const pairs = new Map();
   const pairOf = (row) => {
     if (!pairs.has(row)) pairs.set(row, matchPair(row));
@@ -189,11 +214,8 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
         if (who?.pid) {
           const inn = innsOf(who.team);
           const pre = lines.filter((x) => pairOf(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && !x.books?.every((b) => b.live));
-          if (pre.length && soFarOf) {
-            const runs = soFarOf(who.name || l.player, [refHome, refAway]);
-            if (!(runs != null && runs > openedOf(pre).line)) continue; // the main pre-match line is still open: his row stays pre-match
-          }
-          const opened = openedOf(pre) || (l.first != null ? { line: l.first } : null); // no pre-match line: where the live line first stood
+          if (pre.length) continue; // market was priced before the start: keep the pre-match row; live price is for internal tracking only
+          const opened = l.first != null ? { line: l.first } : null;
           const quote = { source: l.book || FEED_BOOK, kind: "bookmaker", over: l.over, under: l.under, live: true, ...(opened ? { opened: opened.line } : {}) }, at = addLines.find((x) => x.pid === who.pid && x.line === l.line && lineScope(x) === inn);
           if (at) at.books.push(quote); // the same line from another book: one entry with both
           else addLines.push({ pid: who.pid, player: who.name || l.player, book_name: l.player, team: who.team || "", fmt: ref.fmt, stat: "runs", ...(inn ? { inn } : {}), line: l.line, match: label, competition: ref.competition, start_utc: ref.start_utc, books: [quote] });
@@ -203,22 +225,16 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
       } else if (l.kind === "team_runs") {
         const team = [refHome, refAway].find((t) => sameTeam(t, l.team)) || l.team;
         const pre = fancy.filter((x) => pairOf(x) === pair && x.key === "team_total_runs" && teamKey(x.team) === teamKey(team) && (x.inn || 1) === l.inn && !x.live);
-        if (pre.length && teamRunsOf) {
-          const runs = teamRunsOf(team, l.inn, [refHome, refAway], ref.fmt);
-          if (!(runs != null && runs > openedOf(pre).line)) continue; // the side's main pre-match line is still open: it stays
-        }
-        const opened = openedOf(pre) || (l.first != null ? { line: l.first } : null);
+        if (pre.length) continue; // side total was priced before the start: pre-match row only
+        const opened = l.first != null ? { line: l.first } : null;
         addFancy.push({ match: label, home: refHome, away: refAway, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition, key: "team_total_runs", scope: "team", team, inn: l.inn, line: l.line, over: l.over, under: l.under, source: l.book || FEED_BOOK, kind: "bookmaker", live: true, ...(opened ? { opened: opened.line } : {}) });
       } else if (l.kind === "pick") {
-        // a batter's milestone is a line of his own in the props (replacing the earlier one at that line); every other pick has nothing to be judged by and is not shown
+        // a batter's milestone is a props row only when that rung was not priced before the start; every other pick has nothing to be judged by and is not shown
         for (const ms of milestoneRows(l)) {
           const who = link(ms.player, [refHome, refAway]);
           if (!who?.pid) continue;
           const inn = innsOf(who.team);
-          if (soFarOf && lines.some((x) => pairOf(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && x.line === ms.line && !x.books?.every((b) => b.live))) {
-            const runs = soFarOf(who.name || ms.player, [refHome, refAway]);
-            if (!(runs != null && runs > ms.line)) continue; // priced before the start at this rung and still open: the pre-match row stays
-          }
+          if (lines.some((x) => pairOf(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && x.line === ms.line && !x.books?.every((b) => b.live))) continue;
           const quote = { source: l.book || FEED_BOOK, kind: "bookmaker", over: ms.over, under: ms.under, live: true }, at = addLines.find((x) => x.pid === who.pid && x.line === ms.line && lineScope(x) === inn);
           if (at) at.books.push(quote);
           else addLines.push({ pid: who.pid, player: who.name || ms.player, book_name: ms.player, team: who.team || "", fmt: ref.fmt, stat: "runs", ...(inn ? { inn } : {}), line: ms.line, match: label, competition: ref.competition, start_utc: ref.start_utc, books: [quote] });

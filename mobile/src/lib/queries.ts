@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppState } from "react-native";
 import { focusManager, queryOptions } from "@tanstack/react-query";
-import { LIVE_TTL_MS } from "@cricket/engine/live.js";
+import { LIVE_TTL_MS, mergeBoardLive } from "@cricket/engine/live.js";
 import { getJson, peekJson } from "@/lib/net";
 import { readLive, saveLive } from "@/lib/storage";
+
+const BOARD_SCORES_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/board_scores.json";
+async function loadBoardScores(): Promise<any | null> {
+  try {
+    const r = await fetch(BOARD_SCORES_URL, { headers: { "cache-control": "no-cache" } });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
 
 // Feeds the Home rail reads. Same cadence as the site: the fixture and book files are fresh for 10 minutes, /api/live is polled every ~15 s.
 // Both start from the copy kept by the last launch when it is under 3 hours old (counted as stale, so the real one is asked for at once): the rail and the kept Hot rows paint while the request is out.
@@ -31,9 +39,10 @@ export const liveQuery = queryOptions({
   queryKey: ["live-scores"],
   queryFn: async (): Promise<any | null> => {
     try {
-      const body = await getJson("/api/live");
-      saveLive(body);
-      return body;
+      const [body, board] = await Promise.all([getJson("/api/live"), loadBoardScores()]);
+      const merged = mergeBoardLive(body, board);
+      saveLive(merged);
+      return merged;
     } catch {
       // Soft-fail: keep MMKV / last good body so a bad poll does not blank the rail.
       return readLive()?.body ?? null;

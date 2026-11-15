@@ -6,6 +6,7 @@ import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
 import { useRail } from "@/hooks/useRail";
 import { track } from "@/lib/analytics";
+import { TabTitle } from "@/lib/header-slot";
 import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
 import { LeagueBadge } from "@/components/app/badges";
@@ -35,16 +36,23 @@ export function LeaguesPage() {
   const featured = useMemo(() => featuredEvents(store, { big: rail.bigEvent, pin: PIN_FIRST, fixtures: fixtures.data || [] }) as Pick[], [store, rail.bigEvent, fixtures.data]);
   const asked = Number(q.c);
   const e = q.c && Number.isInteger(asked) && asked > 0 && asked < store.events.length ? asked : featured[0]?.e;
-  if (e == null) return <EmptyState icon={<TrophyIcon />} title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." />;
+  if (e == null) {
+    return (
+      <>
+        <TabTitle>Leagues</TabTitle>
+        <EmptyState icon={<TrophyIcon />} title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." />
+      </>
+    );
+  }
   const picks = featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured];
   return (
     <div className="flex flex-col gap-section">
+      <TabTitle>Leagues</TabTitle>
       <StatsAd />
       <section aria-label="Leagues" className="flex flex-col gap-snug">
-        <header className="flex items-center justify-between gap-snug">
-          <h1 className="text-title font-emphasis tracking-tight">Leagues</h1>
+        <div className="flex items-center justify-end">
           <Link to="/competitions" className={more}>All competitions<ArrowRightIcon className="size-3.5" aria-hidden /></Link>
-        </header>
+        </div>
         <PillGroup layoutId="leagues-pick" label="League" value={String(e)} onChange={(v) => { track("leagues_pick", { league: store.events[Number(v)] ?? "" }); setQ({ c: v, season: "" }); }}
           items={picks.map((x) => [String(x.e), <span key={x.e} className="flex items-center gap-tight"><LeagueBadge name={x.name} size="xs" />{x.name}{x.tag && <Tag tag={x.tag} />}</span>] as [string, ReactNode])} />
       </section>

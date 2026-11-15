@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, mixHomeRows, norm, otherHotCount, pool, prioritizeHotGroups, sameMatch } from "./hot-lines";
+import { HOME_TOP, HOT_DAYS, byShard, dayOffset, hotDay, hotDayLabels, hotLines, hotOrder, matchChipId, mixHomeRows, norm, otherHotCount, pool, prioritizeHotGroups, sameMatch } from "./hot-lines";
 
 // local clock times, so the tests hold in any time zone
 const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m).getTime();
@@ -157,6 +157,12 @@ describe("hotOrder", () => {
   });
   it("puts a row with no hit rate after those with one", () => {
     expect(order([row("none", false, null), row("some", false, 0.1)])).toEqual(["some", "none"]);
+  });
+});
+
+describe("HOME_TOP", () => {
+  it("is 10 for Home (fixture pages keep the full list)", () => {
+    expect(HOME_TOP).toBe(10);
   });
 });
 

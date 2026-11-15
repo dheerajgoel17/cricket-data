@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
+import { ChoiceChip } from "@/ui/chips";
+import { Sheet } from "@/ui/sheet";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,7 +14,7 @@ import { useCombos } from "@/lib/saved";
 import { Accordion } from "@/ui/accordion";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, control, font, radius, space, type } from "@/ui/tokens";
+import { color, control, font, radius, space, type, t } from "@/ui/tokens";
 
 export interface FilterChoices {
   days: [string, string][];
@@ -36,16 +39,10 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
   const dayName = (d: string) => choices.days.find(([k]) => k === d)?.[1] ?? d;
   const matchName = (id: string) => choices.matches.find((m) => m.id === id)?.label ?? id;
   const active = useMemo(() => activeFilters(draft, { day: dayName, match: matchName }).length, [draft, choices]);
-  const chip = (on: boolean, label: string, onPress: () => void) => (
-    <Press key={label} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={onPress} style={[styles.chip, on && styles.chipOn]}>
-      <Text style={[styles.chipTxt, on && styles.chipTxtOn]}>{label}</Text>
-    </Press>
-  );
+  const chip = (on: boolean, label: string, onPress: () => void) => <ChoiceChip key={label} label={label} on={on} onPress={onPress} />;
 
   return (
-    <Modal visible={open} animationType="slide" transparent onRequestClose={() => onOpenChange(false)}>
-      <Pressable style={styles.backdrop} onPress={() => onOpenChange(false)} accessibilityRole="button" accessibilityLabel="Close" />
-      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
+    <Sheet visible={open} onClose={() => onOpenChange(false)} full>
         <View style={styles.head}>
           <Text style={styles.title}>Filters{active ? ` · ${active}` : ""}</Text>
           <Press accessibilityRole="button" accessibilityLabel="Close filters" onPress={() => onOpenChange(false)} style={styles.round}>
@@ -124,39 +121,28 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
           </Accordion>
         </ScrollView>
         <View style={styles.foot}>
-          <Press accessibilityRole="button" onPress={() => setDraft({ ...DEFAULTS })} style={styles.clear}><Text style={styles.clearTxt}>Clear all</Text></Press>
-          <Press accessibilityRole="button" onPress={() => { onApply(draft); onOpenChange(false); }} style={styles.apply}><Text style={styles.applyTxt}>Apply</Text></Press>
+          <Button variant="secondary" flex={1} label="Clear all" onPress={() => setDraft({ ...DEFAULTS })} />
+          <Button flex={2} label="Apply" onPress={() => { onApply(draft); onOpenChange(false); }} />
         </View>
-      </View>
-    </Modal>
+    </Sheet>
   );
 }
 
 export { clearFilter };
 
 const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: { position: "absolute", left: 0, right: 0, top: 48, bottom: 0, backgroundColor: color.background, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet },
   head: { height: 56, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.gutter, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
-  title: { ...type.title, color: color.foreground },
+  title: { ...type.heading, color: color.foreground },
   round: { width: control, height: control, borderRadius: control / 2, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   body: { flex: 1, paddingHorizontal: space.gutter },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: space.snug, paddingBottom: space.stack },
   block: { gap: space.snug, paddingBottom: space.stack },
-  chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, backgroundColor: color.card, justifyContent: "center" },
-  chipOn: { backgroundColor: color.primary },
-  chipTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  chipTxtOn: { color: color["primary-foreground"] },
   hint: { ...type.footnote, color: color["muted-foreground"] },
   switchRow: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   switchLabel: { ...type.body, color: color.foreground },
   saveRow: { flexDirection: "row", gap: space.snug },
   input: { flex: 1, height: control, borderRadius: radius.chip, backgroundColor: color.secondary, paddingHorizontal: space.snug, ...type.body, color: color.foreground },
   saveBtn: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, backgroundColor: color.secondary, justifyContent: "center" },
-  saveTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  saveTxt: { ...t.calloutLabel, color: color.foreground },
   foot: { flexDirection: "row", gap: space.snug, paddingHorizontal: space.gutter, paddingTop: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  clear: { flex: 1, height: 44, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
-  clearTxt: { ...type.body, color: color.foreground },
-  apply: { flex: 2, height: 44, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  applyTxt: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
 });

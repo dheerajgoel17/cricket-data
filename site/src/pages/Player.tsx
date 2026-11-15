@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterButton } from "@/components/app/chip";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, InformationCircleIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ import { NextFilters, NextMatch, UnpricedNote } from "@/components/app/next-matc
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
+import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
@@ -230,7 +232,7 @@ function PlayerScreen({ idx }: { idx: number }) {
       <div className="hidden pt-stack lg:block">
         <Crumbs items={[["Player props", "/props"], [name], [statLabel]]} />
       </div>
-      {/* Ad below the sticky band so an empty/pending unit cannot open a gap under the header that vanishes once the band sticks. */}
+      {/* Sticky chrome stays solid elevated when stuck (shell flush). Wash is hero-bound only — scrolls away with identity (app EntityHeroWash twin). */}
       <StickyFilterBand>
         {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
         <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
@@ -238,11 +240,7 @@ function PlayerScreen({ idx }: { idx: number }) {
             <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
               className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
           ) : <span className="min-w-0 flex-1" />}
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-          </Button>
+          <FilterButton count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
         </div>
         <div className="flex flex-col gap-snug px-gutter py-snug">
           {testBat && (
@@ -261,8 +259,10 @@ function PlayerScreen({ idx }: { idx: number }) {
           </div>
         )}
       </StickyFilterBand>
+      <HeroWash accent={sideAccent(side)} height={220} className="-mx-gutter px-gutter">
+        <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
+      </HeroWash>
       <AdSlot slotId="player_detail_top" />
-      <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
         : <EmptyState title="Could not load games" body={String(res.data.error || "Try again in a moment.")} />}

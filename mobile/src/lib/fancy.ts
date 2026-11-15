@@ -20,7 +20,7 @@ const PUBLISH_MS = 400;
 const yieldToMain = () => new Promise<void>((r) => setTimeout(r, YIELD_MS));
 const idOf = (f: any) => f.id || `${f.a}${f.b}${f.start}`;
 
-export interface FancyCard { f: any; ms: number[]; rows: any[] }
+export interface FancyCard { f: any; ms: number[]; rows: any[]; match?: any }
 
 /** What a fixture's own lines are scored on: the sides' last matches and the ground's, the same ones the alerts use (`engine/fancy-edge.js`). */
 export const fxInfoOf = (f: any) => ({ a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() });
@@ -61,7 +61,7 @@ export function useFancyCards(enabled = true) {
   });
   const cards = useMemo(() => timed("fancy cards overlay", () => (enabled ? q.data ?? [] : []).map((c) => {
     const match = liveMatchFor(live.data, lines.data, c.f);
-    return { ...c, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
+    return { ...c, match, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
   })), [enabled, q.data, live.data, lines.data]);
   return { ready: railReady && !!store && matchesReady && !q.isLoading && !!q.data, cards, error: q.isError || stats.isError };
 }

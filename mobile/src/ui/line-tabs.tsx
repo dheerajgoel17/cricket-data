@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useChoice } from "@/lib/use-choice";
 import { StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, spring, t } from "@/ui/tokens";
 
 /** The underline's glide: a spring with a little life in it, settled in about a third of a second. */
-const GLIDE = { duration: 350, dampingRatio: 0.85 };
+const GLIDE = spring.settle;
 
 /**
  * Underline tabs on a hairline (the site's `Tabs variant="line"`: Home's In play / Pre-match / Completed, a player's formats): text tabs as wide as their labels, the chosen one in
  * the accent colour, and one underline that glides to it on a spring (UI thread; its first placement, and reduce motion, are instant). A tab may carry a quieter count. `right` sits
- * at the end of the row (More, Filters).
+ * at the end of the row (More, Filters). Wrap is transparent so a parent canvas / `BlurBar` accent wash shows through (opaque `color.background` punched a hole in player atmosphere).
  */
-export function LineTabs<T extends string>({ items, value, onChange, label, right, flush }: { items: [id: T, label: string, count?: number | string][]; value: T; onChange: (id: T) => void; label: string; right?: ReactNode; /** No hairline under the row (it sits inside another bar that has one). */ flush?: boolean }) {
+export function LineTabs<T extends string>({ items, value: valueProp, onChange: onChangeProp, label, right, flush }: { items: [id: T, label: string, count?: number | string][]; value: T; onChange: (id: T) => void; label: string; right?: ReactNode; /** No hairline under the row (it sits inside another bar that has one). */ flush?: boolean }) {
+  const [value, onChange] = useChoice(valueProp, onChangeProp);
   const calm = useReducedMotion();
   const [boxes, setBoxes] = useState<Record<string, { x: number; w: number }>>({});
   const x = useSharedValue(0), w = useSharedValue(0);
@@ -57,13 +59,13 @@ export function LineTabs<T extends string>({ items, value, onChange, label, righ
 }
 
 const styles = StyleSheet.create({
-  wrap: { backgroundColor: color.background, paddingHorizontal: space.gutter },
+  wrap: { paddingHorizontal: space.gutter },
   hairline: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   row: { flexDirection: "row", alignItems: "stretch", gap: space.stack },
   tab: { alignItems: "center", paddingTop: space.stack },
-  label: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingBottom: space.stack },
+  label: { ...t.calloutLabel, color: color["muted-foreground"], paddingBottom: space.stack },
   labelOn: { color: color.primary },
-  count: { ...type.caption, fontFamily: font.medium, opacity: 0.7 },
+  count: { ...t.captionLabel, opacity: 0.7 },
   // absolute and childless, so animating its width re-lays-out nothing else
   glide: { position: "absolute", left: 0, bottom: 0, height: 2, borderRadius: 1, backgroundColor: color.primary },
   right: { marginLeft: "auto", alignSelf: "center" },

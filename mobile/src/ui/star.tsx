@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/lib/auth";
 import { propKey, useSaved } from "@/lib/saved";
 import { Press } from "@/ui/press";
-import { color, control } from "@/ui/tokens";
+import { color, control, duration } from "@/ui/tokens";
 
 /** The star: when it fills it squeezes, pops past full size and settles (UI thread), with a light tap on the way in and a softer one on the way out. */
 function Star({ on, size }: { on: boolean; size: number }) {
@@ -15,7 +15,7 @@ function Star({ on, size }: { on: boolean; size: number }) {
   const pop = useAnimatedStyle(() => ({ transform: [{ scale: k.value }] }));
   useEffect(() => {
     if (first.value) { first.value = false; return; }
-    k.value = on ? withSequence(withTiming(0.7, { duration: 80 }), withSpring(1.28, { damping: 6, stiffness: 420 }), withSpring(1, { damping: 12 })) : withSequence(withTiming(0.85, { duration: 80 }), withSpring(1, { damping: 12 }));
+    k.value = on ? withSequence(withTiming(0.7, { duration: duration.instant }), withSpring(1.28, { damping: 6, stiffness: 420 }), withSpring(1, { damping: 12 })) : withSequence(withTiming(0.85, { duration: duration.instant }), withSpring(1, { damping: 12 }));
   }, [on, k, first]);
   return <Animated.View style={pop}><Ionicons name={on ? "star" : "star-outline"} size={size} color={on ? color.amber : color.foreground} /></Animated.View>;
 }
@@ -59,6 +59,6 @@ export function PropStar({ idx, stat, line, fmt }: { idx: number; stat: string; 
 }
 
 const styles = StyleSheet.create({
-  round: { backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
+  round: { backgroundColor: color["control-fill"], borderWidth: StyleSheet.hairlineWidth, borderColor: color["control-ring"], alignItems: "center", justifyContent: "center" },
   prop: { width: control, height: control, borderRadius: control / 2, alignItems: "center", justifyContent: "center" },
 });

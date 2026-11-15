@@ -25,6 +25,18 @@ export function HeaderActions({ children }: { children: ReactNode }) {
   return slot?.el ? createPortal(children, slot.el) : null;
 }
 
+/**
+ * Tab page title in the shell bar (app `AppHeader title=` twin). Phone swaps out the brand; from `lg` the brand stays and the title sits beside it.
+ * Use on every tab except Fixtures / Home (those keep the wordmark). Search + account stay via Header for top-level owned bars.
+ */
+export function TabTitle({ children }: { children: ReactNode }) {
+  return (
+    <HeaderActions>
+      <h1 className="min-w-0 flex-1 truncate text-title font-emphasis tracking-tight">{children}</h1>
+    </HeaderActions>
+  );
+}
+
 /** A full-width card sits right under the top bar: the bar takes the card's background and drops its bottom line, so the two read as one surface. */
 export function useHeaderFlush(flush: boolean) {
   const setFlush = useContext(Ctx)?.setFlush;

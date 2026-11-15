@@ -2,15 +2,12 @@
 // The Home rail's order, built from the shared pieces: engine matching (`live.js`, `lines.js`) and the ranking in site/src/lib/priority.ts.
 // The composition below mirrors `usePricedFixtures` (site/src/hooks/useEngine.ts) and `useHomeRail` (site/src/hooks/useHomeRail.ts), which are
 // React hooks and cannot be imported. Phase 1 moves it into the engine so there is one copy; until then a change to those two files needs the same change here.
-import { fixtureInBooks, bookFixtures, liveForFixture } from "@cricket/engine/live.js";
+import { fixtureInBooks, bookFixtures, liveForFixture, teamTotalsPresent } from "@cricket/engine/live.js";
 import { keepMsFor } from "@cricket/engine/lines.js";
 import { seriesChips as sharedSeriesChips } from "@cricket/engine/props-view.js";
 import { countPhases, phaseOf, pickHomePhase, type HomePhase } from "@site/lib/home-phase";
 import { arrangeFixtures, DEFAULT_RAIL, rankFixtures, type RailConfig } from "@site/lib/priority";
 
-/** How far ahead an unpriced game still shows (flagged `noProps`). */
-export const NO_PROPS_DAYS = 10;
-const NO_PROPS_LIMIT = 24;
 /** Upcoming priced matches this far ahead stay on the rail. */
 export const SHOW_AHEAD_MS = 10 * 86400e3;
 /** Display-only extra: on a quiet day, finished limited-overs matches stay up to 4 days so the rail is not bare. */
@@ -36,7 +33,8 @@ const begun = (s: string) => s === "live" || s === "started";
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
   const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (begun(stateOf(f)) && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
   const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
-  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
+  // `inBooks` / showable applies to finished too (priced + scores), not only active rows.
+  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now) && inBooks(f));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 
@@ -54,8 +52,8 @@ export const EMPTY_PHASE: Record<HomePhase, { title: string; body: string }> = {
 export interface RailItem { fixture: any; state: FixtureState; live: any | null; noProps: boolean }
 
 /**
- * The rail in display order: matches in play, then those starting within 24 hours, then later games up to 10 days, then finished ones (`rankFixtures` / `arrangeFixtures`);
- * games the books price first, the unpriced ones after.
+ * The rail in display order: matches in play, then those starting within 24 hours, then later games up to 10 days, then finished ones (`rankFixtures` / `arrangeFixtures`).
+ * Books-priced only; a started/live/final row also needs live/board team totals — holding prices alone is not enough. Upcoming priced stays.
  */
 export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = null, now = Date.now() }: { fixtures: any[]; lines: any; live: any; rail?: RailConfig; home?: string | null; now?: number }): RailItem[] {
   const feed = feedOf(lines);
@@ -63,18 +61,21 @@ export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = n
   const liveHit = new Map<any, any>(), states = new Map<any, FixtureState>();
   const liveOf = (f: any) => { if (!liveHit.has(f)) liveHit.set(f, liveForFixture(live, f)); return liveHit.get(f); };
   const stateOf = (f: any): FixtureState => { let s = states.get(f); if (!s) { s = fixtureState(f, liveOf(f)?.status, now); states.set(f, s); } return s; };
-  const soon = (f: any) => fixtureStart(f).getTime() < now + NO_PROPS_DAYS * 86400e3;
-  const list = feed.length
-    ? shownFixtures(fixtures, stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true }))
-    : shownFixtures(fixtures, stateOf, () => true, now);
+  const showable = (f: any) => {
+    if (!fixtureInBooks(feed, f)) return false;
+    const st = stateOf(f);
+    if (st === "upcoming") return true;
+    return teamTotalsPresent(liveOf(f));
+  };
+  // Empty book feed → empty rail (do not fall back to the whole schedule).
+  const list = feed.length ? shownFixtures(fixtures, stateOf, showable, now) : [];
   const ranked = rankFixtures(list, home, stateOf, rail);
-  const priced = ranked.filter((f) => !f.noProps);
-  const arranged = arrangeFixtures(keepFinished(priced.filter((f) => stateOf(f) === "final"), now).concat(priced.filter((f) => stateOf(f) !== "final")), stateOf, home, rail, now);
+  const arranged = arrangeFixtures(keepFinished(ranked.filter((f) => stateOf(f) === "final"), now).concat(ranked.filter((f) => stateOf(f) !== "final")), stateOf, home, rail, now);
   const upcoming = new Set(arranged.filter((f) => stateOf(f) === "upcoming" && Date.parse(f.start) < now + SHOW_AHEAD_MS));
   const shown = arranged.filter((f) => stateOf(f) !== "upcoming" || upcoming.has(f));
   // the card's live match is the feed's, kept only when the books price the fixture too (`useLiveMatch`)
-  const matchOf = (f: any) => { const hit = liveOf(f); return hit && (!feed.length || fixtureInBooks(feed, f)) ? hit : null; };
-  return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)].map((f) => ({ fixture: f, state: stateOf(f), live: matchOf(f), noProps: !!f.noProps }));
+  const matchOf = (f: any) => { const hit = liveOf(f); return hit && fixtureInBooks(feed, f) ? hit : null; };
+  return shown.map((f) => ({ fixture: f, state: stateOf(f), live: matchOf(f), noProps: false }));
 }
 
 /** The series chips for the matches under a bucket (the shared `seriesChips`): a series the books price first, then by matches. */
@@ -91,11 +92,12 @@ export function liveMatchFor(live: any, lines: any, f: any) {
 }
 
 /**
- * Which games Home shows under In play / Pre-match / Resulted, as the site's Home page does (site/src/pages/Home.tsx): the counts are of games the books price only,
- * and a game with no props yet is listed under Pre-match only. `asked` is the bucket the viewer tapped; with none, the first that holds anything.
+ * Which games Home shows under In play / Pre-match / Resulted (site Home). Counts and lists are priced games only.
+ * `asked` is the bucket the viewer tapped; with none, the first that holds anything.
  */
 export function phaseView(items: RailItem[], asked?: HomePhase) {
-  const counts = countPhases(items.filter((i) => !i.noProps), (i) => phaseOf(i.state));
+  const priced = items.filter((i) => !i.noProps);
+  const counts = countPhases(priced, (i) => phaseOf(i.state));
   const phase = pickHomePhase(counts, asked);
-  return { counts, phase, shown: items.filter((i) => (i.noProps ? phase === "pre" : phaseOf(i.state) === phase)) };
+  return { counts, phase, shown: priced.filter((i) => phaseOf(i.state) === phase) };
 }

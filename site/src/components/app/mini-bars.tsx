@@ -1,16 +1,49 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const BAR: Record<string, string> = { hit: "bg-primary", miss: "bg-miss", push: "bg-amber", dnp: "bg-dnp/50", void: "bg-dnp/50", na: "bg-dnp/50" };
 
+/** Always this many bar slots so short L-histories do not look chunkier than full L10. */
+export const MINI_BARS_SLOTS = 10;
+
+/** Shared scan-row bars / status slot (PropLines compact + fancy OverviewRow). */
+export const MINI_BARS_SLOT = "h-9 w-[72px] shrink-0 sm:w-[104px]";
+
+/** Fixed Edge column so each row's own `auto` track does not shift MiniBars (Home mixed list). */
+export const SCAN_EDGE_COL = "grid w-11 shrink-0 justify-items-center gap-hair px-tight";
+
+/** Scan row grid: avatar · copy · Edge · MiniBars — same tracks on props and fancy. */
+export const SCAN_ROW_GRID = "grid min-h-row w-full grid-cols-[var(--control)_minmax(0,1fr)_auto_auto] items-center gap-snug px-gutter py-snug";
+
 /** Last-games bars against a dashed line (green hit, red miss, amber push, grey DNP). `last` is oldest to newest; `max` is the bar-height scale. */
 export function MiniBars({ last, line, max, className }: { last: { v: number | null; s: string }[]; line: number; max?: number; className?: string }) {
-  const top = max ?? Math.max(line * 1.5, ...last.map((x) => x.v ?? 0), 1);
+  const shown = last.slice(-MINI_BARS_SLOTS);
+  const pad = Math.max(0, MINI_BARS_SLOTS - shown.length);
+  const top = max ?? Math.max(line * 1.5, ...shown.map((x) => x.v ?? 0), 1);
   return (
-    <div className={cn("relative flex h-9 w-[72px] shrink-0 items-end gap-[2px] sm:w-[104px] sm:gap-[3px]", className)} role="img" aria-label={`Last ${last.length}: ${last.map((x) => x.v ?? "DNP").join(", ")} against a line of ${line}`}>
-      {last.map((x, i) => <span key={i} className={cn("flex-1 rounded-[2px]", BAR[x.s] || "bg-dnp/50")} style={{ height: `${Math.max(x.v == null ? 8 : (x.v / top) * 100, 8)}%` }} />)}
+    <div className={cn("relative flex items-end gap-[2px] sm:gap-[3px]", MINI_BARS_SLOT, className)} role="img" aria-label={`Last ${last.length}: ${last.map((x) => x.v ?? "DNP").join(", ")} against a line of ${line}`}>
+      {Array.from({ length: pad }, (_, i) => <span key={`pad-${i}`} className="flex-1" aria-hidden />)}
+      {shown.map((x, i) => <span key={i} className={cn("flex-1 rounded-[2px]", BAR[x.s] || "bg-dnp/50")} style={{ height: `${Math.max(x.v == null ? 8 : (x.v / top) * 100, 8)}%` }} />)}
       <span aria-hidden className="pointer-events-none absolute inset-x-0 border-t border-dashed border-foreground/40" style={{ bottom: `${Math.min(100, (line / top) * 100)}%` }} />
     </div>
+  );
+}
+
+/** Placeholder that keeps the MiniBars column width (Not in XI / VOID). */
+export function MiniBarsSlot({ children, className }: { children?: ReactNode; className?: string }) {
+  return <span className={cn("grid place-items-center text-center", MINI_BARS_SLOT, className)}>{children}</span>;
+}
+
+/** Compact Edge figure shared by PropLines and fancy OverviewRow. */
+export function ScanEdge({ edge, out }: { edge: number | null | undefined; out?: boolean }) {
+  const tone = out || edge == null ? "text-muted-foreground" : edge > 0 ? "text-primary" : "text-miss";
+  return (
+    <span className={SCAN_EDGE_COL}>
+      <span className="label-cap text-caption text-muted-foreground">Edge</span>
+      <span className={cn("font-condensed text-title font-emphasis leading-none tabular-nums", tone)}>
+        {out || edge == null ? "–" : `${edge > 0 ? "+" : ""}${(edge * 100).toFixed(0)}`}
+      </span>
+    </span>
   );
 }
 

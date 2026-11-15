@@ -10,6 +10,11 @@
   FEEDH_URL          Feed H's sportsbook root      FEEDH_NAME   the name its prices are published under
   FEEDH_RELAY        Cloudflare Worker relay (or reuse FEEDG_RELAY); Feed H never runs on a laptop
   SRC_B_BASE, SRC_C_BASE, SRC_D_BASE, SRC_E_BASE   the optional scrapers / key-gated APIs that are not enabled by default
+  BOARD_IN_BASE + BOARD_IN_FEED   India board JSON (optional; default feed /feed/v1/matches/live)
+  BOARD_EN_BASE + BOARD_EN_FEED   England board JSON (optional; default /api/v2/matches.json)
+  BOARD_ZA_BASE + BOARD_ZA_FEED   South Africa board JSON (optional; CSA has no public free feed yet)
+  BOARD_AU_BASE + BOARD_AU_FEED   Australia board JSON (optional)
+  SRC_D_BASE + CRICKETDATA_API_KEY  free Source D currentMatches — primary gap filler (CSA T20 etc.)
 
 Set them as repository variables for the workflows, as deployment variables for the site, and in a git-ignored env file locally (docs/OPERATIONS.md).
 """

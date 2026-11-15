@@ -8,7 +8,7 @@ import { shortDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { TeamBadge } from "./badges";
 
-const CHIP: Record<string, string> = { W: "bg-[#2fa84f] text-white", L: "bg-[#e5484d] text-white", T: "bg-[#8e8e93] text-white", D: "bg-[#8e8e93] text-white", NR: "bg-[#8e8e93] text-white" };
+const CHIP: Record<string, string> = { W: "bg-hit text-primary-foreground", L: "bg-miss text-primary-foreground", T: "bg-muted-foreground text-primary-foreground", D: "bg-muted-foreground text-primary-foreground", NR: "bg-muted-foreground text-primary-foreground" };
 const WORD: Record<string, string> = { W: "Won", L: "Lost", T: "Tied", D: "Drawn", NR: "No result" };
 /** Closed row: last 3 so both sides fit on a phone; the open body is still last 5. */
 const HEADLINE_N = 3;

@@ -27,8 +27,6 @@ function useGaveUp(ms: number, done: boolean): boolean {
  * the first paint also has it: at once from the last /api/live body kept on the device (`live-cache.ts`), else after a short wait (the same for the rail settings). A fresh body that
  * changes a match's state (it has gone live, or ended) re-sorts the rail; one that changes nothing leaves the order as it was.
  */
-/** How many games without props the rail adds after the ones with props. */
-const NO_PROPS_LIMIT = 24;
 /** Upcoming priced matches this far ahead stay on the rail. */
 export const SHOW_AHEAD_MS = 10 * 86400e3;
 /** A limited-overs Final stays on the rail this long after it started (a Test keeps 6 days). */
@@ -53,12 +51,12 @@ export function useHomeRail(): { ready: boolean; fixtures: any[] } {
     const now = Date.now();
     const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
     const ranked = rankFixtures(fx, homeTeam(), stateOf, rail);
+    // usePricedFixtures already drops source-only rows; keep the filter so a stale noProps never reappears.
     const priced = ranked.filter((f) => !f.noProps);
     const arranged = arrangeFixtures(keepFinished(priced.filter((f) => stateOf(f) === "final")).concat(priced.filter((f) => stateOf(f) !== "final")), stateOf, homeTeam(), rail);
     const upcoming = arranged.filter((f) => stateOf(f) === "upcoming" && Date.parse(f.start) < now + SHOW_AHEAD_MS);
     const cap = new Set(upcoming);
-    const shown = arranged.filter((f) => stateOf(f) !== "upcoming" || cap.has(f));
-    return [...shown, ...ranked.filter((f) => f.noProps).slice(0, NO_PROPS_LIMIT)]; // games with props first; the ones without follow, in the same order
+    return arranged.filter((f) => stateOf(f) !== "upcoming" || cap.has(f));
   }, [ready, fx, live.data, rail]);
   return { ready, fixtures };
 }

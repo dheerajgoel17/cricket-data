@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated, { interpolate, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ import { useQuery } from "@tanstack/react-query";
 import { profileParts } from "@/lib/profile";
 import { profilesQuery } from "@/lib/queries";
 import { Accordion } from "@/ui/accordion";
-import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
+import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { BookTable } from "@/ui/book-table";
 import { ChartBars } from "@/ui/charts";
 import { CountUp } from "@/ui/count-up";
@@ -45,7 +45,8 @@ import { pricedFromBooks, SideBook } from "@/ui/side-book";
 import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, control, font, radius, space, type } from "@/ui/tokens";
+import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
+import { color, control, font, radius, space, type, fs, tint, t, d, dStrong, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -81,13 +82,17 @@ export default function PlayerPage() {
   const target = useRef<ComponentRef<typeof View>>(null);
   const { collapsed, onScroll, y } = useCollapseOnScroll();
   const [barH, setBarH] = useState(0), [subH, setSubH] = useState(0);
+  const accent = useEntityAccent(s.side || params.team);
   const sub = useAnimatedStyle(() => ({ height: subH ? subH * (1 - collapsed.value) : undefined, opacity: 1 - collapsed.value }));
   // the hero: the portrait rides slower than the page and fades as it goes, and swells when the page is pulled down past the top; the name follows more gently
   const portraitFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 240], [1, 0.15], "clamp"), transform: [{ translateY: y.value * 0.35 }, { scale: 1 + Math.max(-y.value, 0) / 520 }] }));
   const nameFx = useAnimatedStyle(() => ({ transform: [{ translateY: y.value * 0.12 }] }));
   // sticky title fades in as the hero name scrolls away — avoids a doubled name at the top of the page
   const headerTitleFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0, 1], "clamp") }));
-  const headerSubFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0.35, 1], "clamp") }));
+  const headerSubFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0, 1], "clamp") }));
+  // solid elevated once the hero band (incl. under-sticky overlap) has scrolled past
+  const scrimThreshold = useSharedValue(136);
+  const barScrim = useChromeScrim(y, scrimThreshold);
 
   const res = s.res.data;
   // Hero paints first; plan body mounts as a transition once the index is known.
@@ -103,24 +108,32 @@ export default function PlayerPage() {
     void Share.share({ message: shareText({ entries, line, side: "over", fmt: s.fmt, price, ground: s.next?.ground, opp: s.next?.opp, url }) || url, title: s.name });
   };
   const game = (e: any, st: string, label: string, auxLabel?: string) => push({ pathname: "/info/[topic]", params: { topic: "game", d: e.date, o: e.opp, v: e.venueName ?? "", x: e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[st] ?? "–" : String(e.value), l: label, a: auxLabel && e.value != null ? `${auxLabel}: ${e.aux ?? "–"}` : "", p: e.pos ? `No. ${e.pos}` : "", n: s.name } });
+  const chromePad = Math.max(barH, 1);
 
   return (
-    <View style={styles.root}>
+    <PageAtmosphere>
       <BlurTargetView ref={target} style={styles.root}>
-        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
+        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: chromePad, paddingBottom: inset.bottom + space.section }}>
           {s.storeError ? <View style={styles.pad}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View> : !s.loadingStore && !s.indexed ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
             <>
-              <View style={[styles.hero, styles.pad]}>
-                <Animated.View style={[styles.heroLeft, nameFx]}>
-                  <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
-                  <View style={styles.teamLine}>
-                    <View style={styles.logoCrop}><TeamBadge name={s.side} size={56} bare /></View>
-                    <Text style={styles.sub} numberOfLines={1}>{s.side}</Text>
-                  </View>
-                  {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
-                </Animated.View>
-                {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.side || params.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
-              </View>
+              {/* Hero wash scrolls with identity; negative margin pulls tint under clear sticky chrome at rest. */}
+              <EntityHeroWash
+                accent={accent}
+                style={{ marginTop: -chromePad, paddingTop: chromePad }}
+                onLayout={(e) => { scrimThreshold.value = Math.max(48, e.nativeEvent.layout.height - 64); }}
+              >
+                <View style={[styles.hero, styles.pad]}>
+                  <Animated.View style={[styles.heroLeft, nameFx]}>
+                    <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
+                    <View style={styles.teamLine}>
+                      <View style={styles.logoCrop}><TeamBadge name={s.side} size={56} bare /></View>
+                      <Text style={styles.sub} numberOfLines={1}>{s.side}</Text>
+                    </View>
+                    {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
+                  </Animated.View>
+                  {s.pid ? <Animated.View style={portraitFx}><PlayerPortrait pid={s.pid} team={s.side || params.team} test={s.fmt === "Test"} width={112} /></Animated.View> : null}
+                </View>
+              </EntityHeroWash>
               {loading ? (
                 <View style={{ paddingTop: space.stack }} accessibilityRole="progressbar" accessibilityLabel="Reading his games…"><PlayerSkeleton /></View>
               ) : !res?.ok ? (
@@ -133,8 +146,10 @@ export default function PlayerPage() {
         </Animated.ScrollView>
       </BlurTargetView>
 
-      <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
-        <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
+      <View style={styles.bar} onLayout={(e) => setBarH(Math.round(e.nativeEvent.layout.height))}>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
+        {/* merge = clear at rest; scrim goes solid when hero has scrolled past */}
+        <BlurBar merge blurTarget={target} style={{ paddingTop: inset.top }}>
           <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} titleStyle={headerTitleFx} subtitleStyle={headerSubFx} buttons={2} right={s.indexed ? (
             <>
               <StarButton idx={idx} />
@@ -144,18 +159,18 @@ export default function PlayerPage() {
           {s.fmts.length > 1 ? <LineTabs<string> label="Format" items={s.fmts.map(([i, f]) => [String(i), f] as [string, string])} value={String(s.fmtVal)} onChange={(v) => { setFmt(Number(v)); setLineQ(undefined); setScope(undefined); }} /> : null}
           <CapsuleTabs label="Stat" items={STAT_OPTIONS.map(([k, l]) => [k, l, !pricedSet.has(k)] as [string, string, boolean])} value={s.stat} onChange={(k) => { setStat(k); setLineQ(undefined); }} />
           <Animated.View style={[styles.sub2, sub]}>
-            <View onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h && h !== subH) setSubH(h); }} style={[styles.subInner, { position: "absolute", left: 0, right: 0, top: 0 }]}>
+            <View onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h !== subH) setSubH(h); }} style={[styles.subInner, { position: "absolute", left: 0, right: 0, top: 0 }]}>
               {s.testBat ? <Segmented<string> items={[0, 1, 2].map((n) => [String(n), (SCOPE_LABEL as any)[n]] as [string, string])} value={String(s.scope)} onChange={(v) => { setScope(Number(v)); setLineQ(undefined); }} label="Innings" /> : null}
             </View>
           </Animated.View>
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
-const arrow = (up: boolean | null) => (up == null ? null : <Text style={{ color: up ? color.primary : color.miss, fontSize: 12 }}>{up ? "▲ " : "▼ "}</Text>);
+const arrow = (up: boolean | null) => (up == null ? null : <Text style={{ color: up ? color.primary : color.miss, fontSize: fs.footnote }}>{up ? "▲ " : "▼ "}</Text>);
 
 /** A hit rate on a tint that says how good it is (green from 60%, red to 40%), all one width so a column lines up. */
 function HitCell({ p }: { p: number | null }) {
@@ -220,7 +235,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         {next ? <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
         <EmptyState
           title={`No ${res.sample?.unit || "games"}`}
-          body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection."}
+          body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection. Relax a filter to see a sample."}
           action={active.length ? <Press scale={1} onPress={clearAll} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Clear filters</Text></Press> : undefined}
         />
       </View>
@@ -377,7 +392,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
             {[...entries].reverse().slice(0, logCount).map((e, i) => {
               const st = barState(e, line, side) as string;
               const tone = st === "hit" ? color.primary : st === "miss" ? color.miss : st === "push" ? color.amber : color["muted-foreground"];
-              const bg = st === "hit" ? "rgba(39,218,142,0.2)" : st === "miss" ? "rgba(255,0,0,0.2)" : st === "push" ? "rgba(245,165,36,0.2)" : color.secondary;
+              const bg = st === "hit" ? tint.primary(0.2) : st === "miss" ? tint.miss(0.2) : st === "push" ? tint.amber(0.2) : color.secondary;
               return (
                 <Press scale={1} key={i} onPress={() => onGame(e, st, `${label} ${side} ${line}`, c.auxLabel)} accessibilityRole="button" style={({ pressed }) => [styles.logRow, i > 0 && styles.sep, pressed && { opacity: 0.6 }]}>
                   <TeamBadge name={e.opp} size={32} />
@@ -418,24 +433,24 @@ function Unpriced({ label }: { label: string }) {
   return (
     <View style={styles.unpriced} accessibilityRole="alert">
       <Ionicons name="information-circle-outline" size={16} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
-      <Text style={styles.unpricedText}><Text style={{ color: color.foreground, fontFamily: font.medium }}>No book is offering odds for {label}</Text> on this match. Hit rates and fair prices are from his history, not a listed market.</Text>
+      <Text style={styles.unpricedText}><Text style={{ color: color.foreground, ...w.label }}>No book is offering odds for {label}</Text> on this match. Hit rates and fair prices are from his history, not a listed market.</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
+  root: { flex: 1 },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
   sub2: { overflow: "hidden" },
   subInner: { gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   pad: { paddingHorizontal: space.gutter },
   hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
-  name: { ...type.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
-  profile: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground },
+  name: { ...type.display, fontSize: fs.display, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
+  profile: { ...d.callout, fontSize: fs.body, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
-  strong: { color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  link: { color: color.primary, fontFamily: font.medium },
+  strong: { color: color.foreground, ...w.data, fontVariant: ["tabular-nums"] },
+  link: { color: color.primary, ...w.label },
   teamLine: { alignItems: "flex-start", gap: 2 },
   logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   metricsBand: {
@@ -448,9 +463,9 @@ const styles = StyleSheet.create({
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
   countRow: { flexDirection: "row", alignItems: "center" },
-  metricNum: { fontSize: 16, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: 17, lineHeight: 20, color: color.foreground },
-  notListed: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"] },
+  metricNum: { fontSize: fs.body, lineHeight: 20, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...dStrong.callout, fontSize: fs.title, lineHeight: 20, color: color.foreground },
+  notListed: { ...t.captionLabel, color: color["muted-foreground"] },
   controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: space.snug },
   mainChip: { height: control, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   mainChipText: { ...type.callout, color: color.foreground },
@@ -459,14 +474,14 @@ const styles = StyleSheet.create({
   laneRow: { flexDirection: "row" },
   lane: { flex: 1, minWidth: 0, gap: space.tight, paddingHorizontal: space.snug, paddingVertical: space.snug },
   laneSplit: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline },
-  laneOn: { backgroundColor: "rgba(44,44,46,0.4)" },
+  laneOn: { backgroundColor: tint.hex(color.secondary, 0.4) },
   laneCap: { ...type.caption, color: color["muted-foreground"], textTransform: "uppercase", letterSpacing: 0.4 },
-  laneRate: { ...type.title, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  laneRate: { ...dStrong.title, color: color.foreground },
   laneFoot: { ...type.footnote, color: color["muted-foreground"] },
   meterTrack: { height: 6, borderRadius: 999, backgroundColor: color.hairline, overflow: "hidden" },
   meterFill: { height: "100%", borderRadius: 999 },
   meterOver: { backgroundColor: color.primary },
-  meterUnder: { backgroundColor: "rgba(255,255,255,0.7)" },
+  meterUnder: { backgroundColor: color["text-soft"] },
   bookBand: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   bookLane: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug, paddingVertical: space.snug, alignItems: "flex-start" },
   bookExtras: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingHorizontal: space.snug, paddingVertical: space.snug },
@@ -478,8 +493,8 @@ const styles = StyleSheet.create({
   logRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 56, paddingVertical: space.tight },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   logOpp: { ...type.body, color: color.foreground },
-  valuePill: { minWidth: 56, borderRadius: 8, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
-  valueText: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 12, padding: space.snug },
+  valuePill: { minWidth: 56, borderRadius: radius.sm, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
+  valueText: { ...d.callout },
+  unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: color.tile, borderRadius: radius.control, padding: space.snug },
   unpricedText: { ...type.callout, flex: 1, color: color["muted-foreground"] },
 });

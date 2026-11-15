@@ -27,6 +27,22 @@ describe("BookQuotes (per-side books under a Hot props row)", () => {
     expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
   });
 
+  it("marks=false drops bookmaker logos and keeps face prices flush", () => {
+    render(<BookQuotes quotes={quotes} marks={false} />);
+    expect(screen.getByText(/^O/)).toBeInTheDocument();
+    expect(screen.queryByText("bet365")).toBeNull();
+    expect(screen.queryByText("Ladbrokes")).toBeNull();
+    expect(screen.getByRole("button", { name: /\+\d+ books?/ })).toBeInTheDocument();
+  });
+
+  it("detailOnly skips a single-line strip the Over/Under column already covers", () => {
+    const { rerender } = render(<BookQuotes quotes={bookQuotes([{ line: 17.5, books: [B("bet365", 1.833, 1.833)] }])} detailOnly rowLine={17.5} />);
+    expect(screen.queryByText(/^O/)).toBeNull();
+    rerender(<BookQuotes quotes={quotes} marks={false} detailOnly rowLine={17.5} />);
+    expect(screen.getByText(/^O/)).toBeInTheDocument(); // split lines (17.5 vs 14.5)
+    expect(screen.getByRole("button", { name: /\+\d+ books?/ })).toBeInTheDocument();
+  });
+
   it("rolls the new price in place without flashing the background", () => {
     const live = (price: number) => bookQuotes([{ line: 33.5, books: [{ ...B("bet365", price, 1.9), live: true }] }]);
     const { rerender } = render(<BookQuotes quotes={live(1.8)} />);
@@ -40,10 +56,10 @@ describe("BookQuotes (per-side books under a Hot props row)", () => {
     expect(ticker.className).not.toMatch(/tick-(up|down)/);
   });
 
-  it("a live quote has no Live mark in the strip (the row's name carries it); where the line stood before the match is a short \"was 25.5\"", () => {
+  it("a live quote has no Live / Opened at in the strip (In Play Market is on the row name)", () => {
     const live = bookQuotes([{ line: 33.5, books: [{ ...B("bet365", 1.8, 1.9), live: true, opened: 25.5 }] }]);
     render(<BookQuotes quotes={live} />);
     expect(screen.queryByText("Live")).toBeNull();
-    expect(screen.getByText("was 25.5")).toBeInTheDocument();
+    expect(screen.queryByText(/was |Opened at/)).toBeNull();
   });
 });

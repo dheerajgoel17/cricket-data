@@ -8,9 +8,9 @@ import { useData } from "@/lib/data";
 import { inplayQuery, linesQuery } from "@/lib/queries";
 
 /**
- * The book lines the tables read, with the in-play lines of started matches folded in (`liveMerge`): a batter's innings-runs line and a side's innings-total line replace the earlier ones and
- * carry `live: true`, so the props and fancy tables show them with their own history figures and no table of their own. `/api/inplay` is asked (~15 s) only while a match is on.
- * `data.live` holds the other live markets, shown as live rows of the Match Fancy list. Same shape as `useQuery(linesQuery)`.
+ * The book lines the tables read, with in-play lines folded in only when that market was not priced before the start (`liveMerge`).
+ * Pre-match markets keep their rows; their in-play prices stay in the snapshot / log. `/api/inplay` is asked (~15 s) only while a match is on.
+ * `data.live` holds the other live markets shown on Match Fancy. Same shape as `useQuery(linesQuery)`.
  */
 export function useLinesLive() {
   const lines = useQuery(linesQuery);
