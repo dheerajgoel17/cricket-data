@@ -16,6 +16,7 @@ const GOVERNED = [
   "components/app/book-table.tsx", "components/app/empty-state.tsx", "components/app/error-boundary.tsx", "components/app/fancy-filters.tsx", "components/app/grid-filters.tsx",
   "components/app/fancy-lines.tsx", "components/app/home-mix-table.tsx", "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx",
   "components/app/result-stamp.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
+  "components/app/android-app-banner.tsx",
   "pages/AdminAds.tsx", "pages/AuthCallback.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;

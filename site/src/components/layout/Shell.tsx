@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Suspense, useLayoutEffect, useRef } from "react";
 import { NavLink, Outlet, useLocation, useNavigationType } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
+import { AndroidAppBanner } from "@/components/app/android-app-banner";
 import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
 import { MAIN_NAV, MORE_NAV } from "./nav";
@@ -109,7 +110,10 @@ export function Shell() {
     <SidebarProvider className="relative min-h-screen flex-col pb-[calc(var(--phone-dock-h,calc(var(--tabbar-h)+var(--tabbar-pad)+env(safe-area-inset-bottom))))] lg:pb-0">
       <a href="#main" className="sr-only z-[70] focus:not-sr-only focus:fixed focus:left-gutter focus:top-snug focus:rounded-lg focus:bg-card focus:p-snug">Skip to content</a>
       <PageWashLayer />
-      <div className="sticky top-0 z-50"><Header /></div>
+      <div className="sticky top-0 z-50">
+        <AndroidAppBanner />
+        <Header />
+      </div>
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset id="main" tabIndex={-1} className="min-w-0 overflow-x-clip bg-transparent">

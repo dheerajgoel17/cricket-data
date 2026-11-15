@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — AndroidAppBanner (mobile web install strip)
+- **Path:** `site/src/components/app/android-app-banner.tsx`, `site/src/lib/android-app.ts`, `components/layout/Shell.tsx`, catalogue `DesignSystem.tsx`
+- **Change:** dismissible banner above the sticky header on Android phone browsers only (`lg:hidden`); opens `VITE_ANDROID_APP_URL` or the latest GitHub release; dismiss persists in `localStorage`; analytics `android_app_banner` open/dismiss
+- **Callers:** product shell (web); no native twin (the app is the destination)
+
 ### 2026-11-15 — Web: page wash through the chrome; visible form controls
 - **Path:** `site/src/lib/header-slot.tsx` (`usePageWash`, `usePageWashColor`, `useScrolled`), `components/app/hero-wash.tsx` (`page`), `components/layout/Shell.tsx` (`PageWashLayer`, sidebar), `components/layout/Header.tsx`, `components/app/page.tsx` (`StickyFilterBand`), `pages/Player.tsx`, `pages/Markets.tsx`; tokens `input`
 - **Change:** an entity page's tint (player, team) is a page-level layer behind the sidebar, the header, the breadcrumbs and the sticky chips, so the colour flows through them like the app's clear header; they turn solid once the page scrolls. Form control borders (`input`) were #1c1c1e on #1c1c1e cards (invisible); now #6c6c70, 3.25:1 on cards (WCAG 1.4.11), with a contrast test.
