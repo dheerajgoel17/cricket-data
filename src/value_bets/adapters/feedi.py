@@ -152,10 +152,31 @@ def partner() -> str:
 
 
 def relay() -> tuple[str, str] | None:
-    """(relay address, key) from FEEDH_RELAY / FEEDH_RELAY_KEY, else Feed G's pair."""
+    """Primary hop: FEEDH_RELAY / FEEDH_RELAY_KEY, else Feed G's pair."""
     addr = os.environ.get("FEEDH_RELAY", "").strip() or os.environ.get("FEEDG_RELAY", "").strip()
     key = os.environ.get("FEEDH_RELAY_KEY", "").strip() or os.environ.get("FEEDG_RELAY_KEY", "").strip()
     return (addr, key) if addr.startswith("https://") and key else None
+
+
+def relay_targets() -> list[tuple[str, str]]:
+    """Worker first, then Feed G's Vercel bom1 and optional alt — same dual-hop as Feed G on a Cloudflare challenge."""
+    out: list[tuple[str, str]] = []
+    seen: set[str] = set()
+
+    def add(addr: str, key: str):
+        addr, key = addr.strip(), key.strip()
+        if addr.startswith("https://") and key and addr not in seen:
+            seen.add(addr)
+            out.append((addr, key))
+
+    if primary := relay():
+        add(*primary)
+    add(os.environ.get("FEEDG_RELAY", ""), os.environ.get("FEEDG_RELAY_KEY", ""))
+    add(
+        os.environ.get("FEEDG_RELAY_ALT", ""),
+        os.environ.get("FEEDG_RELAY_ALT_KEY", "") or os.environ.get("FEEDG_RELAY_KEY", "") or (out[0][1] if out else ""),
+    )
+    return out
 
 
 def lab(url: str) -> bool:
@@ -169,10 +190,19 @@ def on_runner() -> bool:
 
 def _http_body(err: urllib.error.HTTPError) -> str:
     try:
-        raw = err.read() if err.fp is not None else b""
-        return raw.decode("utf-8", "replace").strip()[:80]
+        text = (err.read() or b"").decode("utf-8", "replace").strip()
     except Exception:
         return ""
+    low = text[:400].lower()
+    if "host not allowed" in low:
+        return text.split("\n", 1)[0][:240]
+    if "<!doctype html" in low or "just a moment" in low or "cf-browser-verification" in low or "cdn-cgi/challenge" in low:
+        return "cloudflare challenge from the book (tried Mumbai hops)"
+    return text[:240]
+
+
+def _is_challenge(detail: str) -> bool:
+    return "cloudflare challenge" in (detail or "").lower()
 
 
 def _relay_headers(url: str, key: str) -> dict[str, str]:
@@ -186,22 +216,31 @@ def _relay_headers(url: str, key: str) -> dict[str, str]:
 
 
 def request(url: str):
-    """One GET through the free Mumbai Worker hop. Direct only for test hosts. A laptop never reaches a real book."""
+    """One GET through free Mumbai hops (Worker, then Vercel bom1 / alt). Direct only for test hosts. A laptop never reaches a real book."""
     if not on_runner() and not lab(url):
         raise Skip("Feed I does not run on a local machine")
-    rl = relay()
-    if rl is None:
+    targets = relay_targets()
+    if not targets:
         if lab(url):
             return http_json(url, retries=0)[0]
         raise Skip("FEEDH_RELAY not set (never call the book directly)")
-    try:
-        return http_json(
-            f"{rl[0]}?u={urllib.parse.quote(url, safe='')}",
-            headers=_relay_headers(url, rl[1]),
-            retries=0,
-        )[0]
-    except urllib.error.HTTPError as e:
-        raise urllib.error.HTTPError(e.url, e.code, _http_body(e) or e.reason, e.hdrs, None) from e
+    last: urllib.error.HTTPError | None = None
+    for i, (addr, key) in enumerate(targets):
+        try:
+            return http_json(
+                f"{addr}?u={urllib.parse.quote(url, safe='')}",
+                headers=_relay_headers(url, key),
+                retries=0,
+            )[0]
+        except urllib.error.HTTPError as e:
+            detail = _http_body(e)
+            last = urllib.error.HTTPError(e.url, e.code, detail or e.reason, e.hdrs, None)
+            if i + 1 < len(targets) and (_is_challenge(detail) or e.code in (403, 503)):
+                continue
+            raise last from e
+    if last is None:
+        raise Skip("FEEDH_RELAY not set (never call the book directly)")
+    raise last
 
 
 def flip(name: str) -> str:
