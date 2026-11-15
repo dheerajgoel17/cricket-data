@@ -229,4 +229,10 @@ The Android app ships its JavaScript through `expo-updates` (the maintained succ
 * **How the app finds updates:** once per launch, 12 s after start, `src/lib/ota.ts` checks the update server, downloads in the background and applies the new bundle on the next launch (never reloads under the user's finger). Debug builds, the browser and builds made without `EXPO_UPDATES_URL` never check.
 * **Server:** a free EAS account (its free tier) or any static host that serves the Expo Updates protocol. The URL is the repository variable `EXPO_UPDATES_URL` (and in `mobile/.env.local` for a local build); it is never written in a tracked file (`mobile/app.config.js` reads it at build time).
 * **Publish:** Actions → "Mobile OTA update" (needs the secret `EXPO_TOKEN` and the variable `EXPO_UPDATES_URL`), or locally `cd mobile && npx eas-cli update --branch production --message "..."`. The workflow refuses a native change.
-* **First time:** the APK must be built once with `EXPO_UPDATES_URL` set so it can receive updates; builds made before expo-updates was added cannot.
+* **First time, step by step (free EAS account):**
+  1. Sign up at expo.dev/signup, then `cd mobile && npx eas-cli login`.
+  2. `npx eas-cli init` (creates the project; note its project id). The update URL is `https://u.expo.dev/<project id>`.
+  3. Map the channel the app listens to (`production`, set in `app.config.js`) to a branch: `npx eas-cli channel:create production --branch production`.
+  4. Put the URL in `mobile/.env.local` as `EXPO_UPDATES_URL` and in the repository variable `EXPO_UPDATES_URL`; create an access token (expo.dev account settings, Access tokens) and store it as the repository secret `EXPO_TOKEN`.
+  5. Build the APK once with `EXPO_UPDATES_URL` set (an APK built before this cannot receive updates), then publish JavaScript-only changes from Actions → "Mobile OTA update".
+  Check the free plan's monthly update allowance on expo.dev/pricing.

@@ -7,7 +7,7 @@ module.exports = ({ config }) => {
     ...config,
     runtimeVersion: { policy: "fingerprint" },
     updates: url
-      ? { url, enabled: true, checkAutomatically: "NEVER", fallbackToCacheTimeout: 0 }
+      ? { url, enabled: true, checkAutomatically: "NEVER", fallbackToCacheTimeout: 0, requestHeaders: { "expo-channel-name": "production" } } // a locally built APK names its channel itself
       : { enabled: false },
   };
 };
