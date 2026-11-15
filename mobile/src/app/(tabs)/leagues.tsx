@@ -21,7 +21,7 @@ import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { cap, color, font, radius, space, type, fs, rhythm } from "@/ui/tokens";
+import { cap, color, font, radius, space, type, fs, rhythm, t, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -82,14 +82,14 @@ function Leagues() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   all: { flexDirection: "row", alignItems: "center", gap: 2 },
-  allText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },
+  allText: { ...t.calloutLabel, color: color["muted-foreground"] },
   emptyPad: { padding: space.gutter },
   chips: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: 40, flexDirection: "row", alignItems: "center", gap: space.tight, paddingLeft: 8, paddingRight: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.card },
   chipOn: { backgroundColor: color.primary },
-  chipText: { ...type.callout, fontFamily: font.medium, color: color.foreground, maxWidth: 180 },
+  chipText: { ...t.calloutLabel, color: color.foreground, maxWidth: 180 },
   tag: { borderRadius: 999, paddingHorizontal: 6, height: 16, justifyContent: "center" },
-  tagText: { ...cap, fontFamily: font.data, fontSize: fs.caption, color: color.background },
+  tagText: { ...cap, ...w.dataStrong, fontSize: fs.caption, color: color.background },
   body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.top },
   leagueHead: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leagueName: { ...type.title, color: color.foreground, flex: 1 },

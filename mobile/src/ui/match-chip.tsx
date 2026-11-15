@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useChoice } from "@/lib/use-choice";
 import { HScroll } from "@/ui/h-scroll";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -9,7 +10,7 @@ import { abbr } from "@site/lib/format";
 import { dayLabel, localTime } from "@/lib/format";
 import { fixtureStart } from "@/lib/rail";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, control, font, radius, space, tint, type, duration } from "@/ui/tokens";
+import { color, control, font, radius, space, tint, type, duration, t } from "@/ui/tokens";
 
 type Fx = { id: string; a: string; b: string; fmt?: string; start?: string };
 
@@ -41,7 +42,8 @@ type Tag = { text: string; session: boolean };
 /** Home Props fixture hashtags: overlapping crests + `ABR v ABR`, then the start time or, once the match is on, a Live / session tag (the site's `MatchChip`). The chosen chip is the accent fill. */
 const SUB_ON = tint.hex(color["primary-foreground"], 0.7);
 
-export function MatchChips({ items, value, onChange, tags, all }: { items: Fx[]; value: string; onChange: (id: string) => void; tags?: Record<string, Tag>; /** Lead with an "All" chip whose id is `all` (the Player props match filter). */ all?: boolean }) {
+export function MatchChips({ items, value: valueProp, onChange: onChangeProp, tags, all }: { items: Fx[]; value: string; onChange: (id: string) => void; tags?: Record<string, Tag>; /** Lead with an "All" chip whose id is `all` (the Player props match filter). */ all?: boolean }) {
+  const [value, onChange] = useChoice(valueProp, onChangeProp);
   return (
     <HScroll
       contentContainerStyle={styles.row}
@@ -104,12 +106,12 @@ const styles = StyleSheet.create({
   },
   overlap: { marginLeft: -10 },
   text: { minWidth: 0, gap: 1 },
-  title: { ...type.caption, fontFamily: font.medium },
+  title: { ...t.captionLabel },
   sub: { ...type.caption },
   tag: { alignSelf: "flex-start", borderRadius: radius.chip, paddingHorizontal: space.tight },
   tagLive: { backgroundColor: tint.destructive(0.2) },
   tagSession: { backgroundColor: color.secondary },
-  tagText: { ...type.caption, fontFamily: font.medium },
+  tagText: { ...t.captionLabel },
   allChip: { paddingHorizontal: space.stack, justifyContent: "center" },
-  allText: { ...type.callout, fontFamily: font.medium },
+  allText: { ...t.calloutLabel },
 });

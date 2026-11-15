@@ -18,7 +18,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, fs, tint, surface, rhythm } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, fs, tint, surface, rhythm, t, d, w } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -227,27 +227,27 @@ const styles = StyleSheet.create({
   bar: { height: "100%", backgroundColor: color.primary, borderRadius: 2 },
   leader: { ...surface.card, padding: space.stack, gap: space.snug },
   leaderRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  leaderName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  leaderNum: { ...numLg, fontFamily: font.data, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
+  leaderName: { ...t.bodyLabel, color: color.foreground },
+  leaderNum: { ...numLg, ...w.dataStrong, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   subSmall: { ...type.caption, color: color["muted-foreground"] },
   card: { ...surface.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
   cardHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.stack },
-  cardTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  cardTitle: { ...t.bodyLabel, color: color.foreground },
   tr: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.stack, minHeight: 28 },
   trSep: { minHeight: 52, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   th: { ...type.caption, ...cap, color: color["muted-foreground"] },
   numCol: { width: 52, textAlign: "right" },
-  rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  rank: { ...d.footnote, color: color["muted-foreground"] },
   who: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
-  name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  value: { ...num, fontFamily: font.dataLight, fontSize: fs.title, color: color.foreground },
+  name: { ...t.calloutLabel, color: color.foreground },
+  value: { ...num, ...w.data, fontSize: fs.title, color: color.foreground },
   extra: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
   more: { height: 44, alignItems: "center", justifyContent: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  moreText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },
+  moreText: { ...t.calloutLabel, color: color["muted-foreground"] },
   bars: { height: 112, flexDirection: "row", alignItems: "flex-end", gap: 2, marginHorizontal: space.stack, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   barHit: { flex: 1, height: "100%", justifyContent: "flex-end" },
   barFill: { width: "100%", borderTopLeftRadius: 3, borderTopRightRadius: 3 },
   axis: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.stack, paddingBottom: space.snug },
-  axisMid: { ...type.footnote, fontFamily: font.medium, color: color.foreground, flex: 2, textAlign: "center" },
+  axisMid: { ...t.footnoteLabel, color: color.foreground, flex: 2, textAlign: "center" },
 });

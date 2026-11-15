@@ -8,7 +8,7 @@ import { flagUrl } from "@site/lib/assets";
 import { abs } from "@/lib/config";
 import { initials } from "@/lib/format";
 import { photosQuery } from "@/lib/queries";
-import { color, font } from "@/ui/tokens";
+import { color, font, w } from "@/ui/tokens";
 
 /** Round team badge (or, with `bare`, the logo alone with no circle): the source's logo when we know the team, else the national flag, else initials (the site's `TeamBadge`). */
 export function TeamBadge({ name, size = 40, bare }: { name: string; size?: number; bare?: boolean }) {
@@ -41,7 +41,7 @@ export function TeamBadge({ name, size = 40, bare }: { name: string; size?: numb
 
 const styles = StyleSheet.create({
   circle: { overflow: "hidden", alignItems: "center", justifyContent: "center", backgroundColor: color.pill },
-  initials: { fontFamily: font.bold, color: color["muted-foreground"] },
+  initials: { ...w.strong, color: color["muted-foreground"] },
 });
 
 /** Round league badge: the source's logo for the league's newest season, else the league's initials ("IPL"). */

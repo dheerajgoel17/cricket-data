@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /** A selectable rounded chip: filled when selected, 36 px tall (the control height), the touch target is the whole chip. Used in filter views and rails. */
@@ -10,6 +11,17 @@ export function Chip({ on, onClick, children, className, ...rest }: { on?: boole
         on ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-surface-raised", className)}>
       {children}
     </button>
+  );
+}
+
+/** The one "open the filters" button (Props, Fancy, Grid, Ground, Player): icon, label, and the number of active filters as a badge on the corner. App twin: `FilterButton` in `mobile/src/ui/chips.tsx`. */
+export function FilterButton({ label = "Filters", count = 0, onClick }: { label?: ReactNode; count?: number; onClick: () => void }) {
+  return (
+    <Button type="button" variant="secondary" size="sm" aria-label={`Filters${count ? `, ${count} active` : ""}`} onClick={onClick}
+      className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+      <AdjustmentsHorizontalIcon className="size-4" />{label}
+      {count > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{count}</span>}
+    </Button>
   );
 }
 

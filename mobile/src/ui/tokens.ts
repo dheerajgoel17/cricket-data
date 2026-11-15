@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, type TextStyle } from "react-native";
 // Colours and size roles come from the shared token file (site/packages/tokens/tokens.json).
 // Space / type / radius / control are derived so the app stays on the same contract as the site (docs/DESIGN_SYSTEM.md).
 import tokens from "@cricket/tokens/tokens.json";
@@ -128,6 +128,29 @@ export const type = {
   heading: { fontFamily: font.medium, fontSize: title, lineHeight: lh(title, T["fs-title-lh"]), letterSpacing: ls(title, T["fs-title-ls"]) },
   caption: { fontFamily: font.regular, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
+
+
+/**
+ * Named text roles: the only text recipes a screen may spread (CI: `tokens.test.ts`). Three families of job:
+ * - **copy / label / strong** (Satoshi): `t.body` is reading text, `t.bodyLabel` is a control, chip, row label or title at the label weight (500), `t.bodyStrong` is a name or the one key line (700). Same for callout, footnote, caption.
+ * - **data** (Barlow Condensed, tabular): `d.callout` is a figure at the label weight (500: prices, hit rates, counts), `dStrong.callout` the key figure (700: a score, a total). Sizes: caption, footnote, callout, body, title.
+ * - **caps** (`cap`): uppercase column heads and kickers.
+ * The web twins are `text-*` + `font-label` / `font-emphasis` and `font-condensed tabular-nums`.
+ */
+type Sz = "caption" | "footnote" | "callout" | "body" | "title";
+const tx = (sz: Sz, family: string): TextStyle => ({ ...type[sz], fontFamily: family });
+const dx = (sz: Sz, family: string): TextStyle => ({ ...type[sz], fontFamily: family, fontVariant: ["tabular-nums"] });
+export const t = {
+  ...type,
+  bodyLabel: tx("body", font.medium), calloutLabel: tx("callout", font.medium), footnoteLabel: tx("footnote", font.medium), captionLabel: tx("caption", font.medium),
+  bodyStrong: tx("body", font.bold), calloutStrong: tx("callout", font.bold), footnoteStrong: tx("footnote", font.bold), captionStrong: tx("caption", font.bold),
+} as const;
+/** Weight only, for a span inside text that already has its size (copy 400, label 500, strong 700; data = Barlow at 500, dataStrong at 700). */
+export const w = { copy: { fontFamily: font.regular }, label: { fontFamily: font.medium }, strong: { fontFamily: font.bold }, data: { fontFamily: font.dataLight }, dataStrong: { fontFamily: font.data } } as const;
+/** Figures at the label weight (500). */
+export const d = { caption: dx("caption", font.dataLight), footnote: dx("footnote", font.dataLight), callout: dx("callout", font.dataLight), body: dx("body", font.dataLight), title: dx("title", font.dataLight) } as const;
+/** The key figure (700). */
+export const dStrong = { caption: dx("caption", font.data), footnote: dx("footnote", font.data), callout: dx("callout", font.data), body: dx("body", font.data), title: dx("title", font.data) } as const;
 
 const metricSize = metricFs;
 /** The site's `font-condensed text-metric font-emphasis`: a row's hero line ("O/U 29.5") in Barlow Condensed Bold, tabular. */

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterButton } from "@/components/app/chip";
 import { ScrollRow } from "@/components/app/scroll-row";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, ArrowUpOnSquareIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { fancyShareText } from "@cricket/engine/share-text.js";
 import { sendShare, shareFixtureUrl } from "@/lib/share";
@@ -271,11 +272,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />L{win}
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
+            <FilterButton label={`L${win}`} count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {keyList.length > 1 && (
             <div className="px-gutter py-snug">
@@ -297,11 +294,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />L{win}
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
+            <FilterButton label={`L${win}`} count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {activeFilters.length > 0 && (
             <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">

@@ -14,7 +14,7 @@ import { ResultStamp, sideStamp } from "@/ui/result-stamp";
 import { TeamBadge } from "@/ui/team-badge";
 import { InPlayBadge } from "@/ui/live-bits";
 import type { Standing } from "@/ui/tick";
-import { color, control, figure, font, space, type } from "@/ui/tokens";
+import { color, control, figure, font, space, type, t, d, w } from "@/ui/tokens";
 
 /**
  * Compact PropLines twin (native has no dense table): avatar · name · O/U sideLetter + price · Edge · MiniBars.
@@ -90,17 +90,17 @@ const styles = StyleSheet.create({
   pressed: { backgroundColor: color["surface-hover"] },
   main: { flex: 1, minWidth: 0, gap: space.hair },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  name: { ...type.body, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
+  name: { ...t.bodyStrong, color: color.foreground, flexShrink: 1 },
   statusSlot: { width: 72, minHeight: 36, alignItems: "center", justifyContent: "center" },
-  statusMark: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"], textAlign: "center", textTransform: "uppercase", letterSpacing: 0.4 },
+  statusMark: { ...t.captionLabel, color: color["muted-foreground"], textAlign: "center", textTransform: "uppercase", letterSpacing: 0.4 },
   priceRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.hair, rowGap: 2 },
-  priceLine: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
-  odds: { fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
-  outLine: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
+  priceLine: { ...t.calloutLabel, color: color.foreground, flexShrink: 1 },
+  odds: { ...w.data, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
+  outLine: { ...d.callout, color: color["muted-foreground"] },
   outStat: { textTransform: "uppercase", letterSpacing: 0.4 },
   edge: { width: 44, alignItems: "center", gap: space.hair, paddingHorizontal: space.tight },
   edgeLabel: { ...type.caption, textTransform: "uppercase", letterSpacing: 0.4, color: color["muted-foreground"] },
-  edgeValue: { ...figure, fontFamily: font.dataLight },
+  edgeValue: { ...figure, ...w.data },
 });
 
 type PropRowProps = Parameters<typeof PropRowView>[0];

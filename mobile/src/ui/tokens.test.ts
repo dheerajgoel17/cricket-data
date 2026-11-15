@@ -50,4 +50,15 @@ describe("tokens derived from tokens.json", () => {
   it("derives the page rhythm from the space roles", () => {
     expect(rhythm).toEqual({ within: 10, between: 16, section: 32, top: 16, inline: 14 });
   });
+
+  it("picks text from the named roles, never a raw font family", () => {
+    const bad = files(src).filter((f) => !/\/app\/_layout\.tsx$/.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (/\bfont\.(regular|medium|bold|data|dataLight|dataDefault|light)\b/.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(bad).toEqual([]);
+  });
+
+  it("builds buttons and search boxes only in their shared components", () => {
+    const hits = (re: RegExp, allow: RegExp) => files(src).filter((f) => !allow.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(hits(/height: (36|44|48)\b[^}]*backgroundColor: color\.(primary|secondary)\b|backgroundColor: color\.(primary|secondary)\b[^}]*height: (36|44|48)\b/, /(ui\/button|ui\/line-stepper)\.tsx$/)).toEqual([]);
+    expect(hits(/placeholderTextColor=\{color\["muted-foreground"\]\} style=\{styles\.input\} (accessibilityLabel|autoFocus)/, /ui\/search-field\.tsx$/)).toEqual([]);
+  });
 });

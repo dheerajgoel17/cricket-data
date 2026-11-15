@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterButton } from "@/components/app/chip";
 import { ScrollRow } from "@/components/app/scroll-row";
 import { useCallback, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
@@ -547,11 +548,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         <StickyFilterBand>
           <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-            </Button>
+            <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (
             <ScrollRow className="flex items-center gap-snug px-gutter py-snug" aria-label="Active filters">
@@ -564,11 +561,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         <div className="flex flex-col">
           <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-            </Button>
+            <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (
             <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">

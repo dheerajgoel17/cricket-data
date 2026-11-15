@@ -38,6 +38,8 @@ Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 ·
 
 **Weight** (bold where hierarchy needs it, never as default): *emphasis* 700 is for identity and the one key figure: team and player names, scores and totals, a row's hero line and its price, status tags, a page's own headline. *label* 500 is for section / card / sheet titles (`type.heading`), secondary numbers (`font.dataLight`), controls and chips. *copy* 400 is body text; *editorial* 300 is for light tabular figures. If everything in a row is bold, nothing is.
 
+**Text roles** (`t.*`, `d.*`, `dStrong.*`, `w.*` in `ui/tokens.ts`): a screen never writes a font family. `t.bodyLabel` / `t.calloutLabel` is a control, chip or row label (Satoshi 500); `t.bodyStrong` a name or the one key line (700); `d.callout` a figure at the label weight (Barlow 500) and `dStrong.callout` the key figure (700); `w.label` is weight only, for a span inside text. Web: `text-*` with `font-label` / `font-emphasis`, `font-condensed tabular-nums`.
+
 **Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone). Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web): the content fades at an edge that has more behind it (a gradient or mask, never a live blur).
 
 ### Platform conventions (one design, three native idioms)
@@ -162,6 +164,11 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
 | Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters, More); never a hand-built `Modal` |
+| Button | `ui/button` (`Button`: primary / secondary, md at the platform touch height, sm at the control height) | Web twin: `components/ui/button.tsx`; never style a `Press` into a button |
+| Search box | `ui/search-field` (`SearchField`) | One box for Search and Competitions |
+| Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row |
+| Choice latency | `lib/use-choice` (`useChoice`) | Every chip, tab and segmented control highlights in the tap's own frame and runs the real change as a transition |
+| List reflow | `ui/motion` (`Reflow`) | Short lists whose order or membership changes (Saved, market overview): rows glide, a removed row fades. Web twin: `ReflowGroup` / `ReflowItem`. Not for virtualized lists |
 | Round icon button | `ui/round-button` (`RoundButton`) | Native chrome: back, search, account, share, close; web twin is the header icon button |
 
 Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.

@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import Animated, { type AnimatedStyle } from "react-native-reanimated";
 import { goBack } from "@/lib/nav";
 import { ChevronLeft } from "@/ui/icons";
-import { font, color, space, type } from "@/ui/tokens";
+import { font, color, space, type, t } from "@/ui/tokens";
 
 /**
  * The bar over a page one level down (a match, a player), as in the reference app: a round back button, the name and what it is centred, and round buttons at the right
@@ -39,7 +39,7 @@ export { RoundButton } from "@/ui/round-button";
 const styles = StyleSheet.create({
   bar: { height: 56, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter },
   mid: { flex: 1, alignItems: "center", gap: 1 },
-  title: { ...type.body, fontFamily: font.bold, color: color.foreground },
+  title: { ...t.bodyStrong, color: color.foreground },
   subtitle: { ...type.footnote, color: color["muted-foreground"] },
   right: { flexDirection: "row", justifyContent: "flex-end", alignItems: "center", gap: space.tight },
 });

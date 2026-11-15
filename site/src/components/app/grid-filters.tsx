@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { FilterButton } from "@/components/app/chip";
 import { ScrollRow } from "@/components/app/scroll-row";
-import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -85,11 +86,7 @@ export function GridFilterBar({ stat, line, games, hit, items, setQ }: {
     <div className="flex flex-col gap-snug">
       <div className="flex items-center gap-snug">
         <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={items} className="min-w-0 flex-1" />
-        <Button type="button" variant="secondary" size="sm" aria-label={`Filters${active.length ? `, ${active.length} active` : ""}`} onClick={() => setOpen(true)}
-          className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-          <AdjustmentsHorizontalIcon className="size-4" />L{games}
-          {active.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{active.length}</span>}
-        </Button>
+        <FilterButton label={`L${games}`} count={active.length} onClick={() => setOpen(true)} />
       </div>
       {active.length > 0 && (
         <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">

@@ -26,11 +26,11 @@ import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { Press } from "@/ui/press";
-import { Segmented } from "@/ui/segmented";
+import { LineTabs } from "@/ui/line-tabs";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
-import { cap, color, font, num, radius, space, type, fs, surface, rhythm } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type, fs, surface, rhythm, t } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -81,16 +81,14 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
         </View>
 
         {/* Sticky only the short Matches/Markets control — pinning format+gender chips with it is too tall for phone. */}
-        {g.primary >= 0 ? <View style={[styles.pad, styles.sectionBar]}>
-          <Segmented<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} height={44} items={[["matches", "Matches"], ["markets", "Markets"]]} />
+        {g.primary >= 0 ? <View style={styles.sectionBar}>
+          <LineTabs<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} items={[["matches", "Matches"], ["markets", "Markets"]]} />
         </View> : null}
 
         <View style={styles.filters}>
           <View style={[styles.pad, styles.titleRow]}><Text style={styles.kicker}>Match filters</Text><Text style={styles.note}>{activeFmt} · {genderFilterLabel(gender)}</Text></View>
           <Chips items={formats} value={activeFmt} onChange={setFmt} />
-          {both ? <View style={styles.pad}>
-            <Segmented<GenderFilter> label="Gender" value={gender} onChange={setGender} items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]]} />
-          </View> : null}
+          {both ? <Chips items={[["", genderFilterLabel("")], ["male", genderFilterLabel("male")], ["female", genderFilterLabel("female")]] as [GenderFilter, string][]} value={gender} onChange={(g) => setGender(g as GenderFilter)} /> : null}
         </View>
 
         {g.primary >= 0 ? <GroundStats store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} /> : null}
@@ -349,11 +347,11 @@ const styles = StyleSheet.create({
   note: { ...type.footnote, color: color["muted-foreground"] },
   tour: { ...surface.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
   crests: { flexDirection: "row", alignItems: "center" },
-  tourName: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  tourName: { ...t.calloutLabel, color: color.foreground },
   status: { ...cap },
   titleRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
   h2: { ...type.heading, color: color.foreground },
-  h3: { flexShrink: 1, ...type.body, fontFamily: font.medium, color: color.foreground },
+  h3: { flexShrink: 1, ...t.bodyLabel, color: color.foreground },
   count: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
   more: { ...surface.card, height: 44, alignItems: "center", justifyContent: "center" },
   moreText: { ...type.callout, color: color.foreground },
@@ -362,13 +360,13 @@ const styles = StyleSheet.create({
   statNum: { ...num, fontSize: fs.figure, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
-  sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
+  sideKey: { ...t.footnoteLabel, color: color["muted-foreground"], textTransform: "capitalize" },
   big: { ...num, fontSize: fs.metric, color: color.foreground },
   /** Web twin: `-mx-gutter border-y` Top batter edge band. */
   topBleed: { marginTop: space.snug },
   topNote: { paddingHorizontal: space.gutter, paddingVertical: space.snug },
   topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, paddingHorizontal: space.gutter, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  topName: { ...t.bodyLabel, color: color.foreground },
   lineNum: { ...num, fontSize: fs.title, color: color.foreground },
   cellNum: { ...num, fontSize: fs.body, color: color.foreground },
   fair: { ...type.footnote, color: color["muted-foreground"] },

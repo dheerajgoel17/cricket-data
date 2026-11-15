@@ -12,7 +12,7 @@ import { ResultStamp, sideStamp } from "@/ui/result-stamp";
 import { TeamBadge } from "@/ui/team-badge";
 import { InPlayBadge } from "@/ui/live-bits";
 import type { Standing } from "@/ui/tick";
-import { color, control, figure, font, space, type, tint } from "@/ui/tokens";
+import { color, control, figure, font, space, type, tint, t, d, w } from "@/ui/tokens";
 
 /** "+N books": the books not already shown up front for a line, each with its over and under price. */
 export function BookList({ books, shown }: { books: { source: string; over: number | null; under: number | null }[]; shown: (string | undefined)[] }) {
@@ -98,18 +98,18 @@ const styles = StyleSheet.create({
   icon: { width: control, height: control, borderRadius: control / 2, alignItems: "center", justifyContent: "center", backgroundColor: color.secondary },
   left: { flex: 1, minWidth: 0, gap: space.hair },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  label: { ...type.body, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
+  label: { ...t.bodyStrong, color: color.foreground, flexShrink: 1 },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   priceRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.hair, rowGap: 2 },
-  priceLine: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
-  odds: { fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
+  priceLine: { ...t.calloutLabel, color: color.foreground, flexShrink: 1 },
+  odds: { ...w.data, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
   edge: { width: 44, alignItems: "center", gap: space.hair, paddingHorizontal: space.tight },
   edgeLabel: { ...type.caption, textTransform: "uppercase", letterSpacing: 0.4, color: color["muted-foreground"] },
   edgeValue: { ...figure },
   statusSlot: { width: 72, minHeight: 36, alignItems: "center", justifyContent: "center" },
   voidMark: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.amber(0.6), borderStyle: "dashed", borderRadius: 4, paddingHorizontal: space.hair, overflow: "hidden" },
   moreBtn: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", paddingHorizontal: space.gutter },
-  more: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"] },
+  more: { ...t.footnoteLabel, color: color["muted-foreground"] },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter },
-  bookPrice: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  bookPrice: { ...d.footnote, color: color["muted-foreground"] },
 });

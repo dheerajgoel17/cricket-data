@@ -1,4 +1,6 @@
 import { RoundButton } from "@/ui/round-button";
+import { Button } from "@/ui/button";
+import { Reflow } from "@/ui/motion";
 import { mark } from "@/lib/perf";
 import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -20,7 +22,7 @@ import { ListRow, Section } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, space, type, rhythm } from "@/ui/tokens";
+import { color, font, space, type, rhythm, t, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Account Saved (server). Recently viewed stays on this device. */
@@ -50,9 +52,7 @@ function Saved() {
       return (
         <View style={styles.gate}>
           <EmptyState title="Sign in to sync Saved" body="Create a free account or continue with Google. Your watchlist, players and teams are stored on the server." />
-          <Press onPress={openSignIn} style={({ pressed }) => [styles.signBtn, pressed && { opacity: 0.9 }]}>
-            <Text style={styles.signLabel}>Sign in</Text>
-          </Press>
+          <Button label="Sign in" onPress={openSignIn} style={styles.signBtn} />
         </View>
       );
     }
@@ -74,19 +74,21 @@ function Saved() {
         {none ? <EmptyState title="Nothing saved yet" body="Tap the star on a prop, player or team. They sync to your account." /> : null}
         <Section title="Watchlist" count={props.length} emptyTitle="No watchlist props" empty="Tap the star on a prop row to track that line here.">
           {props.map(({ k, p }, n) => (
-            <ListRow key={k} first={n === 0} chevron={false}
+            <Reflow key={k}><ListRow first={n === 0} chevron={false}
               left={<PlayerAvatar pid={store.P.id[p.idx]} team={team(p.idx)} size={44} />}
               title={label(p.idx)}
               sub={<><Text style={styles.line}>O {p.line}</Text> {(STATS as any)[p.stat]?.label ?? p.stat} · {FORMATS[p.fmt] ?? ""}</>}
               right={remove(k)}
-              onPress={() => openPlayer({ idx: p.idx, stat: p.stat, line: p.line, fmt: FORMATS[p.fmt] ?? "T20" })} label={`${label(p.idx)}, over ${p.line}`} />
+              onPress={() => openPlayer({ idx: p.idx, stat: p.stat, line: p.line, fmt: FORMATS[p.fmt] ?? "T20" })} label={`${label(p.idx)}, over ${p.line}`} /></Reflow>
           ))}
         </Section>
         <Section title="Players and teams" count={people.length} emptyTitle="No saved players or teams" empty="Tap the star on a player or team page to keep it here.">
-          {people.map(({ k, kind, i }, n) => kind === "player" ? (
-            <ListRow key={k} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={label(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />
-          ) : (
-            <ListRow key={k} first={n === 0} left={<TeamBadge name={store.teams[i].n} size={44} />} title={store.teamName(i)} sub="Team" onPress={() => push(`/team/${i}`)} />
+          {people.map(({ k, kind, i }, n) => (
+            <Reflow key={k}>{kind === "player" ? (
+              <ListRow first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={44} />} title={label(i)} sub={team(i)} onPress={() => push(`/player/${i}`)} />
+            ) : (
+              <ListRow first={n === 0} left={<TeamBadge name={store.teams[i].n} size={44} />} title={store.teamName(i)} sub="Team" onPress={() => push(`/team/${i}`)} />
+            )}</Reflow>
           ))}
         </Section>
         <Section title="Recently viewed" count={seen.length} emptyTitle="No recent players" empty="Players you open show up here on this device.">
@@ -110,11 +112,10 @@ function Saved() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   sections: { gap: rhythm.between, paddingTop: rhythm.top },
-  line: { color: color.primary, fontFamily: font.dataLight },
+  line: { color: color.primary, ...w.data },
   remove: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
-  signBtn: { alignSelf: "center", height: 44, minWidth: 160, paddingHorizontal: space.group, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  signLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
+  signBtn: { alignSelf: "center", minWidth: 160 },
 });
 
 export default lazyTab(Saved, "Saved");

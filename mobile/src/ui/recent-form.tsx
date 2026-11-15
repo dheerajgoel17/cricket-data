@@ -5,7 +5,7 @@ import { push } from "@/lib/nav";
 import { Press } from "@/ui/press";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
-import { color, font, space, type, tint, radius } from "@/ui/tokens";
+import { color, font, space, type, tint, radius, t, d, w } from "@/ui/tokens";
 import { EmptyState } from "@/ui/empty-state";
 
 const CHIP: Record<string, string> = { W: color.primary, L: color.miss, T: color["muted-foreground"], D: color["muted-foreground"], NR: color["muted-foreground"] };
@@ -65,12 +65,12 @@ export function RecentForm({ forms, store, fmt }: { forms: { name: string; idx: 
 }
 
 const styles = StyleSheet.create({
-  chipText: { fontFamily: font.bold, color: color["primary-foreground"] },
+  chipText: { ...w.strong, color: color["primary-foreground"] },
   team: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug },
-  teamName: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
+  teamName: { ...t.calloutLabel, color: color.foreground, flex: 1 },
   game: { flexDirection: "row", alignItems: "center", gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.snug },
   mark: { width: 28, height: 28, borderRadius: radius.sm, alignItems: "center", justifyContent: "center" },
-  vs: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  vs: { ...t.calloutLabel, color: color.foreground },
   muted: { ...type.footnote, color: color["muted-foreground"] },
-  own: { ...type.footnote, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  own: { ...d.footnote, color: color.foreground },
 });

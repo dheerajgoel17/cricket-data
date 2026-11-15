@@ -1,5 +1,7 @@
 import { fancyMarketPath, push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
+import { Reflow } from "@/ui/motion";
 import { HScroll } from "@/ui/h-scroll";
 import { Sheet } from "@/ui/sheet";
 import { useMemo, useState } from "react";
@@ -27,7 +29,7 @@ import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
 import { Bleed } from "@/ui/bleed";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
@@ -38,7 +40,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration, t, w } from "@/ui/tokens";
 
 
 /** Width of the ladder's Line column: fits the longest line a Test total can have (1100.5) at the figure size. */
@@ -200,11 +202,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
         {scopes.length > 1 ? (
           <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
         ) : <View style={styles.chipFlex} />}
-        <Press onPress={() => setFiltersOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
-          <Ionicons name="options-outline" size={16} color={color.foreground} />
-          <Text style={styles.filterLbl}>L{win}</Text>
-          {activeN > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{activeN}</Text></View> : null}
-        </Press>
+        <FilterButton label={`L${win}`} count={activeN} onPress={() => setFiltersOpen(true)} />
       </View>
       {activeN > 0 ? (
         <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
@@ -230,8 +228,8 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
             </>
           ) : null}
           <View style={styles.sheetFoot}>
-            <Press onPress={() => { setDraftWin(10); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
-            <Press onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
+            <Button variant="secondary" flex={1} label="Clear" onPress={() => { setDraftWin(10); setDraftHere(false); }} />
+            <Button flex={2} label="Apply" onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} />
           </View>
       </Sheet>
 
@@ -246,9 +244,9 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
           {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
           <View style={styles.bleed}>
             {overview.map((r: any, i: number) => (
-              <View key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
+              <Reflow key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
                 <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
-              </View>
+              </Reflow>
             ))}
             {liveScored.map(({ m, r }, i) => (
               <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}>
@@ -280,9 +278,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
             <View style={styles.stepRow}>
               <LineStepper value={line} label="O/U" min={0} onStep={(d) => setMl(d < 0 ? Math.max(0, Math.round((line - stepOf(key)) * 2) / 2) : Math.round((line + stepOf(key)) * 2) / 2)} />
               {bookMain && bookMain.line !== line ? (
-                <Press scale={1} onPress={() => setMl(bookMain.line)} accessibilityRole="button" style={styles.lineBtn}>
-                  {bookMain.books[0] ? <BookBadge source={bookMain.books[0].source} /> : null}<Text style={styles.lineBtnText}>main {bookMain.line}</Text>
-                </Press>
+                <Button variant="secondary" size="sm" icon={bookMain.books[0] ? <BookBadge source={bookMain.books[0].source} /> : undefined} label={`main ${bookMain.line}`} onPress={() => setMl(bookMain.line)} />
               ) : null}
             </View>
             <View style={styles.cards}>
@@ -310,7 +306,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
             </View>
             {ground ? (
               <Text style={[styles.note, ground.differs && { color: color.amber }]}>
-                {ground.differs ? <Text style={{ fontFamily: font.medium }}>Ground differs. </Text> : null}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
+                {ground.differs ? <Text style={{ ...w.label }}>Ground differs. </Text> : null}At {venueName}, last {ground.n} {fmt} {scope >= 0 ? `of ${team?.[0]}` : "matches"}: {ground.under} under {line}, {ground.over} over{ground.max != null ? ` · highest ${ground.max}` : ""}
                 {useHere ? "" : ` (teams' form: ${rep.summary.under} of ${rep.n} under)`}.
               </Text>
             ) : null}
@@ -404,21 +400,13 @@ const styles = StyleSheet.create({
   root: { gap: rhythm.between },
   filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
-  filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card },
-  filterLbl: { ...type.callout, color: color.foreground },
-  filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
-  filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
-  clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
+  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
-  sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
+  sheetSec: { ...t.bodyLabel, color: color.foreground, marginTop: space.snug },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
-  sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
-  sheetClearTxt: { ...type.body, color: color.foreground },
-  sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
   h2: { ...type.heading, color: color.foreground },
-  h3: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  h3: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
@@ -428,11 +416,9 @@ const styles = StyleSheet.create({
   statKey: { ...type.footnote, color: color["muted-foreground"] },
   statNum: { ...numLg, fontSize: fs.figure, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   stepRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug },
-  lineBtn: { height: 36, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary },
-  lineBtnText: { ...type.callout, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
-  sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
+  sideKey: { ...t.footnoteLabel, color: color["muted-foreground"], textTransform: "capitalize" },
   sideNum: { ...numLg, fontSize: fs.display, letterSpacing: -0.56, lineHeight: 32, color: color.foreground },
   sideBook: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.tight },
   sidePrice: { ...num, fontSize: fs.body, color: color.primary },
@@ -454,6 +440,6 @@ const styles = StyleSheet.create({
   topHead: { paddingHorizontal: space.gutter, paddingVertical: space.stack, gap: 2 },
   topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   topFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: tint.primary(0.1) },
-  topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  topName: { ...t.bodyLabel, color: color.foreground },
   topPct: { ...num, fontSize: fs.title, color: color.primary },
 });

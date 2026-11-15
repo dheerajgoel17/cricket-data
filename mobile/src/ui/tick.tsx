@@ -4,7 +4,7 @@ import { Text } from "@/ui/text";
 import Animated, { Easing, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
-import { color, font, space, tint, type, radius, duration, spring } from "@/ui/tokens";
+import { color, font, space, tint, type, radius, duration, spring, d } from "@/ui/tokens";
 
 /** Colour/arrow hold after a move — stock-ticker brief (~1 s), not sticky. */
 const HOLD_MS = 1000;
@@ -90,6 +90,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 2, borderRadius: radius.sm, paddingHorizontal: 2 },
   clip: { overflow: "hidden" },
   rollRow: { flexDirection: "row", alignItems: "center", gap: 2 },
-  text: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  text: { ...d.callout },
   void: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: color.amber, borderRadius: 4, paddingHorizontal: space.hair, borderStyle: "dashed" },
 });

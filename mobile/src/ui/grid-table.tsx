@@ -1,5 +1,6 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
 import { HScroll } from "@/ui/h-scroll";
 import { Sheet } from "@/ui/sheet";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
 import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
-import { ActiveChip, ChoiceChip, ChoiceRow } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, FilterButton } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
 import { EmptyState } from "@/ui/empty-state";
 import { Bleed } from "@/ui/bleed";
@@ -23,7 +24,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface, t, d } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -52,11 +53,7 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
     <View style={styles.filters}>
       <View style={styles.filterRow}>
         <View style={styles.chipFlex}><CapsuleTabs label="Stat" items={STAT_ITEMS.map(([k, l]) => [k, l, false] as [string, string, boolean])} value={stat} onChange={onStat} /></View>
-        <Press scale={1} onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`Filters${activeN ? `, ${activeN} active` : ""}`} style={styles.filterBtn}>
-          <Ionicons name="options-outline" size={16} color={color.foreground} />
-          <Text style={styles.filterLbl}>L{games}</Text>
-          {activeN > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{activeN}</Text></View> : null}
-        </Press>
+        <FilterButton label={`L${games}`} count={activeN} onPress={() => setOpen(true)} />
       </View>
       {activeN > 0 ? (
         <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
@@ -82,8 +79,8 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
             </>
           ) : null}
           <View style={styles.sheetFoot}>
-            <Press scale={1} onPress={() => { setDraftLine(DEFAULT_LINE); setDraftGames(DEFAULT_GAMES); setDraftHit(DEFAULT_HIT); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
-            <Press scale={1} onPress={apply} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
+            <Button variant="secondary" flex={1} label="Clear" onPress={() => { setDraftLine(DEFAULT_LINE); setDraftGames(DEFAULT_GAMES); setDraftHit(DEFAULT_HIT); }} />
+            <Button flex={2} label="Apply" onPress={apply} />
           </View>
       </Sheet>
     </View>
@@ -188,27 +185,19 @@ const styles = StyleSheet.create({
   filters: { gap: space.snug },
   filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
-  filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card },
-  filterLbl: { ...type.callout, color: color.foreground },
-  filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
-  filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
-  clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
+  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
   sheetTitle: { ...type.heading, color: color.foreground },
-  sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
+  sheetSec: { ...t.bodyLabel, color: color.foreground, marginTop: space.snug },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
-  sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
-  sheetClearTxt: { ...type.body, color: color.foreground },
-  sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
   table: { flexDirection: "row", ...surface.card, overflow: "hidden" },
   cell: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingHorizontal: space.tight },
   rowStart: { height: ROW_H, flexDirection: "row", alignItems: "center" },
   th: { ...type.footnote, ...cap, color: color["muted-foreground"] },
-  name: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
+  name: { ...t.calloutLabel, color: color.foreground, flexShrink: 1 },
   hit: { ...num, fontSize: fs.body, textAlign: "center", color: color.primary },
-  date: { ...type.caption, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  date: { ...d.caption, color: color["muted-foreground"] },
   value: { minWidth: 32, height: 28, borderRadius: radius.sm, paddingHorizontal: 6, alignItems: "center", justifyContent: "center" },
   valueText: { ...num, fontSize: fs.body },
   void: { ...type.caption, color: color.amber, borderWidth: 1, borderStyle: "dashed", borderColor: tint.amber(0.6), borderRadius: 5, paddingHorizontal: 3, paddingVertical: 1 },

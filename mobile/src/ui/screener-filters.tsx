@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
+import { ChoiceChip } from "@/ui/chips";
 import { Sheet } from "@/ui/sheet";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from "react-native";
@@ -12,7 +14,7 @@ import { useCombos } from "@/lib/saved";
 import { Accordion } from "@/ui/accordion";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, control, font, radius, space, type } from "@/ui/tokens";
+import { color, control, font, radius, space, type, t } from "@/ui/tokens";
 
 export interface FilterChoices {
   days: [string, string][];
@@ -37,11 +39,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
   const dayName = (d: string) => choices.days.find(([k]) => k === d)?.[1] ?? d;
   const matchName = (id: string) => choices.matches.find((m) => m.id === id)?.label ?? id;
   const active = useMemo(() => activeFilters(draft, { day: dayName, match: matchName }).length, [draft, choices]);
-  const chip = (on: boolean, label: string, onPress: () => void) => (
-    <Press key={label} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={onPress} style={[styles.chip, on && styles.chipOn]}>
-      <Text style={[styles.chipTxt, on && styles.chipTxtOn]}>{label}</Text>
-    </Press>
-  );
+  const chip = (on: boolean, label: string, onPress: () => void) => <ChoiceChip key={label} label={label} on={on} onPress={onPress} />;
 
   return (
     <Sheet visible={open} onClose={() => onOpenChange(false)} full>
@@ -123,8 +121,8 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
           </Accordion>
         </ScrollView>
         <View style={styles.foot}>
-          <Press accessibilityRole="button" onPress={() => setDraft({ ...DEFAULTS })} style={styles.clear}><Text style={styles.clearTxt}>Clear all</Text></Press>
-          <Press accessibilityRole="button" onPress={() => { onApply(draft); onOpenChange(false); }} style={styles.apply}><Text style={styles.applyTxt}>Apply</Text></Press>
+          <Button variant="secondary" flex={1} label="Clear all" onPress={() => setDraft({ ...DEFAULTS })} />
+          <Button flex={2} label="Apply" onPress={() => { onApply(draft); onOpenChange(false); }} />
         </View>
     </Sheet>
   );
@@ -139,20 +137,12 @@ const styles = StyleSheet.create({
   body: { flex: 1, paddingHorizontal: space.gutter },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: space.snug, paddingBottom: space.stack },
   block: { gap: space.snug, paddingBottom: space.stack },
-  chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, backgroundColor: color.card, justifyContent: "center" },
-  chipOn: { backgroundColor: color.primary },
-  chipTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  chipTxtOn: { color: color["primary-foreground"] },
   hint: { ...type.footnote, color: color["muted-foreground"] },
   switchRow: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   switchLabel: { ...type.body, color: color.foreground },
   saveRow: { flexDirection: "row", gap: space.snug },
   input: { flex: 1, height: control, borderRadius: radius.chip, backgroundColor: color.secondary, paddingHorizontal: space.snug, ...type.body, color: color.foreground },
   saveBtn: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, backgroundColor: color.secondary, justifyContent: "center" },
-  saveTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  saveTxt: { ...t.calloutLabel, color: color.foreground },
   foot: { flexDirection: "row", gap: space.snug, paddingHorizontal: space.gutter, paddingTop: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  clear: { flex: 1, height: 44, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
-  clearTxt: { ...type.body, color: color.foreground },
-  apply: { flex: 2, height: 44, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
-  applyTxt: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
 });

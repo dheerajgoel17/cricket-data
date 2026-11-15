@@ -1,17 +1,19 @@
 import { useEffect } from "react";
+import { useChoice } from "@/lib/use-choice";
 import { HScroll } from "@/ui/h-scroll";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { color, control, font, radius, space, type, duration } from "@/ui/tokens";
+import { color, control, font, radius, space, type, duration, t } from "@/ui/tokens";
 
 /**
  * A row of chips, the chosen one filled with the accent colour (the site's `PillGroup` / `Chip`: the stat switch on a player, the sections of a match). Scrolls sideways when there
  * are more than fit; each chip fades its fill in and out on the UI thread (150 ms). `muted` items are shown but quieter (a stat no book lists).
  */
-export function CapsuleTabs({ items, value, onChange, label, flush }: { items: [id: string, label: string, muted?: boolean][]; value: string; onChange: (id: string) => void; label: string; /** Drop the page gutters when the tabs sit inside another bar. */ flush?: boolean }) {
+export function CapsuleTabs({ items, value: valueProp, onChange: onChangeProp, label, flush }: { items: [id: string, label: string, muted?: boolean][]; value: string; onChange: (id: string) => void; label: string; /** Drop the page gutters when the tabs sit inside another bar. */ flush?: boolean }) {
+  const [value, onChange] = useChoice(valueProp, onChangeProp);
   return (
     <View style={[styles.track, flush && styles.flush]}>
       <HScroll contentContainerStyle={styles.row} accessibilityRole="tablist" accessibilityLabel={label}>
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
   flush: { marginHorizontal: 0, marginVertical: 0 },
   row: { alignItems: "center", gap: space.tight },
   tab: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, alignItems: "center", justifyContent: "center" },
-  text: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  text: { ...t.calloutLabel, color: color.foreground },
   textOn: { color: color["primary-foreground"] },
   textMuted: { color: color["muted-foreground"] },
 });

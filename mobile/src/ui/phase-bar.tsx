@@ -8,7 +8,7 @@ import { push } from "@/lib/nav";
 import { LineTabs } from "@/ui/line-tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type, tint } from "@/ui/tokens";
+import { color, font, radius, space, type, tint, t } from "@/ui/tokens";
 import * as Haptics from "expo-haptics";
 
 /** Links that exist in the app (site More also lists web-only tools). */
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   sheet: { backgroundColor: color.popover, paddingHorizontal: space.inset, paddingTop: space.snug, gap: 0 },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.group },
   sheetTitle: { ...type.heading, color: color.foreground },
-  done: { ...type.body, fontFamily: font.medium, color: color.primary },
+  done: { ...t.bodyLabel, color: color.primary },
   links: { gap: space.hair, paddingBottom: space.snug },
   link: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, borderRadius: radius.control },
   linkTxt: { ...type.body, color: color.foreground },

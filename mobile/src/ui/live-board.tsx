@@ -12,7 +12,7 @@ import { Bleed } from "@/ui/bleed";
 import { Press } from "@/ui/press";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, tint, type, fs } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, tint, type, fs, t, d, w } from "@/ui/tokens";
 
 type Side = [string, number];
 
@@ -257,10 +257,10 @@ export function MatchAccordions({ match, teams, noCard }: { match?: any; teams: 
 }
 
 const styles = StyleSheet.create({
-  name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  name: { ...t.calloutLabel, color: color.foreground },
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   muted: { ...type.footnote, color: color["muted-foreground"] },
-  strongMuted: { fontFamily: font.medium, color: color.foreground },
+  strongMuted: { ...w.label, color: color.foreground },
   cardBox: {},
   fullRow: {
     flexDirection: "row",
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     borderTopColor: color.hairline,
   },
   fullBody: { paddingHorizontal: space.gutter, paddingBottom: space.snug },
-  fullText: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
+  fullText: { ...t.calloutLabel, color: color.foreground, flex: 1 },
   strip: {
     flexDirection: "row",
     gap: space.snug,
@@ -295,23 +295,23 @@ const styles = StyleSheet.create({
   stripCol: { flex: 1, minWidth: 0, gap: space.tight },
   stripLeft: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline, paddingRight: space.snug },
   stripName: { ...type.callout, flexShrink: 1 },
-  figures: { ...num, fontSize: fs.callout, color: color["muted-foreground"], fontFamily: font.dataLight },
+  figures: { ...num, fontSize: fs.callout, color: color["muted-foreground"], ...w.data },
   balls: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
   ball: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   ballLong: { minWidth: 28, paddingHorizontal: 6, width: undefined },
-  ballText: { ...num, fontSize: 11, fontFamily: font.dataLight },
+  ballText: { ...num, fontSize: 11, ...w.data },
   batterName: { flexDirection: "row", alignItems: "center", gap: 4, flex: 1, minWidth: 0 },
   strikeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "transparent" },
   strikeOn: { backgroundColor: color.foreground },
   batFigs: { ...num, fontSize: fs.callout },
-  batRuns: { fontFamily: font.data, color: color.foreground },
+  batRuns: { ...w.dataStrong, color: color.foreground },
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
-  innTitle: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  innTitle: { ...t.bodyStrong, color: color.foreground, flex: 1 },
   innScore: { ...num, fontSize: fs.title, color: color.foreground },
   bowlHead: { ...cap, color: color["muted-foreground"] },
   tableBleed: { paddingVertical: 0 },
   th: { flexDirection: "row", alignItems: "center", paddingVertical: space.tight },
   tr: { flexDirection: "row", alignItems: "center", gap: 0, minHeight: 44, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.tight },
   cell: { ...num, fontSize: fs.callout, color: color["muted-foreground"], textAlign: "right" },
-  sum: { ...type.callout, color: color["muted-foreground"], maxWidth: "60%", fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  sum: { ...d.callout, color: color["muted-foreground"], maxWidth: "60%" },
 });

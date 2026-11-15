@@ -46,7 +46,7 @@ import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
-import { color, control, font, radius, space, type, fs, tint } from "@/ui/tokens";
+import { color, control, font, radius, space, type, fs, tint, t, d, dStrong, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -433,7 +433,7 @@ function Unpriced({ label }: { label: string }) {
   return (
     <View style={styles.unpriced} accessibilityRole="alert">
       <Ionicons name="information-circle-outline" size={16} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
-      <Text style={styles.unpricedText}><Text style={{ color: color.foreground, fontFamily: font.medium }}>No book is offering odds for {label}</Text> on this match. Hit rates and fair prices are from his history, not a listed market.</Text>
+      <Text style={styles.unpricedText}><Text style={{ color: color.foreground, ...w.label }}>No book is offering odds for {label}</Text> on this match. Hit rates and fair prices are from his history, not a listed market.</Text>
     </View>
   );
 }
@@ -447,10 +447,10 @@ const styles = StyleSheet.create({
   hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
   name: { ...type.display, fontSize: fs.display, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
-  profile: { ...type.callout, fontFamily: font.dataLight, fontSize: fs.body, color: color.foreground },
+  profile: { ...d.callout, fontSize: fs.body, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
-  strong: { color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
-  link: { color: color.primary, fontFamily: font.medium },
+  strong: { color: color.foreground, ...w.data, fontVariant: ["tabular-nums"] },
+  link: { color: color.primary, ...w.label },
   teamLine: { alignItems: "flex-start", gap: 2 },
   logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   metricsBand: {
@@ -463,9 +463,9 @@ const styles = StyleSheet.create({
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
   countRow: { flexDirection: "row", alignItems: "center" },
-  metricNum: { fontSize: fs.body, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: fs.title, lineHeight: 20, color: color.foreground },
-  notListed: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"] },
+  metricNum: { fontSize: fs.body, lineHeight: 20, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...dStrong.callout, fontSize: fs.title, lineHeight: 20, color: color.foreground },
+  notListed: { ...t.captionLabel, color: color["muted-foreground"] },
   controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: space.snug },
   mainChip: { height: control, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   mainChipText: { ...type.callout, color: color.foreground },
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
   laneSplit: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline },
   laneOn: { backgroundColor: tint.hex(color.secondary, 0.4) },
   laneCap: { ...type.caption, color: color["muted-foreground"], textTransform: "uppercase", letterSpacing: 0.4 },
-  laneRate: { ...type.title, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  laneRate: { ...dStrong.title, color: color.foreground },
   laneFoot: { ...type.footnote, color: color["muted-foreground"] },
   meterTrack: { height: 6, borderRadius: 999, backgroundColor: color.hairline, overflow: "hidden" },
   meterFill: { height: "100%", borderRadius: 999 },
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   logOpp: { ...type.body, color: color.foreground },
   valuePill: { minWidth: 56, borderRadius: radius.sm, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
-  valueText: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  valueText: { ...d.callout },
   unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: color.tile, borderRadius: radius.control, padding: space.snug },
   unpricedText: { ...type.callout, flex: 1, color: color["muted-foreground"] },
 });

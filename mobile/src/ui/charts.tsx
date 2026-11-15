@@ -10,7 +10,7 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { barState } from "@cricket/engine/windows.js";
 import { abbr, shortDate as shortDateRaw } from "@site/lib/format";
-import { color, font, space, type, fs, tint, duration } from "@/ui/tokens";
+import { color, font, space, type, fs, tint, duration, w } from "@/ui/tokens";
 
 /** "06/09" as "6/9": the labels under the bars are short enough to show whole, as in the reference app. */
 const shortDate = (d: string) => String(shortDateRaw(d)).replace(/\b0(\d)/g, "$1");
@@ -179,14 +179,14 @@ const styles = StyleSheet.create({
   line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: StyleSheet.hairlineWidth, borderStyle: "dashed", borderColor: tint.white(0.35) },
   bars: { ...StyleSheet.absoluteFill, flexDirection: "row", alignItems: "flex-end", gap: GAP },
   center: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center" },
-  centerText: { fontSize: fs.body, lineHeight: 18, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
+  centerText: { fontSize: fs.body, lineHeight: 18, ...w.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
   tip: { position: "absolute", top: -4, left: 0, width: TIP_W, alignItems: "center", backgroundColor: tint.hex(color.popover, 0.96), borderRadius: 10, paddingVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.18), zIndex: 5 },
-  tipText: { fontSize: fs.callout, fontFamily: font.dataLight, color: color.foreground, textAlign: "center", width: "100%" },
+  tipText: { fontSize: fs.callout, ...w.data, color: color.foreground, textAlign: "center", width: "100%" },
   slot: { height: "100%", justifyContent: "flex-end" },
   stub: { height: 22, width: "100%" },
   bar: { width: "100%", justifyContent: "flex-end", alignItems: "center", paddingBottom: 4, overflow: "hidden" },
-  barText: { fontSize: fs.callout, width: "100%", textAlign: "center", fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  barText: { fontSize: fs.callout, width: "100%", textAlign: "center", ...w.data, fontVariant: ["tabular-nums"] },
   xRow: { flexDirection: "row", gap: 4, paddingTop: 6 },
   x: { alignItems: "center" },
-  xText: { width: 44, textAlign: "center", fontSize: fs.caption, lineHeight: 13, fontFamily: font.medium, color: color["muted-foreground"] },
+  xText: { width: 44, textAlign: "center", fontSize: fs.caption, lineHeight: 13, ...w.label, color: color["muted-foreground"] },
 });

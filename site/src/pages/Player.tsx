@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { FilterButton } from "@/components/app/chip";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "motion/react";
-import { AdjustmentsHorizontalIcon, InformationCircleIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
+import { InformationCircleIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -239,11 +240,7 @@ function PlayerScreen({ idx }: { idx: number }) {
             <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
               className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
           ) : <span className="min-w-0 flex-1" />}
-          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-            <AdjustmentsHorizontalIcon className="size-4" />Filters
-            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-          </Button>
+          <FilterButton count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
         </div>
         <div className="flex flex-col gap-snug px-gutter py-snug">
           {testBat && (

@@ -1,15 +1,17 @@
 import { useEffect, type ReactNode } from "react";
+import { useChoice } from "@/lib/use-choice";
 import { HScroll } from "@/ui/h-scroll";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { Press } from "@/ui/press";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { AnimatedText, Text } from "@/ui/text";
-import { color, control, radius, space, type, font, tint, duration } from "@/ui/tokens";
+import { color, control, radius, space, type, font, tint, duration, t, d } from "@/ui/tokens";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
-export function Chips({ items, value, onChange }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
+export function Chips({ items, value: valueProp, onChange: onChangeProp }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
+  const [value, onChange] = useChoice(valueProp, onChangeProp);
   return (
     <HScroll contentContainerStyle={styles.row} accessibilityRole="tablist">
       {items.map(([id, label, count, muted]) => (
@@ -31,6 +33,17 @@ function Chip({ label, count, on, muted, onPress }: { label: string; count?: num
         <AnimatedText style={[styles.label, text]}>{label}</AnimatedText>
         {count != null ? <AnimatedText style={[styles.count, countColor]}>{count}</AnimatedText> : null}
       </Animated.View>
+    </Press>
+  );
+}
+
+/** The one "open the filters" button (Props, Fancy, Grid, Home): options icon, a label, and the number of active filters as a badge on the corner (the site's `Filters` button). */
+export function FilterButton({ label = "Filters", count = 0, onPress, style }: { label?: string; count?: number; onPress: () => void; style?: StyleProp<ViewStyle> }) {
+  return (
+    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={`Filters${count ? `, ${count} active` : ""}`} style={[styles.filterBtn, style]}>
+      <Ionicons name="options-outline" size={16} color={color.foreground} />
+      <Text style={styles.filterLbl}>{label}</Text>
+      {count > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{count}</Text></View> : null}
     </Press>
   );
 }
@@ -62,13 +75,17 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
-  label: { ...type.callout, fontFamily: font.medium },
-  count: { ...type.footnote, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  label: { ...t.calloutLabel },
+  count: { ...d.footnote },
   active: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingLeft: space.snug, paddingRight: space.tight, borderRadius: radius.chip, backgroundColor: tint.primary(0.15) },
   activeTxt: { ...type.callout, color: color.primary },
   choice: { height: control, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, alignItems: "center", justifyContent: "center" },
   choiceOn: { backgroundColor: color.primary },
   choiceTxt: { ...type.callout, color: color.foreground },
   choiceTxtOn: { color: color["primary-foreground"] },
+  filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card },
+  filterLbl: { ...t.callout, color: color.foreground },
+  filterBadge: { position: "absolute", top: -4, right: -4, minWidth: 16, height: 16, borderRadius: 8, backgroundColor: color.primary, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
+  filterBadgeTxt: { ...t.captionStrong, color: color.background },
   choiceRow: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
 });

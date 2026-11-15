@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ReflowGroup, ReflowItem } from "@/components/app/reflow";
 import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -73,16 +74,16 @@ export function SavedPage() {
         />
       )}
       <Section icon={<StarIcon className="size-4" />} title="Watchlist" count={props.length} emptyTitle="No watchlist props" emptyBody="Tap the star on a prop row to track that line here.">
-        {props.map(({ k, p }) => (
-          <li key={k} className={rowCls}>
+        <ReflowGroup>{props.map(({ k, p }) => (
+          <ReflowItem key={k} className={rowCls}>
             <Link to={`/player/${p.idx}?stat=${p.stat}&line=${p.line}&fmt=${p.fmt}`} className="flex min-w-0 flex-1 items-center gap-snug outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <PlayerBadge idx={p.idx} size="md" className="size-control" />
               <span className="grid min-w-0"><span className="truncate text-body font-label"><PlayerName idx={p.idx} /></span>
                 <span className="truncate text-callout text-muted-foreground"><span className="tabular-nums text-primary">O {p.line}</span> {(STATS as any)[p.stat]?.label ?? p.stat} · {FORMATS[p.fmt] ?? ""}</span></span>
             </Link>
             <button type="button" aria-label="Remove from watchlist" className={iconBtn} onClick={() => toggle(k)}><XMarkIcon className="size-5" /></button>
-          </li>
-        ))}
+          </ReflowItem>
+        ))}</ReflowGroup>
       </Section>
       <Section icon={<BookmarkIcon className="size-4" />} title="Filters" count={combos.length} emptyTitle="No saved filters" emptyBody="Open Props, set filters and use Save and share to keep a combination here.">
         {combos.map((c) => (

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { LiveDot } from "@/ui/motion";
-import { cap, color, font, space, type, tint } from "@/ui/tokens";
+import { cap, color, font, space, type, tint, w } from "@/ui/tokens";
 
 export type StatusTone = "live" | "inPlay" | "session" | "muted";
 export type StatusSurface = "plain" | "pill" | "dot";
@@ -44,7 +44,7 @@ export function StatusLabel({
 
 const styles = StyleSheet.create({
   pill: { borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 2 },
-  pillText: { ...cap, fontFamily: font.bold, fontSize: 11 },
-  plain: { ...cap, fontFamily: font.bold, fontSize: 11 },
+  pillText: { ...cap, ...w.strong, fontSize: 11 },
+  plain: { ...cap, ...w.strong, fontSize: 11 },
   dotRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
 });

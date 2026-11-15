@@ -24,7 +24,7 @@ import { StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
 import { useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
-import { color, font, space, type, rhythm } from "@/ui/tokens";
+import { color, font, space, type, rhythm, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   name: { ...type.display, color: color.foreground, flex: 1 },
   bleed: { marginHorizontal: -space.gutter },
   headline: { ...type.body, color: color.foreground },
-  tableTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  tableTitle: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   chrome: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
 });

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/ui/button";
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -44,7 +45,7 @@ import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
-import { color, font, radius, space, type, rhythm } from "@/ui/tokens";
+import { color, font, radius, space, type, rhythm, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** A match, as on the site's phone page: the match flat on the page (state, sides, kick-off with a live countdown or the score, the pair at the crease, ball by ball, the scorecard), then the page's sections as chips (Props / Match Fancy / Grid / Custom line) with the open one's stat chips and rows under them. */
@@ -112,7 +113,7 @@ export default function FixturePage() {
               <EmptyState
                 title="Fixture gone"
                 body="That match is no longer in the schedule."
-                action={<Press onPress={goBack} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Back to fixtures</Text></Press>}
+                action={<Button variant="secondary" size="sm" label="Back to fixtures" onPress={goBack} />}
               />
             </View>
           ) : (
@@ -213,10 +214,8 @@ const styles = StyleSheet.create({
   bleed: { marginHorizontal: -space.gutter },
   sections: { paddingTop: rhythm.top },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  gridTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
+  gridTitle: { ...t.bodyLabel, color: color.foreground },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingTop: space.group, paddingBottom: space.snug },
   title: { ...type.heading, color: color.foreground },
   empty: { ...type.callout, color: color["muted-foreground"] },
-  button: { backgroundColor: color.secondary, borderRadius: radius.chip, paddingHorizontal: space.stack, height: 36, alignItems: "center", justifyContent: "center" },
-  buttonText: { ...type.callout, color: color.foreground },
 });

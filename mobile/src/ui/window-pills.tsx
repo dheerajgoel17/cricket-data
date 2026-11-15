@@ -4,7 +4,7 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { cap, color, font, radius, tint, type, duration } from "@/ui/tokens";
+import { cap, color, font, radius, tint, type, duration, d } from "@/ui/tokens";
 
 export interface WindowItem { n: number; label: string; p: number | null }
 
@@ -48,5 +48,5 @@ const styles = StyleSheet.create({
   hit: { flex: 1, minWidth: 52 },
   cell: { alignItems: "center", justifyContent: "center", borderRadius: radius.chip, paddingVertical: 6, paddingHorizontal: 4 },
   label: { ...type.caption, color: color["muted-foreground"], ...cap },
-  value: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  value: { ...d.callout },
 });

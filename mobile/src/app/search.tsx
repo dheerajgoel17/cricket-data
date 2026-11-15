@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { SearchField } from "@/ui/search-field";
 import { useDeferredValue, useMemo, useState } from "react";
 import { Keyboard, ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -19,7 +20,7 @@ import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
-import { color, font, space, type, radius, rhythm } from "@/ui/tokens";
+import { color, font, space, type, radius, rhythm, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"], ["Contact", "/contact"]];
@@ -58,10 +59,7 @@ export default function Search() {
   return (
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <View style={styles.bar}>
-        <View style={styles.field}>
-          <Ionicons name="search" size={18} color={color["muted-foreground"]} />
-          <TextInput value={text} onChangeText={setText} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" placeholder="Search players, teams, matches, grounds" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search" />
-        </View>
+        <SearchField style={styles.fieldFlex} value={text} onChangeText={setText} autoFocus placeholder="Search players, teams, matches, grounds" label="Search" />
         <Press accessibilityRole="button" onPress={goBack} hitSlop={8}><Text style={styles.cancel}>Cancel</Text></Press>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]}>
@@ -115,8 +113,7 @@ export default function Search() {
 
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
-  field: { flex: 1, height: 40, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: radius.control, backgroundColor: color.secondary },
-  input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
+  fieldFlex: { flex: 1 },
   cancel: { ...type.body, color: color.primary },
   body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.top },
 });

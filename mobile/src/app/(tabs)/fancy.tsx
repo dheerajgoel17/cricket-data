@@ -24,7 +24,7 @@ import { MatchChips } from "@/ui/match-chip";
 import { Working } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, radius, space, type, surface } from "@/ui/tokens";
+import { color, font, radius, space, type, surface, t, d } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
@@ -149,18 +149,18 @@ const styles = StyleSheet.create({
   ground: { ...type.footnote, color: color["muted-foreground"], flexShrink: 1, marginLeft: "auto" },
   sides: { gap: space.snug },
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  team: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  team: { ...t.bodyStrong, color: color.foreground, flex: 1 },
   lost: { color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  whenTime: { ...d.callout, color: color.foreground },
   rows: {},
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.inset, paddingVertical: space.stack, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, backgroundColor: color.surface },
   status: { flex: 1, minWidth: 0 },
-  statusText: { ...type.footnote, fontFamily: font.medium, color: color.foreground },
+  statusText: { ...t.footnoteLabel, color: color.foreground },
   series: { ...type.caption, color: color["muted-foreground"] },
   linkRow: { flexDirection: "row", alignItems: "center", gap: 2 },
-  link: { ...type.footnote, fontFamily: font.medium, color: color.primary },
+  link: { ...t.footnoteLabel, color: color.primary },
 });
 
 export default lazyTab(Fancy, "Fancy");

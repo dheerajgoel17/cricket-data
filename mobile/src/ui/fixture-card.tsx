@@ -13,7 +13,7 @@ import { Skeleton } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { color, font, radius, space, type, fs, surface } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, surface, t, d, w } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
 export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: boolean; pending?: boolean; live?: boolean }) {
@@ -86,16 +86,16 @@ const styles = StyleSheet.create({
   place: { marginLeft: "auto", flexShrink: 1 },
   sides: { gap: space.snug },
   side: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  team: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  team: { ...t.bodyStrong, color: color.foreground, flex: 1 },
   lost: { color: color["muted-foreground"] },
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
-  total: { fontFamily: font.data, fontSize: fs.title, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
-  overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  total: { ...w.dataStrong, fontSize: fs.title, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
+  overs: { ...d.footnote, color: color["muted-foreground"] },
   pendingScore: { width: 64, height: 16, borderRadius: 8 },
   yet: { ...type.callout, color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  whenTime: { ...d.callout, color: color.foreground },
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight, marginTop: "auto" },
   status: { flex: 1, minWidth: 0 },
   statusText: { ...type.footnote, color: color.foreground },

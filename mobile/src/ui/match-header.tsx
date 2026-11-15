@@ -12,7 +12,7 @@ import { useNow } from "@/lib/use-now";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { cap, color, font, num, numLg, space, type, fs, radius } from "@/ui/tokens";
+import { cap, color, font, num, numLg, space, type, fs, radius, t, w } from "@/ui/tokens";
 
 /** One side: crest · abbr · large score · Over N (mirrored on the right). Twin of web MatchScoreboard SideBlock. */
 function SideBlock({
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   bare: { gap: space.snug, paddingHorizontal: space.gutter, paddingTop: space.snug, paddingBottom: space.snug },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   topRight: { flexDirection: "row", alignItems: "center", gap: space.snug, flexShrink: 0 },
-  series: { ...type.footnote, fontFamily: font.medium, color: color.foreground, flex: 1 },
+  series: { ...t.footnoteLabel, color: color.foreground, flex: 1 },
   meta: { ...type.footnote, color: color["muted-foreground"] },
   round: { width: 34, height: 34, borderRadius: 17, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   board: { flexDirection: "row", alignItems: "center", gap: space.snug },
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   code: { ...cap, color: color["muted-foreground"] },
   figures: { flex: 1, minWidth: 0, gap: 2 },
   figuresEnd: { alignItems: "flex-end" },
-  total: { fontSize: fs.figure, letterSpacing: -0.4, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  total: { fontSize: fs.figure, letterSpacing: -0.4, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"] },
   dash: { ...type.body, color: color["muted-foreground"] },
   pending: { width: 72, height: 28, borderRadius: radius.sm, backgroundColor: color.secondary },

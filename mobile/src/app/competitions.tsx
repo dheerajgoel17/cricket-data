@@ -1,5 +1,6 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { SearchField } from "@/ui/search-field";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
@@ -16,7 +17,7 @@ import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { LeagueBadge } from "@/ui/team-badge";
-import { color, font, space, type, radius, surface } from "@/ui/tokens";
+import { color, font, space, type, radius, surface, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Every competition in the data with eight matches or more, the biggest first, with a search over the names. */
@@ -32,10 +33,7 @@ export default function Competitions() {
   return (
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title="Competitions" />
-      <View style={styles.field}>
-        <Ionicons name="search" size={18} color={color["muted-foreground"]} />
-        <TextInput value={text} onChangeText={setText} autoCorrect={false} autoCapitalize="none" clearButtonMode="while-editing" placeholder="Search competitions" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search competitions" />
-      </View>
+      <SearchField style={styles.field} value={text} onChangeText={setText} placeholder="Search competitions" />
       {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading…" fill shape="comps" /> : (
         <FlashList
           data={rows}
@@ -52,8 +50,7 @@ export default function Competitions() {
 }
 
 const styles = StyleSheet.create({
-  field: { height: 40, marginHorizontal: space.gutter, marginVertical: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
-  input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
+  field: { marginHorizontal: space.gutter, marginVertical: space.snug },
   list: {},
   box: { ...surface.card, overflow: "hidden" },
   empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },

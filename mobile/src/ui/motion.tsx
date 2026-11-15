@@ -1,7 +1,7 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { useState } from "react";
-import Animated, { FadeIn, FadeInDown, ReduceMotion, useReducedMotion } from "react-native-reanimated";
-import { color, space, spring } from "@/ui/tokens";
+import Animated, { FadeIn, FadeInDown, FadeOut, LinearTransition, ReduceMotion, useReducedMotion } from "react-native-reanimated";
+import { color, duration, space, spring } from "@/ui/tokens";
 import { renderSkeleton, type SkeletonShape } from "@/ui/skeletons";
 
 export { CardSkeleton, RowsSkeleton, Skeleton, SkeletonGroup } from "@/ui/skeletons";
@@ -84,3 +84,18 @@ const styles = StyleSheet.create({
   working: { alignSelf: "stretch", paddingVertical: space.stack },
   workingFill: { flex: 1, minHeight: 280 },
 });
+
+// built on first use (the layout presets are not in the test double of Reanimated)
+let reflow: ReturnType<typeof LinearTransition.duration> | undefined, leave: ReturnType<typeof FadeOut.duration> | undefined;
+/**
+ * A row in a short list whose order or membership changes (Saved, a market overview that re-sorts as prices move): when a sibling is added, removed or moves, this row glides to its new
+ * place (layout transition, UI thread, transform only) and a removed one fades out, instead of the list jumping. Not for virtualized lists (FlashList rows recycle): those keep their order
+ * changes instant. Static when the phone's reduce motion is on. Web twin: `Reflow` in `components/app/reflow.tsx`.
+ */
+export function Reflow({ style, children }: { style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
+  const calm = useReducedMotion();
+  if (calm) return <View style={style}>{children}</View>;
+  reflow ??= LinearTransition.duration(duration.base).reduceMotion(ReduceMotion.System);
+  leave ??= FadeOut.duration(duration.fast).reduceMotion(ReduceMotion.System);
+  return <Animated.View layout={reflow} exiting={leave} style={style}>{children}</Animated.View>;
+}

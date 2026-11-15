@@ -13,7 +13,7 @@ import { DataTable } from "@/ui/data-table";
 import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, num, numLg, radius, space, type, font, fs, surface } from "@/ui/tokens";
+import { cap, color, num, numLg, radius, space, type, font, fs, surface, t, d } from "@/ui/tokens";
 
 export type NextInfo = { match: string; start: string; competition: string; team?: string; opp: string; ground: string; known?: string; priced?: boolean; phase?: "upcoming" | "live" | "final" };
 
@@ -135,21 +135,21 @@ const styles = StyleSheet.create({
   card: { ...surface.card, padding: space.stack, gap: space.snug },
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  when: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  when: { ...d.footnote, color: color["muted-foreground"] },
   teams: { flexDirection: "row", alignItems: "center", gap: space.snug, flexWrap: "wrap" },
   side: { flexDirection: "row", alignItems: "center", gap: space.tight, flexShrink: 1, maxWidth: "46%" },
   vs: { ...type.footnote, color: color["muted-foreground"] },
-  opp: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
+  opp: { ...t.bodyLabel, color: color.foreground, flexShrink: 1 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   ground: { ...type.callout, color: color["muted-foreground"] },
   block: { gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   lineRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  lineText: { ...type.body, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  lineText: { ...d.body, color: color.foreground },
   statLabel: { ...type.callout, color: color["muted-foreground"] },
   tiles: { flexDirection: "row", gap: space.snug },
   tile: { flex: 1, minWidth: 0, backgroundColor: color.tile, borderRadius: radius.card, padding: space.snug + 2, gap: 2 },
   tileNum: { ...numLg, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 34 },
-  tileSub: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
+  tileSub: { ...d.footnote, color: color["muted-foreground"] },
   noSample: { ...type.callout, color: color["muted-foreground"], paddingTop: space.tight },
   chartFilters: { ...type.footnote, color: color["muted-foreground"], ...cap },
 });

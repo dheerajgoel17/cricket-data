@@ -11,7 +11,7 @@ import { InfoButton } from "@/ui/info-button";
 import { Segmented } from "@/ui/segmented";
 import { PlayerFace } from "@/ui/player-avatar";
 import { Tick } from "@/ui/tick";
-import { cap, color, control, font, numLg, radius, space, type, fs, tint, surface } from "@/ui/tokens";
+import { cap, color, control, font, numLg, radius, space, type, fs, tint, surface, w } from "@/ui/tokens";
 
 export type TapeRow = { idx: number; pid: string; name: string; stat: string; line: number; over: number; fmt: string; inn?: number; verdict: "cleared" | "missed" | "push" | null; v?: number };
 
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   ticketRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug, minHeight: 52 },
   ticketSep: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: tint.hex(color["primary-foreground"], 0.25) },
   stub: { alignItems: "flex-end", gap: 2, borderStyle: "dashed", borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: tint.hex(color["primary-foreground"], 0.3), paddingLeft: space.stack },
-  nameHit: { fontFamily: font.bold, fontSize: fs.body, lineHeight: 19, letterSpacing: -0.15, color: color["primary-foreground"] },
+  nameHit: { ...w.strong, fontSize: fs.body, lineHeight: 19, letterSpacing: -0.15, color: color["primary-foreground"] },
   whatHit: { ...type.footnote, color: color["ink-soft"] },
   oddsHit: { ...numLg, fontSize: fs.figure, lineHeight: 24, color: color["primary-foreground"] },
   verdictHit: { ...cap, color: color["primary-foreground"] },

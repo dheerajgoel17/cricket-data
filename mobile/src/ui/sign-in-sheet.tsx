@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "@/ui/button";
 import { Grabber, SheetBackdrop } from "@/ui/sheet";
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { BrandMark } from "@/ui/brand";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type, fs, tint } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, tint, t, w } from "@/ui/tokens";
 
 /** Sign-in sheet — same hierarchy as the site: brand, Google, one email form, mode link. */
 export function SignInSheet() {
@@ -55,10 +56,7 @@ export function SignInSheet() {
               <Text style={styles.hint}>Sign-in is not configured. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in mobile/.env.local, then restart Expo.</Text>
             ) : (
               <View style={styles.body}>
-                <Press disabled={busy} onPress={google} style={({ pressed }) => [styles.google, pressed && { opacity: 0.88 }]}>
-                  <Ionicons name="logo-google" size={18} color={color.foreground} />
-                  <Text style={styles.googleLabel}>Continue with Google</Text>
-                </Press>
+                <Button variant="secondary" disabled={busy} icon={<Ionicons name="logo-google" size={18} color={color.foreground} />} label="Continue with Google" onPress={google} />
 
                 <View style={styles.orRow} accessibilityElementsHidden>
                   <View style={styles.rule} />
@@ -90,11 +88,7 @@ export function SignInSheet() {
                 />
                 {err ? <Text style={styles.err}>{err}</Text> : null}
 
-                <Press disabled={busy} onPress={submit} style={({ pressed }) => [styles.primary, pressed && { opacity: 0.92 }, busy && { opacity: 0.55 }]}>
-                  {busy
-                    ? <ActivityIndicator color={color["primary-foreground"]} />
-                    : <Text style={styles.primaryLabel}>{mode === "in" ? "Sign in with email" : "Create account"}</Text>}
-                </Press>
+                <Button disabled={busy} label={mode === "in" ? "Sign in with email" : "Create account"} onPress={submit} style={styles.submitGap} />
 
                 <Press onPress={() => { setMode((m) => (m === "in" ? "up" : "in")); setErr(null); }} style={styles.switchRow}>
                   <Text style={styles.switchMuted}>
@@ -144,18 +138,6 @@ const styles = StyleSheet.create({
   sub: { ...type.callout, color: color["muted-foreground"], textAlign: "center", maxWidth: 280 },
   body: { gap: space.snug, paddingBottom: space.snug },
   hint: { ...type.callout, color: color["muted-foreground"], paddingBottom: space.stack },
-  google: {
-    height: 48,
-    borderRadius: 999,
-    backgroundColor: color.pill,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: tint.white(0.12),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: space.snug,
-  },
-  googleLabel: { ...type.body, fontFamily: font.medium, color: color.foreground },
   orRow: { flexDirection: "row", alignItems: "center", gap: space.snug, marginVertical: 2 },
   rule: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: color.hairline },
   or: { ...type.caption, color: color["muted-foreground"] },
@@ -171,16 +153,8 @@ const styles = StyleSheet.create({
     ...type.body,
   },
   err: { ...type.footnote, color: color.miss },
-  primary: {
-    height: 48,
-    borderRadius: 999,
-    backgroundColor: color.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: space.tight,
-  },
-  primaryLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
+  submitGap: { marginTop: space.tight },
   switchRow: { alignItems: "center", paddingVertical: space.snug },
   switchMuted: { ...type.callout, color: color["muted-foreground"], textAlign: "center" },
-  switchLink: { color: color.primary, fontFamily: font.medium },
+  switchLink: { color: color.primary, ...w.label },
 });

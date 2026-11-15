@@ -15,7 +15,7 @@ import { MAX_ROWS } from "@/lib/hot";
 import { useHotView } from "@/lib/use-hot";
 import { AppHeader } from "@/ui/brand";
 import { STATS } from "@cricket/engine/rules.js";
-import { Chips } from "@/ui/chips";
+import { Chips, ActiveChip, FilterButton } from "@/ui/chips";
 import { MatchChips } from "@/ui/match-chip";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -25,7 +25,7 @@ import { Press } from "@/ui/press";
 import { PropRow } from "@/ui/prop-row";
 import { ScreenerFilters } from "@/ui/screener-filters";
 import { Text } from "@/ui/text";
-import { color, control, font, radius, space, tint, type } from "@/ui/tokens";
+import { color, control, font, radius, space, tint, type, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const WINS = Object.entries(WIN_LABEL) as [string, string][];
@@ -88,18 +88,12 @@ function PlayerProps() {
       {matchChips.length ? <MatchChips all items={matchChips} tags={matchTags} value={pick} onChange={(match) => setSc((s) => ({ ...s, match }))} /> : null}
       <View style={styles.toolbar}>
         <View style={{ flex: 1 }}><Chips items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></View>
-        <Press accessibilityRole="button" accessibilityLabel={`Filters${active.length ? `, ${active.length} active` : ""}`} onPress={() => setFiltersOpen(true)} style={[styles.filterBtn, active.length > 0 && styles.filterOn]}>
-          <Ionicons name="options-outline" size={18} color={active.length ? color.primary : color.foreground} />
-          <Text style={[styles.filterTxt, active.length > 0 && { color: color.primary }]}>{active.length ? `L${sc.win === "l5" ? 5 : sc.win === "l10" ? 10 : ""}` : "Filters"}{active.length ? ` · ${active.length}` : ""}</Text>
-        </Press>
+        <FilterButton count={active.length} onPress={() => setFiltersOpen(true)} style={styles.filterGap} />
       </View>
       {active.length ? (
         <View style={styles.activeRow}>
           {active.map((f) => (
-            <Press key={f.key} accessibilityRole="button" accessibilityLabel={`Remove ${f.label}`} onPress={() => setSc((s) => clearFilter(s, f.key))} style={styles.activeChip}>
-              <Text style={styles.activeChipTxt}>{f.label} {f.value}</Text>
-              <Ionicons name="close" size={12} color={color.primary} />
-            </Press>
+            <ActiveChip key={f.key} label={`${f.label} ${f.value}`} onClear={() => setSc((s) => clearFilter(s, f.key))} />
           ))}
           <Press accessibilityRole="button" onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.clearAll}>Clear all</Text></Press>
         </View>
@@ -159,14 +153,10 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
   toolbar: { flexDirection: "row", alignItems: "center", gap: space.tight, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
-  filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, marginRight: space.gutter },
-  filterOn: { backgroundColor: tint.primary(0.15) },
-  filterTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  filterGap: { marginRight: space.gutter },
   activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.tight, paddingHorizontal: space.gutter, paddingBottom: space.snug },
-  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: tint.primary(0.15) },
-  activeChipTxt: { ...type.callout, color: color.primary },
-  clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug },
-  link: { ...type.callout, fontFamily: font.medium, color: color.primary },
+  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug },
+  link: { ...t.calloutLabel, color: color.primary },
 });
 
 export default lazyTab(PlayerProps, "Player props");
