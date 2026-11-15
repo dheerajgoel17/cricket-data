@@ -16,16 +16,20 @@ export function AuthCallbackPage() {
     (async () => {
       const params = new URLSearchParams(search);
       const code = params.get("code");
-      const result = code
-        ? await sb.auth.exchangeCodeForSession(code)
-        : await sb.auth.getSession();
-      if (!alive) return;
-      if (!result || typeof result !== "object") { setErr("No session after sign-in."); return; }
-      if ("error" in result && result.error) { setErr((result.error as { message: string }).message); return; }
-      const session = "data" in result ? (result.data as { session: unknown }).session : null;
-      if (!session && code) { setErr("No session after sign-in."); return; }
-      if (!session) {
+      if (code) {
+        const { data, error } = await sb.auth.exchangeCodeForSession(code);
+        if (!alive) return;
+        if (error) {
+          // detectSessionInUrl / StrictMode may have already consumed the code — fall back to a live session.
+          const { data: cur } = await sb.auth.getSession();
+          if (!cur.session) { setErr(error.message); return; }
+        } else if (!data.session) {
+          const { data: cur } = await sb.auth.getSession();
+          if (!cur.session) { setErr("No session after sign-in."); return; }
+        }
+      } else {
         const { data } = await sb.auth.getSession();
+        if (!alive) return;
         if (!data.session) { setErr("No session after sign-in."); return; }
       }
       // Prefer ?next= (design-host OAuth finishes on the product origin); else the pre-sign-in path.

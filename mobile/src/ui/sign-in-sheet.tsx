@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
 import { Grabber, SheetBackdrop } from "@/ui/sheet";
-import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/lib/auth";
+import { getAuthProviderFlags } from "@/lib/supabase";
 import { BrandMark } from "@/ui/brand";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type, fs, tint, t, w, icon } from "@/ui/tokens";
+import { color, radius, space, type, fs, w, icon } from "@/ui/tokens";
 
 /** Sign-in sheet — same hierarchy as the site: brand, Google, one email form, mode link. */
 export function SignInSheet() {
@@ -19,6 +20,14 @@ export function SignInSheet() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [googleOn, setGoogleOn] = useState(false);
+
+  useEffect(() => {
+    if (!signInOpen || !configured) return;
+    let alive = true;
+    getAuthProviderFlags().then((f) => { if (alive) setGoogleOn(f.google); });
+    return () => { alive = false; };
+  }, [signInOpen, configured]);
 
   const submit = async () => {
     if (!email.trim() || password.length < 6) { setErr("Use a valid email and a password of at least 6 characters."); return; }
@@ -56,13 +65,16 @@ export function SignInSheet() {
               <Text style={styles.hint}>Sign-in is not configured. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in mobile/.env.local, then restart Expo.</Text>
             ) : (
               <View style={styles.body}>
-                <Button variant="secondary" disabled={busy} icon={<Ionicons name="logo-google" size={icon.md} color={color.foreground} />} label="Continue with Google" onPress={google} />
-
-                <View style={styles.orRow} accessibilityElementsHidden>
-                  <View style={styles.rule} />
-                  <Text style={styles.or}>or</Text>
-                  <View style={styles.rule} />
-                </View>
+                {googleOn ? (
+                  <>
+                    <Button variant="secondary" disabled={busy} icon={<Ionicons name="logo-google" size={icon.md} color={color.foreground} />} label="Continue with Google" onPress={google} />
+                    <View style={styles.orRow} accessibilityElementsHidden>
+                      <View style={styles.rule} />
+                      <Text style={styles.or}>or</Text>
+                      <View style={styles.rule} />
+                    </View>
+                  </>
+                ) : null}
 
                 <Text style={styles.fieldLabel}>Email</Text>
                 <TextInput

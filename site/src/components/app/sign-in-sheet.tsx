@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { getAuthProviderFlags } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,14 @@ export function SignInSheet() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleOn, setGoogleOn] = useState(false);
+
+  useEffect(() => {
+    if (!signInOpen || !configured) return;
+    let alive = true;
+    getAuthProviderFlags().then((f) => { if (alive) setGoogleOn(f.google); });
+    return () => { alive = false; };
+  }, [signInOpen, configured]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +43,7 @@ export function SignInSheet() {
     const r = mode === "in" ? await signInWithPassword(email, password) : await signUp(email, password);
     setBusy(false);
     if (r.error) toast(r.error);
-    else toast(mode === "in" ? "Signed in. Saved syncs to this account." : "Account created. Check email if confirmation is required.");
+    else toast(mode === "in" ? "Signed in. Saved syncs to this account." : "Account created. Saved syncs to this account.");
   };
 
   const google = async () => {
@@ -73,22 +82,25 @@ export function SignInSheet() {
               </p>
             ) : (
               <>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={busy}
-                  onClick={google}
-                  className="h-11 w-full gap-snug rounded-full text-body font-label"
-                >
-                  <GoogleGlyph className="size-5" />
-                  Continue with Google
-                </Button>
-
-                <div className="flex items-center gap-snug" aria-hidden>
-                  <span className="h-px flex-1 bg-hairline" />
-                  <span className="text-caption text-muted-foreground">or</span>
-                  <span className="h-px flex-1 bg-hairline" />
-                </div>
+                {googleOn ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={busy}
+                      onClick={google}
+                      className="h-11 w-full gap-snug rounded-full text-body font-label"
+                    >
+                      <GoogleGlyph className="size-5" />
+                      Continue with Google
+                    </Button>
+                    <div className="flex items-center gap-snug" aria-hidden>
+                      <span className="h-px flex-1 bg-hairline" />
+                      <span className="text-caption text-muted-foreground">or</span>
+                      <span className="h-px flex-1 bg-hairline" />
+                    </div>
+                  </>
+                ) : null}
 
                 <form className="grid gap-stack" onSubmit={submit}>
                   <div className="grid gap-tight text-left">

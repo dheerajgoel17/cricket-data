@@ -44,4 +44,19 @@ describe("AuthCallbackPage", () => {
     expect(exchangeCodeForSession).toHaveBeenCalled();
     expect(sessionStorage.getItem("cph-auth-next")).toBeNull();
   });
+
+  it("falls back to getSession when the code was already consumed", async () => {
+    exchangeCodeForSession.mockResolvedValue({ data: { session: null }, error: { message: "code verifier not found" } });
+    getSession.mockResolvedValue({ data: { session: { user: { id: "u1" } } }, error: null });
+    render(
+      <MemoryRouter initialEntries={["/auth/callback?code=used"]}>
+        <Routes>
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/saved" element={<p>Saved page</p>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await waitFor(() => expect(screen.getByText("Saved page")).toBeVisible());
+    expect(getSession).toHaveBeenCalled();
+  });
 });

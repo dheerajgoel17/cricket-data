@@ -75,13 +75,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = useCallback(async (email: string, password: string) => {
     const sb = getSupabase();
     if (!sb) return { error: "Sign-in is not configured for this build." };
-    const { error } = await sb.auth.signUp({
+    const { data, error } = await sb.auth.signUp({
       email: email.trim(),
       password,
       options: { emailRedirectTo: authCallbackUrl("/saved") },
     });
-    if (!error) setSignInOpen(false);
-    return { error: error?.message ?? null };
+    if (error) return { error: error.message };
+    // Autoconfirm projects return a session; confirm-email projects leave session null until the link is opened.
+    if (data.session) { setSignInOpen(false); return { error: null }; }
+    if (data.user && !(data.user.identities?.length)) {
+      return { error: "That email already has an account — sign in instead." };
+    }
+    return { error: "Check your email to confirm the account, then sign in." };
   }, []);
 
   const signOut = useCallback(async () => {
