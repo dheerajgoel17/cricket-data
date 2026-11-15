@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-16 00:00 IST
+# Cricket value bets - 2026-11-16 01:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1725 prices
-- **smarkets**: ok, 750 prices
+- **smarkets**: ok, 783 prices
+- **feedh**: error - IncompleteRead: IncompleteRead(10227 bytes read)
 - **feedg**: ok, 24 prices, 3 events
-- **feedk**: ok, 88 prices, 7 events
-- **feede**: ok, 714 prices, 23 events
-- **feedh**: ok, 1877 prices, 44 events
+- **feedk**: ok, 88 prices, 9 events
+- **feede**: ok, 774 prices, 25 events
 - **feedf**: ok, 708 prices, 22 events
-- **feedi**: ok, 2620 prices, 52 events
+- **feedi**: ok, 2581 prices, 52 events
 
-Matches starting in next 168h: **53**, markets priced: **628**, value bets: **8** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **43**, markets priced: **532**, value bets: **8** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -43,6 +43,6 @@ Matches starting in next 168h: **53**, markets priced: **628**, value bets: **8*
 - 11-16 13:40 IST Sydney Thunder (Women) vs Melbourne Stars (Women) / G3555 bowler_wickets / Kim Garth under 1.5 @ 2.75 (feedi_d): edge 90.1%, model 0.7262, market 0.6627
 - 11-18 09:00 IST Australia vs England / G3555 bowler_wickets / Liam Dawson under 1.5 @ 2.62 (feedi_d): edge 63.3%, model 0.5938, market 0.6451
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Andhra (Women) (female), Bangla Tigers (male), Baroda (W) (female), Baroda (Women) (female), Border (W) (female), Karnataka (W) (female), Karnataka (Women) (female), Lahore Region Whites (male), Maharashtra (W) (female), Maharashtra (Women) (female), Nhlangano Legends (male), Peshawar Blues (male), Pondicherry (male), Railways (W) (female), Railways (Women) (female), Recon Tactical Free State (W) (female), Royal Champs (male), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Vidarbha (Women) (female), Western Australia Warriors (male)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Andhra (Women) (female), Bangla Tigers (male), Baroda (W) (female), Baroda (Women) (female), Karnataka (W) (female), Karnataka (Women) (female), Lahore Region Whites (male), Maharashtra (W) (female), Maharashtra (Women) (female), Nhlangano Legends (male), Peshawar Blues (male), Pondicherry (male), Railways (W) (female), Railways (Women) (female), Royal Champs (male), Tasmanian Tigers (male), Vidarbha (W) (female), Vidarbha (Women) (female)
 
-Runtime 259.4s. Snapshot: `odds_20261115T183035Z.jsonl.gz`
+Runtime 209.5s. Snapshot: `odds_20261115T193038Z.jsonl.gz`
