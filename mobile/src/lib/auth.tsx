@@ -89,9 +89,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = useCallback(async (email: string, password: string) => {
     const sb = getSupabase();
     if (!sb) return { error: "Sign-in is not configured for this build." };
-    const { error } = await sb.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: redirectTo } });
-    if (!error) setSignInOpen(false);
-    return { error: error?.message ?? null };
+    const site = String(process.env.EXPO_PUBLIC_SITE_URL || "").replace(/\/+$/, "");
+    const emailRedirectTo = site ? `${site}/auth/callback` : redirectTo;
+    const { data, error } = await sb.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo } });
+    if (error) return { error: error.message };
+    if (data.session) { setSignInOpen(false); return { error: null }; }
+    if (data.user && !(data.user.identities?.length)) {
+      return { error: "That email already has an account — sign in instead." };
+    }
+    return { error: "Check your email to confirm the account, then sign in." };
   }, []);
 
   const signOut = useCallback(async () => {

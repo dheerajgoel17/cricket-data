@@ -41,3 +41,24 @@ export function getSupabase(): SupabaseClient | null {
 }
 
 export const authConfigured = () => !!getSupabase();
+
+let authSettings: Promise<{ google: boolean }> | null = null;
+
+/** Which social providers the project has turned on (from `/auth/v1/settings`). */
+export function getAuthProviderFlags(): Promise<{ google: boolean }> {
+  if (authSettings) return authSettings;
+  const url = String(process.env.EXPO_PUBLIC_SUPABASE_URL || "").replace(/\/+$/, "");
+  const key = String(process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "").trim();
+  if (!url || !key) {
+    authSettings = Promise.resolve({ google: false });
+    return authSettings;
+  }
+  authSettings = fetch(`${url}/auth/v1/settings`, { headers: { apikey: key, Authorization: `Bearer ${key}` } })
+    .then(async (r) => {
+      if (!r.ok) return { google: false };
+      const j = await r.json() as { external?: { google?: boolean } };
+      return { google: !!j.external?.google };
+    })
+    .catch(() => ({ google: false }));
+  return authSettings;
+}
