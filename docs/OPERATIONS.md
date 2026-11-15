@@ -231,8 +231,8 @@ The Android app ships its JavaScript through `expo-updates` (the maintained succ
 * **Publish:** Actions → "Mobile OTA update" (needs the secret `EXPO_TOKEN` and the variable `EXPO_UPDATES_URL`), or locally `cd mobile && npx eas-cli update --branch production --message "..."`. The workflow refuses a native change.
 * **First time, step by step (free EAS account):**
   1. Sign up at expo.dev/signup, then `cd mobile && npx eas-cli login`.
-  2. `npx eas-cli init` (creates the project; note its project id). The update URL is `https://u.expo.dev/<project id>`.
-  3. Map the channel the app listens to (`production`, set in `app.config.js`) to a branch: `npx eas-cli channel:create production --branch production`.
+  2. `npx eas-cli init --force` (creates the project; its id is in `mobile/app.json` as `extra.eas.projectId`, committed: it is not a secret). The update URL is `https://u.expo.dev/<project id>`.
+  3. Map the channel the app listens to (`production`, set in `app.config.js`) to a branch: `npx eas-cli channel:create production` (creates the channel and a branch of the same name).
   4. Put the URL in `mobile/.env.local` as `EXPO_UPDATES_URL` and in the repository variable `EXPO_UPDATES_URL`; create an access token (expo.dev account settings, Access tokens) and store it as the repository secret `EXPO_TOKEN`.
   5. Build the APK once with `EXPO_UPDATES_URL` set (an APK built before this cannot receive updates), then publish JavaScript-only changes from Actions → "Mobile OTA update".
   Check the free plan's monthly update allowance on expo.dev/pricing.
