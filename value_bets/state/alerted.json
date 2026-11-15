@@ -8,5 +8,30 @@
   "edge": 0.0609,
   "start_utc": "2026-11-16T08:10:00Z",
   "alerted_at": "2026-11-15T03:00:06.961538+00:00"
+ },
+ "male|New South Wales|South Australia|2026-11-15|bowler_wickets||HTRY Thornton under 1.5|1.5|under": {
+  "edge": 0.1332,
+  "start_utc": "2026-11-15T23:00:00Z",
+  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_sixes||Phoebe Litchfield under 0.5|0.5|under": {
+  "edge": 0.098,
+  "start_utc": "2026-11-16T08:10:00Z",
+  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
+ },
+ "male|Australia|England|2026-11-18|bowler_wickets||Jofra Archer under 1.5|1.5|under": {
+  "edge": 0.2261,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
+ },
+ "male|Australia|England|2026-11-18|bowler_wickets||Adam Zampa under 1.5|1.5|under": {
+  "edge": 0.2205,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
+ },
+ "male|Australia|England|2026-11-18|bowler_wickets||Riley Meredith under 1.5|1.5|under": {
+  "edge": 0.1349,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
  }
 }
