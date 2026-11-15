@@ -19,16 +19,6 @@
   "start_utc": "2026-11-16T08:13:00Z",
   "alerted_at": "2026-11-13T03:33:45.620664+00:00"
  },
- "male|Australia|England|2026-11-15|batter_milestone||Cooper Connolly 50+ no|49.5|under": {
-  "edge": 0.0619,
-  "start_utc": "2026-11-15T03:30:00Z",
-  "alerted_at": "2026-11-13T12:39:31.841445+00:00"
- },
- "male|Australia|England|2026-11-15|batter_milestone||Tom Banton 50+ no|49.5|under": {
-  "edge": 0.06,
-  "start_utc": "2026-11-15T03:30:00Z",
-  "alerted_at": "2026-11-13T12:39:31.841445+00:00"
- },
  "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_runs||Meg Lanning under 28.5|28.5|under": {
   "edge": 0.0609,
   "start_utc": "2026-11-16T08:10:00Z",
