@@ -19,6 +19,12 @@ jobs:
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EXPO_UPDATES_URL: ${{ vars.EXPO_UPDATES_URL }}
+      # an update's JavaScript carries these values inlined at publish time (same as mobile/.env.local for a local build)
+      EXPO_PUBLIC_SITE_URL: ${{ vars.EXPO_PUBLIC_SITE_URL }}
+      EXPO_PUBLIC_IMG_CDN: ${{ vars.EXPO_PUBLIC_IMG_CDN }}
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      EXPO_PUBLIC_PERF: "0"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,6 +32,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Refuse to publish without the app's settings
+        run: |
+          for k in EXPO_PUBLIC_SITE_URL EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
+            if [ -z "${!k}" ]; then echo "$k is not set (repository variable or secret); an update without it would break the app." >&2; exit 1; fi
+          done
       - name: Is this change OTA-safe
         run: node scripts/ota-check.mjs origin/main | tee ota.txt
       - name: Refuse a native change
