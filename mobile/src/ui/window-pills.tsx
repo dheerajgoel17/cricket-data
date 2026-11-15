@@ -10,7 +10,9 @@ export interface WindowItem { n: number; label: string; p: number | null }
 
 const band = (p: number | null) => (p == null ? color["muted-foreground"] : p >= 0.6 ? color.primary : p >= 0.4 ? color.amber : color.miss);
 
-/** The look-back windows as one segmented track: each cell is the window's name over its hit rate, coloured by how good it is, the chosen one lifted (the site's "Games" pills). */
+/**
+ * Look-back windows as a quiet hairline band (web Player "Games" row twin): label over hit rate, chosen cell lifted with secondary wash — no card track, no filter button beside.
+ */
 export function WindowPills({ items, value, onChange }: { items: WindowItem[]; value: number; onChange: (n: number) => void }) {
   return (
     <View style={styles.track} accessibilityRole="tablist" accessibilityLabel="Games">
@@ -34,9 +36,15 @@ function Cell({ w, on, onPress }: { w: WindowItem; on: boolean; onPress: () => v
 }
 
 const styles = StyleSheet.create({
-  track: { flexDirection: "row", backgroundColor: color.card, borderRadius: radius.chip, padding: 2 },
-  hit: { flex: 1 },
-  cell: { alignItems: "center", justifyContent: "center", borderRadius: radius.chip, paddingVertical: 6 },
-  label: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  value: { fontSize: 18, lineHeight: 22, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  track: {
+    flexDirection: "row",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: color.hairline,
+    paddingVertical: 4,
+  },
+  hit: { flex: 1, minWidth: 52 },
+  cell: { alignItems: "center", justifyContent: "center", borderRadius: radius.chip, paddingVertical: 6, paddingHorizontal: 4 },
+  label: { ...type.caption, color: color["muted-foreground"], ...cap },
+  value: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

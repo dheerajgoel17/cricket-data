@@ -19,7 +19,7 @@ import { abbr, odds, pc } from "@site/lib/format";
 import { shareFixtureUrl } from "@site/lib/share";
 import { SITE_URL } from "@/lib/config";
 import { fxInfoOf } from "@/lib/fancy";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
@@ -51,8 +51,9 @@ const short = (n: number | null | undefined, d = 1) => (n == null ? "–" : Numb
  * `/fixture/:id/fancy`. Detail mode is that page: chart, over/under and ladder. Filters use the Props pattern (scope chips + Filters sheet for window / ground).
  */
 export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: any; teams: [string, number][]; fmt: string; doc: any; start?: { fm?: string; sc?: string; mw?: string; mv?: string }; mode?: "list" | "detail" }) {
-  const stats = useQuery(storeQuery), live = useQuery(liveQuery);
+  const stats = useStore(), live = useQuery(liveQuery);
   const store: any = stats.data?.store;
+  const matchesReady = stats.matchesReady;
   const liveMatch = liveMatchFor(live.data, doc, fx);
   const insets = useSafeAreaInsets();
   const [sc, setSc] = useState(start?.sc ?? "-1"), [fmId, setFmId] = useState(start?.fm ?? ""), [win, setWin] = useState(WINDOWS.includes(Number(start?.mw)) ? Number(start?.mw) : 10), [here, setHere] = useState(start?.mv === "1"), [ml, setMl] = useState<number>();
@@ -79,30 +80,31 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   const marketLabel = (k: string) => ((scope < 0 ? MATCH_KEYS : TEAM_KEYS) as [string, string][]).find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : (((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string));
 
   // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
-  const venueIdx = useMemo(() => (store ? ((venueIndices as any)(store, fx.venue) as number[]) : []), [store, fx.venue]);
-  const hereMatches = (n: number): number[] => (store ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: n, venue: venueIdx }) as number[] : []);
+  const hist = !!(store && matchesReady && store.M);
+  const venueIdx = useMemo(() => (hist ? ((venueIndices as any)(store, fx.venue) as number[]) : []), [hist, store, fx.venue]);
+  const hereMatches = (n: number): number[] => (hist ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: n, venue: venueIdx }) as number[] : []);
   const useHere = here && venueIdx.length > 0;
-  const ms = useMemo(() => (store ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: win, venue: useHere ? venueIdx : undefined }) as number[] : []), [store, teams, scope, fmtIdx, win, useHere, venueIdx]);
+  const ms = useMemo(() => (hist ? fancySample(store, { fmt: fmtIdx, gender, teams, scope, lastN: win, venue: useHere ? venueIdx : undefined }) as number[] : []), [hist, store, teams, scope, fmtIdx, win, useHere, venueIdx]);
   const bookedNow = useMemo(() => (!key || key === "top_batter" ? [] : fancyLines(doc, fxInfo, key, team?.[0] ?? null, inn)), [doc, fxInfo, key, team, inn]);
   const batFirstNow = batFirstBooked(bookedNow, inn, scope) as boolean;
-  const scoredMs = useMemo(() => (store && batFirstNow ? (firstInnsMs(store, ms, scope) as number[]) : ms), [ms, batFirstNow, store, scope]);
+  const scoredMs = useMemo(() => (hist && batFirstNow ? (firstInnsMs(store, ms, scope) as number[]) : ms), [ms, batFirstNow, hist, store, scope]);
   const run = (k: string, line?: number | null, from = scoredMs): any => (scoreMarket as any)(store, from, scope, k, line, inn);
 
   // every market the books price, scored on the same matches and ranked by the better side's edge
   const overview = useMemo(() => {
-    if (!store) return [] as any[];
+    if (!hist) return [] as any[];
     const ground = venueIdx.length ? hereMatches(10) : undefined;
     const inns = scope < 0 ? [0] : (FANCY_INNS as number[]);
     return inns.flatMap((n) => (buildOverview as any)({ store, doc, fxInfo, ms, scope, teamName: team?.[0] ?? null, keys: scope < 0 ? MATCH_KEYS : TEAM_KEYS, label: marketLabel, ground, inn: n }))
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
-  }, [doc, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [doc, ms, fxInfo, team, scope, hist, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // the other live markets (over / under lines and picks), from the in-play merge: prices only
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
 
   const book = useMemo(() => (fancyByLine(bookedNow) as { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] }[]), [bookedNow]);
-  const base = useMemo(() => (!store || !key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
+  const base = useMemo(() => (!hist || !key || key === "top_batter" ? null : run(key)), [hist, store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
   const line: number = ml ?? (book.find((l) => l.over != null && l.under != null) ?? book.find((l) => l.over != null) ?? book[0])?.line ?? base?.ladder[2]?.line ?? base?.ladder[0]?.line ?? 0.5;
   const liveSoFar = (key && key !== "top_batter" ? fancyStanding(liveMatch, { key, team: team?.[0] ?? null, inn, line, batFirst: batFirstNow }) : null) as Standing | null;
   const rep = useMemo(() => (key === "top_batter" || !base ? null : run(key, line)), [base, store, scoredMs, key, scope, line]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -174,7 +176,8 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     void Share.share({ message: text || url, title: `${fx.a} v ${fx.b}` });
   };
 
-  if (!store) return <Working label="Loading…" shape="rows" />;
+  if (stats.isError && !matchesReady) return <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." />;
+  if (!store || !matchesReady) return <Working label="Loading…" shape="rows" />;
   return (
     <View style={styles.root}>
       <View style={styles.filterRow}>
@@ -354,10 +357,12 @@ function Meter({ value, tone }: { value: number; tone: string }) {
 
 /** The chance of each batter making the highest score (of the match, or of the side batting first), from the matches on screen. */
 function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; teamName?: string }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
-  const t = useMemo(() => (scope < 0 ? (topBatters as any)(store, ms, { scope: "match" }) : (topBatters as any)(store, ms, { team: scope, scope: "team" })) as { n: number; rows: any[] }, [store, ms, scope]);
+  const ready = !!(store && stats.matchesReady && store.M);
+  const t = useMemo(() => (!ready ? { n: 0, rows: [] } : (scope < 0 ? (topBatters as any)(store, ms, { scope: "match" }) : (topBatters as any)(store, ms, { team: scope, scope: "team" })) as { n: number; rows: any[] }), [ready, store, ms, scope]);
   const max = Math.max(...t.rows.map((r) => r.pSole), 0.0001);
+  if (!ready) return <Working label="Loading…" shape="rows" />;
   return (
     <View style={styles.top}>
       <View style={{ padding: space.stack, gap: 2 }}>

@@ -1,12 +1,13 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { Text, TextInput } from "@/ui/text";
 import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { competitions } from "@/lib/league";
 import { useScreenInsets } from "@/ui/insets";
 import { EmptyState } from "@/ui/empty-state";
@@ -20,10 +21,11 @@ import { TabFade } from "@/ui/tab-fade";
 /** Every competition in the data with eight matches or more, the biggest first, with a search over the names. */
 export default function Competitions() {
   const inset = useScreenInsets(false);
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
+  const matchesReady = stats.matchesReady;
   const [text, setText] = useState("");
-  const all = useMemo(() => (store ? competitions(store) : []), [store]);
+  const all = useMemo(() => (store && matchesReady ? competitions(store) : []), [store, matchesReady]);
   const t = text.trim().toLowerCase();
   const rows = all.filter(([e]) => !t || store.events[e].toLowerCase().includes(t)).slice(0, 80);
   return (
@@ -33,14 +35,15 @@ export default function Competitions() {
         <Ionicons name="search" size={18} color={color["muted-foreground"]} />
         <TextInput value={text} onChangeText={setText} autoCorrect={false} autoCapitalize="none" clearButtonMode="while-editing" placeholder="Search competitions" placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel="Search competitions" />
       </View>
-      {!store ? <Working label="Loading…" fill shape="comps" /> : (
-        <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.list, { paddingBottom: inset.bottom + 24 }]}>
-          {rows.length ? (
-            <View style={styles.box}>
-              {rows.map(([e, c], n) => <ListRow key={e} first={n === 0} left={<LeagueBadge name={store.events[e]} size={40} />} title={store.events[e]} sub={`${c} matches`} onPress={() => push(`/league/${e}`)} />)}
-            </View>
-          ) : <EmptyState compact title="No matches" body={`No competition matches “${text.trim()}”.`} />}
-        </ScrollView>
+      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading…" fill shape="comps" /> : (
+        <FlashList
+          data={rows}
+          keyExtractor={([e]) => String(e)}
+          keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"
+          contentContainerStyle={[styles.list, { paddingBottom: inset.bottom + 24 }]}
+          renderItem={({ item: [e, c], index }) => <ListRow first={index === 0} left={<LeagueBadge name={store.events[e]} size={40} />} title={store.events[e]} sub={`${c} matches`} onPress={() => push(`/league/${e}`)} />}
+          ListEmptyComponent={<EmptyState compact title="No matches" body={t ? `No competition matches “${text.trim()}”.` : "No competitions with enough matches yet."} />}
+        />
       )}
       <TabFade withTabBar={false} />
     </View>

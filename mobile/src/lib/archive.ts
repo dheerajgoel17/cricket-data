@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { archiveFixture, fixtureBooks, isFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
 import { ARCHIVE_URL } from "@/lib/config";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { fixturesQuery } from "@/lib/queries";
 import { useLinesLive } from "@/lib/use-lines-live";
 
@@ -25,7 +25,7 @@ export async function loadArchive(id: string): Promise<any | null> {
  * with the archive's lines added to the doc.
  */
 export function useFixtureBooks(id: string) {
-  const stats = useQuery(storeQuery), fixtures = useQuery(fixturesQuery), lines = useLinesLive();
+  const stats = useStore(), fixtures = useQuery(fixturesQuery), lines = useLinesLive();
   const store: any = stats.data?.store;
   const listed = (fixtures.data || []).find((f: any) => f.id === id);
   const books = listed ? fixtureBooks(lines.data, listed) : { props: false, fancy: false };

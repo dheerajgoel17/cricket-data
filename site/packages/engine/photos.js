@@ -1,7 +1,18 @@
 // Pure helpers (no DOM) for image URLs, so they can be unit-tested. Data comes from data/photos.json:
 //   { p: { "<Base player id>": "c:<Source A id>" | "w:<Commons file>" }, t: { "<folded team name>": "<Source A team id>" }, l: { "<folded event name>": "<Source A series id, newest season>" } }
-/** The third-party image host is configuration, not code: VITE_IMG_CDN is set in the build environment. */
-const cdn = () => (import.meta.env?.VITE_IMG_CDN ?? (typeof process !== "undefined" ? process.env.VITE_IMG_CDN : "")) || "";
+/**
+ * The third-party image host is configuration, not code.
+ * Site/tests: `process.env.VITE_IMG_CDN` (Vite `define` / test harness).
+ * App: `setImgCdn(EXPO_PUBLIC_IMG_CDN)` from `mobile/index.js` — never read `EXPO_PUBLIC_*` here;
+ * Expo rewrites those to `expo/virtual/env`, which fails outside `mobile/`.
+ */
+let imgCdn = "";
+export const setImgCdn = (url) => { imgCdn = String(url || "").replace(/\/$/, ""); };
+const cdn = () => {
+  if (imgCdn) return imgCdn;
+  if (typeof process === "undefined" || !process.env) return "";
+  return String(process.env.VITE_IMG_CDN || "").replace(/\/$/, "");
+};
 
 export const fold = (s) => String(s ?? "").normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 

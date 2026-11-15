@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { liveForFixture } from "@cricket/engine/live.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useFixtureBooks } from "@/lib/archive";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { liveQuery } from "@/lib/queries";
 import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
@@ -28,17 +28,17 @@ export default function FancyMarketPage() {
   const now = useNow(60_000);
   const live = useQuery(liveQuery);
   const { fx: f, doc, isLoading } = useFixtureBooks(id);
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const item: RailItem | null = f ? { fixture: f, state: fixtureState(f, liveForFixture(live.data, f)?.status, now), live: liveMatchFor(live.data, doc, f), noProps: false } : null;
   const fmt = f && FORMATS.includes(f.fmt) ? f.fmt : "T20";
   const teams: [string, number][] = f ? [[f.a, f.a_ix], [f.b, f.b_ix]] : [];
   const known = teams.filter(([, i]) => i >= 0);
 
-  if (isLoading || !stats.data?.store) {
+  if (isLoading || !stats.data?.store || !stats.matchesReady) {
     return (
       <View style={[styles.root, { paddingTop: inset.top }]}>
         <PageHeader title="Fancy" />
-        <Working label="Loading…" shape="market" />
+        {stats.isError ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : <Working label="Loading…" shape="market" />}
       </View>
     );
   }

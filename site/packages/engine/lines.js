@@ -15,8 +15,21 @@ export const keepMsFor = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS
 /** How far a book's start may be from a fixture's or the live feed's: 14 h, but a Test is priced day by day so any day of it is the same match. */
 export const BOOK_WINDOW_MS = 14 * 3600e3;
 export const sameMatchWindow = (fmt) => (fmt === "Test" || fmt === "FC" ? TEST_KEEP_MS : BOOK_WINDOW_MS);
-/** The 6-day Test window if either side is a Test / FC; otherwise the limited-overs 14 h window. */
-export const sameMatchWindowFor = (...fmts) => sameMatchWindow(fmts.some((f) => f === "Test" || f === "FC") ? "Test" : fmts.find(Boolean) || "");
+/** True when formats agree, or either is unknown. Bilateral tour legs (T20 / ODI / Test) never match each other; Hundred / T10 / O60 are other tournaments and never mix either. */
+export function sameFmt(...fmts) {
+  const known = fmts.map(canonFmt).filter(Boolean);
+  return known.length < 2 || known.every((f) => f === known[0]);
+}
+
+/**
+ * How far two starts may be and still be the same match. Distinct formats → 0 (never).
+ * Same Test/FC (or Test + unknown) → 6 days for day-by-day restamps; otherwise 14 h.
+ * Callers should still check `sameFmt` first; returning 0 here is the backstop for T20/ODI/Test tours.
+ */
+export function sameMatchWindowFor(...fmts) {
+  if (!sameFmt(...fmts)) return 0;
+  return sameMatchWindow(fmts.some((f) => { const c = canonFmt(f); return c === "Test" || c === "FC"; }) ? "Test" : (fmts.map(canonFmt).find(Boolean) || ""));
+}
 
 /** The market's no-vig probability of the over, from one book's two prices (null if either is missing). */
 export function overProb(over, under) {
@@ -183,9 +196,16 @@ export function bookFormatFor(doc, pid, stat = "", now = Date.now(), graceMs = 3
 }
 
 /** Team-name key shared by the schedule and the bookmaker feed: case, "(W)" / "Women" and punctuation ignored. */
+const teamKeys = new Map(); // a name's key never changes; matching asks for it once per line per fixture
 export const teamKey = (n) => {
-  const k = String(n || "").toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
-  return SAME_SIDE[k] || k;
+  const s = String(n || "");
+  let key = teamKeys.get(s);
+  if (key !== undefined) return key;
+  const k = s.toLowerCase().replace(/\(w\)|women'?s?|\sw$/g, "").replace(/[^a-z0-9]/g, "");
+  key = SAME_SIDE[k] || k;
+  if (teamKeys.size > 5000) teamKeys.clear();
+  teamKeys.set(s, key);
+  return key;
 };
 
 /** Are two fixture ids (`date-team-v-team`) the same match? A side the books name differently ("...-dolphins-v-boland" / "...-dolphins-v-rocks") is one side (`SAME_SIDE`), so an old link still opens the page. */
@@ -241,7 +261,7 @@ export function sameFixture(line, fixture, doc) {
   const [x, y] = sidesOf(line);
   if (!x || !y || !((x === a && y === b) || (x === b && y === a))) return false;
   const lf = lineFmt(line, doc), ff = canonFmt(fixture?.fmt);
-  if (lf && ff && lf !== ff) return false;
+  if (!sameFmt(lf, ff)) return false;
   const t = startMs(fixture), u = line?.start_utc ? Date.parse(line.start_utc) : NaN;
   if (!Number.isFinite(t) || !Number.isFinite(u)) return true;
   return Math.abs(t - u) < sameMatchWindowFor(ff, lf);

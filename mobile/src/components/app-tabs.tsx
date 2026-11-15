@@ -1,45 +1,17 @@
-import { NativeTabs } from "expo-router/native-tabs";
+import { Tabs } from "expo-router";
+import { TABS } from "@/lib/tabs";
+import { TabBar } from "@/components/tab-bar";
 import { color } from "@/ui/tokens";
 
-// The same Ionicons the site's tab bar uses (calendar, stats-chart, dice, trophy, bookmark), outline when idle and filled when chosen, as template images the bar tints.
-// Rendered from the ionicons package (MIT) at 24 pt, @1x / @2x / @3x: assets/tab-icons.
-const ICONS = {
-  index: { default: require("../../assets/tab-icons/calendar-outline.png"), selected: require("../../assets/tab-icons/calendar.png") },
-  props: { default: require("../../assets/tab-icons/stats-chart-outline.png"), selected: require("../../assets/tab-icons/stats-chart.png") },
-  fancy: { default: require("../../assets/tab-icons/dice-outline.png"), selected: require("../../assets/tab-icons/dice.png") },
-  leagues: { default: require("../../assets/tab-icons/trophy-outline.png"), selected: require("../../assets/tab-icons/trophy.png") },
-  saved: { default: require("../../assets/tab-icons/bookmark-outline.png"), selected: require("../../assets/tab-icons/bookmark.png") },
-  contact: { default: require("../../assets/tab-icons/mail-outline.png"), selected: require("../../assets/tab-icons/mail.png") },
-};
-
-// iOS: the system tab bar, which is liquid glass on iOS 26 and later and the classic translucent bar before that. Android has its own file (app-tabs.android.tsx).
+// The six tabs with one docked bar (`TabBar`) on iOS, Android and the browser preview. Not the system tab bar: on iOS 26 that is a floating liquid-glass capsule, and the app's
+// bar sits on the bottom edge. A tab is mounted when first chosen and frozen while another is in front (`ui/lazy-tab.tsx`; the navigator's own `freezeOnBlur` has no effect in this
+// Expo Router), so a hidden tab does no work on a live poll. Tabs never slide (`animation: "none"`).
 export default function AppTabs() {
   return (
-    <NativeTabs tintColor={color.primary}>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Fixtures</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.index} renderingMode="template" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="props">
-        <NativeTabs.Trigger.Label>Props</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.props} renderingMode="template" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="fancy">
-        <NativeTabs.Trigger.Label>Fancy</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.fancy} renderingMode="template" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="leagues">
-        <NativeTabs.Trigger.Label>Leagues</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.leagues} renderingMode="template" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="saved">
-        <NativeTabs.Trigger.Label>Saved</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.saved} renderingMode="template" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="contact">
-        <NativeTabs.Trigger.Label>Contact</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon src={ICONS.contact} renderingMode="template" />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs
+      screenOptions={{ headerShown: false, lazy: true, animation: "none", sceneStyle: { backgroundColor: color.background } }}
+      tabBar={(props) => <TabBar {...props} />}>
+      {TABS.map((t) => <Tabs.Screen key={t.name} name={t.name} />)}
+    </Tabs>
   );
 }

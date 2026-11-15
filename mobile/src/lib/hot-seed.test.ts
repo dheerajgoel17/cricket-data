@@ -25,3 +25,10 @@ test("a line the file does not cover, or whose main line has moved, goes to the 
   expect(loadStore).toHaveBeenCalledTimes(1); // asked for the store because the seed's line is not the books' main line (the player is not in this empty store, so no row)
   expect(rows).toEqual([]);
 });
+
+ test.each([null, {}])("seed-only never starts history when the seed is missing or uncovered (%p)", async (seed) => {
+  const loadStore = jest.fn(async () => { throw new Error("must stay seed-only"); });
+  const rows = await scoreHotRows({ loadStore, lines: [line()], fixtures: [], scope: { day: 0 }, now: NOW, seed, seedOnly: true });
+  expect(rows).toEqual([]);
+  expect(loadStore).not.toHaveBeenCalled();
+});

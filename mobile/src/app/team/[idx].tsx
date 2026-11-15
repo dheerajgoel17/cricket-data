@@ -9,7 +9,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { odds, pc } from "@site/lib/format";
 import { collectGrid } from "@site/lib/grid";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { DataTable, Pill } from "@/ui/data-table";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
@@ -30,12 +30,14 @@ export default function Team() {
   const { idx } = useLocalSearchParams<{ idx: string }>();
   const i = Number(idx);
   const inset = useScreenInsets(false);
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
-  const valid = !!store && Number.isInteger(i) && i >= 0 && i < store.teams.length;
-  // the format it has played most
+  const matchesReady = stats.matchesReady;
+  const known = !!store && Number.isInteger(i) && i >= 0 && i < store.teams.length;
+  const valid = known && matchesReady;
+  // the format it has played most (needs matches.json)
   const main = useMemo(() => {
-    if (!valid) return "T20";
+    if (!valid || !store.M) return "T20";
     const c = FORMATS.map(() => 0);
     for (let m = 0; m < store.n; m++) if (store.M.a[m] === i || store.M.b[m] === i) c[store.M.f[m]]++;
     return FORMATS[c.indexOf(Math.max(...c))] ?? "T20";
@@ -46,16 +48,16 @@ export default function Team() {
   const [tab, setTab] = useState("grid"), [market, setMarket] = useState("");
   const rz: any = stats.data?.rz;
   // the team's match markets and top batter, run by the engine over this team's matches in the format (team markets use the side batting first)
-  const plan = useMemo(() => ({ kind: "match_market", market: market || null, line: null, side: "over", filters: { format: fmt, gender: valid ? (store.genderOfTeam(i) ? "female" : "male") : null } }), [market, fmt, valid, store, i]);
+  const plan = useMemo(() => ({ kind: "match_market", market: market || null, line: null, side: "over", filters: { format: fmt, gender: known ? (store.genderOfTeam(i) ? "female" : "male") : null } }), [market, fmt, known, store, i]);
   const mk = useQuery({ queryKey: ["team-plan", i, fmt, market, "m"], enabled: valid && tab === "markets", queryFn: (): Promise<any> => (runPlan as any)(store, rz, plan, { teamIdx: i }) });
   const top = useQuery({ queryKey: ["team-plan", i, fmt, "top"], enabled: valid && tab === "top", queryFn: (): Promise<any> => (runPlan as any)(store, rz, { ...plan, kind: "top_batter", market: null }, { teamIdx: i }) });
   const grid = useQuery({ queryKey: ["team-grid", i, fmt, stat, games], enabled: valid, queryFn: () => collectGrid(store, i, fmt, stat, games) });
-  const name = valid ? store.teamName(i) : "Team";
+  const name = known ? store.teamName(i) : "Team";
 
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
-      <PageHeader title={name} subtitle={valid ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={valid ? <StarButton idx={i} kind="team" /> : undefined} />
-      {!store ? <Working label="Loading…" fill shape="grid" /> : !valid ? <EmptyState title="Unknown team" body="This team is not in the stats data." /> : (
+      <PageHeader title={name} subtitle={known ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={known ? <StarButton idx={i} kind="team" /> : undefined} />
+      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="grid" /> : !known ? <EmptyState title="Unknown team" body="This team is not in the stats data." /> : !matchesReady ? <Working label="Loading matches…" fill shape="grid" /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}><TeamBadge name={store.teams[i].n} size={56} /><Text style={styles.name}>{name}</Text></View>
           <Segmented<string> items={FORMATS.map((f: string) => [f, f] as [string, string])} value={fmt} onChange={setFmt} label="Format" />

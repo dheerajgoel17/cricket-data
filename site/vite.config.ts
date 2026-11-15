@@ -73,6 +73,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss(), dataVersion(), devApi(!useProd)],
     resolve: { alias: [{ find: "@", replacement: path.resolve(import.meta.dirname, "src") }, { find: /^cn$/, replacement: path.resolve(import.meta.dirname, "src/lib/utils.ts") }] },
+    // `photos.js` reads `process.env.VITE_IMG_CDN` (not `import.meta.env`) so Metro can bundle the same file for the app.
+    define: { "process.env.VITE_IMG_CDN": JSON.stringify(env.VITE_IMG_CDN || "") },
     // Quick tunnels send Host: *.trycloudflare.com; Vite blocks unknown hosts unless listed (DNS rebinding guard).
     server: { port: 4173, proxy, allowedHosts: [".trycloudflare.com"] },
     preview: { port: 4173, proxy, allowedHosts: [".trycloudflare.com"] },

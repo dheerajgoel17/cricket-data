@@ -17,9 +17,12 @@ import { color, font, type } from "@/ui/tokens";
 const conditionalReport = conditional as (store: any, ms: number[], o: { team?: number | null; innNo: number; state: { balls: number; runs: number }; target: { kind: string; n?: number }; line?: number | null }) => any;
 const playerConditional = playerCond as (store: any, rows: any[], o: { fmt: number; state: { balls: number; runs: number }; line?: number | null }) => any;
 
+/** Read-only: never start the stats store from a Home prop row (Home must stay seed-only). */
+const useStorePeek = () => useQuery({ ...storeQuery, enabled: false }).data;
+
 /** Under a live innings-total row: "6 over · 3 under · 9 innings" of the format's history in the same spot; nothing when the row is not the innings being batted now or nothing was in that spot. */
 export function TeamSpot({ r, fx, teams }: { r: any; fx: any; teams: [string, number][] }) {
-  const store = useQuery(storeQuery).data?.store;
+  const store = useStorePeek()?.store;
   const live = useQuery(liveQuery).data;
   const fmtIx = FORMATS.indexOf(fx.fmt), gender = fx.gender === "female" ? 1 : 0;
   const match = useMemo(() => liveForFixture(live, { a: fx.a, b: fx.b, start: fx.start, fmt: fx.fmt }), [live, fx.a, fx.b, fx.start, fx.fmt]);
@@ -40,14 +43,16 @@ export function TeamSpot({ r, fx, teams }: { r: any; fx: any; teams: [string, nu
 
 /** The same for a batter at the crease (10 to 150 balls in): his own past innings in the same spot, and the recent innings of the format with a similar score. Needs his progression shard. */
 export function BatterSpot({ r }: { r: any }) {
-  const store = useQuery(storeQuery).data?.store;
+  const peek = useStorePeek();
+  const store = peek?.store;
+  const matchesReady = !!peek?.matchesReady;
   const live = useQuery(liveQuery).data;
   const fmtIx = FORMATS.indexOf(r.fmt);
   const match = useMemo(() => liveForFixture(live, { a: r.team, b: r.opp, start: r.start, fmt: r.fmt }), [live, r.team, r.opp, r.start, r.fmt]);
   const bat = useMemo(() => (liveBoard(match)?.batters as any[] | undefined)?.find((b) => namesMatch(b.name, r.name) && b.balls >= PLAYER_RANGE[0] && b.balls <= PLAYER_RANGE[1]) ?? null, [match, r.name]);
   const idx = useMemo(() => (store?.P?.id ?? []).indexOf(r.pid), [store, r.pid]);
-  const rows = useQuery({ queryKey: ["progression", idx], enabled: !!store && bat != null && idx >= 0, staleTime: Infinity, queryFn: () => store.playerProgression(idx) });
-  const rep = useMemo(() => (bat && rows.data && store?.M ? playerConditional(store, rows.data, { fmt: fmtIx, state: { balls: bat.balls, runs: bat.runs }, line: r.line }) : null), [bat, rows.data, store, fmtIx, r.line]);
+  const rows = useQuery({ queryKey: ["progression", idx], enabled: !!store && matchesReady && bat != null && idx >= 0, staleTime: Infinity, queryFn: () => store.playerProgression(idx) });
+  const rep = useMemo(() => (bat && rows.data && store?.M && matchesReady ? playerConditional(store, rows.data, { fmt: fmtIx, state: { balls: bat.balls, runs: bat.runs }, line: r.line }) : null), [bat, rows.data, store, matchesReady, fmtIx, r.line]);
   const band = bat && r.stat === "runs" ? batterHistoryKey({ fmt: r.fmt, gender: r.gender, balls: bat.balls, runs: bat.runs, line: r.line }) : null;
   const archived = useQuery({ queryKey: ["inplay-history"], enabled: band != null, staleTime: Infinity, queryFn: async () => { try { return await getJson("/data/inplay-history.json"); } catch { return null; } } });
   const counts = band ? (archived.data as Record<string, { over: number; under: number; push: number }> | null | undefined)?.[band] : null;

@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
 import { EmptyState } from "@/ui/empty-state";
 import { ChevronRight } from "@/ui/icons";
-import { cap, color, font, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, radius, space, tint, type, tonal } from "@/ui/tokens";
 
 /** A titled group of rows in a rounded container (the site's Saved sections): small-caps title with its count, then the rows, or an EmptyState when there are none. */
 export function Section({ title, count, empty, emptyTitle, children }: { title: string; count?: number; empty?: string; emptyTitle?: string; children?: ReactNode }) {
@@ -33,7 +33,7 @@ export function ListRow({ left, title, sub, right, onPress, first, chevron = tru
   );
   if (!onPress) return <View style={[styles.row, !first && styles.sep]}>{body}</View>;
   return (
-    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, !first && styles.sep, pressed && { backgroundColor: "rgba(58,58,60,0.45)" }]}>
+    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, !first && styles.sep, pressed && { backgroundColor: tint.row }]}>
       {body}
     </Press>
   );

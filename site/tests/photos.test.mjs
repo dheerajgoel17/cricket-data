@@ -1,7 +1,8 @@
 process.env.VITE_IMG_CDN = "https://img.test";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { leagueLogos, playerPhoto, playerPhotos, teamId, teamJerseys, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
+import { leagueLogos, playerPhoto, playerPhotos, setImgCdn, teamId, teamJerseys, teamLogos, teamLogo, fold } from "@cricket/engine/photos.js";
+setImgCdn("https://img.test");
 
 const photos = { p: { "4ae1755b": "c:1IG", "bad0cafe": "w:Jos buttler.JPG" }, t: { india: "O", "west indies": "V", "mumbai indians": "F" } };
 

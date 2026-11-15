@@ -11,8 +11,8 @@ import * as Haptics from "expo-haptics";
 import { useQuery } from "@tanstack/react-query";
 import { featuredEvents } from "@cricket/engine/tournament.js";
 import { DEFAULT_RAIL } from "@site/lib/priority";
-import { storeQuery } from "@/lib/data";
 import { fixturesQuery } from "@/lib/queries";
+import { useStore } from "@/lib/use-store";
 import { AppHeader } from "@/ui/brand";
 import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
@@ -30,11 +30,12 @@ const PIN_FIRST = ["big bash"];
 function Leagues() {
   mark("render:Leagues");
   const inset = useScreenInsets();
-  const stats = useQuery(storeQuery), fx = useQuery(fixturesQuery);
+  const stats = useStore(), fx = useQuery(fixturesQuery);
   const store: any = stats.data?.store;
+  const matchesReady = stats.matchesReady;
   const [picked, setPicked] = useState<number>();
   const [season, setSeason] = useState("");
-  const featured = useMemo(() => (store ? (featuredEvents(store, { big: DEFAULT_RAIL.bigEvent, pin: PIN_FIRST, fixtures: fx.data || [] }) as { e: number; name: string; tag: "live" | "soon" | "" }[]) : []), [store, fx.data]);
+  const featured = useMemo(() => (store && matchesReady ? (featuredEvents(store, { big: DEFAULT_RAIL.bigEvent, pin: PIN_FIRST, fixtures: fx.data || [] }) as { e: number; name: string; tag: "live" | "soon" | "" }[]) : []), [store, matchesReady, fx.data]);
   const e = picked ?? featured[0]?.e;
 
   return (
@@ -45,7 +46,7 @@ function Leagues() {
         </Press>
       } />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        {!store ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
+        {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
               {(featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured]).map((x) => {
@@ -53,8 +54,8 @@ function Leagues() {
                 return (
                   <Press key={x.e} onPress={() => { if (!on) { void Haptics.selectionAsync(); setPicked(x.e); setSeason(""); } }} accessibilityRole="tab" accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
                     <LeagueBadge name={x.name} size={24} />
-                    <Text style={[styles.chipText, on && { color: color.background }]} numberOfLines={1}>{x.name}</Text>
-                    {x.tag ? <View style={[styles.tag, { backgroundColor: x.tag === "live" ? color.primary : color.amber }]}><Text style={styles.tagText}>{x.tag === "live" ? "Live" : "Soon"}</Text></View> : null}
+                    <Text style={[styles.chipText, on && { color: color["primary-foreground"] }]} numberOfLines={1}>{x.name}</Text>
+                    {x.tag ? <View style={[styles.tag, { backgroundColor: x.tag === "live" ? (on ? color["primary-foreground"] : color.primary) : color.amber }]}><Text style={[styles.tagText, on && x.tag === "live" && { color: color.primary }]}>{x.tag === "live" ? "Live" : "Soon"}</Text></View> : null}
                   </Press>
                 );
               })}
@@ -84,8 +85,8 @@ const styles = StyleSheet.create({
   emptyPad: { padding: space.gutter },
   chips: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: 40, flexDirection: "row", alignItems: "center", gap: space.tight, paddingLeft: 8, paddingRight: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.card },
-  chipOn: { backgroundColor: color.foreground },
-  chipText: { ...type.callout, color: color.foreground, maxWidth: 180 },
+  chipOn: { backgroundColor: color.primary },
+  chipText: { ...type.callout, fontFamily: font.medium, color: color.foreground, maxWidth: 180 },
   tag: { borderRadius: 999, paddingHorizontal: 6, height: 16, justifyContent: "center" },
   tagText: { ...cap, fontFamily: font.data, fontSize: 10, color: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
@@ -93,4 +94,4 @@ const styles = StyleSheet.create({
   leagueName: { ...type.title, color: color.foreground, flex: 1 },
 });
 
-export default lazyTab(Leagues);
+export default lazyTab(Leagues, "Leagues");

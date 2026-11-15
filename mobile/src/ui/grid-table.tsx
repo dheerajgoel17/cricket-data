@@ -6,12 +6,11 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useQuery } from "@tanstack/react-query";
 import { STATS } from "@cricket/engine/rules.js";
 import { heatStep } from "@site/lib/heat";
 import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
 import { ActiveChip, ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
@@ -95,9 +94,9 @@ const NAME_W = 132, HIT_W = 44, CELL_W = 46, ROW_H = 46;
 
 /** Players down, the team's last fixtures across (the site's `GridTable`). A cell is the stat value, tinted by how far it sits from the line; the player names stay put while the fixtures scroll sideways. */
 export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line: number }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
-  if (!store) return <EmptyState compact title="Could not load grid" body="Pull to retry once the stats data is ready." />;
+  if (!store || !stats.matchesReady || !store.M) return <EmptyState compact title="Could not load grid" body="Pull to retry once the stats data is ready." />;
   if (!g.fx.length) return <EmptyState compact title="No fixtures" body="No fixtures for this format." />;
   const M = store.M;
   const label = (i: number) => playerLabel(store, names, i);
@@ -149,9 +148,9 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
 
 /** Players whose recent games clear the line most often, as list rows (picture, line and record, hit rate, last-10 bars) (the site's `TrendCards`). */
 export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; team: number }[]; line: number; minHit: number; stat: string }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
-  if (!store) return <EmptyState compact title="Could not load trends" body="Pull to retry once the stats data is ready." />;
+  if (!store || !stats.matchesReady) return <EmptyState compact title="Could not load trends" body="Pull to retry once the stats data is ready." />;
   const items: any[] = [];
   for (const { g, team } of grids) for (const r of g.body) {
     const played = g.fx.filter((m) => r.map.has(m));

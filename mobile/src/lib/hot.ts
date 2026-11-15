@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Hot props: every priced line of a day scored against the player's history (hit rate over the last 5 / 10 games, this year, against today's opponent, at the ground), as the
 // site's `useHotRows` does (site/src/components/app/hot-props.tsx, a React hook and so not importable). The scoring itself is the shared engine; this is the same loop around it.
+import { Platform } from "react-native";
 import { booksOf, groupByChip, lineKey, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { prioritizeHotGroups, shouldPublishHot } from "@/lib/hot-priority";
 import { span } from "@/lib/perf";
@@ -10,7 +11,7 @@ export const MAX_ROWS = 30;
 /** Player files fetched at a time: several at once (they are latency-bound), few enough that the first ones land early. */
 const SHARDS_AT_ONCE = 8;
 /** The first scored row is shown at once; after that, rows already scored are shown at most this often while the rest are still coming. */
-const PUBLISH_MS = 600;
+const PUBLISH_MS = Platform.OS === "android" ? 1000 : 600;
 
 export type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; underAt?: { line: number; price: number }; underOnly?: boolean; live?: boolean; opened?: number };
 export interface Row {
@@ -20,12 +21,13 @@ export interface Row {
 }
 
 const rest = () => new Promise<void>((r) => setTimeout(r, REST_MS));
-// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS, so on a slow phone the JS thread is busy two thirds of the time at most and
-// touches, scrolls and re-renders always get their turn (the lines take longer to all arrive, and the rows appear as they do).
-const FRAME_MS = 8, REST_MS = 4;
+// A screen refreshes every 16 ms. Scoring is all synchronous work: after FRAME_MS of it the loop rests for REST_MS so touches and scrolls get a turn.
+// Android uses a lighter duty cycle (~1/3 busy) because mid-range phones drop frames when JS stays at ~2/3 busy during cold-start scoring.
+const FRAME_MS = Platform.OS === "android" ? 6 : 8;
+const REST_MS = Platform.OS === "android" ? 12 : 4;
 
 /** The rows for one day of priced lines, or for one match (`scope`: `{ day }` or `{ teams, archive }`). `onRows` is given the rows so far while the player files are still coming in. */
-export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scope, now = Date.now(), onRows, seed, names = null }: { store?: any; rz?: any; loadStore?: () => Promise<{ store: any; rz: any }>; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void; seed?: Record<string, any> | null; names?: Record<string, string> | null }): Promise<Row[]> {
+export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scope, now = Date.now(), onRows, seed, names = null, seedOnly = false }: { store?: any; rz?: any; loadStore?: () => Promise<{ store: any; rz: any }>; lines: any[]; fixtures: any[]; scope: HotScope; now?: number; onRows?: (rows: Row[]) => void; seed?: Record<string, any> | null; names?: Record<string, string> | null; /** When set, return seeded rows only — do not pull matches.json for leftovers (Android Home cold start). */ seedOnly?: boolean }): Promise<Row[]> {
   const todays = hotLines(lines || [], scope, now);
   // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one (that stays: it is the bet we settle).
   const keys = new Map<string, any>();
@@ -42,8 +44,12 @@ export async function scoreHotRows({ store, rz, loadStore, lines, fixtures, scop
     if (row) out.push({ ...row, day: hotDay(row.start, l.fmt, now) }); else todo.push(l);
   }
   if (out.length) onRows?.([...out]);
-  if (!todo.length) { span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} seeded=${out.length}`); return out; }
+  if (!todo.length || seedOnly) {
+    span("scoreHotRows", tAll, `lines=${keys.size} rows=${out.length} seeded=${out.length}${todo.length ? ` deferred=${todo.length}` : ""}`);
+    return out;
+  }
   if (!store) ({ store, rz } = await loadStore!());
+  await store.ready;
   const score = async (l: any) => {
     const tp = Date.now();
     const r = await scoreLine({ store, rz, l, byChip, fixtures, now, year, names });

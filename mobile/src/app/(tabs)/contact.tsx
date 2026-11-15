@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
   note: { ...type.callout, color: color["muted-foreground"] },
 });
 
-export default lazyTab(ContactScreen);
+export default lazyTab(ContactScreen, "Contact");

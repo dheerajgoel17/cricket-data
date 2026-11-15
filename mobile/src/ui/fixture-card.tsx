@@ -73,7 +73,8 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
 }
 
 const styles = StyleSheet.create({
-  card: { flex: 1, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug, justifyContent: "space-between" },
+  // Its own height by default; in the Home rail the cell is held to the tallest card and the card grows to fill it (the site's `h-full`), the foot staying at the bottom.
+  card: { flexGrow: 1, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
   pressed: { backgroundColor: color["surface-hover"] },
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
   cap: { ...type.footnote, color: color.foreground, ...cap },
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
   whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight },
+  foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight, marginTop: "auto" },
   status: { flex: 1, minWidth: 0 },
   statusText: { ...type.footnote, color: color.foreground },
   series: { ...type.caption, color: color["muted-foreground"] },

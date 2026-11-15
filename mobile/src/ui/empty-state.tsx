@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
-import { color, radius, space, type, tonal } from "@/ui/tokens";
+import { color, font, radius, space, type, tonal } from "@/ui/tokens";
 
 /**
  * Empty section / page: a quiet surface, optional icon, a short title and one supporting line.
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: space.gutter, paddingVertical: space.group },
   compact: { paddingHorizontal: space.stack, paddingVertical: space.stack },
   icon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: color.secondary },
-  title: { ...type.body, fontWeight: "600", color: color.foreground },
+  title: { ...type.body, fontFamily: font.medium, color: color.foreground },
   body: { ...type.callout, color: color["muted-foreground"] },
   action: { paddingTop: space.tight },
 });

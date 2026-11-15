@@ -18,7 +18,7 @@ import { useScreenInsets } from "@/ui/insets";
 import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
@@ -36,8 +36,7 @@ function Fancy() {
         data={ready ? shown : []}
         keyExtractor={(c) => c.f.id || `${c.f.a}${c.f.b}${c.f.start}`}
         renderItem={({ item }) => <MatchCard {...item} />}
-        ItemSeparatorComponent={() => <View style={{ height: space.stack }} />}
-        contentContainerStyle={{ paddingHorizontal: space.gutter, paddingBottom: inset.bottom + 24 }}
+        contentContainerStyle={{ paddingBottom: inset.bottom + 24 }}
         ListEmptyComponent={
           !ready
             ? (error ? <View style={styles.emptyPad}><EmptyState title="Could not score fancy lines" body="Try again in a moment." /></View> : <Working label="Scoring the fancy lines…" shape="fancy" />)
@@ -92,8 +91,9 @@ function MatchCard({ f, ms, rows }: Card) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
-  card: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
-  top: { padding: space.stack, gap: space.snug },
+  // flat, as on the site's phone Fancy: a match is a section on the page, closed by a hairline, not a card
+  card: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  top: { paddingHorizontal: space.gutter, paddingVertical: space.stack, gap: space.snug },
   meta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   cap: { ...type.footnote, ...cap, color: color["muted-foreground"] },
   ground: { ...type.footnote, color: color["muted-foreground"], flexShrink: 1 },
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
   team: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  whenTime: { ...type.body, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   rows: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug + 2, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.stack },
   series: { ...type.caption, color: color["muted-foreground"], flex: 1 },
   linkRow: { flexDirection: "row", alignItems: "center", gap: 2 },
   link: { ...type.footnote, fontFamily: font.medium, color: color.primary },
 });
 
-export default lazyTab(Fancy);
+export default lazyTab(Fancy, "Fancy");

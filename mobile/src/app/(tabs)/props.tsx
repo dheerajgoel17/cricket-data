@@ -14,7 +14,9 @@ import {
 import { MAX_ROWS } from "@/lib/hot";
 import { useHotView } from "@/lib/use-hot";
 import { AppHeader } from "@/ui/brand";
+import { STATS } from "@cricket/engine/rules.js";
 import { Chips } from "@/ui/chips";
+import { MatchChips } from "@/ui/match-chip";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { useScreenInsets } from "@/ui/insets";
@@ -23,7 +25,7 @@ import { Press } from "@/ui/press";
 import { PropRow } from "@/ui/prop-row";
 import { ScreenerFilters } from "@/ui/screener-filters";
 import { Text } from "@/ui/text";
-import { color, control, font, radius, space, type } from "@/ui/tokens";
+import { color, control, font, radius, space, tint, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const WINS = Object.entries(WIN_LABEL) as [string, string][];
@@ -37,18 +39,32 @@ function PlayerProps() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
-  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, refetch } = useHotViewWithRefetch(Number(sc.day));
+  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
   const dayRows = useMemo(() => raw.map((r) => ({ ...r, live: r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf]);
   const matchChips = useMemo(() => {
-    const m = new Map<string, { id: string; a: string; b: string }>();
+    const m = new Map<string, { id: string; a: string; b: string; start: string; fmt: string }>();
     for (const r of dayRows) {
       const id = matchChipId(r.match, r.start, r.fmt);
       if (!m.has(id)) {
         const [a, b] = String(r.match).split(/\s+vs\s+/i);
-        m.set(id, { id, a: a || "", b: b || "" });
+        m.set(id, { id, a: a || "", b: b || "", start: r.start, fmt: r.fmt });
       }
     }
     return [...m.values()];
+  }, [dayRows]);
+  // a chip whose match is on says Live under the two sides (the site's `MatchChip`)
+  const matchTags = useMemo(() => {
+    const t: Record<string, { text: string; session: boolean }> = {};
+    for (const r of dayRows) if (matchOf(r)?.status === "live") t[matchChipId(r.match, r.start, r.fmt)] = { text: "Live", session: false };
+    return t;
+  }, [dayRows, matchOf]);
+  // the prop types with the most lines first, ties in the engine's order (the site's stat tabs)
+  const statTabs = useMemo(() => {
+    const count = new Map<string, number>();
+    for (const r of dayRows) count.set(r.stat, (count.get(r.stat) || 0) + 1);
+    const known = Object.keys(STATS);
+    const have = [...count.keys()].filter((k) => (STATS as any)[k]).sort((x, y) => count.get(y)! - count.get(x)! || known.indexOf(x) - known.indexOf(y));
+    return [["all", "All props"], ...have.map((k) => [k, (STATS as any)[k].label])] as [string, string][];
   }, [dayRows]);
   const pick = matchChips.some((c) => c.id === sc.match) ? sc.match : "all";
   const scored = useMemo(() => dayRows
@@ -67,8 +83,10 @@ function PlayerProps() {
   const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
   const header = (
     <View>
+      <Chips items={days} value={sc.day} onChange={(day) => setSc((s) => ({ ...s, day, match: "all" }))} />
+      {matchChips.length ? <MatchChips all items={matchChips} tags={matchTags} value={pick} onChange={(match) => setSc((s) => ({ ...s, match }))} /> : null}
       <View style={styles.toolbar}>
-        <View style={{ flex: 1 }}><Chips items={days} value={sc.day} onChange={(day) => setSc((s) => ({ ...s, day, match: "all" }))} /></View>
+        <View style={{ flex: 1 }}><Chips items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></View>
         <Press accessibilityRole="button" accessibilityLabel={`Filters${active.length ? `, ${active.length} active` : ""}`} onPress={() => setFiltersOpen(true)} style={[styles.filterBtn, active.length > 0 && styles.filterOn]}>
           <Ionicons name="options-outline" size={18} color={active.length ? color.primary : color.foreground} />
           <Text style={[styles.filterTxt, active.length > 0 && { color: color.primary }]}>{active.length ? `L${sc.win === "l5" ? 5 : sc.win === "l10" ? 10 : ""}` : "Filters"}{active.length ? ` · ${active.length}` : ""}</Text>
@@ -127,21 +145,27 @@ function PlayerProps() {
 function useHotViewWithRefetch(day: number) {
   const view = useHotView({ day });
   const qc = useQueryClient();
-  return { ...view, refetch: () => qc.invalidateQueries({ queryKey: ["hot-rows", day] }) };
+  return {
+    ...view,
+    refetch: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ["hot-rows-prematch", day] }),
+      qc.invalidateQueries({ queryKey: ["hot-rows-live", day] }),
+    ]),
+  };
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
-  toolbar: { flexDirection: "row", alignItems: "center", gap: space.tight },
+  toolbar: { flexDirection: "row", alignItems: "center", gap: space.tight, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, marginRight: space.gutter },
-  filterOn: { backgroundColor: "rgba(39,218,142,0.15)" },
+  filterOn: { backgroundColor: tint.primary(0.15) },
   filterTxt: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.tight, paddingHorizontal: space.gutter, paddingBottom: space.snug },
-  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: "rgba(39,218,142,0.15)" },
+  activeChip: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: tint.primary(0.15) },
   activeChipTxt: { ...type.callout, color: color.primary },
   clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug },
   link: { ...type.callout, fontFamily: font.medium, color: color.primary },
 });
 
-export default lazyTab(PlayerProps);
+export default lazyTab(PlayerProps, "Player props");

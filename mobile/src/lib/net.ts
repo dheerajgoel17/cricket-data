@@ -1,9 +1,15 @@
 // The app's way into the site's gated data: ask /api/gate for the cookie and the unwrap key, send the cookie by hand (a native client has no browser cookie jar to lean on), unwrap what comes back.
+import { Platform } from "react-native";
 import { isWrapped } from "@cricket/engine/wrap.js";
 import { cacheAge, cacheGet, cachePut, cacheTag, cacheTouch } from "@/lib/body-cache";
 import { unwrapText } from "@/lib/unwrap-fast";
 import { SITE_URL, USER_AGENT } from "@/lib/config";
 import { span } from "@/lib/perf";
+
+/** Let the UI paint before a multi-MB JSON.parse on Hermes. */
+const beforeBigParse = async (chars: number) => {
+  if (Platform.OS === "android" && chars > 200_000) await new Promise<void>((r) => setTimeout(r, 16));
+};
 
 let key: string | undefined;
 let cookie: string | undefined;
@@ -20,12 +26,18 @@ export function setDataBuild(tag: string | undefined): void { dataTag = tag; }
 const headers = () => ({ "user-agent": USER_AGENT, accept: "application/json", ...(cookie ? { cookie } : {}) });
 
 /** Same object identity for an unchanged body: a 304 / same ciphertext must not allocate a new parse, or every 15 s live poll re-renders the rail. */
-const memo = new Map<string, { mark: string; obj: any }>(); // eslint-disable-line @typescript-eslint/no-explicit-any
+const memo = new Map<string, { mark: string; obj: any; text?: string }>(); // eslint-disable-line @typescript-eslint/no-explicit-any
+/**
+ * The decoded text is kept beside its object (small files only) so a response that decodes to the very same text hands back the very same object. A wrapped file gets a new ETag and
+ * a new ciphertext on every deploy even when nothing in it changed; without this the kept copy Home painted from is replaced by an equal one a second later and everything re-renders.
+ */
+const KEEP_TEXT = 1_500_000;
+const textOf = (text: string) => (text.length <= KEEP_TEXT ? text : undefined);
 function reuse(path: string, mark: string, text: string): any { // eslint-disable-line @typescript-eslint/no-explicit-any
   const hit = memo.get(path);
   if (hit && hit.mark === mark) return hit.obj;
-  const obj = JSON.parse(text);
-  memo.set(path, { mark, obj });
+  const obj = hit && hit.text === text ? hit.obj : JSON.parse(text);
+  memo.set(path, { mark, obj, text: textOf(text) });
   return obj;
 }
 
@@ -55,6 +67,7 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
   const kept = cacheGet(path);
   const pinned = !!dataTag && PINNED.test(path);
   if (kept && pinned && cacheTag(path) === dataTag) {
+    await beforeBigParse(kept.text.length);
     const o = reuse(path, `etag:${kept.etag}`, kept.text);
     span(`get ${path} pinned`, t0, `chars=${kept.text.length}`);
     return o;
@@ -65,6 +78,7 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
   const t1 = Date.now();
   if (r.status === 304 && kept) {
     cacheTouch(path, pinned ? dataTag : undefined);
+    await beforeBigParse(kept.text.length);
     const o = reuse(path, `etag:${kept.etag}`, kept.text);
     span(`get ${path} 304 parse`, t1, `net=${t1 - t0}ms chars=${kept.text.length}`);
     return o;
@@ -90,12 +104,17 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
     const t3 = Date.now();
     body = await unwrapText(doc, k);
     const t4 = Date.now();
-    out = JSON.parse(body);
-    memo.set(path, { mark: ctMark, obj: out });
-    span(`get ${path} 200 wrapped`, t0, `net=${t1 - t0}ms body=${t2 - t1}ms unwrap=${t4 - t3}ms parse=${Date.now() - t4}ms chars=${body.length}`);
+    const was = memo.get(path); // read after the unwrap: another response may have landed while it ran
+    const same = !!was && was.text === body;
+    out = same ? was!.obj : JSON.parse(body);
+    memo.set(path, { mark: ctMark, obj: out, text: textOf(body) });
+    span(`get ${path} 200 wrapped${same ? " same" : ""}`, t0, `net=${t1 - t0}ms body=${t2 - t1}ms unwrap=${t4 - t3}ms parse=${Date.now() - t4}ms chars=${body.length}`);
   } else {
     // Mark by ETag (or the full body) — never by length: `{"v":1}` and `{"v":2}` are the same size.
-    out = reuse(path, etag ? `etag:${etag}` : `body:${body}`, body);
+    const mark = etag ? `etag:${etag}` : `body:${body}`;
+    const hit = memo.get(path);
+    out = hit && (hit.mark === mark || hit.text === body) ? hit.obj : doc;
+    memo.set(path, { mark, obj: out, text: textOf(body) });
     span(`get ${path} 200 plain`, t0, `net=${t1 - t0}ms body=${t2 - t1}ms parse=${Date.now() - t2}ms chars=${body.length}`);
   }
   if (etag) cachePut(path, etag, body, pinned ? dataTag : undefined);

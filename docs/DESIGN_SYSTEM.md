@@ -47,7 +47,9 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | Chips / filters | `Chip`, `PillGroup`, `PillTabs`, `ScreenerFilters` | Format, scope, section tabs, screener; `PillTabs` = documented twin of `PillGroup` (taller control) |
 | Active filter chip | screener / ground filter dismissibles | Clearable “on” filters |
 | Dense stats table | `DataTable` (`bleed`, `TABLE_HEAD`) | Player Splits / When it hits / Research; ResultView |
-| Book quotes table | `BookTable` / odds rows | Next-match / priced books |
+| Book quotes table | `BookTable` / odds rows | Next-match / priced books; app twin `mobile/src/ui/book-table.tsx` |
+| Side book (face price) | `SideBook` + `pricedFromBooks` (`line-ladder.tsx`) | Player / Fancy face Over·Under; app twin `mobile/src/ui/side-book.tsx` |
+| Look-back windows | Player L5…ALL row | App `WindowPills` hairline band (same job) |
 | Line ladder (priced) | Player sticky table + `LadderRow` | Book-priced player lines |
 | Research ladder | `LadderTable` | Unpriced research tab |
 | Game log list | bleed `ul` + `min-h-row` | Player game history |
@@ -99,9 +101,9 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Game log list | `Bleed` + press rows | Twin of web list |
 | Skeletons | `ui/skeletons` + Reanimated | Twin |
 | Segmented control | `Segmented` | **Native-exclusive** (SwiftUI / Compose) |
-| Tab bar | NativeTabs / `FloatingTabBar` | **Native-exclusive** |
+| Tab bar | Docked `TabBar` (`mobile/src/components/tab-bar.tsx`) | **Native-exclusive** (web preview uses the same docked bar) |
 | Long lists | FlashList | **Native-exclusive** |
-| Glass / blur | `GlassView` / `BlurBar` | **Native-exclusive** |
+| Blur chrome | `BlurBar` / solid tint (no liquid glass) | **Native-exclusive** |
 | Page header | `PageHeader` | Native chrome |
 | Accordion | `ui/accordion` | Twin of filters/splits |
 
@@ -121,9 +123,9 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Game log | bleed list | bleed list — **twin** |
 | Skeletons | CSS shapes | Reanimated shapes — twin |
 | Segmented control | PillGroup / Tabs | **Native-exclusive** Segmented |
-| Tab bar | IosTabBar / sidebar | **Native-exclusive** NativeTabs / floating bar |
+| Tab bar | IosTabBar / sidebar | **Native-exclusive** docked `TabBar` |
 | Lists (long) | DOM scroll | **Native-exclusive** FlashList |
-| Glass / blur chrome | CSS / limited | **Native-exclusive** GlassView / BlurBar |
+| Blur chrome | CSS / limited | **Native-exclusive** BlurBar / solid tint |
 | Sheets | Radix Sheet | Native form sheet / RN modal |
 | Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` |
 | Forms | `LiveForm` / Field | Accordion + ChoiceChip / sheets |
@@ -136,7 +138,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 
 When adding a web-only widget the app also needs, design the twin here first; do not force the web component into Metro.
 
-**Filled:** dense `DataTable` + `Bleed` / `TABLE_BLEED` across Player, ResultView, Markets, Simple, team/league/ground/fancy; space/type/radius/control via `remPx`. Segmented, FlashList, GlassView / BlurBar, and NativeTabs stay native-exclusive by design.
+**Filled:** dense `DataTable` + `Bleed` / `TABLE_BLEED` across Player, ResultView, Markets, Simple, team/league/ground/fancy; space/type/radius/control via `remPx`. Segmented, FlashList, BlurBar, and the docked `TabBar` stay native-exclusive by design.
 
 ---
 
@@ -169,7 +171,7 @@ Full `App.tsx` route checklist:
 | Surface | Phone | `md` | `lg+` | Stats tables |
 | --- | --- | --- | --- | --- |
 | Home rail | Snap cards, tab bar | Same | Sidebar + rail; tape above full-width props | — |
-| Player stats | Bleed game-log list; section pills | Same | `DetailSplit` + sticky Lines; Game log / Splits / When it hits tabs | `TABLE_HEAD` + bleed |
+| Player stats | Chart-first; O/U meters + `SideBook`/`BookTable`; quiet `WindowPills`; Lines \| Game log \| Splits \| When it hits; no Alt lines / At a glance / phone gauge | Same | `DetailSplit` + sticky Lines; Game log / Splits / When it hits tabs | `TABLE_HEAD` + bleed |
 | ResultView (`/pair`, team markets) | Bleed ladders / corr / log / splits | Same | Same | `TABLE_HEAD` + bleed |
 | Markets (competition) | Bleed overview / teams / results | Same | Same | `TABLE_HEAD` + bleed |
 | Simple (teams & venues) | Bleed directory table | Same | Same | `TABLE_HEAD` + bleed |

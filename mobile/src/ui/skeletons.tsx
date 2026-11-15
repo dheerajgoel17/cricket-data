@@ -1,7 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
-import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
-import Animated, { Easing, cancelAnimation, makeMutable, useAnimatedStyle, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 import { color, radius, space } from "@/ui/tokens";
 
 /**
@@ -9,33 +8,23 @@ import { color, radius, space } from "@/ui/tokens";
  * match header, player hero, grid, …) so the screen does not jump when data arrives.
  */
 
-// One value drives every placeholder on screen, so twenty skeleton rows are one animation, not twenty.
-const beat = makeMutable(0);
-let watching = 0;
-function useBeat() {
-  useEffect(() => {
-    if (watching++ === 0) beat.value = withRepeat(withTiming(1, { duration: 1300, easing: Easing.inOut(Easing.quad) }), -1, false);
-    return () => { if (--watching === 0) cancelAnimation(beat); };
-  }, []);
+// The placeholders breathe: one CSS animation (Reanimated 4) on the group, run by the UI thread, with no shared value, no measuring and nothing per block. (Each block used to measure
+// itself and then mount its own SVG gradient sweep: fifty blocks on Home cost a quarter of a second of the first paint for a placeholder that is up for less than that.)
+const BREATHE = { animationName: { from: { opacity: 1 }, to: { opacity: 0.5 } }, animationDuration: "900ms", animationTimingFunction: "ease-in-out", animationIterationCount: "infinite", animationDirection: "alternate" } as const;
+const Grouped = createContext(false);
+
+/** One breathing layer for all the placeholders inside it. `Working` and the page skeletons wrap themselves in it; inside another group it is a plain view. Still when the phone's reduce motion is on. */
+export function SkeletonGroup({ style, children }: { style?: StyleProp<ViewStyle>; children?: ReactNode }) {
+  const inside = useContext(Grouped), calm = useReducedMotion();
+  if (inside) return <View style={style}>{children}</View>;
+  return <Grouped.Provider value><Animated.View style={[style, calm ? null : BREATHE] as never}>{children}</Animated.View></Grouped.Provider>;
 }
 
-/** A grey block with a light that sweeps across it while what it stands for is loading. */
+/** A grey block standing for something that is loading. In a `SkeletonGroup` it is a plain view (the group breathes); on its own it breathes itself. */
 export function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
-  useBeat();
-  const [w, setW] = useState(0);
-  const sweep = useAnimatedStyle(() => ({ transform: [{ translateX: -w + 2 * w * beat.value }] }));
-  return (
-    <View style={[styles.block, style, styles.clip]} onLayout={(e) => setW(Math.round(e.nativeEvent.layout.width))}>
-      {w ? (
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, sweep]}>
-          <Svg width="100%" height="100%">
-            <Defs><LinearGradient id="sheen" x1="0" y1="0" x2="1" y2="0"><Stop offset="0" stopColor="#fff" stopOpacity="0" /><Stop offset="0.5" stopColor="#fff" stopOpacity="0.09" /><Stop offset="1" stopColor="#fff" stopOpacity="0" /></LinearGradient></Defs>
-            <Rect width="100%" height="100%" fill="url(#sheen)" />
-          </Svg>
-        </Animated.View>
-      ) : null}
-    </View>
-  );
+  const inside = useContext(Grouped), calm = useReducedMotion();
+  if (inside || calm) return <View style={[styles.block, style]} />;
+  return <Animated.View style={[styles.block, style, BREATHE] as never} />;
 }
 
 const W1 = ["46%", "38%", "54%", "42%", "50%"] as const;
@@ -323,11 +312,10 @@ const SHAPES: Record<SkeletonShape, (p: { rows?: number }) => ReactNode> = {
 
 /** Resolve a named shape for Working / tests. */
 export function renderSkeleton(shape: SkeletonShape, rows?: number) {
-  return SHAPES[shape]({ rows });
+  return <SkeletonGroup>{SHAPES[shape]({ rows })}</SkeletonGroup>;
 }
 
 const styles = StyleSheet.create({
-  clip: { overflow: "hidden" },
   block: { backgroundColor: "rgba(255,255,255,0.09)", borderRadius: radius.card },
   skRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   skSep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },

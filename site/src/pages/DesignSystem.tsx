@@ -88,7 +88,7 @@ const PAGE_WHEN: Record<string, string> = {
   buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs.",
   chips: "Chip / PillGroup for filters; PillTabs when panels switch with the selection.",
   feedback: "Every empty, unknown, or error list uses EmptyState — never a bare spinner or blank panel.",
-  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; StickyFilterBand + flush header; DetailSplit + StickyPanel + CardGrid for desktop boards; TeamBadge sizes; LadderRow + BookTable for priced lines.",
+  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; StickyFilterBand + flush header; DetailSplit + StickyPanel + CardGrid for desktop boards; TeamBadge sizes; LadderRow + BookTable / SideBook for priced lines; Player look-back L5…ALL (app WindowPills hairline twin).",
   forms: "LiveForm for filters that apply as you change them; pair Field with NativeSelect or Input.",
   icons: "Heroicons only under components/app, components/ui, and pages — never Lucide.",
   rules: "Follow these before adding a component, page, or token.",

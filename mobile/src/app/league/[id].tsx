@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { pc } from "@site/lib/format";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { leagueData } from "@/lib/league";
 import { DataTable } from "@/ui/data-table";
 import { EmptyState } from "@/ui/empty-state";
@@ -24,18 +24,19 @@ export default function League() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const e = Number(id);
   const inset = useScreenInsets(false);
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
+  const matchesReady = stats.matchesReady;
   const [tab, setTab] = useState("stats");
   const [season, setSeason] = useState("");
-  const valid = !!store && Number.isInteger(e) && e >= 0 && e < store.events.length;
-  const data = useMemo(() => (valid ? leagueData(store, e) : null), [store, e, valid]);
-  const name = valid ? store.events[e] : "Competition";
+  const known = !!store && Number.isInteger(e) && e >= 0 && e < store.events.length;
+  const data = useMemo(() => (known && matchesReady ? leagueData(store, e) : null), [store, e, known, matchesReady]);
+  const name = known ? store.events[e] : "Competition";
 
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <PageHeader title={name} subtitle={data ? `${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}` : undefined} />
-      {!store ? <Working label="Loading…" fill shape="league" /> : !valid || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
+      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
             <LeagueBadge name={name} size={56} />
