@@ -10,14 +10,14 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { barState } from "@cricket/engine/windows.js";
 import { abbr, shortDate as shortDateRaw } from "@site/lib/format";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, fs, tint } from "@/ui/tokens";
 
 /** "06/09" as "6/9": the labels under the bars are short enough to show whole, as in the reference app. */
 const shortDate = (d: string) => String(shortDateRaw(d)).replace(/\b0(\d)/g, "$1");
 
 const HIT = color.hit, MISS = color.miss, AMBER = color.amber;
 // each bar is one flat colour: no gradient, square corners
-const TONE: Record<string, string> = { hit: "#2fd68f", miss: "#ef4444", push: "#f5a524" };
+const TONE: Record<string, string> = { hit: color.hit, miss: color.miss, push: color.amber };
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** A ring segment that draws itself from nothing to its length on the UI thread. */
@@ -126,7 +126,7 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
                   const s = barState(e, line, side) as string;
                   return (
                     <Press key={`${e.m}-${i}`} scale={1} onPress={() => onSelect?.(e, s)} accessibilityRole="button" accessibilityLabel={`${e.date} v ${e.opp}: ${e.value ?? "did not play"}`} style={[styles.slot, col]}>
-                      {e.value == null ? <HatchStub i={i} active={active} /> : <Bar i={i} active={active} pct={Math.max((Math.min(e.value, top) / top) * 100, 1.5)} tone={s === "miss" ? "miss" : s === "push" ? "push" : "hit"} text={s === "miss" ? "#fff" : color.background} value={e.value} />}
+                      {e.value == null ? <HatchStub i={i} active={active} /> : <Bar i={i} active={active} pct={Math.max((Math.min(e.value, top) / top) * 100, 1.5)} tone={s === "miss" ? "miss" : s === "push" ? "push" : "hit"} text={s === "miss" ? color.foreground : color.background} value={e.value} />}
                     </Press>
                   );
                 })}
@@ -165,8 +165,8 @@ function HatchStub({ i, active }: { i: number; active: SharedValue<number> }) {
   return (
     <Animated.View style={[styles.stub, style]}>
       <Svg width="100%" height="100%">
-        <Defs><Pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><Line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,0.32)" strokeWidth="2" /></Pattern></Defs>
-        <Rect width="100%" height="100%" rx="3" fill="rgba(153,153,153,0.18)" /><Rect width="100%" height="100%" rx="3" fill="url(#hatch)" />
+        <Defs><Pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><Line x1="0" y1="0" x2="0" y2="6" stroke={tint.white(0.32)} strokeWidth="2" /></Pattern></Defs>
+        <Rect width="100%" height="100%" rx="3" fill={tint.hex(color.dnp, 0.18)} /><Rect width="100%" height="100%" rx="3" fill="url(#hatch)" />
       </Svg>
     </Animated.View>
   );
@@ -176,17 +176,17 @@ const styles = StyleSheet.create({
   gauge: { alignItems: "center", gap: space.hair },
   caption: { ...type.caption, color: color["muted-foreground"] },
   chart: { width: "100%" },
-  line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: StyleSheet.hairlineWidth, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.35)" },
+  line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: StyleSheet.hairlineWidth, borderStyle: "dashed", borderColor: tint.white(0.35) },
   bars: { ...StyleSheet.absoluteFill, flexDirection: "row", alignItems: "flex-end", gap: GAP },
   center: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center" },
-  centerText: { fontSize: 15, lineHeight: 18, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
-  tip: { position: "absolute", top: -4, left: 0, width: TIP_W, alignItems: "center", backgroundColor: "rgba(40,40,44,0.96)", borderRadius: 10, paddingVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.18)", zIndex: 5 },
-  tipText: { fontSize: 14, fontFamily: font.data, color: color.foreground, textAlign: "center", width: "100%" },
+  centerText: { fontSize: fs.body, lineHeight: 18, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
+  tip: { position: "absolute", top: -4, left: 0, width: TIP_W, alignItems: "center", backgroundColor: tint.hex(color.popover, 0.96), borderRadius: 10, paddingVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.18), zIndex: 5 },
+  tipText: { fontSize: fs.callout, fontFamily: font.data, color: color.foreground, textAlign: "center", width: "100%" },
   slot: { height: "100%", justifyContent: "flex-end" },
   stub: { height: 22, width: "100%" },
   bar: { width: "100%", justifyContent: "flex-end", alignItems: "center", paddingBottom: 4, overflow: "hidden" },
-  barText: { fontSize: 13, width: "100%", textAlign: "center", fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  barText: { fontSize: fs.callout, width: "100%", textAlign: "center", fontFamily: font.data, fontVariant: ["tabular-nums"] },
   xRow: { flexDirection: "row", gap: 4, paddingTop: 6 },
   x: { alignItems: "center" },
-  xText: { width: 44, textAlign: "center", fontSize: 10.5, lineHeight: 13, fontFamily: font.medium, color: color["muted-foreground"] },
+  xText: { width: 44, textAlign: "center", fontSize: fs.caption, lineHeight: 13, fontFamily: font.medium, color: color["muted-foreground"] },
 });

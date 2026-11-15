@@ -19,7 +19,7 @@ import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, radius } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"], ["Saved", "/saved"], ["Contact", "/contact"]];
@@ -115,7 +115,7 @@ export default function Search() {
 
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
-  field: { flex: 1, height: 40, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
+  field: { flex: 1, height: 40, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: radius.control, backgroundColor: color.secondary },
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
   cancel: { ...type.body, color: color.primary },
   body: { gap: space.group, paddingHorizontal: space.gutter, paddingTop: space.snug },

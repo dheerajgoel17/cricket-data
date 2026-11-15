@@ -40,6 +40,15 @@
   --body-size: 14px;
   --surface-raised: rgba(255, 255, 255, 0.08);
   --focus-ring: #27da8e;
+  --chrome-solid: rgba(12, 12, 14, 0.97);
+  --control-fill: rgba(255, 255, 255, 0.10);
+  --control-ring: rgba(255, 255, 255, 0.14);
+  --tile: rgba(44, 44, 46, 0.6);
+  --segment-track: rgba(44, 44, 46, 0.7);
+  --segment-thumb: #58585c;
+  --ink-soft: rgba(15, 15, 15, 0.65);
+  --skeleton: rgba(255, 255, 255, 0.12);
+  --text-soft: rgba(255, 255, 255, 0.7);
   --chart-hit: var(--hit);
   --chart-miss: var(--miss);
   --chart-push: var(--amber);
@@ -93,6 +102,9 @@
   --fs-stat: 1.875rem;
   --fs-stat-lh: 1;
   --fs-stat-ls: -0.03em;
+  --fs-figure: 1.5rem;
+  --fs-figure-lh: 1;
+  --fs-figure-ls: -0.02em;
   --space-hair: 0.25rem;
   --space-tight: 0.375rem;
   --space-snug: 0.625rem;

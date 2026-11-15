@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
-import { color } from "@/ui/tokens";
+import { color, tint } from "@/ui/tokens";
 
 const BAR: Record<string, string> = { hit: color.hit, miss: color.miss, push: color.amber };
-const DNP = "rgba(153,153,153,0.5)";
+const DNP = tint.hex(color.dnp, 0.5);
 /** Match site MiniBars: always this many slots so short histories are not chunkier. */
 export const MINI_BARS_SLOTS = 10;
 
@@ -23,5 +23,5 @@ export function MiniBars({ last, line, max, width = 72 }: { last: { v: number | 
 const styles = StyleSheet.create({
   box: { width: 96, height: 34, flexDirection: "row", alignItems: "flex-end", gap: 2 },
   bar: { flex: 1, borderRadius: 2 },
-  line: { position: "absolute", left: 0, right: 0, borderTopWidth: 1, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.4)" },
+  line: { position: "absolute", left: 0, right: 0, borderTopWidth: 1, borderStyle: "dashed", borderColor: tint.white(0.4) },
 });

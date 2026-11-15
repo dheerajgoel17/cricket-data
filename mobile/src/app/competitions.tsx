@@ -16,7 +16,7 @@ import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { LeagueBadge } from "@/ui/team-badge";
-import { color, font, space, type, tonal } from "@/ui/tokens";
+import { color, font, space, type, tonal, radius } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Every competition in the data with eight matches or more, the biggest first, with a search over the names. */
@@ -55,6 +55,6 @@ const styles = StyleSheet.create({
   field: { height: 40, marginHorizontal: space.gutter, marginVertical: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
   list: { paddingHorizontal: space.gutter },
-  box: { ...tonal, borderRadius: 18, overflow: "hidden" },
+  box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
   empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },
 });

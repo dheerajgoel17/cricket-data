@@ -28,7 +28,7 @@ export function LiveOpened({ opened, line, label = "was" }: { opened?: number | 
 export function LiveTrack({ value, line, was, verdict }: { value?: number | null; line?: number | null; was?: number | null; verdict?: "cleared" | "missed" | "push" | null }) {
   const t = trackOf(value, line, was, verdict);
   if (!t) return null;
-  const tone = t.tone === "miss" ? color.miss : t.tone === "primary" ? color.primary : "rgba(255,255,255,0.7)";
+  const tone = t.tone === "miss" ? color.miss : t.tone === "primary" ? color.primary : color["text-soft"];
   return (
     <View accessible accessibilityRole="progressbar" accessibilityLabel={`${value} of ${line}${was != null && was !== line ? `, was ${was}` : ""}`} style={styles.track}>
       <View style={[styles.fill, { width: `${t.fill}%`, backgroundColor: tone }]} />

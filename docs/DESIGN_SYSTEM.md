@@ -13,7 +13,52 @@ No rebrand. No paid UI kit. Dark only — elevated canvas `#0C0C0E` (never true 
 | Layout roles | gutter, control, row-min, header-h | CSS vars + utility classes | `space.gutter`, `control`, `HEADER_HEIGHT` |
 | Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list (all product `pages/*` + `components/app|layout/*` enrolled; catalogue/design-host excluded) | Same role names; values from `tokens.ts`. Micro-gaps of 2 px (icon+label) stay literal; 4/6 px prefer `space.hair` / `space.tight` |
 
-Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
+Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Text honours the phone's font-size setting up to a per-platform cap (`platform.font-scale-max-*`: 1.3 iOS, 1.2 Android), as the web's `rem` follows the browser setting. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
+
+### Scale (one table, both platforms)
+
+| Role | Size (px / pt) | Web | App | Use |
+| --- | --- | --- | --- | --- |
+| caption | 10 | `text-caption` | `fs.caption` / `type.caption` | Badges, axis labels |
+| cap (label) | 11 | `label-cap` | `cap` | Uppercase labels (Barlow Condensed) |
+| footnote | 12 | `text-footnote` | `fs.footnote` / `type.footnote` | Table heads, meta |
+| callout | 13 | `text-callout` | `fs.callout` / `type.callout` | Secondary text, chips, dense cells |
+| body | 15 | `text-body` | `fs.body` / `type.body` | Rows, copy |
+| title | 18 | `text-title` | `fs.title` / `type.title` | Section and row titles |
+| metric | 20 | `text-metric` | `fs.metric` / `metric` | Row hero line (O/U 29.5) |
+| figure | 24 | `text-figure` | `fs.figure` | Stat tiles, score tiles |
+| display | 28 | `text-display` | `fs.display` / `type.display` | Page / player name |
+| stat | 30 | `text-stat` | `fs.stat` | Hero numbers |
+
+Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 · chip 999 (`radius.sm` / `control` / `card` / `sheet` / `chip` in the app). Spacing: `hair` 4 · `tight` 6 · `snug` 10 · `inset`/`gutter` 14 · `stack` 16 · `group` 20 · `section` 32 (the web widens the gutter at `md` / `lg`; a phone keeps 14). Surfaces and washes come from `color.*` (`control-fill`, `control-ring`, `tile`, `segment-track`, `segment-thumb`, `chrome-solid`, `skeleton`, `ink-soft`, `text-soft`) and `tint.*`; a screen never writes a hex / rgba literal or a numeric `fontSize` (`mobile/src/ui/tokens.test.ts` fails the build, the web has `design-tokens.test.ts`).
+
+### Platform conventions (one design, three native idioms)
+
+Same tokens, same jobs; the idiom of the platform decides the feel. Values live in `tokens.json` → `platform` and `mobile/src/ui/platform.ts`.
+
+| Concern | Web | iOS | Android |
+| --- | --- | --- | --- |
+| Touch target | 44 px comfortable | 44 pt (HIG) | 48 dp (Material); `hitSlopFor(w, h)` tops a smaller drawing up |
+| Press feedback | `:active` scale 0.97, 120 ms; hover tint | `Press` scale 0.97, 120 ms (UI thread) | Same scale on compact controls; full-width rows get Material ripple (`RIPPLE`) |
+| Selection feedback | colour / thumb transition | `Haptics.selectionAsync` on chip, tab, segment | Same (system haptic) |
+| Text | Satoshi / Barlow Condensed, `rem` zoom | Same faces; width-fit under 375 | Same + `includeFontPadding: false`, greedy line breaking (`ui/text.tsx`) |
+| Shadow / elevation | `--shadow-*` | `shadow*` | `elevation` (shadow props are ignored) |
+| Chrome | Header + sidebar at `lg`, docked tab bar on phone | Docked `TabBar`, solid, no glass | Same docked `TabBar`; no blur anywhere |
+| Lists | DOM scroll | FlashList | FlashList |
+| Motion | `motion/react` springs, CSS transitions | Reanimated 4 springs / CSS transitions on the UI thread | Same; only transform + opacity; no layout animation in list rows |
+
+### Motion map (interaction → implementation)
+
+| Interaction | Web | App |
+| --- | --- | --- |
+| Chip / tab switch | `PillGroup` `layoutId` spring glide | `Chips` colour fade 150 ms; `LineTabs` underline spring glide (twin) |
+| Segmented | thumb glide | `Segmented` thumb timing 220 ms |
+| Number change | `AnimatedNumber` / `Tick` 450 ms flash | `Tick` roll + 450 ms wash, `CountUp` |
+| Press | `:active` scale | `Press` |
+| Entrance | `motion` fade-up | `Rise` / `enter` (first rows only), `Appear` over skeletons |
+| Live | pulsing dot | `LiveDot` halo (CSS animation, UI thread) |
+| Loading | skeleton pulse | `Skeleton` opacity pulse |
+| Reduce motion | `useReducedMotion` | `useReducedMotion` / `ReduceMotion.System` everywhere |
 
 **Decision rule**
 
@@ -108,6 +153,8 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
 | Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
+| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters, More); never a hand-built `Modal` |
+| Round icon button | `ui/round-button` (`RoundButton`) | Native chrome: back, search, account, share, close; web twin is the header icon button |
 
 Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 

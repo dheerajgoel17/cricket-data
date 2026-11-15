@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Grabber, SheetBackdrop } from "@/ui/sheet";
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,7 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { BrandMark } from "@/ui/brand";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, tint } from "@/ui/tokens";
 
 /** Sign-in sheet — same hierarchy as the site: brand, Google, one email form, mode link. */
 export function SignInSheet() {
@@ -36,10 +37,10 @@ export function SignInSheet() {
   return (
     <Modal visible={signInOpen} animationType="slide" transparent onRequestClose={closeSignIn}>
       <View style={styles.root}>
-        <Pressable style={styles.backdrop} onPress={closeSignIn} accessibilityRole="button" accessibilityLabel="Close" />
+        <SheetBackdrop onClose={closeSignIn} />
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.sheetWrap} pointerEvents="box-none">
           <View style={[styles.card, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
-            <View style={styles.grabber} accessibilityElementsHidden />
+            <Grabber style={styles.grabber} />
             <Press accessibilityRole="button" accessibilityLabel="Close" onPress={closeSignIn} style={styles.close} hitSlop={10}>
               <Ionicons name="close" size={18} color={color["muted-foreground"]} />
             </Press>
@@ -112,7 +113,6 @@ export function SignInSheet() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: "flex-end" },
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.55)" },
   sheetWrap: { width: "100%" },
   card: {
     backgroundColor: color.card,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
   },
-  grabber: { alignSelf: "center", width: 36, height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.18)", marginTop: space.snug, marginBottom: space.tight },
+  grabber: { marginTop: space.snug, marginBottom: space.tight },
   close: {
     position: "absolute",
     right: space.group,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   hero: { alignItems: "center", gap: space.tight, paddingTop: space.snug, paddingBottom: space.stack, paddingHorizontal: space.snug },
-  title: { ...type.title, fontSize: 22, lineHeight: 26, color: color.foreground, textAlign: "center" },
+  title: { ...type.title, fontSize: fs.figure, lineHeight: 26, color: color.foreground, textAlign: "center" },
   sub: { ...type.callout, color: color["muted-foreground"], textAlign: "center", maxWidth: 280 },
   body: { gap: space.snug, paddingBottom: space.snug },
   hint: { ...type.callout, color: color["muted-foreground"], paddingBottom: space.stack },
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: color.pill,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: tint.white(0.12),
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

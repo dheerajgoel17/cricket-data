@@ -1,8 +1,10 @@
 import { fancyMarketPath, push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Sheet } from "@/ui/sheet";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
+import { RoundButton } from "@/ui/round-button";
 import { Text } from "@/ui/text";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useEffect } from "react";
@@ -35,7 +37,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, control, font, num, numLg, radius, space, type, tint } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs } from "@/ui/tokens";
 
 
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
@@ -208,12 +210,10 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
           <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
         </ScrollView>
       ) : null}
-      <Modal visible={filtersOpen} animationType="slide" transparent onRequestClose={() => setFiltersOpen(false)}>
-        <Pressable style={styles.sheetBackdrop} onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close filters" />
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
+      <Sheet visible={filtersOpen} onClose={() => setFiltersOpen(false)} label="Close filters">
           <View style={styles.sheetHead}>
             <Text style={styles.h2}>Filters</Text>
-            <Press onPress={() => setFiltersOpen(false)} accessibilityRole="button" accessibilityLabel="Close" style={styles.round}><Ionicons name="close" size={20} color={color.foreground} /></Press>
+            <RoundButton label="Close" onPress={() => setFiltersOpen(false)}><Ionicons name="close" size={20} color={color.foreground} /></RoundButton>
           </View>
           <Text style={styles.sheetSec}>Hit-rate window</Text>
           <ChoiceRow>{WINDOWS.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftWin === n} onPress={() => setDraftWin(n)} />)}</ChoiceRow>
@@ -230,8 +230,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
             <Press onPress={() => { setDraftWin(10); setDraftHere(false); }} accessibilityRole="button" style={styles.sheetClear}><Text style={styles.sheetClearTxt}>Clear</Text></Press>
             <Press onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} accessibilityRole="button" style={styles.sheetApply}><Text style={styles.sheetApplyTxt}>Apply</Text></Press>
           </View>
-        </View>
-      </Modal>
+      </Sheet>
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
     <>
@@ -266,7 +265,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
                 <Text style={styles.note}>{useHere ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} matches`} · void excluded</Text>
               </View>
-              <Press onPress={shareLine} accessibilityRole="button" accessibilityLabel="Share this line" style={styles.round}><Ionicons name="share-outline" size={20} color={color.foreground} /></Press>
+              <RoundButton label="Share this line" onPress={shareLine}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
             </View>
             {liveSoFar != null ? <Text style={styles.live}><StandingMark standing={liveSoFar} line={line} /></Text> : null}
             <View style={styles.stats}>
@@ -357,7 +356,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 }
 
 function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
-  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: 34, lineHeight: 38 }]}>{v}</Text></View>;
+  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: fs.stat, lineHeight: 38 }]}>{v}</Text></View>;
 }
 
 /** A share as a bar that fills from the left on the UI thread. */
@@ -408,8 +407,6 @@ const styles = StyleSheet.create({
   filterBadgeTxt: { ...type.caption, fontFamily: font.bold, color: color.background },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
   clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  sheetBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: tint.black(0.55) },
-  sheet: { marginTop: "auto", backgroundColor: color.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.snug },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
   sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
@@ -423,20 +420,19 @@ const styles = StyleSheet.create({
   bleed: { marginHorizontal: -space.gutter },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   live: { ...type.callout, color: color.primary },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },
   statKey: { ...type.footnote, color: color["muted-foreground"] },
-  statNum: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
+  statNum: { ...numLg, fontSize: fs.figure, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
   stepRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug },
   lineBtn: { height: 36, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary },
   lineBtnText: { ...type.callout, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
-  sideNum: { ...numLg, fontSize: 28, letterSpacing: -0.56, lineHeight: 32, color: color.foreground },
+  sideNum: { ...numLg, fontSize: fs.display, letterSpacing: -0.56, lineHeight: 32, color: color.foreground },
   sideBook: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.tight },
-  sidePrice: { ...num, fontSize: 16, color: color.primary },
+  sidePrice: { ...num, fontSize: fs.body, color: color.primary },
   meter: { height: 6, borderRadius: 3, backgroundColor: color.hairline, overflow: "hidden" },
   meterFill: { height: "100%", width: "100%", borderRadius: 3 },
   ladder: { borderTopWidth: 0 },
@@ -447,8 +443,8 @@ const styles = StyleSheet.create({
   ladderRow: { flexDirection: "row", alignItems: "center", minHeight: 46, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   ladderOn: { backgroundColor: tint.row },
   lineCell: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.tight },
-  ladderLine: { ...num, fontSize: 17, color: color.foreground },
-  cellNum: { ...num, fontSize: 16, color: color.foreground },
+  ladderLine: { ...num, fontSize: fs.title, color: color.foreground },
+  cellNum: { ...num, fontSize: fs.body, color: color.foreground },
   fair: { ...type.footnote, color: color["muted-foreground"] },
   /** Web twin: `border-y border-hairline` edge band (not rounded card). */
   top: { marginHorizontal: -space.gutter, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, overflow: "hidden" },
@@ -456,5 +452,5 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   topFill: { position: "absolute", left: 0, top: 0, bottom: 0, backgroundColor: tint.primary(0.1) },
   topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  topPct: { ...num, fontSize: 18, color: color.primary },
+  topPct: { ...num, fontSize: fs.title, color: color.primary },
 });

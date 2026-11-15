@@ -15,6 +15,12 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Tokens: size roles, surface colours, radii, platform conventions
+- **Path:** `site/packages/tokens/tokens.json` (`color` +chrome-solid / control-fill / control-ring / tile / segment-track / segment-thumb / ink-soft / skeleton / text-soft; `type` +fs-figure; new `platform` group), `site/src/index.css` (`text-figure`), mobile `ui/tokens.ts` (`fs`, `radius.sm` / `control`), `ui/platform.ts`, `ui/press.tsx`, `ui/tokens.test.ts`; web `components/app/recent-form.tsx`
+- **Change:** The app no longer writes a literal `fontSize`, hex or rgba (≈60 sizes, ≈54 colours, scattered radii moved onto the shared roles; a test fails the build on a new one). Sizes that sat between roles (14 / 16 / 17 / 22 / 34) snapped to the nearest role (callout 13, body 15, title 18, figure 24, stat 30). Platform idioms are explicit: Material ripple on full-width Android rows, platform touch targets, elevation for Android shadows. Form chips W / L / T use the same tokens on web and app.
+- **Callers:** every app screen (type sizes shift by ≤ 2 pt); web `RecentForm`; catalogue docs
+- **Also:** one `Sheet` (+ `SheetBackdrop`, `Grabber`) replaces five hand-built modals; one `RoundButton` replaces six hand-styled 40 pt circles; text now honours the OS font size up to 1.3x iOS / 1.2x Android (was ignored)
+
 ### 2026-11-15 — Universal page-header ↔ canvas merge
 - **Path:** mobile `ui/blur-bar.tsx` (`merge` + `useChromeScrim`); `app/player/[idx].tsx`; `app/fixture/[id]/index.tsx`; `app/team/[idx].tsx`; stack roots (`league`, fancy detail, `competitions`, `search`, `ground-page`, venue/ground loaders) via `PageAtmosphere`
 - **Change:** Sticky clear→solid scrim is shared (not player-only). Fixture uses `BlurBar merge` so Android no longer keeps a permanent solid slab at rest. Stack/detail pages wrap `PageAtmosphere` so `PageHeader` sits on the same elevated canvas. Team hero wash underlaps the clear header. Tabs keep transparent `AppHeader` + hairline.

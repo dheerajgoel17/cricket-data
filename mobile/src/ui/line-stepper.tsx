@@ -3,7 +3,7 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import * as Haptics from "expo-haptics";
 import { Minus, Plus } from "@/ui/icons";
-import { color, control, radius, type, font } from "@/ui/tokens";
+import { color, control, radius, type, font, tint } from "@/ui/tokens";
 
 /** The site's line stepper: one rounded capsule, minus at the left, the line in the middle ("O 19.5"), plus at the right. The same control on every page that has a line. */
 export function LineStepper({ value, onStep, label, min = 0.5 }: { value: number; onStep: (delta: number) => void; label: string; min?: number }) {
@@ -12,7 +12,7 @@ export function LineStepper({ value, onStep, label, min = 0.5 }: { value: number
   return (
     <View style={styles.pill}>
       <Press accessibilityRole="button" accessibilityLabel="Lower the line" disabled={low} hitSlop={6} onPress={() => step(-0.5)} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
-        <Minus size={18} color={low ? "rgba(142,142,147,0.4)" : color["muted-foreground"]} />
+        <Minus size={18} color={low ? tint.hex(color["muted-foreground"], 0.4) : color["muted-foreground"]} />
       </Press>
       <Text style={styles.value} accessibilityLiveRegion="polite">{label} {value}</Text>
       <Press accessibilityRole="button" accessibilityLabel="Raise the line" hitSlop={6} onPress={() => step(0.5)} style={({ pressed }) => [styles.btn, pressed && styles.pressed]}>
@@ -25,6 +25,6 @@ export function LineStepper({ value, onStep, label, min = 0.5 }: { value: number
 const styles = StyleSheet.create({
   pill: { height: control, flexDirection: "row", alignItems: "center", backgroundColor: color.card, borderRadius: radius.chip },
   btn: { width: control, height: control, alignItems: "center", justifyContent: "center", borderRadius: radius.chip },
-  pressed: { backgroundColor: "rgba(255,255,255,0.08)" },
+  pressed: { backgroundColor: color["surface-raised"] },
   value: { ...type.callout, minWidth: 64, textAlign: "center", color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

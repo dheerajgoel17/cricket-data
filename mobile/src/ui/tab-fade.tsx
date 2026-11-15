@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { color } from "@/ui/tokens";
+import { color, tint } from "@/ui/tokens";
 
 /**
  * The bottom fade on every screen: the last rows dissolve into the black instead of ending in a hard edge against the docked tab bar (a tab screen) or the home indicator (a detail
@@ -12,7 +12,7 @@ export function TabFade({ withTabBar = true }: { withTabBar?: boolean }) {
   return (
     <LinearGradient
       pointerEvents="none"
-      colors={["rgba(0,0,0,0)", color.background]}
+      colors={[tint.black(0), color.background]}
       style={[styles.fade, { height: withTabBar ? 20 : 16 + bottom }]}
     />
   );

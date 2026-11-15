@@ -17,7 +17,7 @@ import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { Segmented } from "@/ui/segmented";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { color, space, type, tonal } from "@/ui/tokens";
+import { color, space, type, tonal, radius } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** One competition: its season's stats, the summary markets, each side's record and the latest results (the site's `LeaguePage`). */
@@ -80,5 +80,5 @@ const styles = StyleSheet.create({
   sub: { ...type.callout, color: color["muted-foreground"] },
   note: { ...type.footnote, color: color["muted-foreground"] },
   empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
-  box: { ...tonal, borderRadius: 18, overflow: "hidden" },
+  box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
 });

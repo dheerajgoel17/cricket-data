@@ -4,7 +4,7 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { cap, color, font, radius, type } from "@/ui/tokens";
+import { cap, color, font, radius, tint, type } from "@/ui/tokens";
 
 export interface WindowItem { n: number; label: string; p: number | null }
 
@@ -13,6 +13,8 @@ const band = (p: number | null) => (p == null ? color["muted-foreground"] : p >=
 /**
  * Look-back windows as a quiet hairline band (web Player "Games" row twin): label over hit rate, chosen cell lifted with secondary wash — no card track, no filter button beside.
  */
+const CLEAR = tint.hex(color.secondary, 0);
+
 export function WindowPills({ items, value, onChange }: { items: WindowItem[]; value: number; onChange: (n: number) => void }) {
   return (
     <View style={styles.track} accessibilityRole="tablist" accessibilityLabel="Games">
@@ -24,7 +26,7 @@ export function WindowPills({ items, value, onChange }: { items: WindowItem[]; v
 function Cell({ w, on, onPress }: { w: WindowItem; on: boolean; onPress: () => void }) {
   const p = useSharedValue(on ? 1 : 0);
   useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 180 }); }, [on, p]);
-  const fill = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], ["rgba(44,44,46,0)", color.secondary]) }));
+  const fill = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [CLEAR, color.secondary]) }));
   return (
     <Press onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: on }} style={styles.hit}>
       <Animated.View style={[styles.cell, fill]}>

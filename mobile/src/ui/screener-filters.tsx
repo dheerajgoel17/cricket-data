@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Sheet } from "@/ui/sheet";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Switch, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -43,9 +44,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
   );
 
   return (
-    <Modal visible={open} animationType="slide" transparent onRequestClose={() => onOpenChange(false)}>
-      <Pressable style={styles.backdrop} onPress={() => onOpenChange(false)} accessibilityRole="button" accessibilityLabel="Close" />
-      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
+    <Sheet visible={open} onClose={() => onOpenChange(false)} full>
         <View style={styles.head}>
           <Text style={styles.title}>Filters{active ? ` · ${active}` : ""}</Text>
           <Press accessibilityRole="button" accessibilityLabel="Close filters" onPress={() => onOpenChange(false)} style={styles.round}>
@@ -127,16 +126,13 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
           <Press accessibilityRole="button" onPress={() => setDraft({ ...DEFAULTS })} style={styles.clear}><Text style={styles.clearTxt}>Clear all</Text></Press>
           <Press accessibilityRole="button" onPress={() => { onApply(draft); onOpenChange(false); }} style={styles.apply}><Text style={styles.applyTxt}>Apply</Text></Press>
         </View>
-      </View>
-    </Modal>
+    </Sheet>
   );
 }
 
 export { clearFilter };
 
 const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: { position: "absolute", left: 0, right: 0, top: 48, bottom: 0, backgroundColor: color.background, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet },
   head: { height: 56, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.gutter, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   title: { ...type.title, color: color.foreground },
   round: { width: control, height: control, borderRadius: control / 2, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },

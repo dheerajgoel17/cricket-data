@@ -18,7 +18,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, tonal, fs, tint } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -194,7 +194,7 @@ function Trends({ points, current, onPick }: { points: any[]; current: string; o
       <View style={styles.bars} accessibilityRole="image" accessibilityLabel={`${m.label} by season: ${points.map((p, i) => `${p.label} ${read(i)}`).join(", ")}`}>
         {points.map((p, i) => (
           <Press scale={1} key={p.key} onPress={() => onPick(p.key)} accessibilityRole="button" accessibilityLabel={`${p.label}: ${read(i)}`} accessibilityState={{ selected: p.key === current }} style={styles.barHit}>
-            <View style={[styles.barFill, { height: `${Math.max(((vals[i] ?? 0) / top) * 100, 3)}%`, backgroundColor: p.key === current ? color.primary : "rgba(255,255,255,0.25)" }]} />
+            <View style={[styles.barFill, { height: `${Math.max(((vals[i] ?? 0) / top) * 100, 3)}%`, backgroundColor: p.key === current ? color.primary : tint.white(0.25) }]} />
           </Press>
         ))}
       </View>
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   leader: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
   leaderRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leaderName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  leaderNum: { ...numLg, fontFamily: font.data, fontSize: 30, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
+  leaderNum: { ...numLg, fontFamily: font.data, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   subSmall: { ...type.caption, color: color["muted-foreground"] },
   card: { ...tonal, borderRadius: radius.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
   rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   who: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  value: { ...num, fontFamily: font.data, fontSize: 17, color: color.foreground },
-  extra: { ...num, fontSize: 15, color: color["muted-foreground"] },
+  value: { ...num, fontFamily: font.data, fontSize: fs.title, color: color.foreground },
+  extra: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
   more: { height: 44, alignItems: "center", justifyContent: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   moreText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },
   bars: { height: 112, flexDirection: "row", alignItems: "flex-end", gap: 2, marginHorizontal: space.stack, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },

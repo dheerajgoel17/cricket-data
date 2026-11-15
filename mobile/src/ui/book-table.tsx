@@ -53,7 +53,7 @@ export function BookTable({ books, shown }: { books: Priced[]; shown: (string | 
 const styles = StyleSheet.create({
   wrap: { gap: 2 },
   toggle: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", paddingHorizontal: space.tight, borderRadius: 999 },
-  toggleText: { ...type.footnote, fontFamily: font.medium, color: "rgba(255,255,255,0.7)" },
+  toggleText: { ...type.footnote, fontFamily: font.medium, color: color["text-soft"] },
   table: { maxWidth: 320 },
   head: { flexDirection: "row", alignItems: "center", gap: space.snug },
   headCell: { ...type.footnote, ...cap, fontFamily: font.medium, color: color["muted-foreground"], width: 52, textAlign: "right" },

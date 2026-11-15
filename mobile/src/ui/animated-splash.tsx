@@ -4,7 +4,7 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 import { scheduleOnRN } from "react-native-worklets";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/ui/text";
-import { color } from "@/ui/tokens";
+import { color, fs } from "@/ui/tokens";
 
 /** The mark's drawing units (the site's `BrandMark`: a 64-unit tile) and the size it is drawn at. */
 const SIZE = 112, U = SIZE / 64;
@@ -69,5 +69,5 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
 const styles = StyleSheet.create({
   fill: { ...StyleSheet.absoluteFill, backgroundColor: color.background, zIndex: 100 },
   center: { flex: 1, alignItems: "center", justifyContent: "center", gap: 14 },
-  word: { fontSize: 26, fontWeight: "700", letterSpacing: -0.5, color: color.foreground },
+  word: { fontSize: fs.display, fontWeight: "700", letterSpacing: -0.5, color: color.foreground },
 });

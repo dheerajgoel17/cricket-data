@@ -74,6 +74,10 @@ export const space = {
 };
 
 export const radius = {
+  /** Web `--radius-sm` (control radius − 4): small tiles, tags, tooltips. */
+  sm: remPx(Z.radius) - 4,
+  /** Web `--radius`: inputs, tiles, compact cards. */
+  control: remPx(Z.radius),
   card: remPx(Z["card-radius"]),
   chip: remPx(Z["chip-radius"]),
   sheet: remPx(Z["sheet-radius"]),
@@ -90,6 +94,7 @@ const lh = (size: number, ratio: string) => Math.round(size * parseFloat(ratio))
 const ls = (size: number, em: string | undefined) => (em ? Math.round(size * parseFloat(em) * 1000) / 1000 : 0);
 
 const body = remPx(T["fs-body"]);
+const metricFs = remPx(T["fs-metric"]), figureFs = remPx(T["fs-figure"]), statFs = remPx(T["fs-stat"]);
 const title = remPx(T["fs-title"]);
 const callout = remPx(T["fs-callout"]);
 const footnote = remPx(T["fs-footnote"]);
@@ -106,7 +111,7 @@ export const type = {
   caption: { fontFamily: font.regular, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
 
-const metricSize = remPx(T["fs-metric"]);
+const metricSize = metricFs;
 /** The site's `font-condensed text-metric font-emphasis`: a row's hero line ("O/U 29.5") in Barlow Condensed Bold, tabular. */
 export const metric = { fontFamily: font.data, fontSize: metricSize, lineHeight: metricSize + 2, letterSpacing: ls(metricSize, T["fs-metric-ls"]), fontVariant: ["tabular-nums" as const] };
 /** The site's `font-condensed text-title font-emphasis`: the model edge beside a row. */
@@ -122,3 +127,9 @@ export const HEADER_HEIGHT = remPx(Z["header-h"]);
 export const FIXTURE_CARD_SHARE = 0.8;
 /** Height of the docked tab bar's row (`components/tab-bar.tsx`), without the home indicator's room under it. */
 export const TAB_BAR_HEIGHT = 54;
+
+/**
+ * The size scale as plain numbers, for figures that keep their own family / letter-spacing (`num`, `numLg`): the web's `text-caption … text-stat` roles. Never write a literal `fontSize`
+ * in a screen; pick the role (CI: `tokens.test.ts`). `cap.fontSize` (11) is the uppercase label.
+ */
+export const fs = { caption, footnote, callout, body, title, metric: metricFs, figure: figureFs, display, stat: statFs } as const;

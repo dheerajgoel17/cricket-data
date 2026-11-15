@@ -103,6 +103,7 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
@@ -141,6 +142,7 @@
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
@@ -166,7 +168,8 @@
       "mobile/src/ui/match-fancy.tsx",
       "mobile/src/ui/match-header.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -179,7 +182,8 @@
     "dependencies": [
       "mobile/src/ui/ground-page.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -193,6 +197,7 @@
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/blur-bar.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/capsule.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/empty-state.tsx",
@@ -200,7 +205,6 @@
       "mobile/src/ui/grid-table.tsx",
       "mobile/src/ui/live-board.tsx",
       "mobile/src/ui/match-fancy.tsx",
-      "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/match-header.tsx",
       "mobile/src/ui/motion.tsx",
@@ -237,6 +241,7 @@
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tournament-stats.tsx",
@@ -275,6 +280,7 @@
       "mobile/src/ui/side-book.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/tab-fade.tsx",
       "mobile/src/ui/window-pills.tsx"
     ]
@@ -293,6 +299,7 @@
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
   },
@@ -314,6 +321,8 @@
       "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
+      "mobile/src/ui/blur-bar.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
   },
@@ -327,7 +336,8 @@
     "dependencies": [
       "mobile/src/ui/ground-page.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/page-header.tsx"
+      "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx"
     ]
   },
   {
@@ -432,6 +442,7 @@
       "BrandMark"
     ],
     "dependencies": [
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -579,7 +590,9 @@
       "TrendList"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/capsule.tsx",
@@ -606,10 +619,12 @@
       "mobile/src/ui/mini-bars.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/team-badge.tsx",
-      "mobile/src/ui/text.tsx"
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/bleed.tsx"
     ]
   },
   {
@@ -738,7 +753,6 @@
       "mobile/src/ui/accordion.tsx",
       "mobile/src/ui/bleed.tsx",
       "mobile/src/ui/press.tsx",
-      "mobile/src/ui/recent-form.tsx",
       "mobile/src/ui/segmented.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -751,9 +765,7 @@
       "LiveMarketRow"
     ],
     "dependencies": [
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/book-badge.tsx",
-      "mobile/src/ui/live-bits.tsx"
+      "mobile/src/ui/fancy-row.tsx"
     ]
   },
   {
@@ -806,7 +818,9 @@
       "MatchFancy"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/charts.tsx",
@@ -887,6 +901,16 @@
     ]
   },
   {
+    "path": "mobile/src/ui/page-atmosphere.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "EntityHeroWash",
+      "PageAtmosphere"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "mobile/src/ui/page-header.tsx",
     "platform": "native",
     "route": false,
@@ -895,7 +919,7 @@
       "RoundButton"
     ],
     "dependencies": [
-      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx"
     ]
@@ -908,6 +932,7 @@
       "PhaseBar"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
@@ -977,6 +1002,18 @@
     "dependencies": []
   },
   {
+    "path": "mobile/src/ui/round-button.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ROUND",
+      "RoundButton"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
     "path": "mobile/src/ui/screener-filters.tsx",
     "platform": "native",
     "route": false,
@@ -984,20 +1021,10 @@
       "ScreenerFilters"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/accordion.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
-    ]
-  },
-  {
-    "path": "mobile/src/ui/segmented.ios.tsx",
-    "platform": "ios",
-    "route": false,
-    "exports": [
-      "Segmented"
-    ],
-    "dependencies": [
-      "mobile/src/ui/segmented.tsx"
     ]
   },
   {
@@ -1010,6 +1037,17 @@
     "dependencies": [
       "mobile/src/ui/text.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/sheet.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Grabber",
+      "Sheet",
+      "SheetBackdrop"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/side-book.tsx",
@@ -1032,6 +1070,7 @@
       "SignInSheet"
     ],
     "dependencies": [
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
@@ -1434,6 +1473,15 @@
     ]
   },
   {
+    "path": "site/src/components/app/hero-wash.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HeroWash"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "site/src/components/app/home-mix-table.tsx",
     "platform": "web",
     "route": false,
@@ -1580,9 +1628,7 @@
       "LiveMarketRow"
     ],
     "dependencies": [
-      "site/src/components/app/book-badge.tsx",
-      "site/src/components/app/live-spot.tsx",
-      "site/src/components/app/mini-bars.tsx"
+      "site/src/components/app/fancy-lines.tsx"
     ]
   },
   {
@@ -2515,6 +2561,7 @@
       "site/src/components/app/chip.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/forms.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/line-ladder.tsx",
       "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/note.tsx",
@@ -2651,6 +2698,7 @@
       "site/src/components/ui/input.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/entity-hero.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/pill-tabs.tsx",
       "site/src/components/app/grid.tsx",
       "site/src/components/app/badges.tsx",
@@ -2682,6 +2730,7 @@
       "site/src/components/app/forms.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/chart.tsx",
+      "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/star.tsx",

@@ -5,7 +5,7 @@ import { push } from "@/lib/nav";
 import { Press } from "@/ui/press";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, tint, radius } from "@/ui/tokens";
 import { EmptyState } from "@/ui/empty-state";
 
 const CHIP: Record<string, string> = { W: color.primary, L: color.miss, T: color["muted-foreground"], D: color["muted-foreground"], NR: color["muted-foreground"] };
@@ -19,7 +19,7 @@ export function FormChips({ results, compact }: { results: string[]; compact?: b
       {results.map((r, i) => (
         <View key={i} style={{ alignItems: "center", gap: 3 }}>
           <View style={{ width: s, height: s, borderRadius: 7, backgroundColor: CHIP[r], alignItems: "center", justifyContent: "center" }}><Text style={[styles.chipText, { fontSize: compact ? 10.5 : 12 }]}>{r}</Text></View>
-          {!compact ? <View style={{ width: 18, height: 2, borderRadius: 1, backgroundColor: i === results.length - 1 ? "rgba(255,255,255,0.6)" : "transparent" }} /> : null}
+          {!compact ? <View style={{ width: 18, height: 2, borderRadius: 1, backgroundColor: i === results.length - 1 ? tint.white(0.6) : "transparent" }} /> : null}
         </View>
       ))}
     </View>
@@ -65,11 +65,11 @@ export function RecentForm({ forms, store, fmt }: { forms: { name: string; idx: 
 }
 
 const styles = StyleSheet.create({
-  chipText: { fontFamily: font.bold, color: color.background },
+  chipText: { fontFamily: font.bold, color: color["primary-foreground"] },
   team: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug },
   teamName: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
   game: { flexDirection: "row", alignItems: "center", gap: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.snug },
-  mark: { width: 28, height: 28, borderRadius: 7, alignItems: "center", justifyContent: "center" },
+  mark: { width: 28, height: 28, borderRadius: radius.sm, alignItems: "center", justifyContent: "center" },
   vs: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   muted: { ...type.footnote, color: color["muted-foreground"] },
   own: { ...type.footnote, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },

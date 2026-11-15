@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { LiveDot } from "@/ui/motion";
-import { cap, color, font, space, type } from "@/ui/tokens";
+import { cap, color, font, space, type, tint } from "@/ui/tokens";
 
 export type StatusTone = "live" | "inPlay" | "session" | "muted";
 export type StatusSurface = "plain" | "pill" | "dot";
@@ -22,8 +22,8 @@ export function StatusLabel({
 }) {
   const label = children ?? (tone === "live" ? (surface === "pill" ? "LIVE" : "Live") : tone === "inPlay" ? "In Play Market" : null);
   if (surface === "pill") {
-    const bg = tone === "live" ? color.miss : tone === "session" ? "rgba(255, 184, 0, 0.2)" : color.secondary;
-    const fg = tone === "live" ? "#fff" : tone === "session" ? color.amber : color["muted-foreground"];
+    const bg = tone === "live" ? color.miss : tone === "session" ? tint.amber(0.2) : color.secondary;
+    const fg = tone === "live" ? color.foreground : tone === "session" ? color.amber : color["muted-foreground"];
     return (
       <View style={[styles.pill, { backgroundColor: bg }]} accessibilityRole="text">
         <Text style={[styles.pillText, { color: fg }]}>{label}</Text>

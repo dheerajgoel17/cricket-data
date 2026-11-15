@@ -11,7 +11,7 @@ import { InfoButton } from "@/ui/info-button";
 import { Segmented } from "@/ui/segmented";
 import { PlayerFace } from "@/ui/player-avatar";
 import { Tick } from "@/ui/tick";
-import { cap, color, control, font, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, control, font, numLg, radius, space, type, tonal, fs, tint } from "@/ui/tokens";
 
 export type TapeRow = { idx: number; pid: string; name: string; stat: string; line: number; over: number; fmt: string; inn?: number; verdict: "cleared" | "missed" | "push" | null; v?: number };
 
@@ -129,20 +129,20 @@ const styles = StyleSheet.create({
   ticketHead: { paddingHorizontal: space.inset, paddingTop: space.inset, paddingBottom: space.snug, gap: space.tight },
   ticketBody: { paddingHorizontal: space.inset, paddingTop: space.snug, paddingBottom: space.snug },
   tearWrap: { height: 0, zIndex: 1, justifyContent: "center" },
-  tearLine: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderColor: "rgba(15, 15, 15, 0.45)", marginHorizontal: space.stack },
+  tearLine: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderColor: tint.hex(color["primary-foreground"], 0.45), marginHorizontal: space.stack },
   notch: { position: "absolute", top: -NOTCH / 2, width: NOTCH, height: NOTCH, borderRadius: NOTCH / 2, backgroundColor: color.background },
   notchLeft: { left: -NOTCH / 2 },
   notchRight: { right: -NOTCH / 2 },
   headRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: space.snug },
   titleRow: { minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   titleHit: { ...type.title, color: color["primary-foreground"] },
-  countBadge: { ...cap, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(15, 15, 15, 0.35)", borderRadius: radius.chip, paddingHorizontal: space.snug, paddingVertical: 2, color: color["primary-foreground"], overflow: "hidden" },
+  countBadge: { ...cap, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.hex(color["primary-foreground"], 0.35), borderRadius: radius.chip, paddingHorizontal: space.snug, paddingVertical: 2, color: color["primary-foreground"], overflow: "hidden" },
   ticketRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug, minHeight: 52 },
-  ticketSep: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "rgba(15, 15, 15, 0.25)" },
-  stub: { alignItems: "flex-end", gap: 2, borderStyle: "dashed", borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: "rgba(15, 15, 15, 0.3)", paddingLeft: space.stack },
-  nameHit: { fontFamily: font.bold, fontSize: 15, lineHeight: 19, letterSpacing: -0.15, color: color["primary-foreground"] },
-  whatHit: { ...type.footnote, color: "rgba(15, 15, 15, 0.65)" },
-  oddsHit: { ...numLg, fontSize: 22, lineHeight: 24, color: color["primary-foreground"] },
+  ticketSep: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: tint.hex(color["primary-foreground"], 0.25) },
+  stub: { alignItems: "flex-end", gap: 2, borderStyle: "dashed", borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: tint.hex(color["primary-foreground"], 0.3), paddingLeft: space.stack },
+  nameHit: { fontFamily: font.bold, fontSize: fs.body, lineHeight: 19, letterSpacing: -0.15, color: color["primary-foreground"] },
+  whatHit: { ...type.footnote, color: color["ink-soft"] },
+  oddsHit: { ...numLg, fontSize: fs.figure, lineHeight: 24, color: color["primary-foreground"] },
   verdictHit: { ...cap, color: color["primary-foreground"] },
   who: { flex: 1, minWidth: 0, gap: 2 },
   card: { borderRadius: radius.card, padding: space.inset, gap: space.snug },

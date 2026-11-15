@@ -12,7 +12,7 @@ import { ResultStamp, sideStamp } from "@/ui/result-stamp";
 import { TeamBadge } from "@/ui/team-badge";
 import { InPlayBadge } from "@/ui/live-bits";
 import type { Standing } from "@/ui/tick";
-import { color, control, figure, font, space, type } from "@/ui/tokens";
+import { color, control, figure, font, space, type, tint } from "@/ui/tokens";
 
 /** "+N books": the books not already shown up front for a line, each with its over and under price. */
 export function BookList({ books, shown }: { books: { source: string; over: number | null; under: number | null }[]; shown: (string | undefined)[] }) {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   edgeLabel: { ...type.caption, textTransform: "uppercase", letterSpacing: 0.4, color: color["muted-foreground"] },
   edgeValue: { ...figure },
   statusSlot: { width: 72, minHeight: 36, alignItems: "center", justifyContent: "center" },
-  voidMark: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(245, 158, 11, 0.6)", borderStyle: "dashed", borderRadius: 4, paddingHorizontal: space.hair, overflow: "hidden" },
+  voidMark: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.amber(0.6), borderStyle: "dashed", borderRadius: 4, paddingHorizontal: space.hair, overflow: "hidden" },
   moreBtn: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", paddingHorizontal: space.gutter },
   more: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"] },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter },

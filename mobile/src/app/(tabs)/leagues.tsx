@@ -20,7 +20,7 @@ import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { cap, color, font, radius, space, type } from "@/ui/tokens";
+import { cap, color, font, radius, space, type, fs } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: color.primary },
   chipText: { ...type.callout, fontFamily: font.medium, color: color.foreground, maxWidth: 180 },
   tag: { borderRadius: 999, paddingHorizontal: 6, height: 16, justifyContent: "center" },
-  tagText: { ...cap, fontFamily: font.data, fontSize: 10, color: color.background },
+  tagText: { ...cap, fontFamily: font.data, fontSize: fs.caption, color: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
   leagueHead: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leagueName: { ...type.title, color: color.foreground, flex: 1 },

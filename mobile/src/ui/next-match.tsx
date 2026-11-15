@@ -13,7 +13,7 @@ import { DataTable } from "@/ui/data-table";
 import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, num, numLg, radius, space, type, tonal, font } from "@/ui/tokens";
+import { cap, color, num, numLg, radius, space, type, tonal, font, fs } from "@/ui/tokens";
 
 export type NextInfo = { match: string; start: string; competition: string; team?: string; opp: string; ground: string; known?: string; priced?: boolean; phase?: "upcoming" | "live" | "final" };
 
@@ -92,7 +92,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
         <View style={styles.lineRow}>
           <Text style={styles.lineText}>{sideLetter} {line} <Text style={styles.statLabel}>{statLabel}</Text></Text>
           {standing != null ? <StandingMark standing={standing} line={line} /> : null}
-          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...numLg, fontSize: 20, letterSpacing: -0.4, color: color.primary }}>{odds(best)}</Tick></View> : null}
+          {best > 1 ? <View style={{ marginLeft: "auto" }}><Tick value={best} style={{ ...type.body, ...numLg, fontSize: fs.metric, letterSpacing: -0.4, color: color.primary }}>{odds(best)}</Tick></View> : null}
         </View>
         {book ? (
           quotes.length ? (
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
   lineText: { ...type.body, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   statLabel: { ...type.callout, color: color["muted-foreground"] },
   tiles: { flexDirection: "row", gap: space.snug },
-  tile: { flex: 1, minWidth: 0, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 14, padding: space.snug + 2, gap: 2 },
-  tileNum: { ...numLg, fontSize: 30, letterSpacing: -0.6, lineHeight: 34 },
+  tile: { flex: 1, minWidth: 0, backgroundColor: color.tile, borderRadius: radius.card, padding: space.snug + 2, gap: 2 },
+  tileNum: { ...numLg, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 34 },
   tileSub: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   noSample: { ...type.callout, color: color["muted-foreground"], paddingTop: space.tight },
   chartFilters: { ...type.footnote, color: color["muted-foreground"], ...cap },

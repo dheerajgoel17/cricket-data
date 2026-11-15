@@ -30,7 +30,7 @@ import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
-import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type, tonal, fs } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -323,7 +323,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
 }
 
 function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
-  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: 34, lineHeight: 38 }]}>{v}</Text></View>;
+  return <View style={{ gap: 2 }}><Text style={styles.statKey}>{k}</Text><Text style={[styles.statNum, big && { fontSize: fs.stat, lineHeight: 38 }]}>{v}</Text></View>;
 }
 
 const styles = StyleSheet.create({
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   conditions: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug, gap: space.hair },
   match: { gap: space.hair },
   marketCard: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
-  pin: { width: 42, height: 42, borderRadius: 12, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  pin: { width: 42, height: 42, borderRadius: radius.control, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   kicker: { ...type.footnote, ...cap, color: color.primary },
   name: { ...type.display, color: color.foreground },
   city: { ...type.body, color: color["muted-foreground"] },
@@ -350,9 +350,9 @@ const styles = StyleSheet.create({
   gridCellB: { borderBottomWidth: StyleSheet.hairlineWidth },
   secList: { borderTopWidth: 0 },
   secRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, minHeight: 44, paddingHorizontal: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
-  secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: 20, color: color.foreground },
+  secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: fs.metric, color: color.foreground },
   kpiK: { ...cap, color: color["muted-foreground"] },
-  kpiV: { ...num, fontSize: 22, color: color.foreground },
+  kpiV: { ...num, fontSize: fs.figure, color: color.foreground },
   warn: { ...type.footnote, color: color.amber },
   note: { ...type.footnote, color: color["muted-foreground"] },
   tour: { ...tonal, borderRadius: radius.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
@@ -362,22 +362,22 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
   h2: { ...type.title, color: color.foreground },
   h3: { flexShrink: 1, ...type.body, fontFamily: font.medium, color: color.foreground },
-  count: { ...num, fontSize: 15, color: color["muted-foreground"] },
+  count: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
   more: { ...tonal, borderRadius: radius.card, height: 44, alignItems: "center", justifyContent: "center" },
   moreText: { ...type.callout, color: color.foreground },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },
   statKey: { ...type.footnote, color: color["muted-foreground"] },
-  statNum: { ...num, fontSize: 22, color: color.foreground },
+  statNum: { ...num, fontSize: fs.figure, color: color.foreground },
   cards: { flexDirection: "row", gap: space.snug },
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
-  big: { ...num, fontSize: 20, color: color.foreground },
+  big: { ...num, fontSize: fs.metric, color: color.foreground },
   /** Web twin: `-mx-gutter border-y` Top batter edge band. */
   topBleed: { marginTop: space.snug },
   topNote: { paddingHorizontal: space.gutter, paddingVertical: space.snug },
   topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, paddingHorizontal: space.gutter, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  lineNum: { ...num, fontSize: 17, color: color.foreground },
-  cellNum: { ...num, fontSize: 15, color: color.foreground },
+  lineNum: { ...num, fontSize: fs.title, color: color.foreground },
+  cellNum: { ...num, fontSize: fs.body, color: color.foreground },
   fair: { ...type.footnote, color: color["muted-foreground"] },
 });

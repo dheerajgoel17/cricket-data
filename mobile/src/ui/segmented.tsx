@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Text } from "@/ui/text";
-import { color, font, type } from "@/ui/tokens";
+import { color, font, type, tint } from "@/ui/tokens";
 
 export interface SegmentedProps<T extends string> {
   items: [id: T, label: string][];
@@ -43,8 +43,8 @@ export function Segmented<T extends string>({ items, value, onChange, label, wid
 }
 
 const styles = StyleSheet.create({
-  track: { flexDirection: "row", backgroundColor: "rgba(44,44,46,0.7)", borderRadius: 999, padding: 2, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.16)" },
-  thumb: { position: "absolute", top: 2, bottom: 2, left: 2, borderRadius: 999, backgroundColor: "#58585c", shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  track: { flexDirection: "row", backgroundColor: color["segment-track"], borderRadius: 999, padding: 2, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.16) },
+  thumb: { position: "absolute", top: 2, bottom: 2, left: 2, borderRadius: 999, backgroundColor: color["segment-thumb"], shadowColor: tint.black(1), elevation: 1, shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
   hit: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   text: { ...type.callout, fontFamily: font.regular, color: color.foreground },
   textOn: { fontFamily: font.medium },

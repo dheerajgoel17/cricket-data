@@ -176,7 +176,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;
 
 /** List card: face + name, hero OVER line (condensed), book price, model edge. */
-type SoFar = { v: number; state: "live" | "out" | "final"; verdict: "cleared" | "missed" | "push" | null };
+type SoFar = { v: number; state: "live" | "out" | "final" | "void"; verdict: "cleared" | "missed" | "push" | null };
 
 /**
  * Face Over and Under prices under a props row. Extras sit behind `BookTable` (+N books).

@@ -13,7 +13,7 @@ import { Skeleton } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { color, font, radius, space, type } from "@/ui/tokens";
+import { color, font, radius, space, type, fs } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
 export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: boolean; pending?: boolean; live?: boolean }) {
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   team: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
   lost: { color: color["muted-foreground"] },
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
-  total: { fontFamily: font.data, fontSize: 18, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
+  total: { fontFamily: font.data, fontSize: fs.title, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   pendingScore: { width: 64, height: 16, borderRadius: 8 },
   yet: { ...type.callout, color: color["muted-foreground"] },

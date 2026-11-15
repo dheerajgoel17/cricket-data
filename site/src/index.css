@@ -53,6 +53,9 @@
   --text-metric: var(--fs-metric);
   --text-metric--line-height: var(--fs-metric-lh);
   --text-metric--letter-spacing: var(--fs-metric-ls);
+  --text-figure: var(--fs-figure);
+  --text-figure--line-height: var(--fs-figure-lh);
+  --text-figure--letter-spacing: var(--fs-figure-ls);
   --text-stat: var(--fs-stat);
   --text-stat--line-height: var(--fs-stat-lh);
   --text-stat--letter-spacing: var(--fs-stat-ls);

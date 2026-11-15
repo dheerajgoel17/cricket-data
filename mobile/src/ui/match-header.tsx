@@ -12,7 +12,7 @@ import { useNow } from "@/lib/use-now";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
+import { cap, color, font, num, numLg, space, type, fs, radius } from "@/ui/tokens";
 
 /** One side: crest · abbr · large score · Over N (mirrored on the right). Twin of web MatchScoreboard SideBlock. */
 function SideBlock({
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
   code: { ...cap, color: color["muted-foreground"] },
   figures: { flex: 1, minWidth: 0, gap: 2 },
   figuresEnd: { alignItems: "flex-end" },
-  total: { fontSize: 22, letterSpacing: -0.4, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  total: { fontSize: fs.figure, letterSpacing: -0.4, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"] },
   dash: { ...type.body, color: color["muted-foreground"] },
-  pending: { width: 72, height: 28, borderRadius: 6, backgroundColor: color.secondary },
+  pending: { width: 72, height: 28, borderRadius: radius.sm, backgroundColor: color.secondary },
   whenRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
   whenDay: { ...type.callout, color: color["muted-foreground"] },
-  clock: { ...numLg, fontSize: 22, letterSpacing: -0.44, lineHeight: 26, color: color.foreground },
+  clock: { ...numLg, fontSize: fs.figure, letterSpacing: -0.44, lineHeight: 26, color: color.foreground },
   status: { ...type.callout, color: color.foreground },
   ground: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", maxWidth: "100%" },
 });

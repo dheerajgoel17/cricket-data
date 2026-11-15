@@ -46,7 +46,7 @@ import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
-import { color, control, font, radius, space, type } from "@/ui/tokens";
+import { color, control, font, radius, space, type, fs, tint } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -170,7 +170,7 @@ export default function PlayerPage() {
   );
 }
 
-const arrow = (up: boolean | null) => (up == null ? null : <Text style={{ color: up ? color.primary : color.miss, fontSize: 12 }}>{up ? "▲ " : "▼ "}</Text>);
+const arrow = (up: boolean | null) => (up == null ? null : <Text style={{ color: up ? color.primary : color.miss, fontSize: fs.footnote }}>{up ? "▲ " : "▼ "}</Text>);
 
 /** A hit rate on a tint that says how good it is (green from 60%, red to 40%), all one width so a column lines up. */
 function HitCell({ p }: { p: number | null }) {
@@ -392,7 +392,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
             {[...entries].reverse().slice(0, logCount).map((e, i) => {
               const st = barState(e, line, side) as string;
               const tone = st === "hit" ? color.primary : st === "miss" ? color.miss : st === "push" ? color.amber : color["muted-foreground"];
-              const bg = st === "hit" ? "rgba(39,218,142,0.2)" : st === "miss" ? "rgba(255,0,0,0.2)" : st === "push" ? "rgba(245,165,36,0.2)" : color.secondary;
+              const bg = st === "hit" ? tint.primary(0.2) : st === "miss" ? tint.miss(0.2) : st === "push" ? tint.amber(0.2) : color.secondary;
               return (
                 <Press scale={1} key={i} onPress={() => onGame(e, st, `${label} ${side} ${line}`, c.auxLabel)} accessibilityRole="button" style={({ pressed }) => [styles.logRow, i > 0 && styles.sep, pressed && { opacity: 0.6 }]}>
                   <TeamBadge name={e.opp} size={32} />
@@ -446,8 +446,8 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: space.gutter },
   hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
-  name: { ...type.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
-  profile: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground },
+  name: { ...type.display, fontSize: fs.display, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
+  profile: { ...type.callout, fontFamily: font.data, fontSize: fs.body, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
   strong: { color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   link: { color: color.primary, fontFamily: font.medium },
@@ -463,8 +463,8 @@ const styles = StyleSheet.create({
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
   countRow: { flexDirection: "row", alignItems: "center" },
-  metricNum: { fontSize: 16, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: 17, lineHeight: 20, color: color.foreground },
+  metricNum: { fontSize: fs.body, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: fs.title, lineHeight: 20, color: color.foreground },
   notListed: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"] },
   controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: space.snug },
   mainChip: { height: control, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
@@ -474,14 +474,14 @@ const styles = StyleSheet.create({
   laneRow: { flexDirection: "row" },
   lane: { flex: 1, minWidth: 0, gap: space.tight, paddingHorizontal: space.snug, paddingVertical: space.snug },
   laneSplit: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline },
-  laneOn: { backgroundColor: "rgba(44,44,46,0.4)" },
+  laneOn: { backgroundColor: tint.hex(color.secondary, 0.4) },
   laneCap: { ...type.caption, color: color["muted-foreground"], textTransform: "uppercase", letterSpacing: 0.4 },
   laneRate: { ...type.title, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   laneFoot: { ...type.footnote, color: color["muted-foreground"] },
   meterTrack: { height: 6, borderRadius: 999, backgroundColor: color.hairline, overflow: "hidden" },
   meterFill: { height: "100%", borderRadius: 999 },
   meterOver: { backgroundColor: color.primary },
-  meterUnder: { backgroundColor: "rgba(255,255,255,0.7)" },
+  meterUnder: { backgroundColor: color["text-soft"] },
   bookBand: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   bookLane: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug, paddingVertical: space.snug, alignItems: "flex-start" },
   bookExtras: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingHorizontal: space.snug, paddingVertical: space.snug },
@@ -493,8 +493,8 @@ const styles = StyleSheet.create({
   logRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 56, paddingVertical: space.tight },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   logOpp: { ...type.body, color: color.foreground },
-  valuePill: { minWidth: 56, borderRadius: 8, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
+  valuePill: { minWidth: 56, borderRadius: radius.sm, paddingHorizontal: space.snug, paddingVertical: space.tight, alignItems: "center" },
   valueText: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: "rgba(44,44,46,0.6)", borderRadius: 12, padding: space.snug },
+  unpriced: { flexDirection: "row", gap: space.snug, backgroundColor: color.tile, borderRadius: radius.control, padding: space.snug },
   unpricedText: { ...type.callout, flex: 1, color: color["muted-foreground"] },
 });

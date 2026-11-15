@@ -38,6 +38,8 @@ async function tick() {
 type Tag = { text: string; session: boolean };
 
 /** Home Props fixture hashtags: overlapping crests + `ABR v ABR`, then the start time or, once the match is on, a Live / session tag (the site's `MatchChip`). The chosen chip is the accent fill. */
+const SUB_ON = tint.hex(color["primary-foreground"], 0.7);
+
 export function MatchChips({ items, value, onChange, tags, all }: { items: Fx[]; value: string; onChange: (id: string) => void; tags?: Record<string, Tag>; /** Lead with an "All" chip whose id is `all` (the Player props match filter). */ all?: boolean }) {
   return (
     <ScrollView
@@ -70,7 +72,7 @@ function MatchChip({ f, on, onPress, tag }: { f: Fx; on: boolean; onPress: () =>
   useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 150 }); }, [on, p]);
   const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
   const title = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color["primary-foreground"]]) }));
-  const sub = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], "rgba(15,15,15,0.7)"]) }));
+  const sub = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], SUB_ON]) }));
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={`${f.a} v ${f.b}${tag ? `, ${tag.text}` : ""}`} onPress={onPress} scale={0.97}>
       <Animated.View style={[styles.chip, box]}>

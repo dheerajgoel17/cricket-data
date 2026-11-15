@@ -12,7 +12,7 @@ import { Bleed } from "@/ui/bleed";
 import { Press } from "@/ui/press";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, tint, type } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, tint, type, fs } from "@/ui/tokens";
 
 type Side = [string, number];
 
@@ -67,7 +67,7 @@ function Ball({ b }: { b: string }) {
   const label = formatBall(b);
   const tone = ballTone(label);
   const long = label.length > 1;
-  const bg = tone === "wicket" ? "rgba(255,0,0,0.25)" : tone === "boundary" ? color.foreground : tone === "extra" ? color.muted : color.secondary;
+  const bg = tone === "wicket" ? tint.miss(0.25) : tone === "boundary" ? color.foreground : tone === "extra" ? color.muted : color.secondary;
   const fg = tone === "wicket" ? color.miss : tone === "boundary" ? color.background : color.foreground;
   return (
     <View style={[styles.ball, long && styles.ballLong, { backgroundColor: bg }]}>
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   stripCol: { flex: 1, minWidth: 0, gap: space.tight },
   stripLeft: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline, paddingRight: space.snug },
   stripName: { ...type.callout, flexShrink: 1 },
-  figures: { ...num, fontSize: 14, color: color["muted-foreground"], fontFamily: font.data },
+  figures: { ...num, fontSize: fs.callout, color: color["muted-foreground"], fontFamily: font.data },
   balls: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
   ball: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   ballLong: { minWidth: 28, paddingHorizontal: 6, width: undefined },
@@ -303,15 +303,15 @@ const styles = StyleSheet.create({
   batterName: { flexDirection: "row", alignItems: "center", gap: 4, flex: 1, minWidth: 0 },
   strikeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "transparent" },
   strikeOn: { backgroundColor: color.foreground },
-  batFigs: { ...num, fontSize: 14 },
+  batFigs: { ...num, fontSize: fs.callout },
   batRuns: { fontFamily: font.data, color: color.foreground },
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   innTitle: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
-  innScore: { ...num, fontSize: 18, color: color.foreground },
+  innScore: { ...num, fontSize: fs.title, color: color.foreground },
   bowlHead: { ...cap, color: color["muted-foreground"] },
   tableBleed: { paddingVertical: 0 },
   th: { flexDirection: "row", alignItems: "center", paddingVertical: space.tight },
   tr: { flexDirection: "row", alignItems: "center", gap: 0, minHeight: 44, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.tight },
-  cell: { ...num, fontSize: 14, color: color["muted-foreground"], textAlign: "right" },
+  cell: { ...num, fontSize: fs.callout, color: color["muted-foreground"], textAlign: "right" },
   sum: { ...type.callout, color: color["muted-foreground"], maxWidth: "60%", fontFamily: font.data, fontVariant: ["tabular-nums"] },
 });

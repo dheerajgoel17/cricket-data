@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Grabber, Sheet } from "@/ui/sheet";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,7 +8,7 @@ import { push } from "@/lib/nav";
 import { LineTabs } from "@/ui/line-tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type } from "@/ui/tokens";
+import { color, font, radius, space, type, tint } from "@/ui/tokens";
 import * as Haptics from "expo-haptics";
 
 /** Links that exist in the app (site More also lists web-only tools). */
@@ -43,10 +44,8 @@ export function PhaseBar({ value, counts, onChange }: { value: HomePhase; counts
           </Press>
         )}
       />
-      <Modal visible={more} animationType="slide" transparent onRequestClose={() => setMore(false)}>
-        <Pressable style={styles.backdrop} onPress={() => setMore(false)} accessibilityRole="button" accessibilityLabel="Close" />
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
-          <View style={styles.grabber} />
+      <Sheet visible={more} onClose={() => setMore(false)} style={styles.sheet}>
+          <Grabber />
           <View style={styles.sheetHead}>
             <Text style={styles.sheetTitle}>More</Text>
             <Press onPress={() => setMore(false)} accessibilityRole="button" accessibilityLabel="Done">
@@ -66,21 +65,18 @@ export function PhaseBar({ value, counts, onChange }: { value: HomePhase; counts
               </Press>
             ))}
           </View>
-        </View>
-      </Modal>
+      </Sheet>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   moreBtn: { alignSelf: "center", marginLeft: "auto", width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: { position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: color.popover, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, paddingHorizontal: space.inset, paddingTop: space.snug },
-  grabber: { alignSelf: "center", width: 40, height: 5, borderRadius: 3, backgroundColor: "rgba(255,255,255,0.25)", marginBottom: space.stack },
+  sheet: { backgroundColor: color.popover, paddingHorizontal: space.inset, paddingTop: space.snug, gap: 0 },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.group },
   sheetTitle: { ...type.title, color: color.foreground },
   done: { ...type.body, fontFamily: font.medium, color: color.primary },
   links: { gap: space.hair, paddingBottom: space.snug },
-  link: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, borderRadius: 12 },
+  link: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, borderRadius: radius.control },
   linkTxt: { ...type.body, color: color.foreground },
 });

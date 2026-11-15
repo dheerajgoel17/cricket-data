@@ -59,6 +59,6 @@ export function PropStar({ idx, stat, line, fmt }: { idx: number; stat: string; 
 }
 
 const styles = StyleSheet.create({
-  round: { backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
+  round: { backgroundColor: color["control-fill"], borderWidth: StyleSheet.hairlineWidth, borderColor: color["control-ring"], alignItems: "center", justifyContent: "center" },
   prop: { width: control, height: control, borderRadius: control / 2, alignItems: "center", justifyContent: "center" },
 });

@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
-import { color, radius, space } from "@/ui/tokens";
+import { color, radius, space, tint } from "@/ui/tokens";
 
 /**
  * Page-shaped loading placeholders. Each matches the real layout (prop rows, fancy cards,
@@ -72,8 +72,8 @@ export function CardSkeleton({ width }: { width: number }) {
 export function TapeSkeleton() {
   return (
     <View style={styles.tape} testID="skeleton-tape">
-      <Skeleton style={[styles.skBig, { width: "42%", backgroundColor: "rgba(255,255,255,0.18)" }]} />
-      <Skeleton style={[styles.skLine, { width: "58%", backgroundColor: "rgba(255,255,255,0.12)" }]} />
+      <Skeleton style={[styles.skBig, { width: "42%", backgroundColor: tint.white(0.18) }]} />
+      <Skeleton style={[styles.skLine, { width: "58%", backgroundColor: tint.white(0.12) }]} />
       <View style={styles.tear}>
         <View style={styles.tearLine} />
         <View style={[styles.notch, styles.notchL]} />
@@ -81,12 +81,12 @@ export function TapeSkeleton() {
       </View>
       {[0, 1].map((k) => (
         <View key={k} style={styles.tapeRow}>
-          <Skeleton style={[styles.skAvatar, { backgroundColor: "rgba(255,255,255,0.18)" }]} />
+          <Skeleton style={[styles.skAvatar, { backgroundColor: tint.white(0.18) }]} />
           <View style={styles.skText}>
-            <Skeleton style={[styles.skLine, { width: "55%", backgroundColor: "rgba(255,255,255,0.18)" }]} />
-            <Skeleton style={[styles.skLine, { width: "38%", height: 9, backgroundColor: "rgba(255,255,255,0.12)" }]} />
+            <Skeleton style={[styles.skLine, { width: "55%", backgroundColor: tint.white(0.18) }]} />
+            <Skeleton style={[styles.skLine, { width: "38%", height: 9, backgroundColor: tint.white(0.12) }]} />
           </View>
-          <Skeleton style={[styles.skEdge, { backgroundColor: "rgba(255,255,255,0.18)" }]} />
+          <Skeleton style={[styles.skEdge, { backgroundColor: tint.white(0.18) }]} />
         </View>
       ))}
     </View>
@@ -316,7 +316,7 @@ export function renderSkeleton(shape: SkeletonShape, rows?: number) {
 }
 
 const styles = StyleSheet.create({
-  block: { backgroundColor: "rgba(255,255,255,0.09)", borderRadius: radius.card },
+  block: { backgroundColor: tint.white(0.09), borderRadius: radius.card },
   skRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   skSep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   skAvatar: { width: 44, height: 44, borderRadius: 22 },
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   tape: { marginHorizontal: space.gutter, backgroundColor: color.primary, borderRadius: radius.card, padding: space.inset, gap: space.tight, overflow: "hidden" },
   tapeRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.tight },
   tear: { height: 20, justifyContent: "center", marginVertical: space.tight },
-  tearLine: { height: StyleSheet.hairlineWidth, borderStyle: "dashed", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.35)" },
+  tearLine: { height: StyleSheet.hairlineWidth, borderStyle: "dashed", borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.35) },
   notch: { position: "absolute", width: 16, height: 16, borderRadius: 8, backgroundColor: color.background, top: 2 },
   notchL: { left: -8 },
   notchR: { right: -8 },

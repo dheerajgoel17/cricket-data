@@ -177,8 +177,8 @@ function openedOf(entries) {
  * @param {any} [resolve]
  * @param {any[]} [fixtures]
  * @param {((team: string, sides: string[]) => number | null) | null} [innOf]
- * @param {((name: string, sides: string[]) => number | null) | null} [soFarOf]
- * @param {((team: string, inn: number, sides: string[], fmt: string) => number | null) | null} [teamRunsOf]
+ * @param {((name: string, sides: string[]) => number | null) | null} [_soFarOf]
+ * @param {((team: string, inn: number, sides: string[], fmt: string) => number | null) | null} [_teamRunsOf]
  */
 export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, _soFarOf = null, _teamRunsOf = null) {
   const pairs = new Map();

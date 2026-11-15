@@ -345,7 +345,7 @@ export function LiveBoard({ match, teams }: { match: any; teams?: Side[] }) {
         )}
         {balls.length ? (
           <div className="flex flex-wrap items-center gap-hair" aria-label={`This over ${balls.join(" ")}`}>
-            {balls.map((b, i) => <Ball key={`${b}-${i}`} b={b} />)}
+            {balls.map((b: string, i: number) => <Ball key={`${b}-${i}`} b={b} />)}
           </div>
         ) : !!board.overs.length ? (
           <Overs overs={board.overs} />

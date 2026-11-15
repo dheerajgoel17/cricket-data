@@ -1,3 +1,4 @@
+import { color, tint } from "@/ui/tokens";
 import type { ComponentRef, ReactNode, RefObject } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 import {
@@ -13,7 +14,7 @@ import {
 export const BlurTargetView = View;
 export type BlurTarget = RefObject<ComponentRef<typeof View> | null>;
 
-const SOLID = "rgba(12,12,14,0.97)";
+const SOLID = color["chrome-solid"], CLEAR = tint.hex(color.background, 0);
 
 /**
  * Sticky page chrome. With `merge` (or legacy `accent`): clear at rest so the elevated canvas / hero wash shows through —
@@ -46,7 +47,7 @@ export function useChromeScrim(y: SharedValue<number>, threshold: SharedValue<nu
   return useAnimatedStyle(() => {
     const t = Math.max(48, threshold.value);
     return {
-      backgroundColor: interpolateColor(y.value, [t * 0.35, t], ["rgba(12,12,14,0)", SOLID]),
+      backgroundColor: interpolateColor(y.value, [t * 0.35, t], [CLEAR, SOLID]),
     };
   });
 }

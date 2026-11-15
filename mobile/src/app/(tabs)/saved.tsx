@@ -1,3 +1,4 @@
+import { RoundButton } from "@/ui/round-button";
 import { mark } from "@/lib/perf";
 import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -34,13 +35,13 @@ function Saved() {
   const label = (i: number) => playerLabel(store, names, i);
 
   const account = user ? (
-    <Press accessibilityRole="button" accessibilityLabel="Sign out" onPress={() => void signOut()} style={({ pressed }) => [styles.account, pressed && { opacity: 0.6 }]}>
+    <RoundButton label="Sign out" onPress={() => void signOut()}>
       <Ionicons name="person-circle" size={22} color={color.primary} />
-    </Press>
+    </RoundButton>
   ) : (
-    <Press accessibilityRole="button" accessibilityLabel="Sign in" onPress={openSignIn} style={({ pressed }) => [styles.account, pressed && { opacity: 0.6 }]}>
+    <RoundButton label="Sign in" onPress={openSignIn}>
       <Ionicons name="person-circle-outline" size={22} color={color.foreground} />
-    </Press>
+    </RoundButton>
   );
 
   const body = () => {
@@ -114,7 +115,6 @@ const styles = StyleSheet.create({
   gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
   signBtn: { alignSelf: "center", height: 44, minWidth: 160, paddingHorizontal: space.group, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
   signLabel: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
-  account: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });
 
 export default lazyTab(Saved, "Saved");

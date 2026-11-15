@@ -57,10 +57,10 @@ describe("shownFixtures", () => {
     expect(ids(shownFixtures(quiet, state, () => true, now))).toEqual(["IndiaNZ", "m1", "m2"]);
     expect(ids(shownFixtures([done("Old", "2026-10-24T07:00Z"), ...quiet.slice(1)], state, () => true, now))).toEqual(["m1", "m2"]); // 5 days is the limit
   });
-  it("shows finished matches whether or not the books still price them, and only priced ones to come", () => {
+  it("shows only matches the books price, finished or to come", () => {
     const now = at("2026-10-27T13:00:00Z");
-    const mix = [done("Fin", "2026-10-27T07:00Z"), up("priced", "2026-10-27T15:00Z"), up("unpriced", "2026-10-27T16:00Z")];
-    expect(ids(shownFixtures(mix, state, (x) => x.a !== "unpriced" && x.a !== "Fin", now))).toEqual(["priced", "Fin"].sort((p, q) => (p === "Fin" ? -1 : 1) - (q === "Fin" ? -1 : 1)));
+    const mix = [done("Fin", "2026-10-27T07:00Z"), done("FinPriced", "2026-10-27T08:00Z"), up("priced", "2026-10-27T15:00Z"), up("unpriced", "2026-10-27T16:00Z")];
+    expect(ids(shownFixtures(mix, state, (x) => x.a !== "unpriced" && x.a !== "Fin", now))).toEqual(["FinPriced", "priced"]);
   });
   it("keeps a finished Test for 6 days from its start, since it ends days after it began", () => {
     const now = at("2026-10-29T09:00:00Z"); // 2 days and a bit after the start
