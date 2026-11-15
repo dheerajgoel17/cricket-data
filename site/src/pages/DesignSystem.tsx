@@ -4,6 +4,7 @@ import { DocPanel, PreviewFrame } from "@/components/design-system/example-stage
 import { Link, useLocation } from "react-router-dom";
 import { DesignReference, TypographyReference, referenceSections } from "@/components/design-system/reference";
 import { MotionDemos } from "@/components/design-system/motion-demos";
+import { RowDensityDemos } from "@/components/design-system/row-density-demos";
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
@@ -20,7 +21,9 @@ import { ActiveChip, Chip } from "@/components/app/chip";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field, LiveForm, NativeSelect } from "@/components/app/forms";
 import { LadderRow, pricedFromBooks } from "@/components/app/line-ladder";
+import { MatchScoreboard } from "@/components/app/match-scoreboard";
 import { Note } from "@/components/app/note";
+import { StatusLabel } from "@/components/app/status-label";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { ChartBars } from "@/components/app/chart";
 import { CardGrid, Crumbs, DataTable, DetailSplit, Muted, OddsText, PageTitle, Panel, StatGridCards, StatTile, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
@@ -59,7 +62,7 @@ const CHART_DEMO = [
 
 const GROUPS: readonly { title: string; sections: readonly (readonly [string, string])[] }[] = [
   { title: "Foundations", sections: [["type", "Typography"], ["color", "Colour"], ["space", "Space & size"], ["motion", "Motion"]] },
-  { title: "Components", sections: [["components", "Overview"], ["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["forms", "Forms"], ["icons", "Icons"]] },
+  { title: "Components", sections: [["components", "Overview"], ["buttons", "Buttons"], ["chips", "Chips & tabs"], ["feedback", "Empty & notes"], ["data", "Data & metrics"], ["rows", "Prop & fancy rows"], ["forms", "Forms"], ["icons", "Icons"]] },
   { title: "Reference", sections: referenceSections },
   { title: "Guidance", sections: [["rules", "Usage rules"]] },
 ] as const;
@@ -74,6 +77,7 @@ const PAGE_BLURB: Record<string, string> = {
   chips: "Filters, segments, and tab twins for scoped choices.",
   feedback: "Empty, loading, and explanatory notes for every list state.",
   data: "Titles, metrics, charts, dense tables, badges, and priced ladders.",
+  rows: "PropLines + FancyLines: density=auto (compact below lg, dense from lg) on every web page. App stays compact.",
   forms: "Live filters with disabled and invalid states.",
   icons: "Heroicons jobs used in product chrome.",
   rules: "Hard constraints for contributors.",
@@ -85,10 +89,11 @@ const PAGE_WHEN: Record<string, string> = {
   color: "Use semantic tokens (primary, miss, amber, dnp) — never hard-code hex in product UI.",
   space: "Space siblings with parent gap tokens; do not add ad-hoc margins between blocks.",
   motion: "Reuse tokens.motion and the selection spring; honour prefers-reduced-motion.",
-  buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs.",
+  buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs. Match / row status marks use StatusLabel tones — never fork LIVE colours at the call site.",
   chips: "Chip / PillGroup for filters; PillTabs when panels switch with the selection.",
   feedback: "Every empty, unknown, or error list uses EmptyState — never a bare spinner or blank panel.",
-  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; StickyFilterBand + flush header; DetailSplit + StickyPanel + CardGrid for desktop boards; TeamBadge sizes; LadderRow + BookTable / SideBook for priced lines; Player look-back L5…ALL (app WindowPills hairline twin).",
+  data: "StatTile for glances; ChartBars for line history; DataTable + TABLE_HEAD for dense stats; StickyFilterBand + flush header; DetailSplit + StickyPanel + CardGrid for desktop boards; MatchScoreboard + live strip; TeamBadge sizes; LadderRow + BookTable / SideBook for priced lines; Player look-back L5…ALL (app WindowPills hairline twin).",
+  rows: "Breakpoint density, not page chrome. PropLines + FancyLines share SCAN_ROW_GRID / ScanEdge; MarketTape stays separate.",
   forms: "LiveForm for filters that apply as you change them; pair Field with NativeSelect or Input.",
   icons: "Heroicons only under components/app, components/ui, and pages — never Lucide.",
   rules: "Follow these before adding a component, page, or token.",
@@ -99,10 +104,11 @@ const PAGE_SOURCE: Record<string, string> = {
   color: "packages/tokens/tokens.json",
   space: "packages/tokens/tokens.json",
   motion: "packages/tokens/tokens.json",
-  buttons: "components/ui/button.tsx",
+  buttons: "components/ui/button.tsx · status-label.tsx",
   chips: "components/app/pill-group.tsx",
   feedback: "components/app/empty-state.tsx",
-  data: "components/app/page.tsx · chart.tsx · badges.tsx · line-ladder.tsx · book-table.tsx",
+  data: "components/app/page.tsx · chart.tsx · match-scoreboard.tsx · live-board.tsx · badges.tsx · line-ladder.tsx · book-table.tsx",
+  rows: "components/design-system/row-density-demos.tsx → hot-props PropLines · fancy-lines FancyLines",
   forms: "components/app/forms.tsx",
   icons: "@heroicons/react/24/outline",
 };
@@ -128,6 +134,7 @@ const PAGE_TOC: Record<string, TocItem[]> = {
     { id: slugify("Variants"), label: "Variants" },
     { id: slugify("Loading"), label: "Loading" },
     { id: slugify("Badge"), label: "Badge" },
+    { id: slugify("StatusLabel"), label: "StatusLabel" },
   ],
   chips: [
     { id: slugify("Chip + ActiveChip"), label: "Chip" },
@@ -150,9 +157,15 @@ const PAGE_TOC: Record<string, TocItem[]> = {
     { id: slugify("StickyFilterBand + flush header"), label: "StickyFilterBand" },
     { id: slugify("DetailSplit + StickyPanel"), label: "DetailSplit" },
     { id: slugify("CardGrid"), label: "CardGrid" },
+    { id: slugify("MatchScoreboard"), label: "MatchScoreboard" },
     { id: slugify("TeamBadge sizes"), label: "Badges" },
     { id: slugify("BookTable"), label: "BookTable" },
     { id: slugify("LadderRow"), label: "LadderRow" },
+  ],
+  rows: [
+    { id: slugify("Compact — below lg"), label: "Compact" },
+    { id: slugify("Dense — lg+"), label: "Dense" },
+    { id: slugify("Settled — compact"), label: "Settled" },
   ],
   forms: [
     { id: slugify("LiveForm"), label: "LiveForm" },
@@ -181,6 +194,7 @@ const COMPONENT_CARDS: readonly { id: string; title: string; detail: string; pre
   { id: "chips", title: "Chips & tabs", detail: "Filters and segmented controls", preview: <span className="inline-flex h-8 items-center rounded-full bg-primary px-snug text-footnote font-label text-primary-foreground">T20</span> },
   { id: "feedback", title: "Empty & notes", detail: "EmptyState, skeletons, Note", preview: <span className="text-footnote text-muted-foreground">Nothing saved yet</span> },
   { id: "data", title: "Data & metrics", detail: "StatTile, Panel, StickyFilterBand, DetailSplit, CardGrid", preview: <span className="font-condensed text-title tabular-nums text-primary">1.61</span> },
+  { id: "rows", title: "Prop & Fancy lines", detail: "Breakpoint auto density", preview: <span className="text-footnote font-label text-muted-foreground">O 24.5 · Edge</span> },
   { id: "forms", title: "Forms", detail: "LiveForm, Field, NativeSelect", preview: <span className="rounded border border-hairline px-snug py-hair text-footnote">Format ▾</span> },
   { id: "icons", title: "Icons", detail: "Heroicons in product jobs", preview: <StarIcon className="size-5" aria-hidden /> },
 ];
@@ -354,6 +368,23 @@ export function DesignSystemPage() {
           <Badge variant="destructive">Destructive</Badge>
           <Badge className="bg-primary/15 text-primary">Primary wash</Badge>
         </PreviewFrame>
+        <PreviewFrame title="StatusLabel" description="Match / row status: tone (live · inPlay · session · muted) × surface (pill · plain · dot). LIVE pill = match live. InPlayBadge copy = In Play Market (line/odds). Prop rows skip per-player Live." source="components/app/status-label.tsx">
+          <div className="flex flex-col gap-stack">
+            <div className="flex flex-wrap items-center gap-snug">
+              <StatusLabel tone="live" surface="pill" />
+              <StatusLabel tone="session" surface="pill">Stumps</StatusLabel>
+              <StatusLabel tone="muted" surface="pill">Final</StatusLabel>
+              <StatusLabel tone="muted" surface="pill">Started</StatusLabel>
+            </div>
+            <div className="flex flex-wrap items-center gap-snug">
+              <StatusLabel tone="live" surface="dot" />
+              <StatusLabel tone="live" surface="plain" />
+              <StatusLabel tone="inPlay" surface="plain" />
+              <StatusLabel tone="session" surface="plain">Rain delay</StatusLabel>
+              <StatusLabel tone="muted" surface="plain">Upcoming</StatusLabel>
+            </div>
+          </div>
+        </PreviewFrame>
       </>
     ),
 
@@ -437,7 +468,7 @@ export function DesignSystemPage() {
             <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
           </div>
         </PreviewFrame>
-        <PreviewFrame title="StickyFilterBand + flush header" description="Sticky chip/filter band under the shell header. When the band is the first surface under the bar, pair with useHeaderFlush(true) so the top bar uses bg-card and drops its hairline (Player, Match Fancy detail, Ground, Fixture tabs). /props uses the band without flush because the page title sits above it." source="components/app/page.tsx + lib/header-slot.tsx" canvasClassName="items-stretch bg-background">
+        <PreviewFrame title="StickyFilterBand + flush header" description="Sticky chip/filter band under the shell header. When the band is the first surface under the bar, pair with useHeaderFlush(true) so the top bar uses bg-card and drops its hairline (Player, Match Fancy detail, Ground, Fixture tabs). Tab pages put their title in the shell via TabTitle (app AppHeader twin); /props does not flush." source="components/app/page.tsx + lib/header-slot.tsx" canvasClassName="items-stretch bg-background">
           <div className="w-full overflow-hidden rounded-lg border border-hairline">
             <div className="flex h-12 items-center gap-snug bg-card px-gutter text-callout font-label">Flush header (bg-card)</div>
             <StickyFilterBand className="static top-auto z-auto mx-0">
@@ -471,6 +502,67 @@ export function DesignSystemPage() {
               <div key={label} className="rounded-lg border border-hairline bg-card px-inset py-snug text-body font-label">{label}</div>
             ))}
           </CardGrid>
+        </PreviewFrame>
+        <PreviewFrame
+          title="MatchScoreboard"
+          description="Fixture header: series · crest/score · StatusLabel live pill (white on miss) · crest/score · live strip (bowler O-R-W + ongoing over | batters)."
+          source="components/app/match-scoreboard.tsx · live-board.tsx"
+          canvasClassName="items-stretch bg-background"
+        >
+          <div className="w-full min-w-0 overflow-hidden rounded-lg border border-hairline bg-card">
+            <MatchScoreboard
+              a={{ name: "India", ix: -1, score: { display: "210/5", runs: 210, wkts: 5, overs: 20 } }}
+              b={{ name: "Australia", ix: -1, score: { display: "48/2", runs: 48, wkts: 2, overs: 5.4 } }}
+              badge="LIVE"
+              livePulse
+              series="ICC T20 World Cup"
+              meta={<>T20 · Men</>}
+              live
+              strip={
+                <section aria-label="Live scoreboard demo" className="grid grid-cols-2 gap-snug border-t border-hairline bg-secondary/40 px-gutter py-snug">
+                  <div className="grid min-w-0 content-start gap-tight border-r border-hairline pr-snug">
+                    <div className="flex min-w-0 items-baseline justify-between gap-snug">
+                      <span className="truncate text-callout">J Bumrah</span>
+                      <span className="shrink-0 font-condensed text-callout font-emphasis tabular-nums text-muted-foreground">3.5-8-1</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-hair">
+                      {["W", "0", "4", "1LB", "0"].map((b) => (
+                        <span
+                          key={b}
+                          className={cn(
+                            "grid h-6 shrink-0 place-items-center text-caption font-emphasis tabular-nums",
+                            b.length > 1 ? "min-w-6 rounded-full px-snug" : "size-6 rounded-full",
+                            b === "W" && "bg-miss/25 text-miss",
+                            /^[456]$/.test(b) && "bg-foreground text-background",
+                            /\d*(WD|NB|LB|B|PEN)$/i.test(b) && "bg-muted text-foreground",
+                            !/^(W|[456])$/i.test(b) && !/\d*(WD|NB|LB|B|PEN)$/i.test(b) && "bg-secondary text-foreground",
+                          )}
+                        >
+                          {b}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid min-w-0 content-start gap-tight pl-snug">
+                    {[
+                      { n: "D Warner", r: 0, b: 1, strike: true },
+                      { n: "G Maxwell", r: 52, b: 38, strike: false },
+                    ].map((p) => (
+                      <div key={p.n} className="flex min-w-0 items-baseline justify-between gap-snug">
+                        <span className="flex min-w-0 items-center gap-hair">
+                          <span className={cn("size-1.5 shrink-0 rounded-full", p.strike ? "bg-foreground" : "bg-transparent")} aria-hidden />
+                          <span className="truncate text-callout">{p.n}</span>
+                        </span>
+                        <span className="shrink-0 font-condensed text-callout tabular-nums">
+                          <b className="font-emphasis">{p.r}</b> <span className="text-muted-foreground">{p.b}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              }
+            />
+          </div>
         </PreviewFrame>
         <PreviewFrame title="TeamBadge sizes" description="xs/sm/md initials use text-caption; lg/xl use callout/title. Flag for tight rows." source="components/app/badges.tsx">
           <div className="flex flex-wrap items-end gap-stack">
@@ -525,6 +617,8 @@ export function DesignSystemPage() {
         </PreviewFrame>
       </>
     ),
+
+    rows: <RowDensityDemos />,
 
     forms: (
       <>

@@ -23,6 +23,22 @@ describe("FixtureCard", () => {
     expect(screen.getByText("293/6")).toHaveClass("ticker-roll-up");
   });
 
+  it("shows a pending skeleton instead of Yet to bat while live scores are still loading", () => {
+    const { container } = render(<LiveScore live pending s={null} />);
+    expect(screen.queryByText("Yet to bat")).toBeNull();
+    expect(container.querySelector("[aria-hidden]")).toBeTruthy();
+  });
+
+  it("stacks each side as crest · name · score on one row", () => {
+    env.match = { status: "live", teams: [{ name: "Eagles", display: "151/4", runs: 151, wkts: 4, overs: 18 }, { name: "Tuskers", display: "" }] };
+    card();
+    const eagles = screen.getByText("Eagles");
+    const row = eagles.closest("div.flex");
+    expect(row).toHaveTextContent("Eagles");
+    expect(row).toHaveTextContent("151/4");
+    expect(row?.querySelector("[data-testid=badge]")).toBeTruthy();
+  });
+
   it("shows a started match nothing lists honestly: Started, no LIVE badge, no empty score columns, props still linked", () => {
     card();
     expect(screen.getByText("Started")).toBeInTheDocument();

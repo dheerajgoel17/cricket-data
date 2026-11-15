@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { AvatarGroup } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { liveBlurb, nextTestDayLine, scoreLabel, sessionBadge, sessionLabel, teamScore } from "@cricket/engine/live.js";
@@ -12,6 +13,7 @@ import { playState } from "@/lib/play-state";
 import { abbr, dayKey, dayLabel, fixtureStart, localTime, matchDateLabel, pretty } from "@/lib/format";
 import { useNow } from "@/lib/clock";
 import { TeamAvatar, TeamBadge, usePreloadTeams } from "./badges";
+import { StatusLabel } from "./status-label";
 import { Tick } from "./tick";
 
 const seriesName = (f: any) => (f.series ? (f.series.includes(" ") ? f.series : pretty(f.series.replace(/-\d{4}$/, ""))) : `${f.gender === "female" ? "Women's" : "Men's"} cricket`);
@@ -19,7 +21,10 @@ const hasTime = (f: any) => f.start.length > 10;
 const city = (v: string) => (v || "").split(",")[0].replace(/\(.*\)/, "").trim();
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
-export function LiveScore({ s, size = "md", className, live = false }: { live?: boolean; s: { display?: string; runs?: number | null; wkts?: number | null; overs?: number | null } | null | undefined; size?: "md" | "lg"; className?: string }) {
+export function LiveScore({ s, size = "md", className, live = false, pending = false }: { live?: boolean; pending?: boolean; s: { display?: string; runs?: number | null; wkts?: number | null; overs?: number | null } | null | undefined; size?: "md" | "lg"; className?: string }) {
+  if (pending && !s?.display) {
+    return <Skeleton className={cn("h-4 w-16 shrink-0 rounded-md", className)} aria-hidden />;
+  }
   if (!s?.display) {
     return <span className={cn("shrink-0 text-muted-foreground", size === "lg" ? "text-callout" : "text-footnote", className)}>Yet to bat</span>;
   }
@@ -44,7 +49,7 @@ export function startsIn(ms: number) {
   return h >= 1 ? `Starts in ${h}h${m % 60 ? ` ${m % 60}m` : ""}` : `Starts in ${m}m`;
 }
 
-/** Source B-style match card built from shadcn Card parts: status + format badges, the two sides with the start time, the status line, then series and the Props badge.
+/** Match card (app twin): meta · stacked crest·name·score rows · status/series · Props.
  *  `f.cardScores` (optional): precomputed side scores from history when the live feed has none — same shape as `teamScore`. */
 export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
   const { match } = useLiveMatch(f);
@@ -71,7 +76,7 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
       <Card className="h-full gap-0 rounded-2xl border-0 bg-card py-0 shadow-none ring-1 ring-hairline transition-colors group-hover:bg-surface-raised">
         <div className="flex h-full flex-col gap-snug p-inset">
           <div className="flex items-center gap-tight text-footnote font-label text-muted-foreground">
-            {session ? <span className="label-cap text-footnote text-amber">{session}</span> : live ? <span className="inline-flex items-center gap-tight label-cap text-footnote text-destructive"><span className="size-1.5 animate-pulse rounded-full bg-current" />Live</span> : <span className="label-cap text-footnote">{final ? "Final" : started ? "Started" : "Upcoming"}</span>}
+            {session ? <StatusLabel tone="session" surface="plain">{session}</StatusLabel> : live ? <StatusLabel tone="live" surface="dot" /> : <StatusLabel tone="muted" surface="plain">{final ? "Final" : started ? "Started" : "Upcoming"}</StatusLabel>}
             <span aria-hidden>·</span>
             <span>{f.fmt || "T20"}{f.gender === "female" ? " · W" : ""}</span>
             {final ? (
@@ -80,15 +85,15 @@ export function FixtureCard({ f, i = 0 }: { f: any; i?: number }) {
               <span className="ml-auto min-w-0 truncate" title={`${seriesName(f)} · ${f.venue}`}>{city(f.venue)}</span>
             ) : null}
           </div>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-snug gap-y-snug">
+          <div className="flex flex-col gap-snug">
             {[f.a, f.b].map((t: string, k: number) => (
-              <div key={t} className="contents">
-                <div className="flex min-w-0 items-center gap-snug" title={t}>
-                  <TeamBadge name={t} size="md" eager />
-                  <span className={cn("truncate text-body font-emphasis", lost(t) && "text-muted-foreground")}>{t}</span>
-                </div>
-                {hasScore || live ? <LiveScore live={live && !session} s={scores[k]} className={cn(lost(t) && "opacity-60")} /> : k === 0 && !final ? (
-                  <span className="row-span-2 grid justify-items-end text-right">
+              <div key={t} className="flex min-w-0 items-center gap-snug" title={t}>
+                <TeamBadge name={t} size="md" eager />
+                <span className={cn("min-w-0 flex-1 truncate text-body font-emphasis", lost(t) && "text-muted-foreground")}>{t}</span>
+                {hasScore || live ? (
+                  <LiveScore live={live && !session} pending={live && !match} s={scores[k]} className={cn(lost(t) && "opacity-60")} />
+                ) : k === 0 && !final ? (
+                  <span className="grid shrink-0 justify-items-end text-right">
                     <span className="text-footnote text-muted-foreground">{dayLabel(dayKey(f))}</span>
                     {timed && <span className="text-callout font-label tabular-nums">{localTime(when)}</span>}
                   </span>
@@ -112,8 +117,9 @@ export function MatchChip({ f }: { f: any }) {
   const when = fixtureStart(f), timed = hasTime(f);
   const { match } = useLiveMatch(f);
   const session = sessionBadge(liveBlurb(match) || match?.session);
-  const live = !!(session || match?.status === "live");
-  const sub = session || (match?.status === "live" ? "Live" : timed ? localTime(when) : dayLabel(dayKey(f)));
+  // Same evidence as FixtureCard — clock alone never makes Live; avoid a destructive Badge (reads as a Live CTA on the pill).
+  const live = playState(f, match).state === "live";
+  const sub = session || (timed ? localTime(when) : dayLabel(dayKey(f)));
   return (
     <span className="flex min-w-0 items-center gap-tight">
       <AvatarGroup className="-space-x-1.5">
@@ -122,9 +128,11 @@ export function MatchChip({ f }: { f: any }) {
       </AvatarGroup>
       <span className="grid min-w-0 text-left leading-tight">
         <span className="truncate text-caption font-label">{abbr(f.a)} v {abbr(f.b)}</span>
-        {live
-          ? <Badge variant={session ? "secondary" : "destructive"} className="h-auto w-fit rounded-[var(--chip-radius)] px-tight text-caption font-label">{sub}</Badge>
-          : <span className="truncate text-caption opacity-70">{sub}</span>}
+        {session
+          ? <StatusLabel tone="session" surface="plain">{session}</StatusLabel>
+          : live
+            ? <StatusLabel tone="live" surface="dot" />
+            : <span className="truncate text-caption opacity-70">{sub}</span>}
       </span>
     </span>
   );

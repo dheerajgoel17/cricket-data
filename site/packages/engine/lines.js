@@ -46,9 +46,12 @@ export function lineProb(books) {
 
 /** The scope of a line: 0 for the whole match (every line published before innings lines existed), 1 or 2 for the player's own side's first or second innings (a Test only). */
 export const lineScope = (l) => l?.inn || 0;
+/** Player-page switch copy (full words). List badges use the short `SCOPE_TAG` / `scopeTag` forms. */
 export const SCOPE_LABEL = ["Both innings", "1st innings", "2nd innings"];
-/** The tag a Test line carries on every list: "1st innings", "2nd innings" or "Complete match" (his two innings together). Empty for any other format. */
-export const scopeTag = (fmt, inn) => (fmt !== "Test" ? "" : inn ? SCOPE_LABEL[inn] : "Complete match"); // a Test: his two innings combined (the match total), his first, his second
+/** Short Test scope on every list (props + fancy): CMM = complete match, 1st/2nd INN = that side innings. Empty for other formats. */
+export const SCOPE_TAG = ["CMM", "1st INN", "2nd INN"];
+/** The tag a Test line carries on prop/fancy lists. Empty for any other format. Same short forms as fancy `innTag`. */
+export const scopeTag = (fmt, inn) => (fmt !== "Test" ? "" : SCOPE_TAG[inn || 0]);
 
 /**
  * Each book's own line and over price for one player and stat, from `bookLinesFor(...).lines`: [{ source, name, line, over, under, best }], one per book, so a row can show who

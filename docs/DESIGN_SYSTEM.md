@@ -36,12 +36,12 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- | --- |
 | Page title / crumbs | `PageTitle`, `Crumbs` | Drill-in and desktop hierarchy |
 | Entity hero | `EntityHero` | Player / team / league / venue identity strip |
-| Page header (shell) | layout `Header` + page title | Top chrome; app twin is `PageHeader` |
+| Page header (shell) | layout `Header` + `TabTitle` | Top chrome; tab pages (except Fixtures) put the title in the bar via `TabTitle` / `HeaderActions` — app twin is `AppHeader title=` |
 | Empty section | `EmptyState` | Any list / unknown / error that can be empty — **not** `EmptyNote` (deprecated alias only) |
 | 404 | `EmptyState` in `App.tsx` | Catch-all `*` route |
 | Forms | `LiveForm`, `Field`, `Segmented` (`forms.tsx`) | Pair tool, contact-ish inputs, live filters |
 | Metric / stat tile | `Metric`, `StatTile`, `StatGridCards` | Glance figures on Player / Odds / ResultView |
-| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Shared sticky chip/filter recipe. Flush header (`bg-card`) when the band leads the page (Player, Match Fancy detail, Fixture scorecard tabs). Without flush when a title/hero sits above (`/props`, Ground full page) |
+| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Shared sticky chip/filter recipe. Flush header (`bg-card`) when the band leads the page (Player, Match Fancy detail, Fixture scorecard tabs). Without flush when a title/hero sits above (Ground full page; `/props` title is in the shell via `TabTitle`) |
 | Detail board | `DetailSplit`, `StickyPanel` | Player / Match Fancy / Ground chart + sticky Lines rail at `lg+` (game log stays in bottom tabs) |
 | Card directory | `CardGrid` | Fancy list — 1 → 2 (`md`) → 3 (`xl`) |
 | Chips / filters | `Chip`, `PillGroup`, `PillTabs`, `ScreenerFilters` | Format, scope, section tabs, screener; `PillTabs` = documented twin of `PillGroup` (taller control) |
@@ -178,7 +178,7 @@ Full `App.tsx` route checklist:
 | Team / venue | Grid + ResultView markets | Same | Same | ResultView bleed |
 | Competitions / Leagues | Tournament boards in cards | Same | Multi-col boards | `BOARD_HEAD` inset |
 | Screener / filters | Sheet | Sheet | Drawer-friendly width | — |
-| Fancy / props lists | Scroll + rows | Fancy `CardGrid` | Wider content; Props `PropTable` | — |
+| Fancy / props lists | `PropLines` / `FancyLines` compact (`auto`) | Fancy `CardGrid`: phone edge-to-edge hairlines (`-mx-gutter` section); `md` FixtureCard panels; always compact | Fixture Match Fancy + `/props` dense (`auto` from `lg`) | — |
 | Fixture | Scorecard card + chips | Same | Form two teams side-by-side; desktop back + crumbs | — |
 | Match Fancy detail | Edge ladder + `TABLE_HEAD` | Same | `DetailSplit` + `StickyPanel` | `TABLE_HEAD` + bleed layout |
 | Ground | Ladder / rates | Same | `DetailSplit` markets; matches stay stacked FixtureCards | bleed |

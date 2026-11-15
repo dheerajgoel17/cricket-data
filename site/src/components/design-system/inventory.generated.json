@@ -538,6 +538,7 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/collapsible.tsx",
       "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
       "mobile/src/ui/tick.tsx"
@@ -555,7 +556,9 @@
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/team-badge.tsx"
+      "mobile/src/ui/status-label.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tick.tsx"
     ]
   },
   {
@@ -705,6 +708,7 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "InPlayBadge",
       "LineProgress",
       "LiveBadge",
       "LiveOpened",
@@ -712,6 +716,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/text.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx"
     ]
   },
@@ -726,7 +731,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/accordion.tsx",
-      "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/bleed.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/recent-form.tsx",
       "mobile/src/ui/segmented.tsx",
@@ -822,8 +827,9 @@
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/team-badge.tsx"
+      "mobile/src/ui/status-label.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/tick.tsx"
     ]
   },
   {
@@ -831,6 +837,7 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "MINI",
       "MiniBars"
     ],
     "dependencies": []
@@ -869,7 +876,7 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/data-table.tsx",
-      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx",
       "mobile/src/ui/team-badge.tsx"
     ]
@@ -931,14 +938,11 @@
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/book-badge.tsx",
-      "mobile/src/ui/book-table.tsx",
       "mobile/src/ui/mini-bars.tsx",
       "mobile/src/ui/player-avatar.tsx",
+      "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
-      "mobile/src/ui/live-spot.tsx",
-      "mobile/src/ui/star.tsx",
       "mobile/src/ui/tick.tsx"
     ]
   },
@@ -957,6 +961,15 @@
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/empty-state.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/result-stamp.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "ResultStamp"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/screener-filters.tsx",
@@ -1051,6 +1064,18 @@
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/status-label.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "StatusLabel"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/motion.tsx"
     ]
   },
   {
@@ -1278,6 +1303,25 @@
     ]
   },
   {
+    "path": "site/src/components/app/fancy-lines.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "CompactFancyItem",
+      "FancyLines",
+      "OverviewRow"
+    ],
+    "dependencies": [
+      "site/src/components/app/book-badge.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/ui/badge.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/result-stamp.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
     "path": "site/src/components/app/fixture-card.tsx",
     "platform": "web",
     "route": false,
@@ -1292,7 +1336,9 @@
       "site/src/components/ui/avatar.tsx",
       "site/src/components/ui/badge.tsx",
       "site/src/components/ui/card.tsx",
+      "site/src/components/ui/skeleton.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/tick.tsx"
     ]
   },
@@ -1403,7 +1449,7 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/app/fixture-card.tsx",
-      "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/fancy-lines.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/market-tape.tsx",
       "site/src/components/app/pill-group.tsx",
@@ -1417,6 +1463,7 @@
     "exports": [
       "BookQuotes",
       "HotProps",
+      "PropLines",
       "PropRow",
       "PropTable"
     ],
@@ -1435,6 +1482,7 @@
       "site/src/components/app/badges.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/result-stamp.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/chip.tsx",
       "site/src/components/app/screener-filters.tsx",
@@ -1481,7 +1529,8 @@
     ],
     "dependencies": [
       "site/src/components/ui/accordion.tsx",
-      "site/src/components/app/pill-group.tsx"
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/page.tsx"
     ]
   },
   {
@@ -1511,6 +1560,7 @@
     "route": false,
     "exports": [
       "BatterSpot",
+      "InPlayBadge",
       "LineProgress",
       "LiveBadge",
       "LiveOpened",
@@ -1518,6 +1568,7 @@
       "TeamSpot"
     ],
     "dependencies": [
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/tick.tsx"
     ]
   },
@@ -1529,6 +1580,7 @@
       "MarketTape"
     ],
     "dependencies": [
+      "site/src/components/ui/popover.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/tick.tsx",
       "site/src/components/app/badges.tsx"
@@ -1539,6 +1591,7 @@
     "platform": "web",
     "route": false,
     "exports": [
+      "FancyLines",
       "MATCH",
       "MatchFancy",
       "OverviewRow",
@@ -1563,11 +1616,25 @@
       "site/src/components/app/live-spot.tsx",
       "site/src/components/app/live-markets.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/fancy-lines.tsx",
       "site/src/components/app/ad-slot.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/components/app/match-scoreboard.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MatchScoreboard"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
+      "site/src/components/app/tick.tsx"
     ]
   },
   {
@@ -1577,7 +1644,9 @@
     "exports": [
       "MatchStatus"
     ],
-    "dependencies": []
+    "dependencies": [
+      "site/src/components/app/status-label.tsx"
+    ]
   },
   {
     "path": "site/src/components/app/mini-bars.tsx",
@@ -1585,7 +1654,11 @@
     "route": false,
     "exports": [
       "LABELLED",
+      "MINI",
       "MiniBars",
+      "MiniBarsSlot",
+      "SCAN",
+      "ScanEdge",
       "ValueBars"
     ],
     "dependencies": []
@@ -1727,6 +1800,15 @@
     ]
   },
   {
+    "path": "site/src/components/app/result-stamp.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ResultStamp"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "site/src/components/app/result.tsx",
     "platform": "web",
     "route": false,
@@ -1821,6 +1903,15 @@
     "dependencies": [
       "site/src/components/app/ad-slot.tsx"
     ]
+  },
+  {
+    "path": "site/src/components/app/status-label.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "StatusLabel"
+    ],
+    "dependencies": []
   },
   {
     "path": "site/src/components/app/tick.tsx",
@@ -2394,7 +2485,9 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/line-ladder.tsx",
+      "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/note.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/chart.tsx",
       "site/src/components/app/page.tsx",
@@ -2428,6 +2521,7 @@
       "site/src/components/app/grid.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/fixture-card.tsx",
+      "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/live-board.tsx",
       "site/src/components/app/recent-form.tsx",
       "site/src/components/app/live-feed.tsx",
@@ -2502,7 +2596,6 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/ad-slot.tsx",
-      "site/src/components/app/book-table.tsx",
       "site/src/components/app/match-fancy.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/skeletons.tsx",

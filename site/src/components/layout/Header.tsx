@@ -91,6 +91,8 @@ export function Header() {
   const down = !isTopLevel(pathname); // one level down (a player, a team, a match): a back button on phones, where there is no sidebar
   const back = () => (history.state?.idx > 0 ? nav(-1) : nav("/"));
   const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions gets the slot; from lg the brand stays (phone still swaps title into the bar)
+  // Top-level tabs (Fancy / Props) that own the bar keep search + account — only drill-ins (fixture, player) replace the whole phone chrome.
+  const keepTools = !own || isTopLevel(pathname);
   return (
     <header className={cn("sticky top-0 z-50 h-header text-foreground", slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
@@ -100,11 +102,12 @@ export function Header() {
         {own ? null : <SearchField onOpen={search.show} className="hidden md:mx-auto md:flex md:max-w-[32rem] md:flex-1 lg:max-w-[40rem]" />}
         {/* When a page owns the bar, actions land here. On phones they replace the brand; from lg the brand stays and this slot holds trailing actions. */}
         <div ref={slot?.setEl} className={own ? "flex min-w-0 flex-1 items-center gap-snug" : "hidden"} />
-        {own ? null : <div className="ml-auto flex shrink-0 items-center gap-snug">
+        {keepTools ? <div className="ml-auto flex shrink-0 items-center gap-snug">
           <button type="button" aria-label="Search" onClick={search.show} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
+          {own ? <SearchField onOpen={search.show} className="hidden w-56 md:flex lg:w-72" /> : null}
           <AccountControl />
           <span className="hidden lg:contents"><SavedLink /></span>
-        </div>}
+        </div> : null}
       </div>
       <SearchDialog open={search.open} onOpenChange={search.setOpen} onCloseAutoFocus={search.restoreFocus} />
     </header>

@@ -137,19 +137,26 @@ export function fancySample(store, { fmt, gender, teams, scope, lastN, venue }) 
 }
 /** The tag on a team line that is only valid if that side bats first (the book voids it once the side is bowling first). */
 export const BAT_FIRST_TAG = "If bats first";
-/** A line's innings tag. A Test line that covers the whole match says so ("Complete match"), so it is never read as a first-innings line; the first-innings score market is its own innings and needs no tag. */
-export const innTag = (inn, test = false, key = "") => (inn === 1 ? "1st inns" : inn === 2 ? "2nd inns" : test && key !== "first_innings_runs" ? "Complete match" : "");
+/** Side session / innings-runs keys: never "complete match" on a Test (pre-match unscoped ⇒ 1st; in-play-only ⇒ live card's innings). */
+const TEST_SESSION_KEY = /^(team_total_runs|overs_\d+)$/;
+/** A line's innings tag (same short forms as `scopeTag`: CMM / 1st INN / 2nd INN). The first-innings score market is its own innings and needs no tag. CMM is only for whole-match markets — not a side session. */
+export const innTag = (inn, test = false, key = "") => (inn === 1 ? "1st INN" : inn === 2 ? "2nd INN" : test && key && !TEST_SESSION_KEY.test(key) && key !== "first_innings_runs" ? "CMM" : "");
 const abbr = (n) => { const w = String(n || "").replace(/\(W\)/i, "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join("") : (w[0] || "?")).slice(0, 3).toUpperCase(); };
 
-/** A market row as the Match Fancy tab shows it: the engine's numbers (`marketRow`) plus the id the link carries and the label (the side's short name in front when `nameInLabel`). */
-const withLabel = (r, label, nameInLabel, test = false) => ({ ...r, id: fancyFm(`${r.scope}:${r.key}`, r.inn) + (r.live ? ":live" : ""), label: [nameInLabel && r.team ? abbr(r.team) : "", innTag(r.inn, test, r.key), r.batFirst ? BAT_FIRST_TAG : "", label(r.key)].filter(Boolean).join(" · ") });
+/** A market row as the Match Fancy tab shows it: the engine's numbers (`marketRow`) plus the id the link carries and the label (the side's short name in front when `nameInLabel`). `innScope` is the short tag (CMM / 1st INN) for the meta line beside odds — same job as props `scopeTag`, not in the title. */
+const withLabel = (r, label, nameInLabel, test = false) => ({
+  ...r,
+  id: fancyFm(`${r.scope}:${r.key}`, r.inn) + (r.live ? ":live" : ""),
+  label: [nameInLabel && r.team ? abbr(r.team) : "", r.batFirst ? BAT_FIRST_TAG : "", label(r.key)].filter(Boolean).join(" · "),
+  innScope: innTag(r.inn, test, r.key),
+});
 
 /** `overviewRows` of `keys` ([key, label] pairs), each with its id and label. `label` names a key the pairs do not. */
 export function buildOverview({ store, doc, fxInfo, ms, scope, teamName, keys, label, ground, inn = 0, nameInLabel = false }) {
   return overviewRows({ store, doc, fxInfo, ms, scope, teamName, keys: keys.map(([k]) => k), ground, inn }).map((r) => withLabel(r, label, nameInLabel, fxInfo?.fmt === "Test"));
 }
 
-/** `fancyOverview` with each row labelled ("Total runs", "IND · 1st inns · Runs"): what the Match Fancy tab and the Fancy cards list. */
+/** `fancyOverview` with each row labelled ("Total runs", "IND · Runs"); `innScope` carries CMM / 1st INN for the meta line. */
 export function collectOverview({ store, doc, fxInfo, ms, teams, ground }) {
   const matchLabel = (k) => MATCH_KEYS.find(([id]) => id === k)?.[1] ?? MATCH_MARKETS[k]?.label ?? k;
   const teamLabel = (k) => TEAM_KEYS.find(([id]) => id === k)?.[1] ?? TEAM_TOTAL_MARKETS[k]?.label ?? k;

@@ -8,6 +8,7 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
 import { batterHistoryKey } from "@cricket/engine/inplay-history.js";
 import { loadJson, useData } from "@/lib/data";
+import { StatusLabel } from "./status-label";
 import { StandingMark, type Standing } from "./tick";
 import { cn } from "@/lib/utils";
 
@@ -16,9 +17,14 @@ const conditionalReport = conditional as (store: any, ms: number[], o: { team?: 
 const playerConditional = playerCond as (store: any, rows: any[], o: { fmt: number; state: { balls: number; runs: number }; line?: number | null }) => any;
 const overs = (o: number) => (Number.isInteger(o) ? o.toFixed(1) : String(o));
 
-/** The small red mark of a row whose line is a live price: it sits beside the row's name (the player, the market), never on the line. */
+/** Plain "Live" caption (StatusLabel live). Match-live belongs on fixtures/scoreboard; prop rows do not use this (Not in XI / void already covers non-playing). */
 export function LiveBadge({ className }: { className?: string }) {
-  return <span className={cn("label-cap shrink-0 text-caption font-emphasis text-miss", className)}>Live</span>;
+  return <StatusLabel tone="live" surface="plain" className={className} />;
+}
+
+/** Line and odds are in-play ("In Play Market"): sits beside the name (player or market), never on the line. */
+export function InPlayBadge({ className }: { className?: string }) {
+  return <StatusLabel tone="inPlay" surface="plain" className={className} />;
 }
 
 /** Where the line stood before the match, in two words and a number ("was 31.5"); nothing when it has not moved. */
@@ -44,16 +50,13 @@ export function LiveTrack({ value, line, was, verdict, className }: { value?: nu
   );
 }
 
-export function LineProgress({ standing, live, line, opened, quiet }: { quiet?: boolean; standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
+export function LineProgress({ standing, live, line, quiet }: { quiet?: boolean; standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
   if (!standing || (standing.v == null && standing.state !== "void")) {
     return live ? <span className="text-footnote text-muted-foreground">Score unavailable</span> : null;
   }
-  return (
-    <span className="grid gap-hair text-footnote text-muted-foreground">
-      {standing.state === "live" && <LiveTrack value={standing.v} line={line} was={opened} verdict={standing.verdict} />}
-      <StandingMark quiet={quiet} standing={standing} line={line} />
-    </span>
-  );
+  // Hit/Miss stamp covers settled; live/push “N so far” copy is dropped on prop/fancy rows — VOID only.
+  if (standing.state === "void") return <StandingMark quiet={quiet} standing={standing} line={line} />;
+  return null;
 }
 
 /**

@@ -4,6 +4,7 @@
  */
 import { Link } from "react-router-dom";
 import { EnvelopeIcon, BuildingOffice2Icon, WrenchScrewdriverIcon, ShieldCheckIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { TabTitle } from "@/lib/header-slot";
 import { setTitle } from "@/lib/title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,9 +61,9 @@ export function ContactPage() {
   setTitle("Contact");
   return (
     <div className="flex flex-col gap-section">
+      <TabTitle>Contact</TabTitle>
       <header className="flex flex-col gap-snug">
-        <p className="label-cap text-footnote text-primary">Contact</p>
-        <h1 className="text-display font-emphasis tracking-tight">Get in touch</h1>
+        <h2 className="text-display font-emphasis tracking-tight">Get in touch</h2>
         <p className="max-w-prose text-body text-muted-foreground">
           Fancy.cash is a free cricket stats site. Write for business, tech issues, privacy, or anything else —
           one inbox, we read it.

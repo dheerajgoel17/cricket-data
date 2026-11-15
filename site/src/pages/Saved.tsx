@@ -8,6 +8,7 @@ import { FORMATS } from "@cricket/engine/util.js";
 import { useAuth } from "@/lib/auth";
 import { useData } from "@/lib/data";
 import { parsePropKey, useCombos, useRecents, useSaved } from "@/lib/saved";
+import { TabTitle } from "@/lib/header-slot";
 import { setTitle } from "@/lib/title";
 import { EmptyState } from "@/components/app/empty-state";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
@@ -50,7 +51,7 @@ export function SavedPage() {
   if (!user) {
     return (
       <div className="flex flex-col gap-group">
-        <h1 className="text-title font-emphasis tracking-tight">Saved</h1>
+        <TabTitle>Saved</TabTitle>
         <EmptyState
           icon={<StarIcon />}
           title="Sign in to sync Saved"
@@ -63,7 +64,7 @@ export function SavedPage() {
 
   return (
     <div className="flex flex-col gap-group">
-      <h1 className="text-title font-emphasis tracking-tight">Saved</h1>
+      <TabTitle>Saved</TabTitle>
       {none && (
         <EmptyState
           icon={<StarIcon />}

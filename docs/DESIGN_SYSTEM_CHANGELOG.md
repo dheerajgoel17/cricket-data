@@ -15,6 +15,178 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Tab pages: title in shell bar
+- **Path:** `lib/header-slot.tsx` (`TabTitle`); `layout/Header.tsx`; `Lists` / `Leagues` / `Saved` / `Contact`
+- **Change:** Shared `TabTitle` (app `AppHeader title=` twin) on every tab except Fixtures — phone swaps brand for the page name; `lg+` keeps brand + title. Top-level owned bars keep search/account. Fancy also gains day + match chips (`?day=` / `?match=`).
+- **Callers:** `/props`, `/fancy`, `/leagues`, `/saved`, `/contact`
+
+### 2026-11-15 — Fancy phone: card shell (web + app)
+- **Path:** `pages/Lists.tsx` (`FancyCard`); mobile `(tabs)/fancy` (`MatchCard`); `fancy-row` (`OverviewRow` `inset`)
+- **Change:** `/fancy` phone drops flat `-mx-gutter` hairline sections — same FixtureCard panel as desktop (`rounded-2xl bg-card ring`) at every width. App Fancy tab matches (`color.card`, `radius.card`). Zoned header `surface-raised` · rows · footer `surface`.
+- **Callers:** `/fancy` CardGrid; app Fancy tab
+
+### 2026-11-15 — Fancy cards: scores + play states
+- **Path:** `pages/Lists.tsx` (`FancyCard`); mobile `(tabs)/fancy` (`MatchCard`); export `LiveScore` from mobile `fixture-card`
+- **Change:** Fancy match chrome matches FixtureCard: Upcoming/Live/session/Started/Final `StatusLabel`, live totals (or kickoff), status line (in progress / Stumps day countdown / delayed / starts in / no score), series · last N, Fancy CTA. Same evidence rules via `playState` / `cardModel`.
+- **Callers:** `/fancy` CardGrid; app Fancy tab
+
+### 2026-11-15 — Fancy cards: scores + play states
+- **Path:** `pages/Lists.tsx` (`FancyCard`); mobile `(tabs)/fancy` (`MatchCard`); export `LiveScore` from mobile `fixture-card`
+- **Change:** Fancy match chrome matches FixtureCard: Upcoming/Live/session/Started/Final `StatusLabel`, live totals (or kickoff), status line (in progress / Stumps day countdown / delayed / starts in / no score), series · last N, Fancy CTA. Same evidence rules via `playState` / `cardModel`.
+- **Callers:** `/fancy` CardGrid; app Fancy tab
+
+### 2026-11-15 — Fancy edge-to-edge dividers (phone + desktop)
+- **Path:** `pages/Lists.tsx` (`FancyCard`); `fancy-lines.tsx` (`inset`); mobile `(tabs)/fancy`
+- **Change:** Hairlines meet the section/panel edge on every breakpoint. Phone: `-mx-gutter` section. Desktop: no shell `p-inset` (that inset the dividers); pad header / row copy / footer with `px-inset` only. Rows `bleed={false} inset={false}`. App: OverviewRow hairline only (no double sep).
+- **Callers:** `/fancy` CardGrid; Match Fancy list unchanged
+
+### 2026-11-15 — Fancy list CardGrid chrome
+- **Path:** `pages/Lists.tsx` (`FancyCard`); `fancy-lines.tsx` (`bleed`); mobile `(tabs)/fancy`
+- **Change:** `/fancy` cards stay **compact** (dense tables need a full page, not a CardGrid column). From `md`, panels match FixtureCard (`rounded-2xl` / `bg-card` / ring). Phone stays flat hairline sections. Live/session `StatusLabel` on the meta row; title uses `lg:text-display` like Props. `bleed={false}` drops `-mx-gutter` inside padded cards.
+- **Callers:** Fancy directory; Match Fancy / Home keep `density=auto` + bleed
+
+### 2026-11-15 — Fancy scope on meta line (with odds)
+- **Path:** `fancy-edge.js` (`withLabel` → `innScope`); `FancyLineMeta`; mobile `fancy-row`
+- **Change:** CMM / 1st INN / 2nd INN leave the fancy row title and sit on the scan meta beside O/U · line · odds — same place as props. Title stays team · market (and bat-first when needed). Market chips / detail titles still include the tag to tell innings apart.
+- **Callers:** FancyLines, OverviewRow, Home mix, Match Fancy list
+
+### 2026-11-15 — Short Test scope tags (CMM / 1st INN)
+- **Path:** `engine/lines.js` (`SCOPE_TAG`, `scopeTag`); `engine/fancy-edge.js` (`innTag`)
+- **Change:** List badges use **CMM** (complete match), **1st INN**, **2nd INN** — same short forms on props and fancy. Player-page switch keeps full `SCOPE_LABEL` words.
+- **Callers:** PropLineMeta, fancy `innScope` / FancyLineMeta, Match Fancy chips/titles
+
+### 2026-11-15 — Align Hit/Miss stamp with the line
+- **Path:** `result-stamp.tsx`; `PropLineMeta` / `FancyLineMeta`
+- **Change:** Tick/cross sized in `em` and meta row uses `items-center` so Hit/Miss sits on the same axis as the line number (was baseline-misaligned).
+- **Callers:** PropLines, FancyLines, Home mix, catalogue demos
+
+### 2026-11-15 — Drop Opened at on in-play-only rows
+- **Path:** `hot-props.tsx` / `fancy-lines.tsx`; mobile `prop-row` / `fancy-row`
+- **Change:** No “Opened at N” on prop/fancy rows. In-play rows exist only when there was no pre-match line; **In Play Market** is enough. The live number is the row’s O/U line.
+- **Callers:** PropLineMeta, FancyLineMeta, BookQuotes, FancyBooks
+
+### 2026-11-15 — Dense tables drop split-line / multi-book strip
+- **Path:** `hot-props.tsx` / `fancy-lines.tsx` / `home-mix-table.tsx`
+- **Change:** Dense Lines column no longer shows `BookQuotes` / `FancyBooks` detail (different lines, extra odds) — that stays on the dedicated player / fancy page. Lean meta + Over/Under column remain.
+- **Callers:** PropLines dense, FancyLines dense, HomeMixDenseTable
+
+### 2026-11-15 — Home dense mix table (interleaved)
+- **Path:** `home-mix-table.tsx` (new); `hot-home.tsx`
+- **Change:** Desktop Home keeps dense research chrome in **one** table with props + fancy interleaved (`HomeMixDenseTable`). Compact mixed list below `lg`. No longer drops dense when merging, and no longer splits into two PropLines/FancyLines tables.
+- **Callers:** HotHome only; fixture pages unchanged
+
+### 2026-11-15 — Drop prop Live; rename In play → In Play Market
+- **Path:** `status-label.tsx` / mobile twin; `hot-props.tsx` / `hot-home.tsx`; mobile `prop-row` / `use-hot`
+- **Change:** Prop rows no longer show per-player **Live** (Not in XI / void already covers non-playing; match Live stays on fixtures). **In play** badge copy → **In Play Market** (line/odds are in-play).
+- **Callers:** PropLines, FancyLines, LiveMarketRow, StatusLabel catalogue
+
+### 2026-11-15 — MatchChip Live via StatusLabel
+- **Path:** `fixture-card.tsx` (`MatchChip`)
+- **Change:** MatchChip uses `playState` + `StatusLabel` (not a destructive Live Badge on the pill).
+- **Callers:** HotHome fixture pills
+
+### 2026-11-15 — Home one mixed list; dense table edge pads; title truncate
+- **Path:** `hot-home.tsx`; `hot-props.tsx` / `fancy-lines.tsx` (dense pads + `PropLineMeta` / label truncate)
+- **Change:** Dense PropLines/FancyLines bleed with `-mx-gutter` and first/last `pl-gutter`/`pr-gutter`. Market titles truncate to one line. (Home dense split restored in the entry above.)
+- **Callers:** HotHome; fixture `/props` / Match Fancy dense tables
+
+### 2026-11-15 — Status replaces MiniBars; dense books only when O/U differs
+- **Path:** `hot-props.tsx` (`PropBarsSlot`), `fancy-lines.tsx`; mobile `prop-row.tsx`, `fancy-row.tsx`
+- **Change:** Not in XI / VOID / Score unavailable replace the MiniBars graph slot (not title badges). Dense Lines book strip (`detailOnly`) only when split lines or +N books.
+- **Callers:** PropLines, FancyLines, app twins
+
+### 2026-11-15 — Home Top-10 (web + app); fixture keeps all
+- **Path:** `site/src/lib/hot-lines.ts` (`HOME_TOP`); `hot-home.tsx`; mobile `use-hot-home.ts`
+- **Change:** Home shows mixed Top-10 on phone and desktop (dense uses the same Top-10 split into prop/fancy tables). Fixture / `/props` / Match Fancy still carry every line.
+- **Callers:** HotHome, app Home
+
+### 2026-11-15 — Prop/fancy rows: no “N so far” standing copy
+- **Path:** `site/src/components/app/live-spot.tsx` (`LineProgress`); `fancy-lines.tsx`; mobile `live-bits.tsx`
+- **Change:** Drop live/push/final StandingMark text on prop and fancy lines (“3 so far”, “On the line”, Cleared). Hit/Miss stamp remains; VOID and “Score unavailable” stay. `StandingMark` still used on next-match / Match Fancy drill-in.
+- **Callers:** PropLines, FancyLines, app LineProgress
+
+### 2026-11-15 — FancyLines dense Lines cell matches PropLines
+- **Path:** `site/src/components/app/fancy-lines.tsx` (`FancyLineMeta`, `FancyBooks marks=false`); catalogue `row-density-demos.tsx`
+- **Change:** Dense fancy Lines uses the same scan meta as compact (O/U · line · lean price · Hit/Miss), quieter books (no logos), `items-start` — twin of PropLines dense. Settled stamp-only (no Cleared copy) already shared.
+- **Callers:** Home dense fancy table, Match Fancy / `/fancy` dense, design host
+
+### 2026-11-15 — Settled lines: Hit/Miss stamp only (no so-far / bar)
+- **Path:** `site/src/components/app/live-spot.tsx` (`LineProgress`); `fancy-lines.tsx` (dense standing); mobile `live-bits.tsx`
+- **Change:** Cleared/missed no longer render `StandingMark` or `LiveTrack` — the tick/cross `ResultStamp` beside odds is enough. Superseded for live/push copy by the entry above.
+- **Callers:** PropLines compact + dense, FancyLines dense, app LineProgress
+
+### 2026-11-15 — Breakpoint density (PropLines + FancyLines)
+- **Path:** `site/src/components/app/fancy-lines.tsx` (new); `match-fancy.tsx`, `hot-home.tsx`, `Lists.tsx`; catalogue `row-density-demos.tsx`
+- **Change:** Fancy gets `FancyLines` with `auto|compact|dense` mirroring PropLines. Density is viewport-only: Home / fixture / `/props` / `/fancy` all use `auto`. Home = mixed Top-10 (see `HOME_TOP` entry); fixture keeps all. `OverviewRow` → compact wrapper.
+- **Callers:** HotHome, MatchFancy list, Fancy cards, HotProps
+
+### 2026-11-15 — Scan Edge + MiniBars slot count (Home alignment)
+- **Path:** `site/src/components/app/mini-bars.tsx` (`ScanEdge`, `SCAN_ROW_GRID`, `MINI_BARS_SLOTS`); `hot-props.tsx` / `match-fancy.tsx`; mobile `mini-bars.tsx`
+- **Change:** Edge column is fixed `w-11` via `ScanEdge` so per-row `auto` grids no longer shift the bars. MiniBars always pads to 10 slots so short L-histories are not chunkier than a full L10 (Runs vs Player performance on Home).
+- **Callers:** Home mixed props/fancy list, Props compact, Match Fancy, dense L10 chart
+
+### 2026-11-15 — Prop / fancy scan twins share MiniBars slot
+- **Path:** `site/src/components/app/mini-bars.tsx` (`MINI_BARS_SLOT`, `MiniBarsSlot`); `match-fancy.tsx` (`OverviewRow`); `hot-props.tsx` (Not in XI); mobile `fancy-row.tsx`, `live-bits.tsx`, `prop-row.tsx`
+- **Change:** Fancy no longer forces `sm:w-[72px]` on MiniBars (was narrower than props). Shared slot class 72→104. Title weight/`items-center` and `Opened at` copy match PropLines compact.
+- **Callers:** Home mixed list, Match Fancy tab, Props compact rows
+
+### 2026-11-15 — PropLines (unify PropRow + PropTable)
+- **Path:** `site/src/components/app/hot-props.tsx` (`PropLines`, `PropLineIdentity`, `PropLineMeta`); `hot-home.tsx`; catalogue `row-density-demos.tsx`; mobile `prop-row.tsx` (compact twin)
+- **Change:** One priced-line surface with `density` `auto` | `compact` | `dense`. Compact = scan list (phones / Home / app); dense = research table from `lg`. Shared identity/meta helpers. `PropRow` / `PropTable` thin deprecated wrappers. MarketTape and fancy OverviewRow unchanged.
+- **Callers:** HotProps (`auto`), HotHome (compact `<li>` via PropRow for mixed fancy list), `/props`, fixture props, design host Rows topic
+- **PR:** (this change)
+
+### 2026-11-15 — App twins: scoreboard, strip, StatusLabel, scorecard
+- **Path:** `mobile/src/ui/match-header.tsx`, `live-board.tsx`, `status-label.tsx` (new), `live-bits.tsx`, `fixture-card.tsx`, `next-match.tsx`, `tick.tsx`, `motion.tsx` (LiveDot → miss)
+- **Change:** Android/iOS match web: Hotstar scoreboard + LIVE pill (white on miss), live strip (bowler + `formatBall` ongoing over | batters), StatusLabel tones, full scorecard segmented `Team · score` + `Bleed` tables, no partnership/CRR on full card. Tick `arrow={false}` on scoreboard.
+- **Callers:** Fixture page ScorecardCard, rail FixtureCard, prop Live/In play marks
+
+### 2026-11-15 — Full scorecard edge-bleed + team categories
+- **Path:** `site/src/components/app/live-board.tsx` (`ScorecardBody`, `ScorecardAccordion`)
+- **Change:** Batting/bowling use `TABLE_BLEED` + `TABLE_HEAD`. Multi-innings switch is a MarketTape-style segmented category bar (`Team · score`), not chips. Partnership / last wkt / CRR / RRR stay off the full card (live strip only).
+- **Callers:** Fixture accordion + `/fixture/:id/scorecard`
+
+### 2026-11-15 — StatusLabel (central match / row status)
+- **Path:** `site/src/components/app/status-label.tsx` (new); `live-spot.tsx` (`LiveBadge` / `InPlayBadge`); `match-scoreboard.tsx`; `fixture-card.tsx`; `match-status.tsx`; catalogue Buttons topic
+- **Change:** One cva recipe: tone `live` | `inPlay` | `session` | `muted` × surface `pill` | `plain` | `dot`. LIVE pill = white on miss. Call sites stop inventing status colours.
+- **Callers:** Fixture scoreboard, FixtureCard, MatchStatus, prop/fancy Live / In play marks
+
+### 2026-11-15 — Fixture MatchScoreboard (Hotstar-style card)
+- **Path:** `site/src/components/app/match-scoreboard.tsx` (new); `live-board.tsx` (`LiveBoard` strip); `Fixtures.tsx` (`MatchHeader`); catalogue Data topic
+- **Change:** Web fixture header is series · mirrored crest/score · centre `StatusLabel` · live strip (bowler O-R-W + ongoing over balls with `formatBall` extras | batters with strike dot). Dropped player Face avatars from the strip. App twin deferred until this layout is confirmed.
+- **Callers:** `/fixture/:id` header; design host MatchScoreboard stage
+- **PR:** (web-only)
+
+### 2026-11-15 — Live vs In play badges; in-play lines only without pre-match
+- **Path:** `site/packages/engine/inplay-lines.js` (`liveMerge`); `site/src/components/app/live-spot.tsx` (`LiveBadge`, `InPlayBadge`); `hot-props.tsx` / `match-fancy.tsx` / `live-markets.tsx`; mobile `live-bits.tsx` / `prop-row.tsx` / `fancy-row.tsx`; `engine/live.js` (`onNow`)
+- **Change:** **Live** = player on now (crease / bowling). **In play** = live-priced row. `liveMerge` only adds a live-priced row when that market was not offered pre-match; pre-match markets keep their rows and so-far; in-play prices for those stay in the snapshot/log only.
+- **Callers:** Props scan + table, Match Fancy overview / live markets, app twins; design host scan demos
+
+### 2026-11-15 — FixtureCard stacked sides + app score Tick
+- **Path:** `site/src/components/app/fixture-card.tsx`; `mobile/src/ui/fixture-card.tsx`
+- **Change:** Web FixtureCard sides match the app (stacked crest · name · score rows; pending skeleton while live scores load). App `LiveScore` wraps live totals in `Tick` (`runs + wkts/100`) so score updates flash like the site.
+- **Callers:** Home fixture rail (web + app); any other FixtureCard / LiveScore use
+
+### 2026-11-15 — ResultStamp (Hit tick / Miss cross) on props + fancy
+- **Path:** `site/src/components/app/result-stamp.tsx` (+ `sideStamp`); `hot-props.tsx` (`PropRow`), `match-fancy.tsx` (`OverviewRow`); `mobile/src/ui/result-stamp.tsx`, `prop-row.tsx`, `fancy-row.tsx`; catalogue `row-density-demos.tsx`
+- **Change:** Scan rows share one recipe: colour O/U text, muted odds, compact Edge (always), tick/cross beside odds when settled, MiniBars; no list save star / so-far text / +N books under the row. Fancy list drops inline BookTable (detail keeps books).
+- **Callers:** Home mix, `/props`, Match Fancy / Fancy cards, app Props + Fancy tabs
+
+### 2026-11-15 — Prop & fancy scan rows (web product)
+- **Path:** `site/src/components/app/hot-props.tsx` (`PropRow`), `match-fancy.tsx` (`OverviewRow`); catalogue demos in `row-density-demos.tsx`
+- **Change:** Phone list rows are scan-first (Props.Cash-style): avatar · name · one model-side price (O/U pill + line + stat + odds) · compact **Edge** · MiniBars. Dropped dual book lanes / +N / ground / L10 foot / "Model … Over" stack from the list (detail still has books). Live keeps so-far / progress.
+- **Callers:** Home props mix, `/props`, Match Fancy list, Fancy cards; app twins still pending confirm
+
+### 2026-11-15 — App copy aligned to web
+- **Path:** `mobile/src/ui/tick.tsx`, `fixture-card.tsx`, `grid-table.tsx`, `ground-page.tsx`, `next-match.tsx`, `app/(tabs)/props.tsx`, `saved.tsx`, `player/[idx].tsx`, `lib/info.ts`
+- **Change:** Standing push → **On the line**; finished no-props CTA → **Match**; Custom line empty / Props filter empty / ground tour **Live** / Saved sign-in / player empty bodies match site wording.
+- **Callers:** Prop rows, fixture rail, ground, Props tab, Saved, Player
+
+### 2026-11-15 — Market tape: thresholds in info only
+- **Path:** `site/src/components/app/market-tape.tsx`, `mobile/src/ui/market-tape.tsx`
+- **Change:** Dropped the on-card “Over at 2.50…” / “Over at 1.40…” footnotes. Web adds an info popover (same wording as the app `tape` topic); app keeps `InfoButton` on every tape header (including hits-only). Tab labels use web wording (`High odds hits · N` / `Low odds misses · N`) on both; web segmented track is full-width equal segments (same job as the app `Segmented`).
+- **Callers:** Home tape, Player props tape
+
 ### 2026-11-14 — Mobile player: Match Fancy / web Player shape
 - **Path:** `mobile/src/app/player/[idx].tsx`, `ui/window-pills.tsx`, `ui/book-table.tsx`, `ui/side-book.tsx`, `ui/page-header.tsx` (`titleStyle` / `subtitleStyle`), `ui/icons.tsx` (`ChevronDown`)
 - **Change:** Chart-led first viewport; metrics only (no phone gauge); centred O/U + stepper under chart; quiet hairline `WindowPills`; O/U hit-rate meters + book lanes (`SideBook` / `BookTable` twins); drop Alt lines accordion and At a glance; When it hits is its own tab; sticky header title fades in as the hero name scrolls away.

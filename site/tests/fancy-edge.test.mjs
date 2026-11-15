@@ -172,7 +172,11 @@ test("a market's link id carries its innings and reads back; a Test side's innin
   assert.deepEqual(parseFm("match_runs"), { key: "match_runs", inn: 0 });
   assert.deepEqual(parseFm("match_runs:7"), { key: "match_runs", inn: 0 }); // only 1 and 2 are innings
   assert.deepEqual(parseFm(undefined), { key: "", inn: 0 });
-  assert.deepEqual([innTag(0), innTag(1), innTag(2)], ["", "1st inns", "2nd inns"]);
+  assert.deepEqual([innTag(0), innTag(1), innTag(2)], ["", "1st INN", "2nd INN"]);
+  assert.equal(innTag(0, true, "match_runs"), "CMM");
+  assert.equal(innTag(0, true, "first_innings_runs"), "");
+  assert.equal(innTag(0, true, "team_total_runs"), "");
+  assert.equal(innTag(0, true, "overs_6"), "");
 });
 
 test("peerFancyFm keeps Fours when switching Match ↔ team; fancySample caps Match L10 at ten", () => {
@@ -200,7 +204,12 @@ test("the labelled overview names each market and puts the side's short name in 
   const rows = collectOverview({ store, doc: doc(row("match_runs", 300.5, 1.8), row("team_total_sixes", 7.5, 1.9, { team: "Alpha", over: 1.9 })), fxInfo, ms, teams, ground });
   const byKey = Object.fromEntries(rows.map((r) => [r.key, r]));
   assert.equal(byKey.match_runs.label, "Total runs");
+  assert.equal(byKey.match_runs.innScope, "");
   assert.equal(byKey.match_runs.id, "-1:match_runs");
   assert.equal(byKey.team_total_sixes.label, "ALP · Sixes");
+  assert.equal(byKey.team_total_sixes.innScope, "");
   assert.equal(byKey.team_total_sixes.id, "0:team_total_sixes");
+  // Label never embeds the innings tag (CMM / 1st INN live on innScope → FancyLineMeta).
+  assert.ok(!/INN|CMM/i.test(byKey.match_runs.label));
+  assert.ok(!/INN|CMM/i.test(byKey.team_total_sixes.label));
 });

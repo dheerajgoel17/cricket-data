@@ -445,14 +445,17 @@ test("an exchange's No on its own line is quoted beside its Yes, and an under-on
 test("a Test line is tagged with its innings or the complete match", async () => {
   const { scopeTag } = await import("../packages/engine/lines.js");
   const { innTag } = await import("../packages/engine/fancy-edge.js");
-  assert.equal(scopeTag("Test", 0), "Complete match");
-  assert.equal(scopeTag("Test", 1), "1st innings");
-  assert.equal(scopeTag("Test", 2), "2nd innings");
+  assert.equal(scopeTag("Test", 0), "CMM");
+  assert.equal(scopeTag("Test", 1), "1st INN");
+  assert.equal(scopeTag("Test", 2), "2nd INN");
   assert.equal(scopeTag("T20", 0), "");
-  assert.equal(innTag(0, true, "match_runs"), "Complete match");
+  assert.equal(innTag(0, true, "match_runs"), "CMM");
   assert.equal(innTag(0, true, "first_innings_runs"), "");
-  assert.equal(innTag(2, true, "team_total_runs"), "2nd inns");
+  assert.equal(innTag(0, true, "team_total_runs"), ""); // side session: not CMM (pipeline tags 1st)
+  assert.equal(innTag(0, true, "overs_10"), "");
+  assert.equal(innTag(2, true, "team_total_runs"), "2nd INN");
   assert.equal(innTag(0, false, "match_runs"), "");
+  assert.equal(innTag(1, true, "team_total_runs"), "1st INN");
 });
 
 test("a team line that only stands if the side bats first says so", async () => {

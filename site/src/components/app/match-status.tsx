@@ -1,6 +1,7 @@
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { localTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { StatusLabel } from "./status-label";
 
 export type MatchPhase = "upcoming" | "live" | "final";
 
@@ -17,19 +18,17 @@ export function startLabel(iso: string, now = new Date()): string {
 }
 
 /**
- * A match's status as it is shown beside a side's name: the local start time while it is to come, a red pulsing LIVE badge while it is on, and a muted
+ * A match's status as it is shown beside a side's name: the local start time while it is to come, a pulsing Live mark while it is on, and a muted
  * Completed mark once it is over. `className` sizes it; the text never says a time for a match that has started.
  */
 export function MatchStatus({ phase, start, className }: { phase: MatchPhase; start?: string; className?: string }) {
-  if (phase === "live") {
-    return (
-      <span className={cn("inline-flex items-center gap-tight label-cap text-callout font-label text-destructive", className)} role="status">
-        <span aria-hidden className="relative grid size-2 place-items-center"><span className="absolute inline-flex size-full animate-ping rounded-full bg-destructive/60 motion-reduce:animate-none" /><span className="relative size-2 rounded-full bg-destructive" /></span>Live
-      </span>
-    );
-  }
+  if (phase === "live") return <StatusLabel tone="live" surface="dot" className={cn("text-callout", className)} />;
   if (phase === "final") {
-    return <span className={cn("inline-flex items-center gap-hair label-cap text-callout text-muted-foreground", className)}><CheckCircleIcon aria-hidden className="size-3.5" />Completed</span>;
+    return (
+      <StatusLabel tone="muted" surface="plain" className={cn("inline-flex items-center gap-hair text-callout", className)}>
+        <CheckCircleIcon aria-hidden className="size-3.5" />Completed
+      </StatusLabel>
+    );
   }
   return <span className={cn("font-label tabular-nums", className)}>{start ? startLabel(start) : "Scheduled"}</span>;
 }

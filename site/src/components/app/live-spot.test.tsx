@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
 import { Store } from "@cricket/engine/store.js";
-import { BatterSpot, LiveBadge, LiveOpened, LiveTrack, TeamSpot } from "./live-spot";
+import { BatterSpot, InPlayBadge, LiveBadge, LiveOpened, LiveTrack, TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
 
 // Alpha (team 0) bats first at a steady c an over: 3 innings at 9 (54 after 6 overs, 180), 4 at 10 (60, 200), 2 at 11 (66, 220), 2 at 7 (42, 140), 1 at 13 (78, 260).
@@ -74,10 +74,11 @@ describe("BatterSpot", () => {
   });
 });
 
-describe("LiveBadge and LiveOpened", () => {
-  it("the badge is just the mark; where the line stood before the match is two words and a number, only when it has moved", () => {
-    const { rerender } = render(<LiveBadge />);
+describe("LiveBadge, InPlayBadge and LiveOpened", () => {
+  it("Live is match-level copy; In Play Market is a live-priced line; where the line stood is two words and a number, only when it has moved", () => {
+    const { rerender } = render(<><LiveBadge /><InPlayBadge /></>);
     expect(screen.getByText("Live")).toBeInTheDocument();
+    expect(screen.getByText("In Play Market")).toBeInTheDocument();
     expect(screen.queryByText(/was/)).not.toBeInTheDocument();
     rerender(<LiveOpened opened={25.5} line={33.5} />);
     expect(screen.getByText("was 25.5")).toBeInTheDocument();
@@ -90,8 +91,8 @@ describe("LiveBadge and LiveOpened", () => {
 
 describe("live rows", () => {
   it("the tag, an over / under market with both prices and a pick with its outcomes", () => {
-    render(<><LiveBadge /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8, book: "BookK" }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
-    expect(screen.getAllByText("Live").length).toBe(3);
+    render(<><InPlayBadge /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8, book: "BookK" }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
+    expect(screen.getAllByText("In Play Market").length).toBe(3);
     expect(screen.getByText("Runs at Fall of 3rd Wicket")).toBeInTheDocument();
     expect(screen.getByText("O/U 81.5")).toBeInTheDocument();
     expect(document.querySelector('[data-book="BookK"]')).not.toBeNull(); // the row names its book
