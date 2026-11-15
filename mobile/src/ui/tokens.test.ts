@@ -61,4 +61,9 @@ describe("tokens derived from tokens.json", () => {
     expect(hits(/height: (36|44|48)\b[^}]*backgroundColor: color\.(primary|secondary)\b|backgroundColor: color\.(primary|secondary)\b[^}]*height: (36|44|48)\b/, /(ui\/button|ui\/line-stepper)\.tsx$/)).toEqual([]);
     expect(hits(/placeholderTextColor=\{color\["muted-foreground"\]\} style=\{styles\.input\} (accessibilityLabel|autoFocus)/, /ui\/search-field\.tsx$/)).toEqual([]);
   });
+
+  it("takes shadows from the elevation tokens, never a screen's own", () => {
+    const bad = files(src).filter((f) => !/ui\/platform\.ts/.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (/\bshadow(Color|Opacity|Radius|Offset)\b|\belevation: [0-9]/.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(bad).toEqual([]);
+  });
 });

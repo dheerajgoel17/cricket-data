@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { elevation } from "@/ui/platform";
 import { useChoice } from "@/lib/use-choice";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -46,7 +47,7 @@ export function Segmented<T extends string>({ items, value: valueProp, onChange:
 
 const styles = StyleSheet.create({
   track: { flexDirection: "row", backgroundColor: color["segment-track"], borderRadius: 999, padding: 2, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.16) },
-  thumb: { position: "absolute", top: 2, bottom: 2, left: 2, borderRadius: 999, backgroundColor: color["segment-thumb"], shadowColor: tint.black(1), elevation: 1, shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  thumb: { position: "absolute", top: 2, bottom: 2, left: 2, borderRadius: 999, backgroundColor: color["segment-thumb"], ...elevation.thumb },
   hit: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   text: { ...type.callout, ...w.copy, color: color.foreground },
   textOn: { ...w.label },
