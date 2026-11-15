@@ -1,9 +1,10 @@
-# Cricket value bets - 2026-11-15 22:00 IST
+# Cricket value bets - 2026-11-15 22:12 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1696 prices
+- **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta htt
+- **moviodds_bet365**: ok, 1623 prices
 - **smarkets**: ok, 604 prices
 - **feedg**: ok, 16 prices, 2 events
 - **feedk**: ok, 88 prices, 7 events
@@ -22,4 +23,4 @@ Matches starting in next 168h: **43**, markets priced: **483**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Karnataka (W) (female), Maharashtra (W) (female), Nhlangano Legends (male), Railways (W) (female), Recon Tactical Free State (W) (female), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Western Australia Warriors (male)
 
-Runtime 185.0s. Snapshot: `odds_20261115T163033Z.jsonl.gz`
+Runtime 234.0s. Snapshot: `odds_20261115T164221Z.jsonl.gz`

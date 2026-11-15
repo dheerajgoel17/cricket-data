@@ -1,55 +1,60 @@
 {
- "generated_at_utc": "2026-11-15T16:30:33Z",
- "generated_at_ist": "2026-11-15 22:00 IST",
- "runtime_secs": 185.0,
+ "generated_at_utc": "2026-11-15T16:42:21Z",
+ "generated_at_ist": "2026-11-15 22:12 IST",
+ "runtime_secs": 234.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-15",
-  "commit": "e7feae794f"
+  "commit": "21e406f7b9"
  },
  "sources": {
+  "feedi": {
+   "status": "error",
+   "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta htt",
+   "secs": 0.4
+  },
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1696,
-   "secs": 0.2
+   "rows": 1623,
+   "secs": 0.7
   },
   "smarkets": {
    "status": "ok",
    "rows": 604,
-   "secs": 2.1
+   "secs": 2.9
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 11.1,
+   "secs": 10.8,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 88,
-   "secs": 18.0,
+   "secs": 18.2,
    "events": 7
   },
   "feede": {
    "status": "ok",
    "rows": 596,
-   "secs": 46.9,
+   "secs": 47.4,
    "events": 18
   },
   "feedh": {
    "status": "ok",
    "rows": 1624,
-   "secs": 67.5,
+   "secs": 67.8,
    "events": 32
   },
   "feedf": {
    "status": "ok",
    "rows": 684,
-   "secs": 100.5,
+   "secs": 109.5,
    "events": 19
   }
  },
- "snapshot": "odds_20261115T163033Z.jsonl.gz",
+ "snapshot": "odds_20261115T164221Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -109,6 +114,10 @@
   "FEEDH_MAX_EVENTS": 500,
   "FEEDH_HORIZON_HOURS": 240.0,
   "FEEDH_BUDGET_SECS": 240.0,
+  "FEEDI_SPACING_SECS": 0.5,
+  "FEEDI_MAX_EVENTS": 80,
+  "FEEDI_HORIZON_HOURS": 240.0,
+  "FEEDI_BUDGET_SECS": 180.0,
   "DATA_REFRESH": 0,
   "MIN_ODDS_MILESTONE": 1.25,
   "WEATHER": 1,
@@ -1221,29 +1230,30 @@
   }
  },
  "log": [
-  "[22:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:00 IST] history: 24098 matches, last 2026-11-15, players 434454",
-  "[22:02 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1696, 'secs': 0.2}",
-  "[22:02 IST] source smarkets: {'status': 'ok', 'rows': 604, 'secs': 2.1}",
-  "[22:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.1, 'events': 2}",
-  "[22:02 IST] source feedk: {'status': 'ok', 'rows': 88, 'secs': 18.0, 'events': 7}",
-  "[22:02 IST] source feede: {'status': 'ok', 'rows': 596, 'secs': 46.9, 'events': 18}",
-  "[22:02 IST] source feedh: {'status': 'ok', 'rows': 1624, 'secs': 67.5, 'events': 32}",
-  "[22:02 IST] source feedf: {'status': 'ok', 'rows': 684, 'secs': 100.5, 'events': 19}",
-  "[22:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:02 IST] 70 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:02 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[22:02 IST] 56 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[22:02 IST] name map: New South Wales Blues vs South Australia -> New South Wales vs South Australia (2026-11-15T23:00:00Z)",
-  "[22:02 IST] name map: Queensland Bulls vs Tasmania Tigers -> Queensland vs Tasmania (2026-11-16T00:00:00Z)",
-  "[22:02 IST] name map: New South Wales vs South Australia Redbacks -> New South Wales vs South Australia (2026-11-15T23:00:00Z)",
-  "[22:02 IST] name map: Victoria Bushrangers vs Western Australia Warriors -> Victoria vs Western Australia (2026-11-16T03:00:00Z)",
-  "[22:02 IST] name map: Jammu & Kashmir vs Tamil Nadu -> Jammu and Kashmir vs Tamil Nadu (2026-11-16T05:30:00Z)",
-  "[22:02 IST] held back 0 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[22:02 IST] book lines: 468 player lines from 7 source(s)",
-  "[22:02 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[22:03 IST] weather: forecasts for 13 events, 0 failed",
-  "[22:03 IST] prop model: 1454 prop selections modelled, 450 milestone ladder prices anchored to O/U",
-  "[22:03 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[22:12 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[22:12 IST] history: 24098 matches, last 2026-11-15, players 434454",
+  "[22:14 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta htt', 'secs': 0.4}",
+  "[22:14 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1623, 'secs': 0.7}",
+  "[22:14 IST] source smarkets: {'status': 'ok', 'rows': 604, 'secs': 2.9}",
+  "[22:14 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 10.8, 'events': 2}",
+  "[22:14 IST] source feedk: {'status': 'ok', 'rows': 88, 'secs': 18.2, 'events': 7}",
+  "[22:14 IST] source feede: {'status': 'ok', 'rows': 596, 'secs': 47.4, 'events': 18}",
+  "[22:14 IST] source feedh: {'status': 'ok', 'rows': 1624, 'secs': 67.8, 'events': 32}",
+  "[22:14 IST] source feedf: {'status': 'ok', 'rows': 684, 'secs': 109.5, 'events': 19}",
+  "[22:14 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[22:14 IST] 51 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[22:14 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[22:14 IST] 56 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[22:14 IST] name map: New South Wales Blues vs South Australia -> New South Wales vs South Australia (2026-11-15T23:00:00Z)",
+  "[22:14 IST] name map: Queensland Bulls vs Tasmania Tigers -> Queensland vs Tasmania (2026-11-16T00:00:00Z)",
+  "[22:14 IST] name map: New South Wales vs South Australia Redbacks -> New South Wales vs South Australia (2026-11-15T23:00:00Z)",
+  "[22:14 IST] name map: Victoria Bushrangers vs Western Australia Warriors -> Victoria vs Western Australia (2026-11-16T03:00:00Z)",
+  "[22:14 IST] name map: Jammu & Kashmir vs Tamil Nadu -> Jammu and Kashmir vs Tamil Nadu (2026-11-16T05:30:00Z)",
+  "[22:14 IST] held back 0 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[22:14 IST] book lines: 468 player lines from 7 source(s)",
+  "[22:14 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[22:16 IST] weather: forecasts for 13 events, 0 failed",
+  "[22:16 IST] prop model: 1454 prop selections modelled, 450 milestone ladder prices anchored to O/U",
+  "[22:16 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
