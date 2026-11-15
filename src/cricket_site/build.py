@@ -1027,11 +1027,13 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     canonical = parse_zip(zpath, workers)
     names = player_names(zpath)
     remembered, stock = source_memory() if photos else ([], set())
-    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path), provisional_people(data_dir, names), remembered, stock) if photos else {"p": {}, "t": {}, "l": {}, "w": {}, "names": {}, "index": {"players": [], "teams": []}}
+    scraped = provisional_people(data_dir, names)
+    cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path), scraped, remembered, stock) if photos else {"p": {}, "t": {}, "l": {}, "w": {}, "names": {}, "index": {"players": [], "teams": []}}
     ident, review, cover = link_identity(cx, names, vb_dir, data_dir, stock)
     pdoc = profiles.build_json(profiles.load(data_dir), ident["s"])  # role / batting hand / bowling style per player, from data/profiles (fetched by cricket_site.profiles)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])
     A = assemble(canonical, prov, _load_geo(geo_path))
+    names = {**{p: v["name"] for p, v in scraped.items()}, **names}  # a player only scraped matches know (Base has not named him) shows the scorecard's name, never his eight-hex id
     newest = max((m["date"] for m in canonical), default="")
     newest_prov = max((m["date"] for m in prov), default="")
     meta = write(out, A, names, {

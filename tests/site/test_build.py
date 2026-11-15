@@ -723,3 +723,17 @@ def test_a_feed_that_names_a_priced_match_with_other_team_names_is_not_a_second_
               {"start": "2026-11-09T18:00Z", "fmt": "ODI", "a": "West Indies A", "b": "England A"},
               {"start": "2026-11-10T16:00Z", "fmt": "T10", "a": "UAE Bulls", "b": "Emirates Eagles"}]
     assert B._unscheduled_priced(vb, listed, now=now) == []
+
+
+def test_a_player_only_scraped_matches_know_is_named_in_the_index(tmp_path):
+    """Team grid showed "5e72ffe1": index `nm` fell back to the id for players Base has not named. The scorecard's spelling is the name; Base's still wins."""
+    z, data, out, _ = _out(tmp_path)
+    bro = synth.pid(synth.BROOK)
+    pl = [{"player": "MD Aftab", "player_id": "5e72ffe1", "team": "Alpha", "opponent": "Beta", "runs": "12", "balls": "9"},
+          {"player": "Harry B", "player_id": bro, "team": "Alpha", "opponent": "Beta", "runs": "3", "balls": "2"}]
+    (data / "provisional" / "crex-n.json").write_text(json.dumps(_prov("crex-n", "2025-06-01", "Alpha", "Beta", pl)))
+    B.build(z, data, out, None, workers=1)
+    _, IX = _load(out)
+    nm = dict(zip(IX["players"]["id"], IX["players"]["nm"], strict=True))
+    assert nm["5e72ffe1"] == "MD Aftab"
+    assert nm[bro] == "HC Brook" and nm[bro] != "Harry B"
