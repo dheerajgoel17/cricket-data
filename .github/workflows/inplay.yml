@@ -18,6 +18,13 @@ env:
   FEEDK_URL: ${{ secrets.FEEDK_URL }}
   FEEDK_BOOKS: ${{ secrets.FEEDK_BOOKS }}
   FEEDE_BOOKS: ${{ secrets.FEEDE_BOOKS }}
+  FEEDI_URL: ${{ secrets.FEEDI_URL }}
+  FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
+  FEEDI_PARTNER: ${{ secrets.FEEDI_PARTNER }}
+  FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+  FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
+  FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+  FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
   INPLAY_LOG: ${{ vars.INPLAY_LOG }}
   SITE_URL: ${{ vars.SITE_URL }}
   DATA_WRAP_KEY: ${{ secrets.DATA_WRAP_KEY }}

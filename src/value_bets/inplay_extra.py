@@ -1,4 +1,4 @@
-"""In-play lines from the books that list a match once it has started (Feed K and Feed E), in the shape the in-play snapshot keeps.
+"""In-play lines from the books that list a match once it has started (Feed K, Feed E, and Feed I), in the shape the in-play snapshot keeps.
 
 Read once a minute by `scripts/inplay_extra.py`; nothing here is filed in the pre-match book or the archive. Each match is `{home, away, league, kickoff, lines}`, and each line carries `book`, the
 name that book is published under (from the environment, never code):
@@ -18,7 +18,7 @@ import time
 import urllib.parse
 
 from . import config
-from .adapters import feede, feedk
+from .adapters import feede, feedi, feedk
 from .adapters.base import Pace
 from .util import http_json, iso, parse_ts
 
@@ -213,10 +213,15 @@ def e_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> 
     return out
 
 
+def i_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> list[dict]:
+    """Started matches Feed I lists (Mumbai relay; skipped when FEEDI_* unset)."""
+    return feedi.live_matches(now, wanted)
+
+
 def all_matches(now: dt.datetime, wanted: list[tuple[str, str]] | None = None) -> tuple[list[dict], dict[str, int]]:
     """Every started match these books list, and how many each source gave (a source that is not configured or fails gives 0)."""
     matches, counts = [], {}
-    for key, fn in (("feedk", k_matches), ("feede", e_matches)):
+    for key, fn in (("feedk", k_matches), ("feede", e_matches), ("feedi", i_matches)):
         try:
             got = fn(now, wanted)
         except Exception as e:  # not configured, or down: this source gives nothing, the others carry on

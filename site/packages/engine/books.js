@@ -9,6 +9,7 @@ export const BOOK_STEMS = {
   reddybook: "Reddybook",
   polymarket: "Polymarket",
   dafabet: "Dafabet",
+  "1xbet": "1xBet",
 };
 
 const VARIANT = /^(.*\S)\s+(Premium|Fancy)$/i;

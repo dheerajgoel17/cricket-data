@@ -13,6 +13,7 @@ describe("book logos", () => {
     expect(bookLogo("bet365")).toBe(BOOK_LOGOS.bet365);
     expect(bookLogo("Dafabet")).toBe(BOOK_LOGOS.dafabet);
     expect(bookLogo("Reddybook")).toBe(BOOK_LOGOS.reddybook);
+    expect(bookLogo("1xBet")).toBe(BOOK_LOGOS["1xbet"]);
     expect(bookLogo("polymarket")).toBe(BOOK_LOGOS.polymarket);
     expect(bookLogo("nobody")).toBeUndefined();
   });

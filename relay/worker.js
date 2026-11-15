@@ -12,7 +12,7 @@ export const same = (a, b) => {
   return d === 0;
 };
 
-export const allowList = (env) => [env?.RELAY_ALLOW, env?.RELAY_ALLOW_EXTRA, env?.RELAY_ALLOW_FEEDG].filter(Boolean).join(",");
+export const allowList = (env) => [env?.RELAY_ALLOW, env?.RELAY_ALLOW_EXTRA, env?.RELAY_ALLOW_FEEDG, env?.RELAY_ALLOW_FEEDI].filter(Boolean).join(",");
 
 export const allowed = (host, list) => String(list || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).some((d) => host === d || host.endsWith(`.${d}`));
 

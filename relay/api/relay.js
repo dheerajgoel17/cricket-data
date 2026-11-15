@@ -9,7 +9,7 @@ export const same = (a, b) => {
   return x.length === y.length && timingSafeEqual(x, y);
 };
 
-export const allowList = () => [process.env.RELAY_ALLOW, process.env.RELAY_ALLOW_EXTRA, process.env.RELAY_ALLOW_FEEDG].filter(Boolean).join(",");
+export const allowList = () => [process.env.RELAY_ALLOW, process.env.RELAY_ALLOW_EXTRA, process.env.RELAY_ALLOW_FEEDG, process.env.RELAY_ALLOW_FEEDI].filter(Boolean).join(",");
 
 export const allowed = (host, list) => String(list || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
   .some((d) => host === d || host.endsWith(`.${d}`));
