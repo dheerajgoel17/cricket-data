@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { StyleSheet, type TextStyle } from "react-native";
+import { StyleSheet, View, type TextStyle } from "react-native";
 import { Text } from "@/ui/text";
-import Animated, { Easing, interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
-import { color, space, type, font } from "@/ui/tokens";
+import { color, font, space, tint, type } from "@/ui/tokens";
 
 const HOLD_MS = 1100;
+/** How long the wash of colour takes to fade, and how far (pt) the new figure travels as it rolls in. */
+const WASH_MS = 700, ROLL = 14;
+// Precomputed outside worklets — calling `tint.*` inside useAnimatedStyle hits the JS runtime ("Tried to synchronously call a Remote Function").
+const FLASH_RISE = [tint.primary(0), tint.primary(0.24)] as const;
+const FLASH_FALL = [tint.miss(0), tint.miss(0.24)] as const;
 
 /** Direction a number just moved: 1 up, -1 down, 0 still. Holds for a beat so a 15 s live poll is visible, then returns to 0 (the site's `useTick`). */
 export function useTick(value: number | null | undefined) {
@@ -23,23 +28,42 @@ export function useTick(value: number | null | undefined) {
   return dir;
 }
 
-/** Flash green on a rise, red on a drop, with a small arrow while the flash holds; the colour fades out over the hold. How a price or a so-far that moved is seen between polls. */
+/**
+ * A price or a so-far that moved between polls: the new figure rolls in (up on a rise, down on a fall) over a green or red wash, with a small arrow while it holds.
+ * Plain text until the number first moves: most prices never do, so a list of rows mounts no animated view for them.
+ */
 export function Tick({ value, children, style }: { value: number | null | undefined; children: ReactNode; style?: TextStyle }) {
   const dir = useTick(value);
-  const flash = useSharedValue(0);
-  useEffect(() => {
-    if (dir === 0) return;
-    flash.value = 1;
-    flash.value = withTiming(0, { duration: HOLD_MS, easing: Easing.out(Easing.quad) });
-  }, [dir, value, flash]);
-  const rise = dir !== -1;
-  const bg = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(flash.value, [0, 1], rise ? ["rgba(39,218,142,0)", "rgba(39,218,142,0.24)"] : ["rgba(255,0,0,0)", "rgba(255,0,0,0.24)"]) }));
+  const calm = useReducedMotion();
+  const [armed, setArmed] = useState(false);
+  if (dir !== 0 && !armed) setArmed(true);
+  const text = <Text style={[styles.text, style]}>{children}</Text>;
+  if (!armed) return <View style={styles.row}>{text}</View>;
   return (
-    <Animated.View style={[styles.row, bg]}>
+    <Flash dir={dir} value={value} calm={calm}>
       {dir === 1 ? <ArrowUp color={color.primary} /> : dir === -1 ? <ArrowDown color={color.miss} /> : null}
-      <Text style={[styles.text, style]}>{children}</Text>
-    </Animated.View>
+      {text}
+    </Flash>
   );
+}
+
+/**
+ * A number that just moved: the new figure rolls in from below on a rise and from above on a fall and springs to rest (clipped to its own box), over a wash of colour that fades.
+ * Transform and background only, on the UI thread. With reduce motion on, the arrow alone says it.
+ */
+function Flash({ dir, value, calm, children }: { dir: -1 | 0 | 1; value: number | null | undefined; calm: boolean; children: ReactNode }) {
+  const flash = useSharedValue(0), y = useSharedValue(0);
+  useEffect(() => {
+    if (dir === 0 || calm) return;
+    flash.value = 1;
+    flash.value = withTiming(0, { duration: WASH_MS, easing: Easing.out(Easing.cubic) });
+    y.value = dir * ROLL;
+    y.value = withSpring(0, { duration: 420, dampingRatio: 0.8 });
+  }, [dir, value, flash, y, calm]);
+  const colors = dir === -1 ? FLASH_FALL : FLASH_RISE;
+  const bg = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(flash.value, [0, 1], colors) }));
+  const roll = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
+  return <Animated.View style={[styles.row, styles.clip, bg]}><Animated.View style={[styles.rollRow, roll]}>{children}</Animated.View></Animated.View>;
 }
 
 export type Standing = { v: number | null; state: string; verdict: "cleared" | "missed" | "push" | null };
@@ -62,6 +86,8 @@ export function StandingMark({ standing, line }: { standing: Standing | null | u
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 2, borderRadius: 6, paddingHorizontal: 2 },
+  clip: { overflow: "hidden" },
+  rollRow: { flexDirection: "row", alignItems: "center", gap: 2 },
   text: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   void: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: color.amber, borderRadius: 4, paddingHorizontal: space.hair, borderStyle: "dashed" },
 });

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { Platform } from "react-native";
 import type { HomePhase } from "@site/lib/home-phase";
 import { fancyFm } from "@cricket/engine/fancy-edge.js";
 import { sameFixture } from "@cricket/engine/lines.js";
@@ -9,10 +9,12 @@ import { mixHomeRows } from "@site/lib/hot-lines";
 import { phaseOf } from "@site/lib/home-phase";
 import { sideRate } from "@cricket/engine/props-view.js";
 import { useFancyCards } from "@/lib/fancy";
+import { cardModel } from "@/lib/card";
 import { fancyMarketPath } from "@/lib/nav";
+import { timed } from "@/lib/perf";
 import { fixtureState } from "@/lib/rail";
-import { liveQuery } from "@/lib/queries";
 import { useHotView } from "@/lib/use-hot";
+import { useLive } from "@/lib/use-live";
 import { useRail } from "@/lib/use-rail";
 import type { TapeRow } from "@/ui/market-tape";
 
@@ -38,11 +40,18 @@ export function useHotHome(phase: HomePhase) {
   const error = d0.error;
   const soFarOf = d0.soFarOf;
   const outOf = d0.outOf;
-  const live = useQuery(liveQuery);
+  const live = useLive({ defer: true });
   const { items: rail } = useRail();
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
-  // Fancy scores in parallel with Hot — do not wait for Hot to finish (that alone was the old 6–7 s blank).
-  const { cards } = useFancyCards(true);
+  // Fancy pulls the stats store — keep it off Home cold start on Android (Player / Fancy tab still load it).
+  const [fancyOn, setFancyOn] = useState(false);
+  useEffect(() => {
+    if (Platform.OS === "android") return; // Android: player props only on Home until the user opens Fancy / a player
+    if (!(d0.rows.length > 0 || (!d0.isLoading && !d0.scoring))) return;
+    const t = setTimeout(() => setFancyOn(true), 2000);
+    return () => clearTimeout(t);
+  }, [d0.rows.length, d0.isLoading, d0.scoring]);
+  const { cards } = useFancyCards(fancyOn);
 
   const props = useMemo(() => {
     const strict = rows.filter((r) => r.l10.played >= HOME_PLAYED || r.quotes?.some((q: any) => q.live));
@@ -59,7 +68,7 @@ export function useHotHome(phase: HomePhase) {
     return m;
   }, [cards, phase, live.data]);
 
-  const blocks = useMemo(() => {
+  const blocks = useMemo(() => timed("home blocks", () => {
     const priced = rail.filter((i) => !i.noProps && (!phase || phaseOf(i.state) === phase)).map((i) => i.fixture);
     const out: FxBlock[] = [];
     for (const f of priced) {
@@ -73,27 +82,36 @@ export function useHotHome(phase: HomePhase) {
       if (items.length) out.push({ f, items });
     }
     return out;
-  }, [rail, props, fancyById, live.data, phase]);
+  }), [rail, props, fancyById, live.data, phase]);
 
   const [pick, setPick] = useState("");
   const sel = blocks.some((b) => b.f.id === pick) ? pick : (blocks[0]?.f.id || "");
   const block = blocks.find((b) => b.f.id === sel) || null;
 
-  const tape = useMemo<TapeRow[]>(() => d0.rows.map((r) => {
+  const tape = useMemo<TapeRow[]>(() => timed("home tape", () => d0.rows.map((r) => {
     const s = soFarOf(r);
     return { idx: r.idx, pid: r.pid, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
-  }), [d0.rows, soFarOf]);
+  })), [d0.rows, soFarOf]);
 
   // Paint as soon as Hot has any rows (or fancy cards); do not block on fancy finishing.
   const loading = isLoading && !blocks.length;
   const fixtures = blocks.map(({ f }) => f);
+  // what a chip says under the two sides when its match is on: the session ("Stumps", "Lunch") or Live, as the fixture card does
+  const tags: Record<string, { text: string; session: boolean }> = {};
+  for (const { f } of blocks) {
+    const item = rail.find((i) => i.fixture.id === f.id);
+    if (!item) continue;
+    const m = cardModel(item);
+    if (m.session) tags[f.id] = { text: m.session, session: true };
+    else if (m.live) tags[f.id] = { text: "Live", session: false };
+  }
   const items = block?.items ?? [];
 
   const openFancy = (item: Extract<MixItem, { kind: "fancy" }>) =>
     fancyMarketPath(item.f.id, { fm: fancyFm(item.r.key, item.r.inn || 0), sc: item.r.scope >= 0 ? item.r.scope : null });
 
   return {
-    tape, fixtures, items, sel, setPick, block,
+    tape, fixtures, tags, items, sel, setPick, block,
     loading, scoring, error, isLoading, soFarOf, outOf, openFancy,
   };
 }

@@ -613,6 +613,44 @@ test("liveForFixture matches team names within the start window", () => {
   assert.equal(liveForFixture(doc, { a: "Spain", b: "Italy", start: "2026-10-27T09:00:00Z" }), null);
 });
 
+test("multi-format bilateral tour (T20 / ODI / Test): live and books stay on their own format", () => {
+  // Real tours mix only these three (e.g. IND in NZ: ODIs then Tests). Hundred / T10 / O60 are other tournaments, not tour legs.
+  // Starts ~4.8 days apart: inside a naïve Test 6-day window, outside the 14 h limited-overs window.
+  const a = "New Zealand", b = "India";
+  const liveOf = (fmt, start, id) => ({
+    id, status: "live", fmt, start,
+    teams: [{ name: a, display: "167/8 (37.0 ov)", runs: 167, wkts: 8 }, { name: b, display: "", runs: null, wkts: null }],
+  });
+  const fxOf = (fmt, start) => ({ a, b, start, fmt });
+  const pairs = [
+    ["T20", "ODI"], ["ODI", "T20"],
+    ["T20", "Test"], ["Test", "T20"],
+    ["ODI", "Test"], ["Test", "ODI"], // prod: 2026-11-15 ODI Bay Oval + 2026-11-19 Test Basin Reserve, same 167/8 painted
+  ];
+  const liveStart = "2026-11-15T02:00:00.000Z";
+  const laterStart = "2026-11-19T22:00:00.000Z";
+  for (const [liveFmt, laterFmt] of pairs) {
+    const live = liveOf(liveFmt, liveStart, `live-${liveFmt}`);
+    const liveFx = fxOf(liveFmt, liveStart);
+    const laterFx = fxOf(laterFmt, laterStart);
+    assert.equal(liveForFixture({ matches: [live] }, liveFx)?.id, live.id, `${liveFmt} finds itself`);
+    assert.equal(liveForFixture({ matches: [live] }, laterFx), null, `live ${liveFmt} must not paint later ${laterFmt}`);
+    const books = bookFixtures({ events: [{ match: `${a} vs ${b}`, start_utc: liveStart, fmt: liveFmt }] });
+    assert.equal(fixtureInBooks(books, liveFx), true, `${liveFmt} books match ${liveFmt} fixture`);
+    assert.equal(fixtureInBooks(books, laterFx), false, `${liveFmt} books must not mark later ${laterFmt}`);
+    assert.equal(pricedLive([live, { ...live, id: `later-${laterFmt}`, status: "upcoming", fmt: laterFmt, start: laterStart }], books).map((m) => m.id).join(), live.id,
+      `pricedLive keeps only the ${liveFmt}`);
+  }
+  // Same format: Test day-restamp still matches; consecutive ODIs days apart do not via live fallback
+  const testLive = liveOf("Test", "2026-11-15T02:00:00.000Z", "test-d1");
+  assert.equal(liveForFixture({ matches: [testLive] }, fxOf("Test", "2026-11-18T02:00:00.000Z"))?.id, "test-d1", "Test day-4 start still finds day-1 live");
+  const odiLive = liveOf("ODI", liveStart, "odi-1");
+  assert.equal(liveForFixture({ matches: [odiLive] }, fxOf("ODI", laterStart)), null, "next ODI of the series must not inherit today's live score");
+  const testCard = { id: "t", status: "live", fmt: "Test", start: laterStart, teams: [{ name: a }, { name: b }], players: [], card: [] };
+  const odiLine = { pid: "p1", player: "X", team: a, stat: "runs", line: 20.5, fmt: "ODI", match: `${a} vs ${b}`, start_utc: liveStart, books: [{ source: "x", over: 1.9, under: 1.9 }] };
+  assert.equal(settleLines(testCard, [odiLine]).length, 0, "ODI book line does not settle on the Test");
+});
+
 test("a so-far number says when it can no longer move: dismissed, or innings / spell over (hand-computed)", () => {
   const m = chase();
   const state = (name, stat) => liveState(m, livePlayer(m, name, stat), stat);

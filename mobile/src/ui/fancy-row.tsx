@@ -11,7 +11,7 @@ import { MiniBars } from "@/ui/mini-bars";
 import { TeamBadge } from "@/ui/team-badge";
 import { LiveBadge, LiveOpened, LineProgress } from "@/ui/live-bits";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
-import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
+import { cap, color, control, figure, font, metric, space, type } from "@/ui/tokens";
 
 const bookSrc = (preferred?: string, books?: { source: string }[]) => preferred || books?.[0]?.source;
 
@@ -53,7 +53,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra }: { r: an
     <View style={[styles.row, active && styles.active]}>
       <Press onPress={onOpen} disabled={!onOpen} accessibilityRole="button" accessibilityLabel={`Open ${r.label}`} style={styles.main}>
         {r.team
-          ? <TeamBadge name={r.team} size={44} />
+          ? <TeamBadge name={r.team} size={control + 4} />
           : <View style={styles.icon} accessibilityElementsHidden><Ionicons name="stats-chart-outline" size={20} color={color["muted-foreground"]} /></View>}
         <View style={styles.left}>
           <View style={styles.titleRow}><Text style={[styles.label, styles.titleText]} numberOfLines={2}>{r.label}</Text>{r.live ? <LiveBadge /> : null}</View>
@@ -102,27 +102,27 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra }: { r: an
 }
 
 const styles = StyleSheet.create({
-  row: { paddingHorizontal: space.gutter, paddingVertical: space.snug + 2, gap: space.tight },
+  row: { paddingHorizontal: space.gutter, paddingVertical: space.snug, gap: space.tight },
   active: { backgroundColor: "rgba(44,44,46,0.7)" },
   main: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  icon: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", backgroundColor: color.pill },
+  icon: { width: control + 4, height: control + 4, borderRadius: (control + 4) / 2, alignItems: "center", justifyContent: "center", backgroundColor: color.pill },
   left: { flex: 1, minWidth: 0, gap: 3 },
   label: { ...type.body, fontFamily: font.medium, color: color.foreground },
   titleRow: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
   titleText: { flexShrink: 1 },
   hero: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: space.snug, rowGap: 2 },
-  heroLine: { ...numLg, fontSize: 22, letterSpacing: -0.4, lineHeight: 24, color: color.foreground },
+  heroLine: { ...metric, color: color.foreground },
   at: { ...type.footnote, color: color["muted-foreground"] },
   prices: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.snug, rowGap: 2 },
   price: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  sideTag: { ...type.callout, color: color["muted-foreground"] },
-  odds: { ...type.callout, ...num, fontSize: 15, color: color.foreground },
+  sideTag: { ...type.callout, fontFamily: font.dataLight, color: color["muted-foreground"] },
+  odds: { ...type.body, fontFamily: font.data, fontVariant: ["tabular-nums"], color: color.foreground },
   side: { alignItems: "flex-end", gap: space.hair },
   edgeBlock: { alignItems: "flex-end", gap: 2 },
   edgePill: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
   edgeLabel: { ...type.caption, ...cap, color: color["muted-foreground"] },
-  edgeSide: { ...type.footnote, ...cap, fontSize: 10, color: color["muted-foreground"] },
-  edgeValue: { ...numLg, fontSize: 20, letterSpacing: -0.4, lineHeight: 22 },
+  edgeSide: { ...type.caption, ...cap, color: color["muted-foreground"] },
+  edgeValue: { ...figure },
   moreBtn: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start" },
   more: { ...type.footnote, fontFamily: font.medium, color: "rgba(255,255,255,0.7)" },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug },

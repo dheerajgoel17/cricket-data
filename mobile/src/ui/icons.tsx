@@ -27,6 +27,10 @@ export function ChevronLeft({ size = 22, color }: { size?: number; color: string
   return <Svg width={size} height={size} viewBox="0 0 24 24" stroke={color} {...outline}><Path d="M15.75 19.5 8.25 12l7.5-7.5" /></Svg>;
 }
 
+export function ChevronDown({ size = 16, color }: { size?: number; color: string }) {
+  return <Svg width={size} height={size} viewBox="0 0 24 24" stroke={color} {...outline}><Path d="m19.5 8.25-7.5 7.5-7.5-7.5" /></Svg>;
+}
+
 export function Minus({ size = 18, color }: { size?: number; color: string }) {
   return <Svg width={size} height={size} viewBox="0 0 24 24" stroke={color} {...outline}><Path d="M5 12h14" /></Svg>;
 }

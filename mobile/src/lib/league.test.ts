@@ -24,7 +24,11 @@ describe("competitions", () => {
 });
 
 describe("leagueData", () => {
-  const store = synthetic(), d = leagueData(store, 1);
+  const store = synthetic(), d = leagueData(store, 1)!;
+
+  test("needs matches loaded", () => {
+    expect(leagueData({ n: 0 }, 1)).toBeNull();
+  });
 
   test("its matches, format and seasons", () => {
     expect(d.ms).toHaveLength(20);

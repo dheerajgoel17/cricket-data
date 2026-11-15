@@ -8,14 +8,17 @@ import { num } from "@site/lib/format";
 /** Competitions with at least this many matches are listed. */
 export const MIN_MATCHES = 8;
 
-/** Every competition and how many matches it has, the biggest first. */
+/** Every competition and how many matches it has, the biggest first. Needs `store.M` (matchesReady). */
 export function competitions(store: any): [number, number][] {
+  if (!store?.M) return [];
   const cnt = new Map<number, number>();
   for (let m = 0; m < store.n; m++) { const e = store.M.e[m]; if (e) cnt.set(e, (cnt.get(e) || 0) + 1); }
   return [...cnt.entries()].filter(([, c]) => c >= MIN_MATCHES).sort((a, b) => b[1] - a[1]);
 }
 
+/** Needs `store.M` (matchesReady). */
 export function leagueData(store: any, e: number) {
+  if (!store?.M) return null;
   const ms: number[] = [];
   for (let m = 0; m < store.n; m++) if (store.M.e[m] === e) ms.push(m);
   const fc = FORMATS.map(() => 0);

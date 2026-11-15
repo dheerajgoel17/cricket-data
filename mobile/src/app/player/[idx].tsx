@@ -11,20 +11,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { SCOPE_LABEL } from "@cricket/engine/lines.js";
 import { lineNotIn, lineStanding, liveForFixture } from "@cricket/engine/live.js";
 import { shareText } from "@cricket/engine/share-text.js";
-import { sideEdge } from "@cricket/engine/stats.js";
 import { barState, windowRate } from "@cricket/engine/windows.js";
 import { fmtIndex } from "@cricket/engine/util.js";
 import { abbr, num, odds, pc } from "@site/lib/format";
 import { sharePlayerUrl } from "@site/lib/share";
 import { SITE_URL } from "@/lib/config";
 import { deriveChart, STAT_OPTIONS, usePlayerScreen, type Filters } from "@/lib/player";
+import { useLater } from "@/lib/use-later";
 import { useQuery } from "@tanstack/react-query";
 import { profileParts } from "@/lib/profile";
 import { profilesQuery } from "@/lib/queries";
 import { Accordion } from "@/ui/accordion";
 import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
-import { BookBadge } from "@/ui/book-badge";
-import { ChartBars, Gauge, OutcomeDonut } from "@/ui/charts";
+import { BookTable } from "@/ui/book-table";
+import { ChartBars } from "@/ui/charts";
 import { CountUp } from "@/ui/count-up";
 import { CapsuleTabs } from "@/ui/capsule";
 import { Bleed } from "@/ui/bleed";
@@ -37,14 +37,15 @@ import { LineStepper } from "@/ui/line-stepper";
 import { enter } from "@/ui/motion";
 import { PlayerSkeleton } from "@/ui/skeletons";
 import { MatchStatus, NextFilters, NextMatchCard } from "@/ui/next-match";
+import { LineTabs } from "@/ui/line-tabs";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PlayerPortrait } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
+import { pricedFromBooks, SideBook } from "@/ui/side-book";
 import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
-import { Tick } from "@/ui/tick";
-import { cap, color, control, font, radius, space, type, tonal } from "@/ui/tokens";
+import { color, control, font, radius, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -59,8 +60,8 @@ const FILTER_GROUPS: { key: keyof Filters; label: string; options?: [string, str
 ];
 
 /**
- * A player, as on the site: the stat chips and format switch in a blurred bar that tucks away while you scroll down and returns when you scroll up; the player, his numbers, the
- * chart against a line he can step, the match he plays next, filters, and the lines, game log and splits. Opened from a prop row on its line (`?stat=&line=&fmt=&scope=&start=`).
+ * A player, Match Fancy / web Player shape: sticky stat + format bar; identity hero; metrics (no gauge on phone); chart first; centred O/U + stepper; quiet look-back windows;
+ * O/U hit-rate meters + book lanes; next match; filters; Lines | Game log | Splits | When it hits. Opened from a prop row (`?stat=&line=&fmt=&scope=&start=`).
  */
 export default function PlayerPage() {
   const params = useLocalSearchParams<{ idx: string; stat?: string; line?: string; fmt?: string; scope?: string; team?: string; start?: string }>();
@@ -74,7 +75,7 @@ export default function PlayerPage() {
   const [filters, setFilters] = useState<Filters>({});
   const s = usePlayerScreen(idx, { stat, fmt, scope, line: lineQ, start: startQ, filters });
   const profile = profileParts(useQuery(profilesQuery).data, s.pid).join(" · ");
-  useEffect(() => { if (s.ok) pushRecentPlayer(idx); }, [idx, s.ok]);
+  useEffect(() => { if (s.indexed) pushRecentPlayer(idx); }, [idx, s.indexed]);
   const pricedSet = useMemo(() => new Set(s.pricedStats), [s.pricedStats]);
 
   const target = useRef<ComponentRef<typeof View>>(null);
@@ -84,10 +85,15 @@ export default function PlayerPage() {
   // the hero: the portrait rides slower than the page and fades as it goes, and swells when the page is pulled down past the top; the name follows more gently
   const portraitFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 240], [1, 0.15], "clamp"), transform: [{ translateY: y.value * 0.35 }, { scale: 1 + Math.max(-y.value, 0) / 520 }] }));
   const nameFx = useAnimatedStyle(() => ({ transform: [{ translateY: y.value * 0.12 }] }));
+  // sticky title fades in as the hero name scrolls away — avoids a doubled name at the top of the page
+  const headerTitleFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0, 1], "clamp") }));
+  const headerSubFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0.35, 1], "clamp") }));
 
   const res = s.res.data;
-  // cached plan / lines: never blank the page on a background refetch
-  const loading = s.loadingStore || (!res && !s.res.isError);
+  // Hero paints first; plan body mounts as a transition once the index is known.
+  const bodyReady = useLater(s.indexed);
+  // cached plan / lines: never blank the page on a background refetch; wait for matches.json before first plan
+  const loading = !bodyReady || s.loadingStore || !s.matchesReady || (!res && !s.res.isError);
   const patch = (p: Record<string, string>) => { setFilters((f) => ({ ...f, ...p })); setLineQ(undefined); };
   const share = () => {
     const entries = res?.ok ? res.chart?.entries : [];
@@ -102,7 +108,7 @@ export default function PlayerPage() {
     <View style={styles.root}>
       <BlurTargetView ref={target} style={styles.root}>
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
-          {!s.loadingStore && !s.ok ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
+          {s.storeError ? <View style={styles.pad}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View> : !s.loadingStore && !s.indexed ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
             <>
               <View style={[styles.hero, styles.pad]}>
                 <Animated.View style={[styles.heroLeft, nameFx]}>
@@ -117,8 +123,8 @@ export default function PlayerPage() {
               </View>
               {loading ? (
                 <View style={{ paddingTop: space.stack }} accessibilityRole="progressbar" accessibilityLabel="Reading his games…"><PlayerSkeleton /></View>
-              ) : !res.ok ? (
-                <View style={styles.pad}><EmptyState title="Could not load games" body={String(res.error || "Try again in a moment.")} /></View>
+              ) : !res?.ok ? (
+                <View style={styles.pad}><EmptyState title="Could not load games" body={String(res?.error || "Try again in a moment.")} /></View>
               ) : (
                 <Loaded key={`${s.stat}-${s.fmtVal}-${JSON.stringify(s.plan.filters)}-${s.plan.venue}-${s.book ? 1 : 0}`} s={s} filters={filters} onFilters={patch} onGame={game} />
               )}
@@ -129,16 +135,16 @@ export default function PlayerPage() {
 
       <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
         <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
-          <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} buttons={2} right={s.ok ? (
+          <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} titleStyle={headerTitleFx} subtitleStyle={headerSubFx} buttons={2} right={s.indexed ? (
             <>
               <StarButton idx={idx} />
               <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
             </>
           ) : undefined} />
+          {s.fmts.length > 1 ? <LineTabs<string> label="Format" items={s.fmts.map(([i, f]) => [String(i), f] as [string, string])} value={String(s.fmtVal)} onChange={(v) => { setFmt(Number(v)); setLineQ(undefined); setScope(undefined); }} /> : null}
           <CapsuleTabs label="Stat" items={STAT_OPTIONS.map(([k, l]) => [k, l, !pricedSet.has(k)] as [string, string, boolean])} value={s.stat} onChange={(k) => { setStat(k); setLineQ(undefined); }} />
           <Animated.View style={[styles.sub2, sub]}>
             <View onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h && h !== subH) setSubH(h); }} style={[styles.subInner, { position: "absolute", left: 0, right: 0, top: 0 }]}>
-              {s.fmts.length > 1 ? <Segmented<string> items={s.fmts.map(([i, f]) => [String(i), f] as [string, string])} value={String(s.fmtVal)} onChange={(v) => { setFmt(Number(v)); setLineQ(undefined); setScope(undefined); }} label="Format" /> : null}
               {s.testBat ? <Segmented<string> items={[0, 1, 2].map((n) => [String(n), (SCOPE_LABEL as any)[n]] as [string, string])} value={String(s.scope)} onChange={(v) => { setScope(Number(v)); setLineQ(undefined); }} label="Innings" /> : null}
             </View>
           </Animated.View>
@@ -167,17 +173,21 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const d = useMemo(() => deriveChart({ entries, line, side, win, summary: res.summary, sameLine: res.plan?.line === line && (res.plan?.side || "over") === side }), [entries, line, side, win, res]);
-  const { ws, cur, all, shown, mix } = d;
-  const bookAt = book ? book.lines.find((l: any) => l.line === line) : null;
-  const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
-  const prior = bookAt?.prob == null ? null : side === "over" ? bookAt.prob : 1 - bookAt.prob;
-  const edge = bookAt && cur ? sideEdge(cur.hits, cur.played, prior, bestPrice) : null;
+  const { ws, cur, shown, mix } = d;
+  const bookAt = book ? book.lines.find((l: any) => Math.abs(l.line - line) < 0.01) : null;
+  const pricedAt = bookAt ? pricedFromBooks(bookAt.line, bookAt.books) : null;
+  const overFace = pricedAt?.over != null ? pricedAt.books.find((b) => b.over === pricedAt.over) : null;
+  const underFace = pricedAt?.under != null ? pricedAt.books.find((b) => b.under === pricedAt.under) : null;
   const active = (res.filters || []).filter(([k]: [string]) => !["Player", "Stat", "Format", "Line", "Side", "Test innings"].includes(k));
-  const slices = [
-    { key: "hit", n: mix.hit, color: color.hit }, { key: "miss", n: mix.miss, color: color.miss }, { key: "push", n: mix.push, color: color.amber }, { key: "out", n: mix.out, color: color.dnp },
-  ].filter((x) => x.n > 0);
   const sideLetter = side === "over" ? "O" : "U";
   const label = res.statLabel as string;
+  const tabItems: [string, string][] = [
+    ["lines", "Lines"],
+    ["logs", "Game log"],
+    ["splits", "Splits"],
+    ...(res.corr ? [["corr", "When it hits"] as [string, string]] : []),
+  ];
+  const tabValue = tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0];
 
   const [ha, hb] = String(next?.match || "").split(/\s+vs\s+/i);
   const liveMatch = next ? liveForFixture(s.live.data, { a: next.team || ha, b: next.opp || hb, start: next.start, fmt }) : null;
@@ -219,83 +229,90 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
 
   return (
     <View style={{ gap: space.stack }}>
-      <Animated.View entering={enter(0)} style={[styles.pad, { gap: space.snug }]}>
-        <View style={styles.metrics}>
-          <View style={styles.metricGrid}>
-            <Metric compact k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
-            <Metric compact k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
-            <Metric compact text k="Prop">{label}</Metric>
-            <Metric compact k="Hit rate"><View style={styles.countRow}>{arrow(cur.p == null ? null : cur.p >= 0.5)}{cur.p == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={Math.round(cur.p * 100)} suffix="%" style={styles.metricNum} />}</View></Metric>
-            <Metric compact k="Fair price">{cur.p ? <CountUp value={1 / cur.p} digits={2} style={styles.metricNum} /> : "–"}</Metric>
-            <Metric compact k="Opponent">{next?.opp ? <View style={styles.oppRow}><Text style={styles.metricTextSm}>{abbr(next.opp)}</Text><MatchStatus phase={next.phase || "upcoming"} start={next.start} /></View> : <Text style={styles.metricTextSm}>–</Text>}</Metric>
-          </View>
-          <View style={styles.gaugeCard}>
-            {slices.length >= 3 ? <OutcomeDonut caption={`${cur.label} hit rate`} center={cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`} slices={slices} /> : <Gauge p={cur.p} caption={`${cur.label} hit rate`} />}
-          </View>
+      <Animated.View entering={enter(0)} style={[styles.pad, styles.metricsBand]}>
+        <View style={styles.metricGrid}>
+          <Metric compact k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
+          <Metric compact k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
+          <Metric compact k="Hit rate"><View style={styles.countRow}>{arrow(cur.p == null ? null : cur.p >= 0.5)}{cur.p == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={Math.round(cur.p * 100)} suffix="%" style={styles.metricNum} />}</View></Metric>
+          <Metric compact k="Fair price">{cur.p ? <CountUp value={1 / cur.p} digits={2} style={styles.metricNum} /> : "–"}</Metric>
+          <Metric compact k="Opponent">{next?.opp ? <View style={styles.oppRow}><Text style={styles.metricTextSm}>{abbr(next.opp)}</Text><MatchStatus phase={next.phase || "upcoming"} start={next.start} /></View> : <Text style={styles.metricTextSm}>–</Text>}</Metric>
+          <Metric compact text k="Prop">{book ? label : <View style={{ gap: 2 }}><Text style={styles.metricTextSm}>{label}</Text><Text style={styles.notListed}>Not listed</Text></View>}</Metric>
         </View>
       </Animated.View>
-      <View style={styles.rule} />
 
       {!book ? <View style={styles.pad}><Unpriced label={label} /></View> : null}
 
       <View style={[styles.pad, { gap: space.snug }]}>
-        <View style={styles.controls}>
-          <Segmented<"over" | "under"> items={[["over", "Over"], ["under", "Under"]]} value={side} onChange={setSide} label="Side" width={150} />
-          <View style={styles.controlsRight}>
-            <LineStepper value={line} label={sideLetter} onStep={step} />
-            <PropStar idx={idx} stat={stat} line={line} fmt={fmtIndex(fmt)} />
-          </View>
-        </View>
-        {book && book.lines.length > 1 ? (
-          <Accordion title="Alt lines" badge={book.lines.length} value={edge != null ? `Edge ${edge >= 0 ? "+" : ""}${Math.round(edge * 100)}%` : undefined}>
-            <View style={{ paddingBottom: space.snug }}>
-              <View style={styles.altHead}><View style={styles.altBadge} /><Text style={[styles.altCol, styles.altPrice]}>Over</Text><Text style={[styles.altCol, styles.altPrice]}>Under</Text></View>
-              {book.lines.map((l: any) => {
-                const hist = windowRate(entries, cur.n, l.line, "over");
-                const bestO = Math.max(0, ...l.books.map((b: any) => b.over || 0));
-                return (
-                  <Press scale={1} key={l.line} onPress={() => { void Haptics.selectionAsync(); setLine(l.line); }} accessibilityRole="button" accessibilityLabel={`Use line ${l.line}`} style={({ pressed }) => [styles.altRow, line === l.line && styles.altOn, pressed && { opacity: 0.6 }]}>
-                    <View style={styles.altTop}>
-                      <Text style={styles.altLine}>O/U {l.line}{l === book.main ? <Text style={styles.main}>  MAIN</Text> : null}</Text>
-                      <Text style={styles.altRates}>MKT <Text style={styles.strong}>{l.prob == null ? "–" : pc(l.prob)}</Text>   {cur.label.toUpperCase()} <Text style={styles.strong}>{hist.p == null ? "–" : pc(hist.p)}</Text></Text>
-                    </View>
-                    {l.books.map((b: any) => (
-                      <View key={b.source} style={styles.altBook}>
-                        <View style={styles.altBadge}><BookBadge source={b.source} /></View>
-                        <Tick value={b.over} style={{ ...styles.altPrice, color: l.books.length > 1 && b.over === bestO ? color.primary : color.foreground }}>{odds(b.over)}</Tick>
-                        <Text style={[styles.altPrice, { color: color["muted-foreground"] }]}>{odds(b.under)}</Text>
-                      </View>
-                    ))}
-                  </Press>
-                );
-              })}
-            </View>
-          </Accordion>
-        ) : null}
-      </View>
-
-      <View style={[styles.pad, { gap: space.snug }]}>
         <ChartBars entries={shown} line={line} side={side} height={240} onSelect={(e, st) => onGame(e, st, `${label} ${side} ${line}`, c.auxLabel)} />
-        <View style={styles.windowRow}>
-          <View style={{ flex: 1 }}><WindowPills items={ws.map((w: any) => ({ n: w.n, label: w.label, p: w.p }))} value={cur.n} onChange={setWin} /></View>
-          <RoundButton label="Filters" active={filtersOpen || active.length > 0} onPress={() => setFiltersOpen((o) => !o)}>
-            <Ionicons name="options-outline" size={20} color={active.length ? color.primary : color.foreground} />
-          </RoundButton>
+        <View style={styles.controls}>
+          <Segmented<"over" | "under"> items={[["over", "O"], ["under", "U"]]} value={side} onChange={setSide} label="Side" width={112} />
+          <LineStepper value={line} label="O/U" onStep={step} />
+          <PropStar idx={idx} stat={stat} line={line} fmt={fmtIndex(fmt)} />
+          {book?.main && Math.abs(book.main.line - line) >= 0.01 ? (
+            <Press scale={1} onPress={() => { void Haptics.selectionAsync(); setLine(book.main.line); }} accessibilityRole="button" accessibilityLabel={`Use main line ${book.main.line}`} style={({ pressed }) => [styles.mainChip, pressed && { opacity: 0.6 }]}>
+              <Text style={styles.mainChipText}>main {book.main.line}</Text>
+            </Press>
+          ) : null}
         </View>
+        <WindowPills items={ws.map((w: any) => ({ n: w.n, label: w.label, p: w.p }))} value={cur.n} onChange={setWin} />
         {mix.out > 0 || cur.played < 5 ? (
           <View style={styles.counted}>
-            <Text style={[styles.sub, cur.played < 5 && { color: color.amber }]}>
+            <Text style={[styles.sub, { textAlign: "center", flex: 1 }, cur.played < 5 && { color: color.amber }]}>
               {mix.out > 0 ? <><Text style={styles.strong}>{mix.out}</Text> void or not in the XI left out · <Text style={styles.strong}>{cur.played}</Text> {res.sample?.unit || "games"} counted.</> : null}
               {cur.played < 5 ? `${mix.out > 0 ? " " : ""}Too few for a steady read.` : ""}
             </Text>
             {mix.out > 0 ? <InfoButton topic="chart" label="About this chart" /> : null}
           </View>
         ) : null}
-        {book && !(bookAt && next?.priced) ? (bookAt ? (
-          <View style={styles.bookRow}>
-            {bookAt.books.map((b: any) => <View key={b.source} style={styles.altBook}><BookBadge source={b.source} /><Tick value={b.over} style={{ ...type.callout, color: color.foreground }}>{odds(b.over)}</Tick><Text style={styles.sub}>/ {odds(b.under)}</Text></View>)}
+
+        <View style={styles.laneBlock}>
+          <View style={styles.laneRow}>
+            {(["over", "under"] as const).map((lane, i) => {
+              const hist = windowRate(entries, cur.n, line, lane);
+              const p = hist.p, fair = p ? 1 / p : null;
+              const on = side === lane;
+              return (
+                <Press
+                  key={lane}
+                  scale={1}
+                  onPress={() => { void Haptics.selectionAsync(); setSide(lane); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  accessibilityLabel={`${lane} ${line}`}
+                  style={({ pressed }) => [styles.lane, i === 0 && styles.laneSplit, on && styles.laneOn, pressed && { opacity: 0.7 }]}
+                >
+                  <Text style={styles.laneCap}>{lane} {line}</Text>
+                  <Text style={[styles.laneRate, lane === "over" && { color: color.primary }]}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</Text>
+                  <View style={styles.meterTrack}><View style={[styles.meterFill, lane === "over" ? styles.meterOver : styles.meterUnder, { width: `${Math.round((p ?? 0) * 100)}%` }]} /></View>
+                  <Text style={styles.laneFoot}>{hist.hits} of {hist.played} · fair {odds(fair)}</Text>
+                </Press>
+              );
+            })}
           </View>
-        ) : <Text style={styles.sub}>The books price {book.main.line}, not {line}.</Text>) : null}
+          {pricedAt || (book && !bookAt) ? (
+            <View style={styles.bookBand} accessibilityLabel="Book prices">
+              {pricedAt ? (
+                <>
+                  <View style={styles.laneRow}>
+                    {(["over", "under"] as const).map((lane, i) => (
+                      <View key={lane} style={[styles.bookLane, i === 0 && styles.laneSplit]}>
+                        <Text style={styles.laneCap}>{lane} {line}</Text>
+                        <SideBook priced={pricedAt} side={lane} />
+                      </View>
+                    ))}
+                  </View>
+                  <View style={styles.bookExtras}>
+                    <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                  </View>
+                </>
+              ) : (
+                <Press scale={1} onPress={() => { void Haptics.selectionAsync(); setLine(book!.main.line); }} accessibilityRole="button" style={styles.wrongLine}>
+                  <Text style={styles.sub}>The books price {book!.main.line}, not {line}. <Text style={styles.link}>Use {book!.main.line}</Text></Text>
+                </Press>
+              )}
+            </View>
+          ) : null}
+        </View>
       </View>
 
       {next ? (
@@ -329,25 +346,9 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         </Accordion>
       </View>
 
-      <View style={[styles.pad, { gap: space.snug }]}>
-        <Text style={styles.cap}>At a glance</Text>
-        {all ? (
-          <View style={styles.glanceCard}>
-            <View style={styles.glance}>
-              <View style={styles.glanceCell}><Text style={styles.glanceKey}>Cleared</Text><Text style={styles.glanceNum} numberOfLines={1}>{all.hits}<Text style={styles.glanceOf}>/{all.played}</Text></Text></View>
-              <View style={styles.glanceRule} />
-              <View style={styles.glanceCell}><Text style={styles.glanceKey}>Hit rate</Text><Text style={[styles.glanceNum, { color: all.p == null ? color.foreground : all.p >= 0.6 ? color.primary : all.p <= 0.4 ? color.miss : color.amber }]}>{all.p == null ? "–" : `${(all.p * 100).toFixed(1)}%`}</Text></View>
-              <View style={styles.glanceRule} />
-              <View style={styles.glanceCell}><Text style={styles.glanceKey}>Fair price</Text><Text style={styles.glanceNum}>{all.p ? odds(1 / all.p) : "–"}</Text></View>
-            </View>
-            <Text style={styles.glanceFoot}>{name} · {fmt} {label.toLowerCase()} {side} {line} over all {all.played} {res.sample?.unit || "innings"} in this sample.</Text>
-          </View>
-        ) : null}
-      </View>
-
       <View style={[styles.pad, { gap: space.stack }]}>
-        <Segmented<string> items={[["lines", "Lines"], ["logs", "Game log"], ["splits", "Splits"]]} value={tab} onChange={setTab} label="Sections" />
-        {tab === "lines" ? (
+        <Segmented<string> items={tabItems} value={tabValue} onChange={setTab} label="Sections" />
+        {tabValue === "lines" ? (
           <Animated.View entering={enter(0)} style={{ gap: space.stack }}>
             {(() => {
               const ladder = (res.ladder as any[]).filter((l) => l.n);
@@ -360,17 +361,17 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
                   rows={ladder.map((l) => [`${l.line}`, <HitCell key="o" p={l.pOver} />, odds(l.fairOver), <HitCell key="u" p={l.pUnder} />, odds(l.fairUnder)])} />
               );
             })()}
-            {res.corr ? (
-              <View style={{ gap: space.snug }}>
-                <Text style={styles.h3}>When {label.toLowerCase()} {res.plan?.side || "over"} {c?.line ?? res.line} hits</Text>
-                <Text style={styles.noteText}>{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</Text>
-                <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} flex={[2.3, 1, 1.2, 1.1]}
-                  rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), <Pill key="l" text={`${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}`} tone={x.lift >= 0.1 ? "up" : x.lift <= -0.1 ? "down" : "none"} width={48} />])} />
-              </View>
-            ) : null}
           </Animated.View>
         ) : null}
-        {tab === "logs" ? (
+        {tabValue === "corr" && res.corr ? (
+          <Animated.View entering={enter(0)} style={{ gap: space.snug }}>
+            <Text style={styles.h3}>When {label.toLowerCase()} {res.plan?.side || "over"} {c?.line ?? res.line} hits</Text>
+            <Text style={styles.noteText}>{res.corr.n} of {res.corr.of} {res.sample.unit}: how often his other props also clear in those games.</Text>
+            <DataTable bleed columns={["Prop", "Normal", "When it hits", "Lift"]} flex={[2.3, 1, 1.2, 1.1]}
+              rows={res.corr.rows.map((x: any) => [`${x.label} over ${x.line}`, pc(x.base), pc(x.cond), <Pill key="l" text={`${x.lift >= 0 ? "+" : ""}${Math.round(x.lift * 100)}`} tone={x.lift >= 0.1 ? "up" : x.lift <= -0.1 ? "down" : "none"} width={48} />])} />
+          </Animated.View>
+        ) : null}
+        {tabValue === "logs" ? (
           <Animated.View entering={enter(0)}>
             <Bleed>
             {[...entries].reverse().slice(0, logCount).map((e, i) => {
@@ -392,7 +393,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
             {entries.length > logCount ? <Press scale={1} onPress={() => setLogCount(logCount + 30)} style={[styles.button, { alignSelf: "center", marginTop: space.snug }]} accessibilityRole="button"><Text style={styles.buttonText}>Show more ({entries.length - logCount} left)</Text></Press> : null}
           </Animated.View>
         ) : null}
-        {tab === "splits" ? (
+        {tabValue === "splits" ? (
           <Animated.View entering={enter(0)}>
             {Object.entries(res.splits as Record<string, any[]>).filter(([, rows]) => rows.length).map(([kind, rows]) => {
               const title = kind.replace("_", " ");
@@ -428,64 +429,50 @@ const styles = StyleSheet.create({
   sub2: { overflow: "hidden" },
   subInner: { gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   pad: { paddingHorizontal: space.gutter },
-  empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },
   hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
   name: { ...type.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
   profile: { ...type.callout, fontFamily: font.data, fontSize: 15, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
   strong: { color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  link: { color: color.primary, fontFamily: font.medium },
   teamLine: { alignItems: "flex-start", gap: 2 },
-  logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" }, // the logo files carry transparent padding: crop it so the mark sits tight to the name
-  metrics: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  metricGrid: { flex: 1, flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
-  facts: { flexDirection: "row", alignItems: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingVertical: space.tight },
-  fact: { flex: 1, gap: 2, paddingHorizontal: space.tight },
-  factSep: { width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: color.hairline },
-  factKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  factVal: { ...type.callout, color: color.foreground, flexShrink: 1 },
+  logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  metricsBand: {
+    gap: space.snug,
+    paddingTop: space.snug,
+    paddingBottom: space.snug,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: color.hairline,
+  },
+  metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
-  factRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   countRow: { flexDirection: "row", alignItems: "center" },
   metricNum: { fontSize: 16, lineHeight: 20, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricText: { ...type.body, color: color.foreground },
   metricTextSm: { ...type.callout, fontFamily: font.data, fontSize: 17, lineHeight: 20, color: color.foreground },
-  gaugeCard: { width: 84, alignItems: "center", justifyContent: "center", borderRadius: 16, borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, backgroundColor: color.card, paddingVertical: space.tight },
-  rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: space.gutter },
-  controls: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
-  controlsRight: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  altRow: { gap: 6, paddingHorizontal: space.snug, paddingVertical: space.snug + 2, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, borderLeftWidth: 2, borderLeftColor: "transparent" },
-  altOn: { backgroundColor: "rgba(255,255,255,0.05)", borderLeftColor: color.primary },
-  altTop: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
-  altRates: { ...type.footnote, ...cap, color: color["muted-foreground"] },
-  altPrice: { ...type.callout, fontFamily: font.data, width: 52, textAlign: "right" },
-  altLine: { ...type.body, fontFamily: font.data, fontSize: 18, color: color.foreground },
-  main: { ...type.caption, ...cap, color: color.primary },
-  altBook: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  altBadge: { flex: 1 },
-  altHead: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, paddingBottom: 6 },
-  altCol: { ...cap, fontSize: 10, color: color["muted-foreground"] },
-  bookRow: { flexDirection: "row", flexWrap: "wrap", gap: space.stack },
-  windowRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  notListed: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"] },
+  controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: space.snug },
+  mainChip: { height: control, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
+  mainChipText: { ...type.callout, color: color.foreground },
   counted: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  cap: { ...type.callout, color: color["muted-foreground"], ...cap },
-  cap2: { ...type.callout, color: "rgba(255,255,255,0.8)", ...cap },
-  glanceCard: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
-  glance: { flexDirection: "row", alignItems: "center" },
-  glanceCell: { flex: 1, alignItems: "center", gap: 2 },
-  glanceRule: { width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: color.hairline },
-  glanceKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  glanceNum: { fontSize: 22, lineHeight: 26, letterSpacing: -0.44, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"] },
-  glanceOf: { fontSize: 14, fontFamily: font.data, letterSpacing: 0, color: color["muted-foreground"] },
-  glanceFoot: { ...type.footnote, color: color["muted-foreground"], textAlign: "center" },
+  laneBlock: { overflow: "hidden", borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline },
+  laneRow: { flexDirection: "row" },
+  lane: { flex: 1, minWidth: 0, gap: space.tight, paddingHorizontal: space.snug, paddingVertical: space.snug },
+  laneSplit: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline },
+  laneOn: { backgroundColor: "rgba(44,44,46,0.4)" },
+  laneCap: { ...type.caption, color: color["muted-foreground"], textTransform: "uppercase", letterSpacing: 0.4 },
+  laneRate: { ...type.title, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  laneFoot: { ...type.footnote, color: color["muted-foreground"] },
+  meterTrack: { height: 6, borderRadius: 999, backgroundColor: color.hairline, overflow: "hidden" },
+  meterFill: { height: "100%", borderRadius: 999 },
+  meterOver: { backgroundColor: color.primary },
+  meterUnder: { backgroundColor: "rgba(255,255,255,0.7)" },
+  bookBand: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  bookLane: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug, paddingVertical: space.snug, alignItems: "flex-start" },
+  bookExtras: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingHorizontal: space.snug, paddingVertical: space.snug },
+  wrongLine: { paddingHorizontal: space.snug, paddingVertical: space.snug },
   noteText: { ...type.footnote, lineHeight: 17, color: color["muted-foreground"] },
   h3: { ...type.body, color: color.foreground },
-  cell: { ...type.callout, color: color.foreground },
-  optionWrap: { flexDirection: "row", flexWrap: "wrap", gap: space.tight, paddingBottom: space.snug },
-  option: { height: 32, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center", maxWidth: "100%" },
-  optionOn: { backgroundColor: color.foreground },
-  optionText: { ...type.callout, color: color.foreground },
-  optionTextOn: { color: color.background },
   button: { backgroundColor: color.secondary, borderRadius: radius.chip, paddingHorizontal: space.stack, height: control, alignItems: "center", justifyContent: "center" },
   buttonText: { ...type.callout, color: color.foreground },
   logRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 56, paddingVertical: space.tight },

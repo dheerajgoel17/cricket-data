@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { storeQuery } from "@/lib/data";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import * as Localization from "expo-localization";
 import { homeTeam, sanitizeRail } from "@site/lib/priority";
-import { fixturesQuery, linesQuery, liveQuery, railConfigQuery } from "@/lib/queries";
+import { fixturesQuery, linesQuery, railConfigQuery } from "@/lib/queries";
 import { mark, timed } from "@/lib/perf";
 import { buildRail, type RailItem } from "@/lib/rail";
+import { useLive } from "@/lib/use-live";
 
 // Home, the Props block and the Fancy cards each ask for the rail; building it takes ~135 ms on a phone, so the one built for these inputs is shared.
 let built: { fx: unknown; lines: unknown; live: unknown; home: unknown; rail: unknown; items: RailItem[] } | null = null;
@@ -16,19 +16,24 @@ function railFor(fx: any[], lines: any, live: any, home: any, rail: any): RailIt
   return items;
 }
 
+// One settings object per published config and one home side for the app: every `useRail` (Home, the Props block, the Fancy cards) must hand `railFor` the same identities,
+// or each of them rebuilds the rail for itself on every change (three builds per poll).
+let cfgSeen: { raw: unknown; rail: ReturnType<typeof sanitizeRail> } | null = null;
+const railOf = (raw: unknown) => (cfgSeen && cfgSeen.raw === raw ? cfgSeen.rail : (cfgSeen = { raw, rail: sanitizeRail(raw) }).rail);
+let homeSide: { v: string | null } | null = null;
+const homeOf = () => (homeSide ??= { v: homeTeam(Localization.getCalendars()[0]?.timeZone ?? undefined, Localization.getLocales()[0]?.languageTag) }).v;
+
 /** The Home rail: not `ready` until the schedule and the book lines are in, so it is never the unpriced schedule that the priced list then replaces. */
 export function useRail(): { ready: boolean; items: RailItem[]; error: boolean; refetch: () => Promise<unknown>; refreshing: boolean } {
-  const fx = useQuery(fixturesQuery), lines = useQuery(linesQuery), live = useQuery(liveQuery), cfg = useQuery(railConfigQuery);
-  const rail = useMemo(() => sanitizeRail(cfg.data), [cfg.data]);
-  const home = useMemo(() => homeTeam(Localization.getCalendars()[0]?.timeZone ?? undefined, Localization.getLocales()[0]?.languageTag), []);
+  const fx = useQuery(fixturesQuery), lines = useQuery(linesQuery), live = useLive({ defer: true }), cfg = useQuery(railConfigQuery);
+  const rail = railOf(cfg.data);
+  const home = homeOf();
   const ready = fx.isSuccess && (lines.isSuccess || lines.isError);
   const items = useMemo(
     () => (ready ? railFor(fx.data!, lines.data, live.data, home, rail) : []),
     [ready, fx.data, lines.data, live.data, home, rail],
   );
-  const qc = useQueryClient();
-  // the stats data (the longest wait) starts once the cards can be drawn, so its 9 MB does not hold the first screen back
-  useEffect(() => { if (ready) void qc.prefetchQuery(storeQuery); }, [ready, qc]);
+  // Stats store is not prefetched here — Home paints from hot-rows seed; Player / Fancy / leftover scoring pull the store when needed.
   if (ready) mark("rail-ready", `items=${items.length}`);
   return {
     ready, items, error: fx.isError && !fx.data,

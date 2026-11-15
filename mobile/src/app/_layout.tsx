@@ -10,7 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
 import { mark, onRender, PROFILE } from "@/lib/perf";
-import { fixturesQuery, hotRowsQuery, linesQuery, liveQuery, watchAppState } from "@/lib/queries";
+import { fixturesQuery, hotRowsQuery, linesQuery, liveQuery, photosQuery, watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
 import { SignInSheet } from "@/ui/sign-in-sheet";
 import { WebFrame } from "@/ui/web-frame";
@@ -19,8 +19,7 @@ import { color, font } from "@/ui/tokens";
 void SplashScreen.preventAutoHideAsync();
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: 1 } } });
-// the feeds the Home rail reads start loading as the bundle runs, not when the Fixtures screen mounts after the fonts: the scores, the schedule, the books and the published hot rows are then already on their way (or in) by the first paint
-for (const q of [liveQuery, fixturesQuery, linesQuery, hotRowsQuery]) void client.prefetchQuery(q as never);
+// Do not prefetch at import time on Android — peek/parse of lines + hot-rows was a multi-second stall before fonts. Boot after fonts in RootLayout.
 
 // Dark only, in the site's colours. Setting the theme here also avoids a white flash behind the iOS 26 tab bar.
 const theme = {
@@ -43,6 +42,14 @@ export default function RootLayout() {
   const [splashDone, setSplashDone] = useState(false);
   const ready = !!(fonts || fontError);
   if (ready) mark("fonts-ready"); // a failed font load shows the system font rather than a blank screen
+  // Prefetch after fonts so MMKV/network work does not fight font load. Android live waits for useLive({ defer }).
+  useEffect(() => {
+    if (!ready) return;
+    for (const q of [fixturesQuery, linesQuery, hotRowsQuery, photosQuery]) void client.prefetchQuery(q as never);
+    const liveAt = Platform.OS === "android" ? 4_000 : 1200;
+    const t = setTimeout(() => { void client.prefetchQuery(liveQuery as never); }, liveAt);
+    return () => clearTimeout(t);
+  }, [ready]);
   // the system splash is plain black and is taken down by `AnimatedSplash` as it draws; the app is mounted behind it as soon as its fonts are in, so its data loads while the mark is on screen
   // (one parent for both, so the splash is never remounted, which would restart its drawing)
   return (

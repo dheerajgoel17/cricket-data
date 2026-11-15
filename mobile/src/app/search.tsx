@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { norm } from "@cricket/engine/util.js";
 import { dayKey, dayLabel } from "@site/lib/format";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
 import { fixturePath, goBack, push } from "@/lib/nav";
 import { fixturesQuery } from "@/lib/queries";
@@ -26,7 +26,7 @@ const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fa
 /** Search players (typo tolerant, the engine's resolver), teams, matches and leagues. Two letters start it; with an empty field it offers the tabs and the players opened lately. */
 export default function Search() {
   const inset = useScreenInsets(false);
-  const stats = useQuery(storeQuery), fx = useQuery(fixturesQuery);
+  const stats = useStore(), fx = useQuery(fixturesQuery);
   const { recents } = useRecents();
   const [text, setText] = useState("");
   const query = useDeferredValue(text);

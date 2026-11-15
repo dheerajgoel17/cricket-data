@@ -11,7 +11,7 @@ import { matchDateLabel, odds, pc } from "@site/lib/format";
 import { genderFilterLabel, groundGames, groundSummary, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
 import { fetchVenueWx, groundClock } from "@site/lib/venue-wx";
 import { groundMatchFilters } from "@/lib/ground-filters";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { openFixture, openPlayer } from "@/lib/nav";
 import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
 import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
@@ -41,9 +41,11 @@ const short = (n: number | null | undefined, d = 1) => (n == null ? "–" : Numb
  */
 export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixtureId?: string; from?: any }) {
   const inset = useScreenInsets(false);
-  const stats = useQuery(storeQuery), fixtures = useQuery(fixturesQuery);
+  const stats = useStore(), fixtures = useQuery(fixturesQuery);
   const store: any = stats.data?.store;
-  const g = useMemo(() => (store ? groundGames(store, fixtures.data, venue) : null), [store, fixtures.data, venue]);
+  const matchesReady = stats.matchesReady;
+  // History at the ground needs matches.json; schedule-only still paints once fixtures are in.
+  const g = useMemo(() => (store && matchesReady ? groundGames(store, fixtures.data, venue) : null), [store, matchesReady, fixtures.data, venue]);
   const [fmt, setFmt] = useState(from?.fmt ?? ""), [gender, setGender] = useState<GenderFilter>("");
   // From a fixture: open on Markets (Fancy rhythm). Venue list entry keeps Matches first.
   const [section, setSection] = useState<"matches" | "markets">(fixtureId ? "markets" : "matches");
@@ -60,7 +62,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
       <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
     </View></View>
   );
-  if (!g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" shape="ground" /></View>;
+  if (!store || !matchesReady || !g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" shape="ground" /></View>;
   if (!g.known) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></View>;
 
   const { activeFmt, formats, list, both } = filters;

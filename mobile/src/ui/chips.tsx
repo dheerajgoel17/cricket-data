@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint } from "@/ui/tokens";
 
-/** The site's series chips: one row that scrolls sideways, the chosen one filled (the fill fades between chips); each carries how many matches it holds. */
+/** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
 export function Chips({ items, value, onChange }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row} accessibilityRole="tablist">
@@ -20,10 +20,10 @@ export function Chips({ items, value, onChange }: { items: [id: string, label: s
 
 function Chip({ label, count, on, muted, onPress }: { label: string; count?: number | string; on: boolean; muted?: boolean; onPress: () => void }) {
   const p = useSharedValue(on ? 1 : 0);
-  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 200 }); }, [on, p]);
-  const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.foreground]) }));
-  const text = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color.background]) }));
-  const countColor = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], color.background]) }));
+  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 150 }); }, [on, p]);
+  const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
+  const text = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color["primary-foreground"]]) }));
+  const countColor = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], color["primary-foreground"]]) }));
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
       <Animated.View style={[styles.chip, box, muted && !on && { opacity: 0.7 }]}>
@@ -44,7 +44,7 @@ export function ActiveChip({ label, onClear }: { label: string; onClear: () => v
   );
 }
 
-/** Sheet / accordion choice chip (on = filled foreground). */
+/** Sheet / accordion choice chip (on = the accent fill, as the site's `Chip`). */
 export function ChoiceChip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
   return (
     <Press scale={1} onPress={onPress} accessibilityRole="button" style={[styles.choice, on && styles.choiceOn]}>
@@ -61,13 +61,13 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
-  label: { ...type.body, fontSize: 15 },
+  label: { ...type.callout, fontFamily: font.medium },
   count: { ...type.footnote, fontFamily: font.data, fontVariant: ["tabular-nums"] },
   active: { height: control, flexDirection: "row", alignItems: "center", gap: space.hair, paddingLeft: space.snug, paddingRight: space.tight, borderRadius: radius.chip, backgroundColor: tint.primary(0.15) },
   activeTxt: { ...type.callout, color: color.primary },
   choice: { height: control, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card, alignItems: "center", justifyContent: "center" },
-  choiceOn: { backgroundColor: color.foreground },
+  choiceOn: { backgroundColor: color.primary },
   choiceTxt: { ...type.callout, color: color.foreground },
-  choiceTxtOn: { color: color.background },
+  choiceTxtOn: { color: color["primary-foreground"] },
   choiceRow: { flexDirection: "row", flexWrap: "wrap", gap: space.snug },
 });

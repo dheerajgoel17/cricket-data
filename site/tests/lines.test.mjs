@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameFmt, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -110,8 +110,21 @@ test("keepMsFor is 24 hours, 6 days for a Test; the player page's window still h
   assert.equal(keepMsFor("FC"), TEST_KEEP_MS);
   assert.equal(sameMatchWindow("T20"), BOOK_WINDOW_MS);
   assert.equal(sameMatchWindow("Test"), TEST_KEEP_MS);
-  assert.equal(sameMatchWindowFor("T20", "Test"), TEST_KEEP_MS, "either side a Test is the 6-day window");
+  assert.equal(sameMatchWindowFor("T20", "Test"), 0, "tour legs never share a window");
+  assert.equal(sameMatchWindowFor("ODI", "Test"), 0);
+  assert.equal(sameMatchWindowFor("T20", "ODI"), 0);
+  assert.equal(sameMatchWindowFor("Hundred", "T20"), 0, "Hundred is another tournament");
+  assert.equal(sameMatchWindowFor("Test", "Test"), TEST_KEEP_MS);
+  assert.equal(sameMatchWindowFor("Test", ""), TEST_KEEP_MS, "Test + unknown still day-restamps");
   assert.equal(sameMatchWindowFor("", "T20"), BOOK_WINDOW_MS);
+  assert.equal(sameFmt("ODI", "Test"), false);
+  assert.equal(sameFmt("T20", "ODI"), false);
+  assert.equal(sameFmt("Test", "FC"), false, "FC stays distinct from Test");
+  assert.equal(sameFmt("Test", "Test"), true);
+  assert.equal(sameFmt("Test", ""), true, "unknown either side is fine");
+  assert.equal(sameFmt("ODI", "one day"), true);
+  assert.equal(sameFmt("T20", "T20I"), true);
+  assert.equal(sameFmt("ODI", "List A"), true);
   assert.equal(BOOK_KEEP_MS, 24 * 3600e3);
   assert.equal(TEST_KEEP_MS, 6 * 24 * 3600e3);
   const started = L(17.5, 1.85, 1.95, { start_utc: "2026-10-27T00:00:00Z" }); // 5 h before NOW: the 3-hour default lets it go
@@ -388,6 +401,32 @@ test("a T20 in an Afghanistan Test series does not price the Test (the Test's 6-
   const doc = { fancy: [bare], lines: [{ match: "Afghanistan vs Zimbabwe", start_utc: "2026-10-24T14:30:00Z", fmt: "T20", pid: "ab12" }] };
   assert.equal(sameFixture(bare, testFx, doc), false, "a T20 player-prop on the same kick-off tags the fancy");
   assert.equal(sameFixture(bare, t20Fx, doc), true);
+});
+
+test("sameFixture / sameFmt: bilateral tour legs (T20 / ODI / Test) stay separate; other formats never mix either", () => {
+  // Multi-format tours are T20+ODI+Test bilaterals. Hundred / T10 / O60 are different tournaments — still never cross-matched.
+  const startA = "2026-11-15T02:00:00Z", startB = "2026-11-19T22:00:00Z";
+  const line = (fmt) => ({ match: "New Zealand vs India", start_utc: startA, fmt });
+  const fx = (fmt) => ({ a: "New Zealand", b: "India", start: startB, fmt, startMs: Date.parse(startB) });
+  const tour = ["T20", "ODI", "Test"];
+  for (const a of tour) {
+    for (const b of tour) {
+      if (a === b) {
+        assert.equal(sameFmt(a, b), true);
+        assert.equal(sameFixture(line(a), fx(a)), a === "Test", `${a} 4.8d later: ${a === "Test" ? "day-restamp" : "next game"}`);
+        continue;
+      }
+      assert.equal(sameFmt(a, b), false, `tour ${a} ≠ ${b}`);
+      assert.equal(sameMatchWindowFor(a, b), 0);
+      assert.equal(sameFixture(line(a), fx(b)), false, `tour ${a} line must not price ${b} fixture`);
+      assert.equal(fancyFor({ fancy: [{ ...line(a), home: "New Zealand", away: "India", key: "match_fours", scope: "match", team: null, line: 20.5, over: 1.9, under: 1.9, source: "x" }] }, fx(b), "match_fours").length, 0);
+    }
+  }
+  for (const other of ["Hundred", "T10", "O60"]) {
+    assert.equal(sameFmt("T20", other), false, `${other} is another tournament, not a tour leg`);
+    assert.equal(sameMatchWindowFor("ODI", other), 0);
+    assert.equal(sameFixture(line("ODI"), fx(other)), false);
+  }
 });
 
 test("an exchange's No on its own line is quoted beside its Yes, and an under-only line is never the main one", async () => {

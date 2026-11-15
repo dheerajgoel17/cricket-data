@@ -1,7 +1,7 @@
 // Live score snapshots from Source A: the home list + schedule page (match list, URLs, scores), the match page (current pair, partnership, rates) and the scorecard page (every innings).
 // Pure: no fetch, no DOM. Numbers here are "so far", never settlement — VOID rules still apply after the innings qualifies.
 import { NO_IDENTITY } from "./identity.js";
-import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, sameMatchWindow, sameMatchWindowFor } from "./lines.js";
+import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, sameFmt, sameMatchWindow, sameMatchWindowFor } from "./lines.js";
 import { SAME_SIDE, norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
@@ -101,13 +101,21 @@ export function isResultLine(s) {
   return /\bwon by\b|\bmatch (drawn|tied|abandoned)\b|\bdrawn\b|\bno result\b|\babandoned\b|\btied\b/.test(t);
 }
 
+// The rail asks for a side's key once per fixture per live match (tens of thousands of calls a build): the answer for a name never changes, so it is kept.
+const teamKeys = new Map();
 export function teamKey(n) {
-  const k = String(n || "")
+  const s = String(n || "");
+  let key = teamKeys.get(s);
+  if (key !== undefined) return key;
+  const k = s
     .toLowerCase()
     .replace(/\(w\)|women'?s?|\sw$/g, "")
     .replace(/under-?19s?/g, "u19")
     .replace(/[^a-z0-9]/g, "");
-  return SAME_SIDE[k] || k;
+  key = SAME_SIDE[k] || k;
+  if (teamKeys.size > 5000) teamKeys.clear();
+  teamKeys.set(s, key);
+  return key;
 }
 
 /** "HC Brook" / "Harry Brook" / "harry brook" — last name plus first initial. Ambiguous surnames stay unmatched. */
@@ -239,7 +247,9 @@ export function fixtureInBooks(books, fixture) {
   if (!books?.length || !fixture) return false;
   const a = teamKey(fixture.a), b = teamKey(fixture.b), t = fixture.start ? Date.parse(fixture.start) : NaN;
   if (!a || !b) return false;
-  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a)) && (!Number.isFinite(t) || Math.abs(m.t - t) < sameMatchWindowFor(fixture.fmt, m.fmt)));
+  return books.some((m) => ((m.a === a && m.b === b) || (m.a === b && m.b === a))
+    && sameFmt(fixture.fmt, m.fmt)
+    && (!Number.isFinite(t) || Math.abs(m.t - t) < sameMatchWindowFor(fixture.fmt, m.fmt)));
 }
 
 /** A comma-separated file with quoted fields (`"a,b"`, `""` for a quote) as one object per row, keyed by the header line. */
@@ -272,10 +282,12 @@ export function unlistedRows(listed, books, schedule, base = "", now = Date.now(
     if (!Number.isFinite(b.t) || b.t > now) continue;
     const there = (listed || []).some((m) => {
       const n = (m.teams || []).map((x) => teamKey(x.name));
-      return n.includes(b.a) && n.includes(b.b) && (!m.start || Math.abs(Date.parse(m.start) - b.t) < sameMatchWindowFor(m.fmt, b.fmt));
+      return n.includes(b.a) && n.includes(b.b) && sameFmt(m.fmt, b.fmt)
+        && (!m.start || Math.abs(Date.parse(m.start) - b.t) < sameMatchWindowFor(m.fmt, b.fmt));
     });
     if (there) continue;
-    const f = (schedule || []).find((r) => r.url && r.start_utc && Math.abs(Date.parse(r.start_utc) - b.t) < sameMatchWindowFor(r.format, b.fmt)
+    const f = (schedule || []).find((r) => r.url && r.start_utc && sameFmt(r.format, b.fmt)
+      && Math.abs(Date.parse(r.start_utc) - b.t) < sameMatchWindowFor(r.format, b.fmt)
       && ((teamKey(r.team_a) === b.a && teamKey(r.team_b) === b.b) || (teamKey(r.team_a) === b.b && teamKey(r.team_b) === b.a)));
     if (!f || out.some((m) => m.id === f.match_id)) continue;
     if (now - b.t > keepMsFor(f.format || b.fmt)) continue;
@@ -295,7 +307,8 @@ export function pricedLive(matches, books) {
   return (matches || []).filter((m) => {
     const names = (m.teams || []).map((x) => teamKey(x.name));
     const t = m.start ? Date.parse(m.start) : NaN;
-    return books.some((b) => names.includes(b.a) && names.includes(b.b) && (!Number.isFinite(t) || Math.abs(t - b.t) < sameMatchWindowFor(m.fmt, b.fmt)));
+    return books.some((b) => names.includes(b.a) && names.includes(b.b) && sameFmt(m.fmt, b.fmt)
+      && (!Number.isFinite(t) || Math.abs(t - b.t) < sameMatchWindowFor(m.fmt, b.fmt)));
   });
 }
 
@@ -763,9 +776,12 @@ export function liveForFixture(doc, fixture) {
   for (const m of matches) {
     const names = (m.teams || []).map((x) => teamKey(x.name));
     if (!(names.includes(a) && names.includes(b))) continue;
-    if (!Number.isFinite(t) || !m.start) { if (m.status === "live") return m; fallback = fallback || m; continue; }
-    if (Math.abs(Date.parse(m.start) - t) < sameMatchWindowFor(fixture.fmt, m.fmt)) return m;
-    if (m.status === "live") fallback = fallback || m;
+    if (!sameFmt(fixture.fmt, m.fmt)) continue; // bilateral tour: live ODI/T20 must not paint a later Test (or the other way round)
+    const mt = m.start ? Date.parse(m.start) : NaN;
+    // Missing start on either side: still allow a live hit (books sometimes omit kick-off). Outside the window: never — next game of the tour.
+    if (Number.isFinite(t) && Number.isFinite(mt) && Math.abs(mt - t) >= sameMatchWindowFor(fixture.fmt, m.fmt)) continue;
+    if (m.status === "live") return m;
+    fallback = fallback || m;
   }
   return fallback;
 }
@@ -1035,12 +1051,13 @@ function readLine(match, l, idn) {
   return notInXI(match, l.player, l.team, sid, books) ? { value: null, state: "live", verdict: null, notInXI: true } : null;
 }
 
-/** Is this book row (a player line or a fancy line: `match` "A vs B" and `start_utc`) one of this match's: the same two sides, and a start within 14 hours (6 days for a Test)? */
+/** Is this book row (a player line or a fancy line: `match` "A vs B" and `start_utc`) one of this match's: the same two sides, same format, and a start within 14 hours (6 days for a Test)? */
 export function lineBelongs(match, l) {
   const sides = new Set((match?.teams || []).map((t) => teamKey(t.name)));
   if (sides.size !== 2) return false;
   const [a, b] = String(l?.match).split(/\s+vs\s+/i);
   if (!b || !sides.has(teamKey(a)) || !sides.has(teamKey(b))) return false;
+  if (!sameFmt(match?.fmt, l.fmt)) return false;
   const t = match?.start ? Date.parse(match.start) : NaN;
   return !(Number.isFinite(t) && l.start_utc && Math.abs(Date.parse(l.start_utc) - t) >= sameMatchWindowFor(match?.fmt, l.fmt));
 }

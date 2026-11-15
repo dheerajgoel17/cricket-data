@@ -13,6 +13,9 @@ export const USER_AGENT = `FancyCash/${Constants.expoConfig?.version ?? "0"} (${
 /** An image address from the data: a host-relative one (`/books/bet365.svg`) is on the site, a full one is used as it is. */
 export const abs = (u: string) => (u.startsWith("/") ? SITE_URL + u : u);
 
+/** Source image CDN (`EXPO_PUBLIC_IMG_CDN` in `.env.local`, same value as the site's `VITE_IMG_CDN`). Wired into `@cricket/engine/photos` at boot. */
+export const IMG_CDN = (process.env.EXPO_PUBLIC_IMG_CDN ?? "").replace(/\/$/, "");
+
 /**
  * Where each match's permanent archive file lives (every line the books priced for it, kept for good): `EXPO_PUBLIC_ARCHIVE_URL` in mobile/.env.local, never written in a tracked file.
  * Without it a finished match whose lines the live feed has let go simply has no props to show.

@@ -13,8 +13,8 @@ import { STATS } from "@cricket/engine/rules.js";
 import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { FORMATS, fmtIndex } from "@cricket/engine/util.js";
 import { barState, windowRates } from "@cricket/engine/windows.js";
-import { storeQuery } from "@/lib/data";
 import { fixturesQuery, linesQuery, liveQuery } from "@/lib/queries";
+import { useStore } from "@/lib/use-store";
 import { fixtureStart } from "@/lib/rail";
 
 export interface Filters { opp?: string; venue?: string; vt?: string; inn?: string; pos?: string; lvl?: string; last?: string }
@@ -23,13 +23,16 @@ export const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v
 
 /** The page's state for a player: stat, format, innings scope, the line the link carried, and the filters. */
 export function usePlayerScreen(idx: number, q: PlayerQuery) {
-  const stats = useQuery(storeQuery), lines = useQuery(linesQuery), fixtures = useQuery(fixturesQuery), live = useQuery(liveQuery);
+  const stats = useStore(), lines = useQuery(linesQuery), fixtures = useQuery(fixturesQuery), live = useQuery(liveQuery);
   const store = stats.data?.store, rz = stats.data?.rz;
-  const ok = !!store && idx >= 0 && idx < store.P.id.length;
-  const rawName: string = ok ? store.playerName(idx) : "";
-  const team: string = ok ? store.teamName(store.P.tm[idx]) : "";
-  const pid: string = ok ? store.P.id[idx] : "";
-  const fm: number = ok ? store.P.fm[idx] : 0;
+  // Index alone is enough for the name strip; history plans need matches.json (site HistoryGate).
+  const matchesReady = stats.matchesReady;
+  const indexed = !!store && idx >= 0 && idx < store.P.id.length;
+  const ok = indexed && matchesReady;
+  const rawName: string = indexed ? store.playerName(idx) : "";
+  const team: string = indexed ? store.teamName(store.P.tm[idx]) : "";
+  const pid: string = indexed ? store.P.id[idx] : "";
+  const fm: number = indexed ? store.P.fm[idx] : 0;
   const fmts = useMemo(() => FORMATS.map((f: string, i: number) => [i, f] as [number, string]).filter(([i]) => (fm >> i) & 1), [fm]);
   const doc = lines.data;
   const bookName = (doc?.lines || []).find((l: any) => l.pid === pid && l.book_name)?.book_name as string | undefined;
@@ -70,7 +73,7 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
   const next = useMemo(() => nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures: fixtures.data || [], live: live.data, prefer }), [store, doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, prefer]);
   // kit, crest and hero label follow the match side; profile team only when there is no match
   const side = matchSide(next?.team, team);
-  return { ok, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
+  return { ok, indexed, matchesReady, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
 }
 
 /**

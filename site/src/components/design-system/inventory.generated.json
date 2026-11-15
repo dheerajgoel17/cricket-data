@@ -43,14 +43,13 @@
     "path": "mobile/src/app/(tabs)/index.tsx",
     "platform": "native",
     "route": true,
-    "exports": [
-      "Fixtures"
-    ],
+    "exports": [],
     "dependencies": [
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/fixture-card.tsx",
       "mobile/src/ui/hot-home.tsx",
+      "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/phase-bar.tsx",
       "mobile/src/ui/tab-fade.tsx"
@@ -83,6 +82,7 @@
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/match-chip.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/info-button.tsx",
       "mobile/src/ui/motion.tsx",
@@ -251,7 +251,7 @@
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/accordion.tsx",
       "mobile/src/ui/blur-bar.tsx",
-      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/book-table.tsx",
       "mobile/src/ui/charts.tsx",
       "mobile/src/ui/count-up.tsx",
       "mobile/src/ui/capsule.tsx",
@@ -264,12 +264,13 @@
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/skeletons.tsx",
       "mobile/src/ui/next-match.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/page-header.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/side-book.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
-      "mobile/src/ui/tick.tsx",
       "mobile/src/ui/tab-fade.tsx",
       "mobile/src/ui/window-pills.tsx"
     ]
@@ -326,42 +327,22 @@
     ]
   },
   {
-    "path": "mobile/src/components/app-tabs.android.tsx",
-    "platform": "android",
-    "route": false,
-    "exports": [
-      "AppTabs"
-    ],
-    "dependencies": [
-      "mobile/src/components/floating-tab-bar.tsx"
-    ]
-  },
-  {
     "path": "mobile/src/components/app-tabs.tsx",
     "platform": "native",
     "route": false,
     "exports": [
       "AppTabs"
     ],
-    "dependencies": []
-  },
-  {
-    "path": "mobile/src/components/app-tabs.web.tsx",
-    "platform": "native",
-    "route": false,
-    "exports": [
-      "AppTabs"
-    ],
     "dependencies": [
-      "mobile/src/components/floating-tab-bar.tsx"
+      "mobile/src/components/tab-bar.tsx"
     ]
   },
   {
-    "path": "mobile/src/components/floating-tab-bar.tsx",
+    "path": "mobile/src/components/tab-bar.tsx",
     "platform": "native",
     "route": false,
     "exports": [
-      "FloatingTabBar"
+      "TabBar"
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
@@ -422,6 +403,20 @@
     ],
     "dependencies": [
       "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/book-table.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "BookTable"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/icons.tsx"
     ]
   },
   {
@@ -564,15 +559,6 @@
     ]
   },
   {
-    "path": "mobile/src/ui/glass.tsx",
-    "platform": "native",
-    "route": false,
-    "exports": [
-      "GlassSurface"
-    ],
-    "dependencies": []
-  },
-  {
     "path": "mobile/src/ui/grid-table.tsx",
     "platform": "native",
     "route": false,
@@ -644,6 +630,7 @@
     "exports": [
       "ArrowDown",
       "ArrowUp",
+      "ChevronDown",
       "ChevronLeft",
       "ChevronRight",
       "Minus",
@@ -669,7 +656,9 @@
     "platform": "native",
     "route": false,
     "exports": [],
-    "dependencies": []
+    "dependencies": [
+      "mobile/src/ui/brand.tsx"
+    ]
   },
   {
     "path": "mobile/src/ui/line-stepper.tsx",
@@ -682,6 +671,18 @@
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/line-tabs.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LineTabs"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
     ]
   },
   {
@@ -839,11 +840,14 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "Appear",
       "CardSkeleton",
       "LiveDot",
       "Pulse",
+      "Rise",
       "RowsSkeleton",
       "Skeleton",
+      "SkeletonGroup",
       "Working"
     ],
     "dependencies": [
@@ -892,6 +896,7 @@
       "PhaseBar"
     ],
     "dependencies": [
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -927,12 +932,13 @@
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/book-badge.tsx",
-      "mobile/src/ui/collapsible.tsx",
+      "mobile/src/ui/book-table.tsx",
       "mobile/src/ui/mini-bars.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
       "mobile/src/ui/live-spot.tsx",
+      "mobile/src/ui/star.tsx",
       "mobile/src/ui/tick.tsx"
     ]
   },
@@ -988,6 +994,19 @@
     ]
   },
   {
+    "path": "mobile/src/ui/side-book.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "SideBook"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/tick.tsx"
+    ]
+  },
+  {
     "path": "mobile/src/ui/sign-in-sheet.tsx",
     "platform": "native",
     "route": false,
@@ -1017,6 +1036,7 @@
       "PlayerSkeleton",
       "RowsSkeleton",
       "Skeleton",
+      "SkeletonGroup",
       "TapeSkeleton"
     ],
     "dependencies": []

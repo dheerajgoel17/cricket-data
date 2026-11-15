@@ -15,6 +15,26 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-14 — Mobile player: Match Fancy / web Player shape
+- **Path:** `mobile/src/app/player/[idx].tsx`, `ui/window-pills.tsx`, `ui/book-table.tsx`, `ui/side-book.tsx`, `ui/page-header.tsx` (`titleStyle` / `subtitleStyle`), `ui/icons.tsx` (`ChevronDown`)
+- **Change:** Chart-led first viewport; metrics only (no phone gauge); centred O/U + stepper under chart; quiet hairline `WindowPills`; O/U hit-rate meters + book lanes (`SideBook` / `BookTable` twins); drop Alt lines accordion and At a glance; When it hits is its own tab; sticky header title fades in as the hero name scrolls away.
+- **Callers:** Player detail; WindowPills anywhere else using the look-back band
+
+### 2026-11-14 — Mobile: Tick flash + Press timing (Reanimated 4.7)
+- **Path:** `mobile/src/ui/tick.tsx`, `press.tsx`, `collapsible.tsx`
+- **Change:** Precompute Tick flash colours (`FLASH_RISE` / `FLASH_FALL`) outside `useAnimatedStyle` — calling `tint.*` inside a worklet threw Worklets “Tried to synchronously call a Remote Function” (`miss`). Press / TurnChevron CSS transitions use `"ease-out"` only; `cubicBezier(...)` still serialises to `cubic-bezier(...)` and Reanimated 4.7 rejects it as an invalid predefined timing function.
+- **Callers:** Live price / so-far flashes; every `Press`; Fancy book chevrons
+
+### 2026-11-14 — Mobile: docked tab bar; no liquid glass / floating chrome
+- **Path:** `mobile/src/components/tab-bar.tsx`, `app-tabs.tsx` (deleted `floating-tab-bar`, `app-tabs.android/web`, `ui/glass`), `ui/phase-bar.tsx`, `ui/insets.ts`, `TAB_BAR_HEIGHT` 54
+- **Change:** One solid, full-width docked tab bar on iOS/Android/web. Home phase strip (In play / Pre-match / Completed) sits in page flow flush above it. No floating capsule, `NativeTabs`, or `GlassView`.
+- **Callers:** All six tabs; Home rail + phase strip; web preview
+
+### 2026-11-14 — Mobile: Press CSS transition; skeleton pulse; Tick/Collapsible mount-on-use
+- **Path:** `mobile/src/ui/press.tsx`, `skeletons.tsx` / `SkeletonGroup`, `tick.tsx`, `collapsible.tsx`, `motion.tsx`
+- **Change:** Press is a 120 ms UI-thread CSS transform transition (plain Pressable when `scale={1}` or reduce-motion). Skeletons: one opacity pulse per group (was per-block SVG sweep). `Tick` flash and `Collapsible` book tables mount only after first use.
+- **Callers:** Every tappable row/chip; `Working` / page skeletons; prop rows; Fancy books
+
 ### 2026-11-14 — Flags: parent-nation codes; kit/face keep honest empties
 - **Path:** `engine/flags.js` (`flagCode`, `FLAG_CODES`), `lib/assets.ts` (`flagUrl`), `share-text.js`
 - **Change:** Flagcdn lookup moved to the engine; U19 / A / Champions / Women strip to the senior flag; added missing nations (USA spellings, Costa Rica, Cameroon, Iran, Ivory Coast, …). Still no source AD jersey or stock helmet face as UI fallbacks.
@@ -114,3 +134,14 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/chart.tsx`
 - **Change:** Threshold line uses `border-foreground/35` so it reads on `design-light` as well as product dark.
 - **Callers:** Player, ResultView, design-system Data & metrics stage
+
+### 2026-11-15 — App matched to the phone site (header, chips, rows, phase tabs, motion)
+- **Path:** `mobile/src/ui/brand.tsx`, `chips.tsx`, `capsule.tsx`, `match-chip.tsx`, `phase-bar.tsx`, `prop-row.tsx`, `fancy-row.tsx`, `star.tsx`, `motion.tsx`, `tick.tsx`, `tokens.ts`, `mobile/src/lib/tabs.ts`, `mobile/src/app/(tabs)/index.tsx`, `props.tsx`, `fancy.tsx`
+- **Change:** `AppHeader` is the brand bar on every tab with Search and Account (sign in / Saved), the tab's title in a row under it. Chosen chips (`Chips`, `ChoiceChip`, `CapsuleTabs`, `MatchChips`) are the accent fill with dark text, 150 ms fade; `MatchChips` shows a Live / session tag and an optional leading "All". Home's phase tabs sit under the header on a hairline, count quieter. `PropRow` follows the site's row: `O/U` line in Barlow Condensed Bold (`metric`), best Over and Under each with its book (`BookTable` behind "+N books"), watchlist star top right, model edge (`figure`), L10 count coloured by rate. `OverviewRow` uses the same figures. Fancy tab matches are flat sections closed by a hairline, not cards. Player props has the site's match-chip and stat-chip rows. Tab label "Player props". Motion: `Rise` (the site's card entrance: 8 px, 300 ms, 40 ms stagger, first paint only), tick flash 450 ms, live dot 1 ↔ 0.5 in 2 s. New tokens: `metric`, `figure`, `tint.destructive`.
+- **Callers:** every tab (header), Home rail and props block, Player props, Fancy, fixture Props / Match Fancy lists, player stat switch, filter sheets
+
+### 2026-11-15 — Header reverted; native motion; fixture and player pages flat like the phone site
+- **Path:** `mobile/src/ui/brand.tsx`, `motion.tsx`, `tick.tsx`, `line-tabs.tsx` (new), `phase-bar.tsx`, `match-header.tsx`, `live-board.tsx`, `tournament-stats.tsx`, `mobile/src/app/fixture/[id]/index.tsx`, `player/[idx].tsx`, `(tabs)/index.tsx`, `(tabs)/leagues.tsx`
+- **Change:** `AppHeader` is back to the earlier one (brand on Fixtures, each other tab's own title in the bar, Search). Motion is native rather than copied from the site: entrances are springs (`enter`, `Rise`), the LIVE dot has a ring that spreads and fades (`LiveDot`), a number that moved rolls in on a spring over a fading wash (`Tick`), content fades in over its skeleton (`Appear`). New `LineTabs`: underline tabs with one underline that glides on a spring; `PhaseBar` and the player's format switch use it. The match block on a fixture page is flat (no card), and the page's sections are chips under it with the open one's stat chips below. League chips use the accent fill; season facts, the leader figure and the table's key column are Barlow Condensed Bold.
+- **Callers:** every tab (header), Home, fixture page, player page, Leagues, league page
+

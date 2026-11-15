@@ -11,10 +11,10 @@ import type { RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
 import { LiveDot } from "@/ui/motion";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, num, numLg, radius, space, type } from "@/ui/tokens";
+import { cap, color, font, num, numLg, space, type } from "@/ui/tokens";
 
 /**
- * The match at the top of its page, in a container (the site's `MatchHeader`): its state and format with a share button, both sides with their crests and, when it is on or
+ * The match at the top of its page, flat on the page (the site's `MatchHeader`): its state and format with a share button, both sides with their crests and, when it is on or
  * over, their scores, otherwise the kick-off and a live countdown; then the status line, and the series and ground.
  */
 export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem; onShare?: () => void; onGround?: () => void; bare?: boolean }) {
@@ -75,7 +75,8 @@ export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem;
 }
 
 const styles = StyleSheet.create({
-  box: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  // flat on the page (the site's match header): no card behind it
+  box: { gap: space.snug },
   bare: { gap: space.snug },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   state: { flexDirection: "row", alignItems: "center", gap: space.tight },

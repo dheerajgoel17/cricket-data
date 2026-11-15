@@ -48,6 +48,7 @@ export const tint = {
   primary: (a: number) => hexAlpha(color.primary, a),
   miss: (a: number) => hexAlpha(color.miss, a),
   amber: (a: number) => hexAlpha(color.amber, a),
+  destructive: (a: number) => hexAlpha(color.destructive, a),
   white: (a: number) => `rgba(255,255,255,${a})`,
   black: (a: number) => `rgba(0,0,0,${a})`,
   /** Selected ladder / table row wash (matches web card-on). */
@@ -103,6 +104,12 @@ export const type = {
   caption: { fontFamily: font.regular, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
 
+const metricSize = remPx(T["fs-metric"]);
+/** The site's `font-condensed text-metric font-emphasis`: a row's hero line ("O/U 29.5") in Barlow Condensed Bold, tabular. */
+export const metric = { fontFamily: font.data, fontSize: metricSize, lineHeight: metricSize + 2, letterSpacing: ls(metricSize, T["fs-metric-ls"]), fontVariant: ["tabular-nums" as const] };
+/** The site's `font-condensed text-title font-emphasis`: the model edge beside a row. */
+export const figure = { fontFamily: font.data, fontSize: title, lineHeight: title + 2, letterSpacing: -0.3, fontVariant: ["tabular-nums" as const] };
+
 /** The widest the app gets in a browser (`ui/web-frame.tsx`), and so the width its text is fitted to there. */
 export const WEB_MAX_WIDTH = 560;
 
@@ -111,5 +118,5 @@ export const control = remPx(Z.control);
 export const HEADER_HEIGHT = remPx(Z["header-h"]);
 /** Share of the screen a fixture card takes, so the next match peeks (web `--fixture-card`). */
 export const FIXTURE_CARD_SHARE = 0.8;
-/** Height of the custom Android tab bar (the iOS bar is the system's). */
-export const TAB_BAR_HEIGHT = 62;
+/** Height of the docked tab bar's row (`components/tab-bar.tsx`), without the home indicator's room under it. */
+export const TAB_BAR_HEIGHT = 54;

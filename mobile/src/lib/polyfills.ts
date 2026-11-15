@@ -3,11 +3,14 @@ import { sha256 } from "@noble/hashes/sha2.js";
 
 type Bytes = ArrayBuffer | ArrayBufferView;
 
-const toBytes = (b: Bytes | undefined): Uint8Array =>
-  !b ? new Uint8Array(0) : b instanceof Uint8Array ? b : ArrayBuffer.isView(b) ? new Uint8Array(b.buffer, b.byteOffset, b.byteLength) : new Uint8Array(b);
+const toBytes = (b: Bytes | undefined): Uint8Array => {
+  "worklet";
+  return !b ? new Uint8Array(0) : b instanceof Uint8Array ? b : ArrayBuffer.isView(b) ? new Uint8Array(b.buffer, b.byteOffset, b.byteLength) : new Uint8Array(b);
+};
 
 /** UTF-8 to string (the data files are valid UTF-8; a stray byte becomes U+FFFD). */
 export function decodeUtf8(input?: Bytes): string {
+  "worklet";
   const b = toBytes(input);
   const units: number[] = [];
   let out = "";

@@ -4,11 +4,11 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import { color, radius, space, type } from "@/ui/tokens";
+import { color, control, font, radius, space, type } from "@/ui/tokens";
 
 /**
- * Tabs in one rounded capsule, the chosen one a raised pill (the reference app's stat switch: Points / Assists / Rebs). Scrolls sideways when there are more than fit; each item
- * fades its fill in and out on the UI thread. `muted` items are shown but quieter (a stat no book lists).
+ * A row of chips, the chosen one filled with the accent colour (the site's `PillGroup` / `Chip`: the stat switch on a player, the sections of a match). Scrolls sideways when there
+ * are more than fit; each chip fades its fill in and out on the UI thread (150 ms). `muted` items are shown but quieter (a stat no book lists).
  */
 export function CapsuleTabs({ items, value, onChange, label, flush }: { items: [id: string, label: string, muted?: boolean][]; value: string; onChange: (id: string) => void; label: string; /** Drop the page gutters when the tabs sit inside another bar. */ flush?: boolean }) {
   return (
@@ -22,8 +22,8 @@ export function CapsuleTabs({ items, value, onChange, label, flush }: { items: [
 
 function Tab({ text, on, muted, onPress }: { text: string; on: boolean; muted?: boolean; onPress: () => void }) {
   const p = useSharedValue(on ? 1 : 0);
-  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 200 }); }, [on, p]);
-  const fill = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], ["rgba(58,58,60,0)", "rgba(72,72,74,1)"]) }));
+  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 150 }); }, [on, p]);
+  const fill = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
   return (
     <Press onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: on }}>
       <Animated.View style={[styles.tab, fill]}>
@@ -34,11 +34,11 @@ function Tab({ text, on, muted, onPress }: { text: string; on: boolean; muted?: 
 }
 
 const styles = StyleSheet.create({
-  track: { marginHorizontal: space.gutter, marginVertical: space.snug, borderRadius: radius.chip, backgroundColor: "rgba(28,28,30,0.85)", borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, padding: 3 },
+  track: { marginHorizontal: space.gutter, marginVertical: space.snug },
   flush: { marginHorizontal: 0, marginVertical: 0 },
-  row: { alignItems: "center" },
-  tab: { height: 34, paddingHorizontal: space.stack, borderRadius: radius.chip, alignItems: "center", justifyContent: "center" },
-  text: { ...type.callout, color: color.foreground },
-  textOn: { color: color.foreground },
+  row: { alignItems: "center", gap: space.tight },
+  tab: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, alignItems: "center", justifyContent: "center" },
+  text: { ...type.callout, fontFamily: font.medium, color: color.foreground },
+  textOn: { color: color["primary-foreground"] },
   textMuted: { color: color["muted-foreground"] },
 });

@@ -156,6 +156,11 @@ function openedOf(entries) {
  * @param {((team: string, inn: number, sides: string[], fmt: string) => number | null) | null} [teamRunsOf]
  */
 export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soFarOf = null, teamRunsOf = null) {
+  const pairs = new Map();
+  const pairOf = (row) => {
+    if (!pairs.has(row)) pairs.set(row, matchPair(row));
+    return pairs.get(row);
+  };
   const started = inplay?.matches || [];
   if (!doc || !started.length) return doc;
   let lines = [...(doc.lines || [])], fancy = [...(doc.fancy || [])];
@@ -168,12 +173,12 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
       if (fx) ref = { match: `${fx.a} vs ${fx.b}`, home: fx.a, away: fx.b, start_utc: fx.start, fmt: fx.fmt, competition: fx.series || "", fromFixture: true };
     }
     if (!ref) continue;
-    const pair = matchPair(ref), [refHome, refAway] = ref.home ? [ref.home, ref.away] : splitMatch(ref.match);
+    const pair = pairOf(ref), [refHome, refAway] = ref.home ? [ref.home, ref.away] : splitMatch(ref.match);
     const info = { home: refHome, away: refAway, start_utc: ref.start_utc, fmt: ref.fmt, competition: ref.competition };
     const label = ref.match || `${refHome} vs ${refAway}`, markets = [], addLines = [], addFancy = [];
     // a batter the books priced before the start is linked through those lines (the same book spells him the same way: "M Taha"); anyone else through `resolve`
     const innsOf = (team) => (ref.fmt === "Test" && innOf ? innOf(team || "", [refHome, refAway]) || 0 : 0);
-    const known = lines.filter((x) => matchPair(x) === pair && x.pid);
+    const known = lines.filter((x) => pairOf(x) === pair && x.pid);
     const link = (name, sides) => {
       const hit = known.find((x) => namesMatch(x.book_name || x.player, name) || namesMatch(x.player, name));
       return hit ? { pid: hit.pid, name: hit.player, team: hit.team } : (resolve ? resolve(name, sides) : null);
@@ -183,7 +188,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
         const who = link(l.player, [refHome, refAway]);
         if (who?.pid) {
           const inn = innsOf(who.team);
-          const pre = lines.filter((x) => matchPair(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && !x.books?.every((b) => b.live));
+          const pre = lines.filter((x) => pairOf(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && !x.books?.every((b) => b.live));
           if (pre.length && soFarOf) {
             const runs = soFarOf(who.name || l.player, [refHome, refAway]);
             if (!(runs != null && runs > openedOf(pre).line)) continue; // the main pre-match line is still open: his row stays pre-match
@@ -197,7 +202,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
         markets.push({ kind: "ou", market: `${l.player} innings runs`, line: l.line, over: l.over, under: l.under, book: l.book || FEED_BOOK });
       } else if (l.kind === "team_runs") {
         const team = [refHome, refAway].find((t) => sameTeam(t, l.team)) || l.team;
-        const pre = fancy.filter((x) => matchPair(x) === pair && x.key === "team_total_runs" && teamKey(x.team) === teamKey(team) && (x.inn || 1) === l.inn && !x.live);
+        const pre = fancy.filter((x) => pairOf(x) === pair && x.key === "team_total_runs" && teamKey(x.team) === teamKey(team) && (x.inn || 1) === l.inn && !x.live);
         if (pre.length && teamRunsOf) {
           const runs = teamRunsOf(team, l.inn, [refHome, refAway], ref.fmt);
           if (!(runs != null && runs > openedOf(pre).line)) continue; // the side's main pre-match line is still open: it stays
@@ -210,7 +215,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
           const who = link(ms.player, [refHome, refAway]);
           if (!who?.pid) continue;
           const inn = innsOf(who.team);
-          if (soFarOf && lines.some((x) => matchPair(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && x.line === ms.line && !x.books?.every((b) => b.live))) {
+          if (soFarOf && lines.some((x) => pairOf(x) === pair && x.stat === "runs" && x.pid === who.pid && lineScope(x) === inn && x.line === ms.line && !x.books?.every((b) => b.live))) {
             const runs = soFarOf(who.name || ms.player, [refHome, refAway]);
             if (!(runs != null && runs > ms.line)) continue; // priced before the start at this rung and still open: the pre-match row stays
           }
@@ -224,7 +229,7 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, soF
     const firstSides = new Set(addFancy.filter((f) => f.inn === 1).map((f) => teamKey(f.team)));
     const firstKey = firstSides.size === 1;
     if (firstKey) {
-      const was = openedOf(fancy.filter((x) => matchPair(x) === pair && x.key === "first_innings_runs"));
+      const was = openedOf(fancy.filter((x) => pairOf(x) === pair && x.key === "first_innings_runs"));
       for (const f of addFancy.filter((x) => x.inn === 1)) addFancy.push({ ...f, key: "first_innings_runs", scope: "match", team: null, inn: undefined, ...(was ? { opened: was.line } : {}) });
     }
     lines = lines.concat(addLines);

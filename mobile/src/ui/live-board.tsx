@@ -19,6 +19,9 @@ import { recentForms } from "@/lib/form";
 
 type Side = [string, number];
 
+/** Read-only peek — fixture page already runs useStore; do not start a second store load from scorecard faces. */
+const useStorePeek = () => useQuery({ ...storeQuery, enabled: false }).data;
+
 /** "Smith" for "Jason Smith"; "van der Dussen" keeps its particle. */
 function shortName(n: string) {
   const p = String(n).trim().split(/\s+/);
@@ -29,8 +32,8 @@ function shortName(n: string) {
 
 /** Who a live feed's name is in the data: the resolver, within the side when it is known; a name it is not sure of (a debutant) stays plain text. */
 function usePlayerIdx(name: string, team?: string, sides?: Side[]): number | null {
-  const stats = useQuery(storeQuery);
-  const rz: any = stats.data?.rz;
+  const stats = useStorePeek();
+  const rz: any = stats?.rz;
   const teamIdx = sides?.find(([n]) => n === team)?.[1];
   return useMemo(() => {
     if (!rz) return null;
@@ -42,8 +45,7 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]): number | nul
 /** A face: the player's picture in his team's shirt when he is in the data, else the feed's own photo, else a silhouette. */
 function Face({ name, photo, team, sides, size = 36 }: { name: string; photo?: string; team?: string; sides?: Side[]; size?: number }) {
   const idx = usePlayerIdx(name, team, sides);
-  const stats = useQuery(storeQuery);
-  const store: any = stats.data?.store;
+  const store: any = useStorePeek()?.store;
   if (idx != null && store) return <PlayerAvatar pid={store.P.id[idx]} team={team ?? store.teamName(store.P.tm[idx])} size={size} />;
   return (
     <View style={[styles.face, { width: size, height: size, borderRadius: size / 2 }]}>
@@ -277,9 +279,10 @@ const styles = StyleSheet.create({
   muted: { ...type.footnote, color: color["muted-foreground"] },
   strongMuted: { fontFamily: font.medium, color: color.foreground },
   board: { padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
-  cardBox: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  // flat on the page, as the site's match block: sections divided by hairlines, no card behind them
+  cardBox: { gap: space.snug },
   flat: { gap: space.snug },
-  rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: -space.inset },
+  rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: -space.gutter },
   fullRow: { flexDirection: "row", alignItems: "center", gap: space.tight, minHeight: 44 },
   fullText: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
   pair: { flexDirection: "row", alignItems: "stretch", gap: space.snug },

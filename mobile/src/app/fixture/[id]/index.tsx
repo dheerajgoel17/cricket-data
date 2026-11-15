@@ -25,7 +25,8 @@ import { useFixtureBooks } from "@/lib/archive";
 import { fixtureState, fixtureStart, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useHotView } from "@/lib/use-hot";
 import { useNow } from "@/lib/use-now";
-import { storeQuery } from "@/lib/data";
+import { useLater } from "@/lib/use-later";
+import { useStore } from "@/lib/use-store";
 import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
 import { CapsuleTabs } from "@/ui/capsule";
 import { Chips } from "@/ui/chips";
@@ -46,7 +47,7 @@ import { abbr } from "@site/lib/format";
 import { color, font, radius, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
-/** A match, as on the site: its header in a container (state, sides, kick-off with a live countdown or the score) and the player props priced for it, scored against each player's games. The stat chips sit in a blurred bar that tucks away while you scroll down. */
+/** A match, as on the site's phone page: the match flat on the page (state, sides, kick-off with a live countdown or the score, the pair at the crease, ball by ball, the scorecard), then the page's sections as chips (Props / Match Fancy / Grid / Custom line) with the open one's stat chips and rows under them. */
 export default function FixturePage() {
   const { id, tab: tabParam, fm: fmParam, sc: scParam, mw: mwParam, mv: mvParam } = useLocalSearchParams<{ id: string; tab?: string; fm?: string; sc?: string; mw?: string; mv?: string }>();
   // old links opened a market with ?tab=fancy&fm=…; send them to the market page
@@ -62,6 +63,7 @@ export default function FixturePage() {
   const books = useMemo(() => (f ? fixtureBooks(doc, f) : { props: false, fancy: false }), [doc, f]);
   const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : true)), [books]);
   const [tabAsked, setTab] = useState<string | undefined>(tabParam);
+  useEffect(() => { setTab(tabParam); }, [id, tabParam]);
   const tab = tabs.some(([k]) => k === tabAsked) ? tabAsked! : tabs[0][0];
   const scope = useMemo(() => (f && f.fmt !== "FC" && tab === "props" ? { teams: [f.a, f.b] as [string, string], archive: archived } : undefined), [f, tab, archived]);
   const { rows, isLoading, scoring, error, soFarOf, outOf } = useHotView(scope, undefined, archived ? doc : undefined);
@@ -71,34 +73,35 @@ export default function FixturePage() {
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
   const shown = useMemo(() => (stat === "all" || !statKeys.includes(stat) ? here : here.filter((r) => r.stat === stat)).slice(0, MAX_ROWS), [here, stat, statKeys]);
 
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
+  const matchesReady = stats.matchesReady;
   const [gStat, setGStat] = useState("sixes"), [gLine, setGLine] = useState(0.5), [games, setGames] = useState(10), [hit, setHit] = useState(0.6), [gTeam, setGTeam] = useState<number>();
   const fmt = f && FORMATS.includes(f.fmt) ? f.fmt : "T20";
   const teams: [string, number][] = f ? [[f.a, f.a_ix], [f.b, f.b_ix]] : [];
   const known = teams.filter(([, i]) => i >= 0);
   const gridTeam = known.some(([, i]) => i === gTeam) ? gTeam! : known[0]?.[1];
   const grids = useQuery({
-    queryKey: ["fx-grids", id, fmt, gStat, games], enabled: !!store && !!f && f.fmt !== "FC" && (tab === "grid" || tab === "trends"),
+    queryKey: ["fx-grids", id, fmt, gStat, games], enabled: !!store && matchesReady && !!f && f.fmt !== "FC" && (tab === "grid" || tab === "trends"),
     queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, gStat, games) }))),
   });
   const shownGrid = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
 
   const target = useRef<ComponentRef<typeof View>>(null);
-  const { collapsed, onScroll } = useCollapseOnScroll(60);
-  const [barH, setBarH] = useState(0), [subH, setSubH] = useState(0);
-  const sub = useAnimatedStyle(() => ({ height: subH ? subH * (1 - collapsed.value) : undefined, opacity: 1 - collapsed.value }));
+  const [barH, setBarH] = useState(0);
   const share = () => {
     if (!f) return;
     const url = shareFixtureUrl(SITE_URL, f.id);
     const when = f.start.length > 10 ? `${dayLabel(fixtureStart(f), now)}, ${localTime(fixtureStart(f))}` : dayLabel(fixtureStart(f), now);
     void Share.share({ message: matchShareText({ a: f.a, b: f.b, when, venue: shortVenue(f.venue) || f.venue || "", series: seriesName(f), url }) || url, title: `${f.a} v ${f.b}` });
   };
+  // Header paints first; props / fancy / grid mount as an interruptible transition (same pattern as tab opens).
+  const bodyReady = useLater(!!f && !fxLoading);
 
   return (
     <View style={styles.root}>
       <BlurTargetView ref={target} style={styles.root}>
-        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
+        <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
           {fxLoading ? (
             <MatchHeaderSkeleton />
           ) : !f || !item ? (
@@ -116,12 +119,13 @@ export default function FixturePage() {
               ) : (
                 <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
               )}
-              {f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
-              {f.fmt === "FC" ? (
+              {!bodyReady ? <Working label="Loading…" rows={4} /> : f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
+              {bodyReady && f.fmt !== "FC" ? <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View> : null}
+              {!bodyReady ? null : f.fmt === "FC" ? (
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
                 <>
-                  <View style={[styles.pad, styles.titleRow]}><Text style={styles.title}>Player props</Text><InfoButton topic="player-props" /></View>
+                  {statKeys.length > 1 ? <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={setStat} /> : null}
                   {isLoading ? (
                     <Working label="Scoring this match's lines…" rows={4} />
                   ) : error && !here.length ? (
@@ -145,7 +149,7 @@ export default function FixturePage() {
                   {tab === "grid" ? (
                     <>
                       {known.length > 1 ? <View style={styles.bleed}><Chips items={known.map(([name, i]) => [String(i), abbr(name)] as [string, string])} value={String(gridTeam)} onChange={(v) => setGTeam(Number(v))} /></View> : null}
-                      {grids.isLoading && !shownGrid ? <Working label="Reading the players' games…" shape="grid" /> : !shownGrid ? (
+                      {!matchesReady || (grids.isLoading && !shownGrid) ? <Working label="Reading the players' games…" shape="grid" /> : !shownGrid ? (
                         <EmptyState compact title="No grid yet" body="Could not load player games for this match." />
                       ) : (
                         <View style={{ gap: space.snug }}>
@@ -155,7 +159,7 @@ export default function FixturePage() {
                         </View>
                       )}
                     </>
-                  ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
+                  ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : !matchesReady || grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
                 </View>
               )}
             </>
@@ -166,14 +170,6 @@ export default function FixturePage() {
       <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
         <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton> : undefined} />
-          {f && f.fmt !== "FC" ? <View style={styles.tabs}><Segmented<string> items={tabs} value={tab} onChange={setTab} label="Sections" /></View> : null}
-          {tab === "props" && statKeys.length > 1 ? (
-            <Animated.View style={[styles.sub, sub]}>
-              <View style={styles.measure} onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h && h !== subH) setSubH(h); }}>
-                <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={setStat} />
-              </View>
-            </Animated.View>
-          ) : null}
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />
@@ -184,12 +180,10 @@ export default function FixturePage() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
-  sub: { overflow: "hidden" },
-  // measured out of flow: inside a parent that is being squeezed, a scroller shrinks with it and would report the squeezed height
-  measure: { position: "absolute", left: 0, right: 0, top: 0 },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  tabs: { paddingHorizontal: space.gutter, paddingBottom: space.snug },
+  // the page's sections as chips under the match (Props / Match Fancy / Grid / Custom line), then the stat chips of the open one
+  sections: { paddingTop: space.stack },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
   gridTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingTop: space.group, paddingBottom: space.snug },

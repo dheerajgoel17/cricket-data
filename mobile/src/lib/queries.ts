@@ -16,6 +16,7 @@ export const fixturesQuery = queryOptions({
 });
 export const linesQuery = queryOptions({
   queryKey: ["lines"], queryFn: (): Promise<any> => getJson("/data/lines.json"), staleTime: 10 * 60_000, gcTime: FEED_GC_MS,
+  // Peek on Android too — without it the rail/props stay blank until network; matches.json is still never peeked.
   initialData: () => peekJson("/data/lines.json", KEPT_MS), initialDataUpdatedAt: 0,
 });
 
@@ -28,11 +29,21 @@ export const photosQuery = queryOptions({ queryKey: ["photos"], queryFn: async (
 /** Starts from the last body kept on the device (counted as stale, so the fresh one is asked for at once); a failed poll keeps what is on screen. */
 export const liveQuery = queryOptions({
   queryKey: ["live-scores"],
-  queryFn: async (): Promise<any | null> => { try { const body = await getJson("/api/live"); saveLive(body); return body; } catch { return null; } },
+  queryFn: async (): Promise<any | null> => {
+    try {
+      const body = await getJson("/api/live");
+      saveLive(body);
+      return body;
+    } catch {
+      // Soft-fail: keep MMKV / last good body so a bad poll does not blank the rail.
+      return readLive()?.body ?? null;
+    }
+  },
   refetchInterval: LIVE_TTL_MS,
   staleTime: LIVE_TTL_MS,
   gcTime: FEED_GC_MS,
   placeholderData: (p: any) => p,
+  // Kept live paints scores at once; useLive({ defer }) only delays the network refetch on Android.
   initialData: () => readLive()?.body,
   initialDataUpdatedAt: () => readLive()?.t,
 });

@@ -19,39 +19,75 @@ const EVENT_ALIAS = {
 
 export class Resolver {
   constructor(store) {
+    this._start(store);
+    for (let i = 0; i < store.P.id.length; i++) this._indexPlayer(i);
+    this._finish();
+  }
+
+  /**
+   * The same resolver, built in slices: `pause()` is awaited after every `sliceMs` of indexing so a phone's screen keeps answering while ~15,000 names are indexed
+   * (`new Resolver(store)` does it in one go, about half a second there).
+   */
+  static async create(store, pause, sliceMs = 8) {
+    const rz = Object.create(Resolver.prototype);
+    rz._start(store);
+    let t = Date.now();
+    for (let i = 0; i < store.P.id.length; i++) {
+      rz._indexPlayer(i);
+      if ((i & 63) === 63 && Date.now() - t >= sliceMs) { await pause(); t = Date.now(); }
+    }
+    rz._finish();
+    return rz;
+  }
+
+  _start(store) {
     this.s = store;
-    const P = store.P;
     this.bySurname = new Map();
     this.info = [];
     this.fuzzyKeys = null;
-    for (let i = 0; i < P.id.length; i++) {
-      const raw = P.nm[i];
-      const toks = raw.split(/\s+/);
-      let k = 0;
-      while (k < toks.length - 1 && /^[A-Z]{1,4}$/.test(toks[k])) k++;
-      const initials = toks.slice(0, k).join("");
-      const rest = toks.slice(k);
-      const given = initials ? "" : norm(rest.slice(0, -1).join(" "));
-      const sur = norm(rest.join(" ")).length ? norm(initials ? rest.join(" ") : rest[rest.length - 1]) : norm(raw);
-      this.info.push({ initials: initials.toLowerCase(), given, sur, full: norm(raw) });
-      this._indexSur(sur, i);
-      const last = norm(rest[rest.length - 1] || raw);
-      if (last !== sur) this._indexSur(last, i);
-    }
+    this._cnt = null;
+  }
+
+  _indexPlayer(i) {
+    const raw = this.s.P.nm[i];
+    const toks = raw.split(/\s+/);
+    let k = 0;
+    while (k < toks.length - 1 && /^[A-Z]{1,4}$/.test(toks[k])) k++;
+    const initials = toks.slice(0, k).join("");
+    const rest = toks.slice(k);
+    const given = initials ? "" : norm(rest.slice(0, -1).join(" "));
+    const sur = norm(rest.join(" ")).length ? norm(initials ? rest.join(" ") : rest[rest.length - 1]) : norm(raw);
+    this.info.push({ initials: initials.toLowerCase(), given, sur, full: norm(raw) });
+    this._indexSur(sur, i);
+    const last = norm(rest[rest.length - 1] || raw);
+    if (last !== sur) this._indexSur(last, i);
+  }
+
+  _finish() {
+    const store = this.s;
     for (const [ix, names] of Object.entries(store.index.aliases || {})) {
       for (const nm of names) {
         const t = norm(nm).split(" ");
         this._indexSur(t[t.length - 1], +ix);
       }
     }
-    // activity counts for tie-breaks (venues, teams)
-    this.venueCount = new Array(store.venues.length).fill(0);
-    for (let m = 0; m < store.n; m++) this.venueCount[store.M.v[m]]++;
-    this.teamCount = new Array(store.teams.length).fill(0);
-    for (let m = 0; m < store.n; m++) { this.teamCount[store.M.a[m]]++; this.teamCount[store.M.b[m]]++; }
     this.venueNorm = store.venues.map(norm);
     this.teamNorm = store.teams.map((t) => norm(t.n));
   }
+
+  /**
+   * Activity counts for tie-breaks (venues, teams), counted on first use and again when the match table has changed size: with `deferMatches` the resolver is built from the index
+   * alone, before `matches.json` joins (`store.n` is 0 then), and counts taken at that moment would be all zero for good.
+   */
+  _counts() {
+    const s = this.s;
+    if (this._cnt && this._cnt.n === s.n) return this._cnt;
+    const v = new Array(s.venues.length).fill(0), t = new Array(s.teams.length).fill(0);
+    for (let m = 0; m < s.n; m++) { v[s.M.v[m]]++; t[s.M.a[m]]++; t[s.M.b[m]]++; }
+    return (this._cnt = { n: s.n, v, t });
+  }
+  get venueCount() { return this._counts().v; }
+  get teamCount() { return this._counts().t; }
 
   _add(key, i) {
     if (!key) return;

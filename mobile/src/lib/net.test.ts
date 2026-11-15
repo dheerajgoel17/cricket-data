@@ -63,6 +63,15 @@ describe("getJson keeps what it reads", () => {
     expect(second).toBe(first);
   });
 
+  test("a plain body with a new ETag but identical text reuses the object", async () => {
+    const body = JSON.stringify({ items: [{ id: "m1" }] });
+    files = { "/data/same-body.json": { etag: '"f1"', body } };
+    const first = await getJson("/data/same-body.json");
+    files["/data/same-body.json"] = { etag: '"f2"', body };
+    const second = await getJson("/data/same-body.json");
+    expect(second).toBe(first);
+  });
+
   test("a changed file (a new ETag) is downloaded again and replaces the kept copy", async () => {
     files = { "/data/changing.json": { etag: '"a"', body: '{"v":1}' } };
     expect(await getJson("/data/changing.json")).toEqual({ v: 1 });

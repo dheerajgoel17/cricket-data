@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { editionRows, editionSummary, editionsOf, boards as tournamentBoards, trendSeries, TREND_METRICS } from "@cricket/engine/tournament.js";
 import { abbr } from "@site/lib/format";
-import { storeQuery } from "@/lib/data";
+import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
@@ -18,7 +18,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, tonal } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -27,19 +27,21 @@ const fact = (x: number | null | undefined, digits = 0) => (x == null ? "–" : 
 
 /** The stats of one league or series: the season picker, the season in four numbers, the leaders, the lists (batting, bowling, overall) and the same measures season by season (the site's `TournamentStats`). */
 export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: number; season: string; onSeason: (key: string) => void }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store;
-  const eds = useMemo(() => (store ? editionsOf(store, eventIdx) : []), [store, eventIdx]);
+  const matchesReady = stats.matchesReady;
+  const eds = useMemo(() => (store && matchesReady ? editionsOf(store, eventIdx) : []), [store, matchesReady, eventIdx]);
   const ed = eds.find((x: any) => x.key === season) ?? eds[0];
-  const summary = useMemo(() => (ed ? editionSummary(store, ed) : null), [store, ed]);
-  const trend = useMemo(() => (ed ? trendSeries(store, eds, ed) : []), [store, eds, ed]);
+  const summary = useMemo(() => (ed && matchesReady ? editionSummary(store, ed) : null), [store, ed, matchesReady]);
+  const trend = useMemo(() => (ed && matchesReady ? trendSeries(store, eds, ed) : []), [store, eds, ed, matchesReady]);
   const [read, setRead] = useState<[number, number]>([0, 0]);
   const rows = useQuery({
-    queryKey: ["edition-rows", eventIdx, ed?.key], enabled: !!ed, staleTime: Infinity, retry: 1,
+    queryKey: ["edition-rows", eventIdx, ed?.key], enabled: !!ed && matchesReady, staleTime: Infinity, retry: 1,
     queryFn: () => { setRead([0, store.nshard]); return editionRows(store, ed.ms, { onProgress: (d: number, n: number) => setRead([d, n]) }); },
   });
   const result = useMemo(() => (ed && rows.data ? tournamentBoards(store, ed, rows.data) : null), [store, ed, rows.data]);
-  if (!store) return <Working label="Loading…" shape="league" />;
+  if (stats.isError && !matchesReady) return <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." />;
+  if (!store || !matchesReady) return <Working label="Loading…" shape="league" />;
   if (!ed) return <EmptyState title="No matches" body="No matches in the data for this competition." />;
   return (
     <View style={styles.root}>
@@ -107,7 +109,7 @@ function Lists({ ed, result }: { ed: any; result: any }) {
 
 /** The headline card of a list: the leader's picture in his team's shirt, his name and side, and the figure. */
 function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
   const r = l.row, team = store.teams[r.t]?.n ?? "";
   const who = playerLabel(store, names, r.p);
@@ -131,7 +133,7 @@ function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }
 
 /** One list as a table: rank, name with side, the headline figure, then two supporting columns; the best five, the rest behind "Show all". */
 function BoardCard({ b }: { b: any }) {
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
   const [all, setAll] = useState(false);
   const shown = all ? b.rows : b.rows.slice(0, SHOWN);
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
   facts: { flexDirection: "row", ...tonal, borderRadius: radius.card, paddingVertical: space.snug },
   fact: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug },
   factSep: { borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: color.hairline },
-  factNum: { ...numLg, fontSize: 24, letterSpacing: -0.48, lineHeight: 28, color: color.foreground },
+  factNum: { ...metric, color: color.foreground },
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   loading: { gap: space.snug },
   track: { height: 4, borderRadius: 2, backgroundColor: color.hairline, overflow: "hidden", marginHorizontal: space.stack },
@@ -226,7 +228,7 @@ const styles = StyleSheet.create({
   leader: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
   leaderRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leaderName: { ...type.body, fontFamily: font.medium, color: color.foreground },
-  leaderNum: { ...numLg, fontSize: 30, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
+  leaderNum: { ...numLg, fontFamily: font.data, fontSize: 30, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   subSmall: { ...type.caption, color: color["muted-foreground"] },
   card: { ...tonal, borderRadius: radius.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
   rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
   who: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  value: { ...num, fontSize: 17, color: color.foreground },
+  value: { ...num, fontFamily: font.data, fontSize: 17, color: color.foreground },
   extra: { ...num, fontSize: 15, color: color["muted-foreground"] },
   more: { height: 44, alignItems: "center", justifyContent: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   moreText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },

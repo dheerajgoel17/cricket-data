@@ -4,13 +4,12 @@ import { lazyTab } from "@/ui/lazy-tab";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useAuth } from "@/lib/auth";
-import { storeQuery } from "@/lib/data";
 import { playerLabel } from "@/lib/player-label";
+import { useStore } from "@/lib/use-store";
 import { openPlayer, push } from "@/lib/nav";
 import { parsePropKey, useRecents, useSaved } from "@/lib/saved";
 import { AppHeader } from "@/ui/brand";
@@ -27,7 +26,7 @@ import { TabFade } from "@/ui/tab-fade";
 function Saved() {
   mark("render:Saved");
   const inset = useScreenInsets();
-  const stats = useQuery(storeQuery);
+  const stats = useStore();
   const { user, loading, openSignIn, signOut } = useAuth();
   const { list, toggle } = useSaved();
   const { recents } = useRecents();
@@ -118,4 +117,4 @@ const styles = StyleSheet.create({
   account: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.10)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.14)", alignItems: "center", justifyContent: "center" },
 });
 
-export default lazyTab(Saved);
+export default lazyTab(Saved, "Saved");
