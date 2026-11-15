@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-15 19:00 IST
+# Cricket value bets - 2026-11-15 20:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **smarkets**: ok, 584 prices
-- **moviodds_bet365**: ok, 1439 prices
+- **smarkets**: ok, 561 prices
+- **moviodds_bet365**: ok, 1640 prices
 - **feedg**: ok, 8 prices, 1 events
-- **feedk**: ok, 88 prices, 8 events
-- **feede**: ok, 478 prices, 13 events
-- **feedh**: ok, 1409 prices, 22 events
-- **feedf**: ok, 474 prices, 16 events
+- **feedk**: ok, 88 prices, 7 events
+- **feede**: ok, 474 prices, 12 events
+- **feedh**: ok, 1429 prices, 24 events
+- **feedf**: ok, 474 prices, 15 events
 
-Matches starting in next 168h: **37**, markets priced: **408**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **39**, markets priced: **432**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -23,6 +23,6 @@ Matches starting in next 168h: **37**, markets priced: **408**, value bets: **1*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-16 05:30 IST Queensland Bulls vs Tasmania Tigers / Top Batsman - Queensland Bulls / Jimmy Peirson @ 14.00 (feedh_d): edge 38.3%, model 0.1058, market 0.095
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), Karnataka (W) (female), MID West Rhinos (male), Maharashtra (W) (female), Nhlangano Legends (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Western Australia Warriors (male)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), Karnataka (W) (female), Maharashtra (W) (female), Nhlangano Legends (male), Pakistan Association of Hong Kong (male), Railways (W) (female), Recon Tactical Free State (W) (female), South Australia Redbacks (male), Tasmanian Tigers (male), Vidarbha (W) (female), Western Australia Warriors (male)
 
-Runtime 125.0s. Snapshot: `odds_20261115T133037Z.jsonl.gz`
+Runtime 155.9s. Snapshot: `odds_20261115T143033Z.jsonl.gz`
