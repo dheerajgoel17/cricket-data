@@ -161,7 +161,7 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
   }
   items.sort((a, b) => b.rate - a.rate || b.vals.length - a.vals.length);
   const list = items.filter((i) => i.rate >= minHit).slice(0, 24);
-  if (!list.length) return <EmptyState compact title="No clears at this hit rate" body="Lower the hit-rate filter or line." />;
+  if (!list.length) return <EmptyState compact title="No one clears that bar" body="Lower the hit-rate filter or the line to see more players." />;
   const label = (STATS as any)[stat].label;
   const who = (i: number) => playerLabel(store, names, i);
   return (

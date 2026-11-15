@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeOversTape, mergeSchedule, notInXI, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatBall, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeBoardLive, mergeOversTape, mergeSchedule, notInXI, onNow, ongoingOverBalls, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, nextTestDayLine, nextTestDayStart, oversToBalls, parseFixtureCsv, parseMatchPage, parseOvers, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionBadge, sessionLabel, sessionMeta, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "@cricket/engine/live.js";
 import { identityIndex } from "@cricket/engine/identity.js";
@@ -264,6 +264,27 @@ test("parseMatchPage current batters and bowler (hand-computed)", () => {
   assert.deepEqual(board.overs, [{ n: 17, balls: ["1", "0", "4", "W", "0", "1"] }, { n: 18, balls: ["0", "1", "1"] }], "deliveries stay grouped by over with over numbers");
 });
 
+test("formatBall normalises extras; ongoingOverBalls is the over in progress", () => {
+  assert.equal(formatBall("nb"), "NB");
+  assert.equal(formatBall("2nb"), "2NB");
+  assert.equal(formatBall("wd"), "WD");
+  assert.equal(formatBall("1wd"), "1WD");
+  assert.equal(formatBall("1lb"), "1LB");
+  assert.equal(formatBall("2b"), "2B");
+  assert.equal(formatBall("wicket"), "W");
+  assert.equal(formatBall("4"), "4");
+  assert.deepEqual(
+    ongoingOverBalls({ thisOver: ["0", "1", "nb"], overs: [{ n: 1, balls: ["4", "4", "4", "4", "4", "4"] }, { n: 2, balls: ["0", "1", "nb"] }] }),
+    ["0", "1", "NB"],
+    "thisOver wins over a flattened last-N",
+  );
+  assert.deepEqual(
+    ongoingOverBalls({ overs: [{ n: 5, balls: ["1", "0", "0", "0", "1", "4"] }, { n: 6, balls: ["0", "wd", "2"] }] }),
+    ["0", "WD", "2"],
+    "falls back to the last over group",
+  );
+});
+
 test("parseOvers reads Over N labels; ensureOverNumbers fills gaps from batting overs", () => {
   assert.deepEqual(
     parseOvers([{ over: "Over 8", overinfo: ["1", "0", "4"] }, { over: "Over 9", overinfo: ["6", "W"] }], 8.2),
@@ -406,7 +427,7 @@ test("India's chase has started: the board, scores and card follow the second in
   assert.deepEqual(board.partnership, { runs: 42, balls: 10 });
   assert.equal(board.crr, 25.2);
   assert.equal(board.rrr, 8.56);
-  assert.deepEqual(board.thisOver, ["6", "6", "4", "nb"]);
+  assert.deepEqual(board.thisOver, ["6", "6", "4", "NB"]);
 
   assert.deepEqual(liveCard(m).map((i) => [i.team, i.runs, i.wkts]), [["New Zealand", 198, 3], ["India", 42, 0]]);
   assert.equal(livePlayer(m, "Vaibhav Sooryavanshi").strike, true);
@@ -568,6 +589,19 @@ test("last wicket is the latest fall, not the last dismissed batter in batting o
   assert.equal(board.lastWicket.name, "Finn Allen"); // 3-104, after Seifert 1-5 and Phillips 2-64
 });
 
+test("onNow is true for a not-out batter at the crease or the current bowler, not for anyone else", () => {
+  const m = chase();
+  const nzBatting = { ...m, teams: m.teams.map((t) => ({ ...t, batting: t.name === "New Zealand" })) };
+  assert.equal(onNow(nzBatting, "Daryl Mitchell"), true);
+  assert.equal(onNow(nzBatting, "Bevon Jacobs"), true);
+  assert.equal(onNow(nzBatting, "Finn Allen"), false); // already out
+  // only one current bowler: clear any earlier current flag so the board picks this one
+  const players = (nzBatting.players || []).map((p) => (p.wickets != null || p.conceded != null ? { ...p, current: false } : p));
+  players.push({ name: "Jasprit Bumrah", team: "India", wickets: 1, conceded: 20, current: true });
+  assert.equal(onNow({ ...nzBatting, players }, "Jasprit Bumrah"), true);
+  assert.equal(onNow(null, "Daryl Mitchell"), false);
+});
+
 test("without the match page the card still keeps the board on the batting side", () => {
   const row = parseSchedule(pageHtml({ [FIXTURE]: [nzInd] }))[0];
   const m = buildMatch(row, null, parseCardPage(nzIndCard));
@@ -611,6 +645,28 @@ test("liveForFixture matches team names within the start window", () => {
   const miss = liveForFixture(doc, { a: "Zimbabwe", b: "Afghanistan", start: "2026-10-27T14:30:00Z" });
   assert.equal(miss?.status, "upcoming");
   assert.equal(liveForFixture(doc, { a: "Spain", b: "Italy", start: "2026-10-27T09:00:00Z" }), null);
+});
+
+test("mergeBoardLive fills priced gaps; Source A totals win", () => {
+  const board = {
+    generated_at_utc: "2026-11-15T12:00:00Z",
+    matches: [{
+      id: "board-in-india-v-england", status: "live", fmt: "T20", start: "2026-11-15T10:00:00Z", source: "board",
+      teams: [{ name: "India", runs: 145, wkts: 3, display: "145/3" }, { name: "England", display: "" }],
+    }],
+  };
+  const empty = mergeBoardLive({ matches: [] }, board);
+  assert.equal(empty.matches.length, 1);
+  assert.equal(empty.boardAsOf, "2026-11-15T12:00:00Z");
+  assert.equal(liveForFixture(empty, { a: "India", b: "England", start: "2026-11-15T10:00:00Z", fmt: "T20" })?.teams[0].runs, 145);
+  const sourceWins = mergeBoardLive({
+    matches: [{
+      id: "src", status: "live", fmt: "T20", start: "2026-11-15T10:00:00Z",
+      teams: [{ name: "India", runs: 150, wkts: 2, display: "150/2" }, { name: "England", display: "" }],
+    }],
+  }, board);
+  assert.equal(sourceWins.matches.length, 1);
+  assert.equal(sourceWins.matches[0].id, "src");
 });
 
 test("multi-format bilateral tour (T20 / ODI / Test): live and books stay on their own format", () => {

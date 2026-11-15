@@ -227,7 +227,7 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
         <Text style={styles.tourName} numberOfLines={1}>{series}</Text>
         <Text style={styles.note} numberOfLines={1}>{sub}</Text>
       </View>
-      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Ongoing" : status === "Completed" ? "Done" : "Upcoming"}</Text>
+      <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Live" : status === "Completed" ? "Done" : "Upcoming"}</Text>
       <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
     </Press>
   );

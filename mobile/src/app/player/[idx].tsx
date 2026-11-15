@@ -220,7 +220,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
         {next ? <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
         <EmptyState
           title={`No ${res.sample?.unit || "games"}`}
-          body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection."}
+          body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection. Relax a filter to see a sample."}
           action={active.length ? <Press scale={1} onPress={clearAll} style={styles.button} accessibilityRole="button"><Text style={styles.buttonText}>Clear filters</Text></Press> : undefined}
         />
       </View>

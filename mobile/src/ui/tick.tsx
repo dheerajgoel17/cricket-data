@@ -6,14 +6,15 @@ import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
 import { color, font, space, tint, type } from "@/ui/tokens";
 
-const HOLD_MS = 1100;
+/** Colour/arrow hold after a move — stock-ticker brief (~1 s), not sticky. */
+const HOLD_MS = 1000;
 /** How long the wash of colour takes to fade, and how far (pt) the new figure travels as it rolls in. */
-const WASH_MS = 700, ROLL = 14;
+const WASH_MS = 450, ROLL = 14;
 // Precomputed outside worklets — calling `tint.*` inside useAnimatedStyle hits the JS runtime ("Tried to synchronously call a Remote Function").
 const FLASH_RISE = [tint.primary(0), tint.primary(0.24)] as const;
 const FLASH_FALL = [tint.miss(0), tint.miss(0.24)] as const;
 
-/** Direction a number just moved: 1 up, -1 down, 0 still. Holds for a beat so a 15 s live poll is visible, then returns to 0 (the site's `useTick`). */
+/** Direction a number just moved: 1 up, -1 down, 0 still. Holds ~1 s (stock-ticker flash), then returns to 0 (the site's `useTick`). */
 export function useTick(value: number | null | undefined) {
   const prev = useRef(value);
   const [dir, setDir] = useState<-1 | 0 | 1>(0);
@@ -32,7 +33,8 @@ export function useTick(value: number | null | undefined) {
  * A price or a so-far that moved between polls: the new figure rolls in (up on a rise, down on a fall) over a green or red wash, with a small arrow while it holds.
  * Plain text until the number first moves: most prices never do, so a list of rows mounts no animated view for them.
  */
-export function Tick({ value, children, style }: { value: number | null | undefined; children: ReactNode; style?: TextStyle }) {
+/** `arrow={false}` skips the reserved arrow gutter (scoreboard next to a crest — site Tick). */
+export function Tick({ value, children, style, arrow = true }: { value: number | null | undefined; children: ReactNode; style?: TextStyle; arrow?: boolean }) {
   const dir = useTick(value);
   const calm = useReducedMotion();
   const [armed, setArmed] = useState(false);
@@ -41,7 +43,7 @@ export function Tick({ value, children, style }: { value: number | null | undefi
   if (!armed) return <View style={styles.row}>{text}</View>;
   return (
     <Flash dir={dir} value={value} calm={calm}>
-      {dir === 1 ? <ArrowUp color={color.primary} /> : dir === -1 ? <ArrowDown color={color.miss} /> : null}
+      {arrow ? (dir === 1 ? <ArrowUp color={color.primary} /> : dir === -1 ? <ArrowDown color={color.miss} /> : null) : null}
       {text}
     </Flash>
   );
@@ -67,7 +69,7 @@ function Flash({ dir, value, calm, children }: { dir: -1 | 0 | 1; value: number 
 }
 
 export type Standing = { v: number | null; state: string; verdict: "cleared" | "missed" | "push" | null };
-const VERDICT = { cleared: "Cleared", missed: "Missed", push: "Push" } as const;
+const VERDICT = { cleared: "Cleared", missed: "Missed", push: "On the line" } as const;
 
 /** So-far / final / Cleared against the booked line, flashing when the scorecard moves the number (the site's `StandingMark`). */
 export function StandingMark({ standing, line }: { standing: Standing | null | undefined; line?: number }) {

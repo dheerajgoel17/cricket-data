@@ -15,7 +15,7 @@ export function BookTable({ books, shown, className }: { books: Priced[]; shown:
   return (
     <div className={cn("flex flex-col gap-hair text-footnote tabular-nums text-muted-foreground", className)}>
       <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen((v) => !v)}
-        className="inline-flex w-fit items-center gap-hair rounded-full px-tight font-label text-foreground/70 hover:bg-hairline">
+        className="inline-flex w-fit items-center gap-hair rounded-full font-label text-foreground/70 hover:bg-hairline">
         {open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}<ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
       </button>
       {open && (

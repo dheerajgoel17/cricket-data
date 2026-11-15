@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 // Pages and shared components that follow the design system (see "Type and spacing scales" in src/index.css and docs/SITE.md):
 // sizes come from named tokens, never from pixel values or raw spacing numbers. Add a file here when its page is migrated.
 const GOVERNED = [
-  "components/app/hot-props.tsx", "components/app/fixture-card.tsx", "components/app/live-board.tsx", "components/app/match-fancy.tsx", "components/app/recent-form.tsx",
+  "components/app/hot-props.tsx", "components/app/fixture-card.tsx", "components/app/match-scoreboard.tsx", "components/app/status-label.tsx", "components/app/live-board.tsx", "components/app/match-fancy.tsx", "components/app/recent-form.tsx",
   "components/app/pill-group.tsx", "components/app/grid.tsx", "components/app/skeletons.tsx", "components/app/mini-bars.tsx", "components/app/live-feed.tsx",
   "components/app/tick.tsx", "components/app/market-tape.tsx", "components/app/next-match.tsx",
   "components/app/line-stepper.tsx", "components/app/viz.tsx",

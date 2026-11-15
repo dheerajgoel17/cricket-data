@@ -2,20 +2,26 @@
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { trackOf } from "@/lib/live-track";
+import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, num, space, type } from "@/ui/tokens";
+import { color, num, space, type } from "@/ui/tokens";
 
-// The in-play marks of a row, as the site's `live-spot.tsx` draws them.
+// The in-play marks of a row, as the site's `live-spot.tsx` / StatusLabel draws them.
 
-/** The small red mark of a row whose line is a live price: it sits beside the row's name, never on the line. */
+/** Plain "Live" caption. Match-live belongs on fixtures; prop rows do not use this. */
 export function LiveBadge() {
-  return <Text style={styles.badge}>Live</Text>;
+  return <StatusLabel tone="live" surface="plain" />;
 }
 
-/** Where the line stood before the match ("was 31.5"); nothing when it has not moved. */
-export function LiveOpened({ opened, line }: { opened?: number | null; line?: number | null }) {
+/** Line and odds are in-play ("In Play Market"). */
+export function InPlayBadge() {
+  return <StatusLabel tone="inPlay" surface="plain" />;
+}
+
+/** Where the line stood before the match; nothing when it has not moved. Scan rows use `Opened at`. */
+export function LiveOpened({ opened, line, label = "was" }: { opened?: number | null; line?: number | null; label?: string }) {
   if (opened == null || line == null || opened === line) return null;
-  return <Text style={styles.was}>was {opened}</Text>;
+  return <Text style={styles.was}>{label} {opened}</Text>;
 }
 
 /** A live line as a bar: the score against the line, a notch where it opened. */
@@ -32,22 +38,16 @@ export function LiveTrack({ value, line, was, verdict }: { value?: number | null
   );
 }
 
-/** Under a live row: the bar and the so-far words; "Score unavailable" while the match is on and the feed has no figure for it. */
-export function LineProgress({ standing, live, line, opened }: { standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
+/** Under a live row: VOID or "Score unavailable". Hit/Miss stamp covers settled; no “N so far” copy on prop/fancy rows. */
+export function LineProgress({ standing, live, line }: { standing: Standing | null | undefined; live: boolean; line: number; opened?: number | null }) {
   if (!standing || (standing.v == null && standing.state !== "void")) return live ? <Text style={styles.none}>Score unavailable</Text> : null;
-  return (
-    <View style={styles.progress}>
-      {standing.state === "live" ? <LiveTrack value={standing.v} line={line} was={opened} verdict={standing.verdict} /> : null}
-      <StandingMark standing={standing} line={line} />
-    </View>
-  );
+  if (standing.state === "void") return <StandingMark standing={standing} line={line} />;
+  return null;
 }
 
 const styles = StyleSheet.create({
-  badge: { ...cap, fontFamily: num.fontFamily, fontSize: 11, color: color.miss },
   was: { ...type.footnote, ...num, color: color["muted-foreground"] },
   none: { ...type.footnote, color: color["muted-foreground"] },
-  progress: { gap: 4, alignItems: "flex-start", alignSelf: "stretch" },
   track: { height: 6, borderRadius: 3, backgroundColor: color.secondary, alignSelf: "stretch", overflow: "visible" },
   fill: { position: "absolute", top: 0, bottom: 0, left: 0, borderRadius: 3 },
   notch: { position: "absolute", top: -1, bottom: -1, width: 2, borderRadius: 1 },

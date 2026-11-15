@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { STATS } from "@cricket/engine/rules.js";
-import { HIGH_ODDS, LOW_ODDS, marketTape } from "@cricket/engine/tape.js";
+import { marketTape } from "@cricket/engine/tape.js";
 import { odds } from "@site/lib/format";
 import { openPlayer } from "@/lib/nav";
 import { TrendingDown, TrendingUp } from "@/ui/icons";
@@ -41,20 +41,22 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
           {hits.length && misses.length ? (
             <View style={styles.segRow}>
               <View style={{ flex: 1 }}>
-                <Segmented<"hit" | "miss"> items={[["hit", `Hits ${hits.length}`], ["miss", `Misses ${misses.length}`]]} value={kind} onChange={setTab} label="Market tape" />
+                <Segmented<"hit" | "miss"> items={[["hit", `High odds hits · ${hits.length}`], ["miss", `Low odds misses · ${misses.length}`]]} value={kind} onChange={setTab} label="Market tape" />
               </View>
               <InfoButton topic="tape" />
             </View>
           ) : (
             <View style={styles.headRow}>
-              <View style={styles.titleRow}>
+              <View style={[styles.titleRow, { flex: 1 }]}>
                 <TrendingUp color={color["primary-foreground"]} />
                 <Text style={styles.titleHit}>High odds hits</Text>
               </View>
-              <Text style={styles.countBadge}>{list.length} cleared</Text>
+              <View style={styles.titleRow}>
+                <Text style={styles.countBadge}>{list.length} cleared</Text>
+                <InfoButton topic="tape" />
+              </View>
             </View>
           )}
-          <Text style={styles.noteHit}>Over at {odds(HIGH_ODDS)} or longer that has already cleared.</Text>
         </View>
 
         <TicketTear />
@@ -89,7 +91,7 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
       {hits.length && misses.length ? (
         <View style={styles.segRow}>
           <View style={{ flex: 1 }}>
-            <Segmented<"hit" | "miss"> items={[["hit", `Hits ${hits.length}`], ["miss", `Misses ${misses.length}`]]} value={kind} onChange={setTab} label="Market tape" />
+            <Segmented<"hit" | "miss"> items={[["hit", `High odds hits · ${hits.length}`], ["miss", `Low odds misses · ${misses.length}`]]} value={kind} onChange={setTab} label="Market tape" />
           </View>
           <InfoButton topic="tape" />
         </View>
@@ -100,7 +102,6 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
           <View style={{ marginLeft: "auto" }}><InfoButton topic="tape" /></View>
         </View>
       )}
-      <Text style={styles.note}>Over at {odds(LOW_ODDS)} or shorter that has already missed.</Text>
       {list.slice(0, 4).map((r, k) => (
         <Press scale={1} key={`${r.idx}${r.stat}${r.line}${r.fmt}`} onPress={() => openPlayer(r)} accessibilityRole="link" style={({ pressed }) => [styles.row, k > 0 && styles.sep, pressed && { opacity: 0.6 }]}>
           <PlayerFace pid={r.pid} size={control} />
@@ -133,10 +134,9 @@ const styles = StyleSheet.create({
   notchLeft: { left: -NOTCH / 2 },
   notchRight: { right: -NOTCH / 2 },
   headRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: space.snug },
-  titleRow: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
+  titleRow: { minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   titleHit: { ...type.title, color: color["primary-foreground"] },
   countBadge: { ...cap, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(15, 15, 15, 0.35)", borderRadius: radius.chip, paddingHorizontal: space.snug, paddingVertical: 2, color: color["primary-foreground"], overflow: "hidden" },
-  noteHit: { ...type.footnote, color: "rgba(15, 15, 15, 0.7)" },
   ticketRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.snug, minHeight: 52 },
   ticketSep: { borderStyle: "dashed", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: "rgba(15, 15, 15, 0.25)" },
   stub: { alignItems: "flex-end", gap: 2, borderStyle: "dashed", borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: "rgba(15, 15, 15, 0.3)", paddingLeft: space.stack },
@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   segRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   head: { flexDirection: "row", alignItems: "center", gap: space.tight },
   title: { ...type.body, color: color.foreground },
-  note: { ...type.footnote, color: color["muted-foreground"] },
   row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: space.tight, minHeight: 56 },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   name: { ...type.callout, color: color.foreground },

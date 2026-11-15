@@ -18,6 +18,7 @@ from collections import defaultdict
 from cricket_site import testend
 from cricket_site.sides import alike, find_scheduled, same_pair, side_key
 
+from . import fancy as fancy_mod
 from .adapters import feede, feedf, feedg, feedh, feedk
 from .util import parse_ts
 
@@ -62,6 +63,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
     """rows: pipeline rows after player resolution. Returns {"generated_at_utc", "lines": [...], "events": [...], "fancy": [...]}; lines are sorted by start time, player, stat, line."""
     groups: dict[tuple, dict] = {}
     names = public_names()
+    scoped_fancy, _ = fancy_mod.scope_test_session_fancy(fancy)
     for r in rows:
         stat = STAT.get(r.get("market_type"))
         pid, line, side, back = r.get("player_id"), r.get("line"), r.get("side"), r.get("back")
@@ -84,7 +86,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
         if books:
             lines.append({**g, "books": books})
     lines.sort(key=lambda x: (x["start_utc"] or "", x["player"] or "", x["stat"], x.get("inn", 0), x["line"]))
-    return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": fancy or []}
+    return {"generated_at_utc": generated_at, "lines": lines, "events": prop_events(rows), "fancy": scoped_fancy}
 
 
 LIVE_KEEP = dt.timedelta(hours=40)  # buffer past the site's 24 h keep so a late pull still has the closing line
@@ -92,8 +94,9 @@ TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
 
 
 def rescope_prev(prev: dict) -> dict:
-    """The previous pull with a Test's earlier complete-match lines from books that do not quote the match total moved to their 1st-innings entry: earlier runs filed them untagged
-    (`pipeline.scope_multiday_rows`), and carrying that over would keep the wrong scope for the rest of the match. bet365's own match totals stay. Nothing else changes."""
+    """The previous pull with a Test's earlier complete-match player lines from books that do not quote the match total moved to their 1st-innings entry
+    (`pipeline.scope_multiday_rows`), and unscoped Test side session / team-runs fancy moved the same way (`fancy.scope_test_session_fancy`). bet365's own
+    match totals stay. Carrying the old scope would keep wrong CMM / match-total keys for the rest of the match."""
     total = {public_names().get(k, k) for k in MATCH_TOTAL_SOURCES}
     out, moved = [], []
     for x in prev.get("lines") or []:
@@ -106,7 +109,15 @@ def rescope_prev(prev: dict) -> dict:
             out.append({**x, "books": keep})
         if other:
             moved.append({**x, "inn": 1, "books": other})
-    return {**prev, "lines": out + moved} if moved else prev
+    fancy_out, fancy_moved = [], []
+    for x in prev.get("fancy") or []:
+        if fancy_mod.needs_test_session_scope(x):
+            fancy_moved.append({**x, "inn": 1})
+        else:
+            fancy_out.append(x)
+    if not moved and not fancy_moved:
+        return prev
+    return {**prev, "lines": out + moved, "fancy": fancy_out + fancy_moved}
 
 
 KINDS = ("events", "lines", "fancy")

@@ -20,11 +20,14 @@ const line = (match: string, h: number) => ({ match, start_utc: new Date(NOW + h
 // three priced matches and one the books do not price; India v Australia is the biggest, then Pakistan v Sri Lanka, then Namibia v Oman
 const SCHEDULE = [fx("Namibia", "Oman", 1), fx("Pakistan", "Sri Lanka", 2), fx("India", "Australia", 3), fx("Fiji", "Samoa", 4)];
 const BOOK = { generated_at_utc: "2026-10-28T05:00:00Z", lines: [line("Namibia vs Oman", 1), line("Pakistan vs Sri Lanka", 2), line("India vs Australia", 3)], events: [], fancy: [] };
-const names = (r: { current: { fixtures: any[] } }) => r.current.fixtures.filter((f) => !f.noProps).map((f) => `${f.a} v ${f.b}`); // the games with props; the ones without follow them
-const unpriced = (r: { current: { fixtures: any[] } }) => r.current.fixtures.filter((f) => f.noProps).map((f) => `${f.a} v ${f.b}`);
+const names = (r: { current: { fixtures: any[] } }) => r.current.fixtures.map((f) => `${f.a} v ${f.b}`);
 /** A live feed body in which these sides' matches (given as [a, b, hours from NOW, status]) are listed. */
 const kept = (body: unknown, ageMs = 60e3) => saveLive(body, NOW - ageMs); // saved a minute ago, so stale by the live query's 15 s
-const liveBody = (...ms: [string, string, number, string][]) => ({ matches: ms.map(([a, b, h, status]) => ({ status, start: new Date(NOW + h * 3600e3).toISOString(), teams: [{ name: a }, { name: b }] })) });
+const liveBody = (...ms: [string, string, number, string][]) => ({ matches: ms.map(([a, b, h, status]) => ({
+  status, fmt: "T20", start: new Date(NOW + h * 3600e3).toISOString(),
+  // Team totals required for started/live/final to stay on the rail (holding prices alone is not enough).
+  teams: [{ name: a, runs: 120, wkts: 2, display: "120/2" }, { name: b, display: "" }],
+})) });
 
 function run() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -66,17 +69,18 @@ describe("useHomeRail", () => {
     feeds.lines.resolve(BOOK);
     await flush();
     expect(result.current.rail.ready).toBe(true);
-    expect(names({ current: result.current.rail })).toEqual(["India v Australia", "Pakistan v Sri Lanka", "Namibia v Oman"]); // Fiji v Samoa, which the books do not price, follows them flagged noProps
-    expect(unpriced({ current: result.current.rail })).toEqual(["Fiji v Samoa"]);
+    expect(names({ current: result.current.rail })).toEqual(["India v Australia", "Pakistan v Sri Lanka", "Namibia v Oman"]); // Fiji v Samoa is source-only — off the rail
+    expect(result.current.rail.fixtures.every((f: any) => !f.noProps)).toBe(true);
   });
 
-  it("still lists the whole schedule when the books turn out to price nothing, once it knows", async () => {
+  it("stays empty when the books price nothing", async () => {
     const { result } = run();
     feeds.fixtures.resolve(SCHEDULE); feeds.rail.resolve(null); feeds.live.resolve({ matches: [] });
     feeds.lines.resolve({ generated_at_utc: "x", lines: [], events: [], fancy: [] });
     await flush();
     expect(result.current.rail.ready).toBe(true);
-    expect(result.current.rail.fixtures).toHaveLength(4);
+    expect(result.current.rail.fixtures).toEqual([]);
+    expect(result.current.priced.fixtures).toEqual([]);
   });
 
   it("waits for the rail settings and the live scores, so the first order is the final one", async () => {
@@ -86,7 +90,7 @@ describe("useHomeRail", () => {
     expect(result.current.rail.ready).toBe(false); // the schedule and the lines are in; the rail file and the live scores are not
     // the rail file raises Namibia v Oman to the top; the live feed has Pakistan v Sri Lanka in play
     feeds.rail.resolve({ standing: { namibia: 1000 } });
-    feeds.live.resolve({ matches: [{ status: "live", start: new Date(NOW + 2 * 3600e3).toISOString(), teams: [{ name: "Pakistan" }, { name: "Sri Lanka" }] }] });
+    feeds.live.resolve(liveBody(["Pakistan", "Sri Lanka", 2, "live"]));
     await flush();
     expect(result.current.rail.ready).toBe(true);
     expect(names({ current: result.current.rail })).toEqual(["Pakistan v Sri Lanka", "Namibia v Oman", "India v Australia"]);
@@ -154,7 +158,7 @@ describe("useHomeRail", () => {
       const before = result.current.rail.fixtures;
       feeds.live.resolve(liveBody(["Namibia", "Oman", 1, "live"]));
       await flush();
-      expect(names({ current: result.current.rail })).toEqual(before.filter((f: any) => !f.noProps).map((f: any) => `${f.a} v ${f.b}`));
+      expect(names({ current: result.current.rail })).toEqual(before.map((f: any) => `${f.a} v ${f.b}`));
     });
 
     it("does not use a body that is too old to be trusted (a match may have started or ended since)", async () => {

@@ -39,7 +39,7 @@ function PlayerProps() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
-  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
+  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, refetch } = useHotViewWithRefetch(Number(sc.day));
   const dayRows = useMemo(() => raw.map((r) => ({ ...r, live: r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf]);
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string; fmt: string }>();
@@ -119,9 +119,9 @@ function PlayerProps() {
             : (
               <View style={styles.emptyPad}>
                 <EmptyState
-                  title={sc.day === "0" ? "No props priced today" : "No props for this day"}
+                  title={active.length ? "No props match these filters" : sc.day === "0" ? "No props priced today" : "No props for this day"}
                   body={active.length
-                    ? "Nothing matches these filters — clear one above."
+                    ? "Clear a filter to see the rest of the day's lines."
                     : otherDay ? `${otherDay} lines are priced on other days — pick another chip above.` : "Lines usually land a few hours before the toss."}
                   action={active.length ? <Press onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.link}>Clear filters</Text></Press> : undefined}
                 />

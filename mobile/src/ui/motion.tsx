@@ -79,7 +79,7 @@ export function Working({ label, fill, rows = 3, shape = "rows" }: { label: stri
 
 const styles = StyleSheet.create({
   dotBox: { width: 6, height: 6 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: color.destructive },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: color.miss },
   halo: { position: "absolute", left: 0, top: 0 },
   working: { alignSelf: "stretch", paddingVertical: space.stack },
   workingFill: { flex: 1, minHeight: 280 },

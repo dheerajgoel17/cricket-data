@@ -24,10 +24,11 @@ export function HomePage() {
   const live = useLiveDoc();
   const [q, setQ] = useQ();
   const stateOf = (f: any) => fixtureState(f, liveForFixture(live.data, f)?.status);
+  // Rail is books-priced only (`usePricedFixtures`); noProps filter is a safety net for stale flags.
   const priced = useMemo(() => fixtures.filter((f) => !f.noProps), [fixtures]);
   const counts = useMemo(() => countPhases(priced, (f) => phaseOf(stateOf(f))), [priced, live.data]);
   const phase = pickHomePhase(counts, q.view);
-  const shown = fixtures.filter((f) => (f.noProps ? phase === "pre" : phaseOf(stateOf(f)) === phase));
+  const shown = priced.filter((f) => phaseOf(stateOf(f)) === phase);
   return (
     <div className="flex flex-col">
       <h1 className="sr-only">Cricket fixtures</h1>

@@ -48,7 +48,7 @@ function Saved() {
     if (!user) {
       return (
         <View style={styles.gate}>
-          <EmptyState title="Sign in to sync Saved" body="Create a free account or continue with Google. Your watchlist syncs to the server." />
+          <EmptyState title="Sign in to sync Saved" body="Create a free account or continue with Google. Your watchlist, players and teams are stored on the server." />
           <Press onPress={openSignIn} style={({ pressed }) => [styles.signBtn, pressed && { opacity: 0.9 }]}>
             <Text style={styles.signLabel}>Sign in</Text>
           </Press>

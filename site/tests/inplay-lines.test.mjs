@@ -137,17 +137,18 @@ const inplayDoc = () => ({ matches: parseInplayFeed({ matches: [
   { home: "Pakistan", away: "Sri Lanka", in_play: true, quotes: [q("Babar Innings Runs", "Over", "40.5", 1.9)] }, // never priced before the start: left out
 ] }) });
 
-test("live lines are added beside the pre-match ones (never replacing them) and leave everything else alone", () => {
+test("live lines only join the tables when that market was not priced before the start; pre-match markets stay pre-match only", () => {
   const out = liveMerge(prematch(), inplayDoc(), resolveRahim);
   const rahim = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs");
-  assert.deepEqual(rahim.map((l) => [l.line, l.books[0].over, l.books[0].under, l.books[0].live, l.books.length, l.books[0].source]), [[25.5, 1.8, 1.9, undefined, 2, "bet365"], [33.5, 1.833, 1.833, true, 1, "bet365"], [43.5, 2.6, 1.45, true, 1, "bet365"], [49.5, 2.1, null, true, 1, "bet365"]]); // his pre-match 25.5 stays (two books); his "50+" is a line of his own: 49.5, Yes only
+  // he already had runs pre-match: no live innings-runs rows; his "50+" rung was not priced, so that live milestone still shows
+  assert.deepEqual(rahim.map((l) => [l.line, l.books[0].over, l.books[0].under, l.books[0].live, l.books.length, l.books[0].source]), [[25.5, 1.8, 1.9, undefined, 2, "bet365"], [49.5, 2.1, null, true, 1, "bet365"]]);
   assert.equal(rahim[0].match, "Bangladesh vs West Indies");
   assert.equal(rahim[0].start_utc, "2026-11-05T03:00:00Z");
   assert.equal(rahim[0].fmt, "Test");
   assert.equal(out.lines.filter((l) => l.stat === "fours").length, 1); // other stats untouched
   assert.equal(out.lines.filter((l) => l.pid === "p-other").length, 1); // other matches untouched
   const bd = out.fancy.filter((f) => f.team === "Bangladesh");
-  assert.deepEqual(bd.map((f) => [f.key, f.inn, f.line, f.over, f.under, f.live, f.source]), [["team_total_runs", 1, 200.5, 1.9, 1.9, undefined, "bet365"], ["team_total_runs", 1, 250.5, 1.95, 1.8, true, "bet365"]]); // the pre-match total stays beside the live one
+  assert.deepEqual(bd.map((f) => [f.key, f.inn, f.line, f.over, f.under, f.live, f.source]), [["team_total_runs", 1, 200.5, 1.9, 1.9, undefined, "bet365"]]); // pre-match total only; live 250.5 stays off the table
   assert.equal(out.fancy.filter((f) => f.team === "West Indies").length, 1); // the other side's line stays
   assert.equal(out.fancy.find((f) => f.team === "West Indies").line, 300.5);
 });
@@ -171,7 +172,7 @@ test("with nothing live the data is returned as it is", () => {
   assert.equal(liveMerge(null, inplayDoc(), resolveRahim), null);
   // the resolver knows nobody: a batter the books priced before the start is still linked through those earlier lines (the same spelling), so nothing is half-linked
   const out = liveMerge(prematch(), inplayDoc(), () => null);
-  assert.deepEqual(out.lines.filter((l) => l.stat === "runs" && l.pid === "p-rahim").map((l) => l.books[0].live), [undefined, true, true, true]); // his pre-match 25.5, then the live 33.5, 43.5 and the 50+ line
+  assert.deepEqual(out.lines.filter((l) => l.stat === "runs" && l.pid === "p-rahim").map((l) => l.books[0].live), [undefined, true]); // pre-match 25.5 stays; live O/U skipped; 50+ rung was not priced so it shows
   // a batter with no earlier line and no link goes to the live rows
   assert.ok(out.live[0].markets.some((x) => x.market === "Litton Das innings runs" && x.line === 20.5));
 });
@@ -188,6 +189,8 @@ test("a fixture's other live markets, either way round, and none for another mat
 
 test("two books' lines for the same batter and line are one entry with both quotes, and each side's innings line is a row per book", () => {
   const doc = prematch();
+  doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim"); // no pre-match runs: live lines may show
+  doc.fancy = doc.fancy.filter((f) => !(f.team === "Bangladesh" && f.key === "team_total_runs")); // no pre-match BD total
   const inplay = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [
     { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.8, under: 1.9 },
     { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.85, under: 1.85, book: "BookK" },
@@ -195,7 +198,7 @@ test("two books' lines for the same batter and line are one entry with both quot
     { kind: "team_runs", team: "Bangladesh", inn: 1, line: 255.5, over: 1.9, under: 1.8, book: "BookE" },
   ] }] };
   const out = liveMerge(doc, inplay, resolveRahim);
-  const r = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs" && l.books.some((b) => b.live)); // his live lines
+  const r = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs" && l.books.some((b) => b.live));
   assert.equal(r.length, 1);
   assert.deepEqual(r[0].books.map((b) => b.source), ["bet365", "BookK"]);
   assert.deepEqual(out.fancy.filter((f) => f.team === "Bangladesh" && f.live).map((f) => [f.source, f.line]), [["bet365", 250.5], ["BookE", 255.5]]);
@@ -203,41 +206,41 @@ test("two books' lines for the same batter and line are one entry with both quot
 
 test("the match's 1st innings score takes the live line too while only one side has a 1st-innings line, and every live market names its book", () => {
   const doc = prematch();
+  doc.fancy = doc.fancy.filter((f) => !(f.team === "Bangladesh" && f.key === "team_total_runs")); // no pre-match BD total so the live one can show
   doc.fancy.push({ match: "Bangladesh vs West Indies", home: "Bangladesh", away: "West Indies", start_utc: "2026-11-05T03:00:00Z", fmt: "Test", competition: "2nd Test", key: "first_innings_runs", scope: "match", team: null, line: 325.5, over: 1.83, under: 1.83, source: "bet365", kind: "bookmaker" });
   const one = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "ou", market: "Runs in First 20 Overs", line: 68.5, over: 1.9, under: 1.8, book: "BookK" }, { kind: "ou", market: "Other", line: 1.5, over: 1.9, under: 1.8 }] }] }; // "Other" is not a stretch of overs: not shown
   const out = liveMerge(doc, one, resolveRahim);
   const first = out.fancy.filter((f) => f.key === "first_innings_runs");
-  assert.deepEqual(first.map((f) => [f.line, f.scope, f.team, f.live]), [[325.5, "match", null, undefined], [250.5, "match", null, true]]); // the pre-match 325.5 stays beside it
+  assert.deepEqual(first.map((f) => [f.line, f.scope, f.team, f.live]), [[325.5, "match", null, undefined], [250.5, "match", null, true]]); // pre-match match-total stays; live copy from the new BD team line
   assert.deepEqual(out.live[0].markets.map((x) => x.book), ["BookK"]);
-  // both sides have a 1st-innings line (the first is over): the match's market is left as it was
+  // both sides have a 1st-innings line (WI still has its pre-match total): the match's market is left as it was
   const two = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 }, { kind: "team_runs", team: "West Indies", inn: 1, line: 300.5, over: 1.9, under: 1.8 }] }] };
   assert.equal(liveMerge(doc, two, resolveRahim).fancy.filter((f) => f.key === "first_innings_runs")[0].line, 325.5);
 });
 
-test("a live line records where the market opened, and a batter is linked through the same book's own earlier spelling", () => {
+test("a live line records where it first stood when there was no pre-match market, and a batter is linked through the same book's own earlier spelling", () => {
   const doc = prematch();
-  doc.lines[0].book_name = "M Rahim";
-  doc.lines.push({ pid: "p-rahim", player: "Mushfiqur Rahim", book_name: "M Rahim", team: "Bangladesh", fmt: "Test", stat: "runs", line: 45.5, match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 2.6, under: 1.45 }] });
-  doc.fancy.push({ match: "Bangladesh vs West Indies", home: "Bangladesh", away: "West Indies", start_utc: "2026-11-05T03:00:00Z", fmt: "Test", competition: "2nd Test", key: "first_innings_runs", scope: "match", team: null, line: 325.5, over: 1.83, under: 1.83, source: "bet365", kind: "bookmaker" });
-  const inplay = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [
-    { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.8, under: 1.9 },
-    { kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8 },
-  ] }] };
-  const out = liveMerge(doc, inplay, () => null); // the resolver knows nobody: the earlier lines do the linking
-  const r = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs" && l.books.some((b) => b.live)); // his live lines
+  doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim"); // no pre-match runs
+  doc.fancy = doc.fancy.filter((f) => !(f.team === "Bangladesh" && f.key === "team_total_runs"));
+  // a fours line alone still links him by book spelling (runs market absent)
+  doc.lines.push({ pid: "p-rahim", player: "Mushfiqur Rahim", book_name: "M Rahim", team: "Bangladesh", fmt: "Test", stat: "fours", line: 2.5, match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", books: [{ source: "bet365", kind: "bookmaker", over: 1.8, under: 1.9 }] });
+  const feed = [{ home: "Bangladesh", away: "West Indies", lines: [
+    { kind: "player_runs", player: "M Rahim", line: 33.5, over: 1.8, under: 1.9, first: 24.5 },
+    { kind: "team_runs", team: "Bangladesh", inn: 1, line: 250.5, over: 1.9, under: 1.8, first: 200.5 },
+  ] }];
+  const out = liveMerge(doc, { matches: feed }, () => null); // the resolver knows nobody: the earlier lines do the linking
+  const r = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs" && l.books.some((b) => b.live));
   assert.equal(r.length, 1);
-  assert.equal(r[0].books[0].opened, 25.5); // of 25.5 (1.8 / 1.9) and 45.5 (2.6 / 1.45) the first is nearer evens
+  assert.equal(r[0].books[0].opened, 24.5);
   assert.equal(r[0].player, "Mushfiqur Rahim");
-  const team = out.fancy.find((f) => f.key === "team_total_runs" && f.team === "Bangladesh" && f.live);
-  assert.equal(team.opened, 200.5);
-  assert.equal(out.fancy.find((f) => f.key === "first_innings_runs" && f.live).opened, 325.5);
+  assert.equal(out.fancy.find((f) => f.key === "team_total_runs" && f.team === "Bangladesh" && f.live).opened, 200.5);
   assert.equal(out.live?.length ?? 0, 0); // nothing fell through to the generic rows
 });
 
 test("the merged data says which live player lines it holds and the minute, so a cache keyed on the file's timestamp is not reused", () => {
   const at = (iso) => ({ asOf: iso, matches: inplayDoc().matches });
   const a = liveMerge(prematch(), at("2026-11-09T09:30:10.000Z"), resolveRahim), b = liveMerge(prematch(), at("2026-11-09T09:30:50.000Z"), resolveRahim), c = liveMerge(prematch(), at("2026-11-09T09:31:05.000Z"), resolveRahim);
-  assert.equal(a.live_sig, "p-rahim|runs|0|33.5,p-rahim|runs|0|43.5,p-rahim|runs|0|49.5@" + Math.floor(Date.parse("2026-11-09T09:30:00Z") / 60000));
+  assert.equal(a.live_sig, "p-rahim|runs|0|49.5@" + Math.floor(Date.parse("2026-11-09T09:30:00Z") / 60000)); // only the unpriced 50+ milestone
   assert.equal(a.live_sig, b.live_sig); // the same minute: one scoring
   assert.notEqual(a.live_sig, c.live_sig); // the next minute: scored again
   assert.equal(liveMerge(prematch(), { asOf: "2026-11-09T09:30:00Z", matches: [] }, resolveRahim).live_sig, undefined); // nothing live: the plain data
@@ -298,12 +301,13 @@ test("a linked batter's milestone is a live line in his props (replacing the ear
   ] }] };
   const out = liveMerge(doc, inplay, resolveRahim);
   const rahim = out.lines.filter((l) => l.pid === "p-rahim" && l.stat === "runs");
-  assert.deepEqual(rahim.map((l) => [l.line, l.books[0].over, l.books[0].under, l.books[0].live]).sort((a, b) => a[0] - b[0]), [[25.5, 1.8, 1.9, undefined], [49.5, 3, null, undefined], [49.5, 2.2, 1.65, true], [99.5, 5, null, true]]); // the pre-match 49.5 and 25.5 stays (no live O/U line)
+  // 50 was priced pre-match: no live 49.5; 100 was not: live 99.5 shows; pre-match 25.5 / 49.5 stay
+  assert.deepEqual(rahim.map((l) => [l.line, l.books[0].over, l.books[0].under, l.books[0].live]).sort((a, b) => a[0] - b[0]), [[25.5, 1.8, 1.9, undefined], [49.5, 3, null, undefined], [99.5, 5, null, true]]);
   assert.equal(out.lines.filter((l) => l.pid !== "p-rahim" && l.pid !== "p-other").length, 0); // the unlinked batter has no row
   assert.deepEqual(liveRows(out, { a: "Bangladesh", b: "West Indies" }), []); // no milestone, dismissal or pick lands in Match Fancy
 });
 
-test("a Test's live batter line is his side's current innings: it replaces that innings' line only, keeps his match total, and is tagged with the innings", () => {
+test("a Test's live batter line is his side's current innings: only an innings with no pre-match runs gets a live row", () => {
   const doc = prematch();
   const base = { player: "Mushfiqur Rahim", team: "Bangladesh", fmt: "Test", stat: "runs", match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", pid: "p-rahim" };
   doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim"); // start from his lines only
@@ -316,37 +320,32 @@ test("a Test's live batter line is his side's current innings: it replaces that 
     { kind: "pick", market: "M Rahim To Score 100+ Runs", outcomes: [{ label: "Yes", price: 3 }] },
   ] }] };
   const first = liveMerge(doc, inplay, resolveRahim, [], () => 1).lines.filter((l) => l.pid === "p-rahim");
-  assert.deepEqual(first.map((l) => [l.line, l.inn || 0, !!l.books[0].live]).sort((a, b) => a[0] - b[0]), [[31.5, 1, false], [69.5, 0, false], [95.5, 1, true], [99.5, 1, true]]); // his pre-match 31.5 (1st innings) and 69.5 (match) stay
-  assert.equal(first.find((l) => l.line === 95.5).books[0].opened, 31.5); // "was" is the same innings' line, not the match total
+  // 1st innings was priced: no live O/U; 100+ was not: live milestone shows
+  assert.deepEqual(first.map((l) => [l.line, l.inn || 0, !!l.books[0].live]).sort((a, b) => a[0] - b[0]), [[31.5, 1, false], [69.5, 0, false], [99.5, 1, true]]);
   const second = liveMerge(doc, inplay, resolveRahim, [], () => 2).lines.filter((l) => l.pid === "p-rahim");
-  assert.deepEqual(second.map((l) => [l.line, l.inn || 0]).sort((a, b) => a[0] - b[0]), [[31.5, 1], [69.5, 0], [95.5, 2], [99.5, 2]]); // his 2nd innings: the 1st-innings line is a finished bet and stays
-  assert.equal(second.find((l) => l.line === 95.5).books[0].opened, undefined); // nothing to have opened at
-  const plain = liveMerge(doc, inplay, resolveRahim).lines.filter((l) => l.pid === "p-rahim"); // no live match to ask: as before, no scope
-  assert.ok(plain.some((l) => l.line === 95.5 && !l.inn));
+  assert.deepEqual(second.map((l) => [l.line, l.inn || 0, !!l.books[0].live]).sort((a, b) => a[0] - b[0] || (a[1] || 0) - (b[1] || 0)), [[31.5, 1, false], [69.5, 0, false], [95.5, 2, true], [99.5, 2, true]]); // 2nd innings had no pre-match runs
+  assert.equal(second.find((l) => l.line === 95.5).books[0].opened, undefined);
+  const plain = liveMerge(doc, inplay, resolveRahim).lines.filter((l) => l.pid === "p-rahim"); // no innOf: scope 0 has the match total, so no live O/U
+  assert.ok(!plain.some((l) => l.line === 95.5));
+  assert.ok(plain.some((l) => l.line === 99.5 && !l.inn && l.books[0].live));
 });
 
-test("a batter's row stays his pre-match one until his runs are past the main pre-match line (nearest evens); then the live line takes over; no pre-match line, or no scorer, shows it at once", () => {
+test("a batter with pre-match runs keeps those rows only; with no pre-match runs in that scope the live line shows at once", () => {
   const doc = prematch();
   const base = { player: "Mushfiqur Rahim", team: "Bangladesh", fmt: "Test", stat: "runs", match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", pid: "p-rahim", inn: 1 };
   doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim");
   doc.lines.push({ ...base, line: 31.5, books: [{ source: "bet365", kind: "bookmaker", over: 1.85, under: 1.85 }] }, { ...base, line: 41.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.4, under: 1.5 }] });
   const inplay = { matches: [{ home: "Bangladesh", away: "West Indies", lines: [{ kind: "player_runs", player: "M Rahim", line: 95.5, over: 1.83, under: 1.83 }] }] };
   const runs = (r) => liveMerge(doc, inplay, resolveRahim, [], () => 1, () => r).lines.filter((l) => l.pid === "p-rahim").map((l) => [l.line, !!l.books[0].live]).sort((a, b) => a[0] - b[0]);
-  assert.deepEqual(runs(20), [[31.5, false], [41.5, false]]); // short of the main line (31.5, nearest evens): pre-match rows as they were, no live row
-  assert.deepEqual(runs(31), [[31.5, false], [41.5, false]]);
-  assert.deepEqual(runs(32), [[31.5, false], [41.5, false], [95.5, true]]); // past the main line: the live line is added beside the pre-match ones, with "was" from them
-  assert.equal(liveMerge(doc, inplay, resolveRahim, [], () => 1, () => 60).lines.find((l) => l.line === 95.5).books[0].opened, 31.5);
-  // a stray high line in the pre-match file (an in-play price that leaked in) does not hold the row back: the main line is the one nearest evens
-  doc.lines.push({ ...base, line: 95.5, books: [{ source: "bet365", kind: "bookmaker", over: 1.95, under: 1.75 }] });
-  assert.deepEqual(runs(57).filter((l) => l[1]), [[95.5, true]]);
-  doc.lines.pop();
-  assert.deepEqual(runs(null), [[31.5, false], [41.5, false]]); // not on the board: the pre-match bet stays
-  assert.deepEqual(liveMerge(doc, inplay, resolveRahim, [], () => 1).lines.filter((l) => l.pid === "p-rahim").map((l) => l.line), [31.5, 41.5, 95.5]); // no scorer given: the live line is always added
-  const second = liveMerge(doc, inplay, resolveRahim, [], () => 2, () => 3).lines.filter((l) => l.pid === "p-rahim").map((l) => [l.line, l.inn]); // his 2nd innings: nothing pre-match in that scope
-  assert.deepEqual(second.sort((a, b) => a[0] - b[0]), [[31.5, 1], [41.5, 1], [95.5, 2]]);
+  assert.deepEqual(runs(20), [[31.5, false], [41.5, false]]); // pre-match market exists: never add the live line, whatever the score
+  assert.deepEqual(runs(95), [[31.5, false], [41.5, false]]);
+  assert.deepEqual(runs(null), [[31.5, false], [41.5, false]]);
+  assert.deepEqual(liveMerge(doc, inplay, resolveRahim, [], () => 1).lines.filter((l) => l.pid === "p-rahim").map((l) => l.line), [31.5, 41.5]); // no scorer: still pre-match only
+  const second = liveMerge(doc, inplay, resolveRahim, [], () => 2, () => 3).lines.filter((l) => l.pid === "p-rahim").map((l) => [l.line, l.inn, !!l.books[0].live]); // 2nd innings: nothing pre-match in that scope
+  assert.deepEqual(second.sort((a, b) => a[0] - b[0] || (a[1] || 0) - (b[1] || 0)), [[31.5, 1, false], [41.5, 1, false], [95.5, 2, true]]);
 });
 
-test("the same rule for a side's innings total and a batter's milestone: the pre-match line stays until the runs are past it", () => {
+test("the same rule for a side's innings total and a batter's milestone: show live only when that market was not priced before the start", () => {
   const doc = prematch(); // Bangladesh 1st innings 200.5 (fancy), West Indies 300.5
   const base = { player: "Mushfiqur Rahim", team: "Bangladesh", fmt: "Test", stat: "runs", match: "Bangladesh vs West Indies", competition: "2nd Test", start_utc: "2026-11-05T03:00:00Z", pid: "p-rahim", inn: 1 };
   doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim");
@@ -359,16 +358,14 @@ test("the same rule for a side's innings total and a batter's milestone: the pre
   const at = (team, runs) => liveMerge(doc, inplay, resolveRahim, [], () => 1, () => runs, () => team);
   const bd = (out) => out.fancy.filter((f) => f.team === "Bangladesh").map((f) => [f.line, !!f.live]);
   const ml = (out) => out.lines.filter((l) => l.pid === "p-rahim").map((l) => [l.line, !!l.books[0].live]).sort((a, b) => a[0] - b[0]);
-  assert.deepEqual(bd(at(150, 30)), [[200.5, false]]); // 150 of 200.5: the pre-match total stays, no live row
-  assert.deepEqual(bd(at(200, 30)), [[200.5, false]]);
-  assert.deepEqual(bd(at(201, 30)), [[200.5, false], [250.5, true]]); // past it: the live total is added beside it
-  assert.deepEqual(bd(at(null, 30)), [[200.5, false]]); // the side is not on the live board: it stays
-  assert.deepEqual(bd(liveMerge(doc, inplay, resolveRahim, [], () => 1, () => 30)), [[200.5, false], [250.5, true]]); // no side scorer given: as before
-  assert.deepEqual(ml(at(0, 30)), [[49.5, false], [99.5, true]]); // 30 short of the 49.5 he was priced at: that stays; the 100 he was never priced at shows at once
-  assert.deepEqual(ml(at(0, 50)), [[49.5, false], [49.5, true], [99.5, true]]); // past 49.5: the live one is added beside it
+  assert.deepEqual(bd(at(150, 30)), [[200.5, false]]); // pre-match total exists: no live row whatever the score
+  assert.deepEqual(bd(at(250, 30)), [[200.5, false]]);
+  assert.deepEqual(bd(liveMerge(doc, inplay, resolveRahim, [], () => 1, () => 30)), [[200.5, false]]);
+  assert.deepEqual(ml(at(0, 30)), [[49.5, false], [99.5, true]]); // 50 was priced: stay; 100 was not: show live
+  assert.deepEqual(ml(at(0, 50)), [[49.5, false], [99.5, true]]); // past 49.5 still does not add a live 49.5
 });
 
-test("a batter or side with no pre-match line gets its first live line as where it opened, so the bar can pass it however far the line moves", () => {
+test("a batter or side with no pre-match line gets its first live line as where it opened; a pre-match market keeps the live line off the table", () => {
   const doc = prematch();
   doc.lines = doc.lines.filter((l) => l.pid !== "p-rahim");
   const feed = (line, over = 1.85, under = 1.85) => [{ home: "Bangladesh", away: "West Indies", lines: [
@@ -386,11 +383,9 @@ test("a batter or side with no pre-match line gets its first live line as where 
   assert.equal(live.line, 33.5);
   assert.equal(live.books[0].opened, 24.5); // no pre-match line: opened is the first live line
   assert.equal(out.fancy.find((f) => f.key === "team_total_runs" && f.live && f.inn === 2).opened, 98);
-  // a pre-match line, when there is one, still wins
+  // pre-match runs market exists: no live batter row at all
   const withPre = prematch();
-  const hit = liveMerge(withPre, { matches: s.matches }, resolveRahim, [], () => 0, () => 99).lines.find((l) => l.pid === "p-rahim" && l.books[0].live);
-  assert.notEqual(hit.books[0].opened, undefined);
-  assert.notEqual(hit.books[0].opened, 24.5);
+  assert.equal(liveMerge(withPre, { matches: s.matches }, resolveRahim, [], () => 0, () => 99).lines.find((l) => l.pid === "p-rahim" && l.books[0].live), undefined);
 });
 
 test("the first line is the one nearest evens when several are listed at once, a row that is not a batter's or side's innings is left alone, and a line not listed for a while is forgotten", () => {

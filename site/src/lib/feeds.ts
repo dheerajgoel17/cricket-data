@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
 import { isFixtureId } from "@cricket/engine/lines.js";
+import { mergeBoardLive } from "@cricket/engine/live.js";
 import { saveLive } from "@/lib/live-cache";
 import { dataUrl } from "@/lib/data-url";
 import { readJson } from "@/lib/wrap-key";
@@ -57,13 +58,17 @@ export async function loadProps(): Promise<{ snap: any | null; live: boolean }> 
 }
 
 
-/** Live scores + player so-far from /api/live (Source A schedule, match and scorecard pages, ~15 s). Null if the route is down. */
+/** Live scores + player so-far from /api/live (Source A, ~15 s), with hourly board totals merged for priced gaps. Null if the route is down. */
 export async function loadLive(): Promise<any | null> {
   try {
-    const r = await fetch("/api/live", { credentials: "same-origin", headers: { accept: "application/json" } });
+    const [r, board] = await Promise.all([
+      fetch("/api/live", { credentials: "same-origin", headers: { accept: "application/json" } }),
+      live("board_scores.json", LINES_LIVE_MS),
+    ]);
     const body = r.ok ? await readJson(r) : null;
-    saveLive(body);
-    return body;
+    const merged = mergeBoardLive(body, board);
+    saveLive(merged);
+    return merged;
   } catch { return null; }
 }
 

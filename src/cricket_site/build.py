@@ -1065,6 +1065,16 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         (out / "names.json").write_text(json.dumps(full, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "props.json").write_text(json.dumps(build_props(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
     (out / "lines.json").write_text(json.dumps(build_lines(vb_dir), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+    # Hourly board totals for priced gaps Source A missed (optional; empty stub when absent).
+    board_src = vb_dir / "board_scores.json" if vb_dir else None
+    if board_src and board_src.exists():
+        try:
+            (out / "board_scores.json").write_text(board_src.read_text(encoding="utf-8"), encoding="utf-8")
+        except OSError:
+            pass
+    else:
+        (out / "board_scores.json").write_text(
+            json.dumps({"generated_at_utc": "", "source": "board", "matches": []}, separators=(",", ":")), encoding="utf-8")
     return meta
 
 

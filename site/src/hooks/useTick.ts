@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-const HOLD_MS = 1100;
+/** How long the up/down colour (and arrow) stay after a move — stock-ticker brief, not sticky. */
+const HOLD_MS = 1000;
 
 /**
- * Direction a number just moved: 1 up, -1 down, 0 still. Holds the flash for a beat so a 15 s live poll is visible,
- * then returns to 0. Instant under reduced motion (the CSS animation is already off).
+ * Direction a number just moved: 1 up, -1 down, 0 still. Holds the flash for about a second, then returns to 0.
  */
-export function useTick(value: number | null | undefined, holdMs: number | null = HOLD_MS) {
+export function useTick(value: number | null | undefined, holdMs: number = HOLD_MS) {
   const prev = useRef(value);
   const [dir, setDir] = useState< -1 | 0 | 1>(0);
   useEffect(() => {
@@ -16,7 +16,6 @@ export function useTick(value: number | null | undefined, holdMs: number | null 
     if (cur == null || was == null) { setDir(0); return; }
     if (cur === was) return;
     setDir(cur > was ? 1 : -1);
-    if (holdMs == null) return;
     const t = window.setTimeout(() => setDir(0), holdMs);
     return () => window.clearTimeout(t);
   }, [value, holdMs]);

@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { bookQuotes } from "@cricket/engine/lines.js";
 import { authState, savedKeys } from "@/test/auth-harness";
-import { PropRow, PropTable } from "./hot-props";
+import { PropLines, PropRow, PropTable } from "./hot-props";
 
 vi.mock("@/lib/books", () => ({ bookLogo: () => undefined }));
 vi.mock("./live-spot", async (orig) => ({ ...(await orig<typeof import("./live-spot")>()), BatterSpot: () => <span>Similar in-play lines</span> })); // its history line needs the data provider; not what is tested here
@@ -19,13 +19,38 @@ const row: any = {
   idx: 1, pid: "p1", inn: 0, name: "AM Tribe", team: "Jersey", stat: "runs", line: 39.5, fmt: "ODI",
   start: "2026-10-30T12:00:00Z", over: 1.85, quotes: [], venue: "Wankhede Stadium, Mumbai",
   season: window(0.6, 20), h2h: window(0.5, 4), ven: window(0.4, 5), l10: window(0.7, 10),
-  edge: 0.051, last: [{ v: 53, s: "hit" }, { v: 12, s: "miss" }], max: 80,
+  edge: 0.051, side: "over", last: [{ v: 53, s: "hit" }, { v: 12, s: "miss" }], max: 80,
 };
 
-describe("PropTable", () => {
-  it("shows cricket columns, not a copy of another sport's sheet, and ranks from a header click", () => {
+describe("PropLines", () => {
+  it("density=auto mounts both compact list and dense table", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <PropLines rows={[row]} win="l10" onWin={() => {}} bars density="auto" soFarOf={() => null} outOf={() => false} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector(".lg\\:hidden")).toBeTruthy();
+    expect(container.querySelector(".hidden.lg\\:block")).toBeTruthy();
+    expect(screen.getAllByText("AM Tribe").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Lines")).toBeInTheDocument();
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+  });
+
+  it("density=compact mounts the scan list only", () => {
+    render(
+      <MemoryRouter>
+        <PropLines rows={[row]} density="compact" soFarOf={() => null} outOf={() => false} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+    expect(screen.getByText("+5")).toBeInTheDocument();
+    expect(screen.queryByText("Lines")).toBeNull();
+    expect(screen.queryByText("Model edge")).toBeNull();
+  });
+
+  it("dense table shows cricket columns and ranks from a header click", () => {
     const onWin = vi.fn();
-    render(<MemoryRouter><PropTable rows={[row]} win="l10" onWin={onWin} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    render(<MemoryRouter><PropLines rows={[row]} win="l10" onWin={onWin} bars density="dense" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
     expect(screen.getByText("Lines")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /L10 chart/ })).toBeInTheDocument();
     expect(screen.getByText("Over / under")).toBeInTheDocument();
@@ -35,52 +60,72 @@ describe("PropTable", () => {
     expect(screen.queryByText("DVP")).toBeNull();
     expect(screen.queryByText("MATCHUP")).toBeNull();
     expect(screen.getByText("AM Tribe")).toBeInTheDocument();
-    expect(screen.getByText("1.85")).toBeInTheDocument();
+    expect(screen.getAllByText("1.85").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("+5.1")).toBeInTheDocument();
     expect(screen.getByText("Wankhede")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "H2H" }));
     expect(onWin).toHaveBeenCalledWith("h2h");
   });
 
-  it("shows the same score, history and fallback states in the card and table", () => {
+  it("scan and table skip so-far copy; keep history and fallback states", () => {
     const live = { ...row, line: 40, quotes: [{ source: "book", name: "Book", line: 40, over: 1.85, under: 1.95, live: true }] };
     const renderRows = (standing: Parameters<typeof PropRow>[0]["soFar"], out = false) => (
       <MemoryRouter>
-        <ul><PropRow r={live} win="l10" wl="L10" soFar={standing} out={out} /></ul>
-        <PropTable rows={[live]} win="l10" onWin={() => {}} bars={false} soFarOf={() => standing} outOf={() => out} />
+        <PropLines rows={[live]} density="compact" soFarOf={() => standing} outOf={() => out} />
+        <PropLines rows={[live]} win="l10" onWin={() => {}} bars={false} density="dense" soFarOf={() => standing} outOf={() => out} />
       </MemoryRouter>
     );
     const { rerender } = render(renderRows({ v: 32, state: "live", verdict: null }));
-    expect(screen.getAllByText(/32 so far/)).toHaveLength(2);
-    expect(screen.getAllByRole("img", { name: "32 of 40" })).toHaveLength(2);
-    expect(screen.getAllByText("Similar in-play lines")).toHaveLength(2);
+    expect(screen.queryByText(/so far|Cleared|Missed|On the line/)).toBeNull();
+    expect(screen.queryByRole("img", { name: "32 of 40" })).toBeNull();
+    expect(screen.getAllByText("Similar in-play lines")).toHaveLength(1);
     rerender(renderRows(null));
-    expect(screen.getAllByText("Score unavailable")).toHaveLength(2);
+    // Score unavailable replaces MiniBars (not a title badge).
+    expect(screen.getAllByText("Score unavailable").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByRole("img", { name: /Last / })).toBeNull();
     rerender(renderRows({ v: 40, state: "final", verdict: "push" }));
-    expect(screen.getAllByText(/40 final · On the line/)).toHaveLength(2);
+    expect(screen.queryByText(/so far|final|On the line/)).toBeNull();
     expect(screen.queryByText("Similar in-play lines")).toBeNull();
     expect(screen.queryByRole("img", { name: "40 of 40" })).toBeNull();
     rerender(renderRows(null, true));
-    expect(screen.getAllByText("Not in XI")).toHaveLength(2);
-    expect(screen.queryByText("+5%")).toBeNull();
+    expect(screen.getAllByText("Not in XI").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByRole("img", { name: /Last / })).toBeNull(); // Not in XI replaces the bars
+    expect(screen.queryByText("+5")).toBeNull();
     expect(screen.queryByText("+5.1")).toBeNull();
     expect(screen.queryByRole("button", { name: "Book prices" })).toBeNull();
     expect(screen.queryByText("Score unavailable")).toBeNull();
   });
 
-  it("uses a short stadium name on the prop card, full venue on the title", () => {
-    const r = { ...row, venue: "Western Australia Cricket Association Ground, Perth", ven: window(0.2, 5), l10: window(0.7, 10) };
-    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
-    expect(screen.getByText("7 in L10")).toBeInTheDocument();
-    const chip = screen.getByTitle("Western Australia Cricket Association Ground, Perth");
-    expect(chip).toHaveTextContent("1/5 at WACA");
-    expect(screen.queryByText(/Western Australia Cricket Association Ground/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Add to watchlist" })).toBeInTheDocument(); // the star sits beside the row link, never inside it
-    expect(screen.getByRole("button", { name: "Add to watchlist" }).closest("a")).toBeNull();
+  it("scan card keeps edge + bars without a save control on the graph", () => {
+    render(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+    expect(screen.getByText("+5")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Last 2/ })).toBeInTheDocument();
+    expect(screen.queryByText(/in L10/)).toBeNull();
+    expect(screen.queryByText(/at WACA|at Eden/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Add to watchlist" })).toBeNull();
   });
 
-  it("stars a prop without opening it, and stores it on the account", async () => {
-    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
+  it("keeps Edge and puts a Hit/Miss mark beside odds once the pre-match line has settled", () => {
+    const { rerender } = render(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => ({ v: 50, state: "final", verdict: "cleared" })} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByRole("img", { name: "Hit" })).toBeInTheDocument();
+    expect(screen.queryByText(/so far|Cleared|Missed/)).toBeNull();
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+    expect(screen.getByText("+5")).toBeInTheDocument();
+    rerender(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => ({ v: 12, state: "final", verdict: "missed" })} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByRole("img", { name: "Miss" })).toBeInTheDocument();
+    expect(screen.queryByText(/so far|Cleared|Missed/)).toBeNull();
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+    rerender(<MemoryRouter><PropLines rows={[{ ...row, side: "under" }]} density="compact" soFarOf={() => ({ v: 12, state: "final", verdict: "missed" })} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByRole("img", { name: "Hit" })).toBeInTheDocument();
+    rerender(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => ({ v: 39.5, state: "final", verdict: "push" })} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("Edge")).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: "Hit" })).toBeNull();
+    expect(screen.queryByRole("img", { name: "Miss" })).toBeNull();
+  });
+
+  it("stars a prop from the table without opening it, and stores it on the account", async () => {
+    render(<MemoryRouter><PropTable rows={[row]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: "Add to watchlist" }));
     expect(screen.getByRole("button", { name: "Remove from watchlist" })).toHaveAttribute("aria-pressed", "true");
     await waitFor(() => expect(savedKeys()).toContain("prop:1:runs:39.5:1"));
@@ -88,55 +133,73 @@ describe("PropTable", () => {
 
   it("opens sign-in instead of starring when logged out", () => {
     authState.user = null;
-    render(<MemoryRouter><ul><PropRow r={row} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
+    render(<MemoryRouter><PropTable rows={[row]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: "Add to watchlist" }));
     expect(authState.openSignIn).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Add to watchlist" })).toHaveAttribute("aria-pressed", "false");
     expect(savedKeys()).toEqual([]);
   });
 
-  it("puts the bookmaker mark under the line, even when only one book prices the line", () => {
-    const r = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
-    render(<MemoryRouter><ul><PropRow r={r} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
-    expect(screen.getAllByText("bet365").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("bet365")[0].closest("a")).toBeNull();
+  it("shows one model-side price on the scan card (books live on the detail)", () => {
+    const r = { ...row, side: "over", quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
+    render(<MemoryRouter><PropLines rows={[r]} density="compact" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("1.85")).toBeInTheDocument();
+    expect(screen.getByText("O")).toBeInTheDocument();
+    expect(screen.getByText("39.5")).toBeInTheDocument();
+    expect(screen.queryByText("bet365")).toBeNull();
     expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
   });
 
-  it("labels both book prices inline and shows a different under threshold beside its price", () => {
-    const quotes = [{ source: "bet365", name: "bet365", line: 39.5, over: 1.83, under: null, underAt: { line: 41.5, price: 1.95 }, best: false }];
-    render(<MemoryRouter><ul><PropRow r={{ ...row, quotes, edge: null }} win="l10" wl="L10" soFar={null} out={false} /></ul></MemoryRouter>);
-    expect(screen.getByText("O/U 39.5")).toBeInTheDocument();
-    expect(screen.getByText(/^O 39\.5$/)).toBeInTheDocument();
-    expect(screen.getByText("1.83")).toBeInTheDocument();
-    expect(screen.getByText(/U 41\.5/).parentElement).toHaveTextContent(/U 41\.5.*1\.95/);
-    expect(screen.queryByRole("table")).toBeNull();
+  it("leans Under when the model side is under", () => {
+    const quotes = [{ source: "bet365", name: "bet365", line: 39.5, over: 1.83, under: 1.95, best: false }];
+    render(<MemoryRouter><PropLines rows={[{ ...row, quotes, side: "under", under: 1.95, edge: 0.04 }]} density="compact" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.getByText("U")).toBeInTheDocument();
+    expect(screen.getByText("1.95")).toBeInTheDocument();
+    expect(screen.queryByText(/^O$/)).toBeNull();
   });
 
-  it("shows the book's mark when only one book prices the line, and has no +N books toggle", () => {
-    const one = { ...row, quotes: [{ source: "bet365", name: "bet365", line: 39.5, over: 1.85, under: 1.85, best: false }] };
-    render(<MemoryRouter><PropTable rows={[one]} win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
-    expect(screen.getAllByText("bet365").length).toBeGreaterThanOrEqual(1);
+  it("dense Lines has no multi-book / split-line strip (that lives on the dedicated page)", () => {
+    const quotes = bookQuotes([
+      { line: 39.5, books: [{ source: "bet365", kind: "bookmaker", over: 1.85, under: 1.9 }] },
+      { line: 42.5, books: [{ source: "Betfair", kind: "exchange", over: 1.95, under: 1.8 }] },
+    ]);
+    render(<MemoryRouter><PropLines rows={[{ ...row, quotes }]} density="dense" win="l10" onWin={() => {}} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.queryByText("bet365")).toBeNull();
     expect(screen.queryByRole("button", { name: /\+\d+ books?/ })).toBeNull();
+    expect(screen.queryByText(/O 42\.5|U 42\.5/)).toBeNull();
   });
 });
 
 describe("a live props row", () => {
-  it("has the Live mark beside the player's name, and was-39.5 on the quote line", () => {
-    const quotes = bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
-    render(<MemoryRouter><PropTable rows={[{ ...row, line: 49.5, quotes }]} win="l10" onWin={() => undefined} bars soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
-    const name = screen.getAllByText("AM Tribe")[0];
-    expect(within(name.parentElement!.parentElement as HTMLElement).getByText("Live")).toBeInTheDocument(); // on the name line
-    expect(screen.getAllByText("Live")).toHaveLength(1);
-    expect(screen.getByText("was 39.5")).toBeInTheDocument();
+  const liveQuotes = () => bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
+
+  it("Home PropRow + fixture PropLines: In Play Market, never per-player Live or Opened at", () => {
+    const live = { ...row, line: 49.5, quotes: liveQuotes() };
+    // Home: one interleaved PropRow list; fixture Props: HotProps → PropLines.
+    render(
+      <MemoryRouter>
+        <ul><PropRow r={live} soFar={null} out={false} hideMatch /></ul>
+        <PropLines rows={[live]} density="dense" win="l10" onWin={() => undefined} bars soFarOf={() => null} outOf={() => false} />
+      </MemoryRouter>,
+    );
+    expect(screen.getAllByText("In Play Market").length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText("Live")).toBeNull();
+    expect(screen.queryByText(/Opened at/)).toBeNull();
   });
 
-  it("the card row has the same: the mark beside the name, was-39.5 on the quote line", () => {
-    const quotes = bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
-    render(<MemoryRouter><ul><PropRow r={{ ...row, line: 49.5, quotes }} win="l10" wl="L10" soFar={{ v: 30, state: "live", verdict: null }} out={false} /></ul></MemoryRouter>);
-    expect(screen.getByRole("img", { name: "30 of 49.5, was 39.5" })).toBeInTheDocument(); // the bar under the quote
-    expect(screen.getAllByText("Live")).toHaveLength(1);
-    expect(within(screen.getByText("AM Tribe").closest("span.flex") as HTMLElement).getByText("Live")).toBeInTheDocument();
-    expect(screen.getByText("Opened at 39.5")).toBeInTheDocument();
+  it("the card row keeps In Play Market, without so-far text, track, or Opened at", () => {
+    render(<MemoryRouter><PropLines rows={[{ ...row, line: 49.5, quotes: liveQuotes() }]} density="compact" soFarOf={() => ({ v: 30, state: "live", verdict: null })} outOf={() => false} /></MemoryRouter>);
+    expect(screen.queryByRole("img", { name: /30 of 49\.5/ })).toBeNull();
+    expect(screen.queryByText(/30 so far/)).toBeNull();
+    const title = screen.getByText("AM Tribe").closest("span.flex") as HTMLElement;
+    expect(within(title).queryByText("Live")).toBeNull();
+    expect(within(title).getByText("In Play Market")).toBeInTheDocument();
+    expect(screen.queryByText(/Opened at/)).toBeNull();
+  });
+
+  it("no In Play Market when the line is still the pre-match price", () => {
+    render(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
+    expect(screen.queryByText("In Play Market")).toBeNull();
+    expect(screen.queryByText("Live")).toBeNull();
   });
 });

@@ -10,7 +10,7 @@ import { dayLabel, localTime } from "@/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { DataTable } from "@/ui/data-table";
-import { LiveDot } from "@/ui/motion";
+import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
 import { cap, color, num, numLg, radius, space, type, tonal, font } from "@/ui/tokens";
@@ -25,10 +25,10 @@ export function startText(iso: string, now = Date.now()) {
   return `${day === "Today" ? "" : `${day} `}${localTime(d)}`.trim();
 }
 
-/** A match's status beside a side's name: the start time while it is to come, a red pulsing LIVE while it is on, a muted COMPLETED once it is over (the site's `MatchStatus`). */
+/** A match's status beside a side's name (site MatchStatus / StatusLabel). */
 export function MatchStatus({ phase, start }: { phase: "upcoming" | "live" | "final"; start?: string }) {
-  if (phase === "live") return <View style={styles.statusRow}><LiveDot /><Text style={[styles.cap, { color: color.destructive }]}>Live</Text></View>;
-  if (phase === "final") return <Text style={styles.cap}>✓ Completed</Text>;
+  if (phase === "live") return <StatusLabel tone="live" surface="dot" />;
+  if (phase === "final") return <StatusLabel tone="muted" surface="plain">Completed</StatusLabel>;
   return <Text style={styles.when}>{start ? startText(start) : ""}</Text>;
 }
 
@@ -136,7 +136,6 @@ const styles = StyleSheet.create({
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
   when: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: space.tight },
   teams: { flexDirection: "row", alignItems: "center", gap: space.snug, flexWrap: "wrap" },
   side: { flexDirection: "row", alignItems: "center", gap: space.tight, flexShrink: 1, maxWidth: "46%" },
   vs: { ...type.footnote, color: color["muted-foreground"] },

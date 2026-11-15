@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
+import { bookFixtures, fixtureInBooks, liveForFixture, teamTotalsPresent } from "@cricket/engine/live.js";
 import { archiveFixture, fixtureBooks, keepMsFor, sameFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { useData } from "@/lib/data";
@@ -74,17 +74,16 @@ const QUIET_FILL_MS = 96 * 3600e3;
 export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (f: any) => boolean = () => true, now = Date.now()) {
   const active = fx.filter((f) => stateOf(f) !== "final" && (startedSince(f, 12 * 3600e3, now) || (begun(stateOf(f)) && startedSince(f, keepMsFor(f.fmt), now))) && inBooks(f));
   const window = active.length >= 3 ? keepMsFor("T20") : QUIET_FILL_MS;
-  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now));
+  // `inBooks` / showable applies to finished too (priced + scores), not only active rows.
+  const finished = fx.filter((f) => stateOf(f) === "final" && startedSince(f, Math.max(window, keepMsFor(f.fmt)), now) && inBooks(f));
   return [...active, ...finished].sort((x, y) => (x.start < y.start ? -1 : x.start > y.start ? 1 : 0));
 }
 
-/** How far ahead an unpriced game still shows (flagged `noProps`). */
-export const NO_PROPS_DAYS = 10;
-
-/** Upcoming fixtures: the ones the books price (player props, event markets, or fancy) and, up to `NO_PROPS_DAYS` ahead, the ones they do not (`noProps`).
- *  A fixture matches a feed match when both team names agree (ignoring "(W)"/"Women") and the starts are within 14 h.
- *  With no book feed it falls back to every upcoming fixture (`priced: false`) rather than an empty home page, but only once the feed has been read or given up on:
- *  until then `fixtures` is empty (`ready` false), so the list never shows games the books turn out not to price. */
+/** Books-priced fixtures that the front may list.
+ *  Source-only rows stay off. A priced match that has already begun (or finished) also needs live/board
+ *  team totals (`teamTotalsPresent`) — holding book lines alone is not enough. Upcoming priced matches
+ *  stay (no score expected yet). Empty book feed → empty list.
+ *  Archive settle still keeps every priced match off-screen. */
 export function usePricedFixtures() {
   const fx = useFixtures();
   const lines = useQuery(linesQuery);
@@ -95,9 +94,13 @@ export function usePricedFixtures() {
     const all = shownFixtures(fx.data || [], stateOf);
     const ready = !fx.isLoading && !lines.isLoading;
     const now = Date.now();
-    const soon = (f: any) => fixtureStart(f).getTime() < now + NO_PROPS_DAYS * 86400e3;
-    // priced games first-class; the unpriced ones in the next days stay on the list, flagged `noProps` ("No props live yet"), as they may be priced later
-    const fixtures = !ready ? [] : haveBooks ? shownFixtures(fx.data || [], stateOf, (f) => fixtureInBooks(feed, f) || soon(f), now).map((f) => (fixtureInBooks(feed, f) ? f : { ...f, noProps: true })) : all;
+    const showable = (f: any) => {
+      if (!fixtureInBooks(feed, f)) return false;
+      const st = stateOf(f);
+      if (st === "upcoming") return true;
+      return teamTotalsPresent(liveForFixture(live.data, f));
+    };
+    const fixtures = !ready || !haveBooks ? [] : shownFixtures(fx.data || [], stateOf, showable, now);
     const priced = all.filter((f) => fixtureInBooks(feed, f));
     const last = priced.length ? Math.max(...priced.map((f) => fixtureStart(f).getTime())) : 0;
     return { loading: fx.isLoading, ready, all, fixtures, priced: haveBooks, through: priced.length ? new Date(last) : null, feedMatches: feed.length, doc: lines.data };

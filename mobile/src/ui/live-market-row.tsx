@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { odds } from "@site/lib/format";
 import { BookBadge } from "@/ui/book-badge";
-import { LiveBadge } from "@/ui/live-bits";
+import { InPlayBadge } from "@/ui/live-bits";
 import { color, font, num, numLg, space, type } from "@/ui/tokens";
 
 /** One live market of the Match Fancy list (`liveRows`): an over / under line with both prices, or a pick with its outcomes. Prices only, no history, as on the site. */
@@ -12,7 +12,7 @@ export function LiveMarketRow({ m }: { m: any }) {
     <View style={styles.row}>
       <View style={styles.title}>
         <Text style={styles.name} numberOfLines={2}>{m.market}</Text>
-        <LiveBadge />
+        <InPlayBadge />
         {m.book ? <BookBadge source={m.book} /> : null}
       </View>
       {m.kind === "ou" ? (

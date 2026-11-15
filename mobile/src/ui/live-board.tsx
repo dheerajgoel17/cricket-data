@@ -1,36 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Fragment, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
-import { Image } from "expo-image";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
+import { StyleSheet, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
-import { ballsToOvers, liveBoard, liveCard, namesMatch, oversToBalls } from "@cricket/engine/live.js";
+import { ballsToOvers, formatBall, liveBoard, liveCard, namesMatch, ongoingOverBalls, oversToBalls } from "@cricket/engine/live.js";
 import { abbr } from "@site/lib/format";
 import { storeQuery } from "@/lib/data";
 import { push } from "@/lib/nav";
 import { Accordion } from "@/ui/accordion";
-import { PlayerAvatar } from "@/ui/player-avatar";
+import { Bleed } from "@/ui/bleed";
 import { Press } from "@/ui/press";
 import { RecentForm, FormHeadline } from "@/ui/recent-form";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, numLg, radius, space, type } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type } from "@/ui/tokens";
 import { recentForms } from "@/lib/form";
 
 type Side = [string, number];
 
-/** Read-only peek — fixture page already runs useStore; do not start a second store load from scorecard faces. */
+/** Read-only peek — fixture page already runs useStore; do not start a second store load from scorecard links. */
 const useStorePeek = () => useQuery({ ...storeQuery, enabled: false }).data;
 
-/** "Smith" for "Jason Smith"; "van der Dussen" keeps its particle. */
+/** Initial + surname for the live strip ("D Warner"); particles kept. */
 function shortName(n: string) {
   const p = String(n).trim().split(/\s+/);
   if (p.length < 2) return n;
   const last = p[p.length - 1], particle = p[p.length - 2];
-  return /^(de|den|van|von|el|al|la|le|da|di)$/i.test(particle) ? `${particle} ${last}` : last;
+  const head = p[0][0]?.toUpperCase() || "";
+  if (/^(de|den|van|von|el|al|la|le|da|di)$/i.test(particle)) return `${head} ${particle} ${last}`;
+  return `${head} ${last}`;
 }
 
-/** Who a live feed's name is in the data: the resolver, within the side when it is known; a name it is not sure of (a debutant) stays plain text. */
 function usePlayerIdx(name: string, team?: string, sides?: Side[]): number | null {
   const stats = useStorePeek();
   const rz: any = stats?.rz;
@@ -42,20 +42,7 @@ function usePlayerIdx(name: string, team?: string, sides?: Side[]): number | nul
   }, [rz, name, teamIdx]);
 }
 
-/** A face: the player's picture in his team's shirt when he is in the data, else the feed's own photo, else a silhouette. */
-function Face({ name, photo, team, sides, size = 36 }: { name: string; photo?: string; team?: string; sides?: Side[]; size?: number }) {
-  const idx = usePlayerIdx(name, team, sides);
-  const store: any = useStorePeek()?.store;
-  if (idx != null && store) return <PlayerAvatar pid={store.P.id[idx]} team={team ?? store.teamName(store.P.tm[idx])} size={size} />;
-  return (
-    <View style={[styles.face, { width: size, height: size, borderRadius: size / 2 }]}>
-      {photo ? <Image source={{ uri: photo }} style={{ width: size, height: size }} contentFit="cover" contentPosition="top" /> : <Ionicons name="person" size={size * 0.55} color="rgba(142,142,147,0.5)" />}
-    </View>
-  );
-}
-
-/** A name that opens the player's page when he is in the data; the striker carries a green star. */
-function Who({ name, team, sides, strike, short, style }: { name: string; team?: string; sides?: Side[]; strike?: boolean; short?: boolean; style?: object }) {
+function Who({ name, team, sides, short, strike, style }: { name: string; team?: string; sides?: Side[]; short?: boolean; strike?: boolean; style?: object }) {
   const idx = usePlayerIdx(name, team, sides);
   const text = (short ? shortName(name) : name) + (strike ? "*" : "");
   const t = <Text style={[styles.name, strike && { color: color.primary }, style]} numberOfLines={1}>{text}</Text>;
@@ -69,88 +56,75 @@ const ov = (p: any) => {
 const fmtOv = (o: number | null | undefined) => (o == null ? "—" : Number.isInteger(o) ? o.toFixed(1) : String(o));
 const innScore = (inn: any) => (inn?.runs == null ? "" : `${inn.runs}${inn.wkts != null ? `/${inn.wkts}` : ""}${inn.overs != null ? ` ${fmtOv(inn.overs)} ov` : ""}`);
 
-/** One delivery: a wicket in red, a boundary in green, the rest neutral. */
+function ballTone(b: string): "wicket" | "boundary" | "extra" | "plain" {
+  const s = formatBall(b);
+  if (/^W$/i.test(s)) return "wicket";
+  if (/^[456]$/.test(s)) return "boundary";
+  if (/\d*(WD|NB|LB|B|PEN)$/i.test(s)) return "extra";
+  return "plain";
+}
+
+/** One delivery chip — circular; extras use formatBall (NB / 1LB / WD). */
 function Ball({ b }: { b: string }) {
-  const w = /w/i.test(b), four = /[456]/.test(b);
-  return <View style={[styles.ball, { backgroundColor: w ? "rgba(255,0,0,0.2)" : four ? "rgba(39,218,142,0.2)" : color.secondary }]}><Text style={[styles.ballText, { color: w ? color.miss : four ? color.primary : color.foreground }]}>{b}</Text></View>;
-}
-
-/** "Ball by ball" fixed on the left; the overs scroll beside it, oldest to the left and the current over at the right (the site's `Overs`). Each over carries its number, with a thin line where one ends. */
-function Overs({ overs }: { overs: { n?: number | null; balls: string[] }[] }) {
-  const groups = (overs || []).filter((o) => o.balls.length);
-  const ref = useRef<ComponentRef<typeof ScrollView>>(null);
-  if (!groups.length) return null;
+  const label = formatBall(b);
+  const tone = ballTone(label);
+  const long = label.length > 1;
+  const bg = tone === "wicket" ? "rgba(255,0,0,0.25)" : tone === "boundary" ? color.foreground : tone === "extra" ? color.muted : color.secondary;
+  const fg = tone === "wicket" ? color.miss : tone === "boundary" ? color.background : color.foreground;
   return (
-    <View style={styles.tape} accessibilityLabel={`Ball by ball: ${groups.map((o) => `${o.n != null ? `over ${o.n} ` : ""}${o.balls.join(" ")}`).join(", ")}`}>
-      <Text style={styles.tapeLabel}>Ball by ball</Text>
-      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={styles.overs} onContentSizeChange={() => ref.current?.scrollToEnd({ animated: false })}>
-        {groups.map((o, i) => (
-          <View key={o.n ?? i} style={styles.overGroup}>
-            {i > 0 ? <View style={styles.overBreak} /> : null}
-            <Text style={styles.overNum}>{o.n != null ? o.n : "·"}</Text>
-            {o.balls.map((b, k) => <Ball key={k} b={b} />)}
-          </View>
-        ))}
-      </ScrollView>
+    <View style={[styles.ball, long && styles.ballLong, { backgroundColor: bg }]}>
+      <Text style={[styles.ballText, { color: fg }]}>{label}</Text>
     </View>
   );
 }
 
-function BatterEnd({ p, sides, mirror }: { p: any; sides?: Side[]; mirror?: boolean }) {
-  return (
-    <View style={[styles.end, mirror && { flexDirection: "row-reverse" }]}>
-      <Face name={p.name} photo={p.photo} team={p.team} sides={sides} size={38} />
-      <View style={[styles.endText, mirror && { alignItems: "flex-end" }]}>
-        <Who name={p.name} team={p.team} sides={sides} strike={!!p.strike} short />
-        <Text style={styles.endScore}><Text style={styles.endRuns}>{p.runs ?? 0}</Text> ({p.balls ?? 0})</Text>
-      </View>
-    </View>
-  );
-}
-
-function Stat({ k, v }: { k: string; v: ReactNode }) {
-  return <View style={{ alignItems: "flex-end", gap: 2 }}><Text style={styles.cap}>{k}</Text><Text style={styles.statV}>{v}</Text></View>;
-}
-
-/** The match as it stands: the pair at the crease with their partnership, the last wicket, the bowler, this over's deliveries and the run rates. So far only, never used for settlement. */
+/**
+ * Live strip under the scoreboard (site Hotstar-style): bowler O-R-W + ongoing over balls | batters with strike dot.
+ * No faces, partnership, last wkt or CRR here — those stay off the strip.
+ */
 export function LiveBoard({ match, teams, flat }: { match: any; teams?: Side[]; flat?: boolean }) {
   const board = liveBoard(match);
-  if (!board) return null;
-  const bowlOv = ov(board.bowler);
+  if (!board || (!board.batters.length && !board.bowler && !board.overs.length)) return null;
+  const bw = board.bowler;
+  const balls = ongoingOverBalls(board);
+  const batters = (board.batters || []).slice(0, 2);
   return (
-    <View style={flat ? styles.flat : [styles.board, { backgroundColor: color.card, borderRadius: radius.card }]} accessibilityLabel="Live scoreboard">
-      {board.batters[0] ? (
-        <View style={styles.pair}>
-          <BatterEnd p={board.batters[0]} sides={teams} />
-          <View style={styles.ship}>
-            <Text style={styles.cap}>P’ship</Text>
-            <Text style={styles.shipV}>{board.partnership ? board.partnership.runs ?? 0 : "—"}{board.partnership ? <Text style={styles.shipB}> ({board.partnership.balls ?? 0})</Text> : null}</Text>
+    <View
+      style={flat ? styles.strip : [styles.strip, styles.stripCard]}
+      accessibilityLabel="Live scoreboard"
+    >
+      <View style={[styles.stripCol, styles.stripLeft]}>
+        {bw ? (
+          <View style={styles.rowBetween}>
+            <Who name={bw.name} team={bw.team} sides={teams} short style={styles.stripName} />
+            <Text style={styles.figures}>{[ov(bw) ?? "–", bw.conceded ?? 0, bw.wickets ?? 0].join("-")}</Text>
           </View>
-          {board.batters[1] ? <BatterEnd p={board.batters[1]} sides={teams} mirror /> : <View style={{ flex: 1 }} />}
-        </View>
-      ) : null}
-      {board.lastWicket ? (
-        <View style={styles.rowBetween}>
-          <Text style={styles.muted}>Last wkt</Text>
-          <View style={{ flexDirection: "row", gap: 4, flexShrink: 1 }}><Who name={board.lastWicket.name} team={board.lastWicket.team} sides={teams} style={{ fontSize: 12, lineHeight: 16 }} /><Text style={styles.muted}>{board.lastWicket.runs ?? 0}({board.lastWicket.balls ?? 0})</Text></View>
-        </View>
-      ) : null}
-      {board.bowler ? (
-        <View style={styles.bowler}>
-          <Face name={board.bowler.name} photo={board.bowler.photo} team={board.bowler.team} sides={teams} size={32} />
-          <View style={{ flex: 1, minWidth: 0, gap: 1 }}><Who name={board.bowler.name} team={board.bowler.team} sides={teams} /><Text style={styles.muted}>Bowling</Text></View>
-          <Stat k="W-R" v={`${board.bowler.wickets ?? 0}–${board.bowler.conceded ?? 0}`} />
-          <Stat k="Overs" v={bowlOv ?? "—"} />
-          <Stat k="Econ" v={board.bowler.econ != null ? Number(board.bowler.econ).toFixed(2) : "—"} />
-        </View>
-      ) : null}
-      {board.overs.length ? <Overs overs={board.overs} /> : null}
-      {board.crr != null || board.rrr != null ? (
-        <View style={{ flexDirection: "row", gap: space.stack }}>
-          {board.crr != null ? <Text style={styles.muted}>CRR {board.crr.toFixed(2)}</Text> : null}
-          {board.rrr != null ? <Text style={styles.muted}>RRR {board.rrr.toFixed(2)}</Text> : null}
-        </View>
-      ) : null}
+        ) : (
+          <Text style={styles.muted}>—</Text>
+        )}
+        {balls.length ? (
+          <View style={styles.balls} accessibilityLabel={`This over ${balls.join(" ")}`}>
+            {balls.map((b: string, i: number) => <Ball key={`${b}-${i}`} b={b} />)}
+          </View>
+        ) : null}
+      </View>
+      <View style={styles.stripCol}>
+        {batters.length ? batters.map((p: any) => (
+          <View key={p.name} style={styles.rowBetween}>
+            <View style={styles.batterName}>
+              <View style={[styles.strikeDot, p.strike ? styles.strikeOn : null]} />
+              <Who name={p.name} team={p.team} sides={teams} short style={styles.stripName} />
+            </View>
+            <Text style={styles.batFigs}>
+              <Text style={styles.batRuns}>{p.runs ?? 0}</Text>
+              {" "}
+              <Text style={styles.muted}>{p.balls ?? 0}</Text>
+            </Text>
+          </View>
+        )) : (
+          <Text style={styles.muted}>—</Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -158,7 +132,6 @@ export function LiveBoard({ match, teams, flat }: { match: any; teams?: Side[]; 
 const ORD = ["1st", "2nd", "3rd", "4th"];
 const cardInns = (match: any) => liveCard(match).filter((inn: any) => (inn.batters || []).length || (inn.bowlers || []).length || inn.runs != null);
 const innId = (i: any) => `${i.n}-${i.team}`;
-/** "NZ" for a one-innings-a-side match, "NZ 2nd" once a side has batted twice (Tests). */
 const innLabel = (card: any[], k: number) => {
   const team = card[k].team, nth = card.slice(0, k + 1).filter((i) => i.team === team).length;
   return card.some((i, j) => j !== k && i.team === team) ? `${abbr(team)} ${ORD[nth - 1] ?? `${nth}th`}` : abbr(team);
@@ -171,24 +144,36 @@ const extrasText = (e: any) => {
 const BAT = { r: 34, b: 34, f: 30, s: 30, sr: 52 }, BOWL = { o: 40, m: 30, r: 36, w: 30, e: 52 };
 const Cell = ({ w, children, strong }: { w: number; children: ReactNode; strong?: boolean }) => <Text style={[styles.cell, { width: w }, strong && { color: color.foreground }]}>{children}</Text>;
 
-/** Batting and bowling tables, one innings at a time: a selector over the innings (two in a T20 or ODI, up to four in a Test) that follows the latest one until another is picked. */
+/**
+ * Full scorecard: MarketTape-style segmented team categories → batting (bleed) → FOW / yet to bat → bowling.
+ * No partnership / CRR strip (live strip only).
+ */
 function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   const [pick, setPick] = useState<string>();
   const card = cardInns(match);
   if (!card.length) return null;
-  const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1, inn = card[at];
-  const balls = inn.overs != null ? oversToBalls(inn.overs) : null, rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
+  const at = pick && card.some((i: any) => innId(i) === pick) ? card.findIndex((i: any) => innId(i) === pick) : card.length - 1;
+  const inn = card[at];
+  const balls = inn.overs != null ? oversToBalls(inn.overs) : null;
+  const rr = inn.runs != null && balls ? (inn.runs / (balls / 6)).toFixed(2) : null;
   const onStrike = (name: string) => (match?.players || []).some((p: any) => p.strike && namesMatch(p.name, name));
   const yet: string[] = (inn.yetToBat || []).filter((n: string) => n && !/^[A-Z0-9]{1,4}$/.test(n));
+  const multi = card.length > 1;
+  const tabs = card.map((i: any, j: number) => [innId(i), `${innLabel(card, j)} · ${innScore(i) || "—"}`] as [string, string]);
   return (
     <View style={{ gap: space.snug, paddingBottom: space.snug }}>
-      {card.length > 1 ? <Segmented<string> items={card.map((i: any, j: number) => [innId(i), `${innLabel(card, j)} ${innScore(i) || "—"}`] as [string, string])} value={innId(inn)} onChange={setPick} label="Innings" /> : null}
-      <View style={styles.rowBetween}>
-        <Text style={styles.innTitle} numberOfLines={1}>{inn.team || `Innings ${inn.n}`}</Text>
-        <Text style={styles.innScore}>{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</Text>
-      </View>
+      {multi ? (
+        <Segmented items={tabs} value={innId(inn)} onChange={setPick} label="Innings" />
+      ) : (
+        <View style={styles.rowBetween}>
+          <Text style={styles.innTitle} numberOfLines={1}>{inn.team || `Innings ${inn.n}`}</Text>
+          <Text style={styles.innScore}>{innScore(inn) || "—"}{rr ? ` · RR ${rr}` : ""}</Text>
+        </View>
+      )}
+      {multi && rr ? <Text style={styles.muted}>RR {rr}</Text> : null}
+
       {inn.batters?.length ? (
-        <View>
+        <Bleed style={styles.tableBleed}>
           <View style={styles.th}><Text style={[styles.cap, { flex: 1 }]}>Batter</Text><Cell w={BAT.r}>R</Cell><Cell w={BAT.b}>B</Cell><Cell w={BAT.f}>4s</Cell><Cell w={BAT.s}>6s</Cell><Cell w={BAT.sr}>SR</Cell></View>
           {inn.batters.map((p: any) => (
             <View key={p.id || p.name} style={styles.tr}>
@@ -201,21 +186,28 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
           ))}
           {inn.extras ? <View style={styles.tr}><Text style={[styles.muted, { flex: 1 }]}>Extras{extrasText(inn.extras) ? ` (${extrasText(inn.extras)})` : ""}</Text><Cell w={BAT.r} strong>{inn.extras.total}</Cell></View> : null}
           {inn.runs != null ? <View style={styles.tr}><Text style={[styles.name, { flex: 1 }]}>Total</Text><Text style={styles.cell}>{inn.runs}{inn.wkts != null ? `/${inn.wkts}` : ""}{inn.overs != null ? ` · ${fmtOv(inn.overs)} ov` : ""}</Text></View> : null}
-        </View>
+        </Bleed>
       ) : null}
+
       {inn.fow?.length ? (
         <Text style={styles.muted}><Text style={styles.strongMuted}>FOW </Text>{inn.fow.map((w: any, k: number) => `${k > 0 ? " · " : ""}${w.wkts}–${w.runs} (${w.name}${w.balls != null ? `, ${fmtOv(ballsToOvers(w.balls))}` : ""})`).join("")}</Text>
       ) : null}
-      {yet.length ? <Text style={styles.muted}><Text style={styles.strongMuted}>Yet to bat </Text>{yet.join(", ")}</Text> : null}
+      {yet.length ? (
+        <Text style={styles.muted}><Text style={styles.strongMuted}>Yet to bat </Text>{yet.map((n, k) => <Fragment key={n}>{k > 0 ? ", " : ""}{n}</Fragment>)}</Text>
+      ) : null}
+
       {inn.bowlers?.length ? (
-        <View>
-          <View style={styles.th}><Text style={[styles.cap, { flex: 1 }]}>Bowler</Text><Cell w={BOWL.o}>O</Cell><Cell w={BOWL.m}>M</Cell><Cell w={BOWL.r}>R</Cell><Cell w={BOWL.w}>W</Cell><Cell w={BOWL.e}>Econ</Cell></View>
-          {inn.bowlers.map((p: any) => (
-            <View key={p.id || p.name} style={styles.tr}>
-              <View style={{ flex: 1, minWidth: 0 }}><Who name={p.name} team={p.team} sides={teams} /></View>
-              <Cell w={BOWL.o}>{fmtOv(p.overs)}</Cell><Cell w={BOWL.m}>{p.maidens ?? 0}</Cell><Cell w={BOWL.r}>{p.conceded ?? 0}</Cell><Cell w={BOWL.w} strong>{p.wickets ?? 0}</Cell><Cell w={BOWL.e}>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Cell>
-            </View>
-          ))}
+        <View style={{ gap: space.tight }}>
+          <Text style={styles.bowlHead}>Bowling</Text>
+          <Bleed style={styles.tableBleed}>
+            <View style={styles.th}><Text style={[styles.cap, { flex: 1 }]}>Bowler</Text><Cell w={BOWL.o}>O</Cell><Cell w={BOWL.m}>M</Cell><Cell w={BOWL.r}>R</Cell><Cell w={BOWL.w}>W</Cell><Cell w={BOWL.e}>Econ</Cell></View>
+            {inn.bowlers.map((p: any) => (
+              <View key={p.id || p.name} style={styles.tr}>
+                <View style={{ flex: 1, minWidth: 0 }}><Who name={p.name} team={p.team} sides={teams} /></View>
+                <Cell w={BOWL.o}>{fmtOv(p.overs)}</Cell><Cell w={BOWL.m}>{p.maidens ?? 0}</Cell><Cell w={BOWL.r}>{p.conceded ?? 0}</Cell><Cell w={BOWL.w} strong>{p.wickets ?? 0}</Cell><Cell w={BOWL.e}>{p.econ != null ? Number(p.econ).toFixed(2) : "—"}</Cell>
+              </View>
+            ))}
+          </Bleed>
         </View>
       ) : null}
       <Text style={styles.muted}>So far this match. Not used for settlement.</Text>
@@ -223,13 +215,12 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   );
 }
 
-/**
- * The page's header while a match is on (the site's `ScorecardCard`): the match header, the live strip (batters, bowler, this over) and a "Full scorecard" row that opens the whole
- * card in place, all in one container, so the props start higher up the screen.
- */
+/** Header + Hotstar live strip + Full scorecard in place (site ScorecardCard). */
 export function ScorecardCard({ match, teams, header }: { match: any; teams?: Side[]; header: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const full = cardInns(match).length > 0, strip = !!liveBoard(match);
+  const full = cardInns(match).length > 0;
+  const board = liveBoard(match);
+  const strip = !!board && (!!board.batters.length || !!board.bowler || !!board.overs.length);
   return (
     <View style={styles.cardBox} accessibilityLabel="Scorecard">
       {header}
@@ -249,7 +240,7 @@ export function ScorecardCard({ match, teams, header }: { match: any; teams?: Si
   );
 }
 
-/** The scorecard and each side's recent form, as two closed rows under the match so the props stay first. */
+/** Scorecard + recent form accordions under a finished / non-live match. */
 export function MatchAccordions({ match, teams, fmt, store, noCard }: { match?: any; teams: Side[]; fmt: string; store: any; noCard?: boolean }) {
   const card = match && !noCard ? cardInns(match) : [];
   const form = useMemo(() => (store ? recentForms(store, teams, fmt) : []), [store, teams, fmt]);
@@ -273,39 +264,41 @@ export function MatchAccordions({ match, teams, fmt, store, noCard }: { match?: 
 }
 
 const styles = StyleSheet.create({
-  face: { overflow: "hidden", alignItems: "center", justifyContent: "center", backgroundColor: color.pill },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   muted: { ...type.footnote, color: color["muted-foreground"] },
   strongMuted: { fontFamily: font.medium, color: color.foreground },
-  board: { padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
-  // flat on the page, as the site's match block: sections divided by hairlines, no card behind them
   cardBox: { gap: space.snug },
-  flat: { gap: space.snug },
   rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: -space.gutter },
   fullRow: { flexDirection: "row", alignItems: "center", gap: space.tight, minHeight: 44 },
   fullText: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
-  pair: { flexDirection: "row", alignItems: "stretch", gap: space.snug },
-  end: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
-  endText: { flex: 1, minWidth: 0, gap: 2 },
-  endScore: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
-  endRuns: { ...num, fontSize: 17, lineHeight: 20, color: color.foreground },
-  ship: { alignItems: "center", justifyContent: "space-between", paddingVertical: 2 },
-  shipV: { ...num, fontSize: 17, color: color.foreground },
-  shipB: { ...type.caption, color: color["muted-foreground"] },
+  strip: {
+    flexDirection: "row",
+    gap: space.snug,
+    paddingVertical: space.snug,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: color.hairline,
+  },
+  stripCard: { marginHorizontal: space.gutter, borderRadius: radius.card, paddingHorizontal: space.inset },
+  stripCol: { flex: 1, minWidth: 0, gap: space.tight },
+  stripLeft: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: color.hairline, paddingRight: space.snug },
+  stripName: { ...type.callout, flexShrink: 1 },
+  figures: { ...num, fontSize: 14, color: color["muted-foreground"], fontFamily: font.data },
+  balls: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
+  ball: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  ballLong: { minWidth: 28, paddingHorizontal: 6, width: undefined },
+  ballText: { ...num, fontSize: 11, fontFamily: font.data },
+  batterName: { flexDirection: "row", alignItems: "center", gap: 4, flex: 1, minWidth: 0 },
+  strikeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "transparent" },
+  strikeOn: { backgroundColor: color.foreground },
+  batFigs: { ...num, fontSize: 14 },
+  batRuns: { fontFamily: font.data, color: color.foreground },
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
-  bowler: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  statV: { ...num, fontSize: 15, color: color.foreground },
-  tape: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  tapeLabel: { ...type.footnote, ...cap, color: color["muted-foreground"] },
-  overs: { flexDirection: "row", flexWrap: "nowrap", alignItems: "center", gap: 6, paddingRight: 2 },
-  overNum: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
-  overGroup: { flexDirection: "row", alignItems: "center", gap: 6 },
-  overBreak: { width: StyleSheet.hairlineWidth, height: 20, backgroundColor: "rgba(142,142,147,0.5)", marginRight: 3 },
-  ball: { minWidth: 34, height: 30, paddingHorizontal: 5, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-  ballText: { ...num, fontSize: 13 },
-  innTitle: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
-  innScore: { ...type.footnote, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  innTitle: { ...type.body, fontFamily: font.bold, color: color.foreground, flex: 1 },
+  innScore: { ...num, fontSize: 18, color: color.foreground },
+  bowlHead: { ...cap, color: color["muted-foreground"] },
+  tableBleed: { paddingVertical: 0 },
   th: { flexDirection: "row", alignItems: "center", paddingVertical: space.tight },
   tr: { flexDirection: "row", alignItems: "center", gap: 0, minHeight: 44, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingVertical: space.tight },
   cell: { ...num, fontSize: 14, color: color["muted-foreground"], textAlign: "right" },

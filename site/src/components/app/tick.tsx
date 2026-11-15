@@ -10,17 +10,20 @@ export function TrendArrow({ up, className }: { up: boolean; className?: string 
   return <span aria-hidden className={cn("text-footnote", up ? "text-primary" : "text-miss", className)}>{up ? "▲" : "▼"}</span>;
 }
 
-/** Quiet ticks roll the new value into place and keep the last direction visible. */
-export function Tick({ value, children, className, quiet = false }: { quiet?: boolean; value: number | null | undefined; children: ReactNode; className?: string }) {
-  const dir = useTick(value, quiet ? null : undefined);
+/** Quiet ticks roll the new value into place; colour/arrow clear after ~1 s (stock-ticker flash).
+ * Quiet still reserves a w-3 arrow gutter so odds rows don't jump — pass `arrow={false}` on scoreboards next to a crest. */
+export function Tick({ value, children, className, quiet = false, arrow = true }: { quiet?: boolean; arrow?: boolean; value: number | null | undefined; children: ReactNode; className?: string }) {
+  const dir = useTick(value);
   return (
     <span className={cn("inline-flex items-baseline gap-hair rounded-md px-hair", !quiet && dir === 1 && "tick-up", !quiet && dir === -1 && "tick-down", className)}>
-      {quiet ? <span aria-hidden className="w-3 shrink-0 text-center leading-none">{dir !== 0 && <TrendArrow up={dir === 1} />}</span> : (
+      {quiet && arrow ? (
+        <span aria-hidden className="w-3 shrink-0 text-center leading-none">{dir !== 0 && <TrendArrow up={dir === 1} />}</span>
+      ) : !quiet ? (
         <>
           {dir === 1 && <ArrowUpIcon className="size-3 shrink-0 text-primary" aria-hidden />}
           {dir === -1 && <ArrowDownIcon className="size-3 shrink-0 text-miss" aria-hidden />}
         </>
-      )}
+      ) : null}
       {quiet ? (
         <span className="inline-block min-w-0 overflow-hidden align-baseline">
           <span key={value ?? "empty"} className={cn("block tabular-nums", dir === 1 && "ticker-roll-up text-primary", dir === -1 && "ticker-roll-down text-miss")}>{children}</span>
@@ -38,8 +41,9 @@ export function StandingMark({ standing, line, className, quiet }: { quiet?: boo
   if (standing.state === "void") return <span className={cn("rounded border border-dashed border-amber/60 px-hair text-caption text-amber", className)}>VOID</span>;
   const need = standing.state === "live" ? stillNeed(standing.v, line, standing.verdict) : null;
   const tone = standing.verdict === "cleared" ? "text-primary" : standing.verdict === "missed" ? "text-miss" : "text-muted-foreground";
+  // No arrow gutter / side pad — so-far must flush with the line column (dense props table).
   return (
-    <Tick quiet={quiet} value={standing.v} className={cn("tabular-nums", tone, className)}>
+    <Tick quiet={quiet} arrow={false} value={standing.v} className={cn("px-0 tabular-nums", tone, className)}>
       {standing.v} {standing.state === "live" ? "so far" : standing.state}
       {need != null ? ` · ${need} to go` : null}
       {standing.verdict ? ` · ${VERDICT[standing.verdict]}` : null}

@@ -19,7 +19,7 @@ import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
 import { liveBlurb, liveCard, nextTestDayLine, sessionBadge, sessionLabel, teamKey, teamScore } from "@cricket/engine/live.js";
 import { playState } from "@/lib/play-state";
-import { abbr, dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
+import { dayKey, dayLabel, fixtureStart, fixtureWhen, localTime } from "@/lib/format";
 import { formatCountdown, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
@@ -33,17 +33,18 @@ import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
 import { GridTable, TrendCards } from "@/components/app/grid";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
-import { LiveScore, NO_SCORE } from "@/components/app/fixture-card";
+import { NO_SCORE } from "@/components/app/fixture-card";
+import { MatchScoreboard } from "@/components/app/match-scoreboard";
 import { LiveBoard, ScorecardAccordion, ScorecardBody, hasCard } from "@/components/app/live-board";
 import { RecentForm, recentForms } from "@/components/app/recent-form";
 import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
-import { cn } from "@/lib/utils";
 import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, Muted, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { Input } from "@/components/ui/input";
+import { abbr } from "@/lib/format";
 
 const STAT_OPTIONS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label]);
 const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`]);
@@ -51,12 +52,6 @@ const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
 const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["ground", "Ground"], ["form", "Form"], ["grid", "Grid"], ["trends", "Custom line"]];
-
-/** A side's crest and name, linking to its team page when it has one. */
-function TeamName({ name, ix }: { name: string; ix: number }) {
-  const body = <><TeamBadge name={name} size="md" className="size-8" eager /><span className="min-w-0 text-body font-emphasis leading-tight sm:text-title">{name}</span></>;
-  return ix >= 0 ? <Link to={`/team/${ix}`} className="flex min-w-0 flex-1 items-center gap-snug active:opacity-70">{body}</Link> : <div className="flex min-w-0 flex-1 items-center gap-snug">{body}</div>;
-}
 
 /** One match header for scheduled, live and completed fixtures. */
 function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) {
@@ -69,7 +64,7 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
   const rawBlurb = liveBlurb(match);
   const sessionSummary = rawBlurb || match?.session || "";
   const session = !final && (sessionLabel(sessionSummary) || "");
-  const badge = (!final && sessionBadge(sessionSummary)) || (on ? "Live" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
+  const badge = (!final && sessionBadge(sessionSummary)) || (on ? "LIVE" : final ? "Final" : state === "delayed" ? "Delayed" : state === "started" ? "Started" : "Upcoming");
   const livePulse = on && !session;
   const nextDay = !final ? nextTestDayLine(f.start, sessionSummary, now) : "";
   const blurb = nextDay || rawBlurb || (final ? f.result || "" : state === "started" ? NO_SCORE : "");
@@ -84,8 +79,16 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
     const display = teamInnings.map((i: any) => i.wkts == null ? String(i.runs) : `${i.runs}/${i.wkts}`).join(" & ");
     return { display, overs: teamInnings.length === 1 ? teamInnings[0].overs : null };
   });
-  const hasScore = scores.some(Boolean);
   const start = `${dayLabel(dayKey(f))}${timed ? `, ${localTime(when)}` : ""}`;
+  const tickerMain = blurb || (state === "delayed" ? "Start delayed" : final ? "Match completed" : start);
+  // Live card matches the scoreboard mock: series · scores · strip — no mid ticker (session blurb is the badge).
+  const ticker = !on ? (
+    <>
+      <span className="font-label">{tickerMain}</span>
+      {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
+      {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
+    </>
+  ) : null;
   const actions = (
     <HeaderActions>
       <div className="ml-auto flex shrink-0 items-center gap-snug">
@@ -103,28 +106,19 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
       {backBtn}
       {actions}
       <div className="-mx-gutter flex min-w-0 flex-col overflow-hidden border-b border-hairline bg-card">
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-footnote">
-          <span className={cn("label-cap font-emphasis", livePulse ? "text-miss" : session ? "text-amber" : "text-muted-foreground")}>{badge}</span>
-          <span className="text-muted-foreground">{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</span>
-          {f.series && <span className="text-muted-foreground">{f.series}</span>}
-        </div>
-        <div className="divide-y divide-dashed divide-hairline border-y border-hairline">
-          {sides.map(([name, ix], i) => {
-            const score = scores[i];
-            return (
-              <div key={name} className="flex min-w-0 flex-wrap items-center justify-between gap-x-snug gap-y-tight px-gutter py-tight">
-                <TeamName name={name} ix={ix} />
-                {hasScore && (score?.display || on) && <LiveScore live={on && !session} s={score} size="lg" />}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex flex-wrap items-baseline gap-x-snug gap-y-hair px-gutter py-snug text-callout">
-          <span className="font-label">{blurb || (state === "delayed" ? "Start delayed" : on ? "Score unavailable" : final ? "Match completed" : start)}</span>
-          {state === "upcoming" && timed && when.getTime() > now && <span className="text-muted-foreground tabular-nums">Starts in {formatCountdown(when.getTime() - now)}</span>}
-          {f.venue && <FixtureVenue venue={f.venue} fixtureId={f.id} />}
-        </div>
-        {on && <LiveBoard match={match} teams={knownSides} />}
+        <MatchScoreboard
+          a={{ name: f.a, ix: f.a_ix, score: scores[0] }}
+          b={{ name: f.b, ix: f.b_ix, score: scores[1] }}
+          badge={badge}
+          livePulse={livePulse}
+          session={!!session}
+          series={f.series || `${f.fmt || "T20"} · ${f.gender === "female" ? "Women" : "Men"}`}
+          meta={f.series ? <>{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</> : null}
+          ticker={ticker}
+          strip={on ? <LiveBoard match={match} teams={knownSides} /> : null}
+          live={on && !session}
+          pending={on && !match}
+        />
         {hasCard(match) && <ScorecardAccordion key={f.id} match={match} teams={knownSides} inPlay={on} />}
       </div>
     </section>
