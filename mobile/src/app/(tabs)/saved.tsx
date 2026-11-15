@@ -22,7 +22,7 @@ import { ListRow, Section } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, space, type, rhythm, t, w } from "@/ui/tokens";
+import { color, font, space, type, rhythm, t, w, icon, state } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Account Saved (server). Recently viewed stays on this device. */
@@ -38,11 +38,11 @@ function Saved() {
 
   const account = user ? (
     <RoundButton label="Sign out" onPress={() => void signOut()}>
-      <Ionicons name="person-circle" size={22} color={color.primary} />
+      <Ionicons name="person-circle" size={icon.lg} color={color.primary} />
     </RoundButton>
   ) : (
     <RoundButton label="Sign in" onPress={openSignIn}>
-      <Ionicons name="person-circle-outline" size={22} color={color.foreground} />
+      <Ionicons name="person-circle-outline" size={icon.lg} color={color.foreground} />
     </RoundButton>
   );
 
@@ -65,8 +65,8 @@ function Saved() {
     const none = !props.length && !people.length;
     const team = (i: number) => store.teamName(store.P.tm[i]);
     const remove = (k: string) => (
-      <Press accessibilityRole="button" accessibilityLabel="Remove" hitSlop={8} onPress={() => toggle(k)} style={({ pressed }) => [styles.remove, pressed && { opacity: 0.5 }]}>
-        <Ionicons name="close" size={20} color={color["muted-foreground"]} />
+      <Press accessibilityRole="button" accessibilityLabel="Remove" hitSlop={8} onPress={() => toggle(k)} style={({ pressed }) => [styles.remove, pressed && state.pressed]}>
+        <Ionicons name="close" size={icon.md} color={color["muted-foreground"]} />
       </Press>
     );
     return (

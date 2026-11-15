@@ -3,7 +3,7 @@ import { StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { TOUCH } from "@/ui/platform";
-import { color, control, radius, space, t } from "@/ui/tokens";
+import { color, control, radius, space, t, state } from "@/ui/tokens";
 
 /**
  * The app's one button: `primary` (accent fill, the sheet's Apply, Sign in, Email) or `secondary` (quiet fill, Clear, Write about this), `md` at the platform's touch height (44 iOS / 48 Android)
@@ -15,7 +15,7 @@ export function Button({ label, onPress, variant = "primary", size = "md", icon,
   const primary = variant === "primary", sm = size === "sm";
   return (
     <Press scale={sm ? 0.97 : 1} onPress={onPress} disabled={disabled} accessibilityState={{ disabled: !!disabled }} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label}
-      style={({ pressed }) => [styles.base, { height: sm ? control : TOUCH, backgroundColor: primary ? color.primary : color.secondary }, flex ? { flex } : null, sm && styles.sm, pressed && { opacity: 0.85 }, disabled && { opacity: 0.55 }, style]}>
+      style={({ pressed }) => [styles.base, { height: sm ? control : TOUCH, backgroundColor: primary ? color.primary : color.secondary }, flex ? { flex } : null, sm && styles.sm, pressed && state.pressed, disabled && state.disabled, style]}>
       {icon}
       <Text style={[sm ? t.calloutLabel : t.bodyLabel, { color: primary ? color["primary-foreground"] : color.foreground }]} numberOfLines={1}>{label}</Text>
     </Press>

@@ -30,7 +30,7 @@ import { LineTabs } from "@/ui/line-tabs";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
-import { cap, color, font, num, radius, space, type, fs, surface, rhythm, t } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type, fs, surface, rhythm, t, state, icon } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -213,14 +213,14 @@ function TourChip({ from, fixtureId, atGround }: { from: any; fixtureId: string;
   const sub = dates ? (same.length > 1 ? `${dates} · ${same.length} here` : dates) : `${from.a} v ${from.b}`;
   const tone = status === "In progress" ? color.miss : color["muted-foreground"];
   return (
-    <Press accessibilityRole="link" accessibilityLabel={`Back to ${from.a} v ${from.b}`} onPress={() => openFixture({ id: fixtureId })} style={({ pressed }) => [styles.tour, pressed && { opacity: 0.7 }]}>
+    <Press accessibilityRole="link" accessibilityLabel={`Back to ${from.a} v ${from.b}`} onPress={() => openFixture({ id: fixtureId })} style={({ pressed }) => [styles.tour, pressed && state.pressed]}>
       <View style={styles.crests}><TeamBadge name={from.a} size={28} /><View style={{ marginLeft: -8 }}><TeamBadge name={from.b} size={28} /></View></View>
       <View style={{ flex: 1 }}>
         <Text style={styles.tourName} numberOfLines={1}>{series}</Text>
         <Text style={styles.note} numberOfLines={1}>{sub}</Text>
       </View>
       <Text style={[styles.status, { color: tone }]}>{status === "In progress" ? "Live" : status === "Completed" ? "Done" : "Upcoming"}</Text>
-      <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
+      <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} />
     </Press>
   );
 }
@@ -250,7 +250,7 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
           <Bleed style={styles.topBleed}>
             <Text style={[styles.note, styles.topNote]}>Highest score in the match · last {tops.n} {fmtName}</Text>
             {tops.rows.map((r: any) => (
-              <Press key={r.player} accessibilityRole="link" onPress={() => openPlayer({ idx: r.player, stat: "runs", line: 0.5, fmt: fmtName })} style={({ pressed }) => [styles.topRow, pressed && { opacity: 0.6 }]}>
+              <Press key={r.player} accessibilityRole="link" onPress={() => openPlayer({ idx: r.player, stat: "runs", line: 0.5, fmt: fmtName })} style={({ pressed }) => [styles.topRow, pressed && state.pressed]}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.topName} numberOfLines={1}>{r.name}</Text>
                   <Text style={styles.note}>{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {tops.n}</Text>

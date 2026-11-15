@@ -18,7 +18,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, fs, tint, surface, rhythm, t, d, w } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, fs, tint, surface, rhythm, t, d, w, state } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -114,7 +114,7 @@ function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }
   const r = l.row, team = store.teams[r.t]?.n ?? "";
   const who = playerLabel(store, names, r.p);
   return (
-    <Press scale={1} onPress={() => push(`/player/${r.p}`)} accessibilityRole="button" accessibilityLabel={`${l.label}: ${who}, ${r.v}`} style={({ pressed }) => [styles.leader, { width }, pressed && { opacity: 0.7 }]}>
+    <Press scale={1} onPress={() => push(`/player/${r.p}`)} accessibilityRole="button" accessibilityLabel={`${l.label}: ${who}, ${r.v}`} style={({ pressed }) => [styles.leader, { width }, pressed && state.pressed]}>
       <Text style={styles.cap}>{l.label}</Text>
       <View style={styles.leaderRow}>
         <PlayerAvatar pid={store.P.id[r.p]} team={team} test={test} size={52} />
@@ -156,7 +156,7 @@ function BoardCard({ b }: { b: any }) {
         const name = player ? playerLabel(store, names, r.p) : store.teamName(r.t, true);
         const sub = r.m == null ? (player ? side(r.t) : "") : `${player ? `${side(r.t)} ` : ""}v ${side(r.q)}${r.date ? ` · ${day(r.date, false)}` : ""}`;
         return (
-          <Press scale={1} key={`${r.rank}-${r.p ?? r.t}-${r.m ?? ""}`} disabled={!player} onPress={() => push(`/player/${r.p}`)} accessibilityRole={player ? "button" : "text"} style={({ pressed }) => [styles.tr, styles.trSep, pressed && { opacity: 0.6 }]}>
+          <Press scale={1} key={`${r.rank}-${r.p ?? r.t}-${r.m ?? ""}`} disabled={!player} onPress={() => push(`/player/${r.p}`)} accessibilityRole={player ? "button" : "text"} style={({ pressed }) => [styles.tr, styles.trSep, pressed && state.pressed]}>
             <Text style={[styles.rank, { width: 22 }]}>{r.rank}</Text>
             <View style={styles.who}>
               {player ? <PlayerAvatar pid={store.P.id[r.p]} team={crest} size={32} /> : <TeamBadge name={crest} size={32} />}
@@ -171,7 +171,7 @@ function BoardCard({ b }: { b: any }) {
         );
       })}
       {b.rows.length > SHOWN ? (
-        <Press scale={1} onPress={() => setAll(!all)} accessibilityRole="button" accessibilityState={{ expanded: all }} style={({ pressed }) => [styles.more, pressed && { opacity: 0.6 }]}>
+        <Press scale={1} onPress={() => setAll(!all)} accessibilityRole="button" accessibilityState={{ expanded: all }} style={({ pressed }) => [styles.more, pressed && state.pressed]}>
           <Text style={styles.moreText}>{all ? "Show less" : `Show all ${b.rows.length}`}</Text>
         </Press>
       ) : null}

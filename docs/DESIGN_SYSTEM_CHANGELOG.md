@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Foundations: contrast, states, icons, grid, elevation, Figma export, OTA
+- **Path:** `site/packages/tokens/` (`tokens.json` +`state` +`icon` +`grid` +`elevation_native`, `grid.js`, `dtcg.js`, `tokens.dtcg.json`), mobile `ui/tokens.ts` (`state`, `icon`), `ui/platform.ts` (`elevation`), `ui/grid.ts`, `site/tests/contrast.test.mjs`, `mobile/app.config.js`, `src/lib/ota.ts`, `scripts/ota-check.mjs`
+- **Change:** `muted-foreground` raised from #8e8e93 to #98989d (it was 4.27:1 on the secondary fill; AA needs 4.5:1; a test now holds every text colour to it). Pressed / disabled / dim opacities are tokens (the app used 0.5 to 0.92 for the same job); icon sizes are a 4-step scale (12 / 16 / 20 / 24); a column grid (4 / 8 / 12) with a shared pure helper tested against `CardGrid`; shadows come from elevation tokens; tokens export as W3C Design Tokens for Figma; the app can receive JavaScript updates over the air (`expo-updates`, free) and `scripts/ota-check.mjs` says whether a change needs a new APK
+- **Callers:** every app screen (icon sizes, pressed state); muted text on both platforms gets slightly lighter
+
 ### 2026-11-15 — Tokens: size roles, surface colours, radii, platform conventions
 - **Path:** `site/packages/tokens/tokens.json` (`color` +chrome-solid / control-fill / control-ring / tile / segment-track / segment-thumb / ink-soft / skeleton / text-soft; `type` +fs-figure; new `platform` group), `site/src/index.css` (`text-figure`), mobile `ui/tokens.ts` (`fs`, `radius.sm` / `control`), `ui/platform.ts`, `ui/press.tsx`, `ui/tokens.test.ts`; web `components/app/recent-form.tsx`
 - **Change:** The app no longer writes a literal `fontSize`, hex or rgba (≈60 sizes, ≈54 colours, scattered radii moved onto the shared roles; a test fails the build on a new one). Sizes that sat between roles (14 / 16 / 17 / 22 / 34) snapped to the nearest role (callout 13, body 15, title 18, figure 24, stat 30). Platform idioms are explicit: Material ripple on full-width Android rows, platform touch targets, elevation for Android shadows. Form chips W / L / T use the same tokens on web and app.

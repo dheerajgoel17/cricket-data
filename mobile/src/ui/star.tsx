@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/lib/auth";
 import { propKey, useSaved } from "@/lib/saved";
 import { Press } from "@/ui/press";
-import { color, control, duration } from "@/ui/tokens";
+import { color, control, duration, state } from "@/ui/tokens";
 
 /** The star: when it fills it squeezes, pops past full size and settles (UI thread), with a light tap on the way in and a softer one on the way out. */
 function Star({ on, size }: { on: boolean; size: number }) {
@@ -33,7 +33,7 @@ export function StarButton({ idx, kind = "player", size = 40 }: { idx: number; k
         const now = toggle(key);
         void (now ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
       }}
-      style={({ pressed }) => [styles.round, { width: size, height: size, borderRadius: size / 2 }, pressed && { opacity: 0.6 }]}>
+      style={({ pressed }) => [styles.round, { width: size, height: size, borderRadius: size / 2 }, pressed && state.pressed]}>
       <Star on={on} size={19} />
     </Press>
   );
@@ -52,7 +52,7 @@ export function PropStar({ idx, stat, line, fmt }: { idx: number; stat: string; 
         const now = toggle(key);
         void (now ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
       }}
-      style={({ pressed }) => [styles.prop, pressed && { opacity: 0.6 }]}>
+      style={({ pressed }) => [styles.prop, pressed && state.pressed]}>
       <Star on={on} size={18} />
     </Press>
   );

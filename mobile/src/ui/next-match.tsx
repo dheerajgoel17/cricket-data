@@ -13,7 +13,7 @@ import { DataTable } from "@/ui/data-table";
 import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, Tick, type Standing } from "@/ui/tick";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, num, numLg, radius, space, type, font, fs, surface, t, d } from "@/ui/tokens";
+import { cap, color, num, numLg, radius, space, type, font, fs, surface, t, d, state } from "@/ui/tokens";
 
 export type NextInfo = { match: string; start: string; competition: string; team?: string; opp: string; ground: string; known?: string; priced?: boolean; phase?: "upcoming" | "live" | "final" };
 
@@ -65,7 +65,7 @@ export function NextMatchCard({ next, entries, line, side, book, statLabel, stan
   const sideLetter = side === "over" ? "O" : "U";
   const place = [next.ground, /[A-Za-z0-9]/.test(next.competition) ? next.competition : ""].filter(Boolean).join(" · ");
   return (
-    <View style={[styles.card, out && { opacity: 0.6 }]}>
+    <View style={[styles.card, out && state.dim]}>
       <View style={styles.headRow}>
         <Text style={styles.cap}>{heading}</Text>
         <MatchStatus phase={next.phase || "upcoming"} start={next.start} />

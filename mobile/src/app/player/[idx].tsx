@@ -46,7 +46,7 @@ import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
-import { color, control, font, radius, space, type, fs, tint, t, d, dStrong, w } from "@/ui/tokens";
+import { color, control, font, radius, space, type, fs, tint, t, d, dStrong, w, state, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -153,7 +153,7 @@ export default function PlayerPage() {
           <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} titleStyle={headerTitleFx} subtitleStyle={headerSubFx} buttons={2} right={s.indexed ? (
             <>
               <StarButton idx={idx} />
-              <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
+              <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton>
             </>
           ) : undefined} />
           {s.fmts.length > 1 ? <LineTabs<string> label="Format" items={s.fmts.map(([i, f]) => [String(i), f] as [string, string])} value={String(s.fmtVal)} onChange={(v) => { setFmt(Number(v)); setLineQ(undefined); setScope(undefined); }} /> : null}
@@ -264,7 +264,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
           <LineStepper value={line} label="O/U" onStep={step} />
           <PropStar idx={idx} stat={stat} line={line} fmt={fmtIndex(fmt)} />
           {book?.main && Math.abs(book.main.line - line) >= 0.01 ? (
-            <Press scale={1} onPress={() => { void Haptics.selectionAsync(); setLine(book.main.line); }} accessibilityRole="button" accessibilityLabel={`Use main line ${book.main.line}`} style={({ pressed }) => [styles.mainChip, pressed && { opacity: 0.6 }]}>
+            <Press scale={1} onPress={() => { void Haptics.selectionAsync(); setLine(book.main.line); }} accessibilityRole="button" accessibilityLabel={`Use main line ${book.main.line}`} style={({ pressed }) => [styles.mainChip, pressed && state.pressed]}>
               <Text style={styles.mainChipText}>main {book.main.line}</Text>
             </Press>
           ) : null}
@@ -294,7 +294,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
                   accessibilityLabel={`${lane} ${line}`}
-                  style={({ pressed }) => [styles.lane, i === 0 && styles.laneSplit, on && styles.laneOn, pressed && { opacity: 0.7 }]}
+                  style={({ pressed }) => [styles.lane, i === 0 && styles.laneSplit, on && styles.laneOn, pressed && state.pressed]}
                 >
                   <Text style={styles.laneCap}>{lane} {line}</Text>
                   <Text style={[styles.laneRate, lane === "over" && { color: color.primary }]}>{p == null ? "–" : `${(p * 100).toFixed(1)}%`}</Text>
@@ -394,7 +394,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               const tone = st === "hit" ? color.primary : st === "miss" ? color.miss : st === "push" ? color.amber : color["muted-foreground"];
               const bg = st === "hit" ? tint.primary(0.2) : st === "miss" ? tint.miss(0.2) : st === "push" ? tint.amber(0.2) : color.secondary;
               return (
-                <Press scale={1} key={i} onPress={() => onGame(e, st, `${label} ${side} ${line}`, c.auxLabel)} accessibilityRole="button" style={({ pressed }) => [styles.logRow, i > 0 && styles.sep, pressed && { opacity: 0.6 }]}>
+                <Press scale={1} key={i} onPress={() => onGame(e, st, `${label} ${side} ${line}`, c.auxLabel)} accessibilityRole="button" style={({ pressed }) => [styles.logRow, i > 0 && styles.sep, pressed && state.pressed]}>
                   <TeamBadge name={e.opp} size={32} />
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.logOpp} numberOfLines={1}>{e.opp}</Text>
@@ -432,7 +432,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
 function Unpriced({ label }: { label: string }) {
   return (
     <View style={styles.unpriced} accessibilityRole="alert">
-      <Ionicons name="information-circle-outline" size={16} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
+      <Ionicons name="information-circle-outline" size={icon.sm} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
       <Text style={styles.unpricedText}><Text style={{ color: color.foreground, ...w.label }}>No book is offering odds for {label}</Text> on this match. Hit rates and fair prices are from his history, not a listed market.</Text>
     </View>
   );

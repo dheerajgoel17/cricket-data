@@ -14,7 +14,7 @@ import { useCombos } from "@/lib/saved";
 import { Accordion } from "@/ui/accordion";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, control, font, radius, space, type, t } from "@/ui/tokens";
+import { color, control, font, radius, space, type, t, icon } from "@/ui/tokens";
 
 export interface FilterChoices {
   days: [string, string][];
@@ -46,7 +46,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
         <View style={styles.head}>
           <Text style={styles.title}>Filters{active ? ` · ${active}` : ""}</Text>
           <Press accessibilityRole="button" accessibilityLabel="Close filters" onPress={() => onOpenChange(false)} style={styles.round}>
-            <Ionicons name="close" size={20} color={color.foreground} />
+            <Ionicons name="close" size={icon.md} color={color.foreground} />
           </Press>
         </View>
         <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: space.stack }} showsVerticalScrollIndicator={false}>

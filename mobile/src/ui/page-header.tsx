@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import Animated, { type AnimatedStyle } from "react-native-reanimated";
 import { goBack } from "@/lib/nav";
 import { ChevronLeft } from "@/ui/icons";
-import { font, color, space, type, t } from "@/ui/tokens";
+import { font, color, space, type, t, icon } from "@/ui/tokens";
 
 /**
  * The bar over a page one level down (a match, a player), as in the reference app: a round back button, the name and what it is centred, and round buttons at the right
@@ -22,7 +22,7 @@ export function PageHeader({ title, subtitle, right, buttons = 1, titleStyle, su
     <View style={styles.bar}>
       <View style={[side, { alignItems: "flex-start" }]}>
         <RoundButton label="Back" onPress={goBack}>
-          <ChevronLeft size={22} color={color.foreground} />
+          <ChevronLeft size={icon.lg} color={color.foreground} />
         </RoundButton>
       </View>
       <View style={styles.mid} accessibilityRole="header">

@@ -8,7 +8,7 @@ import { push } from "@/lib/nav";
 import { LineTabs } from "@/ui/line-tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type, tint, t } from "@/ui/tokens";
+import { color, font, radius, space, type, tint, t, state, icon } from "@/ui/tokens";
 import * as Haptics from "expo-haptics";
 
 /** Links that exist in the app (site More also lists web-only tools). */
@@ -40,7 +40,7 @@ export function PhaseBar({ value, counts, onChange }: { value: HomePhase; counts
         onChange={onChange}
         right={(
           <Press accessibilityRole="button" accessibilityLabel="More" onPress={() => { void Haptics.selectionAsync(); setMore(true); }} style={styles.moreBtn}>
-            <Ionicons name="ellipsis-horizontal" size={20} color={color["muted-foreground"]} />
+            <Ionicons name="ellipsis-horizontal" size={icon.md} color={color["muted-foreground"]} />
           </Press>
         )}
       />
@@ -58,10 +58,10 @@ export function PhaseBar({ value, counts, onChange }: { value: HomePhase; counts
                 key={path}
                 accessibilityRole="link"
                 onPress={() => { setMore(false); push(path); }}
-                style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}
+                style={({ pressed }) => [styles.link, pressed && state.pressed]}
               >
                 <Text style={styles.linkTxt}>{label}</Text>
-                <Ionicons name="chevron-forward" size={16} color={color["muted-foreground"]} />
+                <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} />
               </Press>
             ))}
           </View>

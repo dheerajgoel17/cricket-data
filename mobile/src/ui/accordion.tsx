@@ -5,7 +5,7 @@ import { Text } from "@/ui/text";
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { ChevronRight } from "@/ui/icons";
-import { color, space, type, duration } from "@/ui/tokens";
+import { color, space, type, duration, state } from "@/ui/tokens";
 
 /**
  * A collapsible section (the site's accordion): a header with the title, what is chosen inside it, and a chevron that turns; the content's height and fade are animated on the
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   itemFlush: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   head: { minHeight: 52, flexDirection: "row", alignItems: "center", gap: space.snug },
   headFlush: { paddingHorizontal: space.gutter },
-  pressed: { opacity: 0.6 },
+  pressed: { ...state.pressed },
   titleRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.tight },
   title: { ...type.body, color: color.foreground },
   badge: { backgroundColor: color.secondary, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 1 },

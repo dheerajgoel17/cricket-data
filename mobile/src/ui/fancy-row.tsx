@@ -12,7 +12,7 @@ import { ResultStamp, sideStamp } from "@/ui/result-stamp";
 import { TeamBadge } from "@/ui/team-badge";
 import { InPlayBadge } from "@/ui/live-bits";
 import type { Standing } from "@/ui/tick";
-import { color, control, figure, font, space, type, tint, t, d, w } from "@/ui/tokens";
+import { color, control, figure, font, space, type, tint, t, d, w, icon } from "@/ui/tokens";
 
 /** "+N books": the books not already shown up front for a line, each with its over and under price. */
 export function BookList({ books, shown }: { books: { source: string; over: number | null; under: number | null }[]; shown: (string | undefined)[] }) {
@@ -54,7 +54,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
       <Press onPress={onOpen} disabled={!onOpen} accessibilityRole="button" accessibilityLabel={`Open ${r.label}`} style={[styles.main, { paddingHorizontal: padX }]}>
         {r.team
           ? <TeamBadge name={r.team} size={control} />
-          : <View style={styles.icon} accessibilityElementsHidden><Ionicons name="stats-chart-outline" size={20} color={color["muted-foreground"]} /></View>}
+          : <View style={styles.icon} accessibilityElementsHidden><Ionicons name="stats-chart-outline" size={icon.md} color={color["muted-foreground"]} /></View>}
         <View style={styles.left}>
           <View style={styles.titleRow}>
             <Text style={styles.label} numberOfLines={1}>{r.label}</Text>

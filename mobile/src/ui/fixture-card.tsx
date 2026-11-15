@@ -13,7 +13,7 @@ import { Skeleton } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { color, font, radius, space, type, fs, surface, t, d, w } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, surface, t, d, w, state } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
 export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: boolean; pending?: boolean; live?: boolean }) {
@@ -24,7 +24,7 @@ export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: bool
   // Include wickets so a dismissal can animate the score even when no runs were scored (site LiveScore).
   const change = s.runs == null ? null : s.runs + (s.wkts ?? 0) / 100;
   return (
-    <View style={[styles.score, dim && { opacity: 0.6 }]}>
+    <View style={[styles.score, dim && state.dim]}>
       {live ? <Tick value={change} style={styles.total}>{total}</Tick> : <Text style={styles.total}>{total}</Text>}
       {overs ? <Text style={styles.overs}>{overs}</Text> : null}
     </View>

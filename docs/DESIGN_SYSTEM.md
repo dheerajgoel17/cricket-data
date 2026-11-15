@@ -42,6 +42,33 @@ Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 ·
 
 **Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone). Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web): the content fades at an edge that has more behind it (a gradient or mask, never a live blur).
 
+
+## Foundations scorecard (the designer's view)
+
+A design system is more than components. This is every layer a designer would expect, where it lives, and whether it is enforced. Update the row when a layer changes.
+
+| Layer | Where it lives | Web | App | Enforced by |
+| --- | --- | --- | --- | --- |
+| Principles (dark only, dense stats, free, no LLM numbers, native feel per platform) | this file, `AGENTS.md` | yes | yes | review |
+| Colour: roles, status colours | `tokens.json` `color` | CSS vars | `color`, `tint` | no literals (test); **contrast test** (WCAG AA: body text 4.5:1 on every surface, status colours 3:1) |
+| Colour states (pressed, disabled, dim) | `tokens.json` `state` | `--pressed-opacity` ... | `state.*` | test |
+| Typography: scale, weights, line-height, tracking, roles | `tokens.json` `type`, `weight` | `text-*`, `font-*` | `t`, `d`, `dStrong`, `w`, `fs` | no raw size / family (tests) |
+| Spacing and page rhythm | `tokens.json` `space`, `rhythm` | `gap-*` | `space`, `rhythm` | review, rhythm test |
+| Layout grid (4 / 8 / 12 columns, margins, gutter) | `tokens.json` `grid`, `packages/tokens/grid.js` | `CardGrid` | `useGrid` | grid + CardGrid tests |
+| Radii, surfaces | `tokens.json` `size` | `rounded-*` | `radius`, `surface` | tests |
+| Elevation | `tokens.json` `elevation`, `elevation_native` | `--shadow-*` | `elevation.*` (shadow / Android elevation) | test |
+| Iconography (Heroicons / Ionicons, sizes 12 / 16 / 20 / 24) | `tokens.json` `icon` | `size-*` | `icon.*` | test |
+| Motion: durations, easings, springs, reduce motion | `tokens.json` `motion`, `spring` | `--duration-*`, motion/react | `duration`, `spring`, Reanimated | test; motion map in this file |
+| Haptics | `ui/platform.ts`, selection on every choice | n/a | `Haptics.selectionAsync` | review |
+| Accessibility: contrast, touch targets, roles / labels, reduce motion, font scaling | tokens + `ui/platform.ts` | yes | yes | contrast test, `hitSlopFor`, review |
+| Components and states (empty, loading, error) | catalogue + `PARITY_CHECKLIST.md` | `components/app` | `ui/` | guard tests |
+| Patterns (page header kinds, filter bar, sheet, list reflow) | this file | yes | yes | review |
+| Platform conventions | `tokens.json` `platform`, `ui/platform.ts` | yes | Android verified, iOS not | docs |
+| Design tool handoff | `packages/tokens/tokens.dtcg.json` (W3C Design Tokens, Figma-importable) | n/a | n/a | staleness test |
+| Content and voice (sentence case, "Player props", no jargon, empty-state copy pattern: what is missing + what to do) | this section | yes | yes | review |
+| Governance (changelog entry per change, parity checklist, guard tests, OTA classification) | `DESIGN_SYSTEM_CHANGELOG.md`, `scripts/ota-check.mjs` | yes | yes | CI |
+| Not built | illustration style, sound, a second theme (light), a Figma component library | | | |
+
 ### Platform conventions (one design, three native idioms)
 
 Same tokens, same jobs; the idiom of the platform decides the feel. Values live in `tokens.json` → `platform` and `mobile/src/ui/platform.ts`.
