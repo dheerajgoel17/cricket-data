@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-15T18:01:03Z",
+ "generated_at_utc": "2026-11-15T18:36:00Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -73,6 +73,29 @@
    "chance": 0.8333,
    "edge": 0.5417,
    "edge_pct": 54.2,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-16-uae-women-v-sri-lanka-women|match_runs||0|over",
+   "fixture_id": "2026-11-16-uae-women-v-sri-lanka-women",
+   "match": "UAE Women vs Sri Lanka Women",
+   "format": "T20",
+   "series": "W-Emerging Trophy 2026",
+   "start_utc": "2026-11-16T09:15:00Z",
+   "start_ist": "2026-11-16 14:45 IST",
+   "key": "match_runs",
+   "team": null,
+   "inn": 0,
+   "side": "over",
+   "line": 50,
+   "best_odds": 1.778,
+   "best_source": "1xBet",
+   "hits": 22,
+   "played": 22,
+   "window": 20,
+   "chance": 0.8483,
+   "edge": 0.5083,
+   "edge_pct": 50.8,
    "bat_first": false
   },
   {
