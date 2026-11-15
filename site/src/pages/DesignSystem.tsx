@@ -480,7 +480,7 @@ export function DesignSystemPage() {
             <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
           </div>
         </PreviewFrame>
-        <PreviewFrame title="AndroidAppBanner" description="Dismissible install strip above the shell header on Android mobile web only (hidden from lg up, iPhone, standalone PWA, and the native app). Download opens VITE_ANDROID_APP_URL or the latest GitHub release." source="components/app/android-app-banner.tsx · lib/android-app.ts" canvasClassName="items-stretch bg-background p-0">
+        <PreviewFrame title="AndroidAppBanner" description="OS-style smart app banner (icon · title/blurb · Download · × last) above the shell header. Android mobile web only — hidden from lg up, iPhone, standalone PWA, when the native package is already installed (getInstalledRelatedApps), and inside the app. × collapses for this visit only (sessionStorage); next visit promotes again. Download resolves the latest release APK (GitHub API) and starts the file download." source="components/app/android-app-banner.tsx · lib/android-app.ts" canvasClassName="items-stretch bg-background p-0">
           <div className="w-full overflow-hidden rounded-lg border border-hairline">
             <AndroidAppBanner force />
             <div className="flex h-12 items-center gap-snug bg-background px-gutter text-callout font-label text-muted-foreground">Header sits under the banner</div>

@@ -15,6 +15,16 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — AndroidAppBanner: session dismiss + hide when installed
+- **Path:** `site/src/components/app/android-app-banner.tsx`, `site/src/lib/android-app.ts`, `site/public/manifest.webmanifest`, `site/public/.well-known/assetlinks.json`
+- **Change:** × collapses for this visit only (`sessionStorage`); next visit shows the promo again. Banner stays hidden when Chrome reports package `cash.fancy.app` already installed (`getInstalledRelatedApps` + related_applications + Digital Asset Links). Download still resolves the latest release `.apk`.
+- **Callers:** product shell + design-system catalogue (`force` preview)
+
+### 2026-11-15 — AndroidAppBanner smart-banner layout
+- **Path:** `site/src/components/app/android-app-banner.tsx`
+- **Change:** restyled like an OS smart app banner: brand mark · title + blurb · Download · dismiss × last on the right; strip uses `bg-primary` / `text-primary-foreground`; Download resolves the latest GitHub release `.apk` (not the releases page)
+- **Callers:** product shell + design-system catalogue (`force` preview)
+
 ### 2026-11-15 — AndroidAppBanner (mobile web install strip)
 - **Path:** `site/src/components/app/android-app-banner.tsx`, `site/src/lib/android-app.ts`, `components/layout/Shell.tsx`, catalogue `DesignSystem.tsx`
 - **Change:** dismissible banner above the sticky header on Android phone browsers only (`lg:hidden`); opens `VITE_ANDROID_APP_URL` or the latest GitHub release; dismiss persists in `localStorage`; analytics `android_app_banner` open/dismiss

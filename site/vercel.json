@@ -14,7 +14,7 @@
       "destination": "/api/og?path=:path*"
     },
     {
-      "source": "/((?!api/|_vercel/).*)",
+      "source": "/((?!api/|_vercel/|\\.well-known/).*)",
       "destination": "/"
     }
   ],

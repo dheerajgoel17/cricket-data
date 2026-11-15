@@ -94,7 +94,7 @@ Live-poll hitch check: with PERF on, watch `[perf-span]` for `/api/live` and `/a
 
 ## Store readiness checklist
 Confirm before TestFlight / Play closed testing (Phase 3):
-* Bundle id / package `cash.fancy.app` in `app.json` (cannot change after first store upload).
+* Bundle id / package `cash.fancy.app` in `app.json` (cannot change after first store upload). Android App Links (`intentFilters` for `https://fancy.cash`) plus the site’s `/.well-known/assetlinks.json` let Chrome hide the mobile-web install banner when the package is already on the phone.
 * 1024 px App Store icon (site 512 px stands in today).
 * Release build + `EXPO_PUBLIC_PERF=1` on a mid-range Android and a physical iPhone (see Measuring start-up).
 * VoiceOver / TalkBack pass on Home, Props, Fixture, Player.

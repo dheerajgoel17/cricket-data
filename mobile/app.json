@@ -23,7 +23,17 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#050606"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            { "scheme": "https", "host": "fancy.cash", "pathPrefix": "/" }
+          ]
+        }
+      ]
     },
     "plugins": [
       "expo-router",
