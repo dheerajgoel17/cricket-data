@@ -42,7 +42,7 @@ export default function Competitions() {
           keyExtractor={([e]) => String(e)}
           keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag"
           contentContainerStyle={[styles.list, { paddingBottom: inset.bottom + 24 }]}
-          renderItem={({ item: [e, c], index }) => <ListRow first={index === 0} left={<LeagueBadge name={store.events[e]} size={40} />} title={store.events[e]} sub={`${c} matches`} onPress={() => push(`/league/${e}`)} />}
+          renderItem={({ item: [e, c], index }) => <ListRow flat first={index === 0} left={<LeagueBadge name={store.events[e]} size={40} />} title={store.events[e]} sub={`${c} matches`} onPress={() => push(`/league/${e}`)} />}
           ListEmptyComponent={<EmptyState compact title="No matches" body={t ? `No competition matches “${text.trim()}”.` : "No competitions with enough matches yet."} />}
         />
       )}
@@ -54,7 +54,7 @@ export default function Competitions() {
 const styles = StyleSheet.create({
   field: { height: 40, marginHorizontal: space.gutter, marginVertical: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
-  list: { paddingHorizontal: space.gutter },
+  list: {},
   box: { ...surface.card, overflow: "hidden" },
   empty: { ...type.callout, color: color["muted-foreground"], paddingTop: space.stack },
 });

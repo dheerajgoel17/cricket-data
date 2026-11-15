@@ -56,7 +56,7 @@ export function Note({ title, items }: { title: string; items: ReactNode[] }) {
 
 /** A small-caps label over a value (the site's `Metric`): the strip of numbers at the top of a player page. */
 /** One labelled figure. `compact` is the player page's small grid (a 10 pt label over a 16 pt value, as in the reference app). */
-export function Metric({ k, children, tone, text, cols = 3, compact }: { k: string; children: ReactNode; tone?: "up" | "down"; text?: boolean; cols?: 2 | 3; compact?: boolean }) {
+export function Metric({ k, children, sub, tone, text, cols = 3, compact }: { k: string; children: ReactNode; /** A quiet line under the value, aligned to its column. */ sub?: string; tone?: "up" | "down"; text?: boolean; cols?: 2 | 3; compact?: boolean }) {
   return (
     <View style={[styles.metric, cols === 2 && { width: "50%" }, compact && styles.metricSm]}>
       <Text style={styles.metricKey} numberOfLines={1}>{k}</Text>
@@ -65,6 +65,7 @@ export function Metric({ k, children, tone, text, cols = 3, compact }: { k: stri
           ? <Text style={[text ? (compact ? styles.metricTextSm : styles.metricText) : compact ? styles.metricNumSm : styles.metricNum, tone === "up" && { color: color.primary }, tone === "down" && { color: color.miss }]} numberOfLines={text ? 2 : 1}>{children}</Text>
           : children}
       </View>
+      {sub ? <Text style={styles.metricSub} numberOfLines={1}>{sub}</Text> : null}
     </View>
   );
 }
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
   noteTitle: { ...type.callout, color: tint.white(0.8), ...cap },
   noteText: { ...type.footnote, lineHeight: 17, color: color["muted-foreground"] },
   metric: { width: "33.33%", gap: 4, paddingRight: space.tight },
+  metricSub: { ...type.footnote, color: color["muted-foreground"] },
   metricKey: { ...type.footnote, color: color["muted-foreground"], ...cap },
   metricValue: { minHeight: 24, justifyContent: "center" },
   metricNum: { fontSize: fs.figure, lineHeight: 28, letterSpacing: -0.48, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"] },

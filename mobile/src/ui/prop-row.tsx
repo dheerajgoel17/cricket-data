@@ -49,11 +49,11 @@ function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soF
           {!out ? (
             <View style={styles.priceRow}>
               <Text style={styles.priceLine} numberOfLines={1}>
-                <Text style={{ color: under ? color.miss : color.primary, fontFamily: font.bold }}>{sideLetter}</Text>
+                <Text style={{ color: under ? color.miss : color.primary }}>{sideLetter}</Text>
                 {" "}
-                <Text style={{ fontFamily: font.bold }}>{r.line}</Text>
+                <Text>{r.line}</Text>
                 {" "}
-                <Text style={{ fontFamily: font.medium }}>{label}{scope ? ` · ${scope}` : ""}</Text>
+                <Text>{label}{scope ? ` · ${scope}` : ""}</Text>
                 {price > 1 ? <Text style={styles.odds}> {odds(price)}</Text> : null}
               </Text>
               {stamp ? <ResultStamp kind={stamp} /> : null}
@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
   statusSlot: { width: 72, minHeight: 36, alignItems: "center", justifyContent: "center" },
   statusMark: { ...type.caption, fontFamily: font.medium, color: color["muted-foreground"], textAlign: "center", textTransform: "uppercase", letterSpacing: 0.4 },
   priceRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.hair, rowGap: 2 },
-  priceLine: { ...type.callout, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
+  priceLine: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   odds: { fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
   outLine: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
   outStat: { textTransform: "uppercase", letterSpacing: 0.4 },
   edge: { width: 44, alignItems: "center", gap: space.hair, paddingHorizontal: space.tight },
   edgeLabel: { ...type.caption, textTransform: "uppercase", letterSpacing: 0.4, color: color["muted-foreground"] },
-  edgeValue: { ...figure },
+  edgeValue: { ...figure, fontFamily: font.dataLight },
 });
 
 type PropRowProps = Parameters<typeof PropRowView>[0];

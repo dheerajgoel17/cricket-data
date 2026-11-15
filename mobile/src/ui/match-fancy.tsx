@@ -41,6 +41,8 @@ import { StandingMark, type Standing } from "@/ui/tick";
 import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration } from "@/ui/tokens";
 
 
+/** Width of the ladder's Line column: fits the longest line a Test total can have (1100.5) at the figure size. */
+const LINE_W = 60;
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
 const WINDOWS = [5, 10, 20, 30];
 const HERE_MIN = 3;
@@ -317,7 +319,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
             <Bleed style={styles.ladder}>
               <View style={styles.ladderHead}>
-                <Text style={[styles.th, { width: 40 }]}>Line</Text>
+                <Text style={[styles.th, { width: LINE_W }]}>Line</Text>
                 <Text style={[styles.th, { flex: 1 }]}>Book</Text>
                 <Text style={[styles.th, styles.col]}>Over</Text>
                 <Text style={[styles.th, styles.col]}>Under</Text>
@@ -329,7 +331,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 const face = overB || underB;
                 return (
                 <Press scale={1} key={l.line} onPress={() => setMl(l.line)} accessibilityRole="button" style={({ pressed }) => [styles.ladderRow, l.line === line && styles.ladderOn, pressed && { opacity: 0.6 }]}>
-                  <Text style={[styles.ladderLine, { width: 40 }]}>{l.line}</Text>
+                  <Text style={[styles.ladderLine, { width: LINE_W }]}>{l.line}</Text>
                   <View style={[styles.lineCell, { flex: 1, flexDirection: "column", alignItems: "flex-start", gap: 2 }]}>
                     {priced && face ? (
                       <>

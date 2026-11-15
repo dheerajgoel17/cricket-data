@@ -284,10 +284,10 @@ export function PropLineMeta({ r, soFar, out }: { r: Row; soFar: SoFar | null; o
   }
   const price = under ? r.under : r.over;
   return (
-    <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-emphasis leading-snug text-foreground">
+    <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-label leading-snug text-foreground">
       <span className={cn("shrink-0", under ? "text-miss" : "text-primary")}>{under ? "U" : "O"}</span>
       <span className="shrink-0 tabular-nums">{r.line}</span>
-      <span className="min-w-0 truncate font-label">{label}{scope ? ` · ${scope}` : ""}</span>
+      <span className="min-w-0 truncate">{label}{scope ? ` · ${scope}` : ""}</span>
       {price > 1 ? <span className="shrink-0 font-condensed tabular-nums text-muted-foreground">{odds(price)}</span> : null}
       {stamp ? <ResultStamp kind={stamp} /> : null}
     </span>
@@ -388,11 +388,11 @@ function DensePropTable({ rows, win, onWin, bars, soFarOf, outOf }: { rows: Row[
                   </span>
                 </td>
                 {bars ? <td className={TD_MID}><PropBarsSlot r={r} soFar={soFar} out={out} /></td> : null}
-                <td className={cn(TD_MID, "font-condensed text-title font-emphasis tabular-nums")}>{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-label text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
+                <td className={cn(TD_MID, "font-condensed text-title font-label tabular-nums")}>{out ? "–" : <><Tick quiet value={r.over}>{odds(r.over)}</Tick>{r.under > 1 && <span className="ml-snug text-callout font-label text-muted-foreground">U {odds(r.under)}</span>}</>}</td>
                 <td className={TD_MID}><RateCell p={r.season.p} n={r.season.played} /></td>
                 <td className={TD_MID}><RateCell p={r.h2h.p} n={r.h2h.played} /></td>
                 <td className={TD_MID} title={r.venue}><span className="grid min-w-0 gap-hair"><RateCell p={r.ven.p} n={r.ven.played} />{ground ? <span className="truncate text-caption text-muted-foreground">{ground}</span> : null}</span></td>
-                <td className={cn(TD_MID, "text-right font-condensed text-title font-emphasis tabular-nums", edgeTone)}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
+                <td className={cn(TD_MID, "text-right font-condensed text-title font-label tabular-nums", edgeTone)}>{out || r.edge == null ? "–" : <><span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span><span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span></>}</td>
                 <td className={cn(TD_END, "w-10 pl-tight")}><PropStar idx={r.idx} stat={r.stat} line={r.line} fmt={fmtIndex(r.fmt)} /></td>
               </tr>
             );

@@ -30,7 +30,7 @@ import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
-import { cap, color, font, num, radius, space, type, fs, surface } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type, fs, surface, rhythm } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -55,7 +55,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
   const name = g?.label || venue || "Ground";
   const { ground, city } = venueParts(name);
   const wx = useQuery({ queryKey: ["venue-wx", name], queryFn: () => fetchVenueWx(name), staleTime: 10 * 60_000, enabled: !!venue });
-  const head = <PageHeader title="Ground" />;
+  const head = <PageHeader title={venue ? ground : "Ground"} subtitle={venue && city ? city : undefined} />;
 
   if (!venue) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></PageAtmosphere>;
   if ((!g && stats.isError) || (fixtures.isError && !fixtures.data)) return (
@@ -75,14 +75,6 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
       <ScrollView stickyHeaderIndices={g.primary >= 0 ? [1] : undefined} contentContainerStyle={{ paddingBottom: inset.bottom + space.section }} showsVerticalScrollIndicator={false}>
         <View style={[styles.pad, styles.stack, styles.intro]}>
           <View style={styles.hero}>
-            <View style={styles.heroHead}>
-              <View style={styles.pin}><Ionicons name="location-outline" size={22} color={color.primary} /></View>
-              <View style={styles.heroText}>
-                <Text style={styles.kicker}>Venue overview</Text>
-                <Text style={styles.name} accessibilityRole="header">{ground}</Text>
-                {city ? <Text style={styles.city}>{city}</Text> : null}
-              </View>
-            </View>
             <GroundConditions count={g.atGround.length} weather={wx.data} loading={wx.isLoading} unavailable={wx.isError} />
           </View>
           {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={g.atGround} /> : null}
@@ -179,10 +171,9 @@ function GroundConditions({ count, weather, loading, unavailable }: { count: num
     <View style={styles.conditions}>
       <View style={styles.metrics}>
         <Metric k="Listed matches">{count}</Metric>
-        <Metric k="Temperature">{loading ? "…" : weather ? `${weather.temp}°` : "–"}</Metric>
-        <Metric k="Local time">{loading ? "…" : local || "–"}</Metric>
+        <Metric k="Temperature" sub={weather?.label || (unavailable ? "Weather unavailable" : undefined)}>{loading ? "…" : weather ? `${weather.temp}°` : "–"}</Metric>
+        <Metric k="Local time" sub={weather?.city || undefined}>{loading ? "…" : local || "–"}</Metric>
       </View>
-      {weather || unavailable ? <Text style={styles.note}>{weather?.label || "Weather unavailable"}{weather?.city ? ` · ${weather.city}` : ""}</Text> : null}
     </View>
   );
 }
@@ -192,7 +183,7 @@ function GroundMatches({ list }: { list: any[] }) {
   const scores = useQuery(liveQuery), lines = useQuery(linesQuery);
   const now = useNow(30_000);
   return (
-    <View style={[styles.pad, styles.stack]}>
+    <View style={[styles.pad, styles.stack, styles.section]}>
       <View style={styles.titleRow}><Text style={styles.h2} accessibilityRole="header">Matches at this ground</Text><Text style={styles.count}>{list.length}</Text></View>
       {!list.length ? <EmptyState compact title="No matches" body="Try another format or gender filter." /> : list.slice(0, shown).map((f) => {
         const historical = f.source === "history";
@@ -328,15 +319,16 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 
 const styles = StyleSheet.create({
   pad: { paddingHorizontal: space.gutter },
-  stack: { gap: space.stack },
+  stack: { gap: rhythm.between },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
   hero: { ...surface.card, padding: space.inset, gap: space.stack },
   heroHead: { flexDirection: "row", alignItems: "flex-start", gap: space.snug },
   heroText: { flex: 1, minWidth: 0, gap: space.hair },
   sectionBar: { backgroundColor: color.background, paddingVertical: space.hair },
   filters: { paddingTop: space.stack, paddingBottom: space.group },
-  conditions: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug, gap: space.hair },
-  match: { gap: space.hair },
+  conditions: { gap: space.hair },
+  match: { gap: rhythm.within },
+  section: { paddingTop: rhythm.section },
   marketCard: { ...surface.card, padding: space.inset, gap: space.stack },
   pin: { width: 42, height: 42, borderRadius: radius.control, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   kicker: { ...type.footnote, ...cap, color: color.primary },

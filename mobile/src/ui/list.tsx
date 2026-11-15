@@ -19,7 +19,7 @@ export function Section({ title, count, empty, emptyTitle, children }: { title: 
 }
 
 /** One row: something at the left (a badge), the title and a line under it, something at the right (a value, a button) and a chevron when it opens something. */
-export function ListRow({ left, title, sub, right, onPress, first, chevron = true, label }: { left?: ReactNode; title: string; sub?: ReactNode; right?: ReactNode; onPress?: () => void; first?: boolean; chevron?: boolean; label?: string }) {
+export function ListRow({ left, title, sub, right, onPress, first, chevron = true, label, flat }: { left?: ReactNode; title: string; sub?: ReactNode; right?: ReactNode; onPress?: () => void; first?: boolean; chevron?: boolean; /** A row in a flat, full-bleed page list (Competitions): inset by the page gutter, not by a card's padding. */ flat?: boolean; label?: string }) {
   const body = (
     <>
       {left}
@@ -31,9 +31,9 @@ export function ListRow({ left, title, sub, right, onPress, first, chevron = tru
       {onPress && chevron ? <ChevronRight color={color["muted-foreground"]} /> : null}
     </>
   );
-  if (!onPress) return <View style={[styles.row, !first && styles.sep]}>{body}</View>;
+  if (!onPress) return <View style={[styles.row, flat && styles.flat, !first && styles.sep]}>{body}</View>;
   return (
-    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, !first && styles.sep, pressed && { backgroundColor: tint.row }]}>
+    <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={label ?? title} style={({ pressed }) => [styles.row, flat && styles.flat, !first && styles.sep, pressed && { backgroundColor: tint.row }]}>
       {body}
     </Press>
   );
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
   count: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   box: { ...surface.card, overflow: "hidden" },
   row: { minHeight: 60, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.stack, paddingVertical: space.snug },
+  flat: { paddingHorizontal: space.gutter },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   text: { flex: 1, minWidth: 0, gap: 1 },
   rowTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
