@@ -1293,6 +1293,15 @@
     ]
   },
   {
+    "path": "site/src/components/app/android-app-banner.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "AndroidAppBanner"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "site/src/components/app/animated-height.tsx",
     "platform": "web",
     "route": false,
@@ -2174,6 +2183,7 @@
     "dependencies": [
       "site/src/components/app/skeletons.tsx",
       "site/src/components/ui/sidebar.tsx",
+      "site/src/components/app/android-app-banner.tsx",
       "site/src/components/layout/Header.tsx",
       "site/src/components/layout/IosTabBar.tsx"
     ]
@@ -2657,6 +2667,7 @@
       "site/src/components/app/line-ladder.tsx",
       "site/src/components/app/match-scoreboard.tsx",
       "site/src/components/app/note.tsx",
+      "site/src/components/app/android-app-banner.tsx",
       "site/src/components/app/status-label.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/chart.tsx",

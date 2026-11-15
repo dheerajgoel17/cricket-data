@@ -24,6 +24,7 @@ import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { LadderRow, pricedFromBooks } from "@/components/app/line-ladder";
 import { MatchScoreboard } from "@/components/app/match-scoreboard";
 import { Note } from "@/components/app/note";
+import { AndroidAppBanner } from "@/components/app/android-app-banner";
 import { StatusLabel } from "@/components/app/status-label";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { ChartBars } from "@/components/app/chart";
@@ -477,6 +478,12 @@ export function DesignSystemPage() {
         >
           <div className="w-full min-w-0">
             <DataTable bleed columns={["Line", "Over", "Fair", "Under"]} rows={[["24.5", "1.90", "1.61", "1.95"], ["25.5", "2.10", "1.85", "1.75"], ["26.5", "2.40", "2.05", "1.55"]]} />
+          </div>
+        </PreviewFrame>
+        <PreviewFrame title="AndroidAppBanner" description="Dismissible install strip above the shell header on Android mobile web only (hidden from lg up, iPhone, standalone PWA, and the native app). Download opens VITE_ANDROID_APP_URL or the latest GitHub release." source="components/app/android-app-banner.tsx · lib/android-app.ts" canvasClassName="items-stretch bg-background p-0">
+          <div className="w-full overflow-hidden rounded-lg border border-hairline">
+            <AndroidAppBanner force />
+            <div className="flex h-12 items-center gap-snug bg-background px-gutter text-callout font-label text-muted-foreground">Header sits under the banner</div>
           </div>
         </PreviewFrame>
         <PreviewFrame title="StickyFilterBand + flush header" description="Sticky chip/filter band under the shell header. When the band is the first surface under the bar, pair with useHeaderFlush(true) so the top bar uses bg-card and drops its hairline (Player, Match Fancy detail, Ground, Fixture tabs). Tab pages put their title in the shell via TabTitle (app AppHeader twin); /props does not flush." source="components/app/page.tsx + lib/header-slot.tsx" canvasClassName="items-stretch bg-background">

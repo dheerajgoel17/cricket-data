@@ -55,6 +55,7 @@ jobs:
       VITE_ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
       VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      VITE_ANDROID_APP_URL: ${{ vars.ANDROID_APP_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -181,6 +182,7 @@ jobs:
             --build-env "VITE_ADSENSE_SLOT=$VITE_ADSENSE_SLOT" \
             --build-env "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" \
             --build-env "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" \
+            --build-env "VITE_ANDROID_APP_URL=$VITE_ANDROID_APP_URL" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY"
       - name: Deploy preview (pull requests from this repository)
         id: preview
@@ -195,6 +197,7 @@ jobs:
             --build-env "VITE_ADSENSE_SLOT=$VITE_ADSENSE_SLOT" \
             --build-env "VITE_SUPABASE_URL=$VITE_SUPABASE_URL" \
             --build-env "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" \
+            --build-env "VITE_ANDROID_APP_URL=$VITE_ANDROID_APP_URL" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY" | tail -n 1)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "### Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
