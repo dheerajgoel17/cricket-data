@@ -1299,7 +1299,9 @@
     "exports": [
       "AndroidAppBanner"
     ],
-    "dependencies": []
+    "dependencies": [
+      "site/src/components/layout/Header.tsx"
+    ]
   },
   {
     "path": "site/src/components/app/animated-height.tsx",
